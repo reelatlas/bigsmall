@@ -185,7 +185,7 @@ export function SmartInput({
 
   return (
     <div
-      className="rounded-lg border border-line bg-surface shadow-sm transition-[border-color] duration-[var(--motion-fast)] ease-standard focus-within:border-accent focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus"
+      className="min-w-0 rounded-lg border border-line bg-surface shadow-sm transition-[border-color] duration-[var(--motion-fast)] ease-standard focus-within:border-accent focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus"
       onBlur={onBlur}
     >
       <label htmlFor={inputId} className="sr-only">

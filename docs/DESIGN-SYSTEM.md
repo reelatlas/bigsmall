@@ -91,3 +91,11 @@ Arriving in milestone 3: `Keypad`, `Sheet`, `Toggle`, `LiveResult`. `SmartInput`
 - **Units follow the standards, not the sentence-case rule.** Symbols are case-sensitive and never altered: mL, kB, °F, km/h. Unit names are lowercase, including ones named after people (kelvin, newton), except "Celsius" and "Fahrenheit", which the SI Brochure and NIST write capitalized. Chips and rows show the plural name ("milliliters") next to the symbol.
 - **Category names** are single capitalized words as labels: Length, Weight, Volume.
 - **Short and plain.** No exclamation marks, no jargon in user-facing text. Error and empty-state text says what to try next.
+
+## Controls
+
+One look for every control: `min-h-11`, `rounded-md`, `border-line`, `bg-surface`, `hover:bg-surface-raised`, and the focus ring from `--focus`. Buttons, the theme select's trigger, and chip buttons all use it. Fields are the larger variant of the same language: `min-h-14`, `rounded-lg`, accent border while focused. A native control keeps its native popup (the theme select on a phone opens the system picker); only its trigger is styled.
+
+Popovers float. A suggestion list is absolutely positioned under its field (`absolute inset-x-0 top-full z-20 mt-1`) with its own `rounded-lg border border-line bg-surface shadow-md` surface, and never pushes content down.
+
+Tints come from the tokens, never from new colors: a chip at rest is `bg-accent-soft`; hovered, it lays `bg-surface/40` over that so it stays recognizably the chip.

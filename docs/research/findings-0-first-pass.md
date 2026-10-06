@@ -19,3 +19,16 @@ Date: 2026-10-06. One person, the product owner, on the desktop build in the The
 - Does Escape removing the unit surprise anyone who only meant to close the list?
 - Do people find undo without the keyboard shortcut? The buttons are small and sit by the hint.
 - Is a chip on the right discoverable as something to click?
+
+## Second pass, same day
+
+| Observation                                                                    | Change                                                                                                 |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| The list pushed content down                                                   | Floats over the page                                                                                   |
+| Should Enter finalize like clicking out?                                       | Yes: Enter picks or locks, then closes the list; focus stays in the field                              |
+| Chip hover matched the field background                                        | Hover tints the chip toward the surface                                                                |
+| Only six to eight digits fit                                                   | Wider page, one-step smaller type past nine characters, symbol-only chip past six                      |
+| Should both boxes copy?                                                        | Yes, whenever a box holds a number                                                                     |
+| Too much text in the list: chevron, "Search all categories", "Now pick a unit" | Plain "← Back" only when a category is expanded; scoped searches widen on no match; the prompt is gone |
+| Escape removed the unit when typing was the last thing done                    | Escape clears the most recently entered thing first                                                    |
+| The theme dropdown looked unlike the inputs                                    | Trigger restyled to the shared control language; native popup kept                                     |

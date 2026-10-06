@@ -3,7 +3,7 @@ import { Button } from '../../components/Button';
 import { CopyIcon, RedoIcon, SwapIcon, UndoIcon } from '../../components/icons';
 import { useIsHydrated } from '../../lib/hydrated';
 import { SmartInput } from './SmartInput';
-import type { BoxId } from './state';
+import type { BoxId, BoxView } from './state';
 import { useConverter } from './useConverter';
 
 const COPIED_MS = 1500;
@@ -14,7 +14,7 @@ export function Converter() {
   const hydrated = useIsHydrated();
   const hintId = useId();
   const sectionRef = useRef<HTMLElement>(null);
-  const [copied, setCopied] = useState(false);
+  const [copiedBox, setCopiedBox] = useState<BoxId | null>(null);
 
   // Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes anywhere inside the converter,
   // replacing the text field's own undo so "undo" always means the last thing the user did here.
@@ -36,28 +36,35 @@ export function Converter() {
     return () => section.removeEventListener('keydown', onKeyDown);
   }, [dispatch]);
 
-  const copyResult = async () => {
-    if (!view.result) return;
+  const copy = async (value: number, box: BoxId) => {
     try {
-      await navigator.clipboard.writeText(String(view.result.value));
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), COPIED_MS);
+      await navigator.clipboard.writeText(String(value));
+      setCopiedBox(box);
+      window.setTimeout(() => setCopiedBox(null), COPIED_MS);
     } catch {
       // Clipboard blocked: nothing to do, the value is visible in the field.
     }
   };
 
-  const copyButton = (box: BoxId) =>
-    view.result?.box === box ? (
+  /** Both boxes get a copy control whenever they hold a number, so the control never jumps sides. */
+  const copyButton = (box: BoxView, label: string) => {
+    const value = box.isSource
+      ? box.parsed.value
+      : view.result?.box === box.id
+        ? view.result.value
+        : undefined;
+    if (value === undefined) return undefined;
+    return (
       <Button
         variant="ghost"
         square
-        aria-label={copied ? 'Copied' : 'Copy result'}
-        onClick={copyResult}
+        aria-label={copiedBox === box.id ? 'Copied' : `Copy ${label}`}
+        onClick={() => copy(value, box.id)}
       >
         <CopyIcon />
       </Button>
-    ) : undefined;
+    );
+  };
 
   return (
     <section
@@ -74,7 +81,7 @@ export function Converter() {
           mode={state.mode}
           env={env}
           dispatch={dispatch}
-          trailing={copyButton('a')}
+          trailing={copyButton(view.a, 'first value')}
         />
         <div className="flex justify-center sm:pt-1.5">
           <Button
@@ -93,7 +100,7 @@ export function Converter() {
           mode={state.mode}
           env={env}
           dispatch={dispatch}
-          trailing={copyButton('b')}
+          trailing={copyButton(view.b, 'second value')}
         />
       </div>
 

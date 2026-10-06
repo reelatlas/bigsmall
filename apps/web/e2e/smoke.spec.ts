@@ -30,6 +30,8 @@ test('every theme passes axe when applied to the page', async ({ page }) => {
   for (const theme of ['midnight', 'sakura', 'neon-noir', 'hardhat', 'theorem']) {
     await page.getByLabel('Theme').selectOption(theme);
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+    // Theme tokens transition; axe must see the settled colors, not a frame in between.
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     expect(results.violations, theme).toEqual([]);
   }

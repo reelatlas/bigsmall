@@ -71,7 +71,7 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
   await expect(page.getByRole('button', { name: 'Remove feet' })).toBeVisible();
 });
 
-test('a space or Enter locks an exact match that could still be extended', async ({ page }) => {
+test('a space locks an exact match that could still be extended', async ({ page }) => {
   await page.goto('/');
   await ready(page);
   const { first } = boxes(page);
@@ -81,6 +81,31 @@ test('a space or Enter locks an exact match that could still be extended', async
   await first.press(' ');
   await expect(page.getByRole('button', { name: 'Remove Celsius' })).toBeVisible();
   await expect(first).toHaveValue('20');
+});
+
+test('Enter commits the box and closes the list, like clicking out', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.fill('20 c');
+  await expect(page.getByRole('listbox')).toBeVisible();
+  await first.press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove Celsius' })).toBeVisible();
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  await expect(first).toBeFocused();
+});
+
+test('the list floats over the page instead of pushing the other box down', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const { first, second } = boxes(page);
+
+  const before = await second.boundingBox();
+  await first.click();
+  await expect(page.getByRole('listbox')).toBeVisible();
+  const after = await second.boundingBox();
+  expect(after?.y).toBe(before?.y);
 });
 
 test('the swap control exchanges sides and keeps the typed value exact', async ({ page }) => {
@@ -95,13 +120,12 @@ test('the swap control exchanges sides and keeps the typed value exact', async (
   await expect(page.getByRole('button', { name: 'Remove kilometers' })).toBeVisible();
 });
 
-test('picking a unit from another category clears the first box and says so', async ({ page }) => {
+test('a query with no match in the scoped category widens to every category', async ({ page }) => {
   await page.goto('/?a=milliliter&v=5&s=a');
   await ready(page);
   const { first, second } = boxes(page);
 
-  await second.fill('f');
-  await page.getByRole('button', { name: 'Search all categories' }).click();
+  await second.fill('fahr');
   await page.getByRole('option', { name: /Fahrenheit Temperature/ }).click();
 
   await expect(page.getByRole('status')).toHaveText('Switched to Temperature');
@@ -110,19 +134,22 @@ test('picking a unit from another category clears the first box and says so', as
   await expect(first).toHaveValue('5');
 });
 
-test('the result can be copied', async ({ page, context, browserName }) => {
+test('both boxes can be copied', async ({ page, context, browserName }) => {
   test.skip(browserName !== 'chromium', 'clipboard permissions are Chromium-only in CI');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/?a=mile&b=kilometer&v=2&s=a');
   await ready(page);
 
-  await page.getByRole('button', { name: 'Copy result' }).click();
+  await page.getByRole('button', { name: 'Copy second value' }).click();
   await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible();
-  const text = await page.evaluate(() => navigator.clipboard.readText());
-  expect(text).toBe('3.218688');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('3.218688');
+
+  await page.getByRole('button', { name: 'Copy first value' }).click();
+  await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');
 });
 
-test('the converter has no WCAG violations with the panel open', async ({ page }) => {
+test('the converter has no WCAG violations with the list open', async ({ page }) => {
   await page.goto('/?a=milliliter&v=5&s=a');
   await ready(page);
   const { second } = boxes(page);
@@ -133,16 +160,18 @@ test('the converter has no WCAG violations with the panel open', async ({ page }
   expect(results.violations).toEqual([]);
 });
 
-test('Escape walks back one step at a time: unit, panel, text', async ({ page }) => {
-  await page.goto('/?a=milliliter&v=250&s=a');
+test('Escape clears the unit first when the unit was the last thing entered', async ({ page }) => {
+  await page.goto('/');
   await ready(page);
   const { first } = boxes(page);
 
-  await first.click();
+  await first.fill('250 ml');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+
   await first.press('Escape');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
   await expect(page.getByRole('option', { name: /^L liters$/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Back' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Back/ })).toBeVisible();
 
   await first.press('Escape');
   await expect(page.getByRole('listbox')).toHaveCount(0);
@@ -150,6 +179,27 @@ test('Escape walks back one step at a time: unit, panel, text', async ({ page })
 
   await first.press('Escape');
   await expect(first).toHaveValue('');
+});
+
+test('Escape clears the text first when typing was the last thing done', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.fill('250 ml');
+  await first.pressSequentially('0');
+  await expect(first).toHaveValue('2500');
+  await expect(page.getByRole('listbox')).toBeVisible();
+
+  await first.press('Escape');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+
+  await first.press('Escape');
+  await expect(first).toHaveValue('');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+
+  await first.press('Escape');
+  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
 });
 
 test('a Back control sits at the top of an expanded category and Escape does the same', async ({
@@ -162,7 +212,7 @@ test('a Back control sits at the top of an expanded category and Escape does the
   await first.click();
   await page.getByRole('option', { name: /^Length$/ }).click();
   await expect(page.getByRole('option', { name: /^m meters$/ })).toBeVisible();
-  await page.getByRole('button', { name: 'Back' }).click();
+  await page.getByRole('button', { name: /Back/ }).click();
   await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
 
   await page.getByRole('option', { name: /^Weight$/ }).click();

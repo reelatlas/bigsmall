@@ -162,9 +162,16 @@ What shipped and where it deliberately differs from the sections above. Each dif
 Sean's first use of the milestone 2 build. Each item is now implemented and covered by a browser test.
 
 - **Chip on the right.** The number sits on the left of the field and the unit chip on the right, so a box reads "250 mL".
-- **Back at the top.** When a category is expanded or the search was widened to all categories, a Back control sits above the list, not below it. A scoped list shows "Search all categories" in the same place.
-- **Escape is Back, one step at a time.** Expanded list → previous list. Unit locked → unit removed, that category's units listed. Panel open → panel closed. Text present → text cleared. The list Escape opens after removing a unit closes on the next Escape rather than going back, matching the sequence Sean described.
+- **Back at the top.** When a category is expanded, a plain "← Back" control sits above the list, not below it. There is no "Search all categories" control: a query that finds nothing in the scoped category widens to every category by itself, so a unit from elsewhere is always one pick away.
+- **Escape is Back, one step at a time.** Expanded list → previous list. Open panel → closed. Then whatever was put into the box most recently: text typed last → text cleared; unit chosen last → unit removed and that category's units listed; then the other. The list Escape opens after removing a unit closes on the next Escape.
 - **Undo and redo.** Ctrl/Cmd+Z and Ctrl/Cmd+Y (or Shift+Z), plus two buttons by the hint. The last interaction is what gets undone: a run of typing in one box is one step, and undoing a unit pick keeps the number and removes the unit. Loading from a URL starts a fresh history.
 - **The chip opens the list.** Clicking the chip body lists the units of its category so the unit can be changed in place; the × still removes it.
 - **No "category" subtext** on category rows. The chevron and the missing symbol column mark them.
 - **Sentence case everywhere** except proper names and unit conventions (docs/DESIGN-SYSTEM.md, "Copy"). "Neon noir", not "Neon Noir".
+- **The list floats.** The suggestion panel overlays the page below the field instead of pushing content down. A browser test checks the other box does not move.
+- **Enter commits.** Enter picks the highlighted row or locks an exact match, then closes the list, the same result as clicking out, while focus stays in the field (the combobox convention).
+- **Copy on both boxes** whenever a box holds a number, so the control never jumps sides.
+- **Room for numbers.** The page is wider on desktop; a number longer than nine characters steps down one text size; a number longer than six collapses the chip to its symbol. The full value is always in the field and in copy.
+- **Chip hover** tints the chip toward the surface instead of replacing its color.
+- **Fewer words.** "Now pick a unit" and the "category" subtext are gone; the only message left is the no-match one.
+- **One control language.** The theme picker keeps a native select for accessibility but its trigger now matches the other controls (docs/DESIGN-SYSTEM.md, "Controls").

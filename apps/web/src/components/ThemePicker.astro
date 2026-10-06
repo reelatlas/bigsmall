@@ -11,16 +11,34 @@ const { id = 'theme-picker' } = Astro.props;
 <!--
   No JavaScript bundle needed: the pre-paint script in layouts/Base.astro handles `change`
   by delegation, so this works before any island hydrates and on pages with no islands at all.
+  The trigger is styled like every other control (docs/DESIGN-SYSTEM.md); the open list stays
+  native so phones get their own picker.
 -->
 <label class="flex items-center gap-2 text-sm" for={id}>
   <span class="text-ink-muted">Theme</span>
-  <select
-    id={id}
-    data-theme-picker
-    class="min-h-11 rounded-md border border-line bg-surface px-3 text-ink"
-  >
-    {THEMES.map((t) => (
-      <option value={t.id}>{t.name}</option>
-    ))}
-  </select>
+  <span class="relative inline-flex">
+    <select
+      id={id}
+      data-theme-picker
+      class="min-h-11 appearance-none rounded-md border border-line bg-surface pr-9 pl-3 text-ink transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    >
+      {THEMES.map((t) => (
+        <option value={t.id}>{t.name}</option>
+      ))}
+    </select>
+    <svg
+      class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-ink-muted"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6 9l6 6 6-6"></path>
+    </svg>
+  </span>
 </label>

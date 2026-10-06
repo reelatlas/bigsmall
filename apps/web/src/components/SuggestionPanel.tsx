@@ -1,25 +1,18 @@
 import { getCategory, type Category, type Unit } from '@bigsmall/core';
-import { ChevronLeftIcon, ChevronRightIcon } from './icons';
+import { ChevronRightIcon } from './icons';
 
 /** What a row in the panel can be. The smart input builds this list from a core search response. */
 export type SuggestionItem =
   { kind: 'unit'; key: string; unit: Unit } | { kind: 'category'; key: string; category: Category };
-
-export interface PanelHeader {
-  label: string;
-  /** Show a back chevron: the action returns to the previous list. */
-  back: boolean;
-  onClick: () => void;
-}
 
 export interface SuggestionPanelProps {
   id: string;
   items: SuggestionItem[];
   activeIndex: number;
   optionId: (index: number) => string;
-  /** A control above the list: "Back" when a category is expanded, "Search all categories" when scoped. */
-  header?: PanelHeader | undefined;
-  /** Shown above the list: "Now pick a unit", "No unit matches …". */
+  /** When set, a "← Back" control sits above the list and returns to the previous list. */
+  onBack?: (() => void) | undefined;
+  /** Shown above the list, such as "No unit matches …". */
   message?: string | undefined;
   /** When true, unit rows show their category, which is how ambiguous symbols are told apart. */
   showCategory: boolean;
@@ -34,30 +27,30 @@ const row =
 /**
  * The listbox under a smart input. Plain WAI-ARIA combobox pattern: the input owns focus and
  * points at the active row with aria-activedescendant; rows are picked with Enter, tap, or click.
- * The header is a real button outside the listbox, reachable by Tab or Escape rather than arrows.
+ * The back control is a real button outside the listbox, reachable by Tab or Escape rather than arrows.
+ * Renders its own surface so it can float over content or sit in flow (the gallery).
  */
 export function SuggestionPanel({
   id,
   items,
   activeIndex,
   optionId,
-  header,
+  onBack,
   message,
   showCategory,
   onPick,
   onHover,
 }: SuggestionPanelProps) {
   return (
-    <div className="border-t border-line">
-      {header && (
+    <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-md">
+      {onBack && (
         <button
           type="button"
           onMouseDown={(event) => event.preventDefault()}
-          onClick={header.onClick}
-          className="flex min-h-11 w-full items-center gap-2 px-3 text-left text-sm text-ink-muted transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+          onClick={onBack}
+          className="flex min-h-11 w-full items-center px-3 text-left text-sm text-ink-muted transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
         >
-          {header.back && <ChevronLeftIcon width="16" height="16" />}
-          {header.label}
+          ← Back
         </button>
       )}
       {message && <p className="px-3 pt-2 text-sm text-ink-muted">{message}</p>}

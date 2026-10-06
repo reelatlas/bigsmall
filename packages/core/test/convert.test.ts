@@ -1,25 +1,55 @@
 import { describe, expect, it } from 'vitest';
 import { ConversionError, convert, getCategory, units } from '../src/index';
 import type { AffineUnit, FunctionalUnit } from '../src/types';
-import golden from './golden/length.json' with { type: 'json' };
+import { golden } from './golden/index';
 
-/** Relative tolerance for floating-point comparison. Factors are exact; two multiplications cost ~1e-16 each. */
-const REL_TOL = 1e-12;
+/** Factors are exact; two floating-point operations cost about 1e-16 each. */
+const DEFAULT_TOLERANCE = 1e-12;
 
-function expectClose(actual: number, expected: number): void {
+/** `floor` sets a minimum scale so tiny values are judged on absolute error (affine offsets make relative error meaningless near zero). */
+function expectClose(
+  actual: number,
+  expected: number,
+  tolerance = DEFAULT_TOLERANCE,
+  floor = 0,
+): void {
   if (expected === 0) {
-    expect(Math.abs(actual)).toBeLessThanOrEqual(REL_TOL);
+    expect(Math.abs(actual)).toBeLessThanOrEqual(tolerance);
     return;
   }
-  expect(Math.abs(actual - expected) / Math.abs(expected)).toBeLessThanOrEqual(REL_TOL);
+  expect(Math.abs(actual - expected) / Math.max(Math.abs(expected), floor)).toBeLessThanOrEqual(
+    tolerance,
+  );
 }
 
 describe('golden conversions (sourced fixtures)', () => {
-  for (const row of golden) {
-    it(`${row.value} ${row.from} → ${row.to} = ${row.expected}`, () => {
-      expectClose(convert(row.value, row.from, row.to), row.expected);
+  for (const [category, rows] of Object.entries(golden)) {
+    describe(category, () => {
+      for (const row of rows) {
+        it(`${row.value} ${row.from} → ${row.to} = ${row.expected}`, () => {
+          expectClose(convert(row.value, row.from, row.to), row.expected, row.tolerance);
+        });
+      }
     });
   }
+
+  it('covers every registered unit with at least one row', () => {
+    const covered = new Set(
+      Object.values(golden).flatMap((rows) => rows.flatMap((r) => [r.from, r.to])),
+    );
+    const missing = units.map((u) => u.id).filter((id) => !covered.has(id));
+    expect(missing).toEqual([]);
+  });
+
+  it('only references units that exist', () => {
+    const ids = new Set(units.map((u) => u.id));
+    for (const rows of Object.values(golden)) {
+      for (const row of rows) {
+        expect(ids.has(row.from), row.from).toBe(true);
+        expect(ids.has(row.to), row.to).toBe(true);
+      }
+    }
+  });
 });
 
 describe('round trips', () => {
@@ -29,51 +59,13 @@ describe('round trips', () => {
     if (!base) throw new Error(`no base unit for ${unit.category}`);
     for (const v of magnitudes) {
       it(`${v} ${unit.id} → ${base} → ${unit.id}`, () => {
-        expectClose(convert(convert(v, unit, base), base, unit), v);
+        expectClose(convert(convert(v, unit, base), base, unit), v, 1e-12, 1);
       });
     }
   }
 });
 
-describe('affine units (temperature-style)', () => {
-  const meta = {
-    category: 'temperature',
-    system: 'metric',
-    tier: 'basic',
-    exact: true,
-    source: 'test',
-  } as const;
-  const celsius: AffineUnit = {
-    kind: 'affine',
-    id: 't-celsius',
-    name: 'celsius',
-    plural: 'celsius',
-    symbol: '°C',
-    aliases: [],
-    factor: 1,
-    offset: 273.15,
-    ...meta,
-  };
-  const fahrenheit: AffineUnit = {
-    kind: 'affine',
-    id: 't-fahrenheit',
-    name: 'fahrenheit',
-    plural: 'fahrenheit',
-    symbol: '°F',
-    aliases: [],
-    factor: 5 / 9,
-    offset: 459.67,
-    ...meta,
-  };
-
-  it('212 °F = 100 °C', () => expectClose(convert(212, fahrenheit, celsius), 100));
-  it('-40 °F = -40 °C', () => expectClose(convert(-40, fahrenheit, celsius), -40));
-  it('0 °C = 32 °F', () => expectClose(convert(0, celsius, fahrenheit), 32));
-  it('37 °C = 98.6 °F', () => expectClose(convert(37, celsius, fahrenheit), 98.6));
-});
-
 describe('functional units (reciprocal)', () => {
-  // Base: kilometers per liter. L/100km is its reciprocal, scaled.
   const meta = {
     category: 'speed',
     system: 'metric',
@@ -115,6 +107,7 @@ describe('errors', () => {
   });
 
   it('rejects category mismatches', () => {
+    expect(() => convert(1, 'meter', 'kilogram')).toThrow(/cannot convert/i);
     const fake: AffineUnit = {
       kind: 'affine',
       id: 't-kelvin',
@@ -140,5 +133,6 @@ describe('errors', () => {
 
   it('is the identity for same-unit conversion', () => {
     expect(convert(42.5, 'meter', 'meter')).toBe(42.5);
+    expect(convert(-40, 'fahrenheit', 'fahrenheit')).toBe(-40);
   });
 });

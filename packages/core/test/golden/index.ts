@@ -1,0 +1,23 @@
+import { area } from './area';
+import { data } from './data';
+import { length } from './length';
+import { mass } from './mass';
+import { speed } from './speed';
+import { temperature } from './temperature';
+import { time } from './time';
+import type { GoldenRow } from './types';
+import { volume } from './volume';
+
+/** Every sourced conversion, keyed by category. Add a file here when a category arrives. */
+export const golden: Record<string, GoldenRow[]> = {
+  length,
+  mass,
+  volume,
+  temperature,
+  area,
+  speed,
+  time,
+  data,
+};
+
+export type { GoldenRow } from './types';

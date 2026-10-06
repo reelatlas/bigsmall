@@ -1,0 +1,92 @@
+import { PUBLISHED_7_DIGITS, type GoldenRow } from './types';
+
+const SP811 = 'NIST SP 811 (2008) Appendix B.8';
+
+export const speed: GoldenRow[] = [
+  {
+    value: 1,
+    from: 'mile-per-hour',
+    to: 'kilometer-per-hour',
+    expected: 1.609344,
+    source: `${SP811}: mile = 1.609344 km`,
+  },
+  {
+    value: 1,
+    from: 'kilometer-per-hour',
+    to: 'meter-per-second',
+    expected: 1000 / 3600,
+    source: 'Derived: 1000 m / 3600 s',
+  },
+  {
+    value: 1,
+    from: 'knot',
+    to: 'kilometer-per-hour',
+    expected: 1.852,
+    source: `${SP811}: nautical mile = 1852 m`,
+  },
+  {
+    value: 1,
+    from: 'foot-per-second',
+    to: 'mile-per-hour',
+    expected: 15 / 22,
+    source: 'Derived: 3600 / 5280',
+  },
+  {
+    value: 60,
+    from: 'mile-per-hour',
+    to: 'foot-per-second',
+    expected: 88,
+    source: 'Derived: 60 × 5280 / 3600',
+  },
+  {
+    value: 1,
+    from: 'meter-per-second',
+    to: 'kilometer-per-hour',
+    expected: 3.6,
+    source: 'Derived: 3600 / 1000',
+  },
+  {
+    value: 1,
+    from: 'knot',
+    to: 'mile-per-hour',
+    expected: 1852 / 1609.344,
+    source: 'Derived: 1852 / 1609.344',
+  },
+  {
+    value: 100,
+    from: 'kilometer-per-hour',
+    to: 'mile-per-hour',
+    expected: 100 / 1.609344,
+    source: 'Derived: 100 / 1.609344',
+  },
+  {
+    value: 1,
+    from: 'mile-per-hour',
+    to: 'meter-per-second',
+    expected: 0.44704,
+    source: `${SP811}: mile per hour = 4.4704E-01 m/s (exact)`,
+  },
+  {
+    value: 1,
+    from: 'foot-per-second',
+    to: 'meter-per-second',
+    expected: 0.3048,
+    source: `${SP811}: foot per second = 3.048E-01 m/s (exact)`,
+  },
+  {
+    value: 1,
+    from: 'knot',
+    to: 'meter-per-second',
+    expected: 5.144444e-1,
+    source: `${SP811}: knot = 5.144444E-01 m/s`,
+    tolerance: PUBLISHED_7_DIGITS,
+  },
+  {
+    value: 1,
+    from: 'kilometer-per-hour',
+    to: 'meter-per-second',
+    expected: 2.777778e-1,
+    source: `${SP811}: kilometer per hour = 2.777778E-01 m/s`,
+    tolerance: PUBLISHED_7_DIGITS,
+  },
+];

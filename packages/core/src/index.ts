@@ -8,3 +8,21 @@ export type { ConversionErrorCode } from './convert';
 export { categories, units, getUnit, getCategory, unitsIn } from './units';
 export { regionDefaults } from './region';
 export type { RegionDefaults, UnitPreference } from './region';
+export { localeSeparators } from './locale';
+export type { Separators } from './locale';
+export { parse } from './parse';
+export type { ParsedInput } from './parse';
+export { normalizeKey, compactKey } from './normalize';
+export { search, resolveExact, suggest } from './search';
+export type {
+  MatchClass,
+  MatchField,
+  UnitMatch,
+  CategoryMatch,
+  SearchResult,
+  SearchOptions,
+  SearchResponse,
+  Suggestion,
+} from './search';
+export { formatNumber } from './format';
+export type { FormatOptions } from './format';

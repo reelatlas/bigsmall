@@ -14,7 +14,7 @@ export type Tier = 'basic' | 'advanced';
  * Which measurement system a unit belongs to.
  * - `imperial`: shared by US customary and British imperial (inch, foot, pound ...).
  * - `us`: a US-only variant (US gallon, short ton).
- * - `uk`: a British-only variant (imperial gallon, long ton).
+ * - `uk`: a British-only variant (imperial gallon, long ton, stone).
  */
 export type UnitSystem = 'si' | 'metric' | 'imperial' | 'us' | 'uk' | 'other';
 
@@ -30,6 +30,7 @@ export type CategoryGroup =
 
 export interface Category {
   id: CategoryId;
+  /** Display name, in everyday language ("Weight", not "Mass"). */
   name: string;
   /** Everyday words people type that mean this category ("distance", "how far"). */
   aliases: readonly string[];
@@ -40,7 +41,7 @@ export interface Category {
 }
 
 interface UnitMeta {
-  /** Stable identifier used in URLs and storage. Lowercase, singular, ASCII. */
+  /** Stable identifier used in URLs and storage. Lowercase, singular, ASCII, kebab-case. */
   id: string;
   category: CategoryId;
   name: string;
@@ -54,6 +55,8 @@ interface UnitMeta {
   exact: boolean;
   /** Citation for the factor or formula (ADR 0004). Example: "NIST SP 811 (2008) Appendix B.8". */
   source: string;
+  /** Short definition shown to users when the unit has a variant or convention worth stating. */
+  note?: string;
 }
 
 /** base = value × factor. Nearly every unit. */

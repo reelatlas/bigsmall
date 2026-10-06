@@ -1,0 +1,98 @@
+import type { Category, Unit } from '../types';
+
+export const speed: Category = {
+  id: 'speed',
+  name: 'Speed',
+  aliases: ['velocity', 'how fast', 'fast', 'rate of travel'],
+  baseUnit: 'meter-per-second',
+  tier: 'basic',
+  group: 'everyday',
+};
+
+const SI = 'BIPM SI Brochure, 9th ed. (2019), §2.3.4 (metre per second); Table 8 (hour = 3600 s)';
+const MPH = 'NIST SP 811 (2008) Appendix B.8: 1 mi/h = 0.44704 m/s exactly';
+const KNOT = 'NIST SP 811 (2008) Appendix B.8: 1 nautical mile = 1852 m; 1 kn = 1852 m/h';
+const FPS = 'International Yard and Pound Agreement (1959): 1 ft = 0.3048 m exactly';
+
+export const speedUnits: readonly Unit[] = [
+  {
+    kind: 'linear',
+    id: 'meter-per-second',
+    category: 'speed',
+    name: 'meter per second',
+    plural: 'meters per second',
+    symbol: 'm/s',
+    aliases: ['mps', 'm/sec', 'meters/second', 'metre per second', 'metres per second'],
+    system: 'si',
+    tier: 'basic',
+    factor: 1,
+    exact: true,
+    source: SI,
+  },
+  {
+    kind: 'linear',
+    id: 'kilometer-per-hour',
+    category: 'speed',
+    name: 'kilometer per hour',
+    plural: 'kilometers per hour',
+    symbol: 'km/h',
+    aliases: [
+      'kph',
+      'kmph',
+      'km/hr',
+      'kmh',
+      'km per hour',
+      'kilometers/hour',
+      'kilometre per hour',
+      'kilometres per hour',
+    ],
+    system: 'si',
+    tier: 'basic',
+    factor: 1000 / 3600,
+    exact: true,
+    source: SI,
+  },
+  {
+    kind: 'linear',
+    id: 'mile-per-hour',
+    category: 'speed',
+    name: 'mile per hour',
+    plural: 'miles per hour',
+    symbol: 'mph',
+    aliases: ['mi/h', 'mi/hr', 'miles/hour', 'miles an hour'],
+    system: 'imperial',
+    tier: 'basic',
+    factor: 0.44704,
+    exact: true,
+    source: MPH,
+  },
+  {
+    kind: 'linear',
+    id: 'knot',
+    category: 'speed',
+    name: 'knot',
+    plural: 'knots',
+    symbol: 'kn',
+    aliases: ['kt', 'kts', 'nautical miles per hour', 'nmi/h'],
+    system: 'other',
+    tier: 'basic',
+    factor: 1852 / 3600,
+    exact: true,
+    source: KNOT,
+    note: 'One nautical mile (1,852 m) per hour. Used at sea and in the air.',
+  },
+  {
+    kind: 'linear',
+    id: 'foot-per-second',
+    category: 'speed',
+    name: 'foot per second',
+    plural: 'feet per second',
+    symbol: 'ft/s',
+    aliases: ['fps', 'ft/sec', 'feet/second', 'feet per sec'],
+    system: 'imperial',
+    tier: 'basic',
+    factor: 0.3048,
+    exact: true,
+    source: FPS,
+  },
+];

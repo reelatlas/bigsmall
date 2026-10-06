@@ -12,7 +12,13 @@ The active box has an accent outline. The keypad, when open, targets the active 
 
 Input text is parsed on every keystroke into `{ value?: number, query?: string, target?: string }`.
 
-**Number grammar (v1).** Optional sign, digits with optional locale grouping separators, optional locale decimal separator, optional exponent (`1e6`, `2.5E-3`). Whitespace after the number is ignored.
+**Number grammar (v1, implemented in `parse.ts`).** Optional sign (`-`, `+`, or the Unicode minus), digit groups separated by `.`, `,`, or a non-breaking space, an optional fraction, an optional exponent (`1e6`, `2.5E-3`), and the leading-dot form (`.5`). Which mark is the decimal:
+
+- two different marks present: the last one is the decimal (`1,234.5` and `1.234,5` both work);
+- one mark used more than once: grouping (`1,000,000`);
+- one mark used once: the locale's reading, unless the tail is not exactly three digits, which can only be a fraction (`1,5` is 1.5 even in en-US; `1,000` is a thousand in en-US and one in de-DE).
+
+Non-breaking spaces always group. Whitespace between the number and the unit is optional.
 
 **Query.** The remainder, trimmed, lowercased, diacritics stripped. Internal whitespace collapsed. Symbols keep their original case for a first exact-match pass (`mL` vs `ML` vs `ml`), then fall back to case-insensitive.
 
@@ -69,6 +75,8 @@ A category match (`fluids`, `temp`, `distance`) expands to that category's units
 - **Unambiguous exact match** (classes 1–2 with a single result): lock immediately. Show the chip with a brief highlight. Keep the panel open for one beat with the next-best alternatives so a wrong lock is one tap to fix.
 - **Ambiguous exact match** (`oz`, `ton`, `cup`, `gal`, `pt`, `qt`, `m`, `cal`, `hp`, `mpg`): do not auto-lock. Show each candidate with its category label and definition note. The top candidate is highlighted; Enter picks it.
 - **Partial match:** never auto-lock. Enter picks the highlighted suggestion.
+- **Timing (added after milestone 1).** An exact match can still be the start of a longer key (`c` → `cm`, `cup`; `km` → `km/h`, `km²`). The engine reports this as `canExtend`. When it is false the lock fires on the keystroke; when it is true the lock waits for a word boundary (space, Enter, Tab, blur), so typing never fights a premature lock.
+- **Engine contract.** `resolveExact(query, { category })` returns a unit only when exactly one unit matches in classes 1–2 within the current scope. `oz` resolves once a category is locked.
 
 This is the behavior most likely to need tuning after testing.
 

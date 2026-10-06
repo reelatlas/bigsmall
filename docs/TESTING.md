@@ -34,9 +34,9 @@ pnpm --filter @bigsmall/web exec playwright install chromium
 
 ## Golden tests
 
-`packages/core/test/golden/<category>.json` holds rows of `{ value, from, to, expected, source }`. Every row cites where `expected` comes from (NIST, BIPM, or a derivation from an exact definition). Tests assert a relative error of at most 1e-12.
+`packages/core/test/golden/<category>.ts` holds rows of `{ value, from, to, expected, source, tolerance? }`, collected in `golden/index.ts`. Rows are TypeScript so a derived value is written as its defining ratio (`1 / 0.3048`) rather than a hand-rounded decimal. Every row cites where `expected` comes from: a standards document, or "Derived:" plus the exact definition used. The default tolerance is a relative 1e-12; rows that quote a published seven-digit figure (NIST SP 811 Appendix B) use `PUBLISHED_7_DIGITS` (1e-6) so the strict default stays strict everywhere else.
 
-Adding a unit means adding at least one row that exercises it. The round-trip test covers every registered unit automatically at four magnitudes, so a unit with no golden row still gets a sanity check, but a sourced row is what proves the factor.
+Adding a unit means adding at least one row that exercises it; a test fails when any registered unit has no row. The round-trip test covers every unit automatically at four magnitudes, judged on `max(|expected|, 1)` so tiny temperatures are not failed on floating-point cancellation.
 
 ## Registry integrity
 

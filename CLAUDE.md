@@ -8,7 +8,7 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 ## Current status
 
-Milestone 0 (setup) complete on 2026-10-06. Next: milestone 1, the core engine (parser, search, formatter, eight primary categories). Progress and definitions of done are in `docs/PLAN.md` §13.
+Milestones 0 (setup) and 1 (core engine) complete on 2026-10-06. The engine has eight categories with sourced basic-tier units, a locale-tolerant parser, ranked search with exact-match resolution, and a formatter, all under test. Next: milestone 2, the smart input spike (docs/UX-SPEC.md). Progress and definitions of done are in `docs/PLAN.md` §13.
 
 ## Non-negotiables
 

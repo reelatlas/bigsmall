@@ -14,16 +14,21 @@ Two packages, one direction of dependency: `web` imports `core`, never the rever
 
 ## packages/core
 
-| File                 | Responsibility                                                                                  |
-| -------------------- | ----------------------------------------------------------------------------------------------- |
-| `src/types.ts`       | Data model: `Category`, `Unit` (linear, affine, functional), tiers, systems                     |
-| `src/units/<id>.ts`  | One file per category: the `Category` record and its `Unit[]`, every unit with a cited source   |
-| `src/units/index.ts` | Registry: `categories`, `units`, `getUnit`, `getCategory`, `unitsIn`                            |
-| `src/convert.ts`     | `convert(value, from, to)` via the category base unit; `toBase` / `fromBase`; `ConversionError` |
-| `src/region.ts`      | `regionDefaults(region)`: which unit family a region expects; unknown falls back to US          |
-| `src/index.ts`       | The public API. Web imports only from here.                                                     |
+| File                 | Responsibility                                                                                                             |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `src/types.ts`       | Data model: `Category`, `Unit` (linear, affine, functional), tiers, systems                                                |
+| `src/units/<id>.ts`  | One file per category: the `Category` record and its `Unit[]`, every unit with a cited source                              |
+| `src/units/index.ts` | Registry: `categories`, `units`, `getUnit`, `getCategory`, `unitsIn`                                                       |
+| `src/convert.ts`     | `convert(value, from, to)` via the category base unit; `toBase` / `fromBase`; `ConversionError`                            |
+| `src/normalize.ts`   | `normalizeKey` / `compactKey`: canonical form for matching typed text (degree signs, superscripts, periods, case, spacing) |
+| `src/parse.ts`       | `parse(text, separators)`: the leading number, locale-tolerant, plus the remaining unit query                              |
+| `src/search.ts`      | `search`, `resolveExact`, `suggest`: ranked unit and category matches with match classes, scope, tier escalation           |
+| `src/format.ts`      | `formatNumber`: significant digits, locale grouping, scientific switch                                                     |
+| `src/locale.ts`      | `localeSeparators(locale)`: decimal and group marks from Intl                                                              |
+| `src/region.ts`      | `regionDefaults(region)`: which unit family a region expects; unknown falls back to US                                     |
+| `src/index.ts`       | The public API. Web imports only from here.                                                                                |
 
-Arriving in milestone 1: `parse.ts` (text → number + unit query), `search.ts` (ranked unit and category matches), `format.ts` (significant figures, locale grouping, exponent switch). All pure functions over the registry.
+Per keystroke the UI calls `suggest(text, { category, separators })`: `parse` splits number from query, `search` ranks registry keys, `resolveExact` says whether one unit can lock. Once both boxes hold units the UI calls `convert` and `formatNumber`. All pure functions over the registry; nothing is cached across calls because the registry is small.
 
 Unit kinds:
 

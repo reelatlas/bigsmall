@@ -1,6 +1,6 @@
 # bigsmall — project plan
 
-Last updated: 2026-10-06. Status: milestone 0 complete; milestone 1 (core engine) is next.
+Last updated: 2026-10-06. Status: milestones 0 and 1 complete; milestone 2 (smart input spike) is next.
 
 ## 1. Vision
 
@@ -257,14 +257,14 @@ Rule of thumb: if a future session would have to rediscover it, write it down.
 
 ## 13. Milestones
 
-| #   | Milestone              | Done when                                                                                                                               |
-| --- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.** |
-| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI                   |
-| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget    |
-| M3  | **Complete converter** | Keypad, basic/advanced modes, swap, persistence, remaining basic-tier categories, advanced categories loaded on demand                  |
-| M4  | **Themes**             | `midnight`, `sakura`, `neon-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI            |
-| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                   |
+| #   | Milestone              | Done when                                                                                                                                   |
+| --- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**     |
+| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.** |
+| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget        |
+| M3  | **Complete converter** | Keypad, basic/advanced modes, swap, persistence, remaining basic-tier categories, advanced categories loaded on demand                      |
+| M4  | **Themes**             | `midnight`, `sakura`, `neon-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI                |
+| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                       |
 
 ## 14. Setup checklist
 

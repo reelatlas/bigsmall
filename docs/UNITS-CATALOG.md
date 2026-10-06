@@ -1,6 +1,17 @@
 # Units catalog
 
-Draft v0.1, 2026-10-06. Taxonomy, tiers, special-logic units, and verification sources. This file is the plan for the data in `packages/core/src/units/`. Once code exists, the code is the source of truth and this file explains the structure and the policies.
+Draft v0.2, 2026-10-06. Taxonomy, tiers, special-logic units, and verification sources. The code in `packages/core/src/units/` is the source of truth; this file explains the structure and the policies.
+
+## 0. Implementation status
+
+Milestone 1 (2026-10-06): all eight primary categories ship their basic tier, 54 units, every one cited and covered by a golden test row. Base units: meter, kilogram, liter, kelvin, square meter, meter per second, second, byte. Advanced tiers arrive in milestone 3.
+
+Alias decisions so far (each one changes what auto-locks, see docs/UX-SPEC.md §5):
+
+- `kilo`/`kilos` → kilogram, `cc` → milliliter, `kph`/`kmh` → kilometer per hour: colloquial, so they count as exact matches.
+- `oz` is also an alias of fluid ounce on purpose: it makes "oz" ambiguous, so the UI asks instead of guessing.
+- No `ton` alias on the metric ton (US short ton and UK long ton arrive in milestone 3 with locale ranking), and no lowercase `b` for bit (it would collide with byte's `B` inside the category).
+- Unit `note` fields carry the definition for anything with a variant: cup, the US liquid family, tonne, month, year, decimal data prefixes.
 
 ## 1. Coverage research
 

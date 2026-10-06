@@ -12,9 +12,9 @@ for (const path of ['/', '/dev/gallery']) {
   });
 }
 
-test('the engine check shows a correct conversion', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByText('1 mi = 1.609344 km')).toBeVisible();
+test('a conversion loads from the URL', async ({ page }) => {
+  await page.goto('/?a=mile&b=kilometer&v=1&s=a');
+  await expect(page.getByRole('combobox', { name: 'Second value' })).toHaveValue('1.609344');
 });
 
 test('theme choice applies immediately and survives reload', async ({ page }) => {

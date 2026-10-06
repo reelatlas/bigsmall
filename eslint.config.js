@@ -33,7 +33,13 @@ export default tseslint.config(
   },
   // Node-side files in the web app (tests, configs).
   {
-    files: ['apps/web/test/**', 'apps/web/e2e/**', 'apps/web/*.config.ts', 'apps/web/*.config.mjs'],
+    files: [
+      'apps/web/test/**',
+      'apps/web/e2e/**',
+      'apps/web/*.config.ts',
+      'apps/web/*.config.mjs',
+      'scripts/**/*.mjs',
+    ],
     languageOptions: { globals: { ...globals.node } },
   },
 

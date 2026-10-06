@@ -150,8 +150,16 @@ describe('search: categories and scope', () => {
   it('reports whether more typing could change the match', () => {
     expect(search('c').canExtend).toBe(true);
     expect(search('cm').canExtend).toBe(true);
+    expect(search('m').canExtend).toBe(true);
     expect(search('celsius').canExtend).toBe(false);
     expect(search('mph').canExtend).toBe(false);
+  });
+
+  it('ignores longer keys of the unit the query already names', () => {
+    expect(search('ml').canExtend).toBe(false);
+    expect(search('kg').canExtend).toBe(false);
+    expect(search('fl oz').canExtend).toBe(false);
+    expect(search('oz').canExtend).toBe(true);
   });
 });
 

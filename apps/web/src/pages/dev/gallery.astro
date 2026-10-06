@@ -1,6 +1,7 @@
 ---
 import { Button } from '../../components/Button';
 import ThemePicker from '../../components/ThemePicker.astro';
+import { SuggestionSample } from './_samples/SuggestionSample';
 import Base from '../../layouts/Base.astro';
 import { THEMES, TOKEN_CONTRACT } from '../../lib/themes';
 
@@ -54,6 +55,10 @@ const swatches = TOKEN_CONTRACT.colors;
           <div class="mt-4 rounded-md bg-surface p-4 shadow-sm">
             <p class="font-numeric text-3xl font-semibold tracking-tight">1.609344</p>
             <p class="mt-1 text-sm text-ink-muted">1 mile in kilometers</p>
+          </div>
+
+          <div class="mt-4">
+            <SuggestionSample client:idle />
           </div>
 
           <div class="mt-4 flex flex-wrap gap-2">

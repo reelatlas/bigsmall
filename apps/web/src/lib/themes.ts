@@ -101,6 +101,8 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = 
   ['ink-muted', 'surface', 4.5],
   ['ink-muted', 'surface-raised', 4.5],
   ['on-accent', 'accent', 4.5],
+  ['ink', 'accent-soft', 4.5],
+  ['ink-muted', 'accent-soft', 4.5],
   ['danger', 'canvas', 4.5],
   ['success', 'canvas', 4.5],
   ['accent', 'canvas', 3],

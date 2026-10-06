@@ -251,8 +251,18 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
     compareRanked(a, b, options.system),
   );
 
-  const extendsQuery = (k: { compact: string }) =>
-    k.compact.length > q.compact.length && k.compact.startsWith(q.compact);
+  // A longer key that belongs to the one unit the query already names exactly does not count:
+  // "ml" should lock even though milliliter also answers to "mls".
+  const exactUnitIds = new Set(
+    [...bestUnit.values()]
+      .filter((r) => r.result.matchClass <= 2)
+      .map((r) => (r.result.kind === 'unit' ? r.result.unit.id : '')),
+  );
+  const soleExact = exactUnitIds.size === 1 ? [...exactUnitIds][0] : null;
+  const extendsQuery = (k: { compact: string; unit?: Unit }) =>
+    k.compact.length > q.compact.length &&
+    k.compact.startsWith(q.compact) &&
+    (soleExact === null || k.unit?.id !== soleExact);
   const canExtend = scopedUnitKeys.some(extendsQuery) || scopedCategoryKeys.some(extendsQuery);
 
   return {

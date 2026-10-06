@@ -26,6 +26,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm bundle:check
 
   e2e:
     name: Browser and accessibility checks

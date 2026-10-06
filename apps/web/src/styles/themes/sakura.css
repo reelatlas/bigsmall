@@ -1,0 +1,33 @@
+/* Sakura — cherry blossom. Soft pinks on warm white, deep plum ink. Petal drift decoration comes in M4. */
+[data-theme='sakura'] {
+  color-scheme: light;
+
+  --canvas: #fff7f9;
+  --surface: #ffffff;
+  --surface-raised: #fff1f4;
+  --ink: #3b2430;
+  --ink-muted: #7a5a68;
+  --accent: #c2407a;
+  --on-accent: #ffffff;
+  --accent-soft: #fde2ea;
+  --line: #f0c9d6;
+  --focus: #c2407a;
+  --danger: #b91c1c;
+  --success: #15803d;
+
+  --type-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --type-body: ui-sans-serif, system-ui, sans-serif;
+  --type-numeric: ui-sans-serif, system-ui, sans-serif;
+
+  --shape-sm: 0.5rem;
+  --shape-md: 1rem;
+  --shape-lg: 1.75rem;
+
+  --elevation-sm: 0 1px 2px rgb(120 40 70 / 0.08);
+  --elevation-md: 0 8px 24px rgb(120 40 70 / 0.12);
+
+  --motion-fast: 150ms;
+  --motion-base: 260ms;
+  --motion-slow: 600ms;
+  --motion-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+}

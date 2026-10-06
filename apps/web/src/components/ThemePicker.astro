@@ -1,0 +1,26 @@
+---
+import { THEMES } from '../lib/themes';
+
+interface Props {
+  id?: string;
+}
+
+const { id = 'theme-picker' } = Astro.props;
+---
+
+<!--
+  No JavaScript bundle needed: the pre-paint script in layouts/Base.astro handles `change`
+  by delegation, so this works before any island hydrates and on pages with no islands at all.
+-->
+<label class="flex items-center gap-2 text-sm" for={id}>
+  <span class="text-ink-muted">Theme</span>
+  <select
+    id={id}
+    data-theme-picker
+    class="min-h-11 rounded-md border border-line bg-surface px-3 text-ink"
+  >
+    {THEMES.map((t) => (
+      <option value={t.id}>{t.name}</option>
+    ))}
+  </select>
+</label>

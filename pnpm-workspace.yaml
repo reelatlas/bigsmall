@@ -1,0 +1,13 @@
+packages:
+  - packages/*
+  - apps/*
+
+# Dependencies allowed to run install scripts (pnpm blocks all others). Review before adding.
+allowBuilds:
+  esbuild: true
+
+# Deliberate peer overrides. Each one is explained in docs/LEARNINGS.md.
+peerDependencyRules:
+  allowedVersions:
+    # jsx-a11y 6.10 declares eslint <=9 but uses no API that ESLint 10 removed (verified 2026-10-06).
+    'eslint-plugin-jsx-a11y>eslint': '10'

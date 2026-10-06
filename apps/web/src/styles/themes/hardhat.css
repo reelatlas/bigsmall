@@ -1,0 +1,33 @@
+/* Hardhat — job site. Blueprint navy, steel surfaces, safety-yellow accent, stencil display face later. */
+[data-theme='hardhat'] {
+  color-scheme: dark;
+
+  --canvas: #1e2a38;
+  --surface: #253447;
+  --surface-raised: #2b3a4d;
+  --ink: #f4f1ea;
+  --ink-muted: #b7c3d0;
+  --accent: #f5b400;
+  --on-accent: #1b1b1b;
+  --accent-soft: #4a3d10;
+  --line: #3a4a5e;
+  --focus: #f5b400;
+  --danger: #ff6b6b;
+  --success: #6ee7b7;
+
+  --type-display: 'Arial Black', Impact, ui-sans-serif, system-ui, sans-serif;
+  --type-body: ui-sans-serif, system-ui, sans-serif;
+  --type-numeric: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --shape-sm: 0.125rem;
+  --shape-md: 0.25rem;
+  --shape-lg: 0.5rem;
+
+  --elevation-sm: 0 1px 0 rgb(0 0 0 / 0.5);
+  --elevation-md: 0 4px 0 rgb(0 0 0 / 0.5);
+
+  --motion-fast: 80ms;
+  --motion-base: 140ms;
+  --motion-slow: 260ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}

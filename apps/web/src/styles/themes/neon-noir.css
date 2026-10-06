@@ -1,0 +1,33 @@
+/* Neon Noir — Tokyo at night. Near-black, magenta and cyan glow, monospace numerals. Rain texture comes in M4. */
+[data-theme='neon-noir'] {
+  color-scheme: dark;
+
+  --canvas: #07060b;
+  --surface: #110f1a;
+  --surface-raised: #1a1726;
+  --ink: #ece8ff;
+  --ink-muted: #a79fc4;
+  --accent: #ff3fa4;
+  --on-accent: #1a0010;
+  --accent-soft: #3a0f2a;
+  --line: #2b2740;
+  --focus: #34f5ff;
+  --danger: #ff5c7a;
+  --success: #3ee6a3;
+
+  --type-display: ui-sans-serif, system-ui, sans-serif;
+  --type-body: ui-sans-serif, system-ui, sans-serif;
+  --type-numeric: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  --shape-sm: 0.25rem;
+  --shape-md: 0.5rem;
+  --shape-lg: 0.75rem;
+
+  --elevation-sm: 0 0 0 1px rgb(255 63 164 / 0.15);
+  --elevation-md: 0 0 24px rgb(255 63 164 / 0.25);
+
+  --motion-fast: 90ms;
+  --motion-base: 160ms;
+  --motion-slow: 320ms;
+  --motion-ease: cubic-bezier(0.3, 0, 0.1, 1);
+}

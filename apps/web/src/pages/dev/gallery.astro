@@ -1,0 +1,69 @@
+---
+import { Button } from '../../components/Button';
+import ThemePicker from '../../components/ThemePicker.astro';
+import Base from '../../layouts/Base.astro';
+import { THEMES, TOKEN_CONTRACT } from '../../lib/themes';
+
+// Development page: every component in every theme, for visual QA (docs/THEMING.md).
+// Each card pins its own theme via data-theme; custom properties cascade, so the subtree re-themes.
+const swatches = TOKEN_CONTRACT.colors;
+---
+
+<Base title="bigsmall · gallery" description="Every component in every theme.">
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <header class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="font-display text-3xl font-semibold tracking-tight">Gallery</h1>
+        <p class="mt-1 text-ink-muted">
+          The picker changes the page theme. Each card below is pinned to its own theme.
+        </p>
+      </div>
+      <ThemePicker />
+    </header>
+
+    <div class="mt-8 grid gap-6 md:grid-cols-2">
+      {THEMES.map((t) => (
+        <section
+          data-theme={t.id}
+          aria-labelledby={`theme-${t.id}`}
+          class="rounded-lg border border-line bg-canvas p-5 text-ink shadow-md"
+        >
+          <div class="flex items-baseline justify-between gap-3">
+            <h2 id={`theme-${t.id}`} class="font-display text-xl font-semibold">
+              {t.name}
+            </h2>
+            <span class="text-xs text-ink-muted">
+              {t.scheme} · {t.status}
+            </span>
+          </div>
+          <p class="mt-1 text-sm text-ink-muted">{t.blurb}</p>
+
+          <ul class="mt-4 flex flex-wrap gap-x-3 gap-y-2" aria-label={`${t.name} color tokens`}>
+            {swatches.map((name) => (
+              <li class="flex items-center gap-1.5 text-xs">
+                <span
+                  class="inline-block size-4 rounded-sm border border-line"
+                  style={`background: var(--${name})`}
+                  aria-hidden="true"
+                />
+                {name}
+              </li>
+            ))}
+          </ul>
+
+          <div class="mt-4 rounded-md bg-surface p-4 shadow-sm">
+            <p class="font-numeric text-3xl font-semibold tracking-tight">1.609344</p>
+            <p class="mt-1 text-sm text-ink-muted">1 mile in kilometers</p>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            <Button client:idle>Convert</Button>
+            <Button client:idle variant="secondary">
+              Swap
+            </Button>
+          </div>
+        </section>
+      ))}
+    </div>
+  </main>
+</Base>

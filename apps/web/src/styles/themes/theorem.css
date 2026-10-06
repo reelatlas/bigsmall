@@ -1,0 +1,33 @@
+/* Theorem — higher mathematics. Chalkboard green-black, chalk ink, serif display, typeset numerals. */
+[data-theme='theorem'] {
+  color-scheme: dark;
+
+  --canvas: #14201b;
+  --surface: #1b2a24;
+  --surface-raised: #22332c;
+  --ink: #f3efe4;
+  --ink-muted: #b9c4bd;
+  --accent: #f2c14e;
+  --on-accent: #14201b;
+  --accent-soft: #3d3418;
+  --line: #35473f;
+  --focus: #f2c14e;
+  --danger: #ff8a80;
+  --success: #9be7a8;
+
+  --type-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --type-body: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --type-numeric: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
+  --shape-sm: 0.25rem;
+  --shape-md: 0.5rem;
+  --shape-lg: 1rem;
+
+  --elevation-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --elevation-md: 0 6px 18px rgb(0 0 0 / 0.45);
+
+  --motion-fast: 120ms;
+  --motion-base: 220ms;
+  --motion-slow: 450ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+}

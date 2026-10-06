@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+import { DEFAULT_DARK, DEFAULT_LIGHT, THEMES, THEME_STORAGE_KEY } from '../lib/themes';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'A unit converter that gets out of your way.' } = Astro.props;
+const themeIds = THEMES.map((t) => t.id);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <script
+      define:vars={{
+        ids: themeIds,
+        key: THEME_STORAGE_KEY,
+        light: DEFAULT_LIGHT,
+        dark: DEFAULT_DARK,
+      }}
+    >
+      // Runs inline before first paint: applies the saved theme (no flash) and handles every
+      // [data-theme-picker] by delegation, so theme switching never waits for a JS bundle.
+      // Values come from src/lib/themes.ts via define:vars, so there is one source of truth.
+      const apply = (id) => {
+        document.documentElement.dataset.theme = id;
+        for (const picker of document.querySelectorAll('[data-theme-picker]')) picker.value = id;
+      };
+      const readSaved = () => {
+        try {
+          return localStorage.getItem(key);
+        } catch {
+          return null;
+        }
+      };
+      const saved = readSaved();
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      apply(ids.includes(saved) ? saved : prefersDark ? dark : light);
+      document.addEventListener('DOMContentLoaded', () =>
+        apply(document.documentElement.dataset.theme),
+      );
+      document.addEventListener('change', (event) => {
+        const el = event.target;
+        if (!(el instanceof HTMLSelectElement) || !el.hasAttribute('data-theme-picker')) return;
+        if (!ids.includes(el.value)) return;
+        apply(el.value);
+        try {
+          localStorage.setItem(key, el.value);
+        } catch {
+          // Storage blocked (private mode): the choice lasts for this page only.
+        }
+      });
+    </script>
+  </head>
+  <body class="min-h-dvh bg-canvas font-body text-ink antialiased">
+    <slot />
+  </body>
+</html>

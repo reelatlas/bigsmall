@@ -1,0 +1,78 @@
+@import 'tailwindcss';
+
+/*
+ * Theme token sets. Each file defines the full contract from src/lib/themes.ts
+ * and is verified for WCAG contrast by test/themes.test.ts.
+ * Token sets are tiny, so all ship together; fonts and decoration load per theme later.
+ */
+@import './themes/daylight.css';
+@import './themes/midnight.css';
+@import './themes/sakura.css';
+@import './themes/neon-noir.css';
+@import './themes/hardhat.css';
+@import './themes/theorem.css';
+
+/*
+ * Bridge semantic tokens into Tailwind utilities (bg-canvas, text-ink, font-display, rounded-md ...).
+ * `inline` keeps the var() reference in the generated CSS so [data-theme] swaps apply at runtime.
+ * Components use only these utilities or the semantic variables; never raw colors (CLAUDE.md rule 3).
+ */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-line: var(--line);
+  --color-focus: var(--focus);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+
+  --font-display: var(--type-display);
+  --font-body: var(--type-body);
+  --font-numeric: var(--type-numeric);
+
+  --radius-sm: var(--shape-sm);
+  --radius-md: var(--shape-md);
+  --radius-lg: var(--shape-lg);
+
+  --shadow-sm: var(--elevation-sm);
+  --shadow-md: var(--elevation-md);
+
+  --ease-standard: var(--motion-ease);
+}
+
+@layer base {
+  html {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--type-body);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .font-numeric {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-fast: 0ms;
+      --motion-base: 0ms;
+      --motion-slow: 0ms;
+    }
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}

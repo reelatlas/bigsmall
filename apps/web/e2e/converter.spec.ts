@@ -61,7 +61,7 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
   const { first } = boxes(page);
 
   await first.click();
-  await expect(page.getByRole('option', { name: /^Length category$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
   await first.press('ArrowDown');
   await first.press('Enter');
   await expect(page.getByRole('option', { name: /^ft feet$/ })).toBeVisible();
@@ -101,7 +101,7 @@ test('picking a unit from another category clears the first box and says so', as
   const { first, second } = boxes(page);
 
   await second.fill('f');
-  await page.getByRole('option', { name: 'Search all categories' }).click();
+  await page.getByRole('button', { name: 'Search all categories' }).click();
   await page.getByRole('option', { name: /Fahrenheit Temperature/ }).click();
 
   await expect(page.getByRole('status')).toHaveText('Switched to Temperature');
@@ -131,4 +131,70 @@ test('the converter has no WCAG violations with the panel open', async ({ page }
 
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   expect(results.violations).toEqual([]);
+});
+
+test('Escape walks back one step at a time: unit, panel, text', async ({ page }) => {
+  await page.goto('/?a=milliliter&v=250&s=a');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.click();
+  await first.press('Escape');
+  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(page.getByRole('option', { name: /^L liters$/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Back' })).toBeVisible();
+
+  await first.press('Escape');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  await expect(first).toHaveValue('250');
+
+  await first.press('Escape');
+  await expect(first).toHaveValue('');
+});
+
+test('a Back control sits at the top of an expanded category and Escape does the same', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.click();
+  await page.getByRole('option', { name: /^Length$/ }).click();
+  await expect(page.getByRole('option', { name: /^m meters$/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Back' }).click();
+  await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
+
+  await page.getByRole('option', { name: /^Weight$/ }).click();
+  await expect(page.getByRole('option', { name: /^kg kilograms$/ })).toBeVisible();
+  await first.press('Escape');
+  await expect(page.getByRole('option', { name: /^Weight$/ })).toBeVisible();
+});
+
+test('undo drops the unit but keeps the number; redo restores it', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.fill('250 ml');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+
+  await first.press('Control+z');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toHaveCount(0);
+  await expect(first).toHaveValue('250');
+
+  await page.getByRole('button', { name: 'Redo' }).click();
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await expect(first).toHaveValue('250');
+});
+
+test('clicking the chip opens the unit list for that category', async ({ page }) => {
+  await page.goto('/?a=milliliter&v=250&s=a');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await page.getByRole('button', { name: 'Change unit: milliliters' }).click();
+  await page.getByRole('option', { name: /^L liters$/ }).click();
+  await expect(page.getByRole('button', { name: 'Remove liters' })).toBeVisible();
+  await expect(first).toHaveValue('250');
 });

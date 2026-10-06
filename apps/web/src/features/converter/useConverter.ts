@@ -7,12 +7,12 @@ import {
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import { detectRegion } from '../../lib/region';
 import {
-  initialState,
-  reduce,
+  initialHistory,
+  reduceWithHistory,
   selectView,
-  type Action,
   type ConverterState,
   type ConverterView,
+  type HistoryAction,
 } from './state';
 import { paramsToState, stateToParams } from './url';
 
@@ -45,14 +45,17 @@ export interface ConverterController {
   state: ConverterState;
   view: ConverterView;
   env: ConverterEnv;
-  dispatch: (action: Action) => void;
+  dispatch: (action: HistoryAction) => void;
+  canUndo: boolean;
+  canRedo: boolean;
   /** Debounced copy of the view's announcement, so screen readers are not flooded while typing. */
   announcement: string | null;
 }
 
-/** Owns the converter state, derives the view, syncs the URL, and paces live-region announcements. */
+/** Owns the converter state and its history, derives the view, syncs the URL, and paces announcements. */
 export function useConverter(): ConverterController {
-  const [state, dispatch] = useReducer(reduce, initialState);
+  const [history, dispatch] = useReducer(reduceWithHistory, initialHistory);
+  const state = history.present;
   const [env] = useState(detectEnv);
   const view = useMemo(() => selectView(state, env), [state, env]);
 
@@ -80,5 +83,13 @@ export function useConverter(): ConverterController {
     return () => window.clearTimeout(timer);
   }, [view.announcement]);
 
-  return { state, view, env, dispatch, announcement };
+  return {
+    state,
+    view,
+    env,
+    dispatch,
+    canUndo: history.past.length > 0,
+    canRedo: history.future.length > 0,
+    announcement,
+  };
 }

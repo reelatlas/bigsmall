@@ -1,17 +1,24 @@
 import { getCategory, type Category, type Unit } from '@bigsmall/core';
-import { ChevronRightIcon } from './icons';
+import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 
 /** What a row in the panel can be. The smart input builds this list from a core search response. */
 export type SuggestionItem =
-  | { kind: 'unit'; key: string; unit: Unit }
-  | { kind: 'category'; key: string; category: Category }
-  | { kind: 'all-categories'; key: string };
+  { kind: 'unit'; key: string; unit: Unit } | { kind: 'category'; key: string; category: Category };
+
+export interface PanelHeader {
+  label: string;
+  /** Show a back chevron: the action returns to the previous list. */
+  back: boolean;
+  onClick: () => void;
+}
 
 export interface SuggestionPanelProps {
   id: string;
   items: SuggestionItem[];
   activeIndex: number;
   optionId: (index: number) => string;
+  /** A control above the list: "Back" when a category is expanded, "Search all categories" when scoped. */
+  header?: PanelHeader | undefined;
   /** Shown above the list: "Now pick a unit", "No unit matches …". */
   message?: string | undefined;
   /** When true, unit rows show their category, which is how ambiguous symbols are told apart. */
@@ -22,17 +29,19 @@ export interface SuggestionPanelProps {
 
 const row =
   'flex min-h-11 cursor-pointer items-center gap-3 px-3 text-left ' +
-  'data-active:bg-accent-soft data-hovered:bg-surface-raised';
+  'data-active:bg-accent-soft hover:bg-surface-raised';
 
 /**
  * The listbox under a smart input. Plain WAI-ARIA combobox pattern: the input owns focus and
  * points at the active row with aria-activedescendant; rows are picked with Enter, tap, or click.
+ * The header is a real button outside the listbox, reachable by Tab or Escape rather than arrows.
  */
 export function SuggestionPanel({
   id,
   items,
   activeIndex,
   optionId,
+  header,
   message,
   showCategory,
   onPick,
@@ -40,6 +49,17 @@ export function SuggestionPanel({
 }: SuggestionPanelProps) {
   return (
     <div className="border-t border-line">
+      {header && (
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={header.onClick}
+          className="flex min-h-11 w-full items-center gap-2 px-3 text-left text-sm text-ink-muted transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+        >
+          {header.back && <ChevronLeftIcon width="16" height="16" />}
+          {header.label}
+        </button>
+      )}
       {message && <p className="px-3 pt-2 text-sm text-ink-muted">{message}</p>}
       <ul role="listbox" id={id} aria-label="Suggestions" className="max-h-72 overflow-y-auto py-1">
         {items.map((item, index) => (
@@ -64,28 +84,23 @@ export function SuggestionPanel({
 }
 
 function RowBody({ item, showCategory }: { item: SuggestionItem; showCategory: boolean }) {
-  switch (item.kind) {
-    case 'unit':
-      return (
-        <>
-          <span className="min-w-12 font-numeric font-semibold">{item.unit.symbol}</span>
-          <span className="flex-1 truncate">{item.unit.plural}</span>
-          {showCategory && (
-            <span className="text-xs text-ink-muted">
-              {getCategory(item.unit.category)?.name ?? item.unit.category}
-            </span>
-          )}
-        </>
-      );
-    case 'category':
-      return (
-        <>
-          <span className="flex-1 font-medium">{item.category.name}</span>
-          <span className="text-xs text-ink-muted">category</span>
-          <ChevronRightIcon className="text-ink-muted" />
-        </>
-      );
-    case 'all-categories':
-      return <span className="flex-1 text-sm text-ink-muted">Search all categories</span>;
+  if (item.kind === 'unit') {
+    return (
+      <>
+        <span className="min-w-12 font-numeric font-semibold">{item.unit.symbol}</span>
+        <span className="flex-1 truncate">{item.unit.plural}</span>
+        {showCategory && (
+          <span className="text-xs text-ink-muted">
+            {getCategory(item.unit.category)?.name ?? item.unit.category}
+          </span>
+        )}
+      </>
+    );
   }
+  return (
+    <>
+      <span className="flex-1 font-medium">{item.category.name}</span>
+      <ChevronRightIcon className="text-ink-muted" />
+    </>
+  );
 }

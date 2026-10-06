@@ -46,7 +46,7 @@ export const THEMES: readonly ThemeMeta[] = [
   },
   {
     id: 'neon-noir',
-    name: 'Neon Noir',
+    name: 'Neon noir',
     scheme: 'dark',
     status: 'palette',
     blurb: 'Tokyo at night: magenta glow, cyan focus, mono numerals.',

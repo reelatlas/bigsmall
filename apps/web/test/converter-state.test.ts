@@ -209,3 +209,90 @@ describe('source handoff', () => {
     expect(v.result).toBeNull();
   });
 });
+
+import {
+  initialHistory,
+  reduceWithHistory,
+  type History,
+  type HistoryAction,
+} from '../src/features/converter/state';
+
+function steps(...actions: HistoryAction[]): History {
+  return actions.reduce(reduceWithHistory, initialHistory);
+}
+
+describe('history', () => {
+  it('coalesces a typing run into one entry', () => {
+    const h = steps(
+      { type: 'input', box: 'a', text: '2' },
+      { type: 'input', box: 'a', text: '25' },
+      { type: 'input', box: 'a', text: '250' },
+    );
+    expect(h.past).toHaveLength(1);
+    expect(reduceWithHistory(h, { type: 'undo' }).present.a.text).toBe('');
+  });
+
+  it('undoing a lock keeps the number and drops the unit; redo brings it back', () => {
+    const h = steps(
+      { type: 'input', box: 'a', text: '250 ml' },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    );
+    expect(h.present.a).toEqual({ text: '250', unit: 'milliliter' });
+    const undone = reduceWithHistory(h, { type: 'undo' });
+    expect(undone.present.a).toEqual({ text: '250', unit: null });
+    const redone = reduceWithHistory(undone, { type: 'redo' });
+    expect(redone.present.a).toEqual({ text: '250', unit: 'milliliter' });
+  });
+
+  it('undoing a unit change restores the previous unit', () => {
+    const h = steps(
+      { type: 'input', box: 'a', text: '5' },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'a', unit: 'liter' },
+    );
+    expect(reduceWithHistory(h, { type: 'undo' }).present.a).toEqual({
+      text: '5',
+      unit: 'milliliter',
+    });
+  });
+
+  it('undoes in interaction order across boxes', () => {
+    let h = steps(
+      { type: 'input', box: 'a', text: '5' },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+      { type: 'input', box: 'b', text: '2' },
+    );
+    h = reduceWithHistory(h, { type: 'undo' });
+    expect(h.present.b).toEqual({ text: '', unit: 'us-cup' });
+    h = reduceWithHistory(h, { type: 'undo' });
+    expect(h.present.b).toEqual({ text: '', unit: null });
+    h = reduceWithHistory(h, { type: 'undo' });
+    expect(h.present.a).toEqual({ text: '5', unit: null });
+    h = reduceWithHistory(h, { type: 'undo' });
+    expect(h.present.a.text).toBe('');
+    expect(reduceWithHistory(h, { type: 'undo' })).toBe(h);
+  });
+
+  it('a new action clears the redo stack', () => {
+    const h = steps(
+      { type: 'input', box: 'a', text: '5' },
+      { type: 'lock', box: 'a', unit: 'meter' },
+    );
+    const undone = reduceWithHistory(h, { type: 'undo' });
+    expect(undone.future).toHaveLength(1);
+    const branched = reduceWithHistory(undone, { type: 'lock', box: 'a', unit: 'foot' });
+    expect(branched.future).toHaveLength(0);
+    expect(reduceWithHistory(branched, { type: 'redo' })).toBe(branched);
+  });
+
+  it('hydrate starts a fresh history and no-ops add nothing', () => {
+    const h = steps(
+      { type: 'input', box: 'a', text: '5' },
+      { type: 'hydrate', state: { a: { text: '1', unit: 'mile' }, source: 'a' } },
+      { type: 'input', box: 'a', text: '1' },
+    );
+    expect(h.past).toHaveLength(0);
+    expect(h.present.a).toEqual({ text: '1', unit: 'mile' });
+  });
+});

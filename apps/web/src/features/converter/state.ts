@@ -206,3 +206,95 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
 function unitName(unit: Unit, value: number): string {
   return value === 1 ? unit.name : unit.plural;
 }
+
+// ---------------------------------------------------------------------------
+// Undo and redo (docs/UX-SPEC.md §14). The most recent interaction is what gets undone:
+// a run of typing in one box is one entry; a lock, unlock, or swap is its own entry.
+
+export interface History {
+  past: ConverterState[];
+  present: ConverterState;
+  future: ConverterState[];
+  /** The box whose typing run is in progress, so consecutive keystrokes share one entry. */
+  run: BoxId | null;
+}
+
+export type HistoryAction = Action | { type: 'undo' } | { type: 'redo' };
+
+export const HISTORY_LIMIT = 50;
+
+export const initialHistory: History = {
+  past: [],
+  present: initialState,
+  future: [],
+  run: null,
+};
+
+function sameState(a: ConverterState, b: ConverterState): boolean {
+  return (
+    a.a.text === b.a.text &&
+    a.a.unit === b.a.unit &&
+    a.b.text === b.b.text &&
+    a.b.unit === b.b.unit &&
+    a.source === b.source &&
+    a.mode === b.mode
+  );
+}
+
+function push(
+  history: History,
+  entry: ConverterState,
+  present: ConverterState,
+  run: BoxId | null,
+): History {
+  const past = [...history.past, entry].slice(-HISTORY_LIMIT);
+  return { past, present, future: [], run };
+}
+
+export function reduceWithHistory(history: History, action: HistoryAction): History {
+  if (action.type === 'undo') {
+    const previous = history.past[history.past.length - 1];
+    if (!previous) return history;
+    return {
+      past: history.past.slice(0, -1),
+      present: { ...previous, notice: null },
+      future: [history.present, ...history.future],
+      run: null,
+    };
+  }
+  if (action.type === 'redo') {
+    const next = history.future[0];
+    if (!next) return history;
+    return {
+      past: [...history.past, history.present],
+      present: { ...next, notice: null },
+      future: history.future.slice(1),
+      run: null,
+    };
+  }
+
+  const present = reduce(history.present, action);
+  if (sameState(present, history.present)) return { ...history, present };
+
+  switch (action.type) {
+    case 'hydrate':
+      return { past: [], present, future: [], run: null };
+    case 'setText':
+    case 'setMode':
+      return { ...history, present };
+    case 'input':
+      if (history.run === action.box) return { ...history, present };
+      return push(history, history.present, present, action.box);
+    case 'lock': {
+      // Undoing a lock keeps the number and drops the unit, so the entry is "before, minus the query".
+      const before = history.present[action.box];
+      const entry: ConverterState = {
+        ...history.present,
+        [action.box]: { text: parse(before.text).valueText ?? '', unit: before.unit },
+      };
+      return push(history, entry, present, null);
+    }
+    default:
+      return push(history, history.present, present, null);
+  }
+}

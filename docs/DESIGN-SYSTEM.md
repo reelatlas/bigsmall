@@ -84,3 +84,10 @@ Arriving in milestone 3: `Keypad`, `Sheet`, `Toggle`, `LiveResult`. `SmartInput`
 4. Add it to `src/pages/dev/gallery.astro`.
 5. Run `pnpm e2e`. Fix any axe violation before merging.
 6. Add a row to the inventory table.
+
+## Copy
+
+- **Sentence case** for every label, button, heading, message, and theme name: "Search all categories", "Neon noir", "Copy result". The only capitals inside a phrase are proper names.
+- **Units follow the standards, not the sentence-case rule.** Symbols are case-sensitive and never altered: mL, kB, °F, km/h. Unit names are lowercase, including ones named after people (kelvin, newton), except "Celsius" and "Fahrenheit", which the SI Brochure and NIST write capitalized. Chips and rows show the plural name ("milliliters") next to the symbol.
+- **Category names** are single capitalized words as labels: Length, Weight, Volume.
+- **Short and plain.** No exclamation marks, no jargon in user-facing text. Error and empty-state text says what to try next.

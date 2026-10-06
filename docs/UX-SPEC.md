@@ -156,3 +156,15 @@ What shipped and where it deliberately differs from the sections above. Each dif
 - **URL** is `?a=<unit>&b=<unit>&v=<number>&s=<a|b>` (§10), written with `replaceState` after a short pause.
 - **Known gap: typing before hydration.** The island is server-rendered; keystrokes before React attaches are lost. Tests wait for the `data-hydrated` mark. Planned fix in milestone 3: an inline listener records early keystrokes and the island adopts them, the same approach as the theme picker.
 - **Not yet:** keypad (§9), persistence (§10), precision setting, the chip's definition note, the "next-best alternatives" after a lock.
+
+## 15. Changes after the first pass (2026-10-06)
+
+Sean's first use of the milestone 2 build. Each item is now implemented and covered by a browser test.
+
+- **Chip on the right.** The number sits on the left of the field and the unit chip on the right, so a box reads "250 mL".
+- **Back at the top.** When a category is expanded or the search was widened to all categories, a Back control sits above the list, not below it. A scoped list shows "Search all categories" in the same place.
+- **Escape is Back, one step at a time.** Expanded list → previous list. Unit locked → unit removed, that category's units listed. Panel open → panel closed. Text present → text cleared. The list Escape opens after removing a unit closes on the next Escape rather than going back, matching the sequence Sean described.
+- **Undo and redo.** Ctrl/Cmd+Z and Ctrl/Cmd+Y (or Shift+Z), plus two buttons by the hint. The last interaction is what gets undone: a run of typing in one box is one step, and undoing a unit pick keeps the number and removes the unit. Loading from a URL starts a fresh history.
+- **The chip opens the list.** Clicking the chip body lists the units of its category so the unit can be changed in place; the × still removes it.
+- **No "category" subtext** on category rows. The chevron and the missing symbol column mark them.
+- **Sentence case everywhere** except proper names and unit conventions (docs/DESIGN-SYSTEM.md, "Copy"). "Neon noir", not "Neon Noir".

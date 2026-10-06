@@ -9,9 +9,13 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
-import { SuggestionPanel, type SuggestionItem } from '../../components/SuggestionPanel';
+import {
+  SuggestionPanel,
+  type PanelHeader,
+  type SuggestionItem,
+} from '../../components/SuggestionPanel';
 import { UnitChip } from '../../components/UnitChip';
-import type { Action, BoxView, Mode } from './state';
+import type { BoxView, HistoryAction, Mode } from './state';
 import type { ConverterEnv } from './useConverter';
 
 export interface SmartInputProps {
@@ -22,17 +26,24 @@ export interface SmartInputProps {
   describedBy: string;
   mode: Mode;
   env: ConverterEnv;
-  dispatch: (action: Action) => void;
+  dispatch: (action: HistoryAction) => void;
   /** Rendered at the end of the field, such as the copy button on the result box. */
   trailing?: ReactNode;
 }
 
-/** 'all' is the escape hatch out of the category scope; a CategoryId is an expanded category row. */
-type ScopeOverride = 'all' | CategoryId | null;
+/**
+ * Where the list is looking when it is not the default scope. 'all' is the escape hatch out of
+ * the category scope; a CategoryId is an expanded category. `origin` decides what Escape does next:
+ * a list the user opened goes back, a list Escape itself opened (after unlocking) closes.
+ */
+interface Override {
+  scope: 'all' | CategoryId;
+  origin: 'pick' | 'escape';
+}
 
 /**
  * One box of the converter: a text field that takes a number, a unit, or both, with the locked
- * unit shown as a chip and a suggestion listbox below (docs/UX-SPEC.md §2–§5).
+ * unit shown as a chip and a suggestion listbox below (docs/UX-SPEC.md §2–§5, §14).
  * Hand-built on the WAI-ARIA combobox pattern (ADR 0006): the input keeps focus, the listbox is
  * virtual-focused through aria-activedescendant.
  */
@@ -53,9 +64,9 @@ export function SmartInput({
 
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
-  const [scopeOverride, setScopeOverride] = useState<ScopeOverride>(null);
+  const [override, setOverride] = useState<Override | null>(null);
 
-  const scope = scopeOverride === 'all' ? null : (scopeOverride ?? box.scope);
+  const scope = override ? (override.scope === 'all' ? null : override.scope) : box.scope;
   const searchOptions = {
     category: scope,
     separators: env.separators,
@@ -73,7 +84,6 @@ export function SmartInput({
       ? { kind: 'unit', key: result.unit.id, unit: result.unit }
       : { kind: 'category', key: `#${result.category.id}`, category: result.category },
   );
-  if (scope) items.push({ kind: 'all-categories', key: '#all' });
 
   const message = noMatch
     ? `No unit matches “${query}”. Try ml, feet, or °F.`
@@ -81,9 +91,37 @@ export function SmartInput({
       ? 'Now pick a unit'
       : undefined;
 
+  const focusInput = () => inputRef.current?.focus();
+
+  const showList = (next: Override | null) => {
+    setOverride(next);
+    setOpen(true);
+    setActive(-1);
+  };
+
+  const header: PanelHeader | undefined = override
+    ? {
+        label: 'Back',
+        back: true,
+        onClick: () => {
+          showList(null);
+          focusInput();
+        },
+      }
+    : scope
+      ? {
+          label: 'Search all categories',
+          back: false,
+          onClick: () => {
+            showList({ scope: 'all', origin: 'pick' });
+            focusInput();
+          },
+        }
+      : undefined;
+
   const lock = (unit: Unit) => {
     dispatch({ type: 'lock', box: box.id, unit: unit.id });
-    setScopeOverride(null);
+    setOverride(null);
     setOpen(false);
     setActive(-1);
   };
@@ -99,17 +137,13 @@ export function SmartInput({
   const pick = (item: SuggestionItem) => {
     if (item.kind === 'unit') {
       lock(item.unit);
-    } else if (item.kind === 'category') {
+    } else {
       if (box.isSource && query) {
         dispatch({ type: 'setText', box: box.id, text: suggestion.parsed.valueText ?? '' });
       }
-      setScopeOverride(item.category.id);
-      setActive(-1);
-    } else {
-      setScopeOverride('all');
-      setActive(-1);
+      showList({ scope: item.category.id, origin: 'pick' });
     }
-    inputRef.current?.focus();
+    focusInput();
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -121,7 +155,29 @@ export function SmartInput({
     tryLock('keystroke', next);
   };
 
+  /** Escape is "back", one step at a time: expanded list → unit → panel → text (docs/UX-SPEC.md §14). */
+  const escape = () => {
+    if (override?.origin === 'pick') {
+      showList(null);
+      return;
+    }
+    if (box.unit) {
+      const category = box.unit.category;
+      dispatch({ type: 'unlock', box: box.id });
+      showList({ scope: category, origin: 'escape' });
+      return;
+    }
+    if (open) {
+      setOpen(false);
+      setActive(-1);
+      setOverride(null);
+      return;
+    }
+    if (box.isSource && box.text) dispatch({ type: 'input', box: box.id, text: '' });
+  };
+
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.ctrlKey || event.metaKey) return; // shortcuts such as undo are handled by the converter
     const count = items.length;
     switch (event.key) {
       case 'ArrowDown':
@@ -142,11 +198,8 @@ export function SmartInput({
         break;
       }
       case 'Escape':
-        if (open) {
-          event.preventDefault();
-          setOpen(false);
-          setActive(-1);
-        }
+        event.preventDefault();
+        escape();
         break;
       case 'Tab':
         tryLock('boundary');
@@ -174,7 +227,7 @@ export function SmartInput({
     tryLock('boundary');
     setOpen(false);
     setActive(-1);
-    setScopeOverride(null);
+    setOverride(null);
   };
 
   useEffect(() => {
@@ -192,15 +245,6 @@ export function SmartInput({
         {label}
       </label>
       <div className="flex min-h-14 items-center gap-2 px-3">
-        {box.unit && (
-          <UnitChip
-            unit={box.unit}
-            onRemove={() => {
-              dispatch({ type: 'unlock', box: box.id });
-              inputRef.current?.focus();
-            }}
-          />
-        )}
         <input
           ref={inputRef}
           id={inputId}
@@ -223,6 +267,19 @@ export function SmartInput({
           onFocus={onFocus}
           className="min-w-0 flex-1 bg-transparent py-3 font-numeric text-2xl text-ink outline-none placeholder:text-ink-muted sm:text-3xl"
         />
+        {box.unit && (
+          <UnitChip
+            unit={box.unit}
+            onOpen={() => {
+              showList(null);
+              focusInput();
+            }}
+            onRemove={() => {
+              dispatch({ type: 'unlock', box: box.id });
+              focusInput();
+            }}
+          />
+        )}
         {trailing}
       </div>
       {open && (
@@ -231,6 +288,7 @@ export function SmartInput({
           items={items}
           activeIndex={active}
           optionId={optionId}
+          header={header}
           message={message}
           showCategory={scope === null}
           onPick={pick}

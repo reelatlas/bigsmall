@@ -141,3 +141,18 @@ Decision 2026-10-06: the box accepts what people naturally type and never punish
 - **Never block.** A partial or invalid expression keeps the last good result and shows a soft hint, not an error state, until the user pauses.
 
 Phasing: v1 ships the number grammar in §2 (sign, grouping, decimal, exponent). Phase 2 adds fractions, feet-and-inches, and the connective form. Phase 3 adds the expression evaluator (a small dependency-free parser in core, never `eval`) and Enter-as-equals. The keypad grows the same operators when phase 3 lands (§9).
+
+## 14. Milestone 2 implementation notes (2026-10-06)
+
+What shipped and where it deliberately differs from the sections above. Each difference is a candidate question for the usability test (docs/research/usability-test-1.md).
+
+- **Labels.** The boxes are named "First value" and "Second value" for assistive technology. Neither is "from" or "to" because either can drive the other. One shared hint sits under the boxes.
+- **Lock closes the panel.** §5 asks for the panel to stay open one beat after a lock; for now it closes, and the chip's remove control is the undo.
+- **Lock timing** follows §5: on the keystroke when nothing else could still be typed, otherwise on Space, Enter, Tab, or blur.
+- **Source handoff.** Only a number makes a box the source. Typing a bare unit into the other box keeps the current source, so the number already entered never disappears while a unit is being chosen.
+- **Swap** moves the typed value with its unit to the other side and makes that side the source, so nothing is re-rounded. §7's "keeps the same source side" meant this.
+- **Category rows** expand in place: picking "Length" lists its units. "Search all categories" at the bottom of a scoped list is the escape hatch from §6.
+- **No match** shows the message, then the categories.
+- **URL** is `?a=<unit>&b=<unit>&v=<number>&s=<a|b>` (§10), written with `replaceState` after a short pause.
+- **Known gap: typing before hydration.** The island is server-rendered; keystrokes before React attaches are lost. Tests wait for the `data-hydrated` mark. Planned fix in milestone 3: an inline listener records early keystrokes and the island adopts them, the same approach as the theme picker.
+- **Not yet:** keypad (§9), persistence (§10), precision setting, the chip's definition note, the "next-best alternatives" after a lock.

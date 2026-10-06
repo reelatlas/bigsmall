@@ -52,6 +52,18 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 | `test/`                   | Node-only unit tests (theme contract and contrast)                                                 |
 | `e2e/`                    | Playwright: smoke, behavior, axe accessibility on desktop and mobile                               |
 
+### The converter (`apps/web/src/features/converter`)
+
+| File              | Responsibility                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `state.ts`        | `reduce` (input, setText, lock, unlock, swap, clear, setMode, hydrate) and `selectView` (texts, result, announcement). Pure; tested in node |
+| `url.ts`          | `stateToParams` / `paramsToState`: the conversion as `?a=&b=&v=&s=`                                                                         |
+| `useConverter.ts` | Owns the reducer, detects locale and region once, restores from the URL after hydration, writes the URL (debounced), paces the live region  |
+| `SmartInput.tsx`  | One box: field, chip, suggestion listbox. The WAI-ARIA combobox pattern by hand (ADR 0006)                                                  |
+| `Converter.tsx`   | The island: two inputs, swap, copy, hint, status line, live region, `data-hydrated` mark                                                    |
+
+`src/lib/hydrated.ts` provides `useIsHydrated`, a `useSyncExternalStore` that flips once on the client, so the island can mark itself ready without effects.
+
 ### Islands
 
 Astro renders every page to static HTML. JavaScript ships only for components marked `client:*`, and only React islands carry React. Rule of thumb: if a thing can be HTML plus a few lines of inline script, it is not an island. The theme picker is the worked example: a plain `<select>` handled by the pre-paint script, so it works before any bundle loads.

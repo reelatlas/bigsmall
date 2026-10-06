@@ -11,6 +11,7 @@ One file per decision, numbered, never edited after acceptance except to change 
 | [0003](0003-core-ui-boundary.md)        | Hard boundary between core engine and UI                    | accepted |
 | [0004](0004-originality-and-sources.md) | Original code; factors verified against standards bodies    | accepted |
 | [0005](0005-toolchain-policy.md)        | Latest tooling where compatible, a11y tooling never dropped | accepted |
+| [0006](0006-smart-input-combobox.md)    | Hand-built WAI-ARIA combobox; React Aria removed            | accepted |
 
 ## Template
 

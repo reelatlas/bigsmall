@@ -51,14 +51,15 @@ Adding a unit means adding at least one row that exercises it; a test fails when
 - Tests run on two projects: Desktop Chrome and a Pixel-class mobile viewport.
 - Every page gets an axe pass with the WCAG 2.0/2.1/2.2 A and AA tags. Violations fail the test.
 - The theme test applies each theme to the live page and runs axe again.
-- When a test interacts with a React island, wait for something the island renders before clicking; islands hydrate after first paint. Things handled by inline scripts (the theme picker) are interactive immediately.
+- The converter island marks itself `data-hydrated` once React has attached. `converter.spec.ts` calls `ready(page)` after every `goto` before typing; without it keystrokes land before hydration and are reset. Things handled by inline scripts (the theme picker) are interactive immediately.
+- `converter.spec.ts` covers the flows in docs/UX-SPEC.md: typing locks a unit and scopes the other box, the second box takes over as source, ambiguous symbols show both meanings, keyboard-only category and unit picking, Space locking an extendable match, swap, cross-category switching with its notice, copy, and an axe pass with the listbox open.
 - Playwright starts `pnpm dev` on `127.0.0.1:4321` and reuses a running server locally.
 
 ## CI
 
 `.github/workflows/ci.yml` runs on every push to `main` and every pull request:
 
-- **verify**: install, lint, format check, typecheck, unit tests, build.
+- **verify**: install, lint, format check, typecheck, unit tests, build, bundle budget (`scripts/bundle-size.mjs`, which follows the converter page's scripts and their imports and gzips each one; 90 KB JS and 20 KB CSS).
 - **e2e**: install Chromium, run Playwright. The HTML report is uploaded on failure.
 
 Both must pass. There is no manual override; fix the code or fix the test.

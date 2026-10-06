@@ -62,16 +62,19 @@ Every component in `apps/web/src/components/`:
 7. Appears in `/dev/gallery` so every theme can be checked against it.
 8. Passes the Playwright axe suite on desktop and mobile.
 
-Prefer native elements when they are good enough (`<select>`, `<dialog>`, `<button>`). Reach for React Aria Components when the interaction is genuinely complex (combobox, listbox, number field). Never re-implement focus management by hand.
+Prefer native elements when they are good enough (`<select>`, `<dialog>`, `<button>`). The smart input is the one hand-built composite control (WAI-ARIA combobox pattern, ADR 0006). A new composite starts from that pattern and the axe suite, and brings in a library only for a measured need recorded in an ADR.
 
 ## Inventory
 
-| Component     | Kind        | Notes                                                                                         |
-| ------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `Button`      | React (RAC) | `variant="primary" \| "secondary"`. Pressed, hovered, and disabled states via data attributes |
-| `ThemePicker` | Astro       | Native `<select>`; the pre-paint script handles it, so it needs no bundle                     |
+| Component         | Kind           | Notes                                                                                                             |
+| ----------------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `Button`          | React (native) | `variant="primary"                                                                                                | "secondary" | "ghost"`, `square`for a lone icon with`aria-label`. Native `<button>`, no runtime |
+| `ThemePicker`     | Astro          | Native `<select>`; the pre-paint script handles it, so it needs no bundle                                         |
+| `UnitChip`        | React          | The locked unit inside a smart input: symbol, plural, remove control                                              |
+| `SuggestionPanel` | React          | The listbox under a smart input: unit, category, and escape-hatch rows, virtual focus via `aria-activedescendant` |
+| `icons`           | React          | Inline SVG icons (swap, close, copy, chevron); decorative, `aria-hidden`                                          |
 
-Arriving in milestones 2 and 3: `SmartInput`, `UnitChip`, `SuggestionList`, `Keypad`, `Sheet`, `Toggle`, `LiveResult`.
+Arriving in milestone 3: `Keypad`, `Sheet`, `Toggle`, `LiveResult`. `SmartInput` lives in `features/converter/` because it composes core search with these primitives.
 
 ## Adding a component
 

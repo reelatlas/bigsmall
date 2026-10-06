@@ -1,6 +1,6 @@
 # bigsmall — project plan
 
-Last updated: 2026-10-06. Status: milestones 0 and 1 complete; milestone 2 (smart input spike) is next.
+Last updated: 2026-10-06. Status: milestones 0 and 1 complete; milestone 2 code complete, usability test pending (docs/research/usability-test-1.md).
 
 ## 1. Vision
 
@@ -138,18 +138,18 @@ State serializes to the URL (`/?a=5ml&b=cup`) so sharing, bookmarks, and later S
 
 ## 6. Stack (proposed, ADR 0002)
 
-| Concern               | Choice                                             | Why                                                                                                                          |
-| --------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Framework             | **Astro** with a **React** island                  | Static HTML by default, zero JS outside the converter, static page generation for later SEO pages, built-in view transitions |
-| Language              | **TypeScript** (strict)                            | Catches unit-data mistakes at compile time                                                                                   |
-| Styling               | **Tailwind CSS v4** over **CSS custom properties** | Tokens are plain CSS variables so themes are just variable sets; Tailwind for speed and consistency                          |
-| Accessible primitives | **React Aria Components**                          | Best-tested combobox, listbox, number field, and dialog on mobile screen readers; locale-aware number parsing included       |
-| Package manager       | **pnpm** workspaces                                | Fast; the workspace enforces the core/web boundary physically                                                                |
-| Tests                 | **Vitest** (core), **Playwright** + **axe** (web)  | Table-driven golden tests for math; end-to-end plus automated accessibility checks                                           |
-| Lint/format           | **ESLint** (flat) + **Prettier**                   | Boring, complete coverage of `.astro`, `.tsx`, and `.css`                                                                    |
-| Perf gates            | **Lighthouse CI**, bundle size check               | Budgets fail the build                                                                                                       |
-| Hosting               | **Cloudflare Pages**                               | Free, global edge, preview deploy per pull request, free cookieless analytics                                                |
-| Repo                  | **GitHub**                                         | Actions for CI, PR previews                                                                                                  |
+| Concern               | Choice                                                 | Why                                                                                                                                                                  |
+| --------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework             | **Astro** with a **React** island                      | Static HTML by default, zero JS outside the converter, static page generation for later SEO pages, built-in view transitions                                         |
+| Language              | **TypeScript** (strict)                                | Catches unit-data mistakes at compile time                                                                                                                           |
+| Styling               | **Tailwind CSS v4** over **CSS custom properties**     | Tokens are plain CSS variables so themes are just variable sets; Tailwind for speed and consistency                                                                  |
+| Accessible primitives | **Native elements + a hand-built combobox** (ADR 0006) | React Aria was tried and removed at milestone 2: its button machinery alone cost 12 KB gzipped, and the hybrid number-and-unit field does not fit a library combobox |
+| Package manager       | **pnpm** workspaces                                    | Fast; the workspace enforces the core/web boundary physically                                                                                                        |
+| Tests                 | **Vitest** (core), **Playwright** + **axe** (web)      | Table-driven golden tests for math; end-to-end plus automated accessibility checks                                                                                   |
+| Lint/format           | **ESLint** (flat) + **Prettier**                       | Boring, complete coverage of `.astro`, `.tsx`, and `.css`                                                                                                            |
+| Perf gates            | **Lighthouse CI**, bundle size check                   | Budgets fail the build                                                                                                                                               |
+| Hosting               | **Cloudflare Pages**                                   | Free, global edge, preview deploy per pull request, free cookieless analytics                                                                                        |
+| Repo                  | **GitHub**                                             | Actions for CI, PR previews                                                                                                                                          |
 
 Alternative worth naming: **SvelteKit** gives smaller bundles and built-in motion. It loses the React component ecosystem and React Aria. Choose it only if bundle size proves to be the deciding factor after the first measurement. **Next.js** is not recommended: heavier runtime and server features this project never uses.
 
@@ -215,7 +215,7 @@ Rules: every theme passes the same contrast checks; decoration costs nothing whe
 | CLS                                       | ≈ 0                                                                                          |
 | Lighthouse                                | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100                             |
 
-Enforced in CI from milestone 2 onward.
+Enforced in CI from milestone 2 onward. Measured 2026-10-06 after milestone 2: 79.1 KB JS and 4.4 KB CSS gzipped (`pnpm bundle`). Lighthouse joins at milestone 5.
 
 ## 10. Accessibility targets
 
@@ -257,14 +257,14 @@ Rule of thumb: if a future session would have to rediscover it, write it down.
 
 ## 13. Milestones
 
-| #   | Milestone              | Done when                                                                                                                                   |
-| --- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**     |
-| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.** |
-| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget        |
-| M3  | **Complete converter** | Keypad, basic/advanced modes, swap, persistence, remaining basic-tier categories, advanced categories loaded on demand                      |
-| M4  | **Themes**             | `midnight`, `sakura`, `neon-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI                |
-| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                       |
+| #   | Milestone              | Done when                                                                                                                                                                               |
+| --- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**                                                 |
+| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                             |
+| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.** |
+| M3  | **Complete converter** | Keypad, basic/advanced modes, swap, persistence, remaining basic-tier categories, advanced categories loaded on demand                                                                  |
+| M4  | **Themes**             | `midnight`, `sakura`, `neon-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI                                                            |
+| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                   |
 
 ## 14. Setup checklist
 
@@ -307,7 +307,7 @@ Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (che
 
 - **Ambiguous symbols** (`m`, `oz`, `ton`, `gal`, `cup`, `cal`, `hp`, `mpg`, `kB`). The disambiguation UX decides whether the smart input feels magical or annoying. Test it early.
 - **Auto-lock vs. explicit pick.** Locking a unit the instant it matches is fast but can surprise. Default proposal is in `docs/UX-SPEC.md`; validate in M2.
-- **React Aria bundle size.** Measure at M2. Have a fallback ready.
+- **Bundle size.** Resolved at M2: 79.1 KB JS gzipped after removing React Aria (ADR 0006). `pnpm bundle:check` gates CI at 90 KB.
 - **Themes vs. speed.** Decoration must be free when inactive. Fonts are the main cost; system fonts for the defaults.
 - **Locale number parsing.** `1,5` means 1.5 in much of the world. Use the browser locale and show the detected format.
 - **Definitions that vary.** Month, year, cup, calorie, horsepower, ton. Each needs a stated definition in the UI and a note in the catalog.

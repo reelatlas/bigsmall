@@ -8,7 +8,7 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 ## Current status
 
-Milestones 0 (setup) and 1 (core engine) complete on 2026-10-06. The engine has eight categories with sourced basic-tier units, a locale-tolerant parser, ranked search with exact-match resolution, and a formatter, all under test. Next: milestone 2, the smart input spike (docs/UX-SPEC.md). Progress and definitions of done are in `docs/PLAN.md` §13.
+Milestones 0 (setup), 1 (core engine), and the code of 2 (smart input) complete on 2026-10-06. The converter works end to end: two linked smart inputs, live results, URL state, 79 KB gzipped. Milestone 2 closes when the five-person usability test in `docs/research/usability-test-1.md` has been run and its findings recorded. Next after that: milestone 3 (keypad, modes, persistence, advanced tiers). Progress and definitions of done are in `docs/PLAN.md` §13.
 
 ## Non-negotiables
 
@@ -29,6 +29,7 @@ Milestones 0 (setup) and 1 (core engine) complete on 2026-10-06. The engine has 
 ```bash
 pnpm dev            # Astro dev server for apps/web
 pnpm build          # static site to apps/web/dist
+pnpm bundle         # gzipped size of what the converter page ships (bundle:check enforces the budget)
 pnpm test           # all Vitest projects (core + web)
 pnpm e2e            # Playwright + axe (first time: pnpm --filter @bigsmall/web exec playwright install chromium)
 pnpm lint

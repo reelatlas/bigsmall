@@ -42,3 +42,5 @@ Stayed with Astro because the product is a static site around one interactive is
 Operating rule so the two component models never blur: **React for everything the user interacts with** (the converter, every design-system control). **Astro only for page scaffolding and static content.** One exception: the theme picker is plain HTML driven by the inline pre-paint script, because it must work before any bundle loads.
 
 Revisit if more than a handful of Astro components accumulate interaction, or if navigation between pair pages needs preserved converter state beyond what Astro's `transition:persist` provides.
+
+Milestone 2 outcome: React Aria Components was removed after measurement; the smart input is a hand-built WAI-ARIA combobox and other controls are native elements (ADR 0006). The rest of this decision stands.

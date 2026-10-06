@@ -45,6 +45,12 @@
   --ease-standard: var(--motion-ease);
 }
 
+/* Thin, themed, arrow-less scrollbars for lists inside rounded shells. */
+@utility scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
 @layer base {
   html {
     background: var(--canvas);

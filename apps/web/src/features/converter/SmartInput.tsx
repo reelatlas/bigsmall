@@ -247,8 +247,10 @@ export function SmartInput({
   return (
     <div className="relative h-14 min-w-0">
       <div
-        className={`absolute inset-x-0 top-0 overflow-hidden rounded-lg border bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard focus-within:border-accent focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus ${
-          open ? 'z-20 border-accent shadow-md' : 'border-line shadow-sm'
+        className={`absolute inset-x-0 top-0 overflow-hidden rounded-lg border bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard focus-within:border-accent focus-within:ring-1 focus-within:ring-accent focus-within:ring-inset ${
+          open
+            ? 'z-20 border-accent shadow-md ring-1 ring-accent ring-inset'
+            : 'border-line shadow-sm'
         }`}
         onBlur={onBlur}
       >

@@ -60,7 +60,12 @@ export function SuggestionPanel({
         </div>
       )}
       {message && <p className="px-3 pt-2 text-sm text-ink-muted">{message}</p>}
-      <ul role="listbox" id={id} aria-label="Suggestions" className="max-h-72 overflow-y-auto py-1">
+      <ul
+        role="listbox"
+        id={id}
+        aria-label="Suggestions"
+        className="max-h-72 scroll-thin overflow-y-auto py-1"
+      >
         {items.map((item, index) => (
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the combobox input handles keys; rows are virtual-focused via aria-activedescendant
           <li

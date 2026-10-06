@@ -20,26 +20,26 @@ Input text is parsed on every keystroke into `{ value?: number, query?: string, 
 
 Examples:
 
-| Input | value | query |
-|---|---|---|
-| `5` | 5 | — |
-| `5 ml` | 5 | `ml` |
-| `5ml` | 5 | `ml` |
-| `ml` | — | `ml` |
-| `-40 f` | -40 | `f` |
-| `1,000.5 km` (en-US) | 1000.5 | `km` |
-| `1.000,5 km` (de-DE) | 1000.5 | `km` |
-| `fluids` | — | `fluids` |
+| Input                | value  | query    |
+| -------------------- | ------ | -------- |
+| `5`                  | 5      | —        |
+| `5 ml`               | 5      | `ml`     |
+| `5ml`                | 5      | `ml`     |
+| `ml`                 | —      | `ml`     |
+| `-40 f`              | -40    | `f`      |
+| `1,000.5 km` (en-US) | 1000.5 | `km`     |
+| `1.000,5 km` (de-DE) | 1000.5 | `km`     |
+| `fluids`             | —      | `fluids` |
 
 ## 3. Box states
 
-| State | Condition | Panel shows |
-|---|---|---|
-| `idle` | empty text, no unit | Primary categories as chips, then "All categories". If the other box has a unit: that category's basic units, ordered by common counterpart. |
-| `number` | value present, no query, no unit | Same as `idle`, with the prompt "Now pick a unit". |
-| `searching` | query present, no unit locked | Ranked unit matches. If the query matches a category name or alias, that category's units. |
-| `locked` | unit chosen | Panel closed. Field is numeric. Chip shows the unit symbol and name. |
-| `no-match` | query present, zero matches | "No unit matches 'xyz'", then the categories, then three example inputs. |
+| State       | Condition                        | Panel shows                                                                                                                                  |
+| ----------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `idle`      | empty text, no unit              | Primary categories as chips, then "All categories". If the other box has a unit: that category's basic units, ordered by common counterpart. |
+| `number`    | value present, no query, no unit | Same as `idle`, with the prompt "Now pick a unit".                                                                                           |
+| `searching` | query present, no unit locked    | Ranked unit matches. If the query matches a category name or alias, that category's units.                                                   |
+| `locked`    | unit chosen                      | Panel closed. Field is numeric. Chip shows the unit symbol and name.                                                                         |
+| `no-match`  | query present, zero matches      | "No unit matches 'xyz'", then the categories, then three example inputs.                                                                     |
 
 Transitions:
 
@@ -120,3 +120,16 @@ This is the behavior most likely to need tuning after testing.
 3. Ambiguity: when `oz` offers two choices, do people pick correctly without reading?
 4. Do people find the swap and keypad controls?
 5. On a phone, is one-thumb use comfortable with the keypad open?
+
+## 13. Input flexibility (principle, phased)
+
+Decision 2026-10-06: the box accepts what people naturally type and never punishes formatting. Not implemented yet; this section is the standing brief so each phase builds toward it.
+
+- **Spacing is irrelevant.** `5ml`, `5 ml`, `5  mL`, and `5 ml` all parse the same.
+- **Locale number formats.** `1,5` and `1.5` both work according to the detected locale. When an input is ambiguous, the other reading is offered, and a quiet line under the field shows the number we understood.
+- **Math inside the box.** `2*3 ft`, `(5+7)/2 cm`, `2^10 bytes`, `1e6 m`, `3 1/2 in`, `5'10"`. Operators: `+ − × ÷ * / ^ ( )`, `e`/`E` exponents, unicode minus and multiplication signs, and `x` as multiply when it sits between two numbers.
+- **Enter means equals.** When the box holds an expression, Enter evaluates it in place and the unit chip stays locked. With a bare number, Enter does nothing new because the result is already live.
+- **Show the understanding.** While an expression is being typed, a line under the field shows the evaluated value (`= 1024`) so people trust what will be converted.
+- **Never block.** A partial or invalid expression keeps the last good result and shows a soft hint, not an error state, until the user pauses.
+
+Phasing: v1 ships the number grammar in §2 (sign, grouping, decimal, exponent). Phase 2 adds fractions, feet-and-inches, and the connective form. Phase 3 adds the expression evaluator (a small dependency-free parser in core, never `eval`) and Enter-as-equals. The keypad grows the same operators when phase 3 lands (§9).

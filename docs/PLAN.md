@@ -1,12 +1,12 @@
 # bigsmall — project plan
 
-Last updated: 2026-10-06. Status: planning, pre-scaffold.
+Last updated: 2026-10-06. Status: milestone 0 complete; milestone 1 (core engine) is next.
 
 ## 1. Vision
 
 The best-feeling unit converter on the web. The two incumbents (unitconverters.net, onlineconversion.com) are correct and comprehensive but their UX is from another decade: two scrolling list boxes, a Convert button, tiny targets, ad-heavy pages, and no sense of place. bigsmall competes on experience, not on breadth, while still matching the coverage people expect.
 
-Positioning in one line: *type anything into either box and get the answer.*
+Positioning in one line: _type anything into either box and get the answer._
 
 ## 2. What we are building
 
@@ -27,7 +27,7 @@ Positioning in one line: *type anything into either box and get the answer.*
 - PWA: installable, works offline. This covers most of the "app" ambition with no app store.
 - Currency (needs live rates from an API, still no database).
 - Ingredient-aware cooking conversions (cups of flour to grams).
-- Expression keypad (`+ − × ÷`), fraction entry, feet-and-inches entry.
+- Expression input: typed math in the box (`2^10 bytes`, `(5+7)/2 cm`), Enter as equals, operator keys on the keypad, fraction and feet-and-inches entry. Principle and phasing in `docs/UX-SPEC.md` §13.
 - Native wrapper (Capacitor) only if the PWA proves insufficient.
 
 ### Out of scope
@@ -51,13 +51,13 @@ The smart input is the whole product. It is the first thing to build and the fir
 
 **No.** A converter is static data plus arithmetic. Conversion factors are constants. Everything the app needs ships with the page and runs in the browser.
 
-| Need | Where it lives |
-|---|---|
-| Unit definitions and factors | TypeScript data in `packages/core`, bundled |
-| Theme, mode, precision, locale preferences | `localStorage` |
-| Recent and favorite conversions | `localStorage` |
-| Current conversion (for sharing) | URL |
-| Usage analytics (which units people use) | Third-party cookieless analytics |
+| Need                                       | Where it lives                              |
+| ------------------------------------------ | ------------------------------------------- |
+| Unit definitions and factors               | TypeScript data in `packages/core`, bundled |
+| Theme, mode, precision, locale preferences | `localStorage`                              |
+| Recent and favorite conversions            | `localStorage`                              |
+| Current conversion (for sharing)           | URL                                         |
+| Usage analytics (which units people use)   | Third-party cookieless analytics            |
 
 What would change the answer: accounts with cross-device sync of favorites (needs auth plus storage), or server-side logging of search queries that returned nothing. Both are additive and can be bolted on later without touching the core. Currency needs an external rate API, not a database. Do not set up Supabase for v1. See ADR 0001.
 
@@ -85,28 +85,36 @@ apps/web           Astro site with one React island for the converter
 
 ```ts
 type Category = {
-  id: string;              // "length"
-  name: string;            // "Length"
-  aliases: string[];       // ["distance", "how far"]
-  baseUnit: string;        // "meter"
-  tier: "basic" | "advanced";
-  group: "everyday" | "mechanics" | "fluids" | "heat" | "electromagnetism" | "light" | "radiation" | "digital";
+  id: string; // "length"
+  name: string; // "Length"
+  aliases: string[]; // ["distance", "how far"]
+  baseUnit: string; // "meter"
+  tier: 'basic' | 'advanced';
+  group:
+    | 'everyday'
+    | 'mechanics'
+    | 'fluids'
+    | 'heat'
+    | 'electromagnetism'
+    | 'light'
+    | 'radiation'
+    | 'digital';
 };
 
 type Unit = {
-  id: string;              // "milliliter"
-  category: string;        // "volume"
-  name: string;            // "milliliter"
-  plural: string;          // "milliliters"
-  symbol: string;          // "mL"
-  aliases: string[];       // ["ml", "millilitre", "cc", "cubic centimeter"]
-  system: "si" | "metric" | "us" | "imperial" | "other";
-  tier: "basic" | "advanced";
-  factor?: number;         // 1 unit = factor base units (linear units)
-  toBase?: (v: number) => number;    // non-linear units (temperature, fuel economy)
+  id: string; // "milliliter"
+  category: string; // "volume"
+  name: string; // "milliliter"
+  plural: string; // "milliliters"
+  symbol: string; // "mL"
+  aliases: string[]; // ["ml", "millilitre", "cc", "cubic centimeter"]
+  system: 'si' | 'metric' | 'us' | 'imperial' | 'other';
+  tier: 'basic' | 'advanced';
+  factor?: number; // 1 unit = factor base units (linear units)
+  toBase?: (v: number) => number; // non-linear units (temperature, fuel economy)
   fromBase?: (v: number) => number;
-  exact: boolean;          // factor is exact by definition
-  source: string;          // "NIST SP 811 §B.8" or "BIPM SI Brochure 9th ed. §2.3.1"
+  exact: boolean; // factor is exact by definition
+  source: string; // "NIST SP 811 §B.8" or "BIPM SI Brochure 9th ed. §2.3.1"
 };
 ```
 
@@ -119,10 +127,10 @@ type BoxState = { text: string; value: number | null; unit: string | null };
 type ConverterState = {
   a: BoxState;
   b: BoxState;
-  source: "a" | "b";       // which box was edited last
+  source: 'a' | 'b'; // which box was edited last
   category: string | null; // locked once either box has a unit
-  mode: "basic" | "advanced";
-  keypad: { open: boolean; target: "a" | "b" };
+  mode: 'basic' | 'advanced';
+  keypad: { open: boolean; target: 'a' | 'b' };
 };
 ```
 
@@ -130,18 +138,18 @@ State serializes to the URL (`/?a=5ml&b=cup`) so sharing, bookmarks, and later S
 
 ## 6. Stack (proposed, ADR 0002)
 
-| Concern | Choice | Why |
-|---|---|---|
-| Framework | **Astro** with a **React** island | Static HTML by default, zero JS outside the converter, static page generation for later SEO pages, built-in view transitions |
-| Language | **TypeScript** (strict) | Catches unit-data mistakes at compile time |
-| Styling | **Tailwind CSS v4** over **CSS custom properties** | Tokens are plain CSS variables so themes are just variable sets; Tailwind for speed and consistency |
-| Accessible primitives | **React Aria Components** | Best-tested combobox, listbox, number field, and dialog on mobile screen readers; locale-aware number parsing included |
-| Package manager | **pnpm** workspaces | Fast; the workspace enforces the core/web boundary physically |
-| Tests | **Vitest** (core), **Playwright** + **axe** (web) | Table-driven golden tests for math; end-to-end plus automated accessibility checks |
-| Lint/format | **ESLint** (flat) + **Prettier** | Boring, complete coverage of `.astro`, `.tsx`, and `.css` |
-| Perf gates | **Lighthouse CI**, bundle size check | Budgets fail the build |
-| Hosting | **Cloudflare Pages** | Free, global edge, preview deploy per pull request, free cookieless analytics |
-| Repo | **GitHub** | Actions for CI, PR previews |
+| Concern               | Choice                                             | Why                                                                                                                          |
+| --------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Framework             | **Astro** with a **React** island                  | Static HTML by default, zero JS outside the converter, static page generation for later SEO pages, built-in view transitions |
+| Language              | **TypeScript** (strict)                            | Catches unit-data mistakes at compile time                                                                                   |
+| Styling               | **Tailwind CSS v4** over **CSS custom properties** | Tokens are plain CSS variables so themes are just variable sets; Tailwind for speed and consistency                          |
+| Accessible primitives | **React Aria Components**                          | Best-tested combobox, listbox, number field, and dialog on mobile screen readers; locale-aware number parsing included       |
+| Package manager       | **pnpm** workspaces                                | Fast; the workspace enforces the core/web boundary physically                                                                |
+| Tests                 | **Vitest** (core), **Playwright** + **axe** (web)  | Table-driven golden tests for math; end-to-end plus automated accessibility checks                                           |
+| Lint/format           | **ESLint** (flat) + **Prettier**                   | Boring, complete coverage of `.astro`, `.tsx`, and `.css`                                                                    |
+| Perf gates            | **Lighthouse CI**, bundle size check               | Budgets fail the build                                                                                                       |
+| Hosting               | **Cloudflare Pages**                               | Free, global edge, preview deploy per pull request, free cookieless analytics                                                |
+| Repo                  | **GitHub**                                         | Actions for CI, PR previews                                                                                                  |
 
 Alternative worth naming: **SvelteKit** gives smaller bundles and built-in motion. It loses the React component ecosystem and React Aria. Choose it only if bundle size proves to be the deciding factor after the first measurement. **Next.js** is not recommended: heavier runtime and server features this project never uses.
 
@@ -183,29 +191,29 @@ A theme is a `[data-theme="name"]` block that reassigns semantic tokens, plus an
 
 Theme roster (working names, to be designed):
 
-| Theme | Feel | Notes |
-|---|---|---|
-| `daylight` | neutral light | default, system fonts, the baseline |
-| `midnight` | neutral dark | default when the OS prefers dark |
-| `sakura` | cherry blossom | soft pinks, paper texture, slow petal drift (CSS only, off under reduced motion) |
-| `neon-noir` | Tokyo at night | near-black, magenta and cyan glow, monospace numerals, rain streak texture |
-| `hardhat` | job site | safety yellow and steel, blueprint grid, stencil display face, chunky targets |
-| `theorem` | higher mathematics | chalkboard or graph paper, math serif, typeset-looking results |
+| Theme       | Feel               | Notes                                                                            |
+| ----------- | ------------------ | -------------------------------------------------------------------------------- |
+| `daylight`  | neutral light      | default, system fonts, the baseline                                              |
+| `midnight`  | neutral dark       | default when the OS prefers dark                                                 |
+| `sakura`    | cherry blossom     | soft pinks, paper texture, slow petal drift (CSS only, off under reduced motion) |
+| `neon-noir` | Tokyo at night     | near-black, magenta and cyan glow, monospace numerals, rain streak texture       |
+| `hardhat`   | job site           | safety yellow and steel, blueprint grid, stencil display face, chunky targets    |
+| `theorem`   | higher mathematics | chalkboard or graph paper, math serif, typeset-looking results                   |
 
 Rules: every theme passes the same contrast checks; decoration costs nothing when the theme is inactive (fonts and textures load on activation only); `prefers-reduced-motion` disables ambient motion; theme is applied by an inline script before first paint so there is no flash; `color-scheme` is set per theme so native controls match. A `/dev/gallery` page renders every component in every theme for visual QA.
 
 ## 9. Performance budgets
 
-| Metric | Budget |
-|---|---|
-| JS on the converter page, gzipped | ≤ 90 KB (target 60) |
-| CSS, gzipped | ≤ 20 KB |
-| Unit data shipped initially | ≤ 15 KB (basic categories); advanced categories lazy-loaded per category |
-| Fonts | 0 KB for defaults (system stack); ≤ 2 subset files per aesthetic theme, loaded on activation |
-| LCP on simulated mid-tier mobile, slow 4G | < 1.5 s |
-| INP | < 200 ms |
-| CLS | ≈ 0 |
-| Lighthouse | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100 |
+| Metric                                    | Budget                                                                                       |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------- |
+| JS on the converter page, gzipped         | ≤ 90 KB (target 60)                                                                          |
+| CSS, gzipped                              | ≤ 20 KB                                                                                      |
+| Unit data shipped initially               | ≤ 15 KB (basic categories); advanced categories lazy-loaded per category                     |
+| Fonts                                     | 0 KB for defaults (system stack); ≤ 2 subset files per aesthetic theme, loaded on activation |
+| LCP on simulated mid-tier mobile, slow 4G | < 1.5 s                                                                                      |
+| INP                                       | < 200 ms                                                                                     |
+| CLS                                       | ≈ 0                                                                                          |
+| Lighthouse                                | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100                             |
 
 Enforced in CI from milestone 2 onward.
 
@@ -232,64 +240,68 @@ WCAG 2.2 AA throughout. Specifically:
 
 ## 12. Documentation system
 
-| Doc | Purpose | Updated when |
-|---|---|---|
-| `CLAUDE.md` | Conventions and rules for every working session | Rules change |
-| `docs/PLAN.md` | Vision, scope, architecture, milestones | Scope or plan changes |
-| `docs/UX-SPEC.md` | Exact UI behavior | Before any behavior change |
-| `docs/UNITS-CATALOG.md` | Taxonomy, tiers, special cases, sources | Units or categories change |
-| `docs/ARCHITECTURE.md` | Modules, data flow, boundaries, how to extend | Structure changes |
-| `docs/DESIGN-SYSTEM.md` | Tokens, components, usage rules | Tokens or components change |
-| `docs/THEMING.md` | How to author and QA a theme | Theming mechanism changes |
-| `docs/TESTING.md` | Test layers, how to add golden rows, CI gates | Test approach changes |
-| `docs/decisions/NNNN-*.md` | Why we chose what we chose | A decision is made or reversed |
-| `docs/LEARNINGS.md` | Dated log of gotchas and best practices | Something is learned |
+| Doc                        | Purpose                                         | Updated when                   |
+| -------------------------- | ----------------------------------------------- | ------------------------------ |
+| `CLAUDE.md`                | Conventions and rules for every working session | Rules change                   |
+| `docs/PLAN.md`             | Vision, scope, architecture, milestones         | Scope or plan changes          |
+| `docs/UX-SPEC.md`          | Exact UI behavior                               | Before any behavior change     |
+| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources         | Units or categories change     |
+| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend   | Structure changes              |
+| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                 | Tokens or components change    |
+| `docs/THEMING.md`          | How to author and QA a theme                    | Theming mechanism changes      |
+| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates   | Test approach changes          |
+| `docs/decisions/NNNN-*.md` | Why we chose what we chose                      | A decision is made or reversed |
+| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices         | Something is learned           |
 
 Rule of thumb: if a future session would have to rediscover it, write it down.
 
 ## 13. Milestones
 
-| # | Milestone | Done when |
-|---|---|---|
-| M0 | **Setup** | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place |
-| M1 | **Core engine** | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI |
-| M2 | **Smart input spike** | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget |
-| M3 | **Complete converter** | Keypad, basic/advanced modes, swap, persistence, remaining basic-tier categories, advanced categories loaded on demand |
-| M4 | **Themes** | `midnight`, `sakura`, `neon-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI |
-| M5 | **Launch** | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing |
+| #   | Milestone              | Done when                                                                                                                               |
+| --- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.** |
+| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI                   |
+| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget    |
+| M3  | **Complete converter** | Keypad, basic/advanced modes, swap, persistence, remaining basic-tier categories, advanced categories loaded on demand                  |
+| M4  | **Themes**             | `midnight`, `sakura`, `neon-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI            |
+| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                   |
 
 ## 14. Setup checklist
 
 ### On this machine (Windows 11)
 
-Checked 2026-10-06: git 2.55 present, no user name or email configured. Node, npm, pnpm, and GitHub CLI are not installed.
+Done 2026-10-06: Node 24.19, pnpm 12.9, GitHub CLI 2.102 (logged in as reelatlas), git identity set, PowerShell execution policy set to RemoteSigned for the current user, Playwright's Chromium installed.
+
+For a new machine:
 
 1. Install Node LTS: `winget install OpenJS.NodeJS.LTS`
-2. Install pnpm: `npm install -g pnpm`
-3. Install GitHub CLI: `winget install GitHub.cli`, then `gh auth login`
+2. Install pnpm: `npm install -g pnpm` (PowerShell may need `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` first)
+3. Install GitHub CLI: `winget install GitHub.cli`, then `gh auth login --web`
 4. Set git identity: `git config --global user.name "Your Name"` and `git config --global user.email "you@example.com"`
-5. Restart the terminal (and the Claude desktop app's shell) after installs so PATH updates.
+5. Clone, then `pnpm install`, `pnpm --filter @bigsmall/web exec playwright install chromium`, and `pnpm check`.
 
 ### Accounts
 
-| Account | Needed by | Cost |
-|---|---|---|
-| GitHub | M0 | free |
-| Cloudflare (Pages + Web Analytics) | M2, for preview deploys | free |
-| Domain registrar | M5 | ~$10–20/yr |
+| Account                            | Needed by               | Cost       |
+| ---------------------------------- | ----------------------- | ---------- |
+| GitHub                             | M0                      | free       |
+| Cloudflare (Pages + Web Analytics) | M2, for preview deploys | free       |
+| Domain registrar                   | M5                      | ~$10–20/yr |
 
 ### Not needed
 
 Supabase or any database. A backend. A paid analytics tier. An app store account.
 
-## 15. Decisions needed before scaffolding
+## 15. Decisions (made 2026-10-06)
 
-1. **Stack.** Confirm Astro + React + TypeScript + Tailwind v4 (ADR 0002), or choose SvelteKit.
-2. **Primary categories.** Confirm the eight in `docs/UNITS-CATALOG.md` (Length, Weight, Volume, Temperature, Area, Speed, Time, Data).
-3. **Theme shortlist for v1.** All four aesthetic themes, or two first (`sakura` and `neon-noir` are the most distinct from each other).
-4. **Locale defaults.** Proposed: detect from the browser, fall back to US (US gallon, short ton, decimal point), with a manual override in settings.
-5. **SEO pages in v1.** Proposed yes, built at M5 from the same URL-state mechanism.
-6. **Name.** bigsmall works. Check domain availability early (`.app`, `.io`, `.co`, `.tools`) even if buying later.
+1. **Stack.** Astro + React + TypeScript + Tailwind v4 (ADR 0002, accepted). Re-examined against an all-React Vite framework the same day and kept; the operating rule is React for interaction, Astro for structure.
+2. **Primary categories.** The eight in `docs/UNITS-CATALOG.md`: Length, Weight, Volume, Temperature, Area, Speed, Time, Data.
+3. **Themes.** Framework and palettes for all six now; polish one at a time in milestone 4, `sakura` first (docs/THEMING.md).
+4. **Locale defaults.** Detect from the browser, fall back to US; manual override in settings later. Implemented as `regionDefaults` in core.
+5. **Toolchain.** Latest where compatible, accessibility tooling never dropped (ADR 0005). TypeScript 6 until the ecosystem supports 7.
+6. **Input flexibility.** Spacing, locale number formats, typed math, and Enter-as-equals are a standing UX principle, phased in `docs/UX-SPEC.md` §13.
+
+Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (check `.app`, `.io`, `.co`, `.tools` availability early).
 
 ## 16. Risks and open questions
 

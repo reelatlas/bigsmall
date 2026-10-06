@@ -1,0 +1,71 @@
+# Testing
+
+Last updated: 2026-10-06 (milestone 0). What is tested where, how to run it, and what CI blocks on.
+
+## Layers
+
+| Layer      | Tool                               | Lives in              | Covers                                                                                                       |
+| ---------- | ---------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Core unit  | Vitest                             | `packages/core/test/` | Golden conversions from sourced fixtures, round trips, unit kinds, errors, registry integrity, region policy |
+| Web unit   | Vitest (node)                      | `apps/web/test/`      | Theme contract and WCAG contrast for every theme                                                             |
+| End to end | Playwright + axe-core              | `apps/web/e2e/`       | Pages render, behavior works, zero WCAG 2.2 AA violations, desktop and mobile viewports, every theme         |
+| Static     | ESLint, Prettier, tsc, astro check | repo root             | Boundaries (ADR 0003), a11y lint for JSX and Astro, types, formatting                                        |
+
+Performance budgets (Lighthouse CI, bundle size) join CI in milestone 2 when there is a real page to measure.
+
+## Commands
+
+```bash
+pnpm test          # all unit projects, once
+pnpm test:watch    # watch mode
+pnpm e2e           # Playwright (starts the dev server itself)
+pnpm lint
+pnpm format:check  # or pnpm format to fix
+pnpm typecheck
+pnpm build
+pnpm check         # lint + typecheck + test + build, same as CI's verify job
+```
+
+First-time Playwright setup on a machine:
+
+```bash
+pnpm --filter @bigsmall/web exec playwright install chromium
+```
+
+## Golden tests
+
+`packages/core/test/golden/<category>.json` holds rows of `{ value, from, to, expected, source }`. Every row cites where `expected` comes from (NIST, BIPM, or a derivation from an exact definition). Tests assert a relative error of at most 1e-12.
+
+Adding a unit means adding at least one row that exercises it. The round-trip test covers every registered unit automatically at four magnitudes, so a unit with no golden row still gets a sanity check, but a sourced row is what proves the factor.
+
+## Registry integrity
+
+`packages/core/test/registry.test.ts` fails on: duplicate or malformed ids, a unit in an unknown category, a category whose base unit is missing or not linear with factor 1, a missing source, and search-key collisions (name, plural, symbol, alias) within a category. Collisions across categories are allowed; they are the ambiguity list the UI must handle (docs/UX-SPEC.md §5).
+
+## Theme contract
+
+`apps/web/test/themes.test.ts` parses each theme CSS file and checks the token contract and the contrast pairs from `src/lib/themes.ts`. A failing pair prints both colors and the achieved ratio.
+
+## End to end
+
+- Tests run on two projects: Desktop Chrome and a Pixel-class mobile viewport.
+- Every page gets an axe pass with the WCAG 2.0/2.1/2.2 A and AA tags. Violations fail the test.
+- The theme test applies each theme to the live page and runs axe again.
+- When a test interacts with a React island, wait for something the island renders before clicking; islands hydrate after first paint. Things handled by inline scripts (the theme picker) are interactive immediately.
+- Playwright starts `pnpm dev` on `127.0.0.1:4321` and reuses a running server locally.
+
+## CI
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request:
+
+- **verify**: install, lint, format check, typecheck, unit tests, build.
+- **e2e**: install Chromium, run Playwright. The HTML report is uploaded on failure.
+
+Both must pass. There is no manual override; fix the code or fix the test.
+
+## Before launch (manual, milestone 5)
+
+- Screen reader pass: VoiceOver on iOS Safari, NVDA on Windows Chrome. Result announcement, suggestion navigation, keypad.
+- Keyboard-only pass through the whole converter.
+- 400 % zoom at 1280 px wide; 320 px wide at 100 %.
+- Reduced motion enabled: no ambient animation in any theme.

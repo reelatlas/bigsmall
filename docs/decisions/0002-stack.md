@@ -1,7 +1,7 @@
 # 0002 — Astro + React island + TypeScript + Tailwind v4
 
 Date: 2026-10-06
-Status: proposed (awaiting confirmation before scaffold)
+Status: accepted (confirmed 2026-10-06; re-examined the same day, see the last section)
 
 ## Context
 
@@ -32,3 +32,13 @@ Requirements: fast first load on low-end phones, responsive, accessible, themeab
 - Every page other than the converter ships no JS.
 - Theme switching is CSS-only and works before hydration.
 - SEO pair pages are a build-time loop over the unit data, no new runtime.
+
+## Re-examination (2026-10-06, after scaffold)
+
+Question raised: should this be an all-React Vite framework (TanStack Start or React Router with prerendering) instead of Astro, for one component model and typed URL state?
+
+Stayed with Astro because the product is a static site around one interactive island. `getStaticPaths` is the simplest way to emit thousands of unit-pair pages; pages without the converter ship no JavaScript; the scaffold is green with CI. The single-component-model benefit is real but does not outweigh React on every page and the rework.
+
+Operating rule so the two component models never blur: **React for everything the user interacts with** (the converter, every design-system control). **Astro only for page scaffolding and static content.** One exception: the theme picker is plain HTML driven by the inline pre-paint script, because it must work before any bundle loads.
+
+Revisit if more than a handful of Astro components accumulate interaction, or if navigation between pair pages needs preserved converter state beyond what Astro's `transition:persist` provides.

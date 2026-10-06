@@ -18,13 +18,13 @@ The existing converters have the math right and the experience wrong: dense page
 
 ## Docs
 
-| Doc | What it holds |
-|---|---|
-| [docs/PLAN.md](docs/PLAN.md) | Vision, scope, architecture, stack, milestones, setup checklist, open decisions |
-| [docs/UX-SPEC.md](docs/UX-SPEC.md) | Exact behavior of the smart input, two-box linkage, keypad, and modes |
-| [docs/UNITS-CATALOG.md](docs/UNITS-CATALOG.md) | Category taxonomy, tiers, special-logic units, verification sources |
-| [docs/decisions/](docs/decisions/README.md) | Architecture Decision Records (ADRs) |
-| [docs/LEARNINGS.md](docs/LEARNINGS.md) | Running log of gotchas and best practices discovered while building |
-| [CLAUDE.md](CLAUDE.md) | Working conventions for AI-assisted sessions |
+| Doc                                            | What it holds                                                                   |
+| ---------------------------------------------- | ------------------------------------------------------------------------------- |
+| [docs/PLAN.md](docs/PLAN.md)                   | Vision, scope, architecture, stack, milestones, setup checklist, open decisions |
+| [docs/UX-SPEC.md](docs/UX-SPEC.md)             | Exact behavior of the smart input, two-box linkage, keypad, and modes           |
+| [docs/UNITS-CATALOG.md](docs/UNITS-CATALOG.md) | Category taxonomy, tiers, special-logic units, verification sources             |
+| [docs/decisions/](docs/decisions/README.md)    | Architecture Decision Records (ADRs)                                            |
+| [docs/LEARNINGS.md](docs/LEARNINGS.md)         | Running log of gotchas and best practices discovered while building             |
+| [CLAUDE.md](CLAUDE.md)                         | Working conventions for AI-assisted sessions                                    |
 
 Docs that arrive with the scaffold: `docs/ARCHITECTURE.md`, `docs/DESIGN-SYSTEM.md`, `docs/THEMING.md`, `docs/TESTING.md`.

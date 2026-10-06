@@ -175,3 +175,11 @@ Sean's first use of the milestone 2 build. Each item is now implemented and cove
 - **Chip hover** tints the chip toward the surface instead of replacing its color.
 - **Fewer words.** "Now pick a unit" and the "category" subtext are gone; the only message left is the no-match one.
 - **One control language.** The theme picker keeps a native select for accessibility but its trigger now matches the other controls (docs/DESIGN-SYSTEM.md, "Controls").
+
+## 16. Third pass (2026-10-06)
+
+- **Nothing locks on a keystroke.** The best match is highlighted as you type; Enter, picking a row, Tab, or leaving the field commits it. "gb" and "ml" stay editable text until then. §5's keystroke lock and the `canExtend` timing are retired for the UI (the engine still reports it).
+- **Two levels, one Back.** Every unit list, including the one the chip opens, has "← Back" at the top with the category name beside it. Back always goes up to the categories; Escape does the same whenever Back is visible, closes the list at the category level, and only then clears the latest entry (§15).
+- **A category label** sits above the boxes: the category being browsed while a list is open, otherwise the locked category. It disappears when the last unit is removed.
+- **One fluid shape, drawn over the page.** The list grows out of the field inside one rounded border, as in milestone 2, but the shell is absolutely positioned inside a fixed-height placeholder so nothing below moves.
+- **The theme menu uses the same shape:** trigger and options in one shell, native radios inside, driven by the pre-paint script. The system select popup is gone because its square, OS-colored list could not match the design language.

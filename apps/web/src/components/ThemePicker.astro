@@ -5,40 +5,59 @@ interface Props {
   id?: string;
 }
 
-const { id = 'theme-picker' } = Astro.props;
+const { id = 'theme' } = Astro.props;
+const menuId = `${id}-menu`;
 ---
 
 <!--
-  No JavaScript bundle needed: the pre-paint script in layouts/Base.astro handles `change`
-  by delegation, so this works before any island hydrates and on pages with no islands at all.
-  The trigger is styled like every other control (docs/DESIGN-SYSTEM.md); the open list stays
-  native so phones get their own picker.
+  Same fluid shape as a smart input: a fixed-height placeholder keeps the layout still while the
+  shell inside grows over the page when open. No bundle needed: the pre-paint script in
+  layouts/Base.astro toggles [data-open], applies the chosen radio, and persists it. The options
+  are native radios, so arrow keys, Space, and screen readers work without any script.
 -->
-<label class="flex items-center gap-2 text-sm" for={id}>
-  <span class="text-ink-muted">Theme</span>
-  <span class="relative inline-flex">
-    <select
-      id={id}
-      data-theme-picker
-      class="min-h-11 appearance-none rounded-md border border-line bg-surface pr-9 pl-3 text-ink transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+<div class="group relative h-11 w-44" data-theme-shell>
+  <div class="absolute inset-x-0 top-0 overflow-hidden rounded-md border border-line bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md">
+    <button
+      type="button"
+      data-theme-toggle
+      aria-expanded="false"
+      aria-controls={menuId}
+      class="flex h-11 w-full items-center justify-between gap-2 rounded-md px-3 text-sm text-ink outline-none hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus group-data-open:rounded-b-none"
     >
+      <span class="text-ink-muted">Theme</span>
+      <span class="flex items-center gap-1">
+        <span data-theme-name>{THEMES[0]?.name}</span>
+        <svg
+          class="text-ink-muted transition-transform duration-[var(--motion-fast)] ease-standard group-data-open:rotate-180"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M6 9l6 6 6-6"></path>
+        </svg>
+      </span>
+    </button>
+    <fieldset id={menuId} class="hidden border-t border-line py-1 group-data-open:block">
+      <legend class="sr-only">Theme</legend>
       {THEMES.map((t) => (
-        <option value={t.id}>{t.name}</option>
+        <label class="flex min-h-11 cursor-pointer items-center px-3 text-sm text-ink hover:bg-surface-raised has-checked:bg-accent-soft has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-focus">
+          <input
+            type="radio"
+            name={`${id}-option`}
+            value={t.id}
+            data-theme-option
+            class="sr-only"
+            checked={t.id === 'daylight'}
+          />
+          {t.name}
+        </label>
       ))}
-    </select>
-    <svg
-      class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-ink-muted"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M6 9l6 6 6-6"></path>
-    </svg>
-  </span>
-</label>
+    </fieldset>
+  </div>
+</div>

@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { getCategory, type CategoryId } from '@bigsmall/core';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Button } from '../../components/Button';
 import { CopyIcon, RedoIcon, SwapIcon, UndoIcon } from '../../components/icons';
 import { useIsHydrated } from '../../lib/hydrated';
@@ -8,13 +9,20 @@ import { useConverter } from './useConverter';
 
 const COPIED_MS = 1500;
 
-/** The converter island: two linked smart inputs, swap, undo and redo, status lines, and the live region. */
+/** The converter island: category label, two linked smart inputs, swap, undo and redo, status lines, live region. */
 export function Converter() {
   const { state, view, env, dispatch, canUndo, canRedo, announcement } = useConverter();
   const hydrated = useIsHydrated();
   const hintId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const [copiedBox, setCopiedBox] = useState<BoxId | null>(null);
+  /** The category a list is being browsed in, while one is open; the locked category otherwise. */
+  const [browsing, setBrowsing] = useState<Record<BoxId, CategoryId | null>>({ a: null, b: null });
+  const onBrowse = useCallback((box: BoxId, category: CategoryId | null) => {
+    setBrowsing((prev) => (prev[box] === category ? prev : { ...prev, [box]: category }));
+  }, []);
+  const categoryId = browsing.a ?? browsing.b ?? view.category;
+  const categoryName = categoryId ? getCategory(categoryId)?.name : undefined;
 
   // Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes anywhere inside the converter,
   // replacing the text field's own undo so "undo" always means the last thing the user did here.
@@ -73,6 +81,13 @@ export function Converter() {
       className="mt-6"
       data-hydrated={hydrated ? '' : undefined}
     >
+      <p
+        aria-live="polite"
+        className="mb-2 min-h-5 text-center text-sm font-medium text-ink-muted"
+        data-category-label
+      >
+        {categoryName ?? ''}
+      </p>
       <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-[1fr_auto_1fr]">
         <SmartInput
           box={view.a}
@@ -81,6 +96,7 @@ export function Converter() {
           mode={state.mode}
           env={env}
           dispatch={dispatch}
+          onBrowse={onBrowse}
           trailing={copyButton(view.a, 'first value')}
         />
         <div className="flex justify-center sm:pt-1.5">
@@ -100,6 +116,7 @@ export function Converter() {
           mode={state.mode}
           env={env}
           dispatch={dispatch}
+          onBrowse={onBrowse}
           trailing={copyButton(view.b, 'second value')}
         />
       </div>
@@ -107,7 +124,8 @@ export function Converter() {
       <div className="mt-3 flex items-start justify-between gap-3">
         <p id={hintId} className="text-sm text-ink-muted">
           Type a number, a unit, or both into either box, like{' '}
-          <span className="font-numeric text-ink">5 ml</span>. The other box follows.
+          <span className="font-numeric text-ink">5 ml</span>, then press Enter. The other box
+          follows.
         </p>
         <div className="flex shrink-0 gap-1">
           <Button

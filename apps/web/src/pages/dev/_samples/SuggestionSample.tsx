@@ -15,7 +15,7 @@ export function SuggestionSample() {
   const noop = () => undefined;
 
   return (
-    <div className="rounded-lg border border-line bg-surface shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-sm">
       <div className="flex min-h-14 items-center gap-2 px-3">
         {milliliter && <UnitChip unit={milliliter} onRemove={noop} />}
         <span className="font-numeric text-2xl">5</span>
@@ -25,7 +25,9 @@ export function SuggestionSample() {
         items={items}
         activeIndex={0}
         optionId={(index) => `${id}-option-${index}`}
-        showCategory
+        onBack={noop}
+        scopeName="Volume"
+        showCategory={false}
         onPick={noop}
         onHover={noop}
       />

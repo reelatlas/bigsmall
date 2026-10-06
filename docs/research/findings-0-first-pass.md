@@ -32,3 +32,13 @@ Date: 2026-10-06. One person, the product owner, on the desktop build in the The
 | Too much text in the list: chevron, "Search all categories", "Now pick a unit" | Plain "← Back" only when a category is expanded; scoped searches widen on no match; the prompt is gone |
 | Escape removed the unit when typing was the last thing done                    | Escape clears the most recently entered thing first                                                    |
 | The theme dropdown looked unlike the inputs                                    | Trigger restyled to the shared control language; native popup kept                                     |
+
+## Third pass, same day
+
+| Observation                                                        | Change                                                                                                          |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| The list the chip opens had no way back to the categories          | Every unit list has "← Back" with the category name; Back and Escape both go up to the categories               |
+| "gb" and "ml" chipped themselves while still being typed           | No lock on a keystroke; the match is highlighted and Enter, a pick, Tab, or leaving the field commits it        |
+| Escape closed the list when Back was showing                       | Escape is Back whenever Back is visible; it closes only at the category level                                   |
+| Nothing said which category you were in                            | A label above the boxes names the category being browsed or locked, and clears with the unit                    |
+| The detached list and the square native theme popup broke the look | Field and list are one fluid shape again, drawn over the page; the theme menu is built the same way with radios |

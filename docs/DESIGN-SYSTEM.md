@@ -66,13 +66,13 @@ Prefer native elements when they are good enough (`<select>`, `<dialog>`, `<butt
 
 ## Inventory
 
-| Component         | Kind           | Notes                                                                                                             |
-| ----------------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `Button`          | React (native) | `variant="primary"                                                                                                | "secondary" | "ghost"`, `square`for a lone icon with`aria-label`. Native `<button>`, no runtime |
-| `ThemePicker`     | Astro          | Native `<select>`; the pre-paint script handles it, so it needs no bundle                                         |
-| `UnitChip`        | React          | The locked unit inside a smart input: symbol, plural, remove control                                              |
-| `SuggestionPanel` | React          | The listbox under a smart input: unit, category, and escape-hatch rows, virtual focus via `aria-activedescendant` |
-| `icons`           | React          | Inline SVG icons (swap, close, copy, chevron); decorative, `aria-hidden`                                          |
+| Component         | Kind           | Notes                                                                                                                      |
+| ----------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `Button`          | React (native) | `variant="primary"                                                                                                         | "secondary" | "ghost"`, `square`for a lone icon with`aria-label`. Native `<button>`, no runtime |
+| `ThemePicker`     | Astro          | Fluid shell with a native radio group; the pre-paint script opens, closes, applies, and persists it, so it needs no bundle |
+| `UnitChip`        | React          | The locked unit inside a smart input: symbol, plural, remove control                                                       |
+| `SuggestionPanel` | React          | The listbox under a smart input: unit, category, and escape-hatch rows, virtual focus via `aria-activedescendant`          |
+| `icons`           | React          | Inline SVG icons (swap, close, copy, chevron); decorative, `aria-hidden`                                                   |
 
 Arriving in milestone 3: `Keypad`, `Sheet`, `Toggle`, `LiveResult`. `SmartInput` lives in `features/converter/` because it composes core search with these primitives.
 
@@ -99,3 +99,9 @@ One look for every control: `min-h-11`, `rounded-md`, `border-line`, `bg-surface
 Popovers float. A suggestion list is absolutely positioned under its field (`absolute inset-x-0 top-full z-20 mt-1`) with its own `rounded-lg border border-line bg-surface shadow-md` surface, and never pushes content down.
 
 Tints come from the tokens, never from new colors: a chip at rest is `bg-accent-soft`; hovered, it lays `bg-surface/40` over that so it stays recognizably the chip.
+
+### Fluid shells
+
+A control that opens a list keeps field and list in one shape: a `relative` placeholder with a fixed height (`h-14` for fields, `h-11` for controls) holds an `absolute inset-x-0 top-0 overflow-hidden` shell with the border, corners, and surface. `overflow-hidden` is what keeps a row's hover or selected highlight inside the rounded corners; the shell's own focus outline is not clipped by it. When open the shell gets `z-20`, the accent border, and `shadow-md`, and the list renders inside it in flow with a `border-t`. The page never reflows; the shell grows over it. `SmartInput` and `ThemePicker` are the two instances; a third should reuse the pattern rather than invent a popover.
+
+Native popups (a `<select>` list, a date picker) cannot take the design language, so a themed menu uses native inputs inside a fluid shell instead: `ThemePicker` is a radio group, which gives arrow keys, Space, and screen reader semantics for free.

@@ -1,4 +1,4 @@
-import { search, suggest, type CategoryId, type Unit } from '@bigsmall/core';
+import { getCategory, search, suggest, type CategoryId, type Unit } from '@bigsmall/core';
 import {
   useEffect,
   useId,
@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { SuggestionPanel, type SuggestionItem } from '../../components/SuggestionPanel';
 import { UnitChip } from '../../components/UnitChip';
-import type { BoxView, HistoryAction, Mode } from './state';
+import type { BoxId, BoxView, HistoryAction, Mode } from './state';
 import type { ConverterEnv } from './useConverter';
 
 export interface SmartInputProps {
@@ -23,18 +23,19 @@ export interface SmartInputProps {
   mode: Mode;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
+  /** Reports the category the open list is inside, or null when the list is closed or at the top level. */
+  onBrowse?: (box: BoxId, category: CategoryId | null) => void;
   /** Rendered at the end of the field, such as the copy button. */
   trailing?: ReactNode;
 }
 
 /**
- * Where the list is looking when it is not the default scope: an expanded category.
- * `origin` decides what Escape does next: a list the user opened goes back, a list Escape
- * itself opened (after removing a unit) closes.
+ * The list has two levels: the categories, and one category's units. Without an override the
+ * level follows the box (a locked unit, or the other box's unit, puts it inside that category).
+ * 'all' forces the top level; a CategoryId forces that category.
  */
 interface Override {
-  scope: CategoryId;
-  origin: 'pick' | 'escape';
+  scope: 'all' | CategoryId;
 }
 
 /** Numbers longer than this step down one size so about eleven digits fit beside a chip. */
@@ -44,9 +45,10 @@ const COMPACT_CHIP = 6;
 
 /**
  * One box of the converter: a text field that takes a number, a unit, or both, with the locked
- * unit shown as a chip and a suggestion listbox floating below (docs/UX-SPEC.md §2–§5, §14–§15).
- * Hand-built on the WAI-ARIA combobox pattern (ADR 0006): the input keeps focus, the listbox is
- * virtual-focused through aria-activedescendant.
+ * unit shown as a chip and a suggestion list that grows out of the field over the page
+ * (docs/UX-SPEC.md §2–§5, §14–§15). Hand-built on the WAI-ARIA combobox pattern (ADR 0006).
+ * Nothing locks on a keystroke: the best match is highlighted and Enter, a pick, or leaving the
+ * field commits it.
  */
 export function SmartInput({
   box,
@@ -55,6 +57,7 @@ export function SmartInput({
   mode,
   env,
   dispatch,
+  onBrowse,
   trailing,
 }: SmartInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -66,10 +69,10 @@ export function SmartInput({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [override, setOverride] = useState<Override | null>(null);
-  /** What Escape clears next: the thing most recently put into this box (docs/UX-SPEC.md §15). */
+  /** What Escape clears when the list is closed: the thing most recently put into this box. */
   const lastEntered = useRef<'text' | 'unit' | null>(null);
 
-  const scope = override ? override.scope : box.scope;
+  const scope = override ? (override.scope === 'all' ? null : override.scope) : box.scope;
   const searchOptions = {
     category: scope,
     separators: env.separators,
@@ -77,8 +80,8 @@ export function SmartInput({
     tier: mode,
   } as const;
 
-  // A query that finds nothing inside the scope widens to every category on its own, so a unit
-  // from elsewhere is always one pick away and no "search all" control is needed.
+  // A query that finds nothing inside the category widens to every category on its own, so a
+  // unit from elsewhere is always one pick away.
   const scoped = suggest(box.text, searchOptions);
   const query = scoped.parsed.query ?? '';
   const widened = scope !== null && query !== '' && scoped.search.results.length === 0;
@@ -93,6 +96,10 @@ export function SmartInput({
   );
 
   const message = noMatch ? `No unit matches “${query}”. Try ml, feet, or °F.` : undefined;
+
+  useEffect(() => {
+    onBrowse?.(box.id, open ? scope : null);
+  }, [open, scope, onBrowse, box.id]);
 
   const focusInput = () => inputRef.current?.focus();
 
@@ -118,7 +125,7 @@ export function SmartInput({
     const category = box.unit?.category ?? null;
     dispatch({ type: 'unlock', box: box.id });
     lastEntered.current = box.text ? 'text' : null;
-    if (thenList && category) showList({ scope: category, origin: 'escape' });
+    if (thenList && category) showList({ scope: category });
     else closePanel();
   };
 
@@ -127,11 +134,10 @@ export function SmartInput({
     lastEntered.current = box.unit ? 'unit' : null;
   };
 
-  /** Lock the exact match now (keystroke, when nothing longer could still be typed) or at a word boundary. */
-  const tryLock = (reason: 'keystroke' | 'boundary', current = suggestion): boolean => {
-    if (!current.exact) return false;
-    if (reason === 'keystroke' && current.search.canExtend) return false;
-    lock(current.exact);
+  /** Commit the exact match, if the query names exactly one unit. Used by Enter, Tab, and blur. */
+  const commitExact = (): boolean => {
+    if (!suggestion.exact) return false;
+    lock(suggestion.exact);
     return true;
   };
 
@@ -142,7 +148,7 @@ export function SmartInput({
       if (box.isSource && query) {
         dispatch({ type: 'setText', box: box.id, text: suggestion.parsed.valueText ?? '' });
       }
-      showList({ scope: item.category.id, origin: 'pick' });
+      showList({ scope: item.category.id });
     }
     focusInput();
   };
@@ -154,16 +160,12 @@ export function SmartInput({
     const next = suggest(value, searchOptions);
     setOpen(true);
     setActive(next.parsed.query ? 0 : -1);
-    tryLock('keystroke', next);
   };
 
-  /**
-   * Escape is "back", one step at a time: an expanded list → the previous list; an open panel → closed;
-   * then whatever was put into the box most recently (text or unit), then the other.
-   */
+  /** Escape is "back": inside a category → the categories; at the categories → closed; closed → clear the latest entry. */
   const escape = () => {
-    if (override?.origin === 'pick') {
-      showList(null);
+    if (open && scope !== null) {
+      showList({ scope: 'all' });
       return;
     }
     if (open) {
@@ -200,7 +202,7 @@ export function SmartInput({
           break;
         }
         if (item) pick(item);
-        else tryLock('boundary');
+        else commitExact();
         closePanel();
         break;
       }
@@ -209,10 +211,7 @@ export function SmartInput({
         escape();
         break;
       case 'Tab':
-        tryLock('boundary');
-        break;
-      case ' ':
-        if (tryLock('boundary')) event.preventDefault();
+        commitExact();
         break;
       case 'Backspace':
         if (box.unit && event.currentTarget.value === '') {
@@ -230,7 +229,7 @@ export function SmartInput({
 
   const onBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
-    tryLock('boundary');
+    commitExact();
     closePanel();
   };
 
@@ -241,78 +240,84 @@ export function SmartInput({
   }, [open, active, idBase]);
 
   const long = box.text.length > LONG_NUMBER;
+  const scopeName = scope ? getCategory(scope)?.name : undefined;
 
+  // A fixed-height placeholder keeps the page layout still; the shell inside it grows downward
+  // over the page when the list opens, so field and list read as one shape.
   return (
-    <div
-      className="relative min-w-0 rounded-lg border border-line bg-surface shadow-sm transition-[border-color] duration-[var(--motion-fast)] ease-standard focus-within:border-accent focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus"
-      onBlur={onBlur}
-    >
-      <label htmlFor={inputId} className="sr-only">
-        {label}
-      </label>
-      <div className="flex min-h-14 items-center gap-2 px-3">
-        <input
-          ref={inputRef}
-          id={inputId}
-          type="text"
-          role="combobox"
-          aria-expanded={open}
-          aria-controls={open ? listboxId : undefined}
-          aria-activedescendant={open && active >= 0 ? optionId(active) : undefined}
-          aria-autocomplete="list"
-          aria-describedby={describedBy}
-          autoComplete="off"
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck={false}
-          enterKeyHint="done"
-          placeholder={box.unit ? '0' : 'Type 5 ml, feet, °F…'}
-          value={box.text}
-          onChange={onChange}
-          onKeyDown={onKeyDown}
-          onFocus={onFocus}
-          className={`min-w-0 flex-1 bg-transparent py-3 font-numeric text-ink outline-none placeholder:text-ink-muted ${
-            long ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'
-          }`}
-        />
-        {box.unit && (
-          <UnitChip
-            unit={box.unit}
-            compact={box.text.length > COMPACT_CHIP}
-            onOpen={() => {
-              showList(null);
-              focusInput();
-            }}
-            onRemove={() => {
-              unlock(false);
-              focusInput();
-            }}
+    <div className="relative h-14 min-w-0">
+      <div
+        className={`absolute inset-x-0 top-0 overflow-hidden rounded-lg border bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard focus-within:border-accent focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus ${
+          open ? 'z-20 border-accent shadow-md' : 'border-line shadow-sm'
+        }`}
+        onBlur={onBlur}
+      >
+        <label htmlFor={inputId} className="sr-only">
+          {label}
+        </label>
+        <div className="flex h-14 items-center gap-2 px-3">
+          <input
+            ref={inputRef}
+            id={inputId}
+            type="text"
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={open ? listboxId : undefined}
+            aria-activedescendant={open && active >= 0 ? optionId(active) : undefined}
+            aria-autocomplete="list"
+            aria-describedby={describedBy}
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            enterKeyHint="done"
+            placeholder={box.unit ? '0' : 'Type 5 ml, feet, °F…'}
+            value={box.text}
+            onChange={onChange}
+            onKeyDown={onKeyDown}
+            onFocus={onFocus}
+            className={`min-w-0 flex-1 bg-transparent py-3 font-numeric text-ink outline-none placeholder:text-ink-muted ${
+              long ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'
+            }`}
           />
-        )}
-        {trailing}
-      </div>
-      {open && (
-        <div className="absolute inset-x-0 top-full z-20 mt-1">
+          {box.unit && (
+            <UnitChip
+              unit={box.unit}
+              compact={box.text.length > COMPACT_CHIP}
+              onOpen={() => {
+                showList(box.unit ? { scope: box.unit.category } : null);
+                focusInput();
+              }}
+              onRemove={() => {
+                unlock(false);
+                focusInput();
+              }}
+            />
+          )}
+          {trailing}
+        </div>
+        {open && (
           <SuggestionPanel
             id={listboxId}
             items={items}
             activeIndex={active}
             optionId={optionId}
             onBack={
-              override
+              scope !== null
                 ? () => {
-                    showList(null);
+                    showList({ scope: 'all' });
                     focusInput();
                   }
                 : undefined
             }
+            scopeName={scopeName}
             message={message}
             showCategory={scope === null || widened}
             onPick={pick}
             onHover={setActive}
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

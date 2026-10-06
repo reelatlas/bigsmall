@@ -9,6 +9,7 @@ interface Props {
 
 const { title, description = 'A unit converter that gets out of your way.' } = Astro.props;
 const themeIds = THEMES.map((t) => t.id);
+const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
 ---
 
 <!doctype html>
@@ -22,17 +23,23 @@ const themeIds = THEMES.map((t) => t.id);
     <script
       define:vars={{
         ids: themeIds,
+        names: themeNames,
         key: THEME_STORAGE_KEY,
         light: DEFAULT_LIGHT,
         dark: DEFAULT_DARK,
       }}
     >
-      // Runs inline before first paint: applies the saved theme (no flash) and handles every
-      // [data-theme-picker] by delegation, so theme switching never waits for a JS bundle.
-      // Values come from src/lib/themes.ts via define:vars, so there is one source of truth.
+      // Runs inline before first paint: applies the saved theme (no flash) and drives every theme
+      // picker by delegation, so switching never waits for a JS bundle. Values come from
+      // src/lib/themes.ts via define:vars, so there is one source of truth.
       const apply = (id) => {
         document.documentElement.dataset.theme = id;
-        for (const picker of document.querySelectorAll('[data-theme-picker]')) picker.value = id;
+        for (const option of document.querySelectorAll('[data-theme-option]')) {
+          option.checked = option.value === id;
+        }
+        for (const name of document.querySelectorAll('[data-theme-name]')) {
+          name.textContent = names[id] || id;
+        }
       };
       const readSaved = () => {
         try {
@@ -47,15 +54,51 @@ const themeIds = THEMES.map((t) => t.id);
       document.addEventListener('DOMContentLoaded', () =>
         apply(document.documentElement.dataset.theme),
       );
+
+      const setOpen = (shell, open) => {
+        shell.toggleAttribute('data-open', open);
+        const toggle = shell.querySelector('[data-theme-toggle]');
+        if (toggle) toggle.setAttribute('aria-expanded', String(open));
+      };
+      const closeAll = () => {
+        for (const shell of document.querySelectorAll('[data-theme-shell]')) setOpen(shell, false);
+      };
+      document.addEventListener('click', (event) => {
+        const target = event.target instanceof Element ? event.target : null;
+        const toggle = target?.closest('[data-theme-toggle]');
+        if (toggle) {
+          const shell = toggle.closest('[data-theme-shell]');
+          const open = !shell.hasAttribute('data-open');
+          closeAll();
+          setOpen(shell, open);
+          if (open) shell.querySelector('[data-theme-option]:checked')?.focus();
+          return;
+        }
+        if (!target?.closest('[data-theme-shell]')) closeAll();
+      });
       document.addEventListener('change', (event) => {
-        const el = event.target;
-        if (!(el instanceof HTMLSelectElement) || !el.hasAttribute('data-theme-picker')) return;
-        if (!ids.includes(el.value)) return;
-        apply(el.value);
+        const option = event.target;
+        if (!(option instanceof HTMLInputElement) || !option.hasAttribute('data-theme-option'))
+          return;
+        if (!ids.includes(option.value)) return;
+        apply(option.value);
         try {
-          localStorage.setItem(key, el.value);
+          localStorage.setItem(key, option.value);
         } catch {
           // Storage blocked (private mode): the choice lasts for this page only.
+        }
+        const shell = option.closest('[data-theme-shell]');
+        if (shell) {
+          setOpen(shell, false);
+          shell.querySelector('[data-theme-toggle]')?.focus();
+        }
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !(event.target instanceof Element)) return;
+        const shell = event.target.closest('[data-theme-shell]');
+        if (shell && shell.hasAttribute('data-open')) {
+          setOpen(shell, false);
+          shell.querySelector('[data-theme-toggle]')?.focus();
         }
       });
     </script>

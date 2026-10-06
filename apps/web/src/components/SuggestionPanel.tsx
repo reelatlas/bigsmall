@@ -10,8 +10,10 @@ export interface SuggestionPanelProps {
   items: SuggestionItem[];
   activeIndex: number;
   optionId: (index: number) => string;
-  /** When set, a "← Back" control sits above the list and returns to the previous list. */
+  /** When set, a "← Back" row sits above the list and returns to the categories. */
   onBack?: (() => void) | undefined;
+  /** The category this list belongs to, shown on the Back row. */
+  scopeName?: string | undefined;
   /** Shown above the list, such as "No unit matches …". */
   message?: string | undefined;
   /** When true, unit rows show their category, which is how ambiguous symbols are told apart. */
@@ -25,10 +27,10 @@ const row =
   'data-active:bg-accent-soft hover:bg-surface-raised';
 
 /**
- * The listbox under a smart input. Plain WAI-ARIA combobox pattern: the input owns focus and
- * points at the active row with aria-activedescendant; rows are picked with Enter, tap, or click.
- * The back control is a real button outside the listbox, reachable by Tab or Escape rather than arrows.
- * Renders its own surface so it can float over content or sit in flow (the gallery).
+ * The listbox that grows out of a smart input. Plain WAI-ARIA combobox pattern: the input owns
+ * focus and points at the active row with aria-activedescendant; rows are picked with Enter, tap,
+ * or click. The Back row is a real button outside the listbox, reachable by Tab or Escape.
+ * The surrounding shell (field or gallery card) draws the border and corners.
  */
 export function SuggestionPanel({
   id,
@@ -36,22 +38,26 @@ export function SuggestionPanel({
   activeIndex,
   optionId,
   onBack,
+  scopeName,
   message,
   showCategory,
   onPick,
   onHover,
 }: SuggestionPanelProps) {
   return (
-    <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-md">
+    <div className="border-t border-line">
       {onBack && (
-        <button
-          type="button"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={onBack}
-          className="flex min-h-11 w-full items-center px-3 text-left text-sm text-ink-muted transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
-        >
-          ← Back
-        </button>
+        <div className="flex items-center justify-between border-b border-line">
+          <button
+            type="button"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={onBack}
+            className="flex min-h-11 items-center px-3 text-sm text-ink-muted transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+          >
+            ← Back
+          </button>
+          {scopeName && <span className="px-3 text-sm font-medium text-ink">{scopeName}</span>}
+        </div>
       )}
       {message && <p className="px-3 pt-2 text-sm text-ink-muted">{message}</p>}
       <ul role="listbox" id={id} aria-label="Suggestions" className="max-h-72 overflow-y-auto py-1">

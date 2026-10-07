@@ -236,8 +236,7 @@ test('the wordmark stays still under reduced motion', async ({ page, isMobile })
   await expect(page.locator('[data-wordmark]')).toHaveText('bigsmall');
 });
 
-test('the art beside the wordmark follows the theme', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'the art shows from the sm breakpoint up');
+test('the art beside the wordmark follows the theme', async ({ page }) => {
   await page.goto('/');
   for (const theme of THEMES) {
     await page.evaluate((id) => {
@@ -316,3 +315,50 @@ test('the lab loads an earlier version’s settings to compare or roll back', as
   await page.getByRole('button', { name: /^Reset to shipped/ }).click();
   await expect(rest).toHaveValue(String(WORDMARK_TIMING.restMs));
 });
+
+// Under 416 px the header's menus take a line of their own, theme menu first and flush left;
+// from 416 px every theme's name, art, and menus share one line, the menus on the right.
+for (const width of [320, 375, 414, 430, 520]) {
+  const ownLine = width < 416;
+  test(`at ${width} px the name keeps its art, and the menus ${ownLine ? 'wrap under it, theme first' : 'share its line'}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/');
+    await ready(page);
+    for (const theme of THEMES) {
+      // As the theme menu applies a theme: the page theme and the name the trigger shows.
+      await page.evaluate(({ id, name }) => {
+        document.documentElement.dataset['theme'] = id;
+        for (const shown of document.querySelectorAll('[data-theme-name]'))
+          shown.textContent = name;
+      }, theme);
+      await expect(page.locator(`header [data-art="${theme.id}"]`), theme.id).toBeVisible();
+      const m = await page.evaluate(() => {
+        const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+        const header = box('main > header');
+        const name = box('main > header h1');
+        const menus = box('[data-header-menus]');
+        const link = box('[aria-label="Copy link"]');
+        const shown = document.querySelector('[data-theme-name]')!;
+        const trigger = shown.closest('button')!.getBoundingClientRect();
+        const content = shown.parentElement!.getBoundingClientRect();
+        return {
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          ownLine: menus.top >= name.bottom,
+          left: Math.round(menus.left - header.left),
+          right: Math.round(header.right - menus.right),
+          themeFirst: trigger.right <= link.left,
+          padLeft: Math.round(content.left - trigger.left),
+          padRight: Math.round(trigger.right - content.right),
+        };
+      });
+      expect(m.overflow, theme.id).toBe(0);
+      expect(m.ownLine, theme.id).toBe(ownLine);
+      expect(m.themeFirst, theme.id).toBe(ownLine);
+      expect(ownLine ? m.left : m.right, theme.id).toBe(0);
+      // The theme's name sits in the middle of its trigger, with no wide gap after it.
+      if (width < 640) expect(Math.abs(m.padLeft - m.padRight), theme.id).toBeLessThanOrEqual(10);
+    }
+  });
+}

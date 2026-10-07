@@ -19,17 +19,29 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
   native radios, so arrow keys, Space, and screen readers work without any script. The shell's
   edge turns accent while anything inside has focus, which is the trigger's focus indicator. Option
   rows use rounded-nested-md, the md corner minus the border and gutter, so the curves nest. Below
-  sm the word "Theme" is only for screen readers and the menu narrows, so the header keeps one line
-  on a 360 px phone beside the copy-link button.
+  sm the word "Theme" is only for screen readers and the menu is as wide as its widest theme name,
+  with the name centered: the sizer below stacks every name in one grid cell, unseen, so the width
+  fits the theme's own font and stays put while the arrow keys preview themes.
 -->
-<div class="group relative h-12 w-32 sm:w-44" data-shell>
+<div class="group relative h-12 sm:w-44" data-shell>
+  <span
+    aria-hidden="true"
+    class="invisible grid h-0 overflow-hidden border-2 border-transparent px-3 text-sm sm:hidden"
+  >
+    {THEMES.map((t) => (
+      <span class="col-start-1 row-start-1 flex items-center gap-1">
+        {t.name}
+        <span class="size-4" />
+      </span>
+    ))}
+  </span>
   <div class={`absolute inset-x-0 top-0 rounded-md ${SHELL} ${SHELL_BORDERED}`}>
     <button
       type="button"
       data-shell-toggle
       aria-expanded="false"
       aria-controls={menuId}
-      class="flex h-11 w-full items-center justify-between gap-2 px-3 text-sm text-ink transition-colors outline-none hover:bg-surface-raised"
+      class="flex h-11 w-full items-center justify-center gap-2 px-3 text-sm text-ink transition-colors outline-none hover:bg-surface-raised sm:justify-between"
     >
       <span class="text-ink-muted max-sm:sr-only">Theme</span>
       <span class="flex items-center gap-1">

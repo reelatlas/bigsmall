@@ -371,3 +371,13 @@ Format:
 
 **What happened.** Checking the calculator in the browser pane, the computer tool's `type` action left the display unchanged: it inserts text, which a focused button ignores, so no keydown reached the calculator's listener. `key` sent real presses but "shift+6" arrived as "6", not "^". Five keydown events dispatched in one script also all read the entry from before the first, since Preact renders between tasks, not between events of one task.
 **Rule.** Drive key handlers in the pane with `key` actions (or on-screen buttons for shifted symbols), and in scripts one task per key. Playwright's `keyboard.type` sends real key events and is the reference.
+
+## 2026-10-06 — Size a control to the widest of its labels with a stacked grid
+
+**What happened.** The theme menu kept a fixed width below `sm` after its "Theme" label went to screen readers only, which left a wide gap after "Sakura". Sizing it to the current name would have made it change width while the arrow keys preview themes.
+**Rule.** Give the control an unseen sizer in flow (`invisible grid h-0`) holding every possible label in the same grid cell (`col-start-1 row-start-1`): it is as wide as the widest label in the current font and never jumps between them. Mirror the control's padding and border in the sizer.
+
+## 2026-10-06 — CSS cannot tell that a row wrapped: switch at a measured container size
+
+**What happened.** The owner wanted the header's menus reordered and flush left only when they wrap under the name. Flex wrapping is invisible to CSS, and the point where it happens depends on the theme's fonts (Hardhat's wide name wraps first).
+**Rule.** Measure the widest case, then switch layouts at the smallest stock container size above it (`@container` on the header, `@max-sm:` on the menus: 384 px of header, where Hardhat needs 353 once the phone gap is 8 px) rather than a one-off breakpoint. Pin both sides of the switch with browser tests at widths around it, in every theme.

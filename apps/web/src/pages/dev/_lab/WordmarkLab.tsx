@@ -431,7 +431,7 @@ const Sheet = memo(function Sheet({
           <h3 id={`${id}-art`} className="font-display text-lg font-semibold">
             The art’s symbols{' '}
             <span className="font-body text-sm font-normal text-ink-muted">
-              {ART_GLYPHS.length}, from the sm breakpoint up
+              {ART_GLYPHS.length}
             </span>
           </h3>
           <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-3">

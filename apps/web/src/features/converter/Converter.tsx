@@ -1,4 +1,4 @@
-import { getCategory, parse } from '@bigsmall/core';
+import { formatNumber, getCategory, parse } from '@bigsmall/core';
 import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
@@ -20,7 +20,7 @@ import { useIsHydrated } from '../../lib/hydrated';
 import { cx } from '../../lib/recipes';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
-import { entryMessage, formatValue, isStepKey, placeNumber, pressKey } from './calculator';
+import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
 import { urlFor } from './url';
@@ -140,7 +140,7 @@ export function Converter() {
     if (entryValue === undefined) return;
     const shown = view[id];
     const showsResult = !shown.isSource && view.result?.box === id;
-    const number = formatValue(entryValue, env);
+    const number = formatNumber(entryValue, { locale: env.locale });
     dispatch({
       type: 'replace',
       box: id,

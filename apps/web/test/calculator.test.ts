@@ -6,12 +6,11 @@ import {
   evaluatedText,
   placeNumber,
   pressKey,
-  type CalculatorEnv,
 } from '../src/features/converter/calculator';
-import { EMPTY_CALC, type CalculatorState } from '../src/features/converter/state';
+import { EMPTY_CALC, type CalculatorState, type NumberEnv } from '../src/features/converter/state';
 
-const EN: CalculatorEnv = { separators: { decimal: '.', group: ',' }, locale: 'en-US' };
-const DE: CalculatorEnv = { separators: { decimal: ',', group: '.' }, locale: 'de-DE' };
+const EN: NumberEnv = { separators: { decimal: '.', group: ',' }, locale: 'en-US' };
+const DE: NumberEnv = { separators: { decimal: ',', group: '.' }, locale: 'de-DE' };
 const MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);

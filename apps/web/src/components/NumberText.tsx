@@ -46,5 +46,5 @@ export function NumberText({ text, parsed, running }: NumberTextProps) {
 /** The value of text holding arithmetic and nothing else, formatted as results are; null otherwise. */
 export function runningValue(parsed: ParsedInput, locale: string | undefined): string | null {
   if (!parsed.expression || parsed.value === undefined || parsed.query) return null;
-  return formatNumber(parsed.value, locale ? { locale } : {});
+  return formatNumber(parsed.value, { locale });
 }

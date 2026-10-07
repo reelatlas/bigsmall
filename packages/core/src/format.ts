@@ -1,8 +1,8 @@
 export interface FormatOptions {
   /** Significant digits to show, 1–21. Default 10. Trailing zeros are never shown. */
   precision?: number;
-  /** BCP 47 locale for grouping and the decimal mark. Default: the runtime's locale. */
-  locale?: string;
+  /** BCP 47 locale for grouping and the decimal mark. Default (or undefined): the runtime's locale. */
+  locale?: string | undefined;
   /** 'auto' switches to scientific notation for very large or very small magnitudes. */
   notation?: 'auto' | 'standard' | 'scientific';
 }

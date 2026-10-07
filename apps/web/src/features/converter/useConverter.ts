@@ -2,7 +2,6 @@ import {
   DEFAULT_SEPARATORS,
   localeSeparators,
   regionDefaults,
-  type Separators,
   type UnitPreference,
 } from '@bigsmall/core';
 import { useEffect, useMemo, useReducer, useState } from 'react';
@@ -18,12 +17,13 @@ import {
   type ConverterView,
   type EscapeTarget,
   type HistoryAction,
+  type NumberEnv,
 } from './state';
 import { paramsToState, stateToParams } from './url';
 
-export interface ConverterEnv {
+/** How this visitor writes numbers (NumberEnv), and which unit family their region expects. */
+export interface ConverterEnv extends NumberEnv {
   locale: string | undefined;
-  separators: Separators;
   system: UnitPreference;
 }
 

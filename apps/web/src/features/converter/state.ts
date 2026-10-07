@@ -172,11 +172,15 @@ export interface ConverterResult {
  */
 export type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real';
 
-const NO_ANSWER_MESSAGE: Record<NoAnswer, string> = {
-  large: 'Too large to convert',
-  small: 'Too small to convert',
-  'divide-by-zero': 'Can’t divide by zero',
-  'not-real': 'No real answer',
+/**
+ * What each place says when there is no answer to show (docs/UX-SPEC.md §7, §8): a box, in place
+ * of a result, and the calculator's display, which is shorter since nothing is converted yet.
+ */
+export const NO_ANSWER_MESSAGES: Record<NoAnswer, { box: string; calculator: string }> = {
+  large: { box: 'Too large to convert', calculator: 'Too large' },
+  small: { box: 'Too small to convert', calculator: 'Too small' },
+  'divide-by-zero': { box: 'Can’t divide by zero', calculator: 'Can’t divide by zero' },
+  'not-real': { box: 'No real answer', calculator: 'No real answer' },
 };
 
 export interface ConverterView {
@@ -196,12 +200,17 @@ export interface ConverterView {
   announcement: string | null;
 }
 
-export interface ViewOptions {
+/**
+ * How this visitor writes numbers: the separators typed text is read with, and the locale results
+ * are formatted in (the runtime's own when undefined). The view, the calculator, and the island
+ * share it.
+ */
+export interface NumberEnv {
   separators: Separators;
   locale?: string | undefined;
 }
 
-export function selectView(state: ConverterState, options: ViewOptions): ConverterView {
+export function selectView(state: ConverterState, options: NumberEnv): ConverterView {
   const unitA = state.a.unit ? (getUnit(state.a.unit) ?? null) : null;
   const unitB = state.b.unit ? (getUnit(state.b.unit) ?? null) : null;
   const category = unitA?.category ?? unitB?.category ?? null;
@@ -221,7 +230,7 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
       // A result a double cannot hold comes back as Infinity or as a 0 that underflowed.
       const value = safeConvert(sourceParsed.value, sourceUnit, targetUnit);
       if (value !== undefined) {
-        const text = formatNumber(value, options.locale ? { locale: options.locale } : {});
+        const text = formatNumber(value, { locale: options.locale });
         if (!text) noAnswer = 'large';
         else if (value === 0 && sourceParsed.value !== 0) noAnswer = 'small';
         else result = { box: targetId, value, text };
@@ -242,7 +251,7 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
       isSource,
       parsed: isSource ? sourceParsed : parse(text, options.separators),
       scope: unit?.category ?? otherUnit?.category ?? null,
-      message: !isSource && !typingQuery && noAnswer ? NO_ANSWER_MESSAGE[noAnswer] : null,
+      message: !isSource && !typingQuery && noAnswer ? NO_ANSWER_MESSAGES[noAnswer].box : null,
     };
   };
 
@@ -252,13 +261,13 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
     // Arithmetic is announced by its value ("8 milliliters"), not by what was typed ("5+3").
     const typed =
       sourceParsed.expression && sourceParsed.value !== undefined
-        ? formatNumber(sourceParsed.value, options.locale ? { locale: options.locale } : {})
+        ? formatNumber(sourceParsed.value, { locale: options.locale })
         : (sourceParsed.valueText ?? '');
     const from = `${typed} ${unitName(sourceUnit, amount)}`.trim();
     if (result) announcement = `${from} is ${result.text} ${unitName(targetUnit, result.value)}`;
     else if (noAnswer === 'large' || noAnswer === 'small') {
       announcement = `${from} is too ${noAnswer} to convert to ${targetUnit.plural}`;
-    } else if (noAnswer) announcement = NO_ANSWER_MESSAGE[noAnswer];
+    } else if (noAnswer) announcement = NO_ANSWER_MESSAGES[noAnswer].box;
   }
 
   const anchor: BoxId | null = category ? (sourceUnit ? sourceId : targetId) : null;

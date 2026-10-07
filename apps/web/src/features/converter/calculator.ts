@@ -1,16 +1,11 @@
 import { formatNumber, parse, type ParsedInput, type Separators } from '@bigsmall/core';
 import type { CalculatorKey } from '../../components/Calculator';
-import { EMPTY_CALC, type CalculatorState, type NoAnswer } from './state';
+import { EMPTY_CALC, NO_ANSWER_MESSAGES, type CalculatorState, type NumberEnv } from './state';
 
 /**
  * The calculator's rules (docs/UX-SPEC.md §8, "The calculator"): what each key does to its own
  * entry, and how a number goes into a box. Pure, so every rule is unit-tested in node.
  */
-
-export interface CalculatorEnv {
-  separators: Separators;
-  locale: string | undefined;
-}
 
 const MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
@@ -31,32 +26,16 @@ function isOperatorKey(key: CalculatorKey): key is OperatorKey {
   return key in SIGN;
 }
 
-/** A value formatted the way results are, in the visitor's locale. */
-export function formatValue(value: number, env: CalculatorEnv): string {
-  return formatNumber(value, env.locale ? { locale: env.locale } : {});
-}
-
 /**
  * What = and Enter turn arithmetic into: its value, formatted the way results are, with any unit
  * query typed after it kept. Null when the text is not arithmetic, or has no value ("5 ÷ 0").
  */
-export function evaluatedText(text: string, env: CalculatorEnv): string | null {
+export function evaluatedText(text: string, env: NumberEnv): string | null {
   const parsed = parse(text, env.separators);
   if (!parsed.expression || parsed.value === undefined) return null;
-  const value = formatValue(parsed.value, env);
+  const value = formatNumber(parsed.value, { locale: env.locale });
   return parsed.query ? `${value} ${parsed.query}` : value;
 }
-
-/**
- * What the display says when the entry has no value to use: shorter than a box's "Too large to
- * convert", since nothing is being converted yet.
- */
-const NO_VALUE: Record<NoAnswer, string> = {
-  large: 'Too large',
-  small: 'Too small',
-  'divide-by-zero': 'Can’t divide by zero',
-  'not-real': 'No real answer',
-};
 
 /**
  * Why the entry has no value, said in the display beside it: a number or a result beyond what a
@@ -65,7 +44,7 @@ const NO_VALUE: Record<NoAnswer, string> = {
  */
 export function entryMessage(parsed: ParsedInput): string | null {
   const problem = parsed.outOfRange ?? parsed.invalid;
-  return problem ? NO_VALUE[problem] : null;
+  return problem ? NO_ANSWER_MESSAGES[problem].calculator : null;
 }
 
 /** = and C make a whole new entry, a step of their own; every other key is typing, chunked. */
@@ -80,7 +59,7 @@ export function isStepKey(key: CalculatorKey): boolean {
 export function pressKey(
   entry: CalculatorState,
   key: CalculatorKey,
-  env: CalculatorEnv,
+  env: NumberEnv,
 ): CalculatorState | null {
   if (key === 'clear') return entry.text === '' ? null : EMPTY_CALC;
   if (key === 'equals') {

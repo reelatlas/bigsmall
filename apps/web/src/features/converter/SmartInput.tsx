@@ -155,10 +155,29 @@ export function SmartInput({
 
   const focusInput = () => inputRef.current?.focus();
 
-  const showList = (next: Level | null) => {
+  // Set when the list opens resting on a row, so that row is scrolled to the list's middle with
+  // its neighbors around it, rather than just into view.
+  const centerNext = useRef(false);
+
+  /** The row of `unitId` (by default the box's own unit) among `rows`, or -1. */
+  const unitRow = (rows: readonly SuggestionItem[], unitId = box.unit?.id) =>
+    unitId ? rows.findIndex((item) => item.kind === 'unit' && item.unit.id === unitId) : -1;
+
+  /** Highlights a row the list opens on, centered: the box's unit, so the list starts where the box is. */
+  const rest = (row: number) => {
+    centerNext.current = row >= 0;
+    setActive(row);
+  };
+
+  /**
+   * Opens the list at `next` resting on the box's unit, or on the unit just removed, when that
+   * level lists it. `text` is the box's text once the change that opens it has landed.
+   */
+  const showList = (next: Level | null, text = box.text, unitId = box.unit?.id) => {
     setLevel(next);
     setOpen(true);
-    setActive(-1);
+    const rows = buildList(text, next === 'top' ? null : (next ?? box.scope), listOptions).items;
+    rest(unitRow(rows, unitId));
   };
 
   const closePanel = () => {
@@ -213,10 +232,9 @@ export function SmartInput({
       lock(item.unit);
     } else {
       // Entering a category drops the query that found it, in either box, and keeps any number.
-      if (query) {
-        dispatch({ type: 'setText', box: box.id, text: suggestion.parsed.valueText ?? '' });
-      }
-      showList(item.category.id);
+      const text = query ? (suggestion.parsed.valueText ?? '') : box.text;
+      if (query) dispatch({ type: 'setText', box: box.id, text });
+      showList(item.category.id, text);
     }
     focusInput();
   };
@@ -252,16 +270,21 @@ export function SmartInput({
     const count = items.length;
     switch (event.key) {
       case 'ArrowDown':
-        // From nothing, Down goes to the first unit or category; from the last row it wraps to
-        // Back. Up from the first unit reaches Back, so Back is one key away in either direction.
-        event.preventDefault();
-        setOpen(true);
-        if (count) setActive((i) => (i < 0 ? Math.min(firstResult, count - 1) : (i + 1) % count));
-        break;
       case 'ArrowUp':
         event.preventDefault();
+        // A closed list opens resting on the box's unit, like a click or focus.
+        if (!open && !query && unitRow(items) >= 0) {
+          setOpen(true);
+          rest(unitRow(items));
+          break;
+        }
         setOpen(true);
-        if (count) setActive((i) => (i <= 0 ? count - 1 : i - 1));
+        if (!count) break;
+        // From nothing, Down goes to the first unit or category; from the last row it wraps to
+        // Back. Up from the first unit reaches Back, so Back is one key away in either direction.
+        if (event.key === 'ArrowDown') {
+          setActive((i) => (i < 0 ? Math.min(firstResult, count - 1) : (i + 1) % count));
+        } else setActive((i) => (i <= 0 ? count - 1 : i - 1));
         break;
       case 'Enter': {
         // Commit and close while keeping focus here. Back and category rows move between the
@@ -272,7 +295,10 @@ export function SmartInput({
           pick(item);
           break;
         }
-        if (item) pick(item);
+        // The box's own unit, highlighted because the list opened on it, changes nothing: Enter
+        // does what it does with no row, evaluating any arithmetic, and closes.
+        const own = item?.kind === 'unit' && item.unit.id === box.unit?.id;
+        if (item && !own) pick(item);
         else if (!commitExact()) evaluate();
         closePanel();
         break;
@@ -292,9 +318,11 @@ export function SmartInput({
 
   const onFocus = (event: FocusEvent<HTMLInputElement>) => {
     // Back in a box that holds an uncommitted query, its best match is highlighted again, so
-    // Enter takes it just as it would have before the box was left.
+    // Enter takes it just as it would have before the box was left. Otherwise the list rests on
+    // the box's unit, so it opens where the box is.
     setOpen(true);
-    setActive(query ? firstResult : -1);
+    if (query) setActive(firstResult);
+    else rest(unitRow(items));
     if (!box.isSource && event.currentTarget.value) event.currentTarget.select();
   };
 
@@ -305,9 +333,17 @@ export function SmartInput({
   };
 
   useEffect(() => {
-    if (open && active >= 0) {
-      document.getElementById(optionIdFor(listboxId, active))?.scrollIntoView({ block: 'nearest' });
-    }
+    if (!open || active < 0) return;
+    const row = document.getElementById(optionIdFor(listboxId, active));
+    const list = document.getElementById(listboxId);
+    if (!row || !list) return;
+    if (centerNext.current) {
+      // Only the list scrolls: scrollIntoView would move the page too.
+      centerNext.current = false;
+      const { top, height } = row.getBoundingClientRect();
+      const box = list.getBoundingClientRect();
+      list.scrollTop += top - box.top - (box.height - height) / 2;
+    } else row.scrollIntoView({ block: 'nearest' });
   }, [open, active, listboxId]);
 
   const scopeName = scope ? getCategory(scope)?.name : undefined;

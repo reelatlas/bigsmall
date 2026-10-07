@@ -109,7 +109,7 @@ test('the arrow keys reach the Back row, and Enter on it goes back', async ({ pa
 
   await first.click();
   await expect(back).toBeVisible();
-  await first.press('ArrowDown');
+  // The list opens resting on the box's unit.
   await expect(page.getByRole('option', { name: /^milliliters mL$/ })).toHaveAttribute(
     'aria-selected',
     'true',
@@ -132,9 +132,42 @@ test('the arrow keys reach the Back row, and Enter on it goes back', async ({ pa
   await arrowTo(first, page.getByRole('option', { name: /^Volume$/ }));
   await first.press('Enter');
   await expect(back).toBeVisible();
+  // Back in Volume, the list rests on milliliters again; Up reaches Back, Up again the last row,
+  // and Down from there wraps to Back.
+  await first.press('ArrowUp');
+  await expect(back).toHaveAttribute('aria-selected', 'true');
   await first.press('ArrowUp');
   await first.press('ArrowDown');
   await expect(back).toHaveAttribute('aria-selected', 'true');
+});
+
+test('opening a box that has a unit rests the list on that unit', async ({ page }) => {
+  await page.goto('/?a=us-pint&b=us-cup&v=2&s=a');
+  await ready(page);
+  const { first } = boxes(page);
+  const pints = page.getByRole('option', { name: /^pints pt$/ });
+
+  // Focus opens it on the unit the box holds; Enter there keeps the unit and closes.
+  await first.focus();
+  await expect(pints).toHaveAttribute('aria-selected', 'true');
+  await first.press('Enter');
+  await expect(pints).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remove pints' })).toBeVisible();
+  await expect(first).toHaveValue('2');
+
+  // The arrow keys and the chip open it there too.
+  await first.press('ArrowDown');
+  await expect(pints).toHaveAttribute('aria-selected', 'true');
+  await first.press('Enter');
+  await page.getByRole('button', { name: 'Change unit: pints' }).click();
+  await expect(pints).toHaveAttribute('aria-selected', 'true');
+  await first.press('Enter');
+
+  // Backspace on an empty box removes the unit and lists its category, resting on it.
+  await first.fill('');
+  await first.press('Backspace');
+  await expect(page.getByRole('button', { name: 'Remove pints' })).toHaveCount(0);
+  await expect(pints).toHaveAttribute('aria-selected', 'true');
 });
 
 test('Enter commits the box and closes the list, keeping focus', async ({ page }) => {

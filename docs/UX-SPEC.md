@@ -49,7 +49,7 @@ A decimal mark still waiting for its digits belongs to the number (`5.` on the w
 
 ## 3. The suggestion list
 
-**Opening.** Focusing a box opens its list; so do typing, the arrow keys, and clicking the chip. A box that holds an uncommitted query opens with its best match highlighted again, so Enter takes it. A focused result box selects its text, so typing replaces it and Ctrl/⌘+C copies it.
+**Opening.** Focusing a box opens its list; so do typing, the arrow keys, and clicking the chip. A box that holds an uncommitted query opens with its best match highlighted again, so Enter takes it. Otherwise a box with a unit opens resting on that unit, scrolled to the middle of the list, so the list starts where the box is: Enter there keeps the unit (and evaluates any arithmetic) and closes, and the arrows move on from it. Entering that unit's category, or a list opened by removing the unit (Backspace or Escape), rests on it the same way. A focused result box selects its text, so typing replaces it and Ctrl/⌘+C copies it.
 
 **Two levels.** The top level lists the categories. Inside a category, the list shows that category's units with a **Back row** first: "← Back" and the category name, pinned while the list scrolls. A box is inside a category when it has a unit, or when the other box has one (its scope); picking a category row, or Back, moves between the levels. Going back up highlights the category just left, so Enter goes straight back in; when a typed query hides that row, the best match is highlighted instead.
 

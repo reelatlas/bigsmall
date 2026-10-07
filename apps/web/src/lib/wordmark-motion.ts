@@ -9,10 +9,10 @@ import {
   nextPhrase,
   pace,
   WORDMARK,
-  WORDMARK_SIZES,
   type FitStep,
   type WordmarkTuning,
 } from './wordmark';
+import { PLAYING_LINE, WORDMARK_SIZES } from './recipes';
 
 /** What the play runs on: WORDMARK_TIMING and WORDMARK_TUNING, or the lab's live copies. */
 export interface WordmarkSettings {
@@ -34,12 +34,6 @@ export interface WordmarkPlayer {
   pace(): number;
 }
 
-/**
- * The live line while playing: over the held box, centered on it, sized by a step. The lab's
- * sheet sets phrases the same way.
- */
-export const PLAYING_LINE =
-  'absolute inset-y-0 left-0 flex origin-left items-center text-left whitespace-pre';
 /** Frames are timed against a 60 Hz frame, so the pace eases back alike on faster screens. */
 const FRAME_MS = 1000 / 60;
 

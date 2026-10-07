@@ -6,6 +6,8 @@
  * value (SI, CODATA, NIST, the IAU's nominal solar values); the wordplay is ours (ADR 0004).
  */
 
+import { WORDMARK_SIZES, type WordmarkSize } from './recipes';
+
 export const WORDMARK = 'bigsmall';
 
 /** Groups digits in long numbers ("299_792_458" in a list): narrow, and never broken across lines. */
@@ -136,21 +138,7 @@ export const PHRASE_KINDS = [
 ] as const;
 export type PhraseKind = (typeof PHRASE_KINDS)[number];
 
-/**
- * The type sizes a phrase steps down through until it fits the name's width, largest first, so a
- * short swap stays as large as the name and an equation or idiom takes a smaller size.
- */
-export const WORDMARK_SIZES = [
-  'text-3xl',
-  'text-2xl',
-  'text-xl',
-  'text-lg',
-  'text-base',
-  'text-sm',
-] as const;
-export type WordmarkSize = (typeof WORDMARK_SIZES)[number];
-
-/** The sizes from the largest down to `smallest`. */
+/** The sizes of the wordmark's ladder (WORDMARK_SIZES) from the largest down to `smallest`. */
 export function sizesDownTo(smallest: WordmarkSize): readonly WordmarkSize[] {
   return WORDMARK_SIZES.slice(0, WORDMARK_SIZES.indexOf(smallest) + 1);
 }

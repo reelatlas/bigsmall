@@ -1,4 +1,5 @@
 import { getCategory, matchSpan, type Category, type Unit } from '@bigsmall/core';
+import { cx } from '../lib/recipes';
 import { ChevronRightIcon } from './icons';
 
 /**
@@ -37,13 +38,13 @@ export interface SuggestionPanelProps {
 
 // Rows sit in the same 8 px inset as the chip inside the field, with corners that nest in the
 // field's corners, so a highlight never touches the shell's edge (docs/DESIGN-SYSTEM.md).
-const row =
+const ROW =
   'flex min-h-11 cursor-pointer items-center gap-3 rounded-nested px-2 text-left ' +
   'data-active:bg-accent-soft hover:bg-surface-raised';
 
 // The Back row stays pinned at the top while the list scrolls, with a divider under it; its inner
 // span carries the highlight so the divider is never highlighted.
-const backRow = 'group sticky top-0 z-10 mb-1 cursor-pointer border-b border-line bg-surface pb-1';
+const BACK_ROW = 'group sticky top-0 z-10 mb-1 cursor-pointer border-b border-line bg-surface pb-1';
 
 /**
  * The listbox that grows out of a smart input. Plain WAI-ARIA combobox pattern: the input owns
@@ -78,7 +79,7 @@ export function SuggestionPanel({
         id={id}
         aria-label={label}
         tabIndex={-1}
-        className={`max-h-72 scroll-thin overflow-y-auto ${hasBack ? 'scroll-pt-14' : ''}`}
+        className={cx('max-h-72 scroll-thin overflow-y-auto', hasBack && 'scroll-pt-14')}
       >
         {items.map((item, index) => {
           const active = index === activeIndex;
@@ -92,7 +93,7 @@ export function SuggestionPanel({
               aria-selected={active}
               aria-label={back ? 'Back to categories' : undefined}
               data-active={active || undefined}
-              className={back ? backRow : row}
+              className={back ? BACK_ROW : ROW}
               onMouseDown={(event) => event.preventDefault()}
               // Movement, not entry: rows that render under a still pointer (after Back, say)
               // must not take the highlight from the row the keyboard or Back put it on.

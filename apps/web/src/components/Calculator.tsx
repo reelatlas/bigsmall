@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
-import { NUMBER_SIZES, useFitStep } from '../lib/fit-step';
-import { FIELD_ROW } from '../lib/shell';
+import { useFitStep } from '../lib/fit-step';
+import { CARD, cx, FIELD_ROW, NUMBER_SIZES } from '../lib/recipes';
 import { Button, type ButtonVariant } from './Button';
 import { BackspaceIcon, CheckIcon, CloseIcon } from './icons';
 
@@ -213,7 +213,7 @@ export function Calculator({
       ref={groupRef}
       role="group"
       aria-labelledby={titleId}
-      className="rounded-lg border border-line bg-surface p-3 shadow-sm"
+      className={cx(CARD, 'p-3 shadow-sm')}
     >
       <div className="mb-2 flex items-center justify-between">
         <h2 id={titleId} className="pl-1 text-sm font-medium text-ink-muted">
@@ -232,7 +232,7 @@ export function Calculator({
       {/* The display has a field's size and edge, so it reads as where the typing goes. */}
       <div className="mb-3 rounded-lg border-2 border-edge bg-surface" data-calculator-display>
         <div className={FIELD_ROW}>
-          <div ref={displayRef} className={`${DISPLAY_TEXT} ${size}`} data-entry>
+          <div ref={displayRef} className={cx(DISPLAY_TEXT, size)} data-entry>
             {display || <span className="text-ink-muted">0</span>}
           </div>
           {message && (

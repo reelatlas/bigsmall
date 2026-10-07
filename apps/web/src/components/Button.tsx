@@ -1,8 +1,11 @@
 import type { ButtonHTMLAttributes } from 'react';
+import { cx } from '../lib/recipes';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'tonal' | 'soft' | 'ghost';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+// className is a plain string, as in React: Preact's own typing also allows a signal there.
+export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
+  className?: string | undefined;
   /**
    * ghost: icon actions on the page (swap, undo, copy). secondary: bordered text button. tonal: a
    * bordered button on the raised surface in muted ink, a quieter sibling of secondary (the
@@ -27,12 +30,12 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 // `disabled` drops a button out of the Tab order; `aria-disabled` looks the same but keeps it a
 // stop, for a set of stops that should not change shape (the calculator's send buttons), and
 // its click handler must then do nothing.
-const base =
+const BASE =
   'inline-flex min-h-11 items-center justify-center gap-2 font-medium transition-[background-color,color,opacity] ' +
   'disabled:opacity-50 aria-disabled:opacity-50 active:opacity-80';
 
 // Secondary buttons share the fields' two-pixel edge, so every bordered control has one weight.
-const variants: Record<ButtonVariant, string> = {
+const VARIANTS: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-on-accent hover:opacity-90',
   secondary: 'border-2 border-edge bg-surface text-ink hover:bg-surface-raised',
   tonal: 'border-2 border-edge bg-surface-raised text-ink-muted hover:text-ink',
@@ -58,9 +61,7 @@ export function Button({
     <button
       type={type}
       {...props}
-      className={[base, radius, on ? ON : variants[variant], shape, className]
-        .filter(Boolean)
-        .join(' ')}
+      className={cx(BASE, radius, on ? ON : VARIANTS[variant], shape, className)}
     />
   );
 }

@@ -1,5 +1,5 @@
 ---
-import { SHELL, SHELL_GHOST } from '../lib/shell';
+import { SHELL, SHELL_GHOST, SHELL_PANEL } from '../lib/recipes';
 import { SHORTCUTS } from '../lib/shortcuts';
 import { Button } from './Button';
 import { KeyboardIcon } from './icons';
@@ -16,7 +16,7 @@ const titleId = `${id}-title`;
 
 <!--
   The keyboard shortcuts map. At rest it is the same ghost icon button as undo, redo, and clear
-  all; open, its shell (lib/shell.ts) takes the fluid-shell edge, surface, and shadow and grows
+  all; open, its shell (lib/recipes.ts) takes the fluid-shell edge, surface, and shadow and grows
   left and down from the icon over the page, the way the theme menu grows out of its trigger. A
   mouse resting on it opens it for a look, a click pins it open, and Escape, a click elsewhere,
   or focus leaving closes it, so the content can be hovered, dismissed, and stays put until then
@@ -30,7 +30,7 @@ const titleId = `${id}-title`;
   data-shell
   data-shell-hover
 >
-  <div class={`absolute top-0 right-0 rounded-md ${SHELL} ${SHELL_GHOST}`}>
+  <div class:list={['absolute top-0 right-0 rounded-md', SHELL, SHELL_GHOST]}>
     <div class="flex items-center">
       <h2
         id={titleId}
@@ -54,7 +54,7 @@ const titleId = `${id}-title`;
       id={panelId}
       role="group"
       aria-labelledby={titleId}
-      class="hidden w-72 border-t border-line px-3 py-2 group-data-open:block"
+      class:list={[SHELL_PANEL, 'w-72 px-3 py-2']}
     >
       <dl>
         {SHORTCUTS.map((shortcut) => (

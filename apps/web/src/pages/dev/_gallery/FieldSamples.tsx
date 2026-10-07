@@ -12,7 +12,7 @@ import {
 import { SmartInput } from '../../../features/converter/SmartInput';
 import type { BoxView } from '../../../features/converter/state';
 import type { ConverterEnv } from '../../../features/converter/useConverter';
-import { FIELD_ROW, SHELL, SHELL_BORDERED } from '../../../lib/shell';
+import { cx, FIELD_ROW, NUMBER_SIZES, SHELL, SHELL_BORDERED } from '../../../lib/recipes';
 
 // Gallery-only: the real field in frozen states, so every theme is checked against what ships.
 // Nothing here dispatches; typing into a sample changes nothing.
@@ -137,9 +137,9 @@ function OpenSample() {
   ];
   return (
     <div className="group" data-open>
-      <div className={`rounded-lg ${SHELL} ${SHELL_BORDERED}`}>
+      <div className={cx('rounded-lg', SHELL, SHELL_BORDERED)}>
         <div className={FIELD_ROW}>
-          <span className="flex-1 font-numeric text-2xl text-ink sm:text-3xl">5 me</span>
+          <span className={cx('flex-1 font-numeric text-ink', NUMBER_SIZES[0])}>5 me</span>
         </div>
         <SuggestionPanel
           id={`${id}-listbox`}

@@ -1,19 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useState, type RefObject } from 'react';
 
 /**
- * The type sizes a number steps down through until it fits on one line, largest first: a field's
- * value and the calculator's display share them (docs/DESIGN-SYSTEM.md, "Fields").
- */
-export const NUMBER_SIZES = [
-  'text-2xl sm:text-3xl',
-  'text-xl sm:text-2xl',
-  'text-lg sm:text-xl',
-  'text-base sm:text-lg',
-  'text-base',
-] as const;
-
-/**
- * Picks the largest of `steps` (class lists, largest first) at which the element's content fits
+ * Picks the largest of `steps` (a type ladder: class lists, largest first, such as NUMBER_SIZES
+ * in lib/recipes.ts) at which the element's content fits
  * its width on one line. It measures before paint after every render, and again whenever the
  * element resizes, so a number shrinks as it grows and takes the room back when the field widens
  * or a chip disappears. The element must clip (`overflow-hidden`) and keep its content on one

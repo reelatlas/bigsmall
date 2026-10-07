@@ -28,8 +28,8 @@ import {
 } from '../../components/SuggestionPanel';
 import { NumberText, runningValue } from '../../components/NumberText';
 import { UnitChip } from '../../components/UnitChip';
-import { NUMBER_SIZES, useFitStep } from '../../lib/fit-step';
-import { FIELD_ROW, SHELL, SHELL_BORDERED } from '../../lib/shell';
+import { useFitStep } from '../../lib/fit-step';
+import { cx, FIELD_ROW, NUMBER_SIZES, SHELL, SHELL_BORDERED } from '../../lib/recipes';
 import { evaluatedText } from './calculator';
 import type { BoxView, EscapeTarget, HistoryAction, Mode } from './state';
 import type { ConverterEnv } from './useConverter';
@@ -77,7 +77,7 @@ const TEXT_LAYER =
  */
 const OUT_OF_RANGE =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-medium text-danger';
-const OUT_OF_RANGE_STEPS = [
+const OUT_OF_RANGE_SIZES = [
   'text-base whitespace-nowrap sm:text-lg',
   'text-sm whitespace-nowrap',
   'text-xs whitespace-nowrap',
@@ -143,7 +143,7 @@ export function SmartInput({
 
   const sizeClass = NUMBER_SIZES[useFitStep(textLayerRef, TEXT_LAYER, NUMBER_SIZES)];
   const outOfRangeClass =
-    OUT_OF_RANGE_STEPS[useFitStep(outOfRangeRef, OUT_OF_RANGE, OUT_OF_RANGE_STEPS)];
+    OUT_OF_RANGE_SIZES[useFitStep(outOfRangeRef, OUT_OF_RANGE, OUT_OF_RANGE_SIZES)];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
   const syncScroll = () => {
@@ -349,13 +349,13 @@ export function SmartInput({
   const scopeName = scope ? getCategory(scope)?.name : undefined;
 
   // A fixed-height placeholder keeps the page layout still; the shell inside it grows downward
-  // over the page when the list opens, so field and list read as one shape (lib/shell.ts). Inside,
+  // over the page when the list opens, so field and list read as one shape (lib/recipes.ts). Inside,
   // the chip and the trailing button keep the same 8 px from the top, bottom, and right edges
   // (docs/DESIGN-SYSTEM.md, "Fields").
   return (
     <div className="group relative h-16 min-w-0" data-open={open || undefined}>
       <div
-        className={`absolute inset-x-0 top-0 rounded-lg shadow-sm ${SHELL} ${SHELL_BORDERED}`}
+        className={cx('absolute inset-x-0 top-0 rounded-lg shadow-sm', SHELL, SHELL_BORDERED)}
         onBlur={onBlur}
       >
         <label htmlFor={inputId} className="sr-only">
@@ -386,9 +386,12 @@ export function SmartInput({
               onKeyDown={onKeyDown}
               onFocus={onFocus}
               onScroll={syncScroll}
-              className={`${sizeClass} h-full w-full bg-transparent font-numeric text-transparent caret-ink outline-none selection:bg-accent-soft placeholder:text-ink-muted`}
+              className={cx(
+                sizeClass,
+                'h-full w-full bg-transparent font-numeric text-transparent caret-ink outline-none selection:bg-accent-soft placeholder:text-ink-muted',
+              )}
             />
-            <div ref={textLayerRef} aria-hidden="true" className={`${TEXT_LAYER} ${sizeClass}`}>
+            <div ref={textLayerRef} aria-hidden="true" className={cx(TEXT_LAYER, sizeClass)}>
               <NumberText
                 text={box.text}
                 parsed={suggestion.parsed}
@@ -399,7 +402,7 @@ export function SmartInput({
             <div
               ref={outOfRangeRef}
               id={outOfRangeId}
-              className={`${OUT_OF_RANGE} ${outOfRangeClass}`}
+              className={cx(OUT_OF_RANGE, outOfRangeClass)}
             >
               {box.message ?? ''}
             </div>

@@ -1,4 +1,5 @@
 import type { Unit } from '@bigsmall/core';
+import { cx } from '../lib/recipes';
 import { CloseIcon } from './icons';
 
 export interface UnitChipProps {
@@ -17,12 +18,12 @@ export interface UnitChipProps {
 }
 
 // The chip lives inside a field: its corners nest inside the field's (docs/DESIGN-SYSTEM.md, "Fields").
-const shell = 'inline-flex min-h-11 shrink-0 items-stretch rounded-nested bg-accent-soft text-ink';
+const CHIP = 'inline-flex min-h-11 shrink-0 items-stretch rounded-nested bg-accent-soft text-ink';
 // Baseline alignment keeps the name and the symbol on one line of type.
-const body = 'inline-flex items-baseline gap-2 self-center px-3';
+const BODY = 'inline-flex items-baseline gap-2 self-center px-3';
 // Hover keeps the chip color and lightens it toward the surface, so it reads as the same chip.
 // Keyboard focus shows the base focus ring.
-const hover = 'transition-colors hover:bg-surface/40';
+const HOVER = 'transition-colors hover:bg-surface/40';
 
 /**
  * The locked unit inside a smart input: its name, then its symbol, the way a row of the unit list
@@ -32,17 +33,17 @@ const hover = 'transition-colors hover:bg-surface/40';
 export function UnitChip({ unit, compact, onOpen, onRemove, inTabOrder }: UnitChipProps) {
   const tabIndex = inTabOrder ? undefined : -1;
   return (
-    <span className={shell}>
+    <span className={CHIP}>
       <button
         type="button"
         aria-label={`Change unit: ${unit.plural}`}
         tabIndex={tabIndex}
         onClick={onOpen}
-        className={`inline-flex rounded-l-nested ${hover}`}
+        className={cx('inline-flex rounded-l-nested', HOVER)}
       >
-        <span className={body}>
+        <span className={BODY}>
           {!compact && <span>{unit.plural}</span>}
-          <span className={`font-numeric font-semibold ${compact ? '' : 'text-ink-muted'}`}>
+          <span className={cx('font-numeric font-semibold', !compact && 'text-ink-muted')}>
             {unit.symbol}
           </span>
         </span>
@@ -52,7 +53,10 @@ export function UnitChip({ unit, compact, onOpen, onRemove, inTabOrder }: UnitCh
         aria-label={`Remove ${unit.plural}`}
         tabIndex={tabIndex}
         onClick={onRemove}
-        className={`inline-flex w-11 items-center justify-center rounded-r-nested text-ink-muted hover:text-ink ${hover}`}
+        className={cx(
+          'inline-flex w-11 items-center justify-center rounded-r-nested text-ink-muted hover:text-ink',
+          HOVER,
+        )}
       >
         <CloseIcon width="16" height="16" />
       </button>

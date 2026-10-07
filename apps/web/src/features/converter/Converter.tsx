@@ -17,6 +17,7 @@ import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
+import { cx } from '../../lib/recipes';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, formatValue, isStepKey, placeNumber, pressKey } from './calculator';
@@ -203,7 +204,7 @@ export function Converter() {
   );
 
   const renderBox = (box: BoxView, label: string, counterpart: BoxView, placement: string) => (
-    <div className={`min-w-0 ${placement}`}>
+    <div className={cx('min-w-0', placement)}>
       <SmartInput
         box={box}
         label={label}

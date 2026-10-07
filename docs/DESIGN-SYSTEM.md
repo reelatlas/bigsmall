@@ -96,6 +96,15 @@ Prefer native elements when they are good enough (`<button>`, radios, `<dialog>`
 
 ## Patterns
 
+### Recipes
+
+A class list more than one file builds from is a recipe in `src/lib/recipes.ts`, written once so a shared shape cannot drift between Astro and TSX: the card (`CARD`), the fluid shells (`SHELL`, `SHELL_BORDERED`, `SHELL_GHOST`, `SHELL_PANEL`), the field row (`FIELD_ROW`), the type ladders (`NUMBER_SIZES`, `WORDMARK_SIZES`), and the wordmark's face and lines (`WORDMARK_FACE`, `PLAYING_LINE`, `ART_LINE`).
+
+- A list only one file uses stays in that file, as an UPPER_SNAKE constant beside its markup (`TEXT_LAYER` in SmartInput, `DISPLAY_TEXT` in Calculator). It moves to `recipes.ts` when a second file needs it.
+- A recipe holds only what every use shares. A part one use needs and another must not have goes in that use or in a variant recipe: merging the shells once gave the shortcuts map a fading edge (docs/LEARNINGS.md, "Merging recipes can undo a fix").
+- TSX joins class lists with `cx()`, which leaves out any a condition turned off (`cx('font-semibold', !compact && 'text-ink-muted')`); Astro joins them with `class:list`. Never a template string with `? '' :`, which leaves stray spaces.
+- Recipes hold tokens only, like every class list, and the token guard checks them.
+
 ### Edges and borders
 
 - **2 px is a control's edge.** Fields, the theme menu, and secondary buttons share `border-2` in `--edge`, so no control looks lighter-edged than its neighbor. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights once ate into it.
@@ -114,7 +123,7 @@ Prefer native elements when they are good enough (`<button>`, radios, `<dialog>`
 ### Motion
 
 - **The wordmark at play** is the one animation driven by script: frames come from `requestAnimationFrame` only while the heading (the name and its art) is hovered or a tap plays it, its pace comes from the pointer's speed, and it never starts under `prefers-reduced-motion`. Every other motion is a CSS transition on the motion tokens.
-- **Type that steps to fit.** A field's number (`NUMBER_SIZES`) and a wordmark phrase (`WORDMARK_SIZES`, `fitSteps()`) both step down the type scale until the text fits its box, never a size in between. A phrase may also take two lines with `leading-tight` (`text-sm` and `text-base` keep two lines within the name's height, or nearly). A transform squeezes only a phrase too long at every step, which the wordmark lab flags and a browser test rejects.
+- **Type that steps to fit.** Text that may not fit its box steps down a type ladder (sizes, largest first, in `src/lib/recipes.ts`) and takes the largest size at which it fits: never a size in between, and never clipped. Two mechanisms measure it, one per kind of box. `useFitStep` (`src/lib/fit-step.ts`) fits text in an island that clips its own box, re-measured on every render and on resize: a field's number and the calculator's display on `NUMBER_SIZES`, and the out-of-range message on three sizes whose last step wraps. `fitPhrase` (`src/lib/wordmark-motion.ts`) fits a line laid over a fixed room, once per phrase: the wordmark on `WORDMARK_SIZES` through `fitSteps()`, which may also set two lines with `leading-tight` (`text-sm` and `text-base` keep two lines within the name's height, or nearly). A transform squeezes only a phrase too long at every step, which the wordmark lab flags and a browser test rejects. New text that must fit uses one of the two with a ladder, never a third way.
 - **Nothing clips a moving line.** The wordmark holds its box at the name's size while it plays, but never clips it, so descenders and tall symbols show whole; each frame fits by construction instead (a flipping letter is never wider than the room its phrase leaves).
 
 - Components write `transition-colors` (or `transition-[border-color,box-shadow]`, `transition-transform`) and nothing else: the bridge makes every transition default to `--motion-fast` and `--motion-ease`.
@@ -130,20 +139,20 @@ An element inset inside a rounded shell uses the shell's radius minus the inset,
 
 ### Fluid shells
 
-A control that opens a list or panel keeps both in one shape, drawn over the page so nothing reflows. The recipe lives in `src/lib/shell.ts` and every instance builds from it:
+A control that opens a list or panel keeps both in one shape, drawn over the page so nothing reflows. Its recipes live in `src/lib/recipes.ts` and every instance builds from them:
 
 - A **placeholder** with `group relative` and a fixed size holds the layout: `h-16` for a field, `h-12` for the theme menu, `size-12` for the shortcuts map. It carries `data-open` while open.
 - The **shell** inside takes `SHELL` (2 px edge, `overflow-hidden`, and the open state: `z-20`, accent edge, `shadow-md`; no motion, since a shared part must not decide how a variant moves), one resting style, and its own position and radius.
   - `SHELL_BORDERED`: bordered at rest, `bg-surface`, accent on `focus-within`, and its edge eases between edge and accent, because the shell stays in view through the change. Fields (`rounded-lg`, plus `shadow-sm` at rest) and the theme menu (`rounded-md`, no resting shadow).
   - `SHELL_GHOST`: a borderless icon button at rest that becomes a card when open. Nothing eases: its panel appears and vanishes at once, so its edge must too, or a fading accent square is left around the icon. A browser test checks the ghost edge cannot animate. The shortcuts map (`rounded-md`), anchored with `absolute top-0 right-0` so it grows left and takes its width from its panel.
-- The list or panel renders inside the shell, in flow, under a `border-t` divider. `overflow-hidden` clips it to the corners; the shell's own border is never clipped.
+- The list or panel renders inside the shell, in flow, under a `border-t` divider (`SHELL_PANEL` for a header menu's panel, which shows only while open). `overflow-hidden` clips it to the corners; the shell's own border is never clipped.
 - `SmartInput` sets `data-open` from component state. The header menus share one controller in the inline script of `Base.astro`: `[data-shell]`, `[data-shell-toggle]`, `[data-open]`, `[data-pinned]` (a click opened it), `[data-shell-hover]` (a resting mouse also opens it), and `[data-shell-initial]` (what takes focus on open). It closes a shell on Escape, a click outside, or focus leaving it. A new header menu reuses this markup and needs no script.
 
 ### Fields
 
-- **Row.** `FIELD_ROW` (`src/lib/shell.ts`): 60 px tall inside the 2 px border, `pl-4 pr-2 gap-2`. The 44 px chip and trailing button keep the same 8 px from the top, bottom, and right edges, and the value starts 16 px in.
+- **Row.** `FIELD_ROW` (`src/lib/recipes.ts`): 60 px tall inside the 2 px border, `pl-4 pr-2 gap-2`. The 44 px chip and trailing button keep the same 8 px from the top, bottom, and right edges, and the value starts 16 px in.
 - **Text layer.** The value is drawn by an `aria-hidden` layer over an input whose own text is transparent (`text-transparent caret-ink selection:bg-accent-soft`). The input keeps the caret, selection, focus, mobile keyboards, and the accessibility tree; the layer gets the typography, which is how the exponent marker in `1.5E21` is `font-semibold` (core's parser reports where it is). The layer matches the input's font, size, and line box, follows its horizontal scroll, and is `pointer-events-none`.
-- **Size steps.** `useFitStep` (`src/lib/fit-step.ts`) picks the largest of five steps (`text-2xl sm:text-3xl` down to `text-base`) at which the layer's text fits on one line, measured before paint on every render and on resize. The out-of-range message uses the same hook with three sizes and a last step that wraps.
+- **Size steps.** `useFitStep` (`src/lib/fit-step.ts`) picks the largest of the five `NUMBER_SIZES` (`text-2xl sm:text-3xl` down to `text-base`) at which the layer's text fits on one line, measured before paint on every render and on resize. The out-of-range message uses the same hook with three sizes and a last step that wraps (see "Type that steps to fit").
 - **Chip.** Symbol and plural on one baseline (`items-baseline`). It collapses to its symbol when the value is longer than six characters or a message shows.
 - **Buttons inside a field** (the chip's two, copy) are out of the Tab order, because the field's own keys do the same jobs.
 - **Messages.** "Too large to convert" is drawn over the field in `text-danger` in place of the placeholder and joins the input's `aria-describedby`.
@@ -169,9 +178,9 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 
 ### Calculator
 
-- A card below the boxes, at most `max-w-sm` and centered: `rounded-lg border border-line bg-surface p-3 shadow-sm`, all in the `Calculator` component.
+- A card below the boxes, at most `max-w-sm` and centered: `CARD` with `p-3 shadow-sm`, all in the `Calculator` component.
 - **Header**: the title "Calculator" (`text-sm font-medium text-ink-muted`, labelling the group) and a ghost close button.
-- **Display**: a field's geometry, `rounded-lg border-2 border-edge bg-surface` around `FIELD_ROW`, so it is the same size as the boxes; the entry in `font-numeric` stepping down through `NUMBER_SIZES` (`src/lib/fit-step.ts`) and keeping its end in view past the smallest; drawn by `NumberText`, so exponent markers and the running value look as they do in a box; a muted 0 when empty; at the row's right, why the entry has no value ("Too large"), in `text-sm font-medium text-danger` like a box's out-of-range message.
+- **Display**: a field's geometry, `rounded-lg border-2 border-edge bg-surface` around `FIELD_ROW`, so it is the same size as the boxes; the entry in `font-numeric` stepping down through `NUMBER_SIZES` (`src/lib/recipes.ts`) and keeping its end in view past the smallest; drawn by `NumberText`, so exponent markers and the running value look as they do in a box; a muted 0 when empty; at the row's right, why the entry has no value ("Too large"), in `text-sm font-medium text-danger` like a box's out-of-range message.
 - **Keys** are `Button`s at `min-h-12` with `font-numeric text-lg`, four to a row (`gap-2`): digits secondary; C, ⌫, E, and the decimal mark `tonal`; the five operators `soft`; = primary.
 - **Sending**: two `SendButton`s under the keys, secondary, reading "Use in 1st" plus the box's unit symbol in semibold, with the copy check (`CheckIcon` in `text-success`) while a send is confirmed, and `aria-disabled` while there is nothing to send.
 - **Focus**: =, the send buttons, and close carry `data-calculator-stop`; Tab cycles through them in that order and Enter presses the focused one. Other keys are `tabIndex={-1}` and a click on them never moves focus. After a send, focus returns to =.
@@ -217,7 +226,7 @@ A visual or motion behavior with more than a couple of settings gets a lab page 
 
 1. Check the inventory. Extend before you add.
 2. Create `src/components/<Name>.tsx` (TSX: the React API, run on Preact, ADR 0007) or `<Name>.astro` (static, or driven by the inline script).
-3. Style with the utilities above and the patterns in this file. Run `pnpm lint`.
+3. Style with the utilities above, the recipes, and the patterns in this file. Run `pnpm lint`.
 4. Add it to `src/pages/dev/gallery.astro` in its real variants and states.
 5. Run `pnpm e2e`. Fix any axe violation before merging.
 6. Add a row to the inventory table.

@@ -45,7 +45,7 @@ pnpm check          # lint + format check + typecheck + test + build + bundle ch
 - **Add a theme:** `docs/THEMING.md` "Authoring a theme".
 - **Add a page:** `apps/web/src/pages/`, use `layouts/Base.astro`, islands only where there is real interaction.
 - **Add a keyboard shortcut:** handle the key in code, add it to `apps/web/src/lib/shortcuts.ts` (the shortcuts map renders from it), and describe it in `docs/UX-SPEC.md` §8.
-- **Add a header menu:** reuse the shell controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`) and the classes in `src/lib/shell.ts`, and place it in `components/HeaderMenus.astro`. No new script.
+- **Add a header menu:** reuse the shell controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`) and the shell recipes in `src/lib/recipes.ts`, and place it in `components/HeaderMenus.astro`. No new script.
 - **Add a UI delay:** a named constant in `apps/web/src/lib/timing.ts`, never a literal number of milliseconds.
 
 ## Commits

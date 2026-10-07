@@ -13,8 +13,16 @@ import {
 import { Button } from '../../../components/Button';
 import { CheckIcon, CopyIcon } from '../../../components/icons';
 import {
-  play,
+  ART_LINE,
+  CARD,
+  cx,
   PLAYING_LINE,
+  WORDMARK_FACE,
+  WORDMARK_SIZES,
+  type WordmarkSize,
+} from '../../../lib/recipes';
+import {
+  play,
   fitPhrase,
   type WordmarkPlayer,
   type WordmarkSettings,
@@ -30,11 +38,9 @@ import {
   PHRASE_KINDS,
   fitSteps,
   WORDMARK,
-  WORDMARK_SIZES,
   WORDMARK_TUNING,
   type FitStep,
   type PhraseKind,
-  type WordmarkSize,
   type WordmarkTuning,
 } from '../../../lib/wordmark';
 
@@ -43,6 +49,15 @@ import {
 
 const STORAGE_KEY = 'bigsmall:wordmark-lab';
 type Timing = WordmarkSettings['timing'];
+
+// The lab's own class lists, each used more than once here; the ones it shares with the site
+// come from lib/recipes.ts.
+const HEADING = 'font-display text-lg font-semibold';
+const FIELD = 'grid gap-1 text-sm';
+const INPUT = 'min-h-11 min-w-0 rounded-md border-2 border-edge bg-surface px-3 text-ink';
+const SELECT = cx(INPUT, 'w-full');
+const CHECK = 'flex min-h-11 items-center gap-2 text-sm';
+const CHECKBOX = 'size-4 accent-accent';
 type TimingKey = keyof Timing;
 
 const defaults = (): WordmarkSettings => ({
@@ -244,15 +259,8 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <fieldset
-      className={[
-        'grid min-w-0 grid-cols-1 content-start gap-4 rounded-lg border border-line bg-surface p-5',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
-    >
-      <legend className="px-1 font-display text-lg font-semibold">{title}</legend>
+    <fieldset className={cx(CARD, 'grid min-w-0 grid-cols-1 content-start gap-4 p-5', className)}>
+      <legend className={cx('px-1', HEADING)}>{title}</legend>
       {children}
     </fieldset>
   );
@@ -264,7 +272,8 @@ function Readout({ player }: { player: RefObject<WordmarkPlayer | null> }) {
   useEffect(() => {
     const line = document.querySelector<HTMLElement>('[data-wordmark]');
     let frame = requestAnimationFrame(function read() {
-      const size = WORDMARK_SIZES.find((step) => line?.classList.contains(step)) ?? 'text-3xl';
+      const size =
+        WORDMARK_SIZES.find((step) => line?.classList.contains(step)) ?? WORDMARK_SIZES[0];
       const quicker = 1 / (player.current?.pace() ?? 1);
       const next = `${line?.textContent?.trim() ?? ''} · ${size} · ${quicker.toFixed(1)}× the resting pace`;
       setText((previous) => (previous === next ? previous : next));
@@ -296,11 +305,43 @@ interface Report {
   tooLong: readonly string[];
 }
 
-const NAME_LINE = `${PLAYING_LINE} font-display font-semibold tracking-tight`;
-const ART_LINE =
-  'absolute inset-0 flex items-center justify-center whitespace-pre font-display font-semibold tracking-tight text-accent';
+/** The sheet sets each phrase as the wordmark does, and each art symbol as the art's line does. */
+const NAME_LINE = cx(PLAYING_LINE, WORDMARK_FACE);
+const SYMBOL_LINE = cx(ART_LINE, 'flex', WORDMARK_FACE);
 const CELL =
   'relative shrink-0 rounded-sm outline outline-line hover:outline-accent data-too-long:outline-danger';
+
+/** One group of the sheet: a heading with its count, then a cell for each phrase or symbol. */
+function SheetGroup({
+  id,
+  title,
+  count,
+  children,
+}: {
+  id: string;
+  title: string;
+  count: number;
+  children: ReactNode;
+}) {
+  return (
+    <section aria-labelledby={id}>
+      <h3 id={id} className={HEADING}>
+        {title} <span className="font-body text-sm font-normal text-ink-muted">{count}</span>
+      </h3>
+      <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-3">{children}</ul>
+    </section>
+  );
+}
+
+/** A cell in the sheet, with the size it took written under it once measured. */
+function SheetCell({ children }: { children: ReactNode }) {
+  return (
+    <li className="grid justify-items-start gap-1">
+      {children}
+      <span className="text-xs text-ink-muted" />
+    </li>
+  );
+}
 
 /** How the sheet names a step: "base, 2 lines". */
 const labelOf = (step: FitStep | null) =>
@@ -365,12 +406,12 @@ const Sheet = memo(function Sheet({
         <h2 id={`${id}-title`} className="font-display text-2xl font-semibold">
           Every phrase
         </h2>
-        <label className="flex min-h-11 items-center gap-2 text-sm">
+        <label className={CHECK}>
           <input
             type="checkbox"
             checked={withBoth}
             onChange={(event) => setWithBoth(event.currentTarget.checked)}
-            className="size-4 accent-accent"
+            className={CHECKBOX}
           />
           Include all {phrases.both.length} “both halves” pairs
         </label>
@@ -378,7 +419,7 @@ const Sheet = memo(function Sheet({
       <span
         ref={probe}
         aria-hidden="true"
-        className="invisible absolute font-display text-3xl font-semibold tracking-tight whitespace-pre"
+        className={cx('invisible absolute whitespace-pre', WORDMARK_FACE, WORDMARK_SIZES[0])}
       >
         {WORDMARK}
       </span>
@@ -402,56 +443,40 @@ const Sheet = memo(function Sheet({
       )}
       <div ref={sheet} className="grid gap-8">
         {PHRASE_KINDS.filter((kind) => kind !== 'both' || withBoth).map((kind) => (
-          <section key={kind} aria-labelledby={`${id}-${kind}`}>
-            <h3 id={`${id}-${kind}`} className="font-display text-lg font-semibold">
-              {KIND_LABELS[kind]}{' '}
-              <span className="font-body text-sm font-normal text-ink-muted">
-                {phrases[kind].length}
-              </span>
-            </h3>
-            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-3">
-              {phrases[kind].map((phrase) => (
-                <li key={phrase} className="grid justify-items-start gap-1">
-                  <button
-                    type="button"
-                    data-cell="phrase"
-                    data-phrase={phrase}
-                    className={CELL}
-                    onClick={() => onShow(phrase)}
-                  >
-                    <span className={NAME_LINE}>{phrase}</span>
-                  </button>
-                  <span className="text-xs text-ink-muted" />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-        <section aria-labelledby={`${id}-art`}>
-          <h3 id={`${id}-art`} className="font-display text-lg font-semibold">
-            The art’s symbols{' '}
-            <span className="font-body text-sm font-normal text-ink-muted">
-              {ART_GLYPHS.length}
-            </span>
-          </h3>
-          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-3">
-            {ART_GLYPHS.map((glyph) => (
-              <li key={glyph} className="grid justify-items-start gap-1">
-                <span data-cell="art" data-phrase={glyph} className={CELL}>
-                  <span className={ART_LINE}>{glyph}</span>
-                </span>
-                <span className="text-xs text-ink-muted" />
-              </li>
+          <SheetGroup
+            key={kind}
+            id={`${id}-${kind}`}
+            title={KIND_LABELS[kind]}
+            count={phrases[kind].length}
+          >
+            {phrases[kind].map((phrase) => (
+              <SheetCell key={phrase}>
+                <button
+                  type="button"
+                  data-cell="phrase"
+                  data-phrase={phrase}
+                  className={CELL}
+                  onClick={() => onShow(phrase)}
+                >
+                  <span className={NAME_LINE}>{phrase}</span>
+                </button>
+              </SheetCell>
             ))}
-          </ul>
-        </section>
+          </SheetGroup>
+        ))}
+        <SheetGroup id={`${id}-art`} title="The art’s symbols" count={ART_GLYPHS.length}>
+          {ART_GLYPHS.map((glyph) => (
+            <SheetCell key={glyph}>
+              <span data-cell="art" data-phrase={glyph} className={CELL}>
+                <span className={SYMBOL_LINE}>{glyph}</span>
+              </span>
+            </SheetCell>
+          ))}
+        </SheetGroup>
       </div>
     </section>
   );
 });
-
-const SELECT = 'min-h-11 w-full min-w-0 rounded-md border-2 border-edge bg-surface px-3 text-ink';
-const CHECK = 'flex min-h-11 items-center gap-2 text-sm';
 
 export function WordmarkLab() {
   const [settings, setSettings] = useState<WordmarkSettings>(defaults);
@@ -551,7 +576,7 @@ export function WordmarkLab() {
   return (
     <>
       {still && (
-        <p className="mt-4 rounded-lg border border-line bg-surface p-4 text-sm">
+        <p className={cx(CARD, 'mt-4 p-4 text-sm')}>
           This system asks for reduced motion, so the wordmark does not play, here or on the site.
           The sheet below still shows every phrase at its size.
         </p>
@@ -562,7 +587,7 @@ export function WordmarkLab() {
           <label className={CHECK}>
             <input
               type="checkbox"
-              className="size-4 accent-accent"
+              className={CHECKBOX}
               checked={pinned}
               disabled={still}
               onChange={(event) => pin(event.currentTarget.checked)}
@@ -572,7 +597,7 @@ export function WordmarkLab() {
           <label className={CHECK}>
             <input
               type="checkbox"
-              className="size-4 accent-accent"
+              className={CHECKBOX}
               checked={held}
               disabled={still}
               onChange={(event) => hold(event.currentTarget.checked)}
@@ -601,7 +626,7 @@ export function WordmarkLab() {
               value={phrase}
               onChange={(event) => setPhrase(event.currentTarget.value)}
               placeholder="Any phrase"
-              className="min-h-11 min-w-0 flex-1 rounded-md border-2 border-edge bg-surface px-3 text-ink"
+              className={cx(INPUT, 'flex-1')}
             />
             <Button variant="secondary" type="submit" disabled={still}>
               Show
@@ -672,7 +697,7 @@ export function WordmarkLab() {
         </Panel>
 
         <Panel title="Mix" className="lg:col-span-2">
-          <div className="grid gap-1 text-sm">
+          <div className={FIELD}>
             <label htmlFor={`${id}-solo`}>Draw from</label>
             <select
               id={`${id}-solo`}
@@ -727,7 +752,7 @@ export function WordmarkLab() {
             hint="The chance, with each phrase, that a symbol flips back to the drawing."
             onChange={(value) => setTuning('artBack', value)}
           />
-          <div className="grid gap-1 text-sm">
+          <div className={FIELD}>
             <label htmlFor={`${id}-smallest`}>Smallest type size</label>
             <select
               id={`${id}-smallest`}
@@ -746,7 +771,7 @@ export function WordmarkLab() {
               squeezed, and marked in the sheet below.
             </p>
           </div>
-          <div className="grid gap-1 text-sm">
+          <div className={FIELD}>
             <label htmlFor={`${id}-two-lines`}>Two lines from</label>
             <select
               id={`${id}-two-lines`}

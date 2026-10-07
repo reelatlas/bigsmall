@@ -212,6 +212,34 @@ test('Enter commits the box and closes the list; the caret stays while the other
   await expect(first).toBeFocused();
 });
 
+test('on a closed list with nothing to commit, Enter opens it again', async ({ page }) => {
+  await page.goto('/?a=celsius&b=fahrenheit&v=20&s=a');
+  await ready(page);
+  const { first } = boxes(page);
+  const celsius = page.getByRole('option', { name: /^Celsius °C$/ });
+
+  // Focus opens the list on the box's unit; Enter keeps it and closes, and Enter opens it again.
+  await first.focus();
+  await expect(celsius).toHaveAttribute('aria-selected', 'true');
+  await first.press('Enter');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  await first.press('Enter');
+  await expect(celsius).toHaveAttribute('aria-selected', 'true');
+  await first.press('Enter');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  await expect(first).toHaveValue('20');
+
+  // A sum still typed in the closed box is worked out first, as before.
+  // Escape goes up to the categories, then closes the list.
+  await first.fill('2 × 3');
+  await first.press('Escape');
+  await first.press('Escape');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  await first.press('Enter');
+  await expect(first).toHaveValue('6');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+});
+
 test('with a number and a unit, Enter moves on to the other box while it still needs a unit', async ({
   page,
 }) => {

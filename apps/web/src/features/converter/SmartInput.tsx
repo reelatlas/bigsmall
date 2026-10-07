@@ -197,6 +197,16 @@ export function SmartInput({
     rest(unitRow(rows, unitId));
   };
 
+  /**
+   * Opens the list where the box is: on the best match of a query still typed, so Enter takes it
+   * just as it would have before the list closed, otherwise resting on the box's unit.
+   */
+  const reopen = () => {
+    setOpen(true);
+    if (query) setActive(firstResult);
+    else rest(unitRow(items));
+  };
+
   const closePanel = () => {
     setOpen(false);
     setActive(-1);
@@ -305,10 +315,16 @@ export function SmartInput({
         } else setActive((i) => (i <= 0 ? count - 1 : i - 1));
         break;
       case 'Enter': {
+        event.preventDefault();
+        // On a closed list with nothing to commit or work out, Enter opens it again, so Enter
+        // toggles the list.
+        if (!open && !suggestion.exact && evaluatedText(box.text, env) === null) {
+          reopen();
+          break;
+        }
         // Commit and close; the converter then moves the caret on when the other box still
         // needs a unit. Back and category rows move between the list's levels instead, so the
         // list stays open.
-        event.preventDefault();
         const item = open && active >= 0 ? items[active] : undefined;
         if (item?.kind === 'category' || item?.kind === 'back') {
           pick(item);
@@ -337,12 +353,9 @@ export function SmartInput({
   };
 
   const onFocus = (event: FocusEvent<HTMLInputElement>) => {
-    // Back in a box that holds an uncommitted query, its best match is highlighted again, so
-    // Enter takes it just as it would have before the box was left. Otherwise the list rests on
-    // the box's unit, so it opens where the box is.
-    setOpen(true);
-    if (query) setActive(firstResult);
-    else rest(unitRow(items));
+    // Back in a box that holds an uncommitted query, its best match is highlighted again;
+    // otherwise the list rests on the box's unit, so it opens where the box is.
+    reopen();
     if (!box.isSource && event.currentTarget.value) event.currentTarget.select();
   };
 

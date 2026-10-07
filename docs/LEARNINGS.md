@@ -510,3 +510,8 @@ Format:
 
 **What happened.** The table layout opens its list once a unit is being typed. Keying that off the parser's `query` would have flashed the list open on the way to a number: `parse` reads `-` and `.` as queries before a digit follows, `1e` and `1e-` as the number 1 with the query `e` or `e-` before the exponent's digits, and `2(3` as 2 with the query `(3`.
 **Rule.** Behavior that should follow "a unit is being typed" checks the query for a character numbers and sums are not written with (a letter or a symbol), and treats a lone `e`, `E`, `e-`, or `e+` right after a number as an exponent on its way (`typingUnit` in `SmartInput.tsx`). A browser test types each of these and checks the list stays closed.
+
+## 2026-10-07 — A layout test tuned to one machine's font failed on CI's
+
+**What happened.** A browser test typed a 13-digit number into one of two boxes and expected it to keep its largest size once the chip gave up its name. It passed on Windows and failed on CI: the numbers use the system's font (`--type-numeric` is a system stack in most themes), and Linux's digits are wider, so 13 of them no longer fit. The production gate held the deploy back, as it should.
+**Rule.** A test of how text fits never hard-codes a count tuned on one machine. Check the rule across a sweep instead (the chip test types 1 to 20 digits and checks that the name never stays while the number shrinks, and that it gives way sooner in a narrower box), or pick lengths far from any edge, with room for fonts a fifth wider or narrower.

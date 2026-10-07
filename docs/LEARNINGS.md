@@ -331,3 +331,28 @@ Format:
 
 **What happened.** The case for Preact had been an estimate ("about 30 KB back"). A spike in a separate worktree measured 55.3 KB back, a faster time to interactive, and the four compat differences above, with the full suite green, before the owner chose.
 **Rule.** For a change of foundation, run the spike on its own branch and worktree (its own dev server port), and bring the owner measured numbers and the list of source changes it took.
+
+## 2026-10-06 — Fit moving text instead of clipping it
+
+**What happened.** The wordmark's held box clipped with `overflow-hidden` so a flip could not run into the art, and it cut off descenders ("g") and tall symbols. `overflow: hidden` clips both axes, and `overflow-x: hidden` alone turns the other axis to `auto`.
+**Rule.** Make every frame fit by construction and clip nothing: each phrase takes the largest type step that fits, and a flipping letter may be no wider than its own letter times the room the phrase leaves (glyph widths from canvas `measureText` in the line's font). If a single axis must clip, `overflow-x: clip` leaves the other visible; `hidden` cannot.
+
+## 2026-10-06 — Group digits with a no-break space when text may wrap
+
+**What happened.** Two-line phrases could have broken "299 792 458" between its groups.
+**Rule.** Group digits with U+202F (narrow no-break space) wherever text may break; the wordmark's lists write `_` for it. A unit test rejects a plain space between two digits.
+
+## 2026-10-06 — Text set during measurement shows for a frame
+
+**What happened.** Fitting a phrase leaves its final text in the line, and the first flip came a frame later, so the finished phrase flashed before its own change began.
+**Rule.** After measuring with the real text, write the first animation frame in the same task, before the browser paints.
+
+## 2026-10-06 — Closed details are not laid out; buttons center their text
+
+**What happened.** Measuring phrases inside a closed `<details>` returned zero widths, so everything "fit"; and the lab's cells, being buttons, centered two-line phrases that the header sets flush left.
+**Rule.** Measure only what is rendered: show or hide a measured group with state, not `<details>`. Give a measured line its own `text-left`, so the container it sits in cannot change it.
+
+## 2026-10-06 — A background tab pauses requestAnimationFrame
+
+**What happened.** Checking the wordmark in a background browser tab, frames did not advance between script calls; a screenshot ran a frame or two, so captures showed a change just starting.
+**Rule.** Verify script-driven motion with state rather than timing: the lab's hold and show, and assertions on what lands. Time-based checks belong in the foreground or in Playwright.

@@ -1,39 +1,57 @@
 ---
 import { WORDMARK } from '../lib/wordmark';
 import ThemeArt from './ThemeArt.astro';
+
+interface Props {
+  /** Nothing plays on its own: /dev/wordmark-lab starts it with its own settings. */
+  manual?: boolean;
+}
+
+const { manual = false } = Astro.props;
 ---
 
 <!--
-  The site name with its theme's art beside it. Hovering the header plays it (docs/UX-SPEC.md §1,
-  "The wordmark at play"): nothing runs until the first hover or tap, and never under reduced motion. The static name is the heading's text, so crawlers and
-  screen readers read "bigsmall"; while it plays, wordmark-motion.ts hides the live line from
-  screen readers and keeps the name for them.
+  The site name with its theme's art beside it. Hovering the heading, the name and its art, plays
+  it (docs/UX-SPEC.md §1, "The wordmark at play"): nothing runs until the first hover or tap, and
+  never under reduced motion. The static name is the heading's text, so crawlers and screen
+  readers read "bigsmall"; while it plays, wordmark-motion.ts hides the live line from screen
+  readers and keeps the name for them. The art's line shows the symbol the art flips to.
 -->
-<h1 class="flex items-center gap-3 font-display text-3xl font-semibold tracking-tight">
+<h1
+  class="flex items-center gap-3 font-display text-3xl font-semibold tracking-tight"
+  data-wordmark-zone
+  data-wordmark-manual={manual ? '' : undefined}
+>
   <span class="relative inline-block" data-wordmark-box>
     <span class="inline-block whitespace-pre" data-wordmark>
       {WORDMARK}
     </span>
   </span>
-  <span class="hidden sm:inline-flex">
+  <span class="relative hidden sm:inline-flex" aria-hidden="true" data-art-box>
     <ThemeArt />
+    <span
+      class="absolute inset-0 hidden items-center justify-center whitespace-pre text-accent"
+      data-art-line
+    ></span>
   </span>
 </h1>
 
 <script>
   import { WORDMARK_TIMING } from '../lib/timing';
+  import { WORDMARK_TUNING } from '../lib/wordmark';
   import { play } from './wordmark-motion';
 
-  // Nothing runs until the header is hovered or tapped, and never under reduced motion. The code
+  // Nothing runs until the heading is hovered or tapped, and never under reduced motion. The code
   // loads with the page rather than on demand: on-demand loading would add a preload helper
   // three times the size of what it saves (docs/LEARNINGS.md).
-  const line = document.querySelector<HTMLElement>('[data-wordmark]');
-  const zone = line?.closest('header');
-  if (line && zone && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const zone = document.querySelector<HTMLElement>(
+    '[data-wordmark-zone]:not([data-wordmark-manual])',
+  );
+  if (zone && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const start = (event: PointerEvent) => {
       zone.removeEventListener('pointerover', start);
       zone.removeEventListener('pointerdown', start);
-      play(zone, line, event, WORDMARK_TIMING);
+      play(zone, { timing: WORDMARK_TIMING, tuning: WORDMARK_TUNING }, event);
     };
     zone.addEventListener('pointerover', start);
     zone.addEventListener('pointerdown', start);

@@ -141,7 +141,7 @@ Rules: every theme passes the same contrast checks; decoration costs nothing whe
 | CLS                                       | ≈ 0                                                                                          |
 | Lighthouse                                | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100                             |
 
-The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 86.5 KB JS and 5.7 KB CSS; with the wordmark at play and theme art, 89.2 KB JS and 5.9 KB CSS; on Preact (ADR 0007), 33.9 KB JS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
+The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 86.5 KB JS and 5.7 KB CSS; with the wordmark at play and theme art, 89.2 KB JS and 5.9 KB CSS; on Preact (ADR 0007), 33.9 KB JS; with the tuned wordmark, 38.2 KB JS and 6.2 KB CSS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
 
 ## 10. Accessibility targets
 

@@ -720,9 +720,7 @@ test('placeholders show examples, then units from the category the other box cho
   await expect(second).toHaveAttribute('placeholder', 'L, tsp, tbsp…');
 });
 
-test('a unit row reads symbol, then name, with the names lined up whatever the symbol', async ({
-  page,
-}) => {
+test('a unit row reads symbol on the left, name on the right', async ({ page }) => {
   await page.goto('/?a=milliliter&v=250&s=a');
   await ready(page);
   await page.getByRole('button', { name: 'Change unit: milliliters' }).click();
@@ -730,10 +728,14 @@ test('a unit row reads symbol, then name, with the names lined up whatever the s
   await expect(options).toHaveCount(3);
 
   await expect(page.getByRole('option', { name: /^fl oz fluid ounces$/ })).toBeVisible();
-  const nameLefts = await options.evaluateAll((rows) =>
-    rows.map((row) => Math.round(row.children[1]!.getBoundingClientRect().left)),
+  const edges = await options.evaluateAll((rows) =>
+    rows.map((row) => ({
+      symbolLeft: Math.round(row.children[0]!.getBoundingClientRect().left),
+      nameRight: Math.round(row.children[1]!.getBoundingClientRect().right),
+    })),
   );
-  expect(new Set(nameLefts).size).toBe(1);
+  expect(new Set(edges.map((edge) => edge.symbolLeft)).size).toBe(1);
+  expect(new Set(edges.map((edge) => edge.nameRight)).size).toBe(1);
 });
 
 test('the letters a query matches are set heavier in the list', async ({ page }) => {

@@ -38,13 +38,12 @@ export interface ConversionTableProps {
 }
 
 /**
- * A row reads "250 mL … milliliters": the value right-aligned in equal-width digits, so values
- * line up at their last digit; the symbol after it in a column of its own, left-aligned, so the
- * quantity reads as one; then, past a column that takes the spare width, the name, left-aligned in
- * a column on the right that shrinks before anything else on a narrow screen, where a long name
- * wraps and hyphenates; then the copy button.
+ * A row reads "250 … mL milliliters": the value on the left, right-aligned in equal-width digits so
+ * values line up at their last digit; past a column that takes the spare width, on the right, the
+ * symbol right-aligned in its column and the name left-aligned in its own, meeting between them;
+ * then the copy button. On a narrow screen the name shrinks first, wrapping and hyphenating.
  */
-const ROWS = 'grid grid-cols-[auto_auto_minmax(0,1fr)_minmax(0,max-content)_auto] gap-y-0.5';
+const ROWS = 'grid grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,max-content)_auto] gap-y-0.5';
 
 /**
  * The table layout's rows (docs/UX-SPEC.md §1): a value in every unit of its category. A row is a
@@ -128,7 +127,7 @@ export function ConversionTable({
                     if (!row.inBox && row.hasValue) onUse(row);
                   }}
                   className={cx(
-                    'col-span-4 grid min-h-11 grid-cols-subgrid items-center gap-x-1.5 rounded-nested px-2 text-left',
+                    'col-span-4 grid min-h-11 grid-cols-subgrid items-center gap-x-2 rounded-nested px-2 text-left',
                     row.inBox ? 'cursor-default bg-accent-soft' : 'hover:bg-surface-raised',
                   )}
                 >
@@ -140,10 +139,10 @@ export function ConversionTable({
                   >
                     {row.text}
                   </span>
-                  <span className="font-numeric font-semibold whitespace-nowrap text-ink-muted">
+                  <span className="col-start-3 text-right font-numeric font-semibold whitespace-nowrap text-ink-muted">
                     {row.symbol}
                   </span>
-                  <span className="col-start-4 min-w-0 break-words hyphens-auto text-ink">
+                  <span className="min-w-0 break-words hyphens-auto text-ink">
                     {row.name}
                     {row.inBox && <span className="sr-only">, in the box</span>}
                   </span>

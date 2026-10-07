@@ -88,7 +88,7 @@ test('the list keeps the rows in view: closed on focus and while typing a number
   await expect(list).toBeVisible();
 });
 
-test('a row reads value and symbol, then the name: values right-aligned, symbols and names in columns', async ({
+test('a row reads the value on the left, then symbol and name on the right, each in its column', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -102,13 +102,13 @@ test('a row reads value and symbol, then the name: values right-aligned, symbols
       const [value, symbol, name] = [...button.children].map((cell) =>
         cell.getBoundingClientRect(),
       );
-      return { valueRight: value!.right, symbolLeft: symbol!.left, nameLeft: name!.left };
+      return { valueRight: value!.right, symbolRight: symbol!.right, nameLeft: name!.left };
     }),
   );
   const same = (pick: (cell: (typeof cells)[number]) => number) =>
     new Set(cells.map((cell) => Math.round(pick(cell)))).size;
   expect(same((cell) => cell.valueRight)).toBe(1);
-  expect(same((cell) => cell.symbolLeft)).toBe(1);
+  expect(same((cell) => cell.symbolRight)).toBe(1);
   expect(same((cell) => cell.nameLeft)).toBe(1);
   // The names sit on the right: past the middle of the row on a wide table.
   const card = (await page.getByRole('region', { name: 'Volume' }).boundingBox())!;

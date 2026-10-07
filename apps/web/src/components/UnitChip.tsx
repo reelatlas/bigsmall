@@ -27,9 +27,8 @@ const BODY = 'inline-flex items-baseline gap-2 self-center px-3';
 const HOVER = 'transition-colors hover:bg-surface/40';
 
 /**
- * The locked unit inside a smart input: its symbol, then its name, the way a row of the unit list
- * reads (SuggestionPanel), which open the unit list, plus a remove control. Collapsed, the symbol
- * stands alone in the ink color.
+ * The locked unit inside a smart input: its symbol, then its name, which open the unit list, plus
+ * a remove control. Collapsed, the symbol stands alone in the ink color.
  */
 export function UnitChip({ unit, compact, nameRef, onOpen, onRemove }: UnitChipProps) {
   // Both buttons stay out of the Tab order: the field's own keys change and remove the unit

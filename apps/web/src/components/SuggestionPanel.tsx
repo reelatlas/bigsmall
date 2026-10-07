@@ -52,18 +52,13 @@ export interface SuggestionPanelProps {
 
 // Rows sit in the same 8 px inset as the chip inside the field, with corners that nest in the
 // field's corners, so a highlight never touches the shell's edge (docs/DESIGN-SYSTEM.md).
-// Every row spans the list's two columns, symbols and names: a unit row lines its symbol and name
-// up in them (a subgrid), so the names start together; a category row lays out on its own.
 const ROW =
-  'col-span-2 min-h-11 cursor-pointer items-center rounded-nested px-2 text-left ' +
+  'flex min-h-11 cursor-pointer items-center gap-3 rounded-nested px-2 text-left ' +
   'data-active:bg-accent-soft hover:bg-surface-raised';
-const UNIT_ROW = 'grid grid-cols-subgrid';
-const CATEGORY_ROW = 'flex gap-3';
 
 // The Back row stays pinned at the top while the list scrolls, with a divider under it; its inner
 // span carries the highlight so the divider is never highlighted.
-const BACK_ROW =
-  'group sticky top-0 z-10 col-span-2 mb-1 cursor-pointer border-b border-line bg-surface pb-1';
+const BACK_ROW = 'group sticky top-0 z-10 mb-1 cursor-pointer border-b border-line bg-surface pb-1';
 
 /**
  * The listbox that grows out of a smart input. Plain WAI-ARIA combobox pattern: the input owns
@@ -98,10 +93,7 @@ export function SuggestionPanel({
         id={id}
         aria-label={label}
         tabIndex={-1}
-        className={cx(
-          'grid max-h-72 scroll-thin grid-cols-[auto_minmax(0,1fr)] gap-x-3 overflow-y-auto',
-          hasBack && 'scroll-pt-14',
-        )}
+        className={cx('max-h-72 scroll-thin overflow-y-auto', hasBack && 'scroll-pt-14')}
       >
         {items.map((item, index) => {
           const active = index === activeIndex;
@@ -115,7 +107,7 @@ export function SuggestionPanel({
               aria-selected={active}
               aria-label={back ? 'Back to categories' : undefined}
               data-active={active || undefined}
-              className={back ? BACK_ROW : cx(ROW, item.kind === 'unit' ? UNIT_ROW : CATEGORY_ROW)}
+              className={back ? BACK_ROW : ROW}
               onMouseDown={(event) => event.preventDefault()}
               // Movement, not entry: rows that render under a still pointer (after Back, say)
               // must not take the highlight from the row the keyboard or Back put it on.
@@ -145,9 +137,9 @@ export function SuggestionPanel({
 }
 
 /**
- * A unit row reads "symbol name": the symbol semibold and muted in the list's first column, the
- * name in the second, so names line up whatever the symbol's width; the order the chip shows them
- * in. The letters the query matches are set heavier in both.
+ * A unit row reads "symbol … name": the symbol on the left, semibold and muted, the name
+ * right-aligned, with its category after it when the list spans categories. The letters the query
+ * matches are set heavier in both.
  */
 function RowBody({
   item,
@@ -161,10 +153,10 @@ function RowBody({
   if (item.kind === 'unit') {
     return (
       <>
-        <span className="font-numeric font-semibold whitespace-nowrap text-ink-muted">
+        <span className="shrink-0 font-numeric font-semibold text-ink-muted">
           <Marked text={item.unit.symbol} query={query} className="text-ink" />
         </span>
-        <span className="truncate">
+        <span className="flex-1 truncate text-right">
           <Marked text={item.unit.plural} query={query} className="font-semibold" />
           {showCategory && (
             // The literal space keeps the accessible name "ounces Weight", not "ouncesWeight".

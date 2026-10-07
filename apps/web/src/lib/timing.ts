@@ -24,3 +24,19 @@ export const PEEK_OPEN_MS = 120;
 
 /** A hover-opened header menu closes this long after the mouse leaves (§10). */
 export const PEEK_CLOSE_MS = 200;
+
+/**
+ * The header wordmark (docs/UX-SPEC.md §1). Wordmark.astro hands these to its motion code.
+ */
+export const WORDMARK_TIMING = {
+  /** The resting pace while hovered, and the fastest it may go. */
+  restMs: 1800,
+  fastMs: 110,
+  /** The first change after the pointer arrives comes this soon, so the header answers at once. */
+  firstMs: 250,
+  /** At rest, how far apart the letters land in a change, and how often a flipping letter changes. */
+  stepMs: 45,
+  flipMs: 40,
+  /** On a touch screen, a tap on the header plays the wordmark this long. */
+  tapMs: 4000,
+} as const;

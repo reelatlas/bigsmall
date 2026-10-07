@@ -2,6 +2,7 @@
 import { Button } from '../../components/Button';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import HeaderMenus from '../../components/HeaderMenus.astro';
+import ThemeArt from '../../components/ThemeArt.astro';
 import {
   CopyIcon,
   EraserIcon,
@@ -43,8 +44,12 @@ const swatches = TOKEN_CONTRACT.colors;
           class="rounded-lg border border-line bg-canvas p-5 text-ink shadow-md"
         >
           <div class="flex items-baseline justify-between gap-3">
-            <h2 id={`theme-${t.id}`} class="font-display text-xl font-semibold">
+            <h2
+              id={`theme-${t.id}`}
+              class="flex items-center gap-2 font-display text-xl font-semibold"
+            >
               {t.name}
+              <ThemeArt theme={t.id} />
             </h2>
             <span class="text-xs text-ink-muted">
               {t.scheme} · {t.status}

@@ -17,6 +17,11 @@
   --danger: #b91c1c;
   --success: #15803d;
 
+  /* Theme art (components/ThemeArt.astro): decoration only, so no contrast pair. */
+  --art-1: #e3a008;
+  --art-2: #fcd34d;
+  --art-3: #0f766e;
+
   --type-display: ui-sans-serif, system-ui, sans-serif;
   --type-body: ui-sans-serif, system-ui, sans-serif;
   --type-numeric: ui-sans-serif, system-ui, sans-serif;

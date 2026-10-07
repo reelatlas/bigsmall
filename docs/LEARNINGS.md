@@ -286,3 +286,18 @@ Format:
 
 **What happened.** The calculator first kept its own entry in component state. Undo after sending its number then had two candidates, the send in the converter's history and the last key in the calculator's, and either choice surprised in some order of events.
 **Rule.** Anything the user edits in the converter lives in the reducer's state and in its one history, chunked by the same typing rules; panels are views of that state. Undo then means the last thing done, wherever it was done.
+
+## 2026-10-06 — Vite wraps every dynamic import in a preload helper
+
+**What happened.** The header animation was loaded on first hover with `import()`. Vite wrapped it in its preload helper, about 0.8 KB gzipped, even with nothing to preload, and Astro's build ignores `build.modulePreload: false`. The lazy route cost more than it saved. The budget script also missed the lazy chunk at first, because Vite writes dynamic imports in backticks and the script only followed `"` and `'`.
+**Rule.** For a few kilobytes, load with the page and run nothing until needed; reach for `import()` only when what it defers is far larger than the helper. The budget script follows imports in any quotes; when a build adds a chunk, check it appears in `pnpm bundle`.
+
+## 2026-10-06 — A build fails when a shell sits inside its output folder
+
+**What happened.** `pnpm build` twice produced no `dist/index.html` after a command had left the shell's working directory inside `apps/web/dist/_astro`. Windows will not delete a folder that is a process's working directory, so the build could not clear its output.
+**Rule.** Inspect build output with paths from the repository root (`ls apps/web/dist/_astro`), not by changing into it.
+
+## 2026-10-06 — Taking a layer out of flow collapses its box
+
+**What happened.** The wordmark's live line became `absolute` when it started to play, so the box that held it lost its height and the header jumped. A browser test that clicked the heading timed out waiting for it to stop moving.
+**Rule.** Before floating a layer, fix its box at the size it had, width and height both, and release the size when the layer returns to flow.

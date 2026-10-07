@@ -32,6 +32,9 @@
   --color-focus: var(--focus);
   --color-danger: var(--danger);
   --color-success: var(--success);
+  --color-art-1: var(--art-1);
+  --color-art-2: var(--art-2);
+  --color-art-3: var(--art-3);
 
   --font-display: var(--type-display);
   --font-body: var(--type-body);

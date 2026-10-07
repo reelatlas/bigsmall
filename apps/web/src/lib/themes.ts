@@ -92,6 +92,8 @@ export const TOKEN_CONTRACT = {
   shape: ['shape-sm', 'shape-md', 'shape-lg'],
   elevation: ['elevation-sm', 'elevation-md'],
   motion: ['motion-fast', 'motion-base', 'motion-slow', 'motion-ease'],
+  /** Theme art's palette: decoration, so it has no contrast pair. */
+  art: ['art-1', 'art-2', 'art-3'],
 } as const;
 
 /** [foreground, background, minimum contrast ratio]. 4.5 for text, 3 for UI (WCAG 2.2 AA). */

@@ -16,6 +16,11 @@
   --danger: #ff5c7a;
   --success: #3ee6a3;
 
+  /* Theme art (components/ThemeArt.astro): decoration only, so no contrast pair. */
+  --art-1: #ff3fa4;
+  --art-2: #34f5ff;
+  --art-3: #7a5cff;
+
   --type-display: ui-sans-serif, system-ui, sans-serif;
   --type-body: ui-sans-serif, system-ui, sans-serif;
   --type-numeric: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;

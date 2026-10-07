@@ -1,5 +1,6 @@
 ---
 import HeaderMenus from '../components/HeaderMenus.astro';
+import Wordmark from '../components/Wordmark.astro';
 import { Converter } from '../features/converter/Converter';
 import Base from '../layouts/Base.astro';
 ---
@@ -7,7 +8,7 @@ import Base from '../layouts/Base.astro';
 <Base title="bigsmall">
   <main class="mx-auto max-w-4xl px-4 py-8 sm:py-12">
     <header class="flex flex-wrap items-center justify-between gap-4">
-      <h1 class="font-display text-3xl font-semibold tracking-tight">bigsmall</h1>
+      <Wordmark />
       <HeaderMenus actions />
     </header>
     <Converter client:load />

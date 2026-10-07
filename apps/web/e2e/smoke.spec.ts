@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { DEFAULT_LIGHT, THEMES } from '../src/lib/themes';
-import { PEEK_CLOSE_MS } from '../src/lib/timing';
+import { PEEK_CLOSE_MS, WORDMARK_TIMING } from '../src/lib/timing';
 import { expectNoA11yViolations, ready, settled } from './support';
 
 const themeToggle = (page: Page) => page.getByRole('button', { name: /^Theme/ });
@@ -194,4 +194,44 @@ test('shortcuts name ⌘ on Apple devices and Ctrl elsewhere', async ({ page, is
   await ready(page);
   await expect(page.locator('[data-mod-key]').first()).toHaveText('⌘');
   await expect(undo).toHaveAttribute('title', 'Undo (⌘Z)');
+});
+
+test('hovering the header plays the wordmark, leaving settles it, and its name stays', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'hover needs a mouse; a tap plays it instead');
+  await page.goto('/');
+  await ready(page);
+  const heading = page.getByRole('heading', { level: 1 });
+  const line = page.locator('[data-wordmark]');
+
+  await page.locator('main > header').hover();
+  await expect(line).not.toHaveText('bigsmall');
+  await expect(heading).toHaveAccessibleName('bigsmall');
+  await page.mouse.move(5, 600);
+  await expect(line).toHaveText('bigsmall');
+  await expect(heading).toHaveAccessibleName('bigsmall');
+});
+
+test('the wordmark stays still under reduced motion', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'hover needs a mouse');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await ready(page);
+  await page.locator('main > header').hover();
+  await page.waitForTimeout(WORDMARK_TIMING.firstMs + WORDMARK_TIMING.restMs);
+  await expect(page.locator('[data-wordmark]')).toHaveText('bigsmall');
+});
+
+test('the art beside the wordmark follows the theme', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the art shows from the sm breakpoint up');
+  await page.goto('/');
+  for (const theme of THEMES) {
+    await page.evaluate((id) => {
+      document.documentElement.dataset['theme'] = id;
+    }, theme.id);
+    await expect(page.locator(`header [data-art="${theme.id}"]`), theme.id).toBeVisible();
+    await expect(page.locator('header [data-art]:visible')).toHaveCount(1);
+  }
 });

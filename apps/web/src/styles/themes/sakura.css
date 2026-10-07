@@ -16,6 +16,11 @@
   --danger: #b91c1c;
   --success: #15803d;
 
+  /* Theme art (components/ThemeArt.astro): decoration only, so no contrast pair. */
+  --art-1: #f8b4cc;
+  --art-2: #c2407a;
+  --art-3: #f2b440;
+
   --type-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --type-body: ui-sans-serif, system-ui, sans-serif;
   --type-numeric: ui-sans-serif, system-ui, sans-serif;

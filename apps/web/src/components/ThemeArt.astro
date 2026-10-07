@@ -1,0 +1,106 @@
+---
+import type { ThemeId } from '../lib/themes';
+
+interface Props {
+  /** Draw one theme's art on its own (the gallery). Without it, every drawing is present and the page's theme picks which shows. */
+  theme?: ThemeId;
+}
+
+const { theme } = Astro.props;
+const shown = (id: ThemeId) => (theme ? theme === id : true);
+
+// Without a fixed theme, each drawing shows only under its own [data-theme]. Written out in full,
+// one per theme, so Tailwind finds every class and a new theme cannot be added without its art.
+const TOGGLE: Record<ThemeId, string> = {
+  daylight: 'hidden in-data-[theme=daylight]:block',
+  midnight: 'hidden in-data-[theme=midnight]:block',
+  sakura: 'hidden in-data-[theme=sakura]:block',
+  'neo-noir': 'hidden in-data-[theme=neo-noir]:block',
+  hardhat: 'hidden in-data-[theme=hardhat]:block',
+  theorem: 'hidden in-data-[theme=theorem]:block',
+};
+const toggle = (id: ThemeId) => (theme ? 'block' : TOGGLE[id]);
+---
+
+<!--
+  A small drawing for each theme beside the wordmark, made for bigsmall (ADR 0004). Decorative:
+  hidden from screen readers. Colors come from each theme's art tokens (--art-1, --art-2, --art-3)
+  through the bridge, so a drawing always matches the theme it belongs to (docs/THEMING.md).
+-->
+<span class="inline-flex size-8 shrink-0" aria-hidden="true" data-theme-art>
+  {shown('daylight') && (
+    <svg viewBox="0 0 32 32" class={toggle('daylight')} data-art="daylight" fill="none">
+      <path
+        class="stroke-art-1"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        d="M16 2.5v4M16 25.5v4M2.5 16h4M25.5 16h4M6.5 6.5l2.8 2.8M22.7 22.7l2.8 2.8M6.5 25.5l2.8-2.8M22.7 9.3l2.8-2.8"
+      />
+      <circle cx="16" cy="16" r="6.5" class="fill-art-2 stroke-art-1" stroke-width="2" />
+    </svg>
+  )}
+  {shown('midnight') && (
+    <svg viewBox="0 0 32 32" class={toggle('midnight')} data-art="midnight" fill="none">
+      <circle cx="15" cy="17" r="11" class="fill-art-1" />
+      <circle cx="11.5" cy="14" r="2.6" class="fill-art-2" />
+      <circle cx="18.5" cy="19.5" r="3.2" class="fill-art-2" />
+      <circle cx="12.5" cy="22" r="1.5" class="fill-art-2" />
+      <path class="stroke-art-3" stroke-width="1.5" stroke-linecap="round" d="M28 3v4M26 5h4" />
+    </svg>
+  )}
+  {shown('sakura') && (
+    <svg viewBox="0 0 32 32" class={toggle('sakura')} data-art="sakura" fill="none">
+      {[0, 72, 144, 216, 288].map((turn) => (
+        <path
+          transform={`rotate(${turn} 16 16)`}
+          class="fill-art-1 stroke-art-2"
+          stroke-width="0.8"
+          d="M16 16C11.5 12.5 11 6.5 14 4.5L16 6.3L18 4.5C21 6.5 20.5 12.5 16 16Z"
+        />
+      ))}
+      <circle cx="16" cy="16" r="2.4" class="fill-art-3" />
+    </svg>
+  )}
+  {shown('neo-noir') && (
+    <svg viewBox="0 0 32 32" class={toggle('neo-noir')} data-art="neo-noir" fill="none">
+      <path
+        class="stroke-art-1"
+        stroke-width="1.6"
+        stroke-linejoin="round"
+        d="M3 29V13h7v16M11 29V6h7v23M14.5 6V2M19 29V16h10v13M2 29h28"
+      />
+      <path
+        class="stroke-art-2"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        d="M5.5 17h2M5.5 21h2M13.5 10h2M13.5 14h2M13.5 18h2M13.5 22h2M21.5 20h2M25 20h1.5M21.5 24h2M25 24h1.5"
+      />
+    </svg>
+  )}
+  {shown('hardhat') && (
+    <svg viewBox="0 0 32 32" class={toggle('hardhat')} data-art="hardhat" fill="none">
+      <path class="fill-art-1" d="M6 21C6 13.5 10.5 8 16 8S26 13.5 26 21Z" />
+      <path
+        class="stroke-art-2"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        d="M16 8.5V20M11.5 10.5C10.5 13.5 10.3 17 10.6 20M20.5 10.5C21.5 13.5 21.7 17 21.4 20"
+      />
+      <rect x="3" y="21" width="26" height="3.5" rx="1.75" class="fill-art-2" />
+    </svg>
+  )}
+  {shown('theorem') && (
+    <svg viewBox="0 0 32 32" class={toggle('theorem')} data-art="theorem" fill="none">
+      <rect x="3" y="4" width="26" height="19" rx="1.5" class="fill-art-2" />
+      <rect x="5" y="6" width="22" height="15" class="fill-art-1" />
+      <path
+        class="stroke-art-3"
+        stroke-width="1.2"
+        stroke-linecap="round"
+        d="M8 11h3M9.5 9.5v3M14 11.5c1-2 2-2 3 0s2 2 3 0M8 17h11"
+      />
+      <path class="stroke-art-2" stroke-width="1.8" stroke-linecap="round" d="M4 25.5h24" />
+      <path class="stroke-art-3" stroke-width="2.4" stroke-linecap="round" d="M19 27.8h6" />
+    </svg>
+  )}
+</span>

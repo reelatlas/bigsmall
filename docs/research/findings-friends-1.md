@@ -10,6 +10,13 @@ Friends who use bigsmall tried the live MVP (`v0.1.0`) and told Sean what they w
 | From the table, switch to any one of the values, so it becomes the one everything converts from             | Tapping a row moves its unit into the box with its value, and every row converts from it (UX-SPEC §14) |
 | Favorite units and categories, in a bar for quick picks                                                     | Noted as an exploration, not scheduled (docs/PLAN.md §2)                                               |
 
+Later the same day two friends added ideas from their own work. Neither is scheduled; both are explorations in docs/PLAN.md §2.
+
+| Who                          | Idea                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Mike, an electrical engineer | Construction dimensions are fractional inches, which are a pain to add and subtract, and less often to multiply and divide; the sites that do it are hard to use, so he keeps a spreadsheet. Enter decimal or fractional feet and inches, and get results in lowest terms or rounded to a chosen step (nearest 1/2, 1/4, 1/8, and so on). He linked a feet-and-inches calculator as an example of the job; nothing is taken from it (ADR 0004) |
+| Dan, an audio engineer       | Beside a value in the table, quick multiples or ratios (½×, 2×, 4×, 8×), so the range around an answer shows at a glance; the user chooses whether to see them and the step (halves, doubling)                                                                                                                                                                                                                                                 |
+
 ## Sean's decisions (2026-10-07)
 
 - Two layouts with a switch: the table, the default, and two boxes, with swap moved into the toolbar right of the calculator. The choice is remembered.

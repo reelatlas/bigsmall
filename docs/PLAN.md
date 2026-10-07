@@ -30,6 +30,15 @@ Positioning in one line: _type anything into either box and get the answer._
 - Expression input, the rest of it: `+ − × ÷` and parentheses with Enter as equals shipped on 2026-10-06; still to come are powers (`2^10 bytes`), fraction and feet-and-inches entry, and more calculator keys. Principle and phasing in `docs/UX-SPEC.md` §14.
 - Native wrapper (Capacitor) only if the PWA proves insufficient.
 
+### Explorations (owner, 2026-10-07)
+
+Directions Sean wants to explore after the MVP is shared; none is designed or scheduled yet.
+
+- **Every category at once.** An option to show all categories as collapsible sections below the boxes, each expanding to show the current value in every unit of that category, like a full conversion table. To work out: when it shows (only with a number?), how it relates to basic and advanced modes, its size on a phone, and its cost with many units.
+- **Many more categories and units.** The catalog's plan (docs/UNITS-CATALOG.md §3: fuel economy, energy, pressure, power, angle, and the advanced groups) and more formulas, each category's data loaded on demand against its own budget (§9), every unit cited (ADR 0004).
+- **Search visibility (SEO).** The pair pages already planned for launch (one static page per popular unit pair), plus the technical basics (canonical domain, sitemap, robots, titles and descriptions, structured data, social cards) and Google Search Console and Bing Webmaster Tools.
+- **Analytics and monitoring.** Cookieless traffic analytics, product events (what people convert, calculator and copy-link use, themes chosen), real-user speed (Core Web Vitals), search performance, and optionally errors and uptime; each script counted against the budget.
+
 ### Out of scope
 
 Time zones and calendar math, clothing and shoe sizes, decibels, number-base conversion, and "fun" units. Each is a different kind of tool. Revisit after launch if users ask.
@@ -232,7 +241,7 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 9. **Control edges.** Fields, the theme menu, and secondary buttons are edged in a new `--edge` token at 3:1 against the page and the surface (WCAG 1.4.11); `--line` stays for dividers. A trial: reverting its one commit restores the lighter edges.
 10. **Framework.** The island runs on Preact through `preact/compat` (ADR 0007): 89.2 KB of JavaScript became 33.9 KB with no change to how components are written, and the 90 KB budget stays, so the room goes to the product. Owner's choice after a measured spike.
 
-Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (check `.app`, `.io`, `.co`, `.tools` availability early).
+Still open: SEO pages in v1 (proposed yes, built at M5). Domains bought 2026-10-07: `bigsmall.fyi` and `bigsmall.work`; to decide before launch: which is canonical (the other redirects to it), and hosting on Vercel, the owner's preference, in place of Cloudflare Pages (ADR 0002), recorded as an ADR when chosen.
 
 ## 16. Risks and open questions
 

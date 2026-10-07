@@ -62,7 +62,7 @@ A decimal mark still waiting for its digits belongs to the number (`5.` on the w
 
 **Rows.**
 
-- A unit row reads "name … symbol": the plural name on the left, the symbol right-aligned and semibold like the chip's. When the list spans categories (top level, or a widened search) each unit row also names its category, which is how `oz` (weight) and `fl oz` (volume) are told apart.
+- A unit row reads "name … symbol": the plural name on the left, the symbol right-aligned, semibold and muted: the order the chip shows them in. When the list spans categories (top level, or a widened search) each unit row also names its category, which is how `oz` (weight) and `fl oz` (volume) are told apart.
 - A category row shows its name and a chevron.
 - The letters the query matches are set heavier, under the same folding search uses (`me` marks "**me**ters" and "kilo**me**ters"; `floz` marks all of "fl oz"). A unit found through an alias the row does not show gets no mark.
 - Moving the pointer over a row highlights it. A row that appears under a still pointer, as after Back, does not take the highlight.
@@ -94,7 +94,7 @@ Nothing commits on a keystroke: while typing, the best match is highlighted and 
 - **Picking a row** with a click or tap commits it.
 - **Tab and leaving the box never commit**, not even an exact match. The text stays as typed, so moving between boxes never changes anything; back in the box, the best match is highlighted again for Enter.
 - Committing keeps the number and drops the query: `5 ml` becomes `5` with the mL chip. Picking a category row while a query is typed, in either box, keeps the number and drops the query.
-- **The chip.** Clicking its body lists the units of its category to change it; its × removes the unit and puts the caret back in the box. Backspace on an empty box removes the unit and lists its category's units.
+- **The chip.** It reads like a row of the list: the unit's name, then its symbol, semibold and muted (`pints pt`); when the field needs the room it collapses to the symbol alone, in the ink color. Clicking its body lists the units of its category to change it; its × removes the unit and puts the caret back in the box. Backspace on an empty box removes the unit and lists its category's units.
 
 ## 6. Two boxes: source, scope, and anchor
 

@@ -679,7 +679,8 @@ test('the chip collapses to its symbol while an out-of-range message needs the r
   const { first } = boxes(page);
   const chip = page.getByRole('button', { name: 'Change unit: meters' });
 
-  await expect(chip).toHaveText('mmeters');
+  // The name, then the symbol, the way a list row reads.
+  await expect(chip).toHaveText('metersm');
   await first.fill('1e308');
   await expect(page.getByText('Too large to convert')).toBeVisible();
   await expect(chip).toHaveText('m');

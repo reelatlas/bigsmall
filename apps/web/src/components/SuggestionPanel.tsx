@@ -122,8 +122,8 @@ export function SuggestionPanel({
 }
 
 /**
- * A unit row reads "name … symbol": the name on the left, the symbol right-aligned and bold like
- * the chip's. The letters the query matches are set heavier in both.
+ * A unit row reads "name … symbol": the name on the left, the symbol right-aligned, semibold and
+ * muted, the order the chip shows them in. The letters the query matches are set heavier in both.
  */
 function RowBody({
   item,

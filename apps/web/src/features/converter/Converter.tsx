@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
 import {
   CalculatorIcon,
-  CheckIcon,
+  CopiedIcon,
   CopyIcon,
   EraserIcon,
   LinkIcon,
@@ -60,7 +60,7 @@ export function Converter() {
   const hintId = useId();
   const calcMessageId = useId();
   const sectionRef = useRef<HTMLElement>(null);
-  const { copied, markCopied, pointerProps } = useCopied<Confirmable>();
+  const { copied, copy, markCopied, pointerProps } = useCopied<Confirmable>();
   const headerActions = useSlot(SLOTS.headerActions);
   const calculatorId = useId();
   const calculatorToggleId = useId();
@@ -99,15 +99,6 @@ export function Converter() {
     section.addEventListener('keydown', onKeyDown);
     return () => section.removeEventListener('keydown', onKeyDown);
   }, [dispatch]);
-
-  const copy = async (text: string, target: Confirmable) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      markCopied(target);
-    } catch {
-      // Clipboard blocked: no check, and the value or the address is still visible.
-    }
-  };
 
   const closeCalculator = () => {
     setCalculatorOpen(false);
@@ -182,7 +173,7 @@ export function Converter() {
       >
         {/* A check in the success color confirms the copy (the status line announces it);
             useCopied decides when it reverts. */}
-        {copied === box.id ? <CheckIcon className="text-success" data-copied /> : <CopyIcon />}
+        {copied === box.id ? <CopiedIcon /> : <CopyIcon />}
       </Button>
     );
   };
@@ -356,7 +347,7 @@ export function Converter() {
             onClick={() => copy(urlFor(state, env.separators, window.location), 'url')}
             {...pointerProps('url')}
           >
-            {copied === 'url' ? <CheckIcon className="text-success" data-copied /> : <LinkIcon />}
+            {copied === 'url' ? <CopiedIcon /> : <LinkIcon />}
           </Button>,
           headerActions,
         )}

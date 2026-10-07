@@ -2,7 +2,7 @@ import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNo
 import { useFitStep } from '../lib/fit-step';
 import { CARD, cx, FIELD_ROW, NUMBER_SIZES } from '../lib/recipes';
 import { Button, type ButtonVariant } from './Button';
-import { BackspaceIcon, CheckIcon, CloseIcon } from './icons';
+import { BackspaceIcon, CloseIcon, CopiedIcon } from './icons';
 
 export type CalculatorKey =
   | '0'
@@ -291,7 +291,7 @@ export function SendButton({ ordinal, symbol, confirmed, unavailable, ...props }
       aria-disabled={unavailable || undefined}
       {...props}
     >
-      {confirmed && <CheckIcon className="text-success" data-copied />}
+      {confirmed && <CopiedIcon />}
       <span>Use in {ordinal}</span>
       {symbol && <span className="font-semibold">{symbol}</span>}
     </Button>

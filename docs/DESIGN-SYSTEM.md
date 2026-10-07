@@ -173,7 +173,7 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 - Groups in a toolbar are set apart by `ToolbarDivider` (`h-6 border-l border-line`): the calculator, then undo and redo, then clear all.
 - **Switched on.** A ghost button that opens a panel or sets a mode takes `on` while it does (the calculator icon): the accent-soft fill, kept while hovered, alongside `aria-expanded` or `aria-pressed`.
 - **Space by what shows.** A ghost icon's 20 px glyph sits 12 px inside its 44 px button, so the space people see between two icons is the gap plus 24 px. Next to a bordered control, which shows its edge, a row of ghost icons keeps the same visible rhythm: the edge sits as far from the last glyph as glyphs sit from each other. In the header that is 36 px both ways (icons `gap-2` inside their 48 px places, the theme menu `gap-5.5` after the icons; `HeaderMenus.astro`).
-- A successful copy swaps the icon for `CheckIcon` in `text-success`, which every theme keeps at 3:1 on the surface (a graphic, WCAG 1.4.11).
+- A successful copy or send swaps the icon for `CopiedIcon`, the check in `text-success`, which every theme keeps at 3:1 on the surface (a graphic, WCAG 1.4.11); `useCopied` (`src/lib/copied.ts`) copies, shows it, and decides when it reverts. On a filled button, where the success color would not show, the plain `CheckIcon` takes the button's ink.
 - Keycaps (`Keycap`) are `rounded-sm border border-line bg-surface-raised font-numeric text-xs`.
 
 ### Calculator
@@ -182,7 +182,7 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 - **Header**: the title "Calculator" (`text-sm font-medium text-ink-muted`, labelling the group) and a ghost close button.
 - **Display**: a field's geometry, `rounded-lg border-2 border-edge bg-surface` around `FIELD_ROW`, so it is the same size as the boxes; the entry in `font-numeric` stepping down through `NUMBER_SIZES` (`src/lib/recipes.ts`) and keeping its end in view past the smallest; drawn by `NumberText`, so exponent markers and the running value look as they do in a box; a muted 0 when empty; at the row's right, why the entry has no value ("Too large"), in `text-sm font-medium text-danger` like a box's out-of-range message.
 - **Keys** are `Button`s at `min-h-12` with `font-numeric text-lg`, four to a row (`gap-2`): digits secondary; C, ⌫, E, and the decimal mark `tonal`; the five operators `soft`; = primary.
-- **Sending**: two `SendButton`s under the keys, secondary, reading "Use in 1st" plus the box's unit symbol in semibold, with the copy check (`CheckIcon` in `text-success`) while a send is confirmed, and `aria-disabled` while there is nothing to send.
+- **Sending**: two `SendButton`s under the keys, secondary, reading "Use in 1st" plus the box's unit symbol in semibold, with the copy check (`CopiedIcon`) while a send is confirmed, and `aria-disabled` while there is nothing to send.
 - **Focus**: =, the send buttons, and close carry `data-calculator-stop`; Tab cycles through them in that order and Enter presses the focused one. Other keys are `tabIndex={-1}` and a click on them never moves focus. After a send, focus returns to =.
 
 ### Copy

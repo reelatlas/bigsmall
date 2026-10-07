@@ -1,12 +1,13 @@
 import { DEFAULT_SEPARATORS, getUnit, parse, search } from '@bigsmall/core';
 import { useId } from 'react';
 import { Button } from '../../../components/Button';
-import { CheckIcon } from '../../../components/icons';
+import { CopiedIcon } from '../../../components/icons';
 import { Calculator, SendButton } from '../../../components/Calculator';
 import { NumberText } from '../../../components/NumberText';
 import {
   BACK_ITEM,
   SuggestionPanel,
+  toSuggestionItem,
   type SuggestionItem,
 } from '../../../components/SuggestionPanel';
 import { SmartInput } from '../../../features/converter/SmartInput';
@@ -54,7 +55,7 @@ function ResultSample({ label }: { label: string }) {
       counterpart={null}
       trailing={
         <Button variant="ghost" square nested tabIndex={-1} aria-label="Copy sample value">
-          <CheckIcon className="text-success" />
+          <CopiedIcon />
         </Button>
       }
     />
@@ -129,11 +130,7 @@ function OpenSample() {
   const query = 'me';
   const items: SuggestionItem[] = [
     BACK_ITEM,
-    ...search(query, { category: 'length', limit: 4 }).results.map((result): SuggestionItem =>
-      result.kind === 'unit'
-        ? { kind: 'unit', key: result.unit.id, unit: result.unit }
-        : { kind: 'category', key: `#${result.category.id}`, category: result.category },
-    ),
+    ...search(query, { category: 'length', limit: 4 }).results.map(toSuggestionItem),
   ];
   return (
     <div className="group" data-open>

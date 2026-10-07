@@ -24,6 +24,7 @@ import {
   BACK_ITEM,
   optionIdFor,
   SuggestionPanel,
+  toSuggestionItem,
   type SuggestionItem,
 } from '../../components/SuggestionPanel';
 import { NumberText, runningValue } from '../../components/NumberText';
@@ -497,14 +498,7 @@ function buildList(text: string, scope: CategoryId | null, options: ListOptions)
     widened,
     noMatch,
     firstResult: hasBack ? 1 : 0,
-    items: [
-      ...(hasBack ? [BACK_ITEM] : []),
-      ...listed.map((result): SuggestionItem =>
-        result.kind === 'unit'
-          ? { kind: 'unit', key: result.unit.id, unit: result.unit }
-          : { kind: 'category', key: `#${result.category.id}`, category: result.category },
-      ),
-    ],
+    items: [...(hasBack ? [BACK_ITEM] : []), ...listed.map(toSuggestionItem)],
   };
 }
 

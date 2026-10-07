@@ -490,7 +490,7 @@ export function WordmarkLab() {
   const player = useRef<WordmarkPlayer | null>(null);
   const loaded = useRef(false);
   const id = useId();
-  const { copied, markCopied, pointerProps } = useCopied<'settings'>();
+  const { copied, copy, pointerProps } = useCopied<'settings'>();
 
   // The player reads `live` every frame, so a change applies at once. Saving waits for the saved
   // settings to load, so the defaults never overwrite them.
@@ -563,15 +563,8 @@ export function WordmarkLab() {
   };
 
   const total = PHRASE_KINDS.reduce((sum, kind) => sum + settings.tuning.mix[kind], 0);
+  // Shown below the button too, to copy by hand where the clipboard is blocked.
   const code = snippet(settings);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-      markCopied('settings');
-    } catch {
-      // Clipboard blocked: the code shows below to copy by hand.
-    }
-  };
 
   return (
     <>
@@ -802,7 +795,12 @@ export function WordmarkLab() {
 
         <Panel title="Settings" className="lg:col-span-3">
           <div className="flex flex-wrap items-end gap-3">
-            <Button variant="primary" onClick={copy} {...pointerProps('settings')}>
+            <Button
+              variant="primary"
+              onClick={() => copy(code, 'settings')}
+              {...pointerProps('settings')}
+            >
+              {/* A filled button: the check takes its ink, not CopiedIcon's success color. */}
               {copied === 'settings' ? <CheckIcon /> : <CopyIcon />}
               Copy settings
             </Button>

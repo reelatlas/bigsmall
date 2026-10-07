@@ -5,7 +5,8 @@ import { COPIED_MIN_MS, COPIED_MS } from './timing';
  * Which of several copy buttons last copied, so it can show a check in place of its icon.
  * With a mouse, the check stays while the pointer rests on that button and reverts when it
  * leaves, after at least COPIED_MIN_MS. Without one (keyboard, touch), it reverts after
- * COPIED_MS. Copying from another button moves the check there.
+ * COPIED_MS. Copying from another button moves the check there. `copy` writes to the clipboard
+ * and marks the button; `markCopied` marks one that confirms something else (a send).
  */
 export function useCopied<K extends string>() {
   const [copied, setCopied] = useState<K | null>(null);
@@ -42,5 +43,15 @@ export function useCopied<K extends string>() {
     },
   });
 
-  return { copied, markCopied, pointerProps };
+  /** Puts `text` on the clipboard and shows the check on `key`. A blocked clipboard shows no check. */
+  const copy = async (text: string, key: K) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      markCopied(key);
+    } catch {
+      // Clipboard blocked: no check, and what was to be copied is still on screen.
+    }
+  };
+
+  return { copied, copy, markCopied, pointerProps };
 }

@@ -1,4 +1,10 @@
-import { getCategory, matchSpan, type Category, type Unit } from '@bigsmall/core';
+import {
+  getCategory,
+  matchSpan,
+  type Category,
+  type SearchResult,
+  type Unit,
+} from '@bigsmall/core';
 import { cx } from '../lib/recipes';
 import { ChevronRightIcon } from './icons';
 
@@ -12,6 +18,13 @@ export type SuggestionItem =
   | { kind: 'category'; key: string; category: Category };
 
 export const BACK_ITEM: SuggestionItem = { kind: 'back', key: '#back' };
+
+/** The row for one core search result: a unit, or a category to go into. */
+export function toSuggestionItem(result: SearchResult): SuggestionItem {
+  return result.kind === 'unit'
+    ? { kind: 'unit', key: result.unit.id, unit: result.unit }
+    : { kind: 'category', key: `#${result.category.id}`, category: result.category };
+}
 
 /** The id of a row, for the combobox's aria-activedescendant. One scheme for the panel and its host. */
 export function optionIdFor(listId: string, index: number): string {

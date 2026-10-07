@@ -112,6 +112,15 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+/**
+ * The check that stands in for a copy or send button's icon once it has done its job, in the
+ * success color every theme keeps at 3:1 on the surface (docs/DESIGN-SYSTEM.md, "Icon buttons").
+ * On a filled button, where that color would not show, use CheckIcon in the button's own ink.
+ */
+export function CopiedIcon(props: IconProps) {
+  return <CheckIcon className="text-success" data-copied {...props} />;
+}
+
 export function LinkIcon(props: IconProps) {
   return (
     <Icon {...props}>

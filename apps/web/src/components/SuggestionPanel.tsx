@@ -33,6 +33,7 @@ export interface SuggestionPanelProps {
   /** When true, unit rows show their category, which is how ambiguous symbols are told apart. */
   showCategory: boolean;
   onPick: (item: SuggestionItem) => void;
+  /** The mouse moved over a row: the host highlights it without scrolling the list. */
   onHover: (index: number) => void;
 }
 

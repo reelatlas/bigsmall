@@ -155,9 +155,13 @@ export function SmartInput({
 
   const focusInput = () => inputRef.current?.focus();
 
-  // Set when the list opens resting on a row, so that row is scrolled to the list's middle with
-  // its neighbors around it, rather than just into view.
-  const centerNext = useRef(false);
+  /**
+   * How the list brings the highlighted row into view the next time the highlight changes. A row
+   * the arrow keys reach scrolls in at the nearest edge. A row the list opens resting on is
+   * centered, with its neighbors around it. A row the mouse moves over stays where it is: moving
+   * the pointer never scrolls the list, which the wheel, trackpad, scrollbar, and touch do.
+   */
+  const reveal = useRef<'nearest' | 'center' | 'none'>('nearest');
 
   /** The row of `unitId` (by default the box's own unit) among `rows`, or -1. */
   const unitRow = (rows: readonly SuggestionItem[], unitId = box.unit?.id) =>
@@ -165,7 +169,13 @@ export function SmartInput({
 
   /** Highlights a row the list opens on, centered: the box's unit, so the list starts where the box is. */
   const rest = (row: number) => {
-    centerNext.current = row >= 0;
+    reveal.current = row >= 0 ? 'center' : 'nearest';
+    setActive(row);
+  };
+
+  /** Highlights the row the mouse moved over, leaving the list's scroll where it is. */
+  const point = (row: number) => {
+    reveal.current = 'none';
     setActive(row);
   };
 
@@ -282,6 +292,7 @@ export function SmartInput({
         if (!count) break;
         // From nothing, Down goes to the first unit or category; from the last row it wraps to
         // Back. Up from the first unit reaches Back, so Back is one key away in either direction.
+        reveal.current = 'nearest';
         if (event.key === 'ArrowDown') {
           setActive((i) => (i < 0 ? Math.min(firstResult, count - 1) : (i + 1) % count));
         } else setActive((i) => (i <= 0 ? count - 1 : i - 1));
@@ -333,13 +344,14 @@ export function SmartInput({
   };
 
   useEffect(() => {
-    if (!open || active < 0) return;
+    const how = reveal.current;
+    reveal.current = 'nearest';
+    if (!open || active < 0 || how === 'none') return;
     const row = document.getElementById(optionIdFor(listboxId, active));
     const list = document.getElementById(listboxId);
     if (!row || !list) return;
-    if (centerNext.current) {
+    if (how === 'center') {
       // Only the list scrolls: scrollIntoView would move the page too.
-      centerNext.current = false;
       const { top, height } = row.getBoundingClientRect();
       const box = list.getBoundingClientRect();
       list.scrollTop += top - box.top - (box.height - height) / 2;
@@ -439,7 +451,7 @@ export function SmartInput({
             notFound={notFound}
             showCategory={scope === null || widened}
             onPick={pick}
-            onHover={setActive}
+            onHover={point}
           />
         )}
       </div>

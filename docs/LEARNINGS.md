@@ -391,3 +391,8 @@ Format:
 
 **What happened.** `astro check` prints hints that `ButtonHTMLAttributes`, `TargetedEvent`, and similar are deprecated. preact/compat maps React's type names onto Preact's JSX-namespace aliases, which Preact marks deprecated in favor of its own names. Its `className` is also typed to accept a signal, which a helper typed for strings (`cx`) rejects.
 **Rule.** The hints are expected while islands are written against the React API (ADR 0007); leave them. A component that hands `className` to a string-only helper types it as React does, `Omit<…, 'className'>` plus `className?: string`, as `Button` does.
+
+## 2026-10-07 — Scroll a list to its highlight only when the keyboard moved it
+
+**What happened.** Sean noticed that moving the mouse over an open list scrolled it. A hovered row became the highlight, and the effect that scrolls the highlight into view, written for the arrow keys, then scrolled any partly hidden row in, sliding new rows under a still cursor.
+**Rule.** Record why the highlight moved and reveal it accordingly: the keyboard scrolls the row in, a list opening on a row centers it, and the pointer leaves the scroll alone. A browser test points at the partly hidden rows at the list's edges and checks the list stays put.

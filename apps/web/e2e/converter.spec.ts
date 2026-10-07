@@ -150,6 +150,53 @@ test('opening a box that has a unit rests the list on that unit', async ({ page 
   await expect(pints).toHaveAttribute('aria-selected', 'true');
 });
 
+test('moving the mouse over the list highlights rows but never scrolls it', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a touch screen scrolls the list by dragging it');
+  await page.goto('/?a=meter&b=foot');
+  await ready(page);
+  const { first } = boxes(page);
+  await first.click();
+  const list = page.getByRole('listbox');
+  await expect(page.getByRole('option', { name: /^meters m$/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  const scrollTop = () => list.evaluate((element) => element.scrollTop);
+  const settledFrames = () =>
+    page.evaluate(
+      () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+    );
+  await settledFrames();
+  const before = await scrollTop();
+
+  // The rows at the list's top and bottom edges are only partly in view; pointing at either
+  // highlights it where it is, without scrolling it in the way the arrow keys do.
+  const box = (await list.boundingBox())!;
+  for (const y of [box.y + box.height - 3, box.y + 60]) {
+    await page.mouse.move(box.x + box.width / 2, y);
+    await page.mouse.move(box.x + box.width / 2 + 8, y);
+    const pointed = await page.evaluate(
+      ([x, at]) =>
+        document
+          .elementFromPoint(x!, at!)
+          ?.closest('[role="option"]')
+          ?.getAttribute('aria-selected'),
+      [box.x + box.width / 2 + 8, y],
+    );
+    expect(pointed).toBe('true');
+    await settledFrames();
+    expect(await scrollTop()).toBe(before);
+  }
+
+  // The arrow keys still bring the row they reach into view.
+  for (let step = 0; step < 8; step += 1) await first.press('ArrowDown');
+  await settledFrames();
+  expect(await scrollTop()).not.toBe(before);
+});
+
 test('Enter commits the box and closes the list, keeping focus', async ({ page }) => {
   await page.goto('/');
   await ready(page);

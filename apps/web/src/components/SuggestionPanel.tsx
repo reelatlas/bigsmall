@@ -1,18 +1,25 @@
-import { getCategory, type Category, type Unit } from '@bigsmall/core';
+import { getCategory, matchSpan, type Category, type Unit } from '@bigsmall/core';
 import { ChevronRightIcon } from './icons';
 
-/** What a row in the panel can be. The smart input builds this list from a core search response. */
+/**
+ * What a row in the panel can be. The smart input builds this list from a core search response,
+ * with the Back row first while a category is open, so arrow keys reach it like any other row.
+ */
 export type SuggestionItem =
-  { kind: 'unit'; key: string; unit: Unit } | { kind: 'category'; key: string; category: Category };
+  | { kind: 'back'; key: string }
+  | { kind: 'unit'; key: string; unit: Unit }
+  | { kind: 'category'; key: string; category: Category };
+
+export const BACK_ITEM: SuggestionItem = { kind: 'back', key: '#back' };
 
 export interface SuggestionPanelProps {
   id: string;
   items: SuggestionItem[];
   activeIndex: number;
   optionId: (index: number) => string;
-  /** When set, a "← Back" row sits above the list and returns to the categories. */
-  onBack?: (() => void) | undefined;
-  /** The category this list belongs to, shown on the Back row. */
+  /** What the user typed to get these rows; the letters it matches are set heavier. */
+  query?: string | undefined;
+  /** The category the list is inside, shown on the Back row. */
   scopeName?: string | undefined;
   /** Shown above the list, such as "No unit matches …". */
   message?: string | undefined;
@@ -22,82 +29,106 @@ export interface SuggestionPanelProps {
   onHover: (index: number) => void;
 }
 
-// Rows are rounded and sit inside a small gutter, so a highlight never touches the shell's edge.
+// Rows sit in the same 8 px inset as the chip inside the field, with corners that nest in the
+// field's corners, so a highlight never touches the shell's edge (docs/DESIGN-SYSTEM.md).
 const row =
-  'flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-2 text-left ' +
+  'flex min-h-11 cursor-pointer items-center gap-3 rounded-nested px-2 text-left ' +
   'data-active:bg-accent-soft hover:bg-surface-raised';
+
+// The Back row stays pinned at the top while the list scrolls, with a divider under it; its inner
+// span carries the highlight so the divider is never highlighted.
+const backRow = 'group sticky top-0 z-10 mb-1 cursor-pointer border-b border-line bg-surface pb-1';
 
 /**
  * The listbox that grows out of a smart input. Plain WAI-ARIA combobox pattern: the input owns
  * focus and points at the active row with aria-activedescendant; rows are picked with Enter, tap,
- * or click. The Back row is a real button outside the listbox, reachable by Tab or Escape.
- * The surrounding shell (field or gallery card) draws the border and corners; the gutter here
- * keeps highlights and the scrollbar inside that edge.
+ * or click. The Back row is the first option and stays pinned while the list scrolls, so it
+ * shares the rows' edges and is reached by the arrow keys like any other row.
+ * The surrounding shell (field or gallery card) draws the border and corners.
  */
 export function SuggestionPanel({
   id,
   items,
   activeIndex,
   optionId,
-  onBack,
+  query,
   scopeName,
   message,
   showCategory,
   onPick,
   onHover,
 }: SuggestionPanelProps) {
+  const hasBack = items[0]?.kind === 'back';
   return (
-    <div className="border-t border-line">
-      {onBack && (
-        <div className="flex items-center justify-between border-b border-line px-1">
-          <button
-            type="button"
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={onBack}
-            className="flex min-h-11 items-center rounded-md px-2 text-sm text-ink-muted transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
-          >
-            ← Back
-          </button>
-          {scopeName && <span className="px-2 text-sm font-medium text-ink">{scopeName}</span>}
-        </div>
-      )}
-      {message && <p className="px-3 pt-2 text-sm text-ink-muted">{message}</p>}
-      <div className="p-1">
-        <ul
-          role="listbox"
-          id={id}
-          aria-label="Suggestions"
-          className="max-h-72 scroll-thin overflow-y-auto"
-        >
-          {items.map((item, index) => (
+    <div className="border-t border-line p-2">
+      {message && <p className="px-2 pt-1 pb-2 text-sm text-ink-muted">{message}</p>}
+      {/*
+        With a pinned Back row, scrolling to a row keeps it clear of the pin. tabIndex -1: Chrome
+        makes a scrolling list with no focusable children a Tab stop, which would catch Tab on its
+        way to the next box; the input's arrow keys already scroll it.
+      */}
+      <ul
+        role="listbox"
+        id={id}
+        aria-label="Suggestions"
+        tabIndex={-1}
+        className={`max-h-72 scroll-thin overflow-y-auto ${hasBack ? 'scroll-pt-14' : ''}`}
+      >
+        {items.map((item, index) => {
+          const active = index === activeIndex;
+          const back = item.kind === 'back';
+          return (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the combobox input handles keys; rows are virtual-focused via aria-activedescendant
             <li
               key={item.key}
               role="option"
               id={optionId(index)}
-              aria-selected={index === activeIndex}
-              data-active={index === activeIndex || undefined}
-              className={row}
+              aria-selected={active}
+              aria-label={back ? 'Back to categories' : undefined}
+              data-active={active || undefined}
+              className={back ? backRow : row}
               onMouseDown={(event) => event.preventDefault()}
               onMouseEnter={() => onHover(index)}
               onClick={() => onPick(item)}
             >
-              <RowBody item={item} showCategory={showCategory} />
+              {back ? (
+                <span className="flex min-h-11 items-center justify-between rounded-nested px-2 text-sm text-ink-muted group-hover:bg-surface-raised group-hover:text-ink group-data-active:bg-accent-soft group-data-active:text-ink">
+                  <span>← Back</span>
+                  {scopeName && (
+                    <span className="font-medium text-ink" data-scope-name>
+                      {scopeName}
+                    </span>
+                  )}
+                </span>
+              ) : (
+                <RowBody item={item} query={query} showCategory={showCategory} />
+              )}
             </li>
-          ))}
-        </ul>
-      </div>
+          );
+        })}
+      </ul>
     </div>
   );
 }
 
-/** A unit row reads "name … symbol": the name on the left, the symbol right-aligned in muted numeric type. */
-function RowBody({ item, showCategory }: { item: SuggestionItem; showCategory: boolean }) {
+/**
+ * A unit row reads "name … symbol": the name on the left, the symbol right-aligned and bold like
+ * the chip's. The letters the query matches are set heavier in both.
+ */
+function RowBody({
+  item,
+  query,
+  showCategory,
+}: {
+  item: SuggestionItem;
+  query: string | undefined;
+  showCategory: boolean;
+}) {
   if (item.kind === 'unit') {
     return (
       <>
         <span className="flex-1 truncate">
-          {item.unit.plural}
+          <Marked text={item.unit.plural} query={query} className="font-semibold" />
           {showCategory && (
             // The literal space keeps the accessible name "ounces Weight", not "ouncesWeight".
             <>
@@ -108,14 +139,44 @@ function RowBody({ item, showCategory }: { item: SuggestionItem; showCategory: b
             </>
           )}
         </span>
-        <span className="shrink-0 font-numeric text-ink-muted">{item.unit.symbol}</span>
+        <span className="shrink-0 font-numeric font-semibold text-ink-muted">
+          <Marked text={item.unit.symbol} query={query} className="text-ink" />
+        </span>
       </>
     );
   }
+  if (item.kind === 'category') {
+    return (
+      <>
+        <span className="flex-1 font-medium">
+          <Marked text={item.category.name} query={query} className="font-bold" />
+        </span>
+        <ChevronRightIcon className="text-ink-muted" />
+      </>
+    );
+  }
+  return null;
+}
+
+/** `text` with the part that matches `query` wrapped in a span, the way search matched it (core matchSpan). */
+function Marked({
+  text,
+  query,
+  className,
+}: {
+  text: string;
+  query: string | undefined;
+  className: string;
+}) {
+  const span = query ? matchSpan(text, query) : null;
+  if (!span) return text;
   return (
     <>
-      <span className="flex-1 font-medium">{item.category.name}</span>
-      <ChevronRightIcon className="text-ink-muted" />
+      {text.slice(0, span.start)}
+      <span className={className} data-match>
+        {text.slice(span.start, span.end)}
+      </span>
+      {text.slice(span.end)}
     </>
   );
 }

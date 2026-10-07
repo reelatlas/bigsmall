@@ -67,7 +67,8 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
         ...state,
         [action.box]: { ...state[action.box], text: action.text },
         // Only a number makes a box the source; typing a bare unit must not blank the other box.
-        source: parse(action.text).value !== undefined ? action.box : state.source,
+        // A number too large or too small to hold still counts, so the other box can say so.
+        source: parse(action.text).valueText !== undefined ? action.box : state.source,
         notice: null,
       };
 
@@ -84,6 +85,10 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
         notice: null,
       };
       const otherId = other(action.box);
+      // Before any number is typed, the first box to get a unit becomes the source: it set the
+      // category, so it anchors the conversion and the category label until a number moves them.
+      const sourceHasNumber = parse(state[state.source].text).valueText !== undefined;
+      if (!sourceHasNumber && state[otherId].unit === null) next.source = action.box;
       const otherUnit = state[otherId].unit ? getUnit(state[otherId].unit) : undefined;
       if (otherUnit && otherUnit.category !== unit.category) {
         // No silent cross-category pairs: the other box loses its unit and keeps its number only if it was the source.
@@ -123,6 +128,8 @@ export interface BoxView {
   parsed: ParsedInput;
   /** Category suggestions should stay within: this box's unit, else the other box's. */
   scope: CategoryId | null;
+  /** Shown in place of a value when the conversion has no answer to show here: "Too large to convert". */
+  message: string | null;
 }
 
 export interface ConverterResult {
@@ -131,13 +138,30 @@ export interface ConverterResult {
   text: string;
 }
 
+/** Why a conversion has no displayable answer: beyond what a double holds, or rounded to zero. */
+export type OutOfRange = 'large' | 'small';
+
+export const OUT_OF_RANGE_MESSAGE: Record<OutOfRange, string> = {
+  large: 'Too large to convert',
+  small: 'Too small to convert',
+};
+
 export interface ConverterView {
   a: BoxView;
   b: BoxView;
   category: CategoryId | null;
+  /**
+   * The box the conversion is anchored on, which carries the category label: the source when it
+   * has a unit, otherwise the box whose unit set the category. Null while no unit is chosen.
+   */
+  anchor: BoxId | null;
   result: ConverterResult | null;
-  error: string | null;
-  /** Sentence for the live region, e.g. "5 milliliters is 0.02113376419 cups". */
+  /** Set when the source holds a number but the conversion cannot be shown. */
+  outOfRange: OutOfRange | null;
+  /**
+   * Sentence for the live region: "5 milliliters is 0.02113376419 cups", or
+   * "1e308 kilometers is too large to convert to millimeters".
+   */
   announcement: string | null;
   notice: string | null;
 }
@@ -159,23 +183,28 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
   const sourceParsed = parse(state[sourceId].text, options.separators);
 
   let result: ConverterResult | null = null;
-  let error: string | null = null;
-  if (sourceUnit && targetUnit && sourceParsed.value !== undefined) {
-    try {
-      const value = convert(sourceParsed.value, sourceUnit, targetUnit);
-      const text = formatNumber(value, options.locale ? { locale: options.locale } : {});
-      if (text) result = { box: targetId, value, text };
-      else error = 'That number is too large to convert.';
-    } catch {
-      error = 'That number cannot be converted.';
+  let outOfRange: OutOfRange | null = null;
+  if (sourceUnit && targetUnit) {
+    if (sourceParsed.outOfRange) {
+      outOfRange = sourceParsed.outOfRange;
+    } else if (sourceParsed.value !== undefined) {
+      // A result a double cannot hold comes back as Infinity or as a 0 that underflowed.
+      const value = safeConvert(sourceParsed.value, sourceUnit, targetUnit);
+      if (value !== undefined) {
+        const text = formatNumber(value, options.locale ? { locale: options.locale } : {});
+        if (!text) outOfRange = 'large';
+        else if (value === 0 && sourceParsed.value !== 0) outOfRange = 'small';
+        else result = { box: targetId, value, text };
+      }
     }
   }
 
   const box = (id: BoxId, unit: Unit | null, otherUnit: Unit | null): BoxView => {
     const isSource = id === sourceId;
     const stored = state[id].text;
+    const typingQuery = parse(stored).query !== undefined;
     // A derived box shows the result unless the user is typing a unit query into it.
-    const text = isSource || parse(stored).query !== undefined ? stored : (result?.text ?? '');
+    const text = isSource || typingQuery ? stored : (result?.text ?? '');
     return {
       id,
       text,
@@ -183,25 +212,44 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
       isSource,
       parsed: isSource ? sourceParsed : parse(text, options.separators),
       scope: unit?.category ?? otherUnit?.category ?? null,
+      message: !isSource && !typingQuery && outOfRange ? OUT_OF_RANGE_MESSAGE[outOfRange] : null,
     };
   };
 
   let announcement: string | null = null;
-  if (result && sourceUnit && targetUnit && sourceParsed.value !== undefined) {
-    const from =
-      `${sourceParsed.valueText ?? ''} ${unitName(sourceUnit, sourceParsed.value)}`.trim();
-    announcement = `${from} is ${result.text} ${unitName(targetUnit, result.value)}`;
+  if (sourceUnit && targetUnit && (result || outOfRange)) {
+    const amount = sourceParsed.value ?? Number.NaN;
+    const from = `${sourceParsed.valueText ?? ''} ${unitName(sourceUnit, amount)}`.trim();
+    announcement = result
+      ? `${from} is ${result.text} ${unitName(targetUnit, result.value)}`
+      : `${from} is too ${outOfRange} to convert to ${targetUnit.plural}`;
   }
+
+  const anchor: BoxId | null = category ? (sourceUnit ? sourceId : targetId) : null;
 
   return {
     a: box('a', unitA, unitB),
     b: box('b', unitB, unitA),
     category,
+    anchor,
     result,
-    error,
+    outOfRange,
     announcement,
     notice: state.notice,
   };
+}
+
+/**
+ * convert() throws only for a cross-category pair or a non-finite input, which lock, the URL
+ * reader, and the parser already rule out. A throw during render would take the island down,
+ * so an impossible pair simply shows no result.
+ */
+function safeConvert(value: number, from: Unit, to: Unit): number | undefined {
+  try {
+    return convert(value, from, to);
+  } catch {
+    return undefined;
+  }
 }
 
 function unitName(unit: Unit, value: number): string {

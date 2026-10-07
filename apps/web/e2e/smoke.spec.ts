@@ -6,7 +6,7 @@ const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const THEMES: Array<[id: string, name: string]> = [
   ['midnight', 'Midnight'],
   ['sakura', 'Sakura'],
-  ['neon-noir', 'Neon noir'],
+  ['neo-noir', 'Neo-noir'],
   ['hardhat', 'Hardhat'],
   ['theorem', 'Theorem'],
 ];

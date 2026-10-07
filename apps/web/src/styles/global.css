@@ -8,7 +8,7 @@
 @import './themes/daylight.css';
 @import './themes/midnight.css';
 @import './themes/sakura.css';
-@import './themes/neon-noir.css';
+@import './themes/neo-noir.css';
 @import './themes/hardhat.css';
 @import './themes/theorem.css';
 
@@ -38,6 +38,11 @@
   --radius-sm: var(--shape-sm);
   --radius-md: var(--shape-md);
   --radius-lg: var(--shape-lg);
+  /*
+   * A corner nested inside a field or its list: the field's corner minus its 2px border and the
+   * 8px inset everything inside keeps, so inner and outer curves stay concentric in every theme.
+   */
+  --radius-nested: max(0px, calc(var(--shape-lg) - 0.625rem));
 
   --shadow-sm: var(--elevation-sm);
   --shadow-md: var(--elevation-md);
@@ -50,7 +55,6 @@
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
 }
-
 @layer base {
   html {
     background: var(--canvas);

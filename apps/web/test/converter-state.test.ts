@@ -117,7 +117,8 @@ describe('selectView', () => {
     expect(v.b.text).toBe('0.02113376419');
     expect(v.result).toMatchObject({ box: 'b', text: '0.02113376419' });
     expect(v.announcement).toBe('5 milliliters is 0.02113376419 cups');
-    expect(v.error).toBeNull();
+    expect(v.outOfRange).toBeNull();
+    expect(v.anchor).toBe('a');
   });
 
   it('uses singular names for one', () => {
@@ -160,7 +161,7 @@ describe('selectView', () => {
     expect(selectView(s, EN).b.text).toBe('1,500');
   });
 
-  it('reports an error when the result overflows', () => {
+  it('says "too large" in the other box when the result overflows, never a bare zero', () => {
     const s = run(
       { type: 'input', box: 'a', text: '1e308', at: 0 },
       { type: 'lock', box: 'a', unit: 'kilometer' },
@@ -168,7 +169,120 @@ describe('selectView', () => {
     );
     const v = selectView(s, EN);
     expect(v.result).toBeNull();
-    expect(v.error).toMatch(/too large/);
+    expect(v.outOfRange).toBe('large');
+    expect(v.b.text).toBe('');
+    expect(v.b.message).toBe('Too large to convert');
+    expect(v.a.message).toBeNull();
+    expect(v.announcement).toBe('1e308 kilometers is too large to convert to millimeters');
+  });
+
+  it('says "too small" when a nonzero result underflows to zero', () => {
+    const s = run(
+      { type: 'input', box: 'a', text: '1e-320', at: 0 },
+      { type: 'lock', box: 'a', unit: 'millimeter' },
+      { type: 'lock', box: 'b', unit: 'kilometer' },
+    );
+    const v = selectView(s, EN);
+    expect(v.outOfRange).toBe('small');
+    expect(v.b.message).toBe('Too small to convert');
+  });
+
+  it('a typed number beyond what a double holds still drives the other box, which says so', () => {
+    const s = run(
+      { type: 'lock', box: 'a', unit: 'kilometer' },
+      { type: 'lock', box: 'b', unit: 'millimeter' },
+      { type: 'input', box: 'b', text: '1e400', at: 0 },
+    );
+    expect(s.source).toBe('b');
+    const v = selectView(s, EN);
+    expect(v.a.message).toBe('Too large to convert');
+    expect(v.b.message).toBeNull();
+  });
+
+  it('a real zero converts to zero', () => {
+    const s = run(
+      { type: 'input', box: 'a', text: '0', at: 0 },
+      { type: 'lock', box: 'a', unit: 'kilometer' },
+      { type: 'lock', box: 'b', unit: 'millimeter' },
+    );
+    const v = selectView(s, EN);
+    expect(v.outOfRange).toBeNull();
+    expect(v.b.text).toBe('0');
+  });
+
+  it('a unit query typed into the other box hides its message while it is typed', () => {
+    const s = run(
+      { type: 'input', box: 'a', text: '1e308', at: 0 },
+      { type: 'lock', box: 'a', unit: 'kilometer' },
+      { type: 'lock', box: 'b', unit: 'millimeter' },
+      { type: 'input', box: 'b', text: 'mi', at: 10 },
+    );
+    expect(selectView(s, EN).b.message).toBeNull();
+  });
+});
+
+describe('anchor', () => {
+  const view = (...actions: Parameters<typeof reduce>[1][]) => selectView(run(...actions), EN);
+
+  it('is empty until a unit is chosen', () => {
+    expect(view({ type: 'input', box: 'a', text: '5', at: 0 }).anchor).toBeNull();
+  });
+
+  it('sits with the box that holds the typed number once it has a unit', () => {
+    const v = view(
+      { type: 'input', box: 'a', text: '5 ml', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+    );
+    expect(v.anchor).toBe('a');
+  });
+
+  it('moves to the other box when a number is typed there', () => {
+    const v = view(
+      { type: 'input', box: 'a', text: '5', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+      { type: 'input', box: 'b', text: '2', at: 10 },
+    );
+    expect(v.anchor).toBe('b');
+  });
+
+  it('sits with the box whose unit set the category while the number has no unit yet', () => {
+    const v = view(
+      { type: 'input', box: 'a', text: '5', at: 0 },
+      { type: 'lock', box: 'b', unit: 'milliliter' },
+    );
+    expect(v.a.isSource).toBe(true);
+    expect(v.anchor).toBe('b');
+  });
+
+  it('before any number, the first box to get a unit becomes the source and keeps the anchor', () => {
+    const s = run(
+      { type: 'lock', box: 'b', unit: 'milliliter' },
+      { type: 'lock', box: 'a', unit: 'us-cup' },
+    );
+    expect(s.source).toBe('b');
+    expect(selectView(s, EN).anchor).toBe('b');
+  });
+
+  it('a later lock does not take the source from a box that holds a number', () => {
+    const s = run(
+      { type: 'input', box: 'a', text: '5', at: 0 },
+      { type: 'lock', box: 'b', unit: 'milliliter' },
+      { type: 'lock', box: 'a', unit: 'liter' },
+    );
+    expect(s.source).toBe('a');
+    expect(selectView(s, EN).anchor).toBe('a');
+  });
+
+  it('follows a switch of category to the box that switched it', () => {
+    const v = view(
+      { type: 'input', box: 'a', text: '5', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'fahrenheit' },
+    );
+    expect(v.anchor).toBe('b');
+    expect(v.notice).toBe('Switched to Temperature');
   });
 });
 

@@ -1,6 +1,7 @@
 import type { SVGProps } from 'react';
 
-// Small inline icons. Decorative by default (aria-hidden); the surrounding control carries the label.
+// Small inline icons, drawn for this project. Decorative by default (aria-hidden); the surrounding
+// control carries the label.
 
 type IconProps = SVGProps<SVGSVGElement>;
 
@@ -80,6 +81,16 @@ export function RedoIcon(props: IconProps) {
     <Icon {...props}>
       <path d="M15 14l5-5-5-5" />
       <path d="M20 9H10a6 6 0 0 0 0 12h3" />
+    </Icon>
+  );
+}
+
+export function EraserIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 15.5L12.5 7a2 2 0 0 1 2.8 0l3.7 3.7a2 2 0 0 1 0 2.8L13 19.5H8z" />
+      <path d="M9 10.5l5.5 5.5" />
+      <path d="M13 19.5h7" />
     </Icon>
   );
 }

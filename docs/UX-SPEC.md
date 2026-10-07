@@ -70,6 +70,8 @@ Within a class, order by: category lock (the other box's category wins) → loca
 
 A category match (`fluids`, `temp`, `distance`) expands to that category's units, basic tier first.
 
+**Showing the match.** The letters a query matches are set heavier wherever they appear in a row, under the same normalization search uses, so `me` marks "**me**ters" and "kilo**me**ters", and `floz` marks all of "fl oz". Unit names go semibold, category names bold, and a symbol's muted text turns ink. A unit found through an alias that the row does not show gets no mark (§18).
+
 ## 5. Locking
 
 - **Unambiguous exact match** (classes 1–2 with a single result): lock immediately. Show the chip with a brief highlight. Keep the panel open for one beat with the next-best alternatives so a wrong lock is one tap to fix.
@@ -91,6 +93,7 @@ This is the behavior most likely to need tuning after testing.
 - Conversion runs whenever both boxes have a unit and the source box has a value.
 - The box edited last is the source. The other box is derived. Editing the derived box makes it the source.
 - Derived values are formatted to the current precision (default 10 significant digits, trailing zeros trimmed, locale grouping). Values beyond 1e15 or below 1e-6 switch to exponent form.
+- **Out of range.** When the typed number is beyond what a double holds (`1e400`), or the result is (`1e308 km` in millimeters), the derived box says "Too large to convert" in place of a value. When a nonzero input or result rounds to zero (`1e-320 mm` in kilometers), it says "Too small to convert". Never a bare 0 or an empty field with a "0" placeholder. The live region says the full sentence: "1e308 kilometers is too large to convert to millimeters" (§18).
 - The derived box has a copy action that copies the full-precision value.
 - A polite live region announces "5 milliliters is 0.169 US fluid ounces" when the result settles (debounced so screen readers are not flooded).
 - Swap exchanges units and values and keeps the same source side.
@@ -167,7 +170,7 @@ Sean's first use of the milestone 2 build. Each item is now implemented and cove
 - **Undo and redo.** Ctrl/Cmd+Z and Ctrl/Cmd+Y (or Shift+Z), plus two buttons by the hint. The last interaction is what gets undone: a run of typing in one box is one step, and undoing a unit pick keeps the number and removes the unit. Loading from a URL starts a fresh history.
 - **The chip opens the list.** Clicking the chip body lists the units of its category so the unit can be changed in place; the × still removes it.
 - **No "category" subtext** on category rows. The chevron and the missing symbol column mark them.
-- **Sentence case everywhere** except proper names and unit conventions (docs/DESIGN-SYSTEM.md, "Copy"). "Neon noir", not "Neon Noir".
+- **Sentence case everywhere** except proper names and unit conventions (docs/DESIGN-SYSTEM.md, "Copy"). "Neo-noir", not "Neo-Noir" (named "Neon noir" until the fifth pass, §18).
 - **The list floats.** The suggestion panel overlays the page below the field instead of pushing content down. A browser test checks the other box does not move.
 - **Enter commits.** Enter picks the highlighted row or locks an exact match, then closes the list, the same result as clicking out, while focus stays in the field (the combobox convention).
 - **Copy on both boxes** whenever a box holds a number, so the control never jumps sides.
@@ -192,3 +195,16 @@ Sean's first use of the milestone 2 build. Each item is now implemented and cove
 - **Category rows only on the category word** (§4).
 - **The exponent marker carries weight.** In a value such as `1.5E21`, the `E` is set semibold so the exponent reads as structure rather than as another digit. Only the marker inside the parsed number counts; an `e` still being typed as part of a unit stays regular. Drawn by a text layer over a transparent-text field (docs/DESIGN-SYSTEM.md, "Fields").
 - **Numbers fit the field.** The type size steps down through five sizes until the number fits on one line beside its chip, measured on every change and resize rather than by character count, and steps back up when room returns. The chip still collapses to its symbol past six characters so the number keeps its size as long as it can. Beyond the smallest size the number scrolls inside the field; wrapping a very long number is a later idea. This replaces the nine-character rule in §15.
+
+## 18. Fifth pass (2026-10-06)
+
+- **Hint above the boxes.** "Type a number, unit, or both. Once each box has a unit, typing in one updates the other." It sits above the boxes, with undo, redo, and clear all at its right.
+- **Clear all.** An eraser button at the far right, set apart from undo and redo by a thin rule. It empties both boxes and their units, puts the caret in the first box, and is disabled when there is nothing to clear. Like every other step it can be undone.
+- **Placeholders are examples.** No "Type…" prefix: the first box shows "5 ml, feet, °F…" and the second "2 kg, inches, speed…", which shows a category can be typed too. Once the other box has a unit, an empty box lists three units of that category instead ("L, tsp, tbsp…" beside milliliters), so the examples never invite a switch of category by accident. A box with its own unit shows "0".
+- **The category label sits under the anchor.** The anchor is the box the conversion reads from: the source when it has a unit, otherwise the box whose unit set the category. The label sits under it at its outer edge (left under the first box, right under the second), so it says both the category and which side is driving. Before any number is typed, the first box to get a unit becomes the source and keeps the label. A switch of category shows there as "Switched to Temperature" until the next change. The category an open list is browsing is named on its Back row instead.
+- **Out-of-range values say so** (§7).
+- **Symbols are bold in the list**, matching the chip, and **matched letters are heavier** (§4).
+- **Back is a row the arrow keys reach.** Inside a category the Back row is the first option of the list and stays pinned while the list scrolls. Down from nothing goes to the first unit; Up from the first unit, or Down from the last, highlights Back; Enter on it goes up to the categories. Escape still does the same.
+- **Tab goes box to box.** Tab from the first box lands in the second, then on swap; Shift+Tab reverses it. The chip's buttons and the copy button stay clickable but leave the Tab order, because the field's own keys do the same: Down or typing changes the unit, Backspace on an empty field or Escape removes it, and a focused result is selected for Ctrl+C. Swap sits after the second box in the DOM; the grid still draws it between them.
+- **Even spacing inside the field.** The field is 64 px tall, so the 44 px chip and copy button keep the same 8 px from the top, bottom, and right edges, and their corners nest inside the field's corner. The number starts 16 px in, and list rows line up with it. Bordered buttons share the fields' 2 px edge (docs/DESIGN-SYSTEM.md, "Fields").
+- **Neo-noir.** The theme that was "Neon noir" is "Neo-noir" (id `neo-noir`), the genre the original brief named.

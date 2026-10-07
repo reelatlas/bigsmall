@@ -7,7 +7,7 @@
 
 export const THEME_STORAGE_KEY = 'bigsmall:theme';
 
-export type ThemeId = 'daylight' | 'midnight' | 'sakura' | 'neon-noir' | 'hardhat' | 'theorem';
+export type ThemeId = 'daylight' | 'midnight' | 'sakura' | 'neo-noir' | 'hardhat' | 'theorem';
 
 export type ThemeScheme = 'light' | 'dark';
 
@@ -45,8 +45,8 @@ export const THEMES: readonly ThemeMeta[] = [
     blurb: 'Cherry blossom: soft pinks, warm paper, plum ink.',
   },
   {
-    id: 'neon-noir',
-    name: 'Neon noir',
+    id: 'neo-noir',
+    name: 'Neo-noir',
     scheme: 'dark',
     status: 'palette',
     blurb: 'Tokyo at night: magenta glow, cyan focus, mono numerals.',
@@ -104,6 +104,8 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = 
   ['ink', 'accent-soft', 4.5],
   ['ink-muted', 'accent-soft', 4.5],
   ['danger', 'canvas', 4.5],
+  // "Too large to convert" is drawn inside a field.
+  ['danger', 'surface', 4.5],
   ['success', 'canvas', 4.5],
   ['accent', 'canvas', 3],
   ['accent', 'surface', 3],

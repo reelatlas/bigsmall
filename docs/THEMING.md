@@ -47,18 +47,18 @@ Rules that keep themes cheap:
 
 ## Status and direction
 
-| Theme       | Scheme | Status   | Direction for milestone 4                                                                                                  |
-| ----------- | ------ | -------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `daylight`  | light  | baseline | Stays neutral. The reference for layout and spacing.                                                                       |
-| `midnight`  | dark   | baseline | Stays neutral. Default under a dark OS.                                                                                    |
-| `sakura`    | light  | palette  | Warm paper texture, slow drifting petals (CSS shapes, low count), rounded chips, serif display face                        |
-| `neon-noir` | dark   | palette  | Magenta and cyan glows as elevation, faint rain streaks, monospace numerals, slight flicker on focus (reduced-motion safe) |
-| `hardhat`   | dark   | palette  | Blueprint grid on the canvas, safety-yellow accent, stencil or heavy display face, hard corners, chunky targets            |
-| `theorem`   | dark   | palette  | Chalk texture, serif body and typeset numerals, results framed like an equation, chalk-dust focus ring                     |
+| Theme      | Scheme | Status   | Direction for milestone 4                                                                                                  |
+| ---------- | ------ | -------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `daylight` | light  | baseline | Stays neutral. The reference for layout and spacing.                                                                       |
+| `midnight` | dark   | baseline | Stays neutral. Default under a dark OS.                                                                                    |
+| `sakura`   | light  | palette  | Warm paper texture, slow drifting petals (CSS shapes, low count), rounded chips, serif display face                        |
+| `neo-noir` | dark   | palette  | Magenta and cyan glows as elevation, faint rain streaks, monospace numerals, slight flicker on focus (reduced-motion safe) |
+| `hardhat`  | dark   | palette  | Blueprint grid on the canvas, safety-yellow accent, stencil or heavy display face, hard corners, chunky targets            |
+| `theorem`  | dark   | palette  | Chalk texture, serif body and typeset numerals, results framed like an equation, chalk-dust focus ring                     |
 
 Two of these are dark themes that could also be light ("blueprint paper" for hardhat, "graph paper" for theorem). Decide per theme at milestone 4 after the first polished theme sets the bar.
 
-Recommended polish order: `sakura` first (a light theme stress-tests decoration behind text), then `neon-noir`, then `hardhat`, then `theorem`.
+Recommended polish order: `sakura` first (a light theme stress-tests decoration behind text), then `neo-noir`, then `hardhat`, then `theorem`.
 
 ## Known gaps
 

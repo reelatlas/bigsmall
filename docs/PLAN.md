@@ -191,14 +191,14 @@ A theme is a `[data-theme="name"]` block that reassigns semantic tokens, plus an
 
 Theme roster (working names, to be designed):
 
-| Theme       | Feel               | Notes                                                                            |
-| ----------- | ------------------ | -------------------------------------------------------------------------------- |
-| `daylight`  | neutral light      | default, system fonts, the baseline                                              |
-| `midnight`  | neutral dark       | default when the OS prefers dark                                                 |
-| `sakura`    | cherry blossom     | soft pinks, paper texture, slow petal drift (CSS only, off under reduced motion) |
-| `neon-noir` | Tokyo at night     | near-black, magenta and cyan glow, monospace numerals, rain streak texture       |
-| `hardhat`   | job site           | safety yellow and steel, blueprint grid, stencil display face, chunky targets    |
-| `theorem`   | higher mathematics | chalkboard or graph paper, math serif, typeset-looking results                   |
+| Theme      | Feel               | Notes                                                                            |
+| ---------- | ------------------ | -------------------------------------------------------------------------------- |
+| `daylight` | neutral light      | default, system fonts, the baseline                                              |
+| `midnight` | neutral dark       | default when the OS prefers dark                                                 |
+| `sakura`   | cherry blossom     | soft pinks, paper texture, slow petal drift (CSS only, off under reduced motion) |
+| `neo-noir` | Tokyo at night     | near-black, magenta and cyan glow, monospace numerals, rain streak texture       |
+| `hardhat`  | job site           | safety yellow and steel, blueprint grid, stencil display face, chunky targets    |
+| `theorem`  | higher mathematics | chalkboard or graph paper, math serif, typeset-looking results                   |
 
 Rules: every theme passes the same contrast checks; decoration costs nothing when the theme is inactive (fonts and textures load on activation only); `prefers-reduced-motion` disables ambient motion; theme is applied by an inline script before first paint so there is no flash; `color-scheme` is set per theme so native controls match. A `/dev/gallery` page renders every component in every theme for visual QA.
 
@@ -263,7 +263,7 @@ Rule of thumb: if a future session would have to rediscover it, write it down.
 | M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                             |
 | M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.** |
 | M3  | **Complete converter** | Keypad, basic/advanced modes, swap, persistence, remaining basic-tier categories, advanced categories loaded on demand                                                                  |
-| M4  | **Themes**             | `midnight`, `sakura`, `neon-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI                                                            |
+| M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI                                                             |
 | M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                   |
 
 ## 14. Setup checklist

@@ -10,10 +10,10 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
-import { SuggestionPanel, type SuggestionItem } from '../../components/SuggestionPanel';
+import { BACK_ITEM, SuggestionPanel, type SuggestionItem } from '../../components/SuggestionPanel';
 import { UnitChip } from '../../components/UnitChip';
 import { useFitStep } from '../../lib/fit-step';
-import type { BoxId, BoxView, EscapeTarget, HistoryAction, Mode } from './state';
+import type { BoxView, EscapeTarget, HistoryAction, Mode } from './state';
 import type { ConverterEnv } from './useConverter';
 
 export interface SmartInputProps {
@@ -27,8 +27,10 @@ export interface SmartInputProps {
   dispatch: (action: HistoryAction) => void;
   /** What Escape takes back once the list is closed: the latest chunk of typing, or the unit (docs/UX-SPEC.md §17). */
   escapeTarget: EscapeTarget;
-  /** Reports the category the open list is inside, or null when the list is closed or at the top level. */
-  onBrowse?: (box: BoxId, category: CategoryId | null) => void;
+  /** Placeholder while the box has no unit and nothing scopes it, such as "5 ml, feet, °F…". */
+  examples: string;
+  /** The other box's unit, which a scoped placeholder leaves out. */
+  counterpart: Unit | null;
   /** Rendered at the end of the field, such as the copy button. */
   trailing?: ReactNode;
 }
@@ -76,7 +78,8 @@ export function SmartInput({
   env,
   dispatch,
   escapeTarget,
-  onBrowse,
+  examples,
+  counterpart,
   trailing,
 }: SmartInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -84,6 +87,7 @@ export function SmartInput({
   const idBase = useId();
   const inputId = `${idBase}-input`;
   const listboxId = `${idBase}-listbox`;
+  const messageId = `${idBase}-message`;
   const optionId = (index: number) => `${idBase}-option-${index}`;
 
   const [open, setOpen] = useState(false);
@@ -107,17 +111,31 @@ export function SmartInput({
   const noMatch = query !== '' && suggestion.search.results.length === 0;
   const listed = noMatch ? search('', { tier: mode }).results : suggestion.search.results;
 
-  const items: SuggestionItem[] = listed.map((result) =>
-    result.kind === 'unit'
-      ? { kind: 'unit', key: result.unit.id, unit: result.unit }
-      : { kind: 'category', key: `#${result.category.id}`, category: result.category },
-  );
+  // Inside a category the Back row comes first, so the arrow keys reach it like any other row;
+  // the best match is the first row after it.
+  const hasBack = scope !== null;
+  const firstResult = hasBack ? 1 : 0;
+  const items: SuggestionItem[] = [
+    ...(hasBack ? [BACK_ITEM] : []),
+    ...listed.map((result): SuggestionItem =>
+      result.kind === 'unit'
+        ? { kind: 'unit', key: result.unit.id, unit: result.unit }
+        : { kind: 'category', key: `#${result.category.id}`, category: result.category },
+    ),
+  ];
 
   const message = noMatch ? `No unit matches “${query}”. Try ml, feet, or °F.` : undefined;
 
-  useEffect(() => {
-    onBrowse?.(box.id, open ? scope : null);
-  }, [open, scope, onBrowse, box.id]);
+  // What the empty field suggests: a number once it has a unit, a few units of its category
+  // once the other box has chosen one, otherwise this box's own examples. A message about the
+  // conversion takes the placeholder's place, so a value that cannot be shown never reads as 0.
+  const placeholder = box.message
+    ? ''
+    : box.unit
+      ? '0'
+      : box.scope
+        ? scopedExamples(box.scope, counterpart, mode)
+        : examples;
 
   const sizeClass = SIZE_STEPS[useFitStep(mirrorRef, MIRROR, SIZE_STEPS)];
 
@@ -163,7 +181,9 @@ export function SmartInput({
   };
 
   const pick = (item: SuggestionItem) => {
-    if (item.kind === 'unit') {
+    if (item.kind === 'back') {
+      showList({ scope: 'all' });
+    } else if (item.kind === 'unit') {
       lock(item.unit);
     } else {
       if (box.isSource && query) {
@@ -179,7 +199,7 @@ export function SmartInput({
     dispatch({ type: 'input', box: box.id, text: value, at: performance.now() });
     const next = suggest(value, searchOptions);
     setOpen(true);
-    setActive(next.parsed.query ? 0 : -1);
+    setActive(next.parsed.query ? firstResult : -1);
   };
 
   /**
@@ -206,9 +226,11 @@ export function SmartInput({
     const count = items.length;
     switch (event.key) {
       case 'ArrowDown':
+        // From nothing, Down goes to the first unit or category; from the last row it wraps to
+        // Back. Up from the first unit reaches Back, so Back is one key away in either direction.
         event.preventDefault();
         setOpen(true);
-        if (count) setActive((i) => (i + 1) % count);
+        if (count) setActive((i) => (i < 0 ? Math.min(firstResult, count - 1) : (i + 1) % count));
         break;
       case 'ArrowUp':
         event.preventDefault();
@@ -216,10 +238,11 @@ export function SmartInput({
         if (count) setActive((i) => (i <= 0 ? count - 1 : i - 1));
         break;
       case 'Enter': {
-        // Commit and close, like clicking out, while keeping focus here.
+        // Commit and close, like clicking out, while keeping focus here. Back and category rows
+        // move between the list's levels instead, so the list stays open.
         event.preventDefault();
         const item = open && active >= 0 ? items[active] : undefined;
-        if (item?.kind === 'category') {
+        if (item?.kind === 'category' || item?.kind === 'back') {
           pick(item);
           break;
         }
@@ -265,9 +288,10 @@ export function SmartInput({
 
   // A fixed-height placeholder keeps the page layout still; the shell inside it grows downward
   // over the page when the list opens, so field and list read as one shape. The edge is a real
-  // two-pixel border, which nothing inside can paint over.
+  // two-pixel border, which nothing inside can paint over. Inside, the chip and the trailing
+  // button keep the same 8 px from the top, bottom, and right edges (docs/DESIGN-SYSTEM.md, "Fields").
   return (
-    <div className="relative h-14 min-w-0">
+    <div className="relative h-16 min-w-0">
       <div
         className={`absolute inset-x-0 top-0 overflow-hidden rounded-lg border-2 bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard focus-within:border-accent ${
           open ? 'z-20 border-accent shadow-md' : 'border-line shadow-sm'
@@ -277,7 +301,7 @@ export function SmartInput({
         <label htmlFor={inputId} className="sr-only">
           {label}
         </label>
-        <div className="flex h-13 items-center gap-2 px-3">
+        <div className="flex h-15 items-center gap-2 pr-2 pl-4">
           <div className="relative min-w-0 flex-1 self-stretch">
             <input
               ref={inputRef}
@@ -288,13 +312,13 @@ export function SmartInput({
               aria-controls={open ? listboxId : undefined}
               aria-activedescendant={open && active >= 0 ? optionId(active) : undefined}
               aria-autocomplete="list"
-              aria-describedby={describedBy}
+              aria-describedby={box.message ? `${describedBy} ${messageId}` : describedBy}
               autoComplete="off"
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
               enterKeyHint="done"
-              placeholder={box.unit ? '0' : 'Type 5 ml, feet, °F…'}
+              placeholder={placeholder}
               value={box.text}
               onChange={onChange}
               onKeyDown={onKeyDown}
@@ -305,11 +329,23 @@ export function SmartInput({
             <div ref={mirrorRef} aria-hidden="true" className={`${MIRROR} ${sizeClass}`}>
               <NumberText text={box.text} valueText={suggestion.parsed.valueText} />
             </div>
+            {box.message && (
+              <div
+                id={messageId}
+                className="pointer-events-none absolute inset-0 flex items-center text-base font-medium text-danger sm:text-lg"
+              >
+                <span className="truncate">{box.message}</span>
+              </div>
+            )}
           </div>
           {box.unit && (
+            // Out of the Tab order: Tab goes to the next box, and the field's own keys do what
+            // the chip does (Down or typing lists the units; Backspace on an empty field or
+            // Escape removes the unit). Pointers and screen readers still reach both buttons.
             <UnitChip
               unit={box.unit}
               compact={box.text.length > COMPACT_CHIP}
+              inTabOrder={false}
               onOpen={() => {
                 showList(box.unit ? { scope: box.unit.category } : null);
                 focusInput();
@@ -328,14 +364,7 @@ export function SmartInput({
             items={items}
             activeIndex={active}
             optionId={optionId}
-            onBack={
-              scope !== null
-                ? () => {
-                    showList({ scope: 'all' });
-                    focusInput();
-                  }
-                : undefined
-            }
+            query={noMatch ? undefined : query}
             scopeName={scopeName}
             message={message}
             showCategory={scope === null || widened}
@@ -346,6 +375,19 @@ export function SmartInput({
       </div>
     </div>
   );
+}
+
+/**
+ * A few units an empty box could take once the other box has chosen its category, in display
+ * order (most common first) and without the other box's unit: "L, tsp, tbsp…" beside milliliters.
+ */
+function scopedExamples(scope: CategoryId, counterpart: Unit | null, mode: Mode): string {
+  const symbols = search('', { category: scope, tier: mode })
+    .results.flatMap((result) =>
+      result.kind === 'unit' && result.unit.id !== counterpart?.id ? [result.unit.symbol] : [],
+    )
+    .slice(0, 3);
+  return `${symbols.join(', ')}…`;
 }
 
 /**

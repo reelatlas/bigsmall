@@ -1,7 +1,7 @@
-import { getCategory, type CategoryId } from '@bigsmall/core';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { getCategory } from '@bigsmall/core';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Button } from '../../components/Button';
-import { CopyIcon, RedoIcon, SwapIcon, UndoIcon } from '../../components/icons';
+import { CopyIcon, EraserIcon, RedoIcon, SwapIcon, UndoIcon } from '../../components/icons';
 import { useIsHydrated } from '../../lib/hydrated';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
@@ -9,7 +9,17 @@ import { useConverter } from './useConverter';
 
 const COPIED_MS = 1500;
 
-/** The converter island: category label, two linked smart inputs, swap, undo and redo, status lines, live region. */
+/** What each empty box suggests before anything scopes it; the second shows a category can be typed too. */
+const EXAMPLES: Record<BoxId, string> = {
+  a: '5 ml, feet, °F…',
+  b: '2 kg, inches, speed…',
+};
+
+/**
+ * The converter island: the hint with undo, redo, and clear all, two linked smart inputs with
+ * swap between them, the category label under the box the conversion is anchored on, and the
+ * live region.
+ */
 export function Converter() {
   const { state, view, env, dispatch, canUndo, canRedo, escapeTargets, announcement } =
     useConverter();
@@ -17,13 +27,14 @@ export function Converter() {
   const hintId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const [copiedBox, setCopiedBox] = useState<BoxId | null>(null);
-  /** The category a list is being browsed in, while one is open; the locked category otherwise. */
-  const [browsing, setBrowsing] = useState<Record<BoxId, CategoryId | null>>({ a: null, b: null });
-  const onBrowse = useCallback((box: BoxId, category: CategoryId | null) => {
-    setBrowsing((prev) => (prev[box] === category ? prev : { ...prev, [box]: category }));
-  }, []);
-  const categoryId = browsing.a ?? browsing.b ?? view.category;
-  const categoryName = categoryId ? getCategory(categoryId)?.name : undefined;
+  const categoryName = view.category ? getCategory(view.category)?.name : undefined;
+  const isEmpty = !state.a.text && !state.a.unit && !state.b.text && !state.b.unit;
+
+  /** Clear both boxes (undoable like any other step) and put the caret back in the first box. */
+  const clearAll = () => {
+    dispatch({ type: 'clear' });
+    sectionRef.current?.querySelector<HTMLInputElement>('input[role="combobox"]')?.focus();
+  };
 
   // Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes anywhere inside the converter,
   // replacing the text field's own undo so "undo" always means the last thing the user did here.
@@ -67,6 +78,9 @@ export function Converter() {
       <Button
         variant="ghost"
         square
+        nested
+        // Out of the Tab order so Tab goes box to box; focusing a result selects it for Ctrl+C.
+        tabIndex={-1}
         aria-label={copiedBox === box.id ? 'Copied' : `Copy ${label}`}
         onClick={() => copy(value, box.id)}
       >
@@ -75,6 +89,39 @@ export function Converter() {
     );
   };
 
+  /**
+   * The category label sits under the box the conversion is anchored on, at that box's outer
+   * edge, so it says both what kind of units these are and which side is driving. A switch of
+   * category shows here first ("Switched to Temperature") until the next change.
+   */
+  const caption = (id: BoxId) => (
+    <p
+      aria-live="polite"
+      data-category-label={id}
+      className={`mt-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted ${id === 'b' ? 'text-right' : ''}`}
+    >
+      {view.anchor === id ? (view.notice ?? categoryName ?? '') : ''}
+    </p>
+  );
+
+  const field = (box: BoxView, label: string, counterpart: BoxView, placement: string) => (
+    <div className={`min-w-0 ${placement}`}>
+      <SmartInput
+        box={box}
+        label={label}
+        describedBy={hintId}
+        mode={state.mode}
+        env={env}
+        dispatch={dispatch}
+        escapeTarget={escapeTargets[box.id]}
+        examples={EXAMPLES[box.id]}
+        counterpart={counterpart.unit}
+        trailing={copyButton(box, label.toLowerCase())}
+      />
+      {caption(box.id)}
+    </div>
+  );
+
   return (
     <section
       ref={sectionRef}
@@ -82,55 +129,11 @@ export function Converter() {
       className="mt-6"
       data-hydrated={hydrated ? '' : undefined}
     >
-      <p
-        aria-live="polite"
-        className="mb-2 min-h-5 text-center text-sm font-medium text-ink-muted"
-        data-category-label
-      >
-        {categoryName ?? ''}
-      </p>
-      <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-[1fr_auto_1fr]">
-        <SmartInput
-          box={view.a}
-          label="First value"
-          describedBy={hintId}
-          mode={state.mode}
-          env={env}
-          dispatch={dispatch}
-          escapeTarget={escapeTargets.a}
-          onBrowse={onBrowse}
-          trailing={copyButton(view.a, 'first value')}
-        />
-        <div className="flex justify-center sm:pt-1.5">
-          <Button
-            variant="secondary"
-            square
-            aria-label="Swap sides"
-            onClick={() => dispatch({ type: 'swap' })}
-          >
-            <SwapIcon className="rotate-90 sm:rotate-0" />
-          </Button>
-        </div>
-        <SmartInput
-          box={view.b}
-          label="Second value"
-          describedBy={hintId}
-          mode={state.mode}
-          env={env}
-          dispatch={dispatch}
-          escapeTarget={escapeTargets.b}
-          onBrowse={onBrowse}
-          trailing={copyButton(view.b, 'second value')}
-        />
-      </div>
-
-      <div className="mt-3 flex items-start justify-between gap-3">
-        <p id={hintId} className="text-sm text-ink-muted">
-          Type a number, a unit, or both into either box, like{' '}
-          <span className="font-numeric text-ink">5 ml</span>, then press Enter. The other box
-          follows.
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <p id={hintId} className="pt-3 text-sm text-ink-muted">
+          Type a number, unit, or both. Once each box has a unit, typing in one updates the other.
         </p>
-        <div className="flex shrink-0 gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           <Button
             variant="ghost"
             square
@@ -151,18 +154,40 @@ export function Converter() {
           >
             <RedoIcon />
           </Button>
+          {/* Clearing is a different kind of step from undo and redo, so a thin rule sets it apart. */}
+          <span aria-hidden="true" className="mx-1 h-6 w-px bg-line" />
+          <Button
+            variant="ghost"
+            square
+            aria-label="Clear all"
+            title="Clear all"
+            disabled={isEmpty}
+            onClick={clearAll}
+          >
+            <EraserIcon />
+          </Button>
         </div>
       </div>
-      {view.notice && (
-        <p role="status" className="mt-2 text-sm text-ink">
-          {view.notice}
-        </p>
-      )}
-      {view.error && (
-        <p role="alert" className="mt-2 text-sm text-danger">
-          {view.error}
-        </p>
-      )}
+
+      {/*
+        The DOM order is first box, second box, swap, so Tab goes from one value straight to the
+        other; the grid still draws swap between them (docs/UX-SPEC.md §18).
+      */}
+      <div className="grid grid-cols-1 items-start gap-x-3 gap-y-2 sm:grid-cols-[1fr_auto_1fr]">
+        {field(view.a, 'First value', view.b, 'row-start-1 sm:col-start-1')}
+        {field(view.b, 'Second value', view.a, 'row-start-3 sm:col-start-3 sm:row-start-1')}
+        <div className="row-start-2 flex justify-center sm:col-start-2 sm:row-start-1 sm:pt-2.5">
+          <Button
+            variant="secondary"
+            square
+            aria-label="Swap sides"
+            onClick={() => dispatch({ type: 'swap' })}
+          >
+            <SwapIcon className="rotate-90 sm:rotate-0" />
+          </Button>
+        </div>
+      </div>
+
       <p aria-live="polite" className="sr-only">
         {announcement ?? ''}
       </p>

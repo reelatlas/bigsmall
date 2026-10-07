@@ -75,11 +75,7 @@ test('every phrase fits the name’s width in every theme, on one line or two', 
   }
 });
 
-test('the art flips to a symbol, and its drawing comes home when play stops', async ({
-  page,
-  isMobile,
-}) => {
-  test.skip(isMobile, 'the art shows from the sm breakpoint up');
+test('the art flips to a symbol, and its drawing comes home when play stops', async ({ page }) => {
   await openLab(page);
   await page.getByLabel('Art flips to a symbol').fill('1');
   const pinned = page.getByLabel('Play without hovering');

@@ -430,7 +430,6 @@ export function SmartInput({
             <UnitChip
               unit={box.unit}
               compact={box.text.length > COMPACT_CHIP_AFTER || box.message !== null}
-              inTabOrder={false}
               onOpen={() => {
                 showList(box.unit ? box.unit.category : null);
                 focusInput();

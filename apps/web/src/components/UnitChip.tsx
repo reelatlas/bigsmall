@@ -10,11 +10,6 @@ export interface UnitChipProps {
   onOpen: () => void;
   /** Called when the user removes the chip. */
   onRemove: () => void;
-  /**
-   * False takes both buttons out of the Tab order, for a host whose own keys already change and
-   * remove the unit (the smart input). They stay clickable and visible to screen readers.
-   */
-  inTabOrder: boolean;
 }
 
 // The chip lives inside a field: its corners nest inside the field's (docs/DESIGN-SYSTEM.md, "Fields").
@@ -30,8 +25,10 @@ const HOVER = 'transition-colors hover:bg-surface/40';
  * reads (SuggestionPanel), which open the unit list, plus a remove control. Collapsed, the symbol
  * stands alone in the ink color.
  */
-export function UnitChip({ unit, compact, onOpen, onRemove, inTabOrder }: UnitChipProps) {
-  const tabIndex = inTabOrder ? undefined : -1;
+export function UnitChip({ unit, compact, onOpen, onRemove }: UnitChipProps) {
+  // Both buttons stay out of the Tab order: the field's own keys change and remove the unit
+  // (docs/UX-SPEC.md §5). They stay clickable and visible to screen readers.
+  const tabIndex = -1;
   return (
     <span className={CHIP}>
       <button

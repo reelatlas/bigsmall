@@ -5,13 +5,8 @@ import { Button } from './Button';
 import { KeyboardIcon } from './icons';
 import { Keycap } from './Keycap';
 
-interface Props {
-  id?: string;
-}
-
-const { id = 'shortcuts' } = Astro.props;
-const panelId = `${id}-panel`;
-const titleId = `${id}-title`;
+const panelId = 'shortcuts-panel';
+const titleId = 'shortcuts-title';
 
 /*
  * The keyboard shortcuts map. At rest it is the same ghost icon button as undo, redo, and clear

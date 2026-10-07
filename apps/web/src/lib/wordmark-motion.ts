@@ -44,14 +44,14 @@ const FLAP_STRETCH_MARGIN = 0.97;
 const MEASURE_PX = 100;
 
 /** Sets a step on a line: its size in place of any other, and tight leading for two lines. */
-export function setStep(line: HTMLElement, step: FitStep): void {
+function setStep(line: HTMLElement, step: FitStep): void {
   line.classList.remove(...WORDMARK_SIZES);
   line.classList.add(step.size);
   line.classList.toggle('leading-tight', step.lines === 2);
 }
 
 /** The width of a line's text, however the line itself is laid out. */
-export function textWidth(line: HTMLElement): number {
+function textWidth(line: HTMLElement): number {
   const range = document.createRange();
   range.selectNodeContents(line);
   return range.getBoundingClientRect().width;
@@ -100,7 +100,7 @@ export function fitPhrase(
 }
 
 /** A change ready to play: the glyphs it lands on, broken for two lines, and their flips. */
-export interface Change {
+interface Change {
   glyphs: string[];
   plan: string[][];
 }
@@ -110,7 +110,7 @@ export interface Change {
  * font, letting a flip glyph be as much wider than its letter as the phrase leaves room for, less
  * a little for kerning. Every frame of the change then fits where the phrase does.
  */
-export function prepare(
+function prepare(
   line: HTMLElement,
   phrase: string,
   room: number,
@@ -157,7 +157,7 @@ export function play(
   first?: PointerEvent,
 ): WordmarkPlayer {
   const line = zone.querySelector<HTMLElement>('[data-wordmark]')!;
-  const box = line.parentElement!;
+  const box = zone.querySelector<HTMLElement>('[data-wordmark-box]')!;
   const artBox = zone.querySelector<HTMLElement>('[data-art-box]');
   const artLine = zone.querySelector<HTMLElement>('[data-art-line]');
   const drawing = zone.querySelector<HTMLElement>('[data-theme-art]');

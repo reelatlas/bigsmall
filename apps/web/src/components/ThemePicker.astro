@@ -3,12 +3,7 @@ import { SHELL, SHELL_BORDERED, SHELL_PANEL } from '../lib/recipes';
 import { DEFAULT_LIGHT, THEMES } from '../lib/themes';
 import { ChevronDownIcon } from './icons';
 
-interface Props {
-  id?: string;
-}
-
-const { id = 'theme' } = Astro.props;
-const menuId = `${id}-menu`;
+const menuId = 'theme-menu';
 const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
 
 /*
@@ -60,7 +55,7 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
         <label class="flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink focus-ring-within-inset hover:bg-surface-raised has-checked:bg-accent-soft">
           <input
             type="radio"
-            name={`${id}-option`}
+            name="theme-option"
             value={t.id}
             data-theme-option
             data-shell-initial

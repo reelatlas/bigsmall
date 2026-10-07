@@ -34,11 +34,7 @@ export function NumberText({ text, parsed, running }: NumberTextProps) {
   return (
     <>
       {pieces}
-      {running !== null && (
-        <span className="text-ink-muted" data-running>
-          {` = ${running}`}
-        </span>
-      )}
+      {running !== null && <span className="text-ink-muted">{` = ${running}`}</span>}
     </>
   );
 }

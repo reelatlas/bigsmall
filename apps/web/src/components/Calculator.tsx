@@ -230,7 +230,7 @@ export function Calculator({
         </Button>
       </div>
       {/* The display has a field's size and edge, so it reads as where the typing goes. */}
-      <div className="mb-3 rounded-lg border-2 border-edge bg-surface" data-calculator-display>
+      <div className="mb-3 rounded-lg border-2 border-edge bg-surface">
         <div className={FIELD_ROW}>
           <div ref={displayRef} className={cx(DISPLAY_TEXT, size)} data-entry>
             {display || <span className="text-ink-muted">0</span>}

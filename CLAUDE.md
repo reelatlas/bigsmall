@@ -36,6 +36,7 @@ pnpm lint
 pnpm format         # or format:check
 pnpm typecheck      # tsc for core, astro check for web
 pnpm check          # lint + format check + typecheck + test + build + bundle check: CI's verify job
+pnpm --filter @bigsmall/web brand   # redraw the icons and the link preview image from the Daylight tokens
 ```
 
 ## Recipes
@@ -47,6 +48,7 @@ pnpm check          # lint + format check + typecheck + test + build + bundle ch
 - **Add a keyboard shortcut:** handle the key in code, add it to `apps/web/src/lib/shortcuts.ts` (the shortcuts map renders from it), and describe it in `docs/UX-SPEC.md` §8.
 - **Add a header menu:** reuse the shell controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`) and the shell recipes in `src/lib/recipes.ts`, and place it in `components/HeaderMenus.astro`. No new script.
 - **Add a UI delay:** a named constant in `apps/web/src/lib/timing.ts`, never a literal number of milliseconds.
+- **Change the icon or the link preview:** edit the mark in `apps/web/scripts/brand-assets.mjs` (or the name or description in `src/lib/site.ts`), run the `brand` command, and commit what it writes to `apps/web/public/`.
 - **Ship:** push to `main`. CI must pass before Vercel promotes the build to `bigsmall.work` (`docs/DEPLOYMENT.md`).
 
 ## Commits

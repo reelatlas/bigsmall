@@ -12,7 +12,7 @@ Current behavior of the milestone 2 build, 2026-10-06. This document describes w
 - **Category label.** Under the box the conversion is anchored on (§6), left-aligned with the value.
 - **Calculator.** When open, a scratch pad below the boxes (§8).
 - **Not found.** Any unknown address shows the site's header, then "Page not found", "Address may be mistyped or the page may have moved.", and a link back to the converter.
-- **Title and description.** The converter page's title is "bigsmall · unit converter", and search results and link previews describe it as "An efficient unit converter."
+- **Title and description.** The converter page's title is "bigsmall · unit converter", and search results and link previews describe it as "An efficient unit converter." A shared link also shows the preview card: the mark beside "bigsmall" over "efficient unit converter" (docs/DESIGN-SYSTEM.md, "Brand assets").
 - Field geometry, corners, and the fluid-shell pattern are in docs/DESIGN-SYSTEM.md ("Fields", "Fluid shells").
 
 ## 2. Parsing

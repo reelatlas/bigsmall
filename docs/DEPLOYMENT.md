@@ -10,6 +10,7 @@ How the site is built and served, the one-time setup behind it, and how to relea
 - **CI stays the gate.** Vercel's Deployment Checks hold each production deployment until the two GitHub Actions jobs pass (docs/TESTING.md, "CI"), so a failing push never reaches `bigsmall.work`.
 - **Headers** (`apps/web/vercel.json`): the hashed files under `/_astro/` are cached for a year, since a change gives them a new name; every response asks browsers not to guess content types, to send only the origin as referrer to other sites, never to show the site in a frame, and to keep the camera, microphone, and location off.
 - **Search and previews.** Astro's `site` is `https://bigsmall.work` (`apps/web/astro.config.mjs`): canonical links, the sitemap (`/sitemap-index.xml`, without the `/dev` pages), `robots.txt`, and link previews are built from it. `404.html` answers unknown addresses with status 404. The `/dev` pages are deployed but ask not to be indexed, and nothing links to them.
+- **Icons and the preview image** live in `apps/web/public/` and are drawn by `pnpm --filter @bigsmall/web brand` from the default theme (docs/DESIGN-SYSTEM.md, "Brand assets").
 
 ## One-time setup
 
@@ -43,6 +44,7 @@ At Porkbun, for `bigsmall.work` and then `bigsmall.diy` (**Domain Management →
 - `https://bigsmall.work` shows the converter; `http://` and `www.` addresses land on it.
 - `https://bigsmall.diy` lands on `https://bigsmall.work` with a 308.
 - `https://bigsmall.work/no-such-page` shows "Page not found" with the way back.
+- A link pasted into a chat shows the preview card; the tab shows the icon.
 - `https://bigsmall.work/robots.txt` and `/sitemap-index.xml` load.
 
 ## Releasing

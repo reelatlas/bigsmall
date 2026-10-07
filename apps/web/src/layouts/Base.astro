@@ -15,6 +15,7 @@ interface Props {
 const { title, description = SITE.description, noindex = false } = Astro.props;
 // Absolute addresses on the main domain (astro.config.mjs `site`), as link previews require.
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const image = new URL(SITE.image, Astro.site);
 const themeIds = THEMES.map((t) => t.id);
 const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
 ---
@@ -28,12 +29,19 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={SITE.imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
     <script
       define:vars={{
         ids: themeIds,

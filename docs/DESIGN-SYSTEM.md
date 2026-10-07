@@ -237,6 +237,19 @@ A visual or motion behavior with more than a couple of settings gets a lab page 
 
 `/dev/wordmark-lab` is the first. It plays the header's wordmark with live settings (timing, pointer response, the mix of phrase kinds, the art's chances, the type steps), can play it without hovering, hold a phrase, show any phrase, or simulate pointer speed, and lists every phrase set in a box the name's size in the page theme. The sheet marks a phrase too long at every step, and a browser test fails if any theme has one.
 
+## Brand assets
+
+The mark is a big circle and a small one on one baseline, on a rounded tile in the accent: it reads like the name, big then small. `apps/web/scripts/brand-assets.mjs` draws it, and everything made from it, from the Daylight theme's tokens into `apps/web/public/`:
+
+| File                   | Use                                                                                                                                     |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `icon.svg`             | The tab icon, in browsers that take SVG                                                                                                 |
+| `favicon.ico`          | The tab icon elsewhere, at 16 and 32 px                                                                                                 |
+| `apple-touch-icon.png` | The home-screen icon on iOS: 180 px and square, since iOS rounds the corners itself                                                     |
+| `og.png`               | The link preview, 1200 × 630: the mark beside the name and the line under it (`SITE.tagline` in `src/lib/site.ts`), in the display face |
+
+Run `pnpm --filter @bigsmall/web brand` after changing the mark, the Daylight colors, the name, or the tagline, and commit what it writes. The files are images, so the token guard does not reach them; their colors come from the theme file. Introduced 2026-10-07 as a trial in its own commit: reverting it leaves the browser's default icon and no preview image.
+
 ## Adding a component
 
 1. Check the inventory. Extend before you add.

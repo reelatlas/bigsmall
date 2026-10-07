@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "typecheck": "astro check",
     "test": "vitest run",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "brand": "node scripts/brand-assets.mjs"
   },
   "dependencies": {
     "@astrojs/preact": "^6.0.5",

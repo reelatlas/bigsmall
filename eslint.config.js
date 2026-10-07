@@ -77,7 +77,7 @@ export default tseslint.config(
       ...reactHooks.configs['recommended-latest'].rules,
     },
   },
-  // Node-side files in the web app (tests, configs).
+  // Node-side files: the web app's tests, configs, and scripts, and the repo's scripts.
   {
     files: [
       'apps/web/test/**',
@@ -85,6 +85,7 @@ export default tseslint.config(
       'apps/web/*.config.ts',
       'apps/web/*.config.mjs',
       'scripts/**/*.mjs',
+      'apps/web/scripts/**/*.mjs',
     ],
     languageOptions: { globals: { ...globals.node } },
   },

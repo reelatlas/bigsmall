@@ -30,6 +30,10 @@ test('pages tell search engines and link previews what they are; dev pages stay 
     'href',
     'https://bigsmall.work/',
   );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://bigsmall.work/og.png',
+  );
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
   for (const path of ['/dev/gallery', '/dev/wordmark-lab']) {
     await page.goto(path);

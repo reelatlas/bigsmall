@@ -223,7 +223,7 @@ export function Converter() {
         The hint has a line of its own, and the toolbar the next one, flush left over the boxes it
         acts on, so what to do and the tools to do it with read apart (docs/UX-SPEC.md §1).
       */}
-      <div className="mb-2 flex flex-col gap-3">
+      <div className="mb-2 flex flex-col gap-2">
         <p id={hintId} className="text-sm text-ink-muted">
           Type a number, unit, or both. Once each box has a unit, typing in one updates the other.
         </p>

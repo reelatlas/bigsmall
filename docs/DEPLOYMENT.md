@@ -22,7 +22,7 @@ Done once by the owner in the Vercel and Porkbun dashboards; Claude never signs 
 2. Keep what Vercel detects: **Root Directory** `apps/web` and the **Astro** preset, with the build and output overrides off.
 3. Under **Environment Variables**, add `ENABLE_EXPERIMENTAL_COREPACK` with the value `1` for production and preview.
 4. **Deploy.** In the build log, check `pnpm 12` installs the dependencies and Node is 24. The site then answers at the project's `vercel.app` address.
-5. In **Settings → Deployment Checks**, add the two CI jobs ("Lint, format, typecheck, test, build" and "Browser and accessibility checks") and mark both required.
+5. In **Settings → Deployment Checks**, **Add Checks**, choose **GitHub**, and open **Select checks to add**. Turn on **Show All Checks**: without it the list shows only checks that report through Vercel's own action, and is empty. Tick the two CI jobs, "Lint, format, typecheck, test, build" and "Browser and accessibility checks", and **Save**; both then show as GitHub checks for Production. Skip "Send workflow updates to Vercel", which is for workflows Vercel starts; CI runs on pushes. Remove Vercel's native Lint and TypeCheck checks if they are listed: CI runs both, so the gate stays in one place. (Done 2026-10-07.)
 
 ### Domains
 

@@ -476,3 +476,9 @@ Format:
 
 **What happened.** Enter that commits a unit now moves the caret to the other box. Focusing it inside the key handler would run its focus handler with the props from before the commit: a box that just got its category would highlight the row the unscoped list had there, the Back row, instead of the best match.
 **Rule.** When an action moves focus to a component its own state change affects, record the request in state and move focus in a layout effect once the commit has rendered, still before the next key (the converter's `entered`). A browser test checks the other box opens with its best match highlighted.
+
+## 2026-10-07 — Vercel hides plain GitHub checks behind "Show All Checks"
+
+**What happened.** Adding the CI jobs as Deployment Checks, Vercel's GitHub import said "No configured checks found". It lists only checks that report through its `repository-dispatch` status action unless **Show All Checks** is on; with it on, both jobs were there. That action is only needed for workflows Vercel triggers, not for CI on pushes.
+**Rule.** Import ordinary GitHub Actions jobs with Show All Checks on, and leave the workflow alone. Keep one gate: Vercel's native Lint and TypeCheck checks duplicate CI and are removed.
+**Promoted** to docs/DEPLOYMENT.md, "The Vercel project", step 5.

@@ -1,6 +1,16 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { DEFAULT_LIGHT, THEMES } from '../src/lib/themes';
-import { applyTheme, expectNoA11yViolations, pickTheme, ready, settled } from './support';
+import type { Layout } from '../src/lib/layout';
+import {
+  applyTheme,
+  chooseLayout,
+  expectNoA11yViolations,
+  pickTheme,
+  ready,
+  settled,
+} from './support';
+
+const LAYOUT_NAMES: Record<Layout, string> = { table: 'table', boxes: 'two-box' };
 
 // Checks that span the site: every page and every theme pass axe, every Tab stop shows focus,
 // and reduced motion stills every theme. Each feature's flows have a file of their own.
@@ -44,22 +54,40 @@ test('pages tell search engines and link previews what they are; dev pages stay 
 
 test('a conversion loads from the URL', async ({ page }) => {
   await page.goto('/?a=mile&b=kilometer&v=1&s=a');
-  await expect(page.getByRole('combobox', { name: 'Second value' })).toHaveValue('1.609344');
+  await expect(page.getByRole('combobox', { name: 'Value' })).toHaveValue('1');
+  await expect(page.locator('li[data-headline]')).toContainText('1.60934');
 });
 
-test('every theme passes axe when applied to the page', async ({ page }) => {
-  await page.goto('/');
-  for (const theme of THEMES.filter((t) => t.id !== DEFAULT_LIGHT)) {
-    await pickTheme(page, theme.name);
-    await expect(page.locator('html'), theme.id).toHaveAttribute('data-theme', theme.id);
+for (const layout of ['table', 'boxes'] as const) {
+  test(`every theme passes axe on the ${LAYOUT_NAMES[layout]} layout`, async ({ page }) => {
+    await chooseLayout(page, layout);
+    // A conversion on screen, so the table's rows are checked too.
+    await page.goto('/?a=mile&b=kilometer&v=1&s=a');
+    await ready(page);
     await expectNoA11yViolations(page);
-  }
-});
+    for (const theme of THEMES.filter((t) => t.id !== DEFAULT_LIGHT)) {
+      await pickTheme(page, theme.name);
+      await expect(page.locator('html'), theme.id).toHaveAttribute('data-theme', theme.id);
+      await expectNoA11yViolations(page);
+    }
+  });
+}
 
-test('every Tab stop shows a visible focus indicator', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'a keyboard walk needs a keyboard');
-  await page.goto('/?a=mile&b=kilometer&v=1&s=a');
-  await ready(page);
+for (const layout of ['table', 'boxes'] as const) {
+  test(`every Tab stop shows a visible focus indicator on the ${LAYOUT_NAMES[layout]} layout`, async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'a keyboard walk needs a keyboard');
+    await chooseLayout(page, layout);
+    await page.goto('/?a=mile&b=kilometer&v=1&s=a');
+    await ready(page);
+    await walkTabStops(page);
+  });
+}
+
+/** Tabs through the page's first stops and fails on any that shows no focus indicator. */
+async function walkTabStops(page: Page) {
   const missing: string[] = [];
   for (let stop = 0; stop < 10; stop += 1) {
     await page.keyboard.press('Tab');
@@ -93,7 +121,7 @@ test('every Tab stop shows a visible focus indicator', async ({ page, isMobile }
     if (result && !result.ok) missing.push(result.name);
   }
   expect(missing).toEqual([]);
-});
+}
 
 test('reduced motion zeroes the motion tokens in every theme', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });

@@ -25,6 +25,8 @@ Later the same day two friends added ideas from their own work. Neither is sched
 - Every category at once waits.
 - No A/B test: the switch, and the five-person test run on the table layout.
 
+Built on 2026-10-07: swap in the toolbar first, then the table, its headline, moving a row into the box, the switch beside the theme menu, and rows at 6 significant digits (docs/UX-SPEC.md §1, §10; ADR 0009, outcome notes). The test script is rewritten for the table.
+
 ## What the five-person test should now learn
 
 The test (docs/research/usability-test-1.md) no longer decides whether to build the table; it checks how the table works in use:

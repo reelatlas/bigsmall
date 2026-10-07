@@ -93,6 +93,15 @@
   }
 }
 
+/*
+ * The converter's layout (ADR 0009), as the inline script in layouts/Base.astro applied it before
+ * paint. Before the island hydrates, these pick which of the server-rendered empty states shows:
+ * `layout-table:hidden` on what only two boxes have (the second box, swap), `layout-boxes:hidden`
+ * on what only the table has. Once hydrated the island renders one layout and they agree with it.
+ */
+@custom-variant layout-table (&:where(:root:not([data-layout='boxes']) *));
+@custom-variant layout-boxes (&:where(:root[data-layout='boxes'] *));
+
 @layer base {
   html {
     background: var(--canvas);

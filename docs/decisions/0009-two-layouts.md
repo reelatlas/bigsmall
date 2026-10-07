@@ -37,3 +37,13 @@ Behavior: docs/UX-SPEC.md §14, "Table layout and the layout switch".
 - The inline script that applies the theme before paint also applies the layout. The server-rendered page carries both layouts' empty state (the second box and swap shown only in the two-box layout), so the first client render still matches the server's.
 - The calculator's send buttons, the hint, the category label, and the live region each adapt to the layout.
 - Both layouts staying is not settled: if the test and later analytics show nearly everyone in one, a new ADR retires the other.
+
+## Outcome notes (2026-10-07)
+
+Built the same day. Where the build settled what the decision left open:
+
+- **Digits.** Rows, the headline included, show 6 significant digits (Sean's choice), so they compare at a glance; copying a row gives its full value. A row moved into the box brings its value to the box's 10 digits, never the row's 6.
+- **The box.** The table layout shows the source box, whichever it was with two boxes, at most 576 px wide, and the table under it the same width.
+- **"Show all N units"** waits for the modes in milestone 3: every unit is basic today, so the row could not appear.
+- **The header.** The switch makes the menus wider, so they take their own line under 544 px of page width (a 512 px header), not 416; on that line the switch sits right of the theme menu.
+- **Swap** moved into the toolbar first, in its own commit, and is off while both boxes are empty, like clear all.

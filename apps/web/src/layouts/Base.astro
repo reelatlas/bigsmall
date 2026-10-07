@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { DEFAULT_LAYOUT, LAYOUT_STORAGE_KEY } from '../lib/layout';
 import { APPLE_PLATFORM } from '../lib/platform';
 import { SITE } from '../lib/site';
 import { PEEK_CLOSE_MS, PEEK_OPEN_MS } from '../lib/timing';
@@ -49,6 +50,8 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         key: THEME_STORAGE_KEY,
         light: DEFAULT_LIGHT,
         dark: DEFAULT_DARK,
+        layoutKey: LAYOUT_STORAGE_KEY,
+        defaultLayout: DEFAULT_LAYOUT,
         applePlatform: APPLE_PLATFORM.source,
         applePlatformFlags: APPLE_PLATFORM.flags,
         peekOpen: PEEK_OPEN_MS,
@@ -67,19 +70,24 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
           name.textContent = names[id] || id;
         }
       };
-      const readSaved = () => {
+      const readSaved = (name) => {
         try {
-          return localStorage.getItem(key);
+          return localStorage.getItem(name);
         } catch {
           return null;
         }
       };
-      const saved = readSaved();
+      const saved = readSaved(key);
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       apply(ids.includes(saved) ? saved : prefersDark ? dark : light);
       document.addEventListener('DOMContentLoaded', () =>
         apply(document.documentElement.dataset.theme),
       );
+
+      // The converter's layout, table or two boxes (src/lib/layout.ts), before paint too, so the
+      // server-rendered page shows the saved one's empty state (the layout-* variants in global.css).
+      document.documentElement.dataset.layout =
+        readSaved(layoutKey) === 'boxes' ? 'boxes' : defaultLayout;
 
       // Shortcuts name the platform's modifier key: Ctrl, or ⌘ on Apple devices (src/lib/platform.ts).
       const apple = new RegExp(applePlatform, applePlatformFlags).test(

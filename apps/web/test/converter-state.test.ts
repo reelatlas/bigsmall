@@ -7,7 +7,9 @@ import {
   nextBox,
   reduce,
   reduceWithHistory,
+  selectTable,
   selectView,
+  TABLE_PRECISION,
   type ConverterState,
   type History,
   type HistoryAction,
@@ -414,6 +416,148 @@ describe('nextBox', () => {
     );
     expect(v.b.unit).toBeNull();
     expect(nextBox(v, 'a')).toBe('b');
+  });
+});
+
+describe('use', () => {
+  const pair = (): ConverterState =>
+    run(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+    );
+
+  it('moves a row into the box with its value, leaving the headline alone', () => {
+    const s = reduce(pair(), { type: 'use', box: 'a', unit: 'liter', text: '0.25' });
+    expect(s.a).toEqual({ text: '0.25', unit: 'liter' });
+    expect(s.b.unit).toBe('us-cup');
+    expect(s.source).toBe('a');
+  });
+
+  it('gives the headline the box’s old unit when the headline moves in, as swap does', () => {
+    const s = reduce(pair(), { type: 'use', box: 'a', unit: 'us-cup', text: '1.056688209' });
+    expect(s.a).toEqual({ text: '1.056688209', unit: 'us-cup' });
+    expect(s.b).toEqual({ text: '', unit: 'milliliter' });
+  });
+
+  it('makes the box the source', () => {
+    const s = reduce(
+      run({ type: 'input', box: 'b', text: '2', at: 0 }, { type: 'lock', box: 'b', unit: 'liter' }),
+      { type: 'use', box: 'a', unit: 'milliliter', text: '2000' },
+    );
+    expect(s.source).toBe('a');
+  });
+
+  it('ignores unknown units', () => {
+    const s = pair();
+    expect(reduce(s, { type: 'use', box: 'a', unit: 'nope', text: '1' })).toBe(s);
+  });
+
+  it('is one undoable step, after which Escape clears the number, then the unit', () => {
+    let h = steps(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    );
+    h = reduceWithHistory(h, { type: 'use', box: 'a', unit: 'liter', text: '0.25' });
+    expect(h.present.a).toEqual({ text: '0.25', unit: 'liter' });
+    expect(escapeTarget(h, 'a')).toBe('text');
+    const undone = reduceWithHistory(h, { type: 'undo' });
+    expect(undone.present.a).toEqual({ text: '250', unit: 'milliliter' });
+  });
+});
+
+describe('selectTable', () => {
+  const options = { ...EN, locale: 'en-US', system: 'us' as const, tier: 'basic' as const };
+  const table = (...actions: Parameters<typeof reduce>[1][]) =>
+    selectTable(run(...actions), options);
+
+  it('waits for a number and a unit', () => {
+    expect(table()).toBeNull();
+    expect(table({ type: 'input', box: 'a', text: '250', at: 0 })).toBeNull();
+    expect(table({ type: 'lock', box: 'a', unit: 'milliliter' })).toBeNull();
+  });
+
+  it('lists every unit of the category in the list’s order, the box’s own marked', () => {
+    const t = table(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    )!;
+    expect(t.box).toBe('a');
+    expect(t.category).toBe('volume');
+    expect(t.headline).toBeNull();
+    expect(t.rows.map((row) => row.id)).toContain('liter');
+    expect(t.rows.filter((row) => row.inBox).map((row) => row.id)).toEqual(['milliliter']);
+    const liter = t.rows.find((row) => row.id === 'liter')!;
+    expect(liter.text).toBe('0.25');
+    expect(liter.value).toBeCloseTo(0.25, 12);
+    expect(liter.name).toBe('liters');
+  });
+
+  it(`shows ${TABLE_PRECISION} significant digits and keeps the full value behind them`, () => {
+    const t = table(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    )!;
+    const cups = t.rows.find((row) => row.id === 'us-cup')!;
+    expect(cups.text).toBe('1.05669');
+    expect(cups.value).toBeCloseTo(1.056688209, 9);
+  });
+
+  it('heads the table with the second unit and leaves it out of the rows', () => {
+    const t = table(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+    )!;
+    expect(t.headline?.id).toBe('us-cup');
+    expect(t.rows.some((row) => row.id === 'us-cup')).toBe(false);
+    expect(t.announcement).toBe('250 milliliters is 1.05669 cups');
+  });
+
+  it('converts from the source, whichever box it is', () => {
+    const t = table(
+      { type: 'input', box: 'b', text: '2', at: 0 },
+      { type: 'lock', box: 'b', unit: 'liter' },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    )!;
+    expect(t.box).toBe('b');
+    expect(t.headline?.id).toBe('milliliter');
+    expect(t.headline?.text).toBe('2,000');
+  });
+
+  it('names one unit in the singular', () => {
+    const t = table(
+      { type: 'input', box: 'a', text: '1000', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    )!;
+    expect(t.rows.find((row) => row.id === 'liter')?.name).toBe('liter');
+  });
+
+  it('says once when the value has no answer, and per row when one unit cannot hold it', () => {
+    const none = table(
+      { type: 'input', box: 'a', text: '1e400', at: 0 },
+      { type: 'lock', box: 'a', unit: 'kilometer' },
+    )!;
+    expect(none.message).toBe('Too large to convert');
+    expect(none.rows).toEqual([]);
+    expect(none.announcement).toBe('1e400 kilometers is too large to convert');
+
+    const some = table(
+      { type: 'input', box: 'a', text: '1e306', at: 0 },
+      { type: 'lock', box: 'a', unit: 'kilometer' },
+    )!;
+    const mm = some.rows.find((row) => row.id === 'millimeter')!;
+    expect(mm.text).toBe('Too large');
+    expect(mm.hasValue).toBe(false);
+    expect(mm.value).toBeNull();
+  });
+
+  it('announces how many units the value is shown in when there is no headline', () => {
+    const t = table(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    )!;
+    expect(t.announcement).toBe(`250 milliliters in ${t.rows.length} units of volume`);
   });
 });
 

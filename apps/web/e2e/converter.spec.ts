@@ -1,8 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
-import { arrowTo, boxes, expectNoA11yViolations, MARGIN_MS, ready } from './support';
+import { arrowTo, boxes, chooseLayout, expectNoA11yViolations, MARGIN_MS, ready } from './support';
 
-// The converter's flows (docs/UX-SPEC.md §2–§9, §11): the two boxes, their lists, and their history.
+// The converter's flows in the two-box layout (docs/UX-SPEC.md §2–§9, §11): the two boxes, their
+// lists, and their history. The table layout's own flows are in table.spec.ts.
+
+test.beforeEach(async ({ page }) => {
+  await chooseLayout(page, 'boxes');
+});
 
 test('typing a number and unit highlights the match; Enter locks it and scopes the other box', async ({
   page,

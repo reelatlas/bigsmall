@@ -1,8 +1,8 @@
 # Usability test 1 — the smart input
 
-Milestone 2 exit gate (docs/PLAN.md §13). Five people, about 20 minutes each, one at a time. The goal is to learn whether the two-box idea is understood without explanation and where the smart input surprises people. Nothing here measures speed. The behavior being tested is described in docs/UX-SPEC.md; its open questions are §15.
+Milestone 2 exit gate (docs/PLAN.md §13). Five people, about 20 minutes each, one at a time. The goal is to learn whether the table layout is understood without explanation, whether people find the two-box layout behind the switch, and where the smart input surprises them. Nothing here measures speed. The behavior being tested is described in docs/UX-SPEC.md; its open questions are §15.
 
-**Revise before running.** The table layout becomes the default (ADR 0009, docs/UX-SPEC.md §14). Once it is built, the tasks and what we watch are rewritten for it, with two boxes on the switch's other side; docs/research/findings-friends-1.md lists what the test should now learn.
+Rewritten for the table layout on 2026-10-07 (ADR 0009). What the test should learn about it is listed in docs/research/findings-friends-1.md.
 
 ## Who
 
@@ -14,17 +14,7 @@ Five participants, recruited from people who are not working on the project:
 
 ## Setup
 
-Until a public preview exists, run a production build from your machine on the same Wi-Fi. The dev server is slower to start on a phone, and anything typed before the page is ready is lost (docs/UX-SPEC.md §13).
-
-```bash
-pnpm build
-```
-
-```bash
-pnpm preview --host
-```
-
-The terminal prints a `Network:` address such as `http://192.168.1.20:4321`. Open it on the participant's phone or laptop. Before they start, open the Theme menu and pick Daylight, since the page otherwise follows the device's dark mode or an earlier choice. Do not demo anything first.
+Use the live site, `https://bigsmall.work`, in a private window on the participant's phone or laptop, so no earlier theme or layout carries over: the layout is then the table, the default. Before they start, open the Theme menu and pick Daylight, since the page otherwise follows the device's dark mode. Wait for the page to finish loading, since anything typed before it is ready is lost (docs/UX-SPEC.md §13). Do not demo anything first.
 
 Record with the participant's consent: screen capture plus audio, or just notes if they prefer. Ask them to think aloud.
 
@@ -34,16 +24,17 @@ Opening (read aloud): "This is an early version of a unit converter. I'm testing
 
 Then the tasks, one at a time. Do not explain the interface between tasks. If they are stuck for a full minute, note it and move on.
 
-| #   | Task (read aloud)                                                                       | What we are watching                                                                                                                                                                                                                                                                                                                          |
-| --- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | "You have a recipe that calls for 250 ml of milk. How many cups is that?"               | Do they type the number and unit together, or look for a dropdown? How do they commit the unit: Enter or picking a row? Does anyone Tab or click away expecting it to commit? Do they notice nothing converts until both boxes have a committed unit? After Enter, the caret moves on to the second box: do they notice, and pick cups there? |
-| 2   | "It's 72 degrees Fahrenheit outside. What is that in Celsius?"                          | Typing "f" or "72 f" vs the name; do they notice the chip; does the result read as a result?                                                                                                                                                                                                                                                  |
-| 3   | "Now go the other way: what is 30 Celsius in Fahrenheit?" (same pair already on screen) | Do they use swap, retype, or type into the other box? Does the category label moving under the box they typed in tell them which side is driving?                                                                                                                                                                                             |
-| 4   | "Convert 5 ounces to grams."                                                            | Two ounces appear, weight and fluid, and the weight ounce is highlighted first. Do they check which one before pressing Enter? Note whether they press Enter, pick a row, or click away (clicking away with "oz" commits neither).                                                                                                            |
-| 5   | "Send this conversion to a friend." (any conversion on screen)                          | Do they look for a share button, copy the URL, or copy the number? Do they notice the copy check?                                                                                                                                                                                                                                             |
-| 6   | "How far is 10 kilometers in miles? Then clear everything and start over."              | Which way do they clear: the eraser button, the chip's ×, Backspace, Escape, or undo? Does Escape stepping back one chunk at a time surprise them?                                                                                                                                                                                            |
+| #   | Task (read aloud)                                                                             | What we are watching                                                                                                                                                                                                                                     |
+| --- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | "You have a recipe that calls for 250 ml of milk. How many cups is that?"                     | Do they type the number and unit together, or look for a dropdown? How do they commit the unit: Enter or picking a row? Does anyone Tab or click away expecting it to commit? Once the table appears, do they find cups in it, or look for a second box? |
+| 2   | "It's 72 degrees Fahrenheit outside. What is that in Celsius?"                                | Typing "f" or "72 f" vs the name; do they notice the chip; do the table's rows read as answers?                                                                                                                                                          |
+| 3   | "Now go the other way: what is 30 Celsius in Fahrenheit?" (the same values already on screen) | Do they tap the Celsius row, which moves it into the box, and type 30; retype "30 c" in the box; or look for a swap? If they tap a row, does what happens match what they expected?                                                                      |
+| 4   | "Convert 5 ounces to grams."                                                                  | Two ounces appear, weight and fluid, and the weight ounce is highlighted first. Do they check which one before pressing Enter? Note whether they press Enter, pick a row, or click away (clicking away with "oz" commits neither).                       |
+| 5   | "Send this conversion to a friend." (any conversion on screen)                                | Do they look for a share button, copy the URL, or copy a number from the box or a row? Do they notice the copy check?                                                                                                                                    |
+| 6   | "How far is 10 kilometers in miles? Then clear everything and start over."                    | Which way do they clear: the eraser button, the chip's ×, Backspace, Escape, or undo? Does Escape stepping back one chunk at a time surprise them?                                                                                                       |
+| 7   | "Some people like to see just two values side by side. Is there a way to do that here?"       | Do they find the layout switch beside the theme menu, and read its icons? Afterwards ask: "Which way do you prefer, and why?"                                                                                                                            |
 
-For a keyboard-only participant, add: "Convert 3 feet to meters using only the keyboard." Watch Tab between the boxes, the arrow keys (including reaching Back), Escape, and whether they find the keyboard shortcuts map.
+For a keyboard-only participant, add: "Convert 3 feet to meters using only the keyboard." Watch Tab into the table (one stop), the arrow keys between its rows and in the box's list (including reaching Back), Enter moving a row into the box, Escape, and whether they find the keyboard shortcuts map.
 
 Closing questions (after the last task): "What did you expect to happen that didn't?" · "If you could change one thing, what?" · "Would you use this instead of what you use now? Why?"
 
@@ -65,7 +56,8 @@ Also log:
 - **Proceed to milestone 3 as planned** if four of five complete tasks 1, 2, and 4 without help.
 - **Revisit the commit cue** (docs/UX-SPEC.md §5) if two or more people leave a unit uncommitted because they expected Tab or clicking away to commit it. Only Enter or a pick commits, by the owner's decision, so the first fix to try is a clearer cue for an uncommitted unit, not an implicit commit.
 - **Rework the ambiguity rows** if people pick the wrong ounce in task 4 more than once.
-- **Strengthen the driving cue** if people cannot tell which box is driving in task 3; the next step would be visible "from" and "to" labels.
+- **Rework moving a row into the box** (docs/UX-SPEC.md §1) if two or more people tap a row in task 3 and are surprised by what happens, or none find it and all retype.
+- **Reconsider the default layout** (ADR 0009) if three or more prefer two boxes in task 7.
 - **Tune Escape and the 700 ms typing chunks** (docs/UX-SPEC.md §9) if two or more people are surprised by what Escape takes back.
 
 Write the findings and the decision in `docs/research/findings-1.md`, then update docs/UX-SPEC.md before changing behavior (CLAUDE.md rule 8).

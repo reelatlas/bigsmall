@@ -1,8 +1,10 @@
 import { DEFAULT_SEPARATORS, getUnit, parse, search } from '@bigsmall/core';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { Button } from '../../../components/Button';
 import { CopiedIcon } from '../../../components/icons';
 import { Calculator, SendButton } from '../../../components/Calculator';
+import { ConversionTable } from '../../../components/ConversionTable';
+import { LayoutSwitch } from '../../../components/LayoutSwitch';
 import { NumberText } from '../../../components/NumberText';
 import {
   BACK_ITEM,
@@ -11,8 +13,9 @@ import {
   type SuggestionItem,
 } from '../../../components/SuggestionPanel';
 import { SmartInput } from '../../../features/converter/SmartInput';
-import type { BoxView } from '../../../features/converter/state';
+import { initialState, selectTable, type BoxView } from '../../../features/converter/state';
 import type { ConverterEnv } from '../../../features/converter/useConverter';
+import type { Layout } from '../../../lib/layout';
 import { cx, FIELD_ROW, NUMBER_SIZES, SHELL, SHELL_BORDERED } from '../../../lib/recipes';
 
 // Gallery-only: the real field in frozen states, so every theme is checked against what ships.
@@ -116,6 +119,7 @@ function CalculatorSample() {
           <>
             <SendButton ordinal="1st" symbol="mL" confirmed unavailable={false} />
             <SendButton ordinal="2nd" confirmed={false} unavailable={false} />
+            <SendButton symbol="mL" confirmed={false} unavailable />
           </>
         }
       />
@@ -157,6 +161,54 @@ function OpenSample() {
   );
 }
 
+/**
+ * The table layout's rows for 250 mL with cups heading them, from the real table view: milliliters
+ * marked as the unit in the box, one copy confirmed. A second table shows a value with no answer.
+ */
+function TableSample() {
+  const table = selectTable(
+    {
+      ...initialState,
+      a: { text: '250', unit: 'milliliter' },
+      b: { text: '', unit: 'us-cup' },
+    },
+    { ...ENV, tier: 'basic' },
+  );
+  if (!table) return null;
+  return (
+    <>
+      <ConversionTable
+        title="Volume"
+        headline={table.headline}
+        rows={table.rows}
+        message={null}
+        copied="liter"
+        onUse={noop}
+        onCopy={noop}
+      />
+      <ConversionTable
+        title="Length"
+        headline={null}
+        rows={[]}
+        message="Too large to convert"
+        copied={null}
+        onUse={noop}
+        onCopy={noop}
+      />
+    </>
+  );
+}
+
+/** The header's layout switch, live here so both options' looks can be checked. */
+function LayoutSwitchSample() {
+  const [layout, setLayout] = useState<Layout>('table');
+  return (
+    <div className="flex">
+      <LayoutSwitch value={layout} onChange={setLayout} />
+    </div>
+  );
+}
+
 export function FieldSamples({ theme }: { theme: string }) {
   return (
     <div className="grid gap-3">
@@ -165,6 +217,8 @@ export function FieldSamples({ theme }: { theme: string }) {
       <ArithmeticSample label={`${theme} arithmetic sample`} />
       <OpenSample />
       <CalculatorSample />
+      <TableSample />
+      <LayoutSwitchSample />
     </div>
   );
 }

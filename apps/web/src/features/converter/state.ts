@@ -1,12 +1,15 @@
 import {
   convert,
   formatNumber,
+  getCategory,
   getUnit,
   parse,
+  search,
   type CategoryId,
   type ParsedInput,
   type Separators,
   type Unit,
+  type UnitPreference,
 } from '@bigsmall/core';
 import { TYPING_CHUNK_MS } from '../../lib/timing';
 
@@ -78,6 +81,8 @@ export type Action =
   /** Replace a box's text without making it the source (used to drop a query after a category pick). */
   | { type: 'setText'; box: BoxId; text: string }
   | { type: 'lock'; box: BoxId; unit: string }
+  /** A row of the table moves into the box: its unit, and its value as text; the box becomes the source. */
+  | { type: 'use'; box: BoxId; unit: string; text: string }
   | { type: 'unlock'; box: BoxId }
   | { type: 'swap' }
   | { type: 'clear' }
@@ -121,6 +126,22 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
           unit: null,
         };
       }
+      return next;
+    }
+
+    case 'use': {
+      // When the row was the headline (the other box's unit), the box's old unit takes its place,
+      // as swap does; any other row leaves the headline alone (docs/UX-SPEC.md §1).
+      const unit = getUnit(action.unit);
+      if (!unit) return state;
+      const otherId = other(action.box);
+      const next: ConverterState = {
+        ...state,
+        [action.box]: { text: action.text, unit: unit.id },
+        source: action.box,
+      };
+      if (state[otherId].unit === unit.id)
+        next[otherId] = { text: '', unit: state[action.box].unit };
       return next;
     }
 
@@ -282,6 +303,134 @@ export function selectView(state: ConverterState, options: NumberEnv): Converter
   };
 }
 
+// ---------------------------------------------------------------------------
+// The table layout (ADR 0009, docs/UX-SPEC.md §1): the source box's value in every unit of its
+// category, the conversion's second unit heading it.
+
+/** Significant digits a row shows: few enough to compare rows at a glance. Copying gives them all. */
+export const TABLE_PRECISION = 6;
+
+/** A row, with what the table component shows (components/ConversionTable.tsx) and what lies behind it. */
+export interface TableRow {
+  unit: Unit;
+  /** The unit's id. */
+  id: string;
+  /** Singular or plural to agree with the value ("1 cup", "2.5 cups"). */
+  name: string;
+  symbol: string;
+  /** The value in this unit at full precision, for copying and for moving into the box; null when a double cannot hold it. */
+  value: number | null;
+  /** As the row shows it: TABLE_PRECISION significant digits, or "Too large" or "Too small". */
+  text: string;
+  /** False while the text is a message: there is nothing to copy or move. */
+  hasValue: boolean;
+  /** The unit in the box. */
+  inBox: boolean;
+}
+
+export interface TableView {
+  /** The box the table converts from: the source, the one box the table layout shows. */
+  box: BoxId;
+  category: CategoryId;
+  /** The conversion's second unit, heading the table; null when it has none. */
+  headline: TableRow | null;
+  /** Every other unit of the category in the list's order, the box's own among them. */
+  rows: TableRow[];
+  /** In place of the rows when the box's value has no answer: "Too large to convert". */
+  message: string | null;
+  /** What the live region says once the table settles. */
+  announcement: string;
+}
+
+export interface TableOptions extends NumberEnv {
+  /** The visitor's unit family, listed first as in the suggestion list. */
+  system: UnitPreference;
+  tier: 'basic' | 'all';
+}
+
+/** The table, once the source box holds a number and a unit; null until then. */
+export function selectTable(state: ConverterState, options: TableOptions): TableView | null {
+  const boxId = state.source;
+  const unit = state[boxId].unit ? getUnit(state[boxId].unit) : undefined;
+  if (!unit) return null;
+  const parsed = parse(state[boxId].text, options.separators);
+  const problem = parsed.outOfRange ?? parsed.invalid;
+  if (parsed.value === undefined && !problem) return null;
+
+  const otherId = state[other(boxId)].unit;
+  const headUnit = otherId ? getUnit(otherId) : undefined;
+  const typed =
+    parsed.expression && parsed.value !== undefined
+      ? formatNumber(parsed.value, { locale: options.locale })
+      : (parsed.valueText ?? '');
+  const from = `${typed} ${unitName(unit, parsed.value ?? Number.NaN)}`.trim();
+  const base = { box: boxId, category: unit.category };
+
+  if (problem || parsed.value === undefined) {
+    const kind = problem ?? 'large';
+    return {
+      ...base,
+      headline: null,
+      rows: [],
+      message: NO_ANSWER_MESSAGES[kind].box,
+      announcement:
+        kind === 'large' || kind === 'small'
+          ? `${from} is too ${kind} to convert`
+          : NO_ANSWER_MESSAGES[kind].box,
+    };
+  }
+
+  const value = parsed.value;
+  const row = (target: Unit): TableRow => {
+    const converted = target.id === unit.id ? value : safeConvert(value, unit, target);
+    const text =
+      converted === undefined
+        ? ''
+        : formatNumber(converted, {
+            precision: TABLE_PRECISION,
+            locale: options.locale,
+          });
+    const tooSmall = converted === 0 && value !== 0;
+    const shown = text && !tooSmall ? (converted ?? null) : null;
+    return {
+      unit: target,
+      id: target.id,
+      name: unitName(target, shown ?? Number.NaN),
+      symbol: target.symbol,
+      value: shown,
+      text: !text
+        ? NO_ANSWER_MESSAGES.large.calculator
+        : tooSmall
+          ? NO_ANSWER_MESSAGES.small.calculator
+          : text,
+      hasValue: shown !== null,
+      inBox: target.id === unit.id,
+    };
+  };
+
+  const listed = search('', {
+    category: unit.category,
+    system: options.system,
+    tier: options.tier,
+  }).results.flatMap((result) => (result.kind === 'unit' ? [result.unit] : []));
+  // A unit from beyond the mode's tier, reached by search, still shows where it is in use.
+  if (!listed.some((u) => u.id === unit.id)) listed.push(unit);
+  const headline = headUnit ? row(headUnit) : null;
+  const rows = listed.filter((u) => u.id !== headUnit?.id).map(row);
+
+  let announcement: string;
+  if (headline && headUnit) {
+    announcement =
+      headline.value === null
+        ? `${from} is ${headline.text.toLowerCase()} to convert to ${headUnit.plural}`
+        : `${from} is ${headline.text} ${unitName(headUnit, headline.value)}`;
+  } else {
+    const kind = getCategory(unit.category)?.name.toLowerCase() ?? '';
+    announcement = `${from} in ${rows.length} units of ${kind}`.trim();
+  }
+  return { ...base, headline, rows, message: null, announcement };
+}
+
 /**
  * Where the caret goes after Enter in `from` (docs/UX-SPEC.md §5): on to the other box when a
  * unit there is all the conversion still needs, this box having its unit and a number to
@@ -315,7 +464,7 @@ function unitName(unit: Unit, value: number): string {
 // Undo, redo, and Escape (docs/UX-SPEC.md §9). The most recent interaction is what gets
 // undone. Typing is grouped into chunks the way editors coalesce undo: keystrokes in one box,
 // or in the calculator, less than TYPING_CHUNK_MS apart belong together, and a space starts a
-// new chunk. A lock, unlock, swap, clear, send, =, or C is its own entry. Escape steps back
+// new chunk. A lock, unlock, swap, use, clear, send, =, or C is its own entry. Escape steps back
 // through the same chunks, one box (or the calculator) at a time, and each step is undoable.
 
 /** What Escape can step back through in one box: a chunk of typing (with the text it started from) or the unit. */
@@ -560,6 +709,15 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
         b: history.entries.a,
         calc: history.entries.calc,
       });
+    case 'use': {
+      // The box holds a new number and unit at once, so its old chunks no longer apply; Escape
+      // then clears the number, then the unit, as for a conversion loaded from a URL. A headline
+      // that took the box's old unit starts over the same way.
+      const otherId = other(action.box);
+      const entries = { ...history.entries, [action.box]: [] };
+      if (present[otherId].unit !== history.present[otherId].unit) entries[otherId] = [];
+      return commit(history, present, null, entries);
+    }
     case 'clear':
       return commit(history, present, null, { ...NO_ENTRIES, calc: history.entries.calc });
   }

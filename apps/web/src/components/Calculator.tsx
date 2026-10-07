@@ -271,8 +271,8 @@ export interface SendButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'children' | 'className' | 'disabled'
 > {
-  /** "1st" or "2nd". */
-  ordinal: string;
+  /** "1st" or "2nd" with two boxes ("Use in 1st"); without one it reads "Use", for the table's one box. */
+  ordinal?: string | undefined;
   /** The box's unit symbol, once it has one. */
   symbol?: string | undefined;
   /** Shows the check that confirms a send, the one copy uses. */
@@ -292,7 +292,7 @@ export function SendButton({ ordinal, symbol, confirmed, unavailable, ...props }
       {...props}
     >
       {confirmed && <CopiedIcon />}
-      <span>Use in {ordinal}</span>
+      <span>{ordinal ? `Use in ${ordinal}` : 'Use'}</span>
       {symbol && <span className="font-semibold">{symbol}</span>}
     </Button>
   );

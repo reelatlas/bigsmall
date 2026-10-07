@@ -5,12 +5,14 @@ import {
   type UnitPreference,
 } from '@bigsmall/core';
 import { useEffect, useMemo, useReducer, useState } from 'react';
+import type { Layout } from '../../lib/layout';
 import { browserLocale, detectRegion } from '../../lib/region';
 import { ANNOUNCE_MS, URL_WRITE_MS } from '../../lib/timing';
 import {
   escapeTarget,
   initialHistory,
   reduceWithHistory,
+  selectTable,
   selectView,
   type BoxId,
   type ConverterState,
@@ -18,6 +20,7 @@ import {
   type EscapeTarget,
   type HistoryAction,
   type NumberEnv,
+  type TableView,
 } from './state';
 import { paramsToState, stateToParams } from './url';
 
@@ -46,22 +49,34 @@ function detectEnv(): ConverterEnv {
 export interface ConverterController {
   state: ConverterState;
   view: ConverterView;
+  /** The table layout's view, once the source box holds a number and a unit; null otherwise, and in the two-box layout. */
+  table: TableView | null;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
   canUndo: boolean;
   canRedo: boolean;
   /** Per box, what Escape takes back once its list is closed. */
   escapeTargets: Record<BoxId, EscapeTarget>;
-  /** Debounced copy of the view's announcement, so screen readers are not flooded while typing. */
+  /** Debounced copy of the layout's announcement, so screen readers are not flooded while typing. */
   announcement: string | null;
 }
 
-/** Owns the converter state and its history, derives the view, syncs the URL, and paces announcements. */
-export function useConverter(): ConverterController {
+/**
+ * Owns the converter state and its history, derives the view (and the table, in that layout),
+ * syncs the URL, and paces announcements. `layout` is null until the island hydrates.
+ */
+export function useConverter(layout: Layout | null): ConverterController {
   const [history, dispatch] = useReducer(reduceWithHistory, initialHistory);
   const state = history.present;
   const [env] = useState(detectEnv);
   const view = useMemo(() => selectView(state, env), [state, env]);
+  const table = useMemo(
+    () =>
+      layout === 'table'
+        ? selectTable(state, { ...env, tier: state.mode === 'basic' ? 'basic' : 'all' })
+        : null,
+    [layout, state, env],
+  );
 
   // Restore the conversion from the URL once, after hydration (the server renders the empty state).
   useEffect(() => {
@@ -81,15 +96,18 @@ export function useConverter(): ConverterController {
     return () => window.clearTimeout(timer);
   }, [state, env.separators]);
 
+  // Two boxes say the pair's sentence; the table says its own, which names the headline if any.
+  const spoken = layout === 'table' ? (table?.announcement ?? null) : view.announcement;
   const [announcement, setAnnouncement] = useState<string | null>(null);
   useEffect(() => {
-    const timer = window.setTimeout(() => setAnnouncement(view.announcement), ANNOUNCE_MS);
+    const timer = window.setTimeout(() => setAnnouncement(spoken), ANNOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [view.announcement]);
+  }, [spoken]);
 
   return {
     state,
     view,
+    table,
     env,
     dispatch,
     canUndo: history.past.length > 0,

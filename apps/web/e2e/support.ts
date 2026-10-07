@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Locator, type Page } from '@playwright/test';
+import { LAYOUT_STORAGE_KEY, type Layout } from '../src/lib/layout';
 import type { ThemeMeta } from '../src/lib/themes';
 
 /** How long past a delay a test waits for its effect, so a slow machine still sees it land. */
@@ -14,6 +15,23 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'
  */
 export async function ready(page: Page) {
   await page.locator('section[data-hydrated]').waitFor();
+}
+
+/**
+ * Saves a layout before the page loads, as the switch would have (ADR 0009): the table is the
+ * default, so tests of the two-box flows call this with 'boxes' first.
+ */
+export async function chooseLayout(page: Page, layout: Layout) {
+  await page.addInitScript(
+    ([key, value]) => {
+      try {
+        localStorage.setItem(key!, value!);
+      } catch {
+        // Storage blocked: the page falls back to the default layout.
+      }
+    },
+    [LAYOUT_STORAGE_KEY, layout],
+  );
 }
 
 /** Theme tokens transition; axe must see the settled colors, not a frame in between. */

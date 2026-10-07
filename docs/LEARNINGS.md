@@ -482,3 +482,9 @@ Format:
 **What happened.** Adding the CI jobs as Deployment Checks, Vercel's GitHub import said "No configured checks found". It lists only checks that report through its `repository-dispatch` status action unless **Show All Checks** is on; with it on, both jobs were there. That action is only needed for workflows Vercel triggers, not for CI on pushes.
 **Rule.** Import ordinary GitHub Actions jobs with Show All Checks on, and leave the workflow alone. Keep one gate: Vercel's native Lint and TypeCheck checks duplicate CI and are removed.
 **Promoted** to docs/DEPLOYMENT.md, "The Vercel project", step 5.
+
+## 2026-10-07 — A saved layout must not flash on a server-rendered island
+
+**What happened.** The table layout became the default, with two boxes a remembered choice. The island is server-rendered before anyone's choice is known, and it learns the choice only after hydrating, so a two-box visitor would have seen the table's one box first, then the second box appear.
+**Rule.** Treat a layout like the theme: the inline script applies the saved choice to `<html data-layout>` before paint, the server's markup carries both layouts' empty state, and custom variants (`layout-table:hidden`, `layout-boxes:hidden`) show the right one until the island takes over. A browser test blocks the island's code and checks both. Keep the island's first render identical to the server's (both states), and render one layout only once hydrated.
+**Promoted** to docs/DESIGN-SYSTEM.md, "Patterns".

@@ -111,3 +111,15 @@ export function CheckIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function LinkIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      {/* Two rounded links overlapping on a diagonal. */}
+      <g transform="rotate(-45 12 12)">
+        <rect x="2" y="9" width="12" height="6" rx="3" />
+        <rect x="10" y="9" width="12" height="6" rx="3" />
+      </g>
+    </Icon>
+  );
+}

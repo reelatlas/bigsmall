@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { initialState, reduce } from '../src/features/converter/state';
-import { paramsToState, stateToParams } from '../src/features/converter/url';
+import { linkFor, paramsToState, stateToParams } from '../src/features/converter/url';
 
 const EN = { decimal: '.', group: ',' };
 const DE = { decimal: ',', group: '.' };
@@ -74,5 +74,22 @@ describe('paramsToState', () => {
       b: { text: '', unit: null },
       source: 'a',
     });
+  });
+});
+
+describe('linkFor', () => {
+  const page = { origin: 'https://bigsmall.example', pathname: '/' };
+
+  it('is the page address with the conversion, read from the state', () => {
+    const s = [
+      { type: 'input', box: 'a', text: '5', at: 0 } as const,
+      { type: 'lock', box: 'a', unit: 'milliliter' } as const,
+      { type: 'lock', box: 'b', unit: 'us-cup' } as const,
+    ].reduce(reduce, initialState);
+    expect(linkFor(s, EN, page)).toBe('https://bigsmall.example/?a=milliliter&b=us-cup&v=5&s=a');
+  });
+
+  it('is the bare page address when nothing is entered', () => {
+    expect(linkFor(initialState, EN, page)).toBe('https://bigsmall.example/');
   });
 });

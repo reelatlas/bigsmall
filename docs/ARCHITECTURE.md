@@ -66,16 +66,17 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 | `copied.ts`    | `useCopied()`: which copy button shows its check, and when it reverts                                                      |
 | `timing.ts`    | Every UI delay as a named constant: typing chunks, URL writes, announcements, copy feedback, hover peek                    |
 | `shell.ts`     | The fluid-shell class recipe the fields and the header menus share (`SHELL`, `SHELL_BORDERED`, `SHELL_GHOST`, `FIELD_ROW`) |
+| `slots.ts`     | `SLOTS` and `useSlot()`: places in static markup an island fills after hydration (the header's copy link)                  |
 
 ### The converter (`apps/web/src/features/converter`)
 
 | File              | Responsibility                                                                                                                                                                                                                                                                                 |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `state.ts`        | `reduce` (input, setText, lock, unlock, swap, clear, setMode, hydrate); `selectView` (texts, scope, result, per-box `message` for out-of-range values, `anchor`, announcement); `reduceWithHistory` (undo, redo, `stepBack`, typing chunks, 50 steps) and `escapeTarget`. Pure; tested in node |
-| `url.ts`          | `stateToParams` / `paramsToState`: the conversion as `?a=&b=&v=&s=`                                                                                                                                                                                                                            |
+| `url.ts`          | `stateToParams` / `paramsToState`: the conversion as `?a=&b=&v=&s=`; `linkFor`: the full address copy link copies                                                                                                                                                                              |
 | `useConverter.ts` | Owns the history reducer, detects locale and region once, restores from the URL after hydration, writes the URL (debounced), paces the live region, exposes each box's Escape target                                                                                                           |
 | `SmartInput.tsx`  | One box: field, text layer, chip, copy slot, out-of-range message, and the suggestion listbox with its Back row. The WAI-ARIA combobox pattern by hand (ADR 0006)                                                                                                                              |
-| `Converter.tsx`   | The island: hint with undo, redo, and clear all; the two boxes, swap, copy buttons, category labels; Ctrl/⌘ undo and redo; live regions; the `data-hydrated` mark                                                                                                                              |
+| `Converter.tsx`   | The island: hint with undo, redo, and clear all; the two boxes, swap, copy buttons, category labels; the copy-link button, drawn into the header slot; Ctrl/⌘ undo and redo; live regions; the `data-hydrated` mark                                                                            |
 
 ### Islands and the inline script
 

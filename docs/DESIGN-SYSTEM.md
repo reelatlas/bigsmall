@@ -153,7 +153,8 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 
 ### Icon buttons and the toolbar
 
-- An icon-only action on the page is `Button variant="ghost" square` with an `aria-label`: swap, undo, redo, clear all, copy (also `nested`, inside a field), and the shortcuts map at rest. Disabled ones drop to 50 % opacity.
+- An icon-only action on the page is `Button variant="ghost" square` with an `aria-label`: swap, undo, redo, clear all, copy (also `nested`, inside a field), copy link, and the shortcuts map at rest. Disabled ones drop to 50 % opacity.
+- **Slots.** A control an island owns but the static header shows (copy link) is drawn into a slot the markup reserves at its final size (`src/lib/slots.ts`, a React portal), so it appears after hydration without moving anything and keeps the island's state at hand.
 - The toolbar's divider between redo and clear all is `h-6 border-l border-line`.
 - A successful copy swaps the icon for `CheckIcon` in `text-success`, which every theme keeps at 3:1 on the surface (a graphic, WCAG 1.4.11).
 - Keycaps (`Keycap`) are `rounded-sm border border-line bg-surface-raised font-numeric text-xs`.
@@ -173,8 +174,8 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 | `UnitChip`        | React | The committed unit inside a field: bold symbol and muted name on one baseline, which open the unit list, plus a 44 px remove control; `compact` and `inTabOrder` are explicit |
 | `SuggestionPanel` | React | The listbox inside a field's shell: Back row, unit rows, category rows, matched letters. `optionIdFor` gives the row ids the combobox points at                               |
 | `Keycap`          | React | One key as printed; `label="Mod"` reads Ctrl, or ⌘ on Apple devices                                                                                                           |
-| `icons`           | React | Inline SVG icons drawn for this project: swap, close, copy, check, chevron right and down, undo, redo, eraser, keyboard. Decorative, `aria-hidden`                            |
-| `HeaderMenus`     | Astro | The header's menus in their fixed order: the shortcuts map, then the theme menu                                                                                               |
+| `icons`           | React | Inline SVG icons drawn for this project: swap, close, copy, check, chevron right and down, undo, redo, eraser, keyboard, link. Decorative, `aria-hidden`                      |
+| `HeaderMenus`     | Astro | The header's controls in their fixed order: the shortcuts map, the actions slot (`actions` prop; copy link on the converter page), then the theme menu                        |
 | `ThemePicker`     | Astro | Fluid shell with a native radio group; the inline script opens it, applies and saves the choice, and lets arrow keys preview themes until Enter                               |
 | `ShortcutsHelp`   | Astro | Ghost icon button that grows into the shortcuts map from `src/lib/shortcuts.ts`; peeks on hover, pins on click; hidden on touch-first devices and below `sm`                  |
 

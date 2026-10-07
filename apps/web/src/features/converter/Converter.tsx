@@ -1,10 +1,12 @@
 import { getCategory } from '@bigsmall/core';
 import { useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
 import {
   CheckIcon,
   CopyIcon,
   EraserIcon,
+  LinkIcon,
   RedoIcon,
   SwapIcon,
   UndoIcon,
@@ -12,9 +14,14 @@ import {
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { isApplePlatform } from '../../lib/platform';
+import { SLOTS, useSlot } from '../../lib/slots';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
+import { linkFor } from './url';
 import { useConverter } from './useConverter';
+
+/** What a copy button copies: one box's value, or the link to the whole conversion. */
+type CopyTarget = BoxId | 'link';
 
 /** What each empty box suggests before anything scopes it; the second shows a category can be typed too. */
 const EXAMPLES: Record<BoxId, string> = {
@@ -25,7 +32,7 @@ const EXAMPLES: Record<BoxId, string> = {
 /**
  * The converter island: the hint with undo, redo, and clear all, two linked smart inputs with
  * swap between them, the category label under the box the conversion is anchored on, and the
- * live region.
+ * live region. It also draws the copy-link button into the header's slot (docs/UX-SPEC.md §7).
  */
 export function Converter() {
   const { state, view, env, dispatch, canUndo, canRedo, escapeTargets, announcement } =
@@ -35,7 +42,8 @@ export function Converter() {
   const apple = hydrated && isApplePlatform();
   const hintId = useId();
   const sectionRef = useRef<HTMLElement>(null);
-  const { copied, markCopied, pointerProps } = useCopied<BoxId>();
+  const { copied, markCopied, pointerProps } = useCopied<CopyTarget>();
+  const headerActions = useSlot(SLOTS.headerActions);
   const categoryName = view.category ? getCategory(view.category)?.name : undefined;
   const isEmpty = !state.a.text && !state.a.unit && !state.b.text && !state.b.unit;
 
@@ -65,12 +73,12 @@ export function Converter() {
     return () => section.removeEventListener('keydown', onKeyDown);
   }, [dispatch]);
 
-  const copy = async (value: number, box: BoxId) => {
+  const copy = async (text: string, target: CopyTarget) => {
     try {
-      await navigator.clipboard.writeText(String(value));
-      markCopied(box);
+      await navigator.clipboard.writeText(text);
+      markCopied(target);
     } catch {
-      // Clipboard blocked: no check, and the value is still visible in the field.
+      // Clipboard blocked: no check, and the value or the address is still visible.
     }
   };
 
@@ -90,7 +98,7 @@ export function Converter() {
         // Out of the Tab order so Tab goes box to box; focusing a result selects it for Ctrl+C.
         tabIndex={-1}
         aria-label={`Copy ${label}`}
-        onClick={() => copy(value, box.id)}
+        onClick={() => copy(String(value), box.id)}
         {...pointerProps(box.id)}
       >
         {/* A check in the success color confirms the copy (the status line announces it);
@@ -209,8 +217,24 @@ export function Converter() {
         {announcement ?? ''}
       </p>
       <p role="status" className="sr-only">
-        {copied ? 'Copied' : ''}
+        {copied === 'link' ? 'Link copied' : copied ? 'Copied' : ''}
       </p>
+
+      {/* Drawn into the header so it copies from this state, not from the address bar. */}
+      {headerActions &&
+        createPortal(
+          <Button
+            variant="ghost"
+            square
+            aria-label="Copy link"
+            title="Copy link"
+            onClick={() => copy(linkFor(state, env.separators, window.location), 'link')}
+            {...pointerProps('link')}
+          >
+            {copied === 'link' ? <CheckIcon className="text-success" data-copied /> : <LinkIcon />}
+          </Button>,
+          headerActions,
+        )}
     </section>
   );
 }

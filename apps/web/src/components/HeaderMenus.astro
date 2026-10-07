@@ -1,10 +1,23 @@
 ---
+import { SLOTS } from '../lib/slots';
 import ShortcutsHelp from './ShortcutsHelp.astro';
 import ThemePicker from './ThemePicker.astro';
+
+interface Props {
+  /** Reserve the slot the page's island fills with its header actions (the converter's copy link). */
+  actions?: boolean;
+}
+
+const { actions = false } = Astro.props;
 ---
 
-<!-- The header's menus, in one place so every page shows the same ones in the same order. -->
+<!--
+  The header's controls, in one place so every page shows the same ones in the same order. The
+  actions slot is the size of the icon buttons beside it (a 44 px button inside 2 px, like the
+  shells' edges), so the button the island draws into it lines up and nothing shifts.
+-->
 <div class="flex items-start gap-2">
   <ShortcutsHelp />
+  {actions && <div id={SLOTS.headerActions} class="size-12 p-0.5" />}
   <ThemePicker />
 </div>

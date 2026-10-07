@@ -26,6 +26,20 @@ export function stateToParams(state: ConverterState, separators: Separators): UR
   return params;
 }
 
+/**
+ * The address of this conversion, which copy link puts on the clipboard: the page's own address
+ * with the state's parameters, built from the state itself rather than from the address bar, so
+ * it is current even inside the URL's write delay.
+ */
+export function linkFor(
+  state: ConverterState,
+  separators: Separators,
+  page: Pick<Location, 'origin' | 'pathname'>,
+): string {
+  const query = stateToParams(state, separators).toString();
+  return `${page.origin}${page.pathname}${query ? `?${query}` : ''}`;
+}
+
 /** Reads a URL back into state. Unknown units are dropped; a second unit from another category is dropped too. */
 export function paramsToState(params: URLSearchParams): Restorable | null {
   const unitA = validUnit(params.get(PARAM.a));

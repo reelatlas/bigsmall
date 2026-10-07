@@ -1,4 +1,4 @@
-import { getCategory } from '@bigsmall/core';
+import { getCategory, parse } from '@bigsmall/core';
 import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
@@ -12,20 +12,30 @@ import {
   SwapIcon,
   UndoIcon,
 } from '../../components/icons';
-import { Keypad, type KeypadKey } from '../../components/Keypad';
-import { Segmented, type SegmentedOption } from '../../components/Segmented';
+import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
+import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
-import { pressKey } from './keypad';
+import { EMPTY_ENTRY, formatValue, placeNumber, pressKey } from './calculator';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
 import { linkFor } from './url';
 import { useConverter } from './useConverter';
 
-/** What a copy button copies: one box's value, or the link to the whole conversion. */
-type CopyTarget = BoxId | 'link';
+/**
+ * The buttons that confirm with a check: copying a box's value or the link, and sending the
+ * calculator's value to a box. What the status region says for each.
+ */
+type Confirmable = BoxId | 'link' | `use-${BoxId}`;
+const CONFIRMATION: Record<Confirmable, string> = {
+  a: 'Copied',
+  b: 'Copied',
+  link: 'Link copied',
+  'use-a': 'Sent to the first value',
+  'use-b': 'Sent to the second value',
+};
 
 /** What each empty box suggests before anything scopes it; the second shows a category can be typed too. */
 const EXAMPLES: Record<BoxId, string> = {
@@ -36,7 +46,7 @@ const EXAMPLES: Record<BoxId, string> = {
 /**
  * The converter island: the hint with undo, redo, and clear all, two linked smart inputs with
  * swap between them, the category label under the box the conversion is anchored on, and the
- * live region; the keypad below the boxes when it is open (docs/UX-SPEC.md §8). It also draws the
+ * live region; the calculator below the boxes when it is open (docs/UX-SPEC.md §8). It also draws the
  * copy-link button into the header's slot (§7).
  */
 export function Converter() {
@@ -47,16 +57,17 @@ export function Converter() {
   const apple = hydrated && isApplePlatform();
   const hintId = useId();
   const sectionRef = useRef<HTMLElement>(null);
-  const { copied, markCopied, pointerProps } = useCopied<CopyTarget>();
+  const { copied, markCopied, pointerProps } = useCopied<Confirmable>();
   const headerActions = useSlot(SLOTS.headerActions);
-  const keypadId = useId();
-  const keypadToggleId = useId();
-  const [keypadOpen, setKeypadOpen] = useState(false);
-  // The keypad fills the box last focused, or the source box before any box was focused.
-  const [focusedBox, setFocusedBox] = useState<BoxId | null>(null);
-  // The text = just gave a box: the next digit starts over, as on a calculator.
-  const [evaluated, setEvaluated] = useState<{ box: BoxId; text: string } | null>(null);
-  const target = focusedBox ?? state.source;
+  const calculatorId = useId();
+  const calculatorToggleId = useId();
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
+  // The calculator's own entry: a scratch pad that stays while the page is open.
+  const [entry, setEntry] = useState(EMPTY_ENTRY);
+  const entryParsed = parse(entry.text, env.separators);
+  const entryValue = entryParsed.value;
+  const running =
+    entryParsed.expression && entryValue !== undefined ? formatValue(entryValue, env) : null;
   const categoryName = view.category ? getCategory(view.category)?.name : undefined;
   const isEmpty = !state.a.text && !state.a.unit && !state.b.text && !state.b.unit;
 
@@ -86,7 +97,7 @@ export function Converter() {
     return () => section.removeEventListener('keydown', onKeyDown);
   }, [dispatch]);
 
-  const copy = async (text: string, target: CopyTarget) => {
+  const copy = async (text: string, target: Confirmable) => {
     try {
       await navigator.clipboard.writeText(text);
       markCopied(target);
@@ -95,37 +106,44 @@ export function Converter() {
     }
   };
 
-  const closeKeypad = () => {
-    setKeypadOpen(false);
-    document.getElementById(keypadToggleId)?.focus();
+  const closeCalculator = () => {
+    setCalculatorOpen(false);
+    document.getElementById(calculatorToggleId)?.focus();
   };
 
-  /** A key press becomes typing or a step of its own in the box the keypad fills (keypad.ts). */
-  const press = (key: KeypadKey) => {
-    const shown = view[target];
-    const showsResult =
-      (!shown.isSource && view.result?.box === target) ||
-      (evaluated?.box === target && evaluated.text === state[target].text);
-    const edit = pressKey({ text: shown.text, showsResult }, key, env);
-    setEvaluated(key === 'equals' && edit ? { box: target, text: edit.text } : null);
-    if (!edit) return;
-    dispatch(
-      edit.kind === 'type'
-        ? { type: 'input', box: target, text: edit.text, at: performance.now() }
-        : { type: 'replace', box: target, text: edit.text },
-    );
+  /** Keys change only the calculator's own entry (calculator.ts); the boxes wait for a send. */
+  const press = (key: CalculatorKey) => {
+    setEntry((current) => pressKey(current, key, env) ?? current);
   };
 
-  /** One side of the keypad's switch: "First", plus the box's unit symbol once it has one. */
-  const fills = (id: BoxId, word: string): SegmentedOption<BoxId> => ({
-    value: id,
-    label: (
-      <>
-        {word}
-        {view[id].unit && <span className="font-semibold">{view[id].unit.symbol}</span>}
-      </>
-    ),
-  });
+  /**
+   * "Use in 1st": the entry's value, its running value if = was not pressed, replaces the box's
+   * number or fills an empty box, keeping its unit. One undoable step that makes the box the
+   * source.
+   */
+  const send = (id: BoxId) => {
+    if (entryValue === undefined) return;
+    const shown = view[id];
+    const showsResult = !shown.isSource && view.result?.box === id;
+    const number = formatValue(entryValue, env);
+    dispatch({
+      type: 'replace',
+      box: id,
+      text: placeNumber(shown.text, showsResult, number, env.separators),
+    });
+    markCopied(`use-${id}`);
+  };
+
+  const sendButton = (id: BoxId, ordinal: string) => (
+    <SendButton
+      ordinal={ordinal}
+      symbol={view[id].unit?.symbol}
+      confirmed={copied === `use-${id}`}
+      disabled={entryValue === undefined}
+      onClick={() => send(id)}
+      {...pointerProps(`use-${id}`)}
+    />
+  );
 
   /** Both boxes get a copy control whenever they hold a number, so the control never jumps sides. */
   const copyButton = (box: BoxView, label: string) => {
@@ -182,8 +200,6 @@ export function Converter() {
         examples={EXAMPLES[box.id]}
         counterpart={counterpart.unit}
         trailing={copyButton(box, label.toLowerCase())}
-        keypad={keypadOpen ? (target === box.id ? 'target' : 'other') : 'closed'}
-        onFocusBox={() => setFocusedBox(box.id)}
       />
       {categoryLabel(box.id)}
     </div>
@@ -206,18 +222,18 @@ export function Converter() {
           <Button
             variant="ghost"
             square
-            id={keypadToggleId}
+            id={calculatorToggleId}
             aria-label="Calculator"
             title="Calculator"
-            aria-expanded={keypadOpen}
-            aria-controls={keypadOpen ? keypadId : undefined}
-            onClick={() => (keypadOpen ? closeKeypad() : setKeypadOpen(true))}
-            className="aria-expanded:bg-accent-soft aria-expanded:text-ink"
+            aria-expanded={calculatorOpen}
+            aria-controls={calculatorOpen ? calculatorId : undefined}
+            onClick={() => (calculatorOpen ? closeCalculator() : setCalculatorOpen(true))}
+            on={calculatorOpen}
           >
             <CalculatorIcon />
           </Button>
-          {/* Opening the keypad is a different kind of action from undo and redo. */}
-          <span aria-hidden="true" className="mx-1 h-6 border-l border-line" />
+          {/* Opening the calculator is a different kind of action from undo and redo. */}
+          <ToolbarDivider />
           <Button
             variant="ghost"
             square
@@ -241,7 +257,7 @@ export function Converter() {
             <RedoIcon />
           </Button>
           {/* Clearing is a different kind of step from undo and redo, so a divider sets it apart. */}
-          <span aria-hidden="true" className="mx-1 h-6 border-l border-line" />
+          <ToolbarDivider />
           <Button
             variant="ghost"
             square
@@ -275,19 +291,21 @@ export function Converter() {
         </div>
       </div>
 
-      {keypadOpen && (
-        <div id={keypadId} className="mx-auto mt-4 max-w-sm">
-          <Keypad decimalMark={env.separators.decimal} onPress={press} onClose={closeKeypad}>
-            <div className="mb-3">
-              <Segmented
-                legend="Calculator fills"
-                name={`${keypadId}-fills`}
-                options={[fills('a', 'First'), fills('b', 'Second')]}
-                value={target}
-                onChange={setFocusedBox}
-              />
-            </div>
-          </Keypad>
+      {calculatorOpen && (
+        <div id={calculatorId} className="mx-auto mt-4 max-w-sm">
+          <Calculator
+            entry={entry.text}
+            running={running}
+            decimalMark={env.separators.decimal}
+            onPress={press}
+            onClose={closeCalculator}
+            footer={
+              <>
+                {sendButton('a', '1st')}
+                {sendButton('b', '2nd')}
+              </>
+            }
+          />
         </div>
       )}
 
@@ -296,7 +314,7 @@ export function Converter() {
         {announcement ?? ''}
       </p>
       <p role="status" className="sr-only">
-        {copied === 'link' ? 'Link copied' : copied ? 'Copied' : ''}
+        {copied ? CONFIRMATION[copied] : ''}
       </p>
 
       {/* Drawn into the header so it copies from this state, not from the address bar. */}

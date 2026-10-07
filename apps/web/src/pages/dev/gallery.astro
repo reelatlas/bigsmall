@@ -1,9 +1,11 @@
 ---
 import { Button } from '../../components/Button';
+import { ToolbarDivider } from '../../components/ToolbarDivider';
 import HeaderMenus from '../../components/HeaderMenus.astro';
 import {
   CopyIcon,
   EraserIcon,
+  CalculatorIcon,
   KeyboardIcon,
   LinkIcon,
   RedoIcon,
@@ -84,7 +86,7 @@ const swatches = TOKEN_CONTRACT.colors;
             <Button variant="ghost" square aria-label="Redo sample, disabled" disabled>
               <RedoIcon />
             </Button>
-            <span aria-hidden="true" class="mx-1 h-6 border-l border-line" />
+            <ToolbarDivider />
             <Button variant="ghost" square aria-label="Clear all sample">
               <EraserIcon />
             </Button>
@@ -96,6 +98,15 @@ const swatches = TOKEN_CONTRACT.colors;
             </Button>
             <Button variant="ghost" square aria-label="Copy link sample">
               <LinkIcon />
+            </Button>
+            <Button
+              variant="ghost"
+              square
+              on
+              aria-pressed="true"
+              aria-label="Calculator sample, on"
+            >
+              <CalculatorIcon />
             </Button>
           </div>
 

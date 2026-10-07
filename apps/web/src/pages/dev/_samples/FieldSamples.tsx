@@ -2,8 +2,7 @@ import { DEFAULT_SEPARATORS, getUnit, parse, search } from '@bigsmall/core';
 import { useId } from 'react';
 import { Button } from '../../../components/Button';
 import { CheckIcon } from '../../../components/icons';
-import { Keypad } from '../../../components/Keypad';
-import { Segmented } from '../../../components/Segmented';
+import { Calculator, SendButton } from '../../../components/Calculator';
 import {
   BACK_ITEM,
   SuggestionPanel,
@@ -52,8 +51,6 @@ function ResultSample({ label }: { label: string }) {
       escapeTarget={null}
       examples=""
       counterpart={null}
-      keypad="closed"
-      onFocusBox={noop}
       trailing={
         <Button variant="ghost" square nested tabIndex={-1} aria-label="Copy sample value">
           <CheckIcon className="text-success" />
@@ -77,13 +74,11 @@ function OutOfRangeSample({ label }: { label: string }) {
       escapeTarget={null}
       examples=""
       counterpart={null}
-      keypad="closed"
-      onFocusBox={noop}
     />
   );
 }
 
-/** Arithmetic typed in the box the keypad fills: the accent edge and the running value. */
+/** Arithmetic typed into a box: its running value follows it in the muted color. */
 function ArithmeticSample({ label }: { label: string }) {
   const hint = useId();
   return (
@@ -97,31 +92,27 @@ function ArithmeticSample({ label }: { label: string }) {
       escapeTarget={null}
       examples=""
       counterpart={null}
-      keypad="target"
-      onFocusBox={noop}
     />
   );
 }
 
-/** The keypad with its switch, the way it opens below the boxes. */
-function KeypadSample({ theme }: { theme: string }) {
-  const name = useId();
+/** The calculator mid-sum, as it opens below the boxes, one send confirmed. */
+function CalculatorSample() {
   return (
     <div className="max-w-sm">
-      <Keypad decimalMark="." onPress={noop} onClose={noop}>
-        <div className="mb-3">
-          <Segmented
-            legend={`${theme} calculator fills sample`}
-            name={name}
-            options={[
-              { value: 'a', label: 'First' },
-              { value: 'b', label: 'Second' },
-            ]}
-            value="a"
-            onChange={noop}
-          />
-        </div>
-      </Keypad>
+      <Calculator
+        entry="12×3"
+        running="36"
+        decimalMark="."
+        onPress={noop}
+        onClose={noop}
+        footer={
+          <>
+            <SendButton ordinal="1st" symbol="mL" confirmed />
+            <SendButton ordinal="2nd" confirmed={false} />
+          </>
+        }
+      />
     </div>
   );
 }
@@ -171,7 +162,7 @@ export function FieldSamples({ theme }: { theme: string }) {
       <OutOfRangeSample label={`${theme} out-of-range sample`} />
       <ArithmeticSample label={`${theme} arithmetic sample`} />
       <OpenSample />
-      <KeypadSample theme={theme} />
+      <CalculatorSample />
     </div>
   );
 }

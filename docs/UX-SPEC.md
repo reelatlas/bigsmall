@@ -8,7 +8,7 @@ Current behavior of the milestone 2 build, 2026-10-06. This document describes w
 - **Hint row.** Above the boxes: "Type a number, unit, or both. Once each box has a unit, typing in one updates the other." On its right: the calculator icon, a thin rule, undo, redo, a thin rule, and clear all, all ghost icon buttons. Below `sm` the hint takes the full width and the buttons sit on their own line under it, right-aligned.
 - **Two boxes.** Side by side from the `sm` breakpoint (640 px), stacked below it. A ghost swap button sits between them. Each box is a field (a text input, the unit chip once a unit is chosen, and a copy button once it holds a number) whose suggestion list grows out of it over the page, never pushing content down.
 - **Category label.** Under the box the conversion is anchored on (§6), left-aligned with the value.
-- **Keypad.** When open, a panel below the boxes (§8).
+- **Calculator.** When open, a scratch pad below the boxes (§8).
 - Field geometry, corners, and the fluid-shell pattern are in docs/DESIGN-SYSTEM.md ("Fields", "Fluid shells").
 
 ## 2. Parsing
@@ -114,7 +114,7 @@ Nothing commits on a keystroke: while typing, the best match is highlighted and 
 - **Copy link.** A link icon in the header, between the shortcuts map and the theme menu, copies the address of the current conversion (§11). The address is built from the converter's state at the moment of the click, so it is current even inside the URL's write delay; with nothing entered it is the bare page address. It confirms exactly like the box copy buttons, and the status region says "Link copied". Unlike the shortcuts map it shows on every device, phones included. The button is drawn by the converter island into a slot the header reserves, so it appears after hydration without moving anything.
 - **Announcements.** A polite live region says "5 milliliters is 0.1690701102 fluid ounces" once the result settles (600 ms after the last change), or "1e308 kilometers is too large to convert to millimeters". For arithmetic it names the value (`5 + 3` mL: "8 milliliters is …"), and for a division by zero it says "Can’t divide by zero".
 
-## 8. Keyboard and keypad
+## 8. Keyboard and calculator
 
 | Key                                        | In a box                                                                                                          |
 | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
@@ -128,18 +128,17 @@ Nothing commits on a keystroke: while typing, the best match is highlighted and 
 
 The chip's buttons and the copy buttons are out of the Tab order because the field's own keys do the same jobs; pointers and screen readers still reach them. The list itself is not a Tab stop. Swap follows the second box in the DOM so Tab goes box to box; the grid still draws it between them.
 
-### The keypad
+### The calculator
 
-A calculator for anyone who would rather tap than type.
+A scratch pad for working out a number, for anyone who would rather tap than type or wants to try a few sums first. Nothing in it touches the boxes until its number is sent to one, and it can be opened, used, and closed without sending anything.
 
-- **Opening.** The calculator icon at the left of the toolbar opens the keypad below the boxes and closes it again; while open, the icon shows an accent-soft fill (`aria-expanded`). Escape inside the keypad closes it and returns focus to the icon.
-- **Which box it fills.** A two-option switch tops the keypad: "First" and "Second", each with its unit symbol once it has one. It starts on the box last focused, else the source box, and focusing a box while the keypad is open moves it there. The box it fills shows its accent edge.
+- **Opening.** The calculator icon at the left of the toolbar opens it below the boxes and closes it again; while open, the icon shows an accent-soft fill (`aria-expanded`). Escape inside it closes it and returns focus to the icon. What it holds stays while the page is open, so closing and reopening keeps the number.
+- **Display.** Its own value area at the top, right-aligned: what was entered (`12×3`), and under it, in the muted color, the running value while the entry is arithmetic (`= 36`). Empty, it shows a muted 0. A long entry steps down through the field's type sizes, then keeps its end in view.
 - **Keys**, 48 px or taller: `C` (two columns), `⌫`, `÷`; `7 8 9 ×`; `4 5 6 −`; `1 2 3 +`; `0` (two columns), the decimal mark, `=`.
-- **What they do.** Digits and the decimal mark (the locale's, `.` or `,`) add to the box, or start it fresh when it shows a result: the other box's conversion, or the value `=` just gave. An operator adds to whatever the box shows, so a result can be carried on (`× 2`); a second operator in a row replaces the first, except `−` after `×` or `÷`, which starts a negative number. On an empty box only `−` works. The decimal mark is ignored when the number has one, and starts a number as `0.`. `⌫` deletes the last character; `C` empties the box and keeps its unit; `=` replaces the arithmetic with its value, as Enter does (§5).
-- **History.** Presses go through the same parser and history as typing: presses less than 700 ms apart are one chunk for undo and Escape, and `=` and `C` are steps of their own.
-- **A keyboard inside the keypad.** With focus on a key, typing a digit, `.` or `,`, `+ - * /`, `=`, or Backspace presses the matching key. Enter and Space press the focused key, as for any button.
-- **Phones.** While the keypad is open the boxes ask for no on-screen keyboard (`inputmode="none"`), so the keypad takes its place; units are still picked from the list (tap a box or its chip). Closing the keypad brings the system keyboard back.
-- **Accessibility.** The keypad is a group named "Calculator", like its icon; each key is a native button named in words ("plus", "divided by", "decimal point", "backspace", "clear"); the switch is a native radio group. Values are announced through the conversion announcement (§7).
+- **What they do.** Digits and the decimal mark (the locale's, `.` or `,`) add to the display, or start it over right after `=`. An operator adds to what the display shows, so a result can be carried on (`× 2`); a second operator in a row replaces the first, except `−` after `×` or `÷`, which starts a negative number. On an empty display only `−` works. The decimal mark is ignored when the number has one, and starts a number as `0.`. `⌫` deletes the last character, `C` empties the display, and `=` replaces arithmetic with its value.
+- **Sending.** Under the keys, "Use in 1st" and "Use in 2nd", each with that box's unit symbol once it has one, put the display's value into that box: the running value, so `=` is optional. It replaces the number there, or fills an empty box, and keeps the box's unit and any unit text typed after the number; the box becomes the source, so the other box converts from it. One undoable step. The button confirms with the check copy uses (§7), and the status region says "Sent to the first value". Both are disabled while the display has no value (empty, or dividing by zero). The calculator stays open, so the same number can go to the other box too.
+- **A keyboard inside it.** With focus inside, typing a digit, `.` or `,`, `+ - * /`, `=`, or Backspace presses the matching key; Enter and Space press the focused key, as for any button. Ctrl/⌘+Z still undoes the converter's last step, a send included; the display's own entry is not in that history (`⌫` and `C` edit it).
+- **Accessibility.** A group named "Calculator", like its icon; each key a native button named in words ("plus", "divided by", "decimal point", "backspace", "clear"); the send buttons named by what they show. The display is plain text at the top of the group, so a screen reader reaches it first.
 
 ## 9. Undo, redo, and Escape
 
@@ -193,13 +192,13 @@ Both are fluid shells driven by the inline script in `layouts/Base.astro`, so th
 
 Not built yet; each item names its milestone in docs/PLAN.md §13.
 
-**Owner's ideas, logged 2026-10-06**, built in this order: copy link (built, §7), the keypad as a calculator with `+ − × ÷` from the start (built, §8), then the header animation and theme art together. Back highlighting the category it came from (§3) and "Toggle inputs" (§10) shipped at once. Later, maybe: on phones, the native share sheet in place of copy link, and the keypad docked to the bottom of the screen.
+**Owner's ideas, logged 2026-10-06**, built in this order: copy link (built, §7), the calculator, a scratch pad with its own display, `+ − × ÷`, and a button to send its number to either box (built, §8), then the header animation and theme art together. Back highlighting the category it came from (§3) and "Toggle inputs" (§10) shipped at once. Later, maybe: on phones, the native share sheet in place of copy link, and the calculator docked to the bottom of the screen.
 
 - **Header animation.** Hovering the header plays conversions: units, numbers, and arrows turning into one another in text and symbols, ASCII in spirit, perhaps a few emoji. While the pointer rests on the header the conversions rotate through at a leisurely pace; moving the pointer speeds them up, and the faster it moves the faster they go, accelerating quickly, then easing back to the leisurely pace when it slows or stops. Decorative: `aria-hidden`, the heading still reads "bigsmall", no layout shift, loaded on first hover so it costs nothing before, and measured against the bundle budget. People who turn motion off in their system settings see it still; an in-app motion switch can join the settings later. Original content only (ADR 0004).
 - **Theme art.** A small piece of art beside the site name for each theme: Sakura a cherry blossom, Midnight a full moon, Daylight a sun in a yellow that pairs with its green, Neo-noir a neon Tokyo street or tower, Hardhat a hard hat, Theorem a chalkboard with a piece of chalk. Recommended as inline SVG drawn for bigsmall in each theme's own tokens, since emoji look different on every system and cannot follow a palette. Decorative (`aria-hidden`), loaded with its theme. Belongs with the theme polish of milestone 4.
 
 - **Modes (milestone 3).** `basic` (default) lists basic-tier units with a final "Show all N units" row; `advanced` lists all units. When a query matches only advanced units, show them under an "Advanced units" label without changing the mode. The mode persists. The reducer already has a `setMode` action; nothing dispatches it yet.
-- **Keypad, phase 2.** `( )`, `½ ¼ ⅛`, and `′ ″` keys; the open state remembered with the other preferences.
+- **Calculator, phase 2.** `( )`, `½ ¼ ⅛`, and `′ ″` keys; the open state and the display remembered with the other preferences.
 - **Persistence (milestone 3).** Mode, precision, locale override, the last conversion, up to ten recent pairs, and pinned pairs in `localStorage`.
 - **Early keystrokes (milestone 3).** An inline listener records keystrokes typed before hydration and the island adopts them, the same approach as the header menus.
 - **URL keeps the typed text (milestone 3).** Today `v` holds the parsed double, so eighteen typed digits come back rounded after a reload.

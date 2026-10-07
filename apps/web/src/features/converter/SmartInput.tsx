@@ -29,14 +29,11 @@ import {
   type SuggestionItem,
 } from '../../components/SuggestionPanel';
 import { UnitChip } from '../../components/UnitChip';
-import { useFitStep } from '../../lib/fit-step';
+import { NUMBER_SIZES, useFitStep } from '../../lib/fit-step';
 import { FIELD_ROW, SHELL, SHELL_BORDERED } from '../../lib/shell';
-import { evaluatedText } from './keypad';
+import { evaluatedText } from './calculator';
 import type { BoxView, EscapeTarget, HistoryAction, Mode } from './state';
 import type { ConverterEnv } from './useConverter';
-
-/** This box's part in the keypad: closed, the box it fills, or the other one. */
-export type KeypadRole = 'closed' | 'target' | 'other';
 
 export interface SmartInputProps {
   box: BoxView;
@@ -55,10 +52,6 @@ export interface SmartInputProps {
   counterpart: Unit | null;
   /** Rendered at the end of the field, such as the copy button. */
   trailing?: ReactNode;
-  /** While the keypad is open the field asks for no on-screen keyboard, and its target shows its edge. */
-  keypad: KeypadRole;
-  /** The field took focus, so the keypad can follow it. */
-  onFocusBox: () => void;
 }
 
 /**
@@ -68,14 +61,6 @@ export interface SmartInputProps {
  */
 type Level = 'top' | CategoryId;
 
-/** Type sizes the number steps down through until it fits on one line, largest first. */
-const SIZE_STEPS = [
-  'text-2xl sm:text-3xl',
-  'text-xl sm:text-2xl',
-  'text-lg sm:text-xl',
-  'text-base sm:text-lg',
-  'text-base',
-] as const;
 /** Numbers longer than this collapse the chip to its symbol, so the number keeps its size as long as it can. */
 const COMPACT_CHIP = 6;
 
@@ -118,8 +103,6 @@ export function SmartInput({
   examples,
   counterpart,
   trailing,
-  keypad,
-  onFocusBox,
 }: SmartInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
@@ -159,7 +142,7 @@ export function SmartInput({
         ? scopedExamples(box.scope, counterpart, listOptions.tier)
         : examples;
 
-  const sizeClass = SIZE_STEPS[useFitStep(textLayerRef, TEXT_LAYER, SIZE_STEPS)];
+  const sizeClass = NUMBER_SIZES[useFitStep(textLayerRef, TEXT_LAYER, NUMBER_SIZES)];
   const outOfRangeClass =
     OUT_OF_RANGE_STEPS[useFitStep(outOfRangeRef, OUT_OF_RANGE, OUT_OF_RANGE_STEPS)];
 
@@ -314,7 +297,6 @@ export function SmartInput({
     setOpen(true);
     setActive(query ? firstResult : -1);
     if (!box.isSource && event.target.value) event.target.select();
-    onFocusBox();
   };
 
   // Leaving the box only closes the list: a query stays as typed until Enter or a pick.
@@ -337,10 +319,8 @@ export function SmartInput({
   // (docs/DESIGN-SYSTEM.md, "Fields").
   return (
     <div className="group relative h-16 min-w-0" data-open={open || undefined}>
-      {/* The box the keypad fills shows the accent edge, as a focused box does. */}
       <div
-        className={`absolute inset-x-0 top-0 rounded-lg shadow-sm ${SHELL} ${SHELL_BORDERED} data-targeted:border-accent`}
-        data-targeted={keypad === 'target' || undefined}
+        className={`absolute inset-x-0 top-0 rounded-lg shadow-sm ${SHELL} ${SHELL_BORDERED}`}
         onBlur={onBlur}
       >
         <label htmlFor={inputId} className="sr-only">
@@ -365,7 +345,6 @@ export function SmartInput({
               autoCorrect="off"
               spellCheck={false}
               enterKeyHint="done"
-              inputMode={keypad === 'closed' ? undefined : 'none'}
               placeholder={placeholder}
               value={box.text}
               onChange={onChange}

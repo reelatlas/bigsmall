@@ -41,17 +41,17 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 
 ## apps/web
 
-| Path                      | Responsibility                                                                                                                                                                             |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `src/layouts/Base.astro`  | HTML shell, meta, global CSS, and the inline script: the pre-paint theme, the header-menu controller, and the Ctrl or ⌘ key labels                                                         |
-| `src/pages/`              | Routes. `index.astro` is the converter; `dev/gallery.astro` renders every component in every theme                                                                                         |
-| `src/components/`         | Design-system components: Button, UnitChip, SuggestionPanel, Keycap, Keypad, Segmented, icons (React); ThemePicker, ShortcutsHelp, and HeaderMenus, which places them (Astro). Tokens only |
-| `src/features/<name>/`    | Product features composed from components and core (`converter/` holds the converter island)                                                                                               |
-| `src/lib/`                | Shared helpers with no markup of their own (see below)                                                                                                                                     |
-| `src/styles/global.css`   | Tailwind import, theme imports, the token → utility bridge, custom utilities, base styles                                                                                                  |
-| `src/styles/themes/*.css` | One token set per theme                                                                                                                                                                    |
-| `test/`                   | Node-only unit tests: the converter reducer, view, and history; the URL; the theme contract and contrast                                                                                   |
-| `e2e/`                    | Playwright on desktop and mobile Chromium: converter behavior, smoke, theme and shortcuts menus, axe accessibility                                                                         |
+| Path                      | Responsibility                                                                                                                                                                                      |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/layouts/Base.astro`  | HTML shell, meta, global CSS, and the inline script: the pre-paint theme, the header-menu controller, and the Ctrl or ⌘ key labels                                                                  |
+| `src/pages/`              | Routes. `index.astro` is the converter; `dev/gallery.astro` renders every component in every theme                                                                                                  |
+| `src/components/`         | Design-system components: Button, UnitChip, SuggestionPanel, Keycap, Calculator, ToolbarDivider, icons (React); ThemePicker, ShortcutsHelp, and HeaderMenus, which places them (Astro). Tokens only |
+| `src/features/<name>/`    | Product features composed from components and core (`converter/` holds the converter island)                                                                                                        |
+| `src/lib/`                | Shared helpers with no markup of their own (see below)                                                                                                                                              |
+| `src/styles/global.css`   | Tailwind import, theme imports, the token → utility bridge, custom utilities, base styles                                                                                                           |
+| `src/styles/themes/*.css` | One token set per theme                                                                                                                                                                             |
+| `test/`                   | Node-only unit tests: the converter reducer, view, and history; the URL; the theme contract and contrast                                                                                            |
+| `e2e/`                    | Playwright on desktop and mobile Chromium: converter behavior, smoke, theme and shortcuts menus, axe accessibility                                                                                  |
 
 ### `src/lib`
 
@@ -76,8 +76,8 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 | `url.ts`          | `stateToParams` / `paramsToState`: the conversion as `?a=&b=&v=&s=`; `linkFor`: the full address copy link copies                                                                                                                                                                                       |
 | `useConverter.ts` | Owns the history reducer, detects locale and region once, restores from the URL after hydration, writes the URL (debounced), paces the live region, exposes each box's Escape target                                                                                                                    |
 | `SmartInput.tsx`  | One box: field, text layer, chip, copy slot, out-of-range message, and the suggestion listbox with its Back row. The WAI-ARIA combobox pattern by hand (ADR 0006)                                                                                                                                       |
-| `keypad.ts`       | `pressKey`: what each keypad key does to a box's text; `evaluatedText`: arithmetic turned into its value for = and Enter. Pure; tested in node                                                                                                                                                          |
-| `Converter.tsx`   | The island: hint with undo, redo, and clear all; the two boxes, swap, copy buttons, category labels; the copy-link button, drawn into the header slot; the calculator toggle and keypad; Ctrl/⌘ undo and redo; live regions; the `data-hydrated` mark                                                   |
+| `calculator.ts`   | The calculator's rules: `pressKey` (what a key does to its own entry), `placeNumber` (a sent value into a box's text, keeping its unit text), `evaluatedText` (arithmetic into its value, for = and Enter in a box). Pure; tested in node                                                               |
+| `Converter.tsx`   | The island: hint with undo, redo, and clear all; the two boxes, swap, copy buttons, category labels; the copy-link button, drawn into the header slot; the calculator toggle, its entry, and sending its value to a box; Ctrl/⌘ undo and redo; live regions; the `data-hydrated` mark                   |
 
 ### Islands and the inline script
 

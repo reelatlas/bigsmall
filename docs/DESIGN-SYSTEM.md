@@ -127,9 +127,9 @@ An element inset inside a rounded shell uses the shell's radius minus the inset,
 A control that opens a list or panel keeps both in one shape, drawn over the page so nothing reflows. The recipe lives in `src/lib/shell.ts` and every instance builds from it:
 
 - A **placeholder** with `group relative` and a fixed size holds the layout: `h-16` for a field, `h-12` for the theme menu, `size-12` for the shortcuts map. It carries `data-open` while open.
-- The **shell** inside takes `SHELL` (2 px edge, `overflow-hidden`, and the open state: `z-20`, accent edge, `shadow-md`), one resting style, and its own position and radius.
-  - `SHELL_BORDERED`: bordered at rest, `bg-surface`, accent on `focus-within`. Fields (`rounded-lg`, plus `shadow-sm` at rest) and the theme menu (`rounded-md`, no resting shadow).
-  - `SHELL_GHOST`: a borderless icon button at rest that becomes a card when open. The shortcuts map (`rounded-md`), anchored with `absolute top-0 right-0` so it grows left and takes its width from its panel.
+- The **shell** inside takes `SHELL` (2 px edge, `overflow-hidden`, and the open state: `z-20`, accent edge, `shadow-md`; no motion, since a shared part must not decide how a variant moves), one resting style, and its own position and radius.
+  - `SHELL_BORDERED`: bordered at rest, `bg-surface`, accent on `focus-within`, and its edge eases between edge and accent, because the shell stays in view through the change. Fields (`rounded-lg`, plus `shadow-sm` at rest) and the theme menu (`rounded-md`, no resting shadow).
+  - `SHELL_GHOST`: a borderless icon button at rest that becomes a card when open. Nothing eases: its panel appears and vanishes at once, so its edge must too, or a fading accent square is left around the icon. A browser test checks the ghost edge cannot animate. The shortcuts map (`rounded-md`), anchored with `absolute top-0 right-0` so it grows left and takes its width from its panel.
 - The list or panel renders inside the shell, in flow, under a `border-t` divider. `overflow-hidden` clips it to the corners; the shell's own border is never clipped.
 - `SmartInput` sets `data-open` from React state. The header menus share one controller in the inline script of `Base.astro`: `[data-shell]`, `[data-shell-toggle]`, `[data-open]`, `[data-pinned]` (a click opened it), `[data-shell-hover]` (a resting mouse also opens it), and `[data-shell-initial]` (what takes focus on open). It closes a shell on Escape, a click outside, or focus leaving it. A new header menu reuses this markup and needs no script.
 
@@ -155,18 +155,19 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 
 - An icon-only action on the page is `Button variant="ghost" square` with an `aria-label`: swap, undo, redo, clear all, copy (also `nested`, inside a field), copy link, and the shortcuts map at rest. Disabled ones drop to 50 % opacity.
 - **Slots.** A control an island owns but the static header shows (copy link) is drawn into a slot the markup reserves at its final size (`src/lib/slots.ts`, a React portal), so it appears after hydration without moving anything and keeps the island's state at hand.
-- The toolbar's divider between redo and clear all is `h-6 border-l border-line`.
+- Groups in a toolbar are set apart by `ToolbarDivider` (`h-6 border-l border-line`): the calculator, then undo and redo, then clear all.
+- **Switched on.** A ghost button that opens a panel or sets a mode takes `on` while it does (the calculator icon): the accent-soft fill, kept while hovered, alongside `aria-expanded` or `aria-pressed`.
 - **Space by what shows.** A ghost icon's 20 px glyph sits 12 px inside its 44 px button, so the space people see between two icons is the gap plus 24 px. Next to a bordered control, which shows its edge, a row of ghost icons keeps the same visible rhythm: the edge sits as far from the last glyph as glyphs sit from each other. In the header that is 36 px both ways (icons `gap-2` inside their 48 px places, the theme menu `gap-5.5` after the icons; `HeaderMenus.astro`).
 - A successful copy swaps the icon for `CheckIcon` in `text-success`, which every theme keeps at 3:1 on the surface (a graphic, WCAG 1.4.11).
 - Keycaps (`Keycap`) are `rounded-sm border border-line bg-surface-raised font-numeric text-xs`.
 
-### Keypad
+### Calculator
 
-- A card below the boxes: `rounded-lg border border-line bg-surface p-3 shadow-sm`, at most `max-w-sm`, centered.
-- Keys are `Button`s at `min-h-12` with `font-numeric text-lg` in a four-column grid (`gap-2`): digits, the decimal mark, C, and ⌫ secondary (edged); the four operators `soft`; = primary. C and 0 span two columns.
-- The switch for which box it fills is `Segmented`: radios in a `bg-surface-raised` track, the chosen one `bg-accent text-on-accent`, which every theme keeps at 3:1 against the surface.
-- The box it fills shows the accent edge, the one focus shows (`data-targeted:border-accent` on the field's shell).
-- Arithmetic's running value follows it in the field's text layer in `text-ink-muted` ("5 + 3 = 8").
+- A card below the boxes, at most `max-w-sm` and centered: `rounded-lg border border-line bg-surface p-3 shadow-sm`, all in the `Calculator` component.
+- **Display** at the top: `rounded-md bg-surface-raised px-3 py-2`, the entry right-aligned in `font-numeric` stepping down through `NUMBER_SIZES` (the fields' sizes, `src/lib/fit-step.ts`) and keeping its end in view past the smallest, the running value under it in `text-sm text-ink-muted`, a muted 0 when empty.
+- **Keys** are `Button`s at `min-h-12` with `font-numeric text-lg` in a four-column grid (`gap-2`): digits, the decimal mark, C, and ⌫ secondary (edged); the four operators `soft`; = primary. C and 0 span two columns.
+- **Sending**: two `SendButton`s under the keys, a secondary button reading "Use in 1st" plus the box's unit symbol in semibold, with the copy check (`CheckIcon` in `text-success`) while a send is confirmed.
+- A box's own arithmetic shows its running value the same way, after the value in the field's text layer ("5 + 3 = 8").
 
 ### Copy
 
@@ -177,18 +178,18 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 
 ## Inventory
 
-| Component         | Kind  | Notes                                                                                                                                                                                    |
-| ----------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Button`          | React | Native `<button>`, no runtime. `variant` (required): ghost, secondary (2 px edge), soft (accent-soft fill), primary. `square` for a lone icon with `aria-label`; `nested` inside a field |
-| `UnitChip`        | React | The committed unit inside a field: bold symbol and muted name on one baseline, which open the unit list, plus a 44 px remove control; `compact` and `inTabOrder` are explicit            |
-| `SuggestionPanel` | React | The listbox inside a field's shell: Back row, unit rows, category rows, matched letters. `optionIdFor` gives the row ids the combobox points at                                          |
-| `Keycap`          | React | One key as printed; `label="Mod"` reads Ctrl, or ⌘ on Apple devices                                                                                                                      |
-| `Keypad`          | React | The calculator's keys in a card: a labelled group of native buttons, 48 px tall, with typed keys pressing them; what a key does is the caller's                                          |
-| `Segmented`       | React | A choice between a few options side by side: native radios in labels, the chosen one in the accent fill (the keypad's switch)                                                            |
-| `icons`           | React | Inline SVG icons drawn for this project: swap, close, copy, check, chevron right and down, undo, redo, eraser, keyboard, link, calculator, backspace. Decorative, `aria-hidden`          |
-| `HeaderMenus`     | Astro | The header's controls in their fixed order: the shortcuts map, the actions slot (`actions` prop; copy link on the converter page), then the theme menu                                   |
-| `ThemePicker`     | Astro | Fluid shell with a native radio group; the inline script opens it, applies and saves the choice, and lets arrow keys preview themes until Enter                                          |
-| `ShortcutsHelp`   | Astro | Ghost icon button that grows into the shortcuts map from `src/lib/shortcuts.ts`; peeks on hover, pins on click; hidden on touch-first devices and below `sm`                             |
+| Component         | Kind  | Notes                                                                                                                                                                                                                                 |
+| ----------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`          | React | Native `<button>`, no runtime. `variant` (required): ghost, secondary (2 px edge), soft (accent-soft fill), primary. `on` for a ghost button that is switched on. `square` for a lone icon with `aria-label`; `nested` inside a field |
+| `UnitChip`        | React | The committed unit inside a field: bold symbol and muted name on one baseline, which open the unit list, plus a 44 px remove control; `compact` and `inTabOrder` are explicit                                                         |
+| `SuggestionPanel` | React | The listbox inside a field's shell: Back row, unit rows, category rows, matched letters. `optionIdFor` gives the row ids the combobox points at                                                                                       |
+| `Keycap`          | React | One key as printed; `label="Mod"` reads Ctrl, or ⌘ on Apple devices                                                                                                                                                                   |
+| `Calculator`      | React | The calculator card: display, keys as native buttons 48 px tall in a labelled group, typed keys pressing them, and a footer slot; `SendButton` is its "Use in 1st" button. What a key does is the caller's                            |
+| `ToolbarDivider`  | React | The thin vertical rule between groups of icon buttons in a toolbar                                                                                                                                                                    |
+| `icons`           | React | Inline SVG icons drawn for this project: swap, close, copy, check, chevron right and down, undo, redo, eraser, keyboard, link, calculator, backspace. Decorative, `aria-hidden`                                                       |
+| `HeaderMenus`     | Astro | The header's controls in their fixed order: the shortcuts map, the actions slot (`actions` prop; copy link on the converter page), then the theme menu                                                                                |
+| `ThemePicker`     | Astro | Fluid shell with a native radio group; the inline script opens it, applies and saves the choice, and lets arrow keys preview themes until Enter                                                                                       |
+| `ShortcutsHelp`   | Astro | Ghost icon button that grows into the shortcuts map from `src/lib/shortcuts.ts`; peeks on hover, pins on click; hidden on touch-first devices and below `sm`                                                                          |
 
 React components used in Astro files without a `client:` directive (the icons, `Button`, and `Keycap` inside the header menus) render to static HTML and ship no JavaScript. `SmartInput` lives in `features/converter/` because it composes core search with these components. Arriving in milestone 3: a mode toggle; later, the keypad docked as a sheet on phones.
 

@@ -15,7 +15,7 @@ Positioning in one line: _type anything into either box and get the answer._
 - **Two linked smart inputs.** Each accepts a number, a unit, or both (`5 ml`, `ml`, `5`). Typing in one updates the other instantly. Either box can be the source.
 - **Smart search.** Empty box shows categories. Typing a unit narrows to matching units across categories. Typing a category word (`fluids`, `temp`) narrows to that category. Once one box has a unit, the other is scoped to the same category.
 - **Manual selection.** Everything reachable by tapping, with no typing required.
-- **Keypad.** An on-screen keypad behind an icon button, for anyone who would rather tap than type, with a switch for which box it fills (docs/UX-SPEC.md §14).
+- **Calculator.** A scratch pad behind an icon button, for anyone who would rather tap than type or wants to work a number out first; its number goes into either box only when sent (docs/UX-SPEC.md §8).
 - **Basic and advanced modes.** Basic shows the common units of the common categories. Advanced reveals everything. Searching for an advanced unit escalates automatically.
 - **Themes.** Two neutral defaults (light, dark) plus distinctive aesthetic themes. Theme choice persists.
 - **Shareable URLs.** The current conversion is in the URL, so links and bookmarks work; a copy-link button in the header copies it.
@@ -27,7 +27,7 @@ Positioning in one line: _type anything into either box and get the answer._
 - PWA: installable, works offline. This covers most of the "app" ambition with no app store.
 - Currency (needs live rates from an API, still no database).
 - Ingredient-aware cooking conversions (cups of flour to grams).
-- Expression input: typed math in the box (`2^10 bytes`, `(5+7)/2 cm`), Enter as equals, operator keys on the keypad, fraction and feet-and-inches entry. Principle and phasing in `docs/UX-SPEC.md` §14.
+- Expression input, the rest of it: `+ − × ÷` and parentheses with Enter as equals shipped on 2026-10-06; still to come are powers (`2^10 bytes`), fraction and feet-and-inches entry, and more calculator keys. Principle and phasing in `docs/UX-SPEC.md` §14.
 - Native wrapper (Capacitor) only if the PWA proves insufficient.
 
 ### Out of scope
@@ -43,7 +43,7 @@ Full behavior lives in `docs/UX-SPEC.md`. The short version:
 3. Suggestions update on every keystroke with the best match highlighted, but nothing commits on a keystroke: Enter or a pick puts the unit into a chip, and Tab or clicking away leaves the text as typed. Ambiguous matches (`oz`, later `ton`, `cup`, `gal`) name their category so the choice is visible.
 4. When one box has a unit, the other box's list is scoped to that category, most common units first.
 5. Once both boxes have a unit, the result appears live in the box that is not the source. Typing a number into either box makes it the source.
-6. Swap flips the pair; undo, redo, and clear all sit above the boxes. A keypad (milestone 3) will target either box.
+6. Swap flips the pair; undo, redo, and clear all sit above the boxes. A calculator beside them works a number out and sends it to either box.
 
 The smart input is the whole product. It is the first thing to build and the first thing to test with people.
 
@@ -66,7 +66,7 @@ What would change the answer: accounts with cross-device sync of favorites (need
 Two layers with a hard boundary (ADR 0003). `packages/core` is pure TypeScript with zero runtime dependencies and no DOM: units, conversion, parsing, search, and formatting. `apps/web` is the Astro site with one React island for the converter: everything the user sees. The module map, data flow, and how to extend each part are in `docs/ARCHITECTURE.md`.
 
 - **Data model.** `Category` and `Unit` in `packages/core/src/types.ts`. Conversion always goes `from → base → to`, never through an intermediate unit: linear units multiply by a factor; non-linear units (temperature now, fuel economy later) use a `toBase`/`fromBase` pair. Every unit cites its source.
-- **Converter state.** `apps/web/src/features/converter/state.ts`: each box's text and unit, the source box, and the mode, with undo history around them. The keypad's state arrives with the keypad.
+- **Converter state.** `apps/web/src/features/converter/state.ts`: each box's text and unit, the source box, and the mode, with undo history around them. The calculator's entry lives beside them in the converter, outside the undo history; a send is one undoable step.
 - **URL.** The state serializes to `?a=<unit id>&b=<unit id>&v=<number>&s=<a|b>` (docs/UX-SPEC.md §11), so sharing, bookmarks, and later SEO pages use one mechanism.
 
 ## 6. Stack (ADR 0002, accepted)
@@ -141,13 +141,13 @@ Rules: every theme passes the same contrast checks; decoration costs nothing whe
 | CLS                                       | ≈ 0                                                                                          |
 | Lighthouse                                | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100                             |
 
-The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the keypad, and arithmetic, 85.7 KB JS and 5.6 KB CSS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
+The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 85.7 KB JS and 5.6 KB CSS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
 
 ## 10. Accessibility targets
 
 WCAG 2.2 AA throughout. Specifically:
 
-- Keyboard-complete, including suggestion lists, chips, keypad, theme picker.
+- Keyboard-complete, including suggestion lists, chips, the calculator, and the theme picker.
 - Results announced through a polite live region.
 - Touch targets ≥ 44 × 44 CSS px.
 - Contrast ≥ 4.5:1 for text and ≥ 3:1 for UI, verified per theme.
@@ -184,14 +184,14 @@ Rule of thumb: if a future session would have to rediscover it, write it down.
 
 ## 13. Milestones
 
-| #   | Milestone              | Done when                                                                                                                                                                                                        |
-| --- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**                                                                          |
-| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                                                      |
-| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.**                          |
-| M3  | **Complete converter** | Basic/advanced modes, persistence, remaining basic-tier categories, advanced categories loaded on demand. Shipped early: swap (M2); the keypad with + − × ÷, arithmetic in the boxes, and copy link (2026-10-06) |
-| M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem` designed and polished: fonts, decoration, per-theme art. The picker, the contrast test, the gallery, and the bundle budget already exist                  |
-| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                                            |
+| #   | Milestone              | Done when                                                                                                                                                                                                                                                                   |
+| --- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**                                                                                                                                     |
+| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                                                                                                                 |
+| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.**                                                                                     |
+| M3  | **Complete converter** | Basic/advanced modes, persistence, remaining basic-tier categories, advanced categories loaded on demand. Shipped early: swap (M2); the calculator (a scratch pad with + − × ÷ whose number can be sent to either box), arithmetic in the boxes, and copy link (2026-10-06) |
+| M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem` designed and polished: fonts, decoration, per-theme art. The picker, the contrast test, the gallery, and the bundle budget already exist                                                                             |
+| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                                                                                                       |
 
 ## 14. Setup checklist
 
@@ -237,7 +237,7 @@ Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (che
 
 - **Ambiguous symbols** (`m`, `oz`, `ton`, `gal`, `cup`, `cal`, `hp`, `mpg`, `kB`). The disambiguation UX decides whether the smart input feels magical or annoying. Test it early.
 - **Explicit commit.** Decided: nothing commits on a keystroke, and only Enter or a pick commits (decision 7). The risk left is people who never press Enter; the usability test watches for it.
-- **Bundle size.** Resolved at M2 by removing React Aria (ADR 0006), and tight again: 85.7 KB JS gzipped after the keypad and arithmetic, against the 90 KB gate. The header animation and theme art must fit in what remains (theme art as SVG in the static HTML costs no JS); if they cannot, the owner decides between trimming and a budget that counts on-demand extras separately.
+- **Bundle size.** Resolved at M2 by removing React Aria (ADR 0006), and tight again: 85.7 KB JS gzipped after the calculator and arithmetic, against the 90 KB gate. The header animation and theme art must fit in what remains (theme art as SVG in the static HTML costs no JS); if they cannot, the owner decides between trimming and a budget that counts on-demand extras separately.
 - **Themes vs. speed.** Decoration must be free when inactive. Fonts are the main cost; system fonts for the defaults.
 - **Locale number parsing.** `1,5` means 1.5 in much of the world. Use the browser locale and show the detected format.
 - **Definitions that vary.** Month, year, cup, calorie, horsepower, ton. Each needs a stated definition in the UI and a note in the catalog.

@@ -197,8 +197,10 @@ test('moving the mouse over the list highlights rows but never scrolls it', asyn
   expect(await scrollTop()).not.toBe(before);
 });
 
-test('Enter commits the box and closes the list, keeping focus', async ({ page }) => {
-  await page.goto('/');
+test('Enter commits the box and closes the list; the caret stays while the other box has its unit', async ({
+  page,
+}) => {
+  await page.goto('/?b=fahrenheit');
   await ready(page);
   const { first } = boxes(page);
 
@@ -207,6 +209,33 @@ test('Enter commits the box and closes the list, keeping focus', async ({ page }
   await first.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove Celsius' })).toBeVisible();
   await expect(page.getByRole('listbox')).toHaveCount(0);
+  await expect(first).toBeFocused();
+});
+
+test('with a number and a unit, Enter moves on to the other box while it still needs a unit', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  const { first, second, scope } = boxes(page);
+
+  await first.fill('5 ml');
+  await first.press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await expect(second).toBeFocused();
+  // Its list opens inside the category, so the next unit is a few keys away.
+  await expect(scope).toHaveText('Volume');
+  await page.keyboard.type('cup');
+  await page.keyboard.press('Enter');
+  await expect(second).toHaveValue('0.02113376419');
+  // Both boxes have their units now, so Enter leaves the caret where it is.
+  await expect(second).toBeFocused();
+
+  // A bare unit with nothing to convert keeps the caret too: the number comes next.
+  await page.getByRole('button', { name: 'Clear all' }).click();
+  await first.fill('ml');
+  await first.press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
   await expect(first).toBeFocused();
 });
 
@@ -238,6 +267,12 @@ test('Tab and clicking away never commit; back in the box, Enter takes the match
   await first.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove gigabytes' })).toBeVisible();
   await expect(first).toHaveValue('3');
+  // The second box still needs a unit, so the caret moves on to it, its best match highlighted.
+  await expect(second).toBeFocused();
+  await expect(page.getByRole('option', { name: /^kilometers Length km$/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
 });
 
 test('picking a category from a typed word drops the word, in either box', async ({ page }) => {
@@ -404,7 +439,8 @@ test('Back and Escape go up to the categories from any unit list', async ({ page
 test('with the list closed, Escape clears the unit first when it was the last thing entered', async ({
   page,
 }) => {
-  await page.goto('/');
+  // The second box has its unit, so Enter leaves the caret in the first.
+  await page.goto('/?b=us-cup');
   await ready(page);
   const { first, labelA, scope } = boxes(page);
 
@@ -413,7 +449,7 @@ test('with the list closed, Escape clears the unit first when it was the last th
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
 
   await first.press('Escape');
-  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toHaveCount(0);
   await expect(page.getByRole('option', { name: /^liters L$/ })).toBeVisible();
   await expect(scope).toHaveText('Volume');
   await expect(labelA).toHaveText('');
@@ -431,7 +467,8 @@ test('with the list closed, Escape clears the unit first when it was the last th
 test('with the list closed, Escape takes back the typing done after the lock, then the unit', async ({
   page,
 }) => {
-  await page.goto('/');
+  // As above, the second box's unit keeps the caret in the first after Enter.
+  await page.goto('/?b=us-cup');
   await ready(page);
   const { first } = boxes(page);
 
@@ -452,7 +489,7 @@ test('with the list closed, Escape takes back the typing done after the lock, th
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
 
   await first.press('Escape');
-  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toHaveCount(0);
   await expect(page.getByRole('listbox')).toBeVisible();
   await first.press('Escape');
   await first.press('Escape');

@@ -283,6 +283,18 @@ export function selectView(state: ConverterState, options: NumberEnv): Converter
 }
 
 /**
+ * Where the caret goes after Enter in `from` (docs/UX-SPEC.md §5): on to the other box when a
+ * unit there is all the conversion still needs, this box having its unit and a number to
+ * convert. Null keeps the caret in the box.
+ */
+export function nextBox(view: ConverterView, from: BoxId): BoxId | null {
+  const to = other(from);
+  const source = view.a.isSource ? view.a : view.b;
+  const hasNumber = source.parsed.valueText !== undefined;
+  return view[from].unit && !view[to].unit && hasNumber ? to : null;
+}
+
+/**
  * convert() throws only for a cross-category pair or a non-finite input, which lock, the URL
  * reader, and the parser already rule out. A throw during render would take the island down,
  * so an impossible pair simply shows no result.

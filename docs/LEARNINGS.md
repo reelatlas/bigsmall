@@ -466,3 +466,8 @@ Format:
 
 **What happened.** The first launch build gave the not-found page a canonical link to `/404/`, though it answers every unknown address, and gave the `/dev` pages both `noindex` and a canonical link, which tell search engines opposite things.
 **Rule.** One prop decides both: `Base`'s `noindex` writes the robots tag in place of the canonical link. A browser test checks the converter page names its canonical address and the dev pages name none.
+
+## 2026-10-07 — Move focus to another field after the commit renders
+
+**What happened.** Enter that commits a unit now moves the caret to the other box. Focusing it inside the key handler would run its focus handler with the props from before the commit: a box that just got its category would highlight the row the unscoped list had there, the Back row, instead of the best match.
+**Rule.** When an action moves focus to a component its own state change affects, record the request in state and move focus in a layout effect once the commit has rendered, still before the next key (the converter's `entered`). A browser test checks the other box opens with its best match highlighted.

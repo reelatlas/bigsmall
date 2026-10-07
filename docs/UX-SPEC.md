@@ -93,7 +93,7 @@ Match classes, strongest first:
 
 Nothing commits on a keystroke: while typing, the best match is highlighted and the text stays editable.
 
-- **Enter** commits the highlighted row. While typing, the highlight sits on the best match, so Enter takes it even when it is a prefix match (`kilom` + Enter → kilometers). Enter on a category row or the Back row moves between levels instead. With nothing highlighted, Enter commits an exact match if the query names exactly one unit; failing that, when the box holds arithmetic, Enter replaces it with its value (`5 + 3` becomes `8`, the unit stays), one undoable step. Enter closes the list and keeps focus in the box.
+- **Enter** commits the highlighted row. While typing, the highlight sits on the best match, so Enter takes it even when it is a prefix match (`kilom` + Enter → kilometers). Enter on a category row or the Back row moves between levels instead. With nothing highlighted, Enter commits an exact match if the query names exactly one unit; failing that, when the box holds arithmetic, Enter replaces it with its value (`5 + 3` becomes `8`, the unit stays), one undoable step. Enter closes the list. Then, when a unit in the other box is all the conversion still needs (this box has its unit, there is a number to convert, and the other box has no unit, or just lost it to a switch of category, §6), the caret moves on to the other box, whose list opens inside the category (§3), so the next unit is a few keys away. Otherwise the caret stays in the box: with both units chosen, Enter leaves it where it is, so units can be compared in one box. A click or tap on a row never moves the caret.
 - **Picking a row** with a click or tap commits it.
 - **Tab and leaving the box never commit**, not even an exact match. The text stays as typed, so moving between boxes never changes anything; back in the box, the best match is highlighted again for Enter.
 - Committing keeps the number and drops the query: `5 ml` becomes `5` with the mL chip. Picking a category row while a query is typed, in either box, keeps the number and drops the query.
@@ -121,15 +121,15 @@ Nothing commits on a keystroke: while typing, the best match is highlighted and 
 
 ## 8. Keyboard and calculator
 
-| Key                                        | In a box                                                                                                          |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| Enter                                      | Commit the highlighted row, or move between levels on a category or Back row (§5)                                 |
-| ↑ ↓                                        | Move through the list. Down from nothing goes to the first unit or category; Up from nothing goes to the last row |
-| Up from the first unit, Down from the last | Highlight the Back row                                                                                            |
-| Esc                                        | Back one step (§9)                                                                                                |
-| Backspace                                  | On an empty box with a unit: remove the unit                                                                      |
-| Tab, Shift+Tab                             | Go to the other box without committing anything: first box, second box, then swap                                 |
-| Ctrl/⌘+Z, Ctrl/⌘+Y, Ctrl/⌘+Shift+Z         | Undo and redo, anywhere inside the converter, replacing the field's own text undo                                 |
+| Key                                        | In a box                                                                                                                           |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Enter                                      | Commit the highlighted row, or move between levels on a category or Back row; on to the other box while it still needs a unit (§5) |
+| ↑ ↓                                        | Move through the list. Down from nothing goes to the first unit or category; Up from nothing goes to the last row                  |
+| Up from the first unit, Down from the last | Highlight the Back row                                                                                                             |
+| Esc                                        | Back one step (§9)                                                                                                                 |
+| Backspace                                  | On an empty box with a unit: remove the unit                                                                                       |
+| Tab, Shift+Tab                             | Go to the other box without committing anything: first box, second box, then swap                                                  |
+| Ctrl/⌘+Z, Ctrl/⌘+Y, Ctrl/⌘+Shift+Z         | Undo and redo, anywhere inside the converter, replacing the field's own text undo                                                  |
 
 The chip's buttons and the copy buttons are out of the Tab order because the field's own keys do the same jobs; pointers and screen readers still reach them. The list itself is not a Tab stop. Swap follows the second box in the DOM so Tab goes box to box; the grid still draws it between them.
 
@@ -225,6 +225,7 @@ The script is docs/research/usability-test-1.md. The questions this build raises
 4. Do people find undo, redo, and clear all, and the chip as something to click?
 5. Do they read the category label under a box as "this side is driving"?
 6. With `oz`, do they notice which ounce is highlighted before pressing Enter?
+7. When Enter moves the caret on to the other box, do they notice and pick the next unit there, or does the move surprise them? Does anyone tapping a row expect it to move on too?
 
 ## 16. Change history
 

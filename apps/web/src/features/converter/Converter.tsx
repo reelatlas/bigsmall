@@ -1,5 +1,5 @@
 import { formatNumber, getCategory, parse } from '@bigsmall/core';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
 import {
@@ -22,7 +22,7 @@ import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { SmartInput } from './SmartInput';
-import type { BoxId, BoxView } from './state';
+import { nextBox, type BoxId, type BoxView } from './state';
 import { urlFor } from './url';
 import { useConverter } from './useConverter';
 
@@ -44,6 +44,11 @@ const EXAMPLES: Record<BoxId, string> = {
   a: '5 ml, feet, °F…',
   b: '2 kg, inches, speed…',
 };
+
+/** A box's text field, found by the mark SmartInput puts on it. */
+function boxInput(section: HTMLElement | null, id: BoxId): HTMLInputElement | null {
+  return section?.querySelector<HTMLInputElement>(`input[data-box="${id}"]`) ?? null;
+}
 
 /**
  * The converter island: the hint and the toolbar (the calculator, undo, redo, clear all), two
@@ -77,8 +82,21 @@ export function Converter() {
   /** Clear both boxes (undoable like any other step) and put the caret back in the first box. */
   const clearAll = () => {
     dispatch({ type: 'clear' });
-    sectionRef.current?.querySelector<HTMLInputElement>('input[role="combobox"]')?.focus();
+    boxInput(sectionRef.current, 'a')?.focus();
   };
+
+  // Enter in a box moves the caret on when the other box still needs a unit (docs/UX-SPEC.md
+  // §5). The move waits for the render that commits the unit, so the other box opens on its new
+  // scope, and runs in a layout effect, before the next key. Each Enter is a new object, handled
+  // once however often the view changes after it.
+  const [entered, setEntered] = useState<{ box: BoxId } | null>(null);
+  const handledEnter = useRef<{ box: BoxId } | null>(null);
+  useLayoutEffect(() => {
+    if (!entered || handledEnter.current === entered) return;
+    handledEnter.current = entered;
+    const to = nextBox(view, entered.box);
+    if (to) boxInput(sectionRef.current, to)?.focus();
+  }, [entered, view]);
 
   // Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes anywhere inside the converter,
   // replacing the text field's own undo so "undo" always means the last thing the user did here.
@@ -207,6 +225,7 @@ export function Converter() {
         examples={EXAMPLES[box.id]}
         counterpart={counterpart.unit}
         trailing={copyButton(box, label.toLowerCase())}
+        onEnter={() => setEntered({ box: box.id })}
       />
       {categoryLabel(box.id)}
     </div>

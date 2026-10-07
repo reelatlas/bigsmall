@@ -50,6 +50,7 @@ function ResultSample({ label }: { label: string }) {
       mode="basic"
       env={ENV}
       dispatch={noop}
+      onEnter={noop}
       escapeTarget={null}
       examples=""
       counterpart={null}
@@ -73,6 +74,7 @@ function OutOfRangeSample({ label }: { label: string }) {
       mode="basic"
       env={ENV}
       dispatch={noop}
+      onEnter={noop}
       escapeTarget={null}
       examples=""
       counterpart={null}
@@ -91,6 +93,7 @@ function ArithmeticSample({ label }: { label: string }) {
       mode="basic"
       env={ENV}
       dispatch={noop}
+      onEnter={noop}
       escapeTarget={null}
       examples=""
       counterpart={null}

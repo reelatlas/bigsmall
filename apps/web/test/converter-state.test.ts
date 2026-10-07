@@ -4,6 +4,7 @@ import {
   HISTORY_LIMIT,
   initialHistory,
   initialState,
+  nextBox,
   reduce,
   reduceWithHistory,
   selectView,
@@ -364,6 +365,55 @@ describe('source handoff', () => {
     expect(v.a.text).toBe('');
     expect(v.b.text).toBe('');
     expect(v.result).toBeNull();
+  });
+});
+
+describe('nextBox', () => {
+  const view = (...actions: Parameters<typeof reduce>[1][]) => selectView(run(...actions), EN);
+
+  it('moves on to the other box once this one has a number and a unit', () => {
+    const v = view(
+      { type: 'input', box: 'a', text: '5 ml', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    );
+    expect(nextBox(v, 'a')).toBe('b');
+  });
+
+  it('stays while the other box has its unit', () => {
+    const v = view(
+      { type: 'input', box: 'a', text: '5 ml', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+    );
+    expect(nextBox(v, 'a')).toBeNull();
+  });
+
+  it('stays while there is no number to convert', () => {
+    const v = view({ type: 'lock', box: 'a', unit: 'milliliter' });
+    expect(nextBox(v, 'a')).toBeNull();
+  });
+
+  it('stays while this box has no unit', () => {
+    expect(nextBox(view({ type: 'input', box: 'a', text: '5', at: 0 }), 'a')).toBeNull();
+  });
+
+  it('moves to the box holding the number when only it lacks a unit', () => {
+    const v = view(
+      { type: 'input', box: 'a', text: '5', at: 0 },
+      { type: 'lock', box: 'b', unit: 'foot' },
+    );
+    expect(nextBox(v, 'b')).toBe('a');
+  });
+
+  it('moves on after a switch of category clears the other box’s unit', () => {
+    const v = view(
+      { type: 'input', box: 'a', text: '5 ml', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+      { type: 'lock', box: 'a', unit: 'kilogram' },
+    );
+    expect(v.b.unit).toBeNull();
+    expect(nextBox(v, 'a')).toBe('b');
   });
 });
 

@@ -52,6 +52,8 @@ export interface SmartInputProps {
   counterpart: Unit | null;
   /** Rendered at the end of the field, such as the copy button. */
   trailing?: ReactNode;
+  /** Enter committed or kept the box's unit and closed the list; the converter decides whether the caret moves on (docs/UX-SPEC.md §5). */
+  onEnter: () => void;
 }
 
 /**
@@ -106,6 +108,7 @@ export function SmartInput({
   examples,
   counterpart,
   trailing,
+  onEnter,
 }: SmartInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
@@ -302,8 +305,9 @@ export function SmartInput({
         } else setActive((i) => (i <= 0 ? count - 1 : i - 1));
         break;
       case 'Enter': {
-        // Commit and close while keeping focus here. Back and category rows move between the
-        // list's levels instead, so the list stays open.
+        // Commit and close; the converter then moves the caret on when the other box still
+        // needs a unit. Back and category rows move between the list's levels instead, so the
+        // list stays open.
         event.preventDefault();
         const item = open && active >= 0 ? items[active] : undefined;
         if (item?.kind === 'category' || item?.kind === 'back') {
@@ -316,6 +320,7 @@ export function SmartInput({
         if (item && !own) pick(item);
         else if (!commitExact()) evaluate();
         closePanel();
+        onEnter();
         break;
       }
       case 'Escape':
@@ -382,6 +387,7 @@ export function SmartInput({
             <input
               ref={inputRef}
               id={inputId}
+              data-box={box.id}
               type="text"
               role="combobox"
               aria-expanded={open}

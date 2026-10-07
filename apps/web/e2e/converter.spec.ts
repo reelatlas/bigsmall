@@ -320,7 +320,9 @@ test('picking a category from a typed word drops the word, in either box', async
   await expect(page.getByRole('option', { name: /^milliliters mL$/ })).toBeVisible();
 });
 
-test('Tab goes from the first box straight to the second, then to swap', async ({ page }) => {
+test('Tab goes from the toolbar to the first box, then straight to the second', async ({
+  page,
+}) => {
   await page.goto('/?a=milliliter&b=us-cup&v=250&s=a');
   await ready(page);
   const { first, second } = boxes(page);
@@ -328,12 +330,16 @@ test('Tab goes from the first box straight to the second, then to swap', async (
   await first.click();
   await first.press('Tab');
   await expect(second).toBeFocused();
-  await second.press('Tab');
-  await expect(page.getByRole('button', { name: 'Swap sides' })).toBeFocused();
-  await page.keyboard.press('Shift+Tab');
-  await expect(second).toBeFocused();
   await second.press('Shift+Tab');
   await expect(first).toBeFocused();
+  // Before the boxes comes the toolbar, with swap right of the calculator. Undo and redo have
+  // nothing to do yet, so they are not Tab stops.
+  await first.press('Shift+Tab');
+  await expect(page.getByRole('button', { name: 'Clear all' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.getByRole('button', { name: 'Swap sides' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.getByRole('button', { name: 'Calculator' })).toBeFocused();
 });
 
 test('the list grows out of the field over the page instead of pushing the other box down', async ({
@@ -731,6 +737,8 @@ test('clear all empties both boxes, and undo brings them back', async ({ page })
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
   await expect(first).toBeFocused();
   await expect(clear).toBeDisabled();
+  // With nothing in either box there is nothing to swap either.
+  await expect(page.getByRole('button', { name: 'Swap sides' })).toBeDisabled();
   await expect(page).toHaveURL(/\/$/);
 
   await page.getByRole('button', { name: 'Undo' }).click();
@@ -752,6 +760,11 @@ test('the hint has a line of its own, and the toolbar sits under it, over the bo
   const fieldBox = (await boxes(page).first.boundingBox())!;
   expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(toolbar.y);
   expect(toolbar.y + toolbar.height).toBeLessThanOrEqual(fieldBox.y);
+  // Swap sits in the toolbar, right of the calculator.
+  const calculator = (await page.getByRole('button', { name: 'Calculator' }).boundingBox())!;
+  const swap = (await page.getByRole('button', { name: 'Swap sides' }).boundingBox())!;
+  expect(swap.y).toBe(calculator.y);
+  expect(swap.x).toBeGreaterThan(calculator.x);
 });
 
 test('Backspace on an empty box removes its unit and lists that category', async ({ page }) => {

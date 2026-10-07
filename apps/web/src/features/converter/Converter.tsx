@@ -17,7 +17,6 @@ import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
-import { cx } from '../../lib/recipes';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
@@ -212,8 +211,8 @@ export function Converter() {
     </p>
   );
 
-  const renderBox = (box: BoxView, label: string, counterpart: BoxView, placement: string) => (
-    <div className={cx('min-w-0', placement)}>
+  const renderBox = (box: BoxView, label: string, counterpart: BoxView) => (
+    <div className="min-w-0">
       <SmartInput
         box={box}
         label={label}
@@ -260,7 +259,18 @@ export function Converter() {
           >
             <CalculatorIcon />
           </Button>
-          {/* Opening the calculator is a different kind of action from undo and redo. */}
+          {/* The arrows point the way the boxes sit: across from sm, down below it. */}
+          <Button
+            variant="ghost"
+            square
+            aria-label="Swap sides"
+            title="Swap sides"
+            disabled={isEmpty}
+            onClick={() => dispatch({ type: 'swap' })}
+          >
+            <SwapIcon className="rotate-90 sm:rotate-0" />
+          </Button>
+          {/* The calculator and swap act on the conversion; undo and redo step through its history. */}
           <ToolbarDivider />
           <Button
             variant="ghost"
@@ -299,24 +309,10 @@ export function Converter() {
         </div>
       </div>
 
-      {/*
-        The DOM order is first box, second box, swap, so Tab goes from one value straight to the
-        other; the grid still draws swap between them (docs/UX-SPEC.md §8). sm:pt-2.5 centers the
-        44 px swap button on the 64 px fields.
-      */}
-      <div className="grid grid-cols-1 items-start gap-x-3 gap-y-2 sm:grid-cols-[1fr_auto_1fr]">
-        {renderBox(view.a, 'First value', view.b, 'row-start-1 sm:col-start-1')}
-        {renderBox(view.b, 'Second value', view.a, 'row-start-3 sm:col-start-3 sm:row-start-1')}
-        <div className="row-start-2 flex justify-center sm:col-start-2 sm:row-start-1 sm:pt-2.5">
-          <Button
-            variant="ghost"
-            square
-            aria-label="Swap sides"
-            onClick={() => dispatch({ type: 'swap' })}
-          >
-            <SwapIcon className="rotate-90 sm:rotate-0" />
-          </Button>
-        </div>
+      {/* Side by side from sm, stacked below it; Tab goes from one value straight to the other. */}
+      <div className="grid grid-cols-1 items-start gap-x-4 gap-y-2 sm:grid-cols-2">
+        {renderBox(view.a, 'First value', view.b)}
+        {renderBox(view.b, 'Second value', view.a)}
       </div>
 
       {calculatorOpen && (

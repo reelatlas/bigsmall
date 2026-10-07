@@ -156,6 +156,7 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 - An icon-only action on the page is `Button variant="ghost" square` with an `aria-label`: swap, undo, redo, clear all, copy (also `nested`, inside a field), copy link, and the shortcuts map at rest. Disabled ones drop to 50 % opacity.
 - **Slots.** A control an island owns but the static header shows (copy link) is drawn into a slot the markup reserves at its final size (`src/lib/slots.ts`, a React portal), so it appears after hydration without moving anything and keeps the island's state at hand.
 - The toolbar's divider between redo and clear all is `h-6 border-l border-line`.
+- **Space by what shows.** A ghost icon's 20 px glyph sits 12 px inside its 44 px button, so the space people see between two icons is the gap plus 24 px. Next to a bordered control, which shows its edge, a row of ghost icons keeps the same visible rhythm: the edge sits as far from the last glyph as glyphs sit from each other. In the header that is 36 px both ways (icons `gap-2` inside their 48 px places, the theme menu `gap-5.5` after the icons; `HeaderMenus.astro`).
 - A successful copy swaps the icon for `CheckIcon` in `text-success`, which every theme keeps at 3:1 on the surface (a graphic, WCAG 1.4.11).
 - Keycaps (`Keycap`) are `rounded-sm border border-line bg-surface-raised font-numeric text-xs`.
 

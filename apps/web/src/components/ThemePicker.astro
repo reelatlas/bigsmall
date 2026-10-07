@@ -10,19 +10,20 @@ interface Props {
 const { id = 'theme' } = Astro.props;
 const menuId = `${id}-menu`;
 const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
+
+/*
+ * The theme menu: a fluid shell (lib/recipes.ts) whose trigger and options are one shape, growing
+ * over the page when open. No bundle: the inline script in layouts/Base.astro opens and closes it
+ * (data-shell), applies and saves the chosen radio, and fills in the current name. The options are
+ * native radios, so arrow keys, Space, and screen readers work without any script. The shell's
+ * edge turns accent while anything inside has focus, which is the trigger's focus indicator. Option
+ * rows use rounded-nested-md, the md corner minus the border and gutter, so the curves nest. Below
+ * sm the word "Theme" is only for screen readers and the menu is as wide as its widest theme name,
+ * with the name centered: the sizer below stacks every name in one grid cell, unseen, so the width
+ * fits the theme's own font and stays put while the arrow keys preview themes.
+ */
 ---
 
-<!--
-  The theme menu: a fluid shell (lib/recipes.ts) whose trigger and options are one shape, growing
-  over the page when open. No bundle: the inline script in layouts/Base.astro opens and closes it
-  (data-shell), applies and saves the chosen radio, and fills in the current name. The options are
-  native radios, so arrow keys, Space, and screen readers work without any script. The shell's
-  edge turns accent while anything inside has focus, which is the trigger's focus indicator. Option
-  rows use rounded-nested-md, the md corner minus the border and gutter, so the curves nest. Below
-  sm the word "Theme" is only for screen readers and the menu is as wide as its widest theme name,
-  with the name centered: the sizer below stacks every name in one grid cell, unseen, so the width
-  fits the theme's own font and stays put while the arrow keys preview themes.
--->
 <div class="group relative h-12 sm:w-44" data-shell>
   <span
     aria-hidden="true"

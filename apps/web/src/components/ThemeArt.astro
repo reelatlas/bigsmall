@@ -20,13 +20,14 @@ const TOGGLE: Record<ThemeId, string> = {
   theorem: 'hidden in-data-[theme=theorem]:block',
 };
 const toggle = (id: ThemeId) => (theme ? 'block' : TOGGLE[id]);
+
+/*
+ * A small drawing for each theme beside the wordmark, made for bigsmall (ADR 0004). Decorative:
+ * hidden from screen readers. Colors come from each theme's art tokens (--art-1, --art-2, --art-3)
+ * through the bridge, so a drawing always matches the theme it belongs to (docs/THEMING.md).
+ */
 ---
 
-<!--
-  A small drawing for each theme beside the wordmark, made for bigsmall (ADR 0004). Decorative:
-  hidden from screen readers. Colors come from each theme's art tokens (--art-1, --art-2, --art-3)
-  through the bridge, so a drawing always matches the theme it belongs to (docs/THEMING.md).
--->
 <span class="inline-flex size-8 shrink-0" aria-hidden="true" data-theme-art>
   {shown('daylight') && (
     <svg viewBox="0 0 32 32" class={toggle('daylight')} data-art="daylight" fill="none">

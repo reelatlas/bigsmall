@@ -9,24 +9,25 @@ interface Props {
 }
 
 const { actions = false } = Astro.props;
+
+/*
+ * The header's controls, in one place so every page shows the same ones in the same order. The
+ * actions slot is the size of the icon buttons beside it (a 44 px button inside 2 px, like the
+ * shells' edges), so the button the island draws into it lines up and nothing shifts.
+ *
+ * Spacing follows what the eye sees, not the boxes (docs/DESIGN-SYSTEM.md, "Icon buttons"): a
+ * ghost icon's glyph sits 12 px inside its button and 2 px more inside its 48 px place, so two
+ * icons 8 px apart show 36 px between glyphs. The bordered theme menu shows its edge, so it sits
+ * 22 px from the icons, which also leaves 36 px between the last glyph and that edge. Below sm it
+ * sits 8 px away (22 px seen), so a phone's header keeps one line longer.
+ *
+ * Where the page's header (an @container) is narrower than sm, too narrow for every theme's name,
+ * art, and menus on one line (Hardhat's wide name needs the most), the menus take a line of their
+ * own under the name, flush left, with the theme menu first so the row reads from the left edge
+ * (docs/UX-SPEC.md §1). Wider, they sit on the right, the icons before the theme menu.
+ */
 ---
 
-<!--
-  The header's controls, in one place so every page shows the same ones in the same order. The
-  actions slot is the size of the icon buttons beside it (a 44 px button inside 2 px, like the
-  shells' edges), so the button the island draws into it lines up and nothing shifts.
-
-  Spacing follows what the eye sees, not the boxes (docs/DESIGN-SYSTEM.md, "Icon buttons"): a
-  ghost icon's glyph sits 12 px inside its button and 2 px more inside its 48 px place, so two
-  icons 8 px apart show 36 px between glyphs. The bordered theme menu shows its edge, so it sits
-  22 px from the icons, which also leaves 36 px between the last glyph and that edge. Below sm it
-  sits 8 px away (22 px seen), so a phone's header keeps one line longer.
-
-  Where the page's header (an @container) is narrower than sm, too narrow for every theme's name,
-  art, and menus on one line (Hardhat's wide name needs the most), the menus take a line of their
-  own under the name, flush left, with the theme menu first so the row reads from the left edge
-  (docs/UX-SPEC.md §1). Wider, they sit on the right, the icons before the theme menu.
--->
 <div
   class="ml-auto flex items-start gap-2 sm:gap-5.5 @max-sm:ml-0 @max-sm:basis-full"
   data-header-menus

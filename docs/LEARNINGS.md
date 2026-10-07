@@ -381,3 +381,13 @@ Format:
 
 **What happened.** The owner wanted the header's menus reordered and flush left only when they wrap under the name. Flex wrapping is invisible to CSS, and the point where it happens depends on the theme's fonts (Hardhat's wide name wraps first).
 **Rule.** Measure the widest case, then switch layouts at the smallest stock container size above it (`@container` on the header, `@max-sm:` on the menus: 384 px of header, where Hardhat needs 353 once the phone gap is 8 px) rather than a one-off breakpoint. Pin both sides of the switch with browser tests at widths around it, in every theme.
+
+## 2026-10-07 — Astro template comments ship in the page
+
+**What happened.** The pre-launch tidy-up found every component's notes, written as HTML comments in its template, in each built page: 3.6 KB of the converter page's HTML, a sixth of it gzipped. The inline script in `Base.astro` is not minified either, so its line comments ship too (1.8 KB).
+**Rule.** A component's notes go in its frontmatter as a block comment, which the build strips, or in `{/* */}` inside the template; `test/astro-templates.test.ts` fails on an HTML comment in any template. Minifying the inline script belongs with the performance budgets of milestone 5.
+
+## 2026-10-07 — astro check's deprecation hints come from preact/compat's types
+
+**What happened.** `astro check` prints hints that `ButtonHTMLAttributes`, `TargetedEvent`, and similar are deprecated. preact/compat maps React's type names onto Preact's JSX-namespace aliases, which Preact marks deprecated in favor of its own names. Its `className` is also typed to accept a signal, which a helper typed for strings (`cx`) rejects.
+**Rule.** The hints are expected while islands are written against the React API (ADR 0007); leave them. A component that hands `className` to a string-only helper types it as React does, `Omit<…, 'className'>` plus `className?: string`, as `Button` does.

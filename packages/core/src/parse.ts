@@ -9,6 +9,11 @@ export interface ParsedInput {
   valueText?: string;
   /** Whatever followed the number, trimmed, original case. The whole text when there is no number. */
   query?: string;
+  /**
+   * Set when the text is a number a double cannot hold, and `value` is then absent:
+   * 'large' beyond about ±1.8e308 ("1e400"), 'small' when nonzero digits round to zero ("1e-400").
+   */
+  outOfRange?: 'large' | 'small';
 }
 
 const DEFAULT_SEPARATORS: Separators = { decimal: '.', group: ',' };
@@ -27,6 +32,8 @@ const LEADING_NUMBER = new RegExp(
   `^${SIGN}(?:${DIGITS}(?:${SEPARATOR}${DIGITS})*|[.,]${DIGITS})(?:[eE]${SIGN}${DIGITS})?`,
 );
 const ANY_SEPARATOR = new RegExp(SEPARATOR, 'g');
+const EXPONENT_MARK = /[eE]/;
+const NONZERO_DIGIT = /[1-9]/;
 
 /**
  * Parse one box's text. Lenient by design (docs/UX-SPEC.md §2 and §13):
@@ -45,12 +52,16 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
   const value = toNumber(valueText, separators);
 
   const result: ParsedInput = { raw: text, valueText };
-  if (value !== undefined) result.value = value;
+  if (!Number.isFinite(value)) result.outOfRange = 'large';
+  else if (value === 0 && NONZERO_DIGIT.test(valueText.split(EXPONENT_MARK)[0] ?? '')) {
+    result.outOfRange = 'small';
+  } else result.value = value;
   if (rest) result.query = rest;
   return result;
 }
 
-function toNumber(text: string, separators: Separators): number | undefined {
+/** The number the text spells, which may be ±Infinity or a zero that underflowed; parse() judges the range. */
+function toNumber(text: string, separators: Separators): number {
   let body = text.split(UNICODE_MINUS).join('-');
   let exponent = '';
   const expIndex = body.search(/[eE]/);
@@ -74,8 +85,7 @@ function toNumber(text: string, separators: Separators): number | undefined {
     decimalIndex >= 0 ? body.slice(decimalIndex + 1).replace(ANY_SEPARATOR, '') : '';
 
   const canonical = `${sign}${integerPart || '0'}${fractionPart ? `.${fractionPart}` : ''}${exponent ? `e${exponent}` : ''}`;
-  const value = Number(canonical);
-  return Number.isFinite(value) ? value : undefined;
+  return Number(canonical);
 }
 
 /**

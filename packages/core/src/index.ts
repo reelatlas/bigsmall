@@ -24,5 +24,7 @@ export type {
   SearchResponse,
   Suggestion,
 } from './search';
+export { matchSpan } from './highlight';
+export type { TextSpan } from './highlight';
 export { formatNumber } from './format';
 export type { FormatOptions } from './format';

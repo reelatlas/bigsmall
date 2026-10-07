@@ -72,6 +72,30 @@ describe('parse', () => {
   it('defaults to a period decimal and comma grouping', () => {
     expect(parse('1,234.5').value).toBe(1234.5);
   });
+
+  it('flags numbers a double cannot hold instead of dropping them', () => {
+    expect(parse('1e400 km')).toEqual({
+      raw: '1e400 km',
+      valueText: '1e400',
+      query: 'km',
+      outOfRange: 'large',
+    });
+    expect(parse('-1e400').outOfRange).toBe('large');
+    expect(parse('9'.repeat(400)).outOfRange).toBe('large');
+    expect(parse('1e-400')).toMatchObject({ valueText: '1e-400', outOfRange: 'small' });
+    expect(parse('1e-400').value).toBeUndefined();
+  });
+
+  it('keeps an honest zero a zero, whatever its exponent', () => {
+    expect(parse('0e-400')).toMatchObject({ value: 0 });
+    expect(parse('0.000')).toMatchObject({ value: 0 });
+    expect(parse('0e-400').outOfRange).toBeUndefined();
+  });
+
+  it('keeps the largest and smallest doubles in range', () => {
+    expect(parse('1.7e308').value).toBe(1.7e308);
+    expect(parse('5e-324').value).toBe(5e-324);
+  });
 });
 
 describe('localeSeparators', () => {

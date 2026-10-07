@@ -130,6 +130,20 @@ describe('search: categories and scope', () => {
     expect(ids(search('storage'))[0]).toBe('#data');
   });
 
+  it('a category row needs the start of its name or a whole alias, never part of an alias', () => {
+    expect(ids(search('vol'))[0]).toBe('#volume');
+    expect(ids(search('Temperature'))[0]).toBe('#temperature');
+    expect(ids(search('flui'))).not.toContain('#volume');
+    expect(ids(search('how'))).not.toContain('#length');
+    expect(ids(search('eight'))).not.toContain('#mass');
+    expect(ids(search('ata'))).not.toContain('#data');
+  });
+
+  it('does not guess a category from a typo; the no-match list offers them all', () => {
+    expect(ids(search('lenght'))).toEqual([]);
+    expect(ids(search('fluidz'))).not.toContain('#volume');
+  });
+
   it('a locked category scopes results to its units and hides categories', () => {
     expect(ids(search('m', { category: 'time' }))).toEqual(['millisecond', 'minute', 'month']);
     expect(ids(search('oz', { category: 'volume' }))).toEqual(['us-fluid-ounce']);

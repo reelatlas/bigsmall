@@ -9,6 +9,9 @@ import { categories, units } from './units';
  * Match classes from docs/UX-SPEC.md §4, strongest first. 0 means "listed without a query".
  * 1 exact symbol (case-sensitive) · 2 exact symbol/name/plural/alias (case-insensitive)
  * 3 prefix of name or alias · 4 prefix of symbol · 5 substring of name or alias · 6 one-typo fuzzy
+ * Categories use only 2 (exact name or alias) and 3 (prefix of the name): a category row appears
+ * when the query is visibly the start of the category word, or an everyday word for it, never
+ * from the middle of an alias.
  */
 export type MatchClass = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type MatchField = 'symbol' | 'name' | 'plural' | 'alias';
@@ -66,6 +69,7 @@ interface UnitKey {
 interface CategoryKey {
   category: Category;
   index: number;
+  field: 'name' | 'alias';
   raw: string;
   compact: string;
 }
@@ -89,14 +93,19 @@ const unitKeys: readonly UnitKey[] = units.flatMap((unit, index) => {
   return keys.map((k) => ({ unit, index, field: k.field, raw: k.raw, compact: compactKey(k.raw) }));
 });
 
-const categoryKeys: readonly CategoryKey[] = categories.flatMap((category, index) =>
-  [category.name, ...category.aliases].map((raw) => ({
+const categoryKeys: readonly CategoryKey[] = categories.flatMap((category, index) => {
+  const keys: Array<{ field: 'name' | 'alias'; raw: string }> = [
+    { field: 'name', raw: category.name },
+    ...category.aliases.map((raw) => ({ field: 'alias' as const, raw })),
+  ];
+  return keys.map((k) => ({
     category,
     index,
-    raw,
-    compact: compactKey(raw),
-  })),
-);
+    field: k.field,
+    raw: k.raw,
+    compact: compactKey(k.raw),
+  }));
+});
 
 function toQuery(text: string): Query {
   return { raw: text.replace(/\s+/g, ' ').trim(), compact: compactKey(text) };
@@ -112,8 +121,7 @@ function classifyUnit(q: Query, key: UnitKey): MatchClass | null {
 
 function classifyCategory(q: Query, key: CategoryKey): MatchClass | null {
   if (key.compact === q.compact) return 2;
-  if (key.compact.startsWith(q.compact)) return 3;
-  if (key.compact.includes(q.compact)) return 5;
+  if (key.field === 'name' && key.compact.startsWith(q.compact)) return 3;
   return null;
 }
 
@@ -228,12 +236,10 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
     if (matchClass !== null) offerCategory(key, matchClass);
   }
 
+  // Fuzzy matching is for units only: a no-match list shows every category anyway.
   if (bestUnit.size === 0 && bestCategory.size === 0 && q.compact.length >= FUZZY_MIN_LENGTH) {
     for (const key of scopedUnitKeys) {
       if (withinOneEdit(q.compact, key.compact)) offerUnit(key, 6);
-    }
-    for (const key of scopedCategoryKeys) {
-      if (withinOneEdit(q.compact, key.compact)) offerCategory(key, 6);
     }
   }
 

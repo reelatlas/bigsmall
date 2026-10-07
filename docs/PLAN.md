@@ -141,7 +141,7 @@ Rules: every theme passes the same contrast checks; decoration costs nothing whe
 | CLS                                       | ≈ 0                                                                                          |
 | Lighthouse                                | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100                             |
 
-The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 85.7 KB JS and 5.6 KB CSS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
+The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 86.5 KB JS and 5.7 KB CSS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
 
 ## 10. Accessibility targets
 
@@ -237,7 +237,7 @@ Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (che
 
 - **Ambiguous symbols** (`m`, `oz`, `ton`, `gal`, `cup`, `cal`, `hp`, `mpg`, `kB`). The disambiguation UX decides whether the smart input feels magical or annoying. Test it early.
 - **Explicit commit.** Decided: nothing commits on a keystroke, and only Enter or a pick commits (decision 7). The risk left is people who never press Enter; the usability test watches for it.
-- **Bundle size.** Resolved at M2 by removing React Aria (ADR 0006), and tight again: 85.7 KB JS gzipped after the calculator and arithmetic, against the 90 KB gate. The header animation and theme art must fit in what remains (theme art as SVG in the static HTML costs no JS); if they cannot, the owner decides between trimming and a budget that counts on-demand extras separately.
+- **Bundle size.** Resolved at M2 by removing React Aria (ADR 0006), and tight again: 86.5 KB JS gzipped after the calculator and arithmetic, against the 90 KB gate. The header animation and theme art must fit in what remains (theme art as SVG in the static HTML costs no JS); if they cannot, the owner decides between trimming and a budget that counts on-demand extras separately.
 - **Themes vs. speed.** Decoration must be free when inactive. Fonts are the main cost; system fonts for the defaults.
 - **Locale number parsing.** `1,5` means 1.5 in much of the world. Use the browser locale and show the detected format.
 - **Definitions that vary.** Month, year, cup, calorie, horsepower, ton. Each needs a stated definition in the UI and a note in the catalog.

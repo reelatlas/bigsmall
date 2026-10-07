@@ -15,8 +15,11 @@ export interface ParsedInput {
    * rounds to zero ("1e-400", "1e-200 × 1e-200").
    */
   outOfRange?: 'large' | 'small';
-  /** Set when the arithmetic divides by zero ("5 ÷ 0"); `value` is then absent. */
-  invalid?: 'divide-by-zero';
+  /**
+   * Set when the arithmetic has no answer, and `value` is then absent: 'divide-by-zero' ("5 ÷ 0",
+   * "0^-1"), or 'not-real' for a power with no real value ("(-8)^0.5").
+   */
+  invalid?: 'divide-by-zero' | 'not-real';
   /** Set when the value comes from arithmetic rather than one number, so the UI can show it. */
   expression?: true;
   /** Where the exponent markers ("e" or "E") sit within `valueText`, so the UI can set them apart. */
@@ -30,9 +33,9 @@ const UNICODE_MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);
 
-type Operator = 'add' | 'subtract' | 'multiply' | 'divide';
+type Operator = 'add' | 'subtract' | 'multiply' | 'divide' | 'power';
 
-/** Arithmetic by the character typed: ASCII, and the signs the keypad writes (− × ÷). */
+/** Arithmetic by the character typed: ASCII, and the signs the calculator writes (− × ÷). */
 const OPERATORS: Readonly<Record<string, Operator>> = {
   '+': 'add',
   '-': 'subtract',
@@ -41,12 +44,13 @@ const OPERATORS: Readonly<Record<string, Operator>> = {
   [TIMES]: 'multiply',
   '/': 'divide',
   [DIVIDE]: 'divide',
+  '^': 'power',
 };
 
 const SIGNS = new Set(['+', '-', UNICODE_MINUS]);
 const DIGITS = '[0-9]+';
 const SEPARATOR = `[.,${NBSP}${NARROW_NBSP}]`;
-const ENDS_A_NUMBER = `[ ${NBSP}${NARROW_NBSP})+*/${TIMES}${DIVIDE}${UNICODE_MINUS}-]`;
+const ENDS_A_NUMBER = `[ ${NBSP}${NARROW_NBSP})+*/^${TIMES}${DIVIDE}${UNICODE_MINUS}-]`;
 
 /**
  * One unsigned number (arithmetic reads the signs): digit groups split by ".", ",", or a
@@ -74,7 +78,7 @@ type Token =
  * Parse one box's text. Lenient by design (docs/UX-SPEC.md §2): spacing never matters, both
  * "1,000.5" and "1.000,5" work, a lone separator is read the way the locale would write it unless
  * the digits make that reading impossible ("1,5" is 1.5 everywhere), and the number can be
- * arithmetic ("2 × 3 ft", "(5 + 7) / 2 cm").
+ * arithmetic ("2 × 3 ft", "(5 + 7) / 2 cm", "2^10 bytes").
  */
 export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS): ParsedInput {
   const trimmed = text.trim();
@@ -98,6 +102,7 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
   );
   if (numbers.some((token) => !Number.isFinite(token.value))) result.outOfRange = 'large';
   else if (evaluation.divideByZero) result.invalid = 'divide-by-zero';
+  else if (evaluation.notReal) result.invalid = 'not-real';
   else if (!Number.isFinite(evaluation.value)) result.outOfRange = 'large';
   else if (evaluation.value === 0 && (evaluation.underflow || roundedToZero)) {
     result.outOfRange = 'small';
@@ -109,7 +114,7 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
 }
 
 /**
- * Read the arithmetic the text starts with: numbers joined by + − × ÷ (or * and /), with signs
+ * Read the arithmetic the text starts with: numbers joined by + − × ÷ ^ (or * and /), with signs
  * and parentheses, stopping where something else begins, which is the unit query. An operator,
  * sign, or "(" at the very end stays part of it, because the user is still typing. Null when the
  * text does not start with a number.
@@ -193,12 +198,15 @@ interface Evaluation {
   /** Operations performed; 0 means a single number, signed or not. */
   operations: number;
   divideByZero: boolean;
-  /** A product or quotient of nonzero amounts rounded to zero. */
+  /** A power with no real value, such as a negative number to the power of a half. */
+  notReal: boolean;
+  /** A product, quotient, or power of nonzero amounts rounded to zero. */
   underflow: boolean;
 }
 
 /**
- * The value of scanned arithmetic, × and ÷ before + and −. Unfinished input is read as far as it
+ * The value of scanned arithmetic: ^ first (from the right, and before a sign, so −2^2 is −4),
+ * then × and ÷, then + and −. Unfinished input is read as far as it
  * goes: a trailing operator, sign, or "(" is ignored and open parentheses close at the end, so
  * "5 +" is 5 and "(5 + 3" is 8 while the user types.
  */
@@ -206,7 +214,13 @@ function evaluate(scanned: readonly Token[]): Evaluation {
   let length = scanned.length;
   while (length > 0 && !['number', 'close'].includes(scanned[length - 1]!.kind)) length -= 1;
   const tokens = scanned.slice(0, length);
-  const result: Evaluation = { value: 0, operations: 0, divideByZero: false, underflow: false };
+  const result: Evaluation = {
+    value: 0,
+    operations: 0,
+    divideByZero: false,
+    notReal: false,
+    underflow: false,
+  };
   let at = 0;
 
   function apply(left: number, operator: Operator, right: number): number {
@@ -230,13 +244,22 @@ function evaluate(scanned: readonly Token[]): Evaluation {
         if (value === 0 && left !== 0) result.underflow = true;
         return value;
       }
+      case 'power': {
+        if (left === 0 && right < 0) {
+          result.divideByZero = true;
+          return Number.NaN;
+        }
+        const value = left ** right;
+        if (Number.isNaN(value)) result.notReal = true;
+        else if (value === 0 && left !== 0) result.underflow = true;
+        return value;
+      }
     }
   }
 
-  function operand(): number {
+  function primary(): number {
     const token = tokens[at];
     at += 1;
-    if (token?.kind === 'sign') return token.negative ? -operand() : operand();
     if (token?.kind === 'open') {
       const value = sum();
       if (tokens[at]?.kind === 'close') at += 1;
@@ -245,12 +268,28 @@ function evaluate(scanned: readonly Token[]): Evaluation {
     return token?.kind === 'number' ? token.value : Number.NaN;
   }
 
+  /** A power reads its exponent as a signed power, so 2^-3 works and 2^3^2 is 2^9. */
+  function power(): number {
+    const base = primary();
+    const token = tokens[at];
+    if (token?.kind !== 'operator' || token.operator !== 'power') return base;
+    at += 1;
+    return apply(base, 'power', signed());
+  }
+
+  function signed(): number {
+    const token = tokens[at];
+    if (token?.kind !== 'sign') return power();
+    at += 1;
+    return token.negative ? -signed() : signed();
+  }
+
   function product(): number {
-    let value = operand();
+    let value = signed();
     for (let token = tokens[at]; token?.kind === 'operator'; token = tokens[at]) {
       if (token.operator !== 'multiply' && token.operator !== 'divide') break;
       at += 1;
-      value = apply(value, token.operator, operand());
+      value = apply(value, token.operator, signed());
     }
     return value;
   }

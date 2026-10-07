@@ -10,6 +10,7 @@ import {
   type ConverterState,
   type History,
   type HistoryAction,
+  type TextTarget,
 } from '../src/features/converter/state';
 import { TYPING_CHUNK_MS } from '../src/lib/timing';
 
@@ -379,13 +380,63 @@ describe('history', () => {
   });
   const undo = (h: History) => reduceWithHistory(h, { type: 'undo' });
   const redo = (h: History) => reduceWithHistory(h, { type: 'redo' });
-  const back = (h: History, box: 'a' | 'b' = 'a') =>
+  const back = (h: History, box: TextTarget = 'a') =>
     reduceWithHistory(h, { type: 'stepBack', box });
+  const calcType = (text: string, at: number): HistoryAction => ({
+    type: 'calcType',
+    text,
+    fresh: false,
+    at,
+  });
 
   it('keystrokes within the pause window form one chunk', () => {
     const h = steps(type('a', '2', 0), type('a', '25', 200), type('a', '250', 400));
     expect(h.past).toHaveLength(1);
     expect(undo(h).present.a.text).toBe('');
+  });
+
+  it('the calculator types in chunks that Escape takes back one at a time', () => {
+    const later = TYPING_CHUNK_MS + 100;
+    let h = steps(
+      calcType('1', 0),
+      calcType('12', 100),
+      calcType('123', 100 + later),
+      calcType('1234', 200 + 2 * later),
+    );
+    const seen: string[] = [];
+    for (let step = 0; step < 3; step += 1) {
+      h = back(h, 'calc');
+      seen.push(h.present.calc.text);
+    }
+    expect(seen).toEqual(['123', '12', '']);
+    expect(escapeTarget(h, 'calc')).toBeNull();
+    // Each Escape step is undoable, like a box's.
+    expect(undo(h).present.calc.text).toBe('12');
+  });
+
+  it('undo goes from a send back into the arithmetic that produced it', () => {
+    let h = steps(
+      calcType('1', 0),
+      calcType('12', 100),
+      calcType('12×', 200),
+      calcType('12×3', 300),
+      { type: 'calcSet', text: '36', fresh: true },
+      { type: 'replace', box: 'b', text: '36' },
+    );
+    expect(h.present.b.text).toBe('36');
+    h = undo(h);
+    expect(h.present.b.text).toBe('');
+    expect(h.present.calc.text).toBe('36');
+    h = undo(h);
+    expect(h.present.calc.text).toBe('12×3');
+    h = redo(redo(h));
+    expect(h.present.b.text).toBe('36');
+  });
+
+  it('clear all and swap leave the calculator’s entry alone', () => {
+    const h = steps(calcType('42', 0), type('a', '5', 1000), { type: 'swap' }, { type: 'clear' });
+    expect(h.present.calc.text).toBe('42');
+    expect(escapeTarget(h, 'calc')).toBe('text');
   });
 
   it('replace is a step of its own, so undo brings the arithmetic back', () => {

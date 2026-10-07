@@ -13,12 +13,13 @@ import {
   UndoIcon,
 } from '../../components/icons';
 import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
+import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
-import { EMPTY_ENTRY, formatValue, placeNumber, pressKey } from './calculator';
+import { formatValue, isStepKey, placeNumber, pressKey } from './calculator';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
 import { linkFor } from './url';
@@ -62,12 +63,10 @@ export function Converter() {
   const calculatorId = useId();
   const calculatorToggleId = useId();
   const [calculatorOpen, setCalculatorOpen] = useState(false);
-  // The calculator's own entry: a scratch pad that stays while the page is open.
-  const [entry, setEntry] = useState(EMPTY_ENTRY);
+  // The calculator's own entry: a scratch pad in the converter's state, so undo reaches it too.
+  const entry = state.calc;
   const entryParsed = parse(entry.text, env.separators);
   const entryValue = entryParsed.value;
-  const running =
-    entryParsed.expression && entryValue !== undefined ? formatValue(entryValue, env) : null;
   const categoryName = view.category ? getCategory(view.category)?.name : undefined;
   const isEmpty = !state.a.text && !state.a.unit && !state.b.text && !state.b.unit;
 
@@ -113,7 +112,19 @@ export function Converter() {
 
   /** Keys change only the calculator's own entry (calculator.ts); the boxes wait for a send. */
   const press = (key: CalculatorKey) => {
-    setEntry((current) => pressKey(current, key, env) ?? current);
+    const next = pressKey(entry, key, env);
+    if (!next) return;
+    dispatch(
+      isStepKey(key)
+        ? { type: 'calcSet', ...next }
+        : { type: 'calcType', ...next, at: performance.now() },
+    );
+  };
+
+  /** Escape takes back the latest chunk of the entry, like Escape in a box; empty, it closes. */
+  const escapeCalculator = () => {
+    if (entry.text === '') closeCalculator();
+    else dispatch({ type: 'stepBack', box: 'calc' });
   };
 
   /**
@@ -139,7 +150,7 @@ export function Converter() {
       ordinal={ordinal}
       symbol={view[id].unit?.symbol}
       confirmed={copied === `use-${id}`}
-      disabled={entryValue === undefined}
+      unavailable={entryValue === undefined}
       onClick={() => send(id)}
       {...pointerProps(`use-${id}`)}
     />
@@ -294,10 +305,18 @@ export function Converter() {
       {calculatorOpen && (
         <div id={calculatorId} className="mx-auto mt-4 max-w-sm">
           <Calculator
-            entry={entry.text}
-            running={running}
+            display={
+              entry.text && (
+                <NumberText
+                  text={entry.text}
+                  parsed={entryParsed}
+                  running={runningValue(entryParsed, env.locale)}
+                />
+              )
+            }
             decimalMark={env.separators.decimal}
             onPress={press}
+            onEscape={escapeCalculator}
             onClose={closeCalculator}
             footer={
               <>

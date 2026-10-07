@@ -144,6 +144,13 @@ describe('parse arithmetic', () => {
     { text: '1.000+2.000', separators: DE, value: 3000 },
     { text: '1,5+2,5', separators: DE, value: 4 },
     { text: '1e3+1', value: 1001 },
+    { text: '2^10', value: 1024 },
+    { text: '2^10 bytes', value: 1024, query: 'bytes' },
+    { text: `${MINUS}2^2`, value: -4 },
+    { text: '2^-3', value: 0.125 },
+    { text: '2^3^2', value: 512 },
+    { text: '3*2^2', value: 12 },
+    { text: '(1+1)^3', value: 8 },
   ];
   for (const c of arithmetic) {
     it(`evaluates ${JSON.stringify(c.text)}`, () => {
@@ -159,6 +166,7 @@ describe('parse arithmetic', () => {
     expect(parse('5 km/h')).toMatchObject({ value: 5, query: 'km/h' });
     expect(parse('m/s')).toEqual({ raw: 'm/s', query: 'm/s' });
     expect(parse('5 -ft')).toMatchObject({ value: 5, valueText: '5', query: '-ft' });
+    expect(parse('5 m^2')).toMatchObject({ value: 5, query: 'm^2' });
     expect(parse('5 ft').expression).toBeUndefined();
     expect(parse('-5').expression).toBeUndefined();
   });
@@ -169,6 +177,7 @@ describe('parse arithmetic', () => {
     expect(parse(`5${TIMES}${MINUS}`)).toMatchObject({ value: 5 });
     expect(parse('5*(')).toMatchObject({ value: 5, valueText: '5*(' });
     expect(parse('(5+3')).toMatchObject({ value: 8, expression: true });
+    expect(parse('2^')).toMatchObject({ value: 2, valueText: '2^' });
     expect(parse('5.')).toMatchObject({ value: 5, valueText: '5.' });
     expect(parse('5.5.')).toMatchObject({ value: 5.5 });
     expect(parse('5,', DE)).toMatchObject({ value: 5, valueText: '5,' });
@@ -183,5 +192,9 @@ describe('parse arithmetic', () => {
     expect(parse('1e-400+1').value).toBe(1);
     expect(parse('5-5')).toMatchObject({ value: 0 });
     expect(parse('5-5').outOfRange).toBeUndefined();
+    expect(parse('0^-1').invalid).toBe('divide-by-zero');
+    expect(parse('(-8)^0.5')).toMatchObject({ invalid: 'not-real', expression: true });
+    expect(parse('10^400').outOfRange).toBe('large');
+    expect(parse('10^-400').outOfRange).toBe('small');
   });
 });

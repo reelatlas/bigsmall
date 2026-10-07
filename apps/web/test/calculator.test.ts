@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import type { CalculatorKey } from '../src/components/Calculator';
 import {
-  EMPTY_ENTRY,
   evaluatedText,
   placeNumber,
   pressKey,
   type CalculatorEnv,
 } from '../src/features/converter/calculator';
+import { EMPTY_CALC, type CalculatorState } from '../src/features/converter/state';
 
 const EN: CalculatorEnv = { separators: { decimal: '.', group: ',' }, locale: 'en-US' };
 const DE: CalculatorEnv = { separators: { decimal: ',', group: '.' }, locale: 'de-DE' };
@@ -13,18 +14,15 @@ const MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);
 
-const typed = (text: string) => ({ text, fresh: false });
-const evaluated = (text: string) => ({ text, fresh: true });
-const press = (
-  entry: { text: string; fresh: boolean },
-  key: Parameters<typeof pressKey>[1],
-  env = EN,
-) => pressKey(entry, key, env)?.text ?? null;
+const typed = (text: string): CalculatorState => ({ text, fresh: false });
+const evaluated = (text: string): CalculatorState => ({ text, fresh: true });
+const press = (entry: CalculatorState, key: CalculatorKey, env = EN) =>
+  pressKey(entry, key, env)?.text ?? null;
 
 describe('pressKey', () => {
   it('adds digits to the entry, and starts over right after =', () => {
     expect(press(typed('12'), '3')).toBe('123');
-    expect(press(EMPTY_ENTRY, '7')).toBe('7');
+    expect(press(EMPTY_CALC, '7')).toBe('7');
     expect(press(evaluated('36'), '5')).toBe('5');
   });
 
@@ -32,7 +30,7 @@ describe('pressKey', () => {
     expect(press(typed('5'), 'decimal')).toBe('5.');
     expect(press(typed('5'), 'decimal', DE)).toBe('5,');
     expect(press(typed('5.2'), 'decimal')).toBeNull();
-    expect(press(EMPTY_ENTRY, 'decimal')).toBe('0.');
+    expect(press(EMPTY_CALC, 'decimal')).toBe('0.');
     expect(press(typed(`5.2${TIMES}`), 'decimal')).toBe(`5.2${TIMES}0.`);
     expect(press(evaluated('3.5'), 'decimal')).toBe('0.');
   });
@@ -42,25 +40,42 @@ describe('pressKey', () => {
     expect(press(typed('5+'), 'divide')).toBe(`5${DIVIDE}`);
     expect(press(typed(`5${TIMES}`), 'subtract')).toBe(`5${TIMES}${MINUS}`);
     expect(press(typed(`5${TIMES}${MINUS}`), 'add')).toBe('5+');
+    expect(press(typed('2'), 'power')).toBe('2^');
+    expect(press(typed('2^'), 'subtract')).toBe(`2^${MINUS}`);
+    expect(press(typed('2^'), 'multiply')).toBe(`2${TIMES}`);
   });
 
   it('starts an entry with a minus only', () => {
-    expect(press(EMPTY_ENTRY, 'subtract')).toBe(MINUS);
-    expect(press(EMPTY_ENTRY, 'add')).toBeNull();
+    expect(press(EMPTY_CALC, 'subtract')).toBe(MINUS);
+    expect(press(EMPTY_CALC, 'add')).toBeNull();
     expect(press(typed(MINUS), '4')).toBe(`${MINUS}4`);
+  });
+
+  it('writes E as times ten to the power of, once per number', () => {
+    expect(press(typed('1.5'), 'exponent')).toBe('1.5E');
+    expect(press(EMPTY_CALC, 'exponent')).toBe('1E');
+    expect(press(typed('1E'), 'exponent')).toBeNull();
+    expect(press(typed(`1E${MINUS}3`), 'exponent')).toBeNull();
+    expect(press(evaluated('36'), 'exponent')).toBe('36E');
+    // An exponent waiting for digits takes a sign and nothing else.
+    expect(press(typed('1E'), 'subtract')).toBe(`1E${MINUS}`);
+    expect(press(typed(`1E${MINUS}`), 'add')).toBe('1E+');
+    expect(press(typed('1E'), 'multiply')).toBeNull();
+    expect(press(typed('1E'), 'decimal')).toBeNull();
   });
 
   it('deletes the last character, and clears the entry', () => {
     expect(press(typed('123'), 'backspace')).toBe('12');
-    expect(press(EMPTY_ENTRY, 'backspace')).toBeNull();
-    expect(pressKey(typed('12+3'), 'clear', EN)).toEqual(EMPTY_ENTRY);
-    expect(pressKey(EMPTY_ENTRY, 'clear', EN)).toBeNull();
+    expect(press(EMPTY_CALC, 'backspace')).toBeNull();
+    expect(pressKey(typed('12+3'), 'clear', EN)).toEqual(EMPTY_CALC);
+    expect(pressKey(EMPTY_CALC, 'clear', EN)).toBeNull();
   });
 
   it('turns arithmetic into its value with =, which the next digit replaces', () => {
-    expect(pressKey(typed('12+3'), 'equals', EN)).toEqual({ text: '15', fresh: true });
-    expect(pressKey(typed('15'), 'equals', EN)).toBeNull();
-    expect(pressKey(typed('5/0'), 'equals', EN)).toBeNull();
+    expect(pressKey(typed('12+3'), 'equals', EN)).toEqual(evaluated('15'));
+    expect(press(typed('2^10'), 'equals')).toBe('1,024');
+    expect(press(typed('15'), 'equals')).toBeNull();
+    expect(press(typed('5/0'), 'equals')).toBeNull();
   });
 });
 

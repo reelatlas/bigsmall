@@ -1,5 +1,6 @@
 import { formatNumber, parse, type Separators } from '@bigsmall/core';
 import type { CalculatorKey } from '../../components/Calculator';
+import { EMPTY_CALC, type CalculatorState } from './state';
 
 /**
  * The calculator's rules (docs/UX-SPEC.md §8, "The calculator"): what each key does to its own
@@ -11,22 +12,18 @@ export interface CalculatorEnv {
   locale: string | undefined;
 }
 
-/** What the calculator's display holds. `fresh` is true right after =, when a digit starts over. */
-export interface CalculatorEntry {
-  text: string;
-  fresh: boolean;
-}
-
-export const EMPTY_ENTRY: CalculatorEntry = { text: '', fresh: false };
-
 const MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);
 
 /** The sign each operator key writes: the typographic ones, which the parser reads like + - * /. */
-const SIGN = { add: '+', subtract: MINUS, multiply: TIMES, divide: DIVIDE } as const;
-const OPERATOR_CHARS = new Set(['+', '-', MINUS, '*', TIMES, '/', DIVIDE]);
-const MULTIPLYING = new Set(['*', TIMES, '/', DIVIDE]);
+const SIGN = { add: '+', subtract: MINUS, multiply: TIMES, divide: DIVIDE, power: '^' } as const;
+const OPERATOR_CHARS = new Set(['+', '-', MINUS, '*', TIMES, '/', DIVIDE, '^']);
+/** Operators after which − starts a negative number instead of replacing them. */
+const TAKES_A_SIGN = new Set(['*', TIMES, '/', DIVIDE, '^']);
+/** A number whose exponent is still waiting for its digits: 1E, or 1E− with its sign. */
+const OPEN_EXPONENT = /[eE]$/;
+const OPEN_EXPONENT_SIGN = new RegExp('[eE][+' + MINUS + '-]$');
 
 type OperatorKey = keyof typeof SIGN;
 
@@ -50,13 +47,21 @@ export function evaluatedText(text: string, env: CalculatorEnv): string | null {
   return parsed.query ? `${value} ${parsed.query}` : value;
 }
 
-/** The entry after one key, or null when the key changes nothing. */
+/** = and C make a whole new entry, a step of their own; every other key is typing, chunked. */
+export function isStepKey(key: CalculatorKey): boolean {
+  return key === 'equals' || key === 'clear';
+}
+
+/**
+ * The entry after one key, or null when the key changes nothing. The history decides what undo
+ * and Escape take back (state.ts): typing keys are chunked like keystrokes in a box.
+ */
 export function pressKey(
-  entry: CalculatorEntry,
+  entry: CalculatorState,
   key: CalculatorKey,
   env: CalculatorEnv,
-): CalculatorEntry | null {
-  if (key === 'clear') return entry.text === '' ? null : EMPTY_ENTRY;
+): CalculatorState | null {
+  if (key === 'clear') return entry.text === '' ? null : EMPTY_CALC;
   if (key === 'equals') {
     const value = evaluatedText(entry.text, env);
     return value === null ? null : { text: value, fresh: true };
@@ -92,33 +97,48 @@ function edit(
   mark: string,
 ): string | null {
   if (key === 'backspace') return text === '' ? null : text.slice(0, -1);
+  if (key === 'exponent') {
+    // E is times ten to the power of: one per number, and on its own it means 1E.
+    const operand = lastOperand(text);
+    if (/[eE]/.test(operand)) return null;
+    return operand === '' ? `${text}1E` : `${text}E`;
+  }
   if (key === 'decimal') {
     if (fresh) return `0${mark}`;
     const operand = lastOperand(text);
-    if (operand.includes(mark)) return null;
+    if (operand.includes(mark) || /[eE]/.test(operand)) return null;
     return `${text}${operand === '' ? '0' : ''}${mark}`;
   }
   if (isOperatorKey(key)) {
     // Operators carry a result on, so they never start over.
     const base = text.trimEnd();
+    // An exponent waiting for digits takes only a sign: 1E then − gives 1E−.
+    const operand = lastOperand(base);
+    if (OPEN_EXPONENT.test(operand) || OPEN_EXPONENT_SIGN.test(operand)) {
+      if (key !== 'add' && key !== 'subtract') return null;
+      const head = OPEN_EXPONENT.test(operand) ? base : base.slice(0, -1);
+      return `${head}${SIGN[key]}`;
+    }
     let start = base.length;
     while (start > 0 && OPERATOR_CHARS.has(base[start - 1]!)) start -= 1;
     const head = base.slice(0, start);
     const run = base.slice(start);
     if (head === '') return key === 'subtract' ? SIGN.subtract : null;
     // − after × or ÷ starts a negative number; any other second operator replaces the first.
-    if (key === 'subtract' && MULTIPLYING.has(run)) return `${base}${SIGN.subtract}`;
+    if (key === 'subtract' && TAKES_A_SIGN.has(run)) return `${base}${SIGN.subtract}`;
     return `${head}${SIGN[key]}`;
   }
   return fresh ? key : `${text}${key}`;
 }
 
-/** The number being typed: what follows the last operator or parenthesis. */
+/** The number being typed: what follows the last operator or parenthesis, an exponent's sign included. */
 function lastOperand(text: string): string {
   let start = text.length;
   while (start > 0) {
     const char = text[start - 1]!;
-    if (OPERATOR_CHARS.has(char) || char === '(' || char === ')') break;
+    const exponentSign =
+      (char === '+' || char === '-' || char === MINUS) && /[eE]/.test(text[start - 2] ?? '');
+    if (!exponentSign && (OPERATOR_CHARS.has(char) || char === '(' || char === ')')) break;
     start -= 1;
   }
   return text.slice(start).trim();

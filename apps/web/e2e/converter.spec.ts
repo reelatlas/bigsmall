@@ -681,7 +681,7 @@ test('the chip collapses to its symbol while an out-of-range message needs the r
   await expect(chip).toHaveText('m');
 });
 
-test('the calculator is a scratch pad: nothing reaches a box until its number is sent', async ({
+test('the calculator holds the keyboard, cycles Enter targets with Tab, and steps back with Escape', async ({
   page,
 }) => {
   await page.goto('/?a=milliliter&b=liter&v=1&s=a');
@@ -693,50 +693,82 @@ test('the calculator is a scratch pad: nothing reaches a box until its number is
   const entry = calculator.locator('[data-entry]');
   const useIn = (ordinal: string) =>
     calculator.getByRole('button', { name: new RegExp(`^Use in ${ordinal}`) });
+  const close = calculator.getByRole('button', { name: 'Close calculator' });
 
+  // Opening puts focus on =, so typing and Enter reach the calculator at once.
   await toggle.click();
-  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(key('equals')).toBeFocused();
+  await expect(useIn('1st')).toHaveAttribute('aria-disabled', 'true');
   await expectNoA11yViolations(page);
-  await expect(useIn('1st')).toBeDisabled();
-
-  for (const name of ['1', '2', 'times', '3']) await key(name).click();
-  await expect(entry).toHaveText('12×3');
-  await expect(calculator.locator('[data-running]')).toHaveText('= 36');
+  await page.keyboard.type('12*3');
+  await expect(entry).toHaveText('12×3 = 36');
   await expect(first).toHaveValue('1');
-  await expect(second).toHaveValue('0.001');
+  await page.keyboard.press('Enter');
+  await expect(entry).toHaveText('36');
 
-  // Sending puts the running value in, replaces that box's number, and keeps its unit.
-  await useIn('2nd').click();
+  // Tab cycles =, Use in 1st, Use in 2nd, Close; Enter presses whichever has focus.
+  await page.keyboard.press('Tab');
+  await expect(useIn('1st')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(useIn('2nd')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(close).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(key('equals')).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Shift+Tab');
+  await expect(useIn('2nd')).toBeFocused();
+  await page.keyboard.press('Enter');
   await expect(second).toHaveValue('36');
   await expect(first).toHaveValue('36,000');
-  await expect(page.getByRole('button', { name: 'Remove liters' })).toBeVisible();
-  await expect(useIn('2nd').locator('[data-copied]')).toBeVisible();
   await expect(
     page.getByRole('status').filter({ hasText: 'Sent to the second value' }),
   ).toHaveCount(1);
 
-  // = gives the value and the next digit starts over; the other box can take a number too.
-  await key('equals').click();
-  await expect(entry).toHaveText('36');
-  await key('5').click();
-  await expect(entry).toHaveText('5');
-  await useIn('1st').click();
-  await expect(first).toHaveValue('5');
-  await expect(second).toHaveValue('0.005');
-
-  // A send is one step for undo.
+  // One history: undo takes back the send, then the =, and redo puts both back.
   await page.keyboard.press('Control+z');
-  await expect(first).toHaveValue('36,000');
+  await expect(second).toHaveValue('0.001');
+  await page.keyboard.press('Control+z');
+  await expect(entry).toHaveText('12×3 = 36');
+  await page.keyboard.press('Control+y');
+  await page.keyboard.press('Control+y');
+  await expect(entry).toHaveText('36');
+  await expect(second).toHaveValue('36');
 
-  // Typed keys press calculator keys while focus is inside; Escape closes and keeps the entry.
-  await key('clear').click();
-  await page.keyboard.type('7*2=');
-  await expect(entry).toHaveText('14');
+  // Escape takes back one burst of typing at a time, then closes once the display is empty.
+  await page.keyboard.type('12345');
+  await page.waitForTimeout(TYPING_CHUNK_MS + 150);
+  await page.keyboard.type('678');
+  await page.waitForTimeout(TYPING_CHUNK_MS + 150);
+  await page.keyboard.type('9');
+  await page.keyboard.press('Backspace');
+  await page.keyboard.type('+1');
+  await expect(entry).toHaveText('12345678+1 = 12,345,679');
+  await page.keyboard.press('Escape');
+  await expect(entry).toHaveText('12345678');
+  await page.keyboard.press('Escape');
+  await expect(entry).toHaveText('12345');
+  await page.keyboard.press('Escape');
+  await expect(entry).toHaveText('0');
   await page.keyboard.press('Escape');
   await expect(calculator).toHaveCount(0);
   await expect(toggle).toBeFocused();
+
+  // A click elsewhere leaves it open; a key click brings the keyboard back to it.
   await toggle.click();
-  await expect(entry).toHaveText('14');
+  await page.keyboard.type('4e2');
+  await expect(entry).toHaveText('4E2');
+  await page.getByRole('heading', { level: 1 }).click();
+  await expect(calculator).toBeVisible();
+  await key('5').click();
+  await page.keyboard.type('6');
+  await expect(entry).toHaveText('4E256');
+
+  // Close keeps the entry for next time.
+  await close.click();
+  await expect(calculator).toHaveCount(0);
+  await toggle.click();
+  await expect(entry).toHaveText('4E256');
 });
 
 test('Enter on typed arithmetic gives its value and keeps the unit', async ({ page }) => {

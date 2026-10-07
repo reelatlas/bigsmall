@@ -271,3 +271,18 @@ Format:
 
 **What happened.** Three shells were merged into one class recipe to stop them drifting apart. The shared part took the fields' `transition-[border-color,box-shadow]`, which the shortcuts map had dropped on purpose to fix a lingering green edge, and the bug came back unnoticed until Sean saw it.
 **Rule.** A shared recipe holds only what every variant does the same way; anything a variant does differently, motion included, stays in the variant. When merging, compare each instance's computed style before and after, and turn the fix being preserved into a test (here, "the ghost edge cannot animate").
+
+## 2026-10-06 — A keyboard widget must take focus when it opens
+
+**What happened.** The first calculator opened under its toolbar icon and left focus on the icon. Typed digits went nowhere, and Enter pressed the icon again, which closed the calculator: it looked as if Enter closed it.
+**Rule.** A panel that owns keys moves focus into itself when it opens, onto the control Enter should press, and returns it to its trigger when it closes. Keys it handles respond only while focus is inside (WCAG 2.1.4), and a click on any of its keys brings focus back if it had left.
+
+## 2026-10-06 — String.replace reads `$` patterns in the replacement text
+
+**What happened.** An edit script used `text.replace(old, newText)` where `newText` held the regex `'[eE][+−-]$'`. JavaScript reads `$'` in a replacement string as "the rest of the original text", so the second half of the file was pasted in again.
+**Rule.** In scripts that edit files, pass a function as the replacement (`text.replace(old, () => newText)`) or use `split(old).join(newText)`, which take the text literally. The repository's edit helper already does.
+
+## 2026-10-06 — One undo history for everything the user does in the converter
+
+**What happened.** The calculator first kept its own entry in component state. Undo after sending its number then had two candidates, the send in the converter's history and the last key in the calculator's, and either choice surprised in some order of events.
+**Rule.** Anything the user edits in the converter lives in the reducer's state and in its one history, chunked by the same typing rules; panels are views of that state. Undo then means the last thing done, wherever it was done.

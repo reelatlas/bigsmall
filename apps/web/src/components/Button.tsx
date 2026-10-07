@@ -1,11 +1,13 @@
 import type { ButtonHTMLAttributes } from 'react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'soft' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'tonal' | 'soft' | 'ghost';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
-   * ghost: icon actions on the page (swap, undo, copy). secondary: bordered text button. soft: a
-   * tinted key that sets itself apart from its neighbors (the calculator's operators). primary: filled.
+   * ghost: icon actions on the page (swap, undo, copy). secondary: bordered text button. tonal: a
+   * bordered button on the raised surface in muted ink, a quieter sibling of secondary (the
+   * calculator's C, ⌫, E, and decimal mark). soft: a tinted key that sets itself apart from its
+   * neighbors (the calculator's operators). primary: filled.
    */
   variant: ButtonVariant;
   /**
@@ -22,14 +24,18 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 // Native <button>: accessible by default, no runtime. Tokens only: every color, radius, and
 // duration here resolves to a theme variable. Keyboard focus shows the base focus ring.
+// `disabled` drops a button out of the Tab order; `aria-disabled` looks the same but keeps it a
+// stop, for a set of stops that should not change shape (the calculator's send buttons), and
+// its click handler must then do nothing.
 const base =
   'inline-flex min-h-11 items-center justify-center gap-2 font-medium transition-[background-color,color,opacity] ' +
-  'disabled:opacity-50 active:opacity-80';
+  'disabled:opacity-50 aria-disabled:opacity-50 active:opacity-80';
 
 // Secondary buttons share the fields' two-pixel edge, so every bordered control has one weight.
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-on-accent hover:opacity-90',
   secondary: 'border-2 border-edge bg-surface text-ink hover:bg-surface-raised',
+  tonal: 'border-2 border-edge bg-surface-raised text-ink-muted hover:text-ink',
   soft: 'bg-accent-soft text-ink hover:opacity-90',
   ghost: 'text-ink-muted hover:bg-surface-raised hover:text-ink',
 };

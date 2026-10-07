@@ -1,11 +1,9 @@
 import {
-  formatNumber,
   getCategory,
   parse,
   search,
   suggest,
   type CategoryId,
-  type ParsedInput,
   type SearchOptions,
   type Separators,
   type Suggestion,
@@ -28,6 +26,7 @@ import {
   SuggestionPanel,
   type SuggestionItem,
 } from '../../components/SuggestionPanel';
+import { NumberText, runningValue } from '../../components/NumberText';
 import { UnitChip } from '../../components/UnitChip';
 import { NUMBER_SIZES, useFitStep } from '../../lib/fit-step';
 import { FIELD_ROW, SHELL, SHELL_BORDERED } from '../../lib/shell';
@@ -471,51 +470,4 @@ function scopedExamples(
     )
     .slice(0, 3);
   return `${symbols.join(', ')}…`;
-}
-
-/**
- * The field's text with each exponent marker set in a heavier weight, so "1.5E21" reads as a
- * number with an exponent rather than a run of characters, then the running value of arithmetic
- * in the muted color ("5 + 3 = 8"). The parser says where the markers are, so an "e" that is
- * still part of a unit query stays regular.
- */
-function NumberText({
-  text,
-  parsed,
-  running,
-}: {
-  text: string;
-  parsed: ParsedInput;
-  running: string | null;
-}) {
-  const start = parsed.valueText ? text.indexOf(parsed.valueText) : -1;
-  const marks = start < 0 ? [] : (parsed.exponentMarks ?? []).map((at) => start + at);
-  const pieces: ReactNode[] = [];
-  let from = 0;
-  for (const at of marks) {
-    pieces.push(
-      text.slice(from, at),
-      <span key={at} className="font-semibold" data-marker>
-        {text[at]}
-      </span>,
-    );
-    from = at + 1;
-  }
-  pieces.push(text.slice(from));
-  return (
-    <>
-      {pieces}
-      {running !== null && (
-        <span className="text-ink-muted" data-running>
-          {` = ${running}`}
-        </span>
-      )}
-    </>
-  );
-}
-
-/** The value of a box holding arithmetic and nothing else, formatted as results are. */
-function runningValue(parsed: ParsedInput, locale: string | undefined): string | null {
-  if (!parsed.expression || parsed.value === undefined || parsed.query) return null;
-  return formatNumber(parsed.value, locale ? { locale } : {});
 }

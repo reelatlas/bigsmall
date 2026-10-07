@@ -3,6 +3,7 @@ import { useId } from 'react';
 import { Button } from '../../../components/Button';
 import { CheckIcon } from '../../../components/icons';
 import { Calculator, SendButton } from '../../../components/Calculator';
+import { NumberText } from '../../../components/NumberText';
 import {
   BACK_ITEM,
   SuggestionPanel,
@@ -101,15 +102,16 @@ function CalculatorSample() {
   return (
     <div className="max-w-sm">
       <Calculator
-        entry="12×3"
-        running="36"
+        display={<NumberText text="12×3" parsed={parse('12×3')} running="36" />}
         decimalMark="."
         onPress={noop}
+        onEscape={noop}
         onClose={noop}
+        focusOnOpen={false}
         footer={
           <>
-            <SendButton ordinal="1st" symbol="mL" confirmed />
-            <SendButton ordinal="2nd" confirmed={false} />
+            <SendButton ordinal="1st" symbol="mL" confirmed unavailable={false} />
+            <SendButton ordinal="2nd" confirmed={false} unavailable={false} />
           </>
         }
       />

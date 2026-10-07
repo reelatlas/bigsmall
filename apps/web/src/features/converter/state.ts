@@ -25,24 +25,41 @@ export interface BoxState {
   unit: string | null;
 }
 
+/** The calculator's own entry (docs/UX-SPEC.md §8). `fresh` is true right after =, when a digit starts over. */
+export interface CalculatorState {
+  text: string;
+  fresh: boolean;
+}
+
 export interface ConverterState {
   a: BoxState;
   b: BoxState;
   /** The box the user edited last. Its value is the truth; the other box is derived from it. */
   source: BoxId;
   mode: Mode;
+  /**
+   * The calculator's scratch entry. It lives here, outside the conversion, so one history holds
+   * everything: undo goes from a send back into the arithmetic that produced it.
+   */
+  calc: CalculatorState;
 }
+
+/** Where typing lands: one of the boxes, or the calculator's entry. */
+export type TextTarget = BoxId | 'calc';
 
 /** The part of the state a URL or a later persistence layer restores, through the `hydrate` action. */
 export type Restorable = Partial<Pick<ConverterState, 'a' | 'b' | 'source' | 'mode'>>;
 
 const EMPTY_BOX: BoxState = { text: '', unit: null };
 
+export const EMPTY_CALC: CalculatorState = { text: '', fresh: false };
+
 export const initialState: ConverterState = {
   a: EMPTY_BOX,
   b: EMPTY_BOX,
   source: 'a',
   mode: 'basic',
+  calc: EMPTY_CALC,
 };
 
 function other(box: BoxId): BoxId {
@@ -52,8 +69,12 @@ function other(box: BoxId): BoxId {
 export type Action =
   /** A keystroke or paste. `at` is a monotonic time in ms; only gaps between inputs matter. */
   | { type: 'input'; box: BoxId; text: string; at: number }
-  /** A whole new text as one undoable step: arithmetic turned into its value (= or Enter), or the keypad's C. */
+  /** A whole new text as one undoable step: arithmetic turned into its value (Enter), or a number sent from the calculator. */
   | { type: 'replace'; box: BoxId; text: string }
+  /** A calculator key that edits its entry the way typing does: chunked for undo and Escape. */
+  | { type: 'calcType'; text: string; fresh: boolean; at: number }
+  /** = or C in the calculator: a whole new entry as one undoable step. */
+  | { type: 'calcSet'; text: string; fresh: boolean }
   /** Replace a box's text without making it the source (used to drop a query after a category pick). */
   | { type: 'setText'; box: BoxId; text: string }
   | { type: 'lock'; box: BoxId; unit: string }
@@ -110,8 +131,13 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       // Units and texts trade places; the typed value stays the source so nothing is re-rounded.
       return { ...state, a: state.b, b: state.a, source: other(state.source) };
 
+    case 'calcType':
+    case 'calcSet':
+      return { ...state, calc: { text: action.text, fresh: action.fresh } };
+
     case 'clear':
-      return { ...initialState, mode: state.mode };
+      // Clear all empties the conversion; the calculator's scratch entry is not part of it.
+      return { ...initialState, mode: state.mode, calc: state.calc };
 
     case 'setMode':
       return { ...state, mode: action.mode };
@@ -140,13 +166,17 @@ export interface ConverterResult {
   text: string;
 }
 
-/** Why a conversion has no answer to show: beyond what a double holds, rounded to zero, or a division by zero. */
-export type NoAnswer = 'large' | 'small' | 'divide-by-zero';
+/**
+ * Why a conversion has no answer to show: beyond what a double holds, rounded to zero, or
+ * arithmetic with no answer (a division by zero, a power with no real value).
+ */
+export type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real';
 
 const NO_ANSWER_MESSAGE: Record<NoAnswer, string> = {
   large: 'Too large to convert',
   small: 'Too small to convert',
   'divide-by-zero': 'Can’t divide by zero',
+  'not-real': 'No real answer',
 };
 
 export interface ConverterView {
@@ -226,8 +256,9 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
         : (sourceParsed.valueText ?? '');
     const from = `${typed} ${unitName(sourceUnit, amount)}`.trim();
     if (result) announcement = `${from} is ${result.text} ${unitName(targetUnit, result.value)}`;
-    else if (noAnswer === 'divide-by-zero') announcement = NO_ANSWER_MESSAGE[noAnswer];
-    else announcement = `${from} is too ${noAnswer} to convert to ${targetUnit.plural}`;
+    else if (noAnswer === 'large' || noAnswer === 'small') {
+      announcement = `${from} is too ${noAnswer} to convert to ${targetUnit.plural}`;
+    } else if (noAnswer) announcement = NO_ANSWER_MESSAGE[noAnswer];
   }
 
   const anchor: BoxId | null = category ? (sourceUnit ? sourceId : targetId) : null;
@@ -260,18 +291,18 @@ function unitName(unit: Unit, value: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// Undo, redo, and Escape (docs/UX-SPEC.md §14, §17). The most recent interaction is what gets
-// undone. Typing is grouped into chunks the way editors coalesce undo: keystrokes in one box
-// less than TYPING_CHUNK_MS apart belong together, and a space starts a new chunk. A lock,
-// unlock, swap, or clear is its own entry. Escape steps back through the same chunks, one box
-// at a time, and each step is itself undoable.
+// Undo, redo, and Escape (docs/UX-SPEC.md §9). The most recent interaction is what gets
+// undone. Typing is grouped into chunks the way editors coalesce undo: keystrokes in one box,
+// or in the calculator, less than TYPING_CHUNK_MS apart belong together, and a space starts a
+// new chunk. A lock, unlock, swap, clear, send, =, or C is its own entry. Escape steps back
+// through the same chunks, one box (or the calculator) at a time, and each step is undoable.
 
 /** What Escape can step back through in one box: a chunk of typing (with the text it started from) or the unit. */
 export type BoxEntry = { kind: 'text'; before: string } | { kind: 'unit' };
 
 export type EscapeTarget = 'text' | 'unit' | null;
 
-type Entries = Record<BoxId, BoxEntry[]>;
+type Entries = Record<TextTarget, BoxEntry[]>;
 
 interface Snapshot {
   state: ConverterState;
@@ -282,9 +313,9 @@ export interface History {
   past: Snapshot[];
   present: ConverterState;
   future: Snapshot[];
-  /** The typing chunk in progress: which box, and when its latest keystroke landed. */
-  run: { box: BoxId; at: number } | null;
-  /** Per box, oldest first, what Escape can step back through. */
+  /** The typing chunk in progress: which box or the calculator, and when its latest key landed. */
+  run: { box: TextTarget; at: number } | null;
+  /** Per box and for the calculator, oldest first, what Escape can step back through. */
   entries: Entries;
 }
 
@@ -292,12 +323,12 @@ export type HistoryAction =
   | Action
   | { type: 'undo' }
   | { type: 'redo' }
-  /** Escape with the list closed: take back the latest thing put into this box. */
-  | { type: 'stepBack'; box: BoxId };
+  /** Escape with the list closed, or in the calculator: take back the latest thing put in. */
+  | { type: 'stepBack'; box: TextTarget };
 
 export const HISTORY_LIMIT = 50;
 
-const NO_ENTRIES: Entries = { a: [], b: [] };
+const NO_ENTRIES: Entries = { a: [], b: [], calc: [] };
 
 export const initialHistory: History = {
   past: [],
@@ -314,7 +345,9 @@ function sameState(a: ConverterState, b: ConverterState): boolean {
     a.b.text === b.b.text &&
     a.b.unit === b.b.unit &&
     a.source === b.source &&
-    a.mode === b.mode
+    a.mode === b.mode &&
+    a.calc.text === b.calc.text &&
+    a.calc.fresh === b.calc.fresh
   );
 }
 
@@ -328,21 +361,33 @@ function isCheckpoint(before: string, text: string): boolean {
   return before.length < text.length && text.startsWith(before);
 }
 
-/** Whether the box's stored text is what the user sees (the view shows a result instead for a derived number). */
-function showsText(state: ConverterState, box: BoxId): boolean {
-  return state.source === box || parse(state[box].text).query !== undefined;
+function textOf(state: ConverterState, target: TextTarget): string {
+  return target === 'calc' ? state.calc.text : state[target].text;
 }
 
-/** Index of the latest entry Escape can act on in this box, or -1. */
-function latestEntry(entries: BoxEntry[], state: ConverterState, box: BoxId): number {
-  const current = state[box];
-  const textCounts = showsText(state, box);
+/**
+ * Whether the stored text is what the user sees: always for the calculator; for a box, unless
+ * the view shows a result in its place (a derived number).
+ */
+function showsText(state: ConverterState, target: TextTarget): boolean {
+  if (target === 'calc') return true;
+  return state.source === target || parse(state[target].text).query !== undefined;
+}
+
+function unitOf(state: ConverterState, target: TextTarget): string | null {
+  return target === 'calc' ? null : state[target].unit;
+}
+
+/** Index of the latest entry Escape can act on in this box or the calculator, or -1. */
+function latestEntry(entries: BoxEntry[], state: ConverterState, target: TextTarget): number {
+  const text = textOf(state, target);
+  const textCounts = showsText(state, target);
   for (let i = entries.length - 1; i >= 0; i -= 1) {
     const entry = entries[i]!;
     const applies =
       entry.kind === 'unit'
-        ? current.unit !== null
-        : textCounts && isCheckpoint(entry.before, current.text);
+        ? unitOf(state, target) !== null
+        : textCounts && isCheckpoint(entry.before, text);
     if (applies) return i;
   }
   return -1;
@@ -353,12 +398,12 @@ function latestEntry(entries: BoxEntry[], state: ConverterState, box: BoxId): nu
  * still present in the text, or the unit. Without a usable entry (a conversion loaded from the
  * URL, say) it falls back to the text, then the unit.
  */
-export function escapeTarget(history: History, box: BoxId): EscapeTarget {
+export function escapeTarget(history: History, target: TextTarget): EscapeTarget {
   const state = history.present;
-  const index = latestEntry(history.entries[box], state, box);
-  if (index >= 0) return history.entries[box][index]!.kind;
-  if (showsText(state, box) && state[box].text !== '') return 'text';
-  if (state[box].unit !== null) return 'unit';
+  const index = latestEntry(history.entries[target], state, target);
+  if (index >= 0) return history.entries[target][index]!.kind;
+  if (showsText(state, target) && textOf(state, target) !== '') return 'text';
+  if (unitOf(state, target) !== null) return 'unit';
   return null;
 }
 
@@ -381,25 +426,43 @@ function commit(
   return { past, present, future: [], run, entries };
 }
 
-function stepBack(history: History, box: BoxId): History {
+function stepBack(history: History, box: TextTarget): History {
   const target = escapeTarget(history, box);
   if (target === null) return history;
   const log = history.entries[box];
   const index = latestEntry(log, history.present, box);
   const kept = index >= 0 ? log.slice(0, index) : log;
   const entry = index >= 0 ? log[index] : undefined;
-  const present =
-    target === 'unit'
-      ? reduce(history.present, { type: 'unlock', box })
-      : reduce(history.present, {
-          type: 'input',
-          box,
-          text: entry?.kind === 'text' ? entry.before : '',
-          at: 0,
-        });
+  const text = entry?.kind === 'text' ? entry.before : '';
+  let present: ConverterState;
+  if (box === 'calc') present = reduce(history.present, { type: 'calcSet', text, fresh: false });
+  else if (target === 'unit') present = reduce(history.present, { type: 'unlock', box });
+  else present = reduce(history.present, { type: 'input', box, text, at: 0 });
   if (sameState(present, history.present))
     return { ...history, entries: { ...history.entries, [box]: kept } };
   return commit(history, present, null, { ...history.entries, [box]: kept });
+}
+
+/** Typing in a box or the calculator: it joins the chunk in progress or starts a new one. */
+function typed(
+  history: History,
+  present: ConverterState,
+  target: TextTarget,
+  before: string,
+  after: string,
+  at: number,
+): History {
+  const run = { box: target, at };
+  const continues =
+    history.run?.box === target &&
+    at - history.run.at <= TYPING_CHUNK_MS &&
+    !startsWord(before, after);
+  if (continues) return { ...history, present, run };
+  const entries = {
+    ...history.entries,
+    [target]: [...history.entries[target], { kind: 'text', before } satisfies BoxEntry],
+  };
+  return commit(history, present, run, entries);
 }
 
 export function reduceWithHistory(history: History, action: HistoryAction): History {
@@ -439,21 +502,16 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
     case 'replace':
       return commit(history, present, null, history.entries);
     case 'input': {
-      const { box, at } = action;
+      const { box } = action;
       // The chunk starts from what the user saw: a derived box shows a result, not its stale text.
       const before = showsText(history.present, box) ? history.present[box].text : '';
-      const run = { box, at };
-      const continues =
-        history.run?.box === box &&
-        at - history.run.at <= TYPING_CHUNK_MS &&
-        !startsWord(before, action.text);
-      if (continues) return { ...history, present, run };
-      const entries = {
-        ...history.entries,
-        [box]: [...history.entries[box], { kind: 'text', before } satisfies BoxEntry],
-      };
-      return commit(history, present, run, entries);
+      return typed(history, present, box, before, action.text, action.at);
     }
+    case 'calcType':
+      return typed(history, present, 'calc', history.present.calc.text, action.text, action.at);
+    case 'calcSet':
+      // = and C start the entry over, so Escape then clears it rather than restoring the sum.
+      return commit(history, present, null, { ...history.entries, calc: [] });
     case 'lock': {
       // Undoing a lock keeps the number and drops the unit, so the entry is "before, minus the query".
       const { box } = action;
@@ -476,8 +534,12 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
         [action.box]: withoutUnit(history.entries[action.box]),
       });
     case 'swap':
-      return commit(history, present, null, { a: history.entries.b, b: history.entries.a });
+      return commit(history, present, null, {
+        a: history.entries.b,
+        b: history.entries.a,
+        calc: history.entries.calc,
+      });
     case 'clear':
-      return commit(history, present, null, NO_ENTRIES);
+      return commit(history, present, null, { ...NO_ENTRIES, calc: history.entries.calc });
   }
 }

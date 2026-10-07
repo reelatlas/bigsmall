@@ -1,13 +1,15 @@
 import {
   useEffect,
+  useId,
   useLayoutEffect,
   useRef,
   type ButtonHTMLAttributes,
   type ReactNode,
 } from 'react';
 import { NUMBER_SIZES, useFitStep } from '../lib/fit-step';
+import { FIELD_ROW } from '../lib/shell';
 import { Button, type ButtonVariant } from './Button';
-import { BackspaceIcon, CheckIcon } from './icons';
+import { BackspaceIcon, CheckIcon, CloseIcon } from './icons';
 
 export type CalculatorKey =
   | '0'
@@ -25,6 +27,8 @@ export type CalculatorKey =
   | 'subtract'
   | 'multiply'
   | 'divide'
+  | 'power'
+  | 'exponent'
   | 'equals'
   | 'backspace'
   | 'clear';
@@ -36,7 +40,6 @@ interface KeyDef {
   /** What a screen reader says. */
   name: string;
   variant: ButtonVariant;
-  wide?: boolean;
 }
 
 const digit = (key: CalculatorKey): KeyDef => ({ key, face: key, name: key, variant: 'secondary' });
@@ -47,50 +50,63 @@ const TYPED: Readonly<Record<string, CalculatorKey>> = {
   '-': 'subtract',
   '*': 'multiply',
   '/': 'divide',
+  '^': 'power',
+  e: 'exponent',
+  E: 'exponent',
   '=': 'equals',
   '.': 'decimal',
   ',': 'decimal',
   Backspace: 'backspace',
 };
 
-/** The entry line: right-aligned, one line, sized down like a long number in a field. */
-const ENTRY = 'overflow-hidden text-right font-numeric whitespace-pre text-ink';
+/** The display's text: one line, sized down like a long number in a field, its end kept in view. */
+const DISPLAY_TEXT = 'min-w-0 flex-1 overflow-hidden font-numeric whitespace-pre text-ink';
+
+/** Marks what Tab moves between: close, =, and each send button. Enter presses the one focused. */
+const STOP = 'data-calculator-stop';
 
 export interface CalculatorProps {
-  /** What was entered, such as "12×3". */
-  entry: string;
-  /** The running value of arithmetic ("36"), or null when the entry is not arithmetic. */
-  running: string | null;
+  /** What the display shows, such as a NumberText; empty shows a muted 0. */
+  display: ReactNode;
   /** The visitor's decimal mark, "." or ",". */
   decimalMark: string;
   onPress: (key: CalculatorKey) => void;
-  /** Escape inside the calculator. */
+  /** Escape inside the calculator: the caller steps back or closes. */
+  onEscape: () => void;
+  /** The close button. */
   onClose: () => void;
+  /** Move focus onto = when it mounts, which is what opening does. False for gallery samples. */
+  focusOnOpen?: boolean;
   /** Under the keys: the buttons that send the value to a box. */
   footer?: ReactNode;
 }
 
 /**
- * A calculator with its own display: digits, the decimal mark, + − × ÷, =, backspace, and clear,
- * as native buttons at least 48 px tall in a labelled group. Typing a digit, an operator, ".",
- * ",", "=", or Backspace while focus is inside presses the matching key; Enter and Space press
- * the focused key, as for any button. What a key does is the caller's
- * (features/converter/calculator.ts).
+ * A calculator with its own display. While it is open it holds the keyboard: focus moves in,
+ * every typed key presses its key (digits, ". ,", "+ - * / ^", "e", "=", Backspace), Tab and
+ * Shift+Tab cycle through close, =, and each send button, and Enter presses whichever has focus,
+ * so focus always shows what Enter will do. Escape is the caller's (step back, then close). The
+ * other keys stay out of the Tab order, and a click on one returns the keyboard to the calculator
+ * without moving focus off the key Enter would press. Clicking elsewhere on the page leaves it open. What a key does is
+ * the caller's (features/converter/calculator.ts).
  */
 export function Calculator({
-  entry,
-  running,
+  display,
   decimalMark,
   onPress,
+  onEscape,
   onClose,
   footer,
+  focusOnOpen = true,
 }: CalculatorProps) {
+  const titleId = useId();
   const groupRef = useRef<HTMLDivElement>(null);
-  const entryRef = useRef<HTMLDivElement>(null);
-  const size = NUMBER_SIZES[useFitStep(entryRef, ENTRY, NUMBER_SIZES)];
+  const displayRef = useRef<HTMLDivElement>(null);
+  const size = NUMBER_SIZES[useFitStep(displayRef, DISPLAY_TEXT, NUMBER_SIZES)];
   const keys: KeyDef[] = [
-    { key: 'clear', face: 'C', name: 'clear', variant: 'secondary', wide: true },
-    { key: 'backspace', face: <BackspaceIcon />, name: 'backspace', variant: 'secondary' },
+    { key: 'clear', face: 'C', name: 'clear', variant: 'tonal' },
+    { key: 'backspace', face: <BackspaceIcon />, name: 'backspace', variant: 'tonal' },
+    { key: 'power', face: '^', name: 'to the power of', variant: 'soft' },
     { key: 'divide', face: '÷', name: 'divided by', variant: 'soft' },
     digit('7'),
     digit('8'),
@@ -104,31 +120,54 @@ export function Calculator({
     digit('2'),
     digit('3'),
     { key: 'add', face: '+', name: 'plus', variant: 'soft' },
-    { ...digit('0'), wide: true },
+    { key: 'exponent', face: 'E', name: 'times ten to the power of', variant: 'tonal' },
+    digit('0'),
     {
       key: 'decimal',
       face: decimalMark,
       name: decimalMark === ',' ? 'decimal comma' : 'decimal point',
-      variant: 'secondary',
+      variant: 'tonal',
     },
     { key: 'equals', face: '=', name: 'equals', variant: 'primary' },
   ];
 
   // Past the smallest size, the end of the entry stays in view, where the next key lands.
   useLayoutEffect(() => {
-    const line = entryRef.current;
+    const line = displayRef.current;
     if (line) line.scrollLeft = line.scrollWidth;
   });
 
-  // A native listener, like the converter's undo keys: the group is not itself interactive.
+  // Opening moves focus in, onto =, so typing and Enter reach the calculator at once.
+  useEffect(() => {
+    if (focusOnOpen) groupRef.current?.querySelector<HTMLElement>(`[${STOP}="equals"]`)?.focus();
+  }, [focusOnOpen]);
+
+  // Native listeners, like the converter's undo keys: the group is not itself interactive.
   useEffect(() => {
     const group = groupRef.current;
     if (!group) return;
+    const stops = () => [...group.querySelectorAll<HTMLElement>(`[${STOP}]`)];
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       if (event.key === 'Escape') {
         event.preventDefault();
-        onClose();
+        onEscape();
+        return;
+      }
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        const all = stops();
+        const at = all.indexOf(document.activeElement as HTMLElement);
+        const step = event.shiftKey ? -1 : 1;
+        all[at < 0 ? 0 : (at + step + all.length) % all.length]?.focus();
+        return;
+      }
+      if (
+        event.key === 'Enter' &&
+        !(document.activeElement as HTMLElement | null)?.hasAttribute(STOP)
+      ) {
+        event.preventDefault();
+        onPress('equals');
         return;
       }
       const key = /^[0-9]$/.test(event.key) ? (event.key as CalculatorKey) : TYPED[event.key];
@@ -136,24 +175,51 @@ export function Calculator({
       event.preventDefault();
       onPress(key);
     };
+    // A click anywhere but on a stop leaves focus where it is, or brings it back to = if it had
+    // left the calculator, so typing reaches the calculator again.
+    const onMouseDown = (event: MouseEvent) => {
+      if ((event.target as Element).closest(`[${STOP}]`)) return;
+      event.preventDefault();
+      if (!group.contains(document.activeElement)) {
+        group.querySelector<HTMLElement>(`[${STOP}="equals"]`)?.focus();
+      }
+    };
     group.addEventListener('keydown', onKeyDown);
-    return () => group.removeEventListener('keydown', onKeyDown);
-  }, [onPress, onClose]);
+    group.addEventListener('mousedown', onMouseDown);
+    return () => {
+      group.removeEventListener('keydown', onKeyDown);
+      group.removeEventListener('mousedown', onMouseDown);
+    };
+  }, [onPress, onEscape]);
 
   return (
     <div
       ref={groupRef}
       role="group"
-      aria-label="Calculator"
+      aria-labelledby={titleId}
       className="rounded-lg border border-line bg-surface p-3 shadow-sm"
     >
-      <div className="mb-3 rounded-md bg-surface-raised px-3 py-2" data-calculator-display>
-        <div ref={entryRef} className={`${ENTRY} ${size}`} data-entry>
-          {entry || <span className="text-ink-muted">0</span>}
+      <div className="mb-2 flex items-center justify-between">
+        <h2 id={titleId} className="pl-1 text-sm font-medium text-ink-muted">
+          Calculator
+        </h2>
+        <Button
+          variant="ghost"
+          square
+          aria-label="Close calculator"
+          data-calculator-stop="close"
+          onClick={onClose}
+        >
+          <CloseIcon />
+        </Button>
+      </div>
+      {/* The display has a field's size and edge, so it reads as where the typing goes. */}
+      <div className="mb-3 rounded-lg border-2 border-edge bg-surface" data-calculator-display>
+        <div className={FIELD_ROW}>
+          <div ref={displayRef} className={`${DISPLAY_TEXT} ${size}`} data-entry>
+            {display || <span className="text-ink-muted">0</span>}
+          </div>
         </div>
-        <p className="min-h-5 text-right font-numeric text-sm text-ink-muted" data-running>
-          {running === null ? '' : `= ${running}`}
-        </p>
       </div>
       <div className="grid grid-cols-4 gap-2">
         {keys.map((def) => (
@@ -161,8 +227,10 @@ export function Calculator({
             key={def.key}
             variant={def.variant}
             aria-label={def.name}
+            tabIndex={def.key === 'equals' ? undefined : -1}
+            data-calculator-stop={def.key === 'equals' ? 'equals' : undefined}
             onClick={() => onPress(def.key)}
-            className={`min-h-12 font-numeric text-lg ${def.wide ? 'col-span-2' : ''}`}
+            className="min-h-12 font-numeric text-lg"
           >
             {def.face}
           </Button>
@@ -175,7 +243,7 @@ export function Calculator({
 
 export interface SendButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
-  'children' | 'className'
+  'children' | 'className' | 'disabled'
 > {
   /** "1st" or "2nd". */
   ordinal: string;
@@ -183,12 +251,20 @@ export interface SendButtonProps extends Omit<
   symbol?: string | undefined;
   /** Shows the check that confirms a send, the one copy uses. */
   confirmed: boolean;
+  /** Nothing to send yet. The button stays a Tab stop, so Tab always cycles the same three. */
+  unavailable: boolean;
 }
 
 /** "Use in 1st": puts the calculator's value into a box. Named by what it shows. */
-export function SendButton({ ordinal, symbol, confirmed, ...props }: SendButtonProps) {
+export function SendButton({ ordinal, symbol, confirmed, unavailable, ...props }: SendButtonProps) {
   return (
-    <Button variant="secondary" className="min-h-12 text-sm" {...props}>
+    <Button
+      variant="secondary"
+      className="min-h-12 text-sm"
+      data-calculator-stop="send"
+      aria-disabled={unavailable || undefined}
+      {...props}
+    >
       {confirmed && <CheckIcon className="text-success" data-copied />}
       <span>Use in {ordinal}</span>
       {symbol && <span className="font-semibold">{symbol}</span>}

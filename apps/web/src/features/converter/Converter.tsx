@@ -58,6 +58,18 @@ const EXAMPLES: Record<BoxId, string> = {
   b: '2 kg, inches, speed…',
 };
 
+/**
+ * The table layout from md (docs/UX-SPEC.md §1): the box and its table in the first column, and
+ * the calculator in a column of its own on their right, spanning both rows; the second row takes
+ * any height the calculator adds, so the table always sits right under the box. Below md, and
+ * with two boxes, the calculator opens under the boxes, flush left.
+ */
+const TABLE_GRID = 'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_1fr] md:gap-x-4';
+const TABLE_BOX_CELL = 'md:col-start-1 md:row-start-1';
+const TABLE_ROWS_CELL = 'md:col-start-1 md:row-start-2';
+const TABLE_CALCULATOR_CELL =
+  'md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:w-72 md:self-start';
+
 /** A box's text field, found by the mark SmartInput puts on it. */
 function boxInput(section: HTMLElement | null, id: BoxId): HTMLInputElement | null {
   return section?.querySelector<HTMLInputElement>(`input[data-box="${id}"]`) ?? null;
@@ -68,10 +80,10 @@ type FocusRequest = { kind: 'enter'; box: BoxId } | { kind: 'box'; box: BoxId };
 
 /**
  * The converter island, in either layout (ADR 0009, docs/UX-SPEC.md §1): the hint and the
- * toolbar (calculator, swap with two boxes, undo, redo, clear all); then the table layout's one
- * box and its table, or the two linked boxes with the category label under the anchored one; the
- * calculator under the boxes when open (§8); and the live regions. It draws the Copy URL button
- * and the layout switch into the header's slots (§7, §10).
+ * toolbar (calculator, swap with two boxes, undo, redo, clear all); the category label; then the
+ * table layout's one box and its table, or the two linked boxes; the calculator when open, beside
+ * the table or under the boxes (§8); and the live regions. It draws the Copy URL button and the
+ * layout switch into the header's slots (§7, §10).
  *
  * Until it hydrates the layout is unknown here, so the server's markup carries both layouts' empty
  * state and the layout-* variants (global.css) show the one the inline script applied. Classes
@@ -206,11 +218,9 @@ export function Converter() {
     />
   );
 
-  /** A table row's full-precision value, by unit id: the headline's or a row's. */
-  const rowValue = (unitId: string): number | null => {
-    const row = [table?.headline, ...(table?.rows ?? [])].find((r) => r?.unit.id === unitId);
-    return row?.value ?? null;
-  };
+  /** A table row's full-precision value, by unit id. */
+  const rowValue = (unitId: string): number | null =>
+    table?.rows.find((row) => row.unit.id === unitId)?.value ?? null;
 
   /**
    * A row moves into the box: its unit, and its value to the digits a box shows, so the box reads
@@ -254,27 +264,11 @@ export function Converter() {
     );
   };
 
-  /**
-   * The category label sits under the box the conversion is anchored on, left-aligned with the
-   * value in both boxes so it reads right beside what the user typed. It says both what kind of
-   * units these are and which side is driving; after a switch of category it simply names the
-   * new one, under the box that switched it. Not a live region: the result announcement already
-   * names the units (docs/UX-SPEC.md §12). Two boxes only: the table is named by its category.
-   */
-  const categoryLabel = (id: BoxId) => (
-    <p
-      data-category-label={id}
-      className="mt-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted layout-table:hidden"
-    >
-      {view.anchor === id ? (categoryName ?? '') : ''}
-    </p>
-  );
-
   const renderBox = (
     box: BoxView,
     label: string,
     counterpart: BoxView,
-    options: { examples: string; withLabel: boolean; className?: string },
+    options: { examples: string; className?: string },
   ) => (
     // Keyed by box, so the table layout's one box starts fresh when the source moves.
     <div key={box.id} className={cx('min-w-0 flex-1', options.className)}>
@@ -290,8 +284,9 @@ export function Converter() {
         counterpart={counterpart.unit}
         trailing={copyButton(box, label.toLowerCase())}
         onEnter={() => setFocusRequest({ kind: 'enter', box: box.id })}
+        // The table's rows sit under the box, so its list waits to be asked (docs/UX-SPEC.md §3).
+        listOpens={layout === 'table' ? 'on-request' : 'eagerly'}
       />
-      {options.withLabel && categoryLabel(box.id)}
     </div>
   );
 
@@ -382,72 +377,89 @@ export function Converter() {
       </div>
 
       {/*
-        The table layout shows the source box alone, a column wide enough to read its rows across;
-        two boxes sit side by side from sm and stack below it, Tab going from one straight to the
-        other.
+        The category label, in the same place in both layouts: over the box, or the first of two,
+        left-aligned with the value, whichever box drives. It keeps its line while empty, so
+        nothing moves when it appears. Plain text, not a live region: the announcement already
+        names the units (docs/UX-SPEC.md §12).
       */}
-      <div className="flex flex-col gap-y-2 sm:flex-row sm:gap-x-4 layout-table:max-w-xl">
-        {layout === 'table'
-          ? renderBox(view[source], 'Value', view[source === 'a' ? 'b' : 'a'], {
-              examples: EXAMPLES.a,
-              withLabel: false,
-            })
-          : [
-              renderBox(view.a, 'First value', view.b, { examples: EXAMPLES.a, withLabel: true }),
-              renderBox(view.b, 'Second value', view.a, {
-                examples: EXAMPLES.b,
-                withLabel: true,
-                className: 'layout-table:hidden',
-              }),
-            ]}
+      <p data-category-label className="mb-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted">
+        {categoryName ?? ''}
+      </p>
+
+      <div className={cx(layout === 'table' && TABLE_GRID)}>
+        {/*
+          The table layout shows the source box alone, a column wide enough to read its rows
+          across; two boxes sit side by side from sm and stack below it, Tab going from one
+          straight to the other.
+        */}
+        <div
+          className={cx(
+            'flex flex-col gap-y-2 sm:flex-row sm:gap-x-4 layout-table:max-w-xl',
+            layout === 'table' && TABLE_BOX_CELL,
+          )}
+        >
+          {layout === 'table'
+            ? renderBox(view[source], 'Value', view[source === 'a' ? 'b' : 'a'], {
+                examples: EXAMPLES.a,
+              })
+            : [
+                renderBox(view.a, 'First value', view.b, { examples: EXAMPLES.a }),
+                renderBox(view.b, 'Second value', view.a, {
+                  examples: EXAMPLES.b,
+                  className: 'layout-table:hidden',
+                }),
+              ]}
+        </div>
+
+        {calculatorOpen && (
+          <div
+            id={calculatorId}
+            className={cx('mt-4 max-w-sm', layout === 'table' && TABLE_CALCULATOR_CELL)}
+          >
+            <Calculator
+              display={
+                entry.text && (
+                  <NumberText
+                    text={entry.text}
+                    parsed={entryParsed}
+                    running={runningValue(entryParsed, env.locale)}
+                  />
+                )
+              }
+              message={calcMessage}
+              messageId={calcMessageId}
+              decimalMark={env.separators.decimal}
+              onPress={press}
+              onEscape={escapeCalculator}
+              onClose={closeCalculator}
+              footer={
+                layout === 'table' ? (
+                  sendButton(source)
+                ) : (
+                  <>
+                    {sendButton('a', '1st')}
+                    {sendButton('b', '2nd')}
+                  </>
+                )
+              }
+            />
+          </div>
+        )}
+
+        {layout === 'table' && table && (
+          <div className={cx('max-w-xl', TABLE_ROWS_CELL)}>
+            <ConversionTable
+              title={getCategory(table.category)?.name ?? ''}
+              rows={table.rows}
+              message={table.message}
+              copied={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
+              onUse={(row) => moveIntoBox(row.id)}
+              onCopy={(row) => copyRow(row.id)}
+              copyProps={(row) => pointerProps(`row-${row.id}`)}
+            />
+          </div>
+        )}
       </div>
-
-      {calculatorOpen && (
-        <div id={calculatorId} className="mx-auto mt-4 max-w-sm">
-          <Calculator
-            display={
-              entry.text && (
-                <NumberText
-                  text={entry.text}
-                  parsed={entryParsed}
-                  running={runningValue(entryParsed, env.locale)}
-                />
-              )
-            }
-            message={calcMessage}
-            messageId={calcMessageId}
-            decimalMark={env.separators.decimal}
-            onPress={press}
-            onEscape={escapeCalculator}
-            onClose={closeCalculator}
-            footer={
-              layout === 'table' ? (
-                sendButton(source)
-              ) : (
-                <>
-                  {sendButton('a', '1st')}
-                  {sendButton('b', '2nd')}
-                </>
-              )
-            }
-          />
-        </div>
-      )}
-
-      {layout === 'table' && table && (
-        <div className="max-w-xl">
-          <ConversionTable
-            title={getCategory(table.category)?.name ?? ''}
-            headline={table.headline}
-            rows={table.rows}
-            message={table.message}
-            copied={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
-            onUse={(row) => moveIntoBox(row.id)}
-            onCopy={(row) => copyRow(row.id)}
-            copyProps={(row) => pointerProps(`row-${row.id}`)}
-          />
-        </div>
-      )}
 
       {/* The two live regions (docs/UX-SPEC.md §12): the result, once it settles; and action feedback. */}
       <p aria-live="polite" className="sr-only">

@@ -141,7 +141,6 @@ describe('selectView', () => {
     expect(v.result).toMatchObject({ box: 'b', text: '0.02113376419' });
     expect(v.announcement).toBe('5 milliliters is 0.02113376419 cups');
     expect(v.b.message).toBeNull();
-    expect(v.anchor).toBe('a');
   });
 
   it('uses singular names for one', () => {
@@ -267,48 +266,28 @@ describe('selectView', () => {
   });
 });
 
-describe('anchor', () => {
+describe('category, and the source before a number', () => {
   const view = (...actions: Parameters<typeof reduce>[1][]) => selectView(run(...actions), EN);
 
   it('is empty until a unit is chosen', () => {
-    expect(view({ type: 'input', box: 'a', text: '5', at: 0 }).anchor).toBeNull();
+    expect(view({ type: 'input', box: 'a', text: '5', at: 0 }).category).toBeNull();
   });
 
-  it('sits with the box that holds the typed number once it has a unit', () => {
-    const v = view(
-      { type: 'input', box: 'a', text: '5 ml', at: 0 },
-      { type: 'lock', box: 'a', unit: 'milliliter' },
-      { type: 'lock', box: 'b', unit: 'us-cup' },
-    );
-    expect(v.anchor).toBe('a');
-  });
-
-  it('moves to the other box when a number is typed there', () => {
-    const v = view(
-      { type: 'input', box: 'a', text: '5', at: 0 },
-      { type: 'lock', box: 'a', unit: 'milliliter' },
-      { type: 'lock', box: 'b', unit: 'us-cup' },
-      { type: 'input', box: 'b', text: '2', at: 10 },
-    );
-    expect(v.anchor).toBe('b');
-  });
-
-  it('sits with the box whose unit set the category while the number has no unit yet', () => {
+  it('comes from either box’s unit, so the label names it whichever box drives', () => {
     const v = view(
       { type: 'input', box: 'a', text: '5', at: 0 },
       { type: 'lock', box: 'b', unit: 'milliliter' },
     );
     expect(v.a.isSource).toBe(true);
-    expect(v.anchor).toBe('b');
+    expect(v.category).toBe('volume');
   });
 
-  it('before any number, the first box to get a unit becomes the source and keeps the anchor', () => {
+  it('before any number, the first box to get a unit becomes the source', () => {
     const s = run(
       { type: 'lock', box: 'b', unit: 'milliliter' },
       { type: 'lock', box: 'a', unit: 'us-cup' },
     );
     expect(s.source).toBe('b');
-    expect(selectView(s, EN).anchor).toBe('b');
   });
 
   it('a later lock does not take the source from a box that holds a number', () => {
@@ -318,16 +297,14 @@ describe('anchor', () => {
       { type: 'lock', box: 'a', unit: 'liter' },
     );
     expect(s.source).toBe('a');
-    expect(selectView(s, EN).anchor).toBe('a');
   });
 
-  it('follows a switch of category to the box that switched it', () => {
+  it('follows a switch of category', () => {
     const v = view(
       { type: 'input', box: 'a', text: '5', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
       { type: 'lock', box: 'b', unit: 'fahrenheit' },
     );
-    expect(v.anchor).toBe('b');
     expect(v.category).toBe('temperature');
   });
 });
@@ -427,14 +404,14 @@ describe('use', () => {
       { type: 'lock', box: 'b', unit: 'us-cup' },
     );
 
-  it('moves a row into the box with its value, leaving the headline alone', () => {
+  it('moves a row into the box with its value, keeping the other box’s unit for two boxes', () => {
     const s = reduce(pair(), { type: 'use', box: 'a', unit: 'liter', text: '0.25' });
     expect(s.a).toEqual({ text: '0.25', unit: 'liter' });
     expect(s.b.unit).toBe('us-cup');
     expect(s.source).toBe('a');
   });
 
-  it('gives the headline the box’s old unit when the headline moves in, as swap does', () => {
+  it('gives the other box the box’s old unit when its unit moves in, so they never share one', () => {
     const s = reduce(pair(), { type: 'use', box: 'a', unit: 'us-cup', text: '1.056688209' });
     expect(s.a).toEqual({ text: '1.056688209', unit: 'us-cup' });
     expect(s.b).toEqual({ text: '', unit: 'milliliter' });
@@ -484,7 +461,6 @@ describe('selectTable', () => {
     )!;
     expect(t.box).toBe('a');
     expect(t.category).toBe('volume');
-    expect(t.headline).toBeNull();
     expect(t.rows.map((row) => row.id)).toContain('liter');
     expect(t.rows.filter((row) => row.inBox).map((row) => row.id)).toEqual(['milliliter']);
     const liter = t.rows.find((row) => row.id === 'liter')!;
@@ -503,15 +479,19 @@ describe('selectTable', () => {
     expect(cups.value).toBeCloseTo(1.056688209, 9);
   });
 
-  it('heads the table with the second unit and leaves it out of the rows', () => {
+  it('lists the other box’s unit like any other, in its place, kept only for two boxes', () => {
+    const alone = table(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    )!;
     const t = table(
       { type: 'input', box: 'a', text: '250', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
       { type: 'lock', box: 'b', unit: 'us-cup' },
     )!;
-    expect(t.headline?.id).toBe('us-cup');
-    expect(t.rows.some((row) => row.id === 'us-cup')).toBe(false);
-    expect(t.announcement).toBe('250 milliliters is 1.05669 cups');
+    expect(t.rows.map((row) => row.id)).toEqual(alone.rows.map((row) => row.id));
+    expect(t.rows.find((row) => row.id === 'us-cup')?.text).toBe('1.05669');
+    expect(t.announcement).toBe(alone.announcement);
   });
 
   it('converts from the source, whichever box it is', () => {
@@ -521,8 +501,8 @@ describe('selectTable', () => {
       { type: 'lock', box: 'a', unit: 'milliliter' },
     )!;
     expect(t.box).toBe('b');
-    expect(t.headline?.id).toBe('milliliter');
-    expect(t.headline?.text).toBe('2,000');
+    expect(t.rows.filter((row) => row.inBox).map((row) => row.id)).toEqual(['liter']);
+    expect(t.rows.find((row) => row.id === 'milliliter')?.text).toBe('2,000');
   });
 
   it('names one unit in the singular', () => {
@@ -552,7 +532,7 @@ describe('selectTable', () => {
     expect(mm.value).toBeNull();
   });
 
-  it('announces how many units the value is shown in when there is no headline', () => {
+  it('announces how many units the value is shown in', () => {
     const t = table(
       { type: 'input', box: 'a', text: '250', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },

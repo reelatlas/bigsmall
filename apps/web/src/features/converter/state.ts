@@ -114,13 +114,13 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       };
       const otherId = other(action.box);
       // Before any number is typed, the first box to get a unit becomes the source: it set the
-      // category, so it anchors the conversion and the category label until a number moves them.
+      // category, so it leads the conversion (the table layout shows it) until a number moves it.
       const sourceHasNumber = parse(state[state.source].text).valueText !== undefined;
       if (!sourceHasNumber && state[otherId].unit === null) next.source = action.box;
       const otherUnit = state[otherId].unit ? getUnit(state[otherId].unit) : undefined;
       if (otherUnit && otherUnit.category !== unit.category) {
         // No cross-category pairs: the other box loses its unit and keeps its number only if it
-        // was the source. The category label moving to this box shows the switch.
+        // was the source. The category label then names the new category.
         next[otherId] = {
           text: state.source === otherId ? (parse(state[otherId].text).valueText ?? '') : '',
           unit: null,
@@ -130,8 +130,9 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
     }
 
     case 'use': {
-      // When the row was the headline (the other box's unit), the box's old unit takes its place,
-      // as swap does; any other row leaves the headline alone (docs/UX-SPEC.md §1).
+      // The table never shows the other box, but keeps it for a switch back to two boxes. When
+      // the row is the other box's unit, the box's old unit takes its place, as swap does, so the
+      // boxes never share a unit; any other row leaves it alone (docs/UX-SPEC.md §1).
       const unit = getUnit(action.unit);
       if (!unit) return state;
       const otherId = other(action.box);
@@ -207,12 +208,8 @@ export const NO_ANSWER_MESSAGES: Record<NoAnswer, { box: string; calculator: str
 export interface ConverterView {
   a: BoxView;
   b: BoxView;
+  /** The conversion's category, which the category label names: either box's, since they share it. */
   category: CategoryId | null;
-  /**
-   * The box the conversion is anchored on, which carries the category label: the source when it
-   * has a unit, otherwise the box whose unit set the category. Null while no unit is chosen.
-   */
-  anchor: BoxId | null;
   result: ConverterResult | null;
   /**
    * Sentence for the live region: "5 milliliters is 0.02113376419 cups", or
@@ -291,13 +288,10 @@ export function selectView(state: ConverterState, options: NumberEnv): Converter
     } else if (noAnswer) announcement = NO_ANSWER_MESSAGES[noAnswer].box;
   }
 
-  const anchor: BoxId | null = category ? (sourceUnit ? sourceId : targetId) : null;
-
   return {
     a: box('a', unitA, unitB),
     b: box('b', unitB, unitA),
     category,
-    anchor,
     result,
     announcement,
   };
@@ -305,7 +299,7 @@ export function selectView(state: ConverterState, options: NumberEnv): Converter
 
 // ---------------------------------------------------------------------------
 // The table layout (ADR 0009, docs/UX-SPEC.md §1): the source box's value in every unit of its
-// category, the conversion's second unit heading it.
+// category. The other box's unit is kept for a switch back to two boxes, but not shown.
 
 /** Significant digits a row shows: few enough to compare rows at a glance. Copying gives them all. */
 export const TABLE_PRECISION = 6;
@@ -332,9 +326,7 @@ export interface TableView {
   /** The box the table converts from: the source, the one box the table layout shows. */
   box: BoxId;
   category: CategoryId;
-  /** The conversion's second unit, heading the table; null when it has none. */
-  headline: TableRow | null;
-  /** Every other unit of the category in the list's order, the box's own among them. */
+  /** Every unit of the category in the list's order, the box's own among them. */
   rows: TableRow[];
   /** In place of the rows when the box's value has no answer: "Too large to convert". */
   message: string | null;
@@ -357,8 +349,6 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   const problem = parsed.outOfRange ?? parsed.invalid;
   if (parsed.value === undefined && !problem) return null;
 
-  const otherId = state[other(boxId)].unit;
-  const headUnit = otherId ? getUnit(otherId) : undefined;
   const typed =
     parsed.expression && parsed.value !== undefined
       ? formatNumber(parsed.value, { locale: options.locale })
@@ -370,7 +360,6 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
     const kind = problem ?? 'large';
     return {
       ...base,
-      headline: null,
       rows: [],
       message: NO_ANSWER_MESSAGES[kind].box,
       announcement:
@@ -415,20 +404,11 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   }).results.flatMap((result) => (result.kind === 'unit' ? [result.unit] : []));
   // A unit from beyond the mode's tier, reached by search, still shows where it is in use.
   if (!listed.some((u) => u.id === unit.id)) listed.push(unit);
-  const headline = headUnit ? row(headUnit) : null;
-  const rows = listed.filter((u) => u.id !== headUnit?.id).map(row);
+  const rows = listed.map(row);
 
-  let announcement: string;
-  if (headline && headUnit) {
-    announcement =
-      headline.value === null
-        ? `${from} is ${headline.text.toLowerCase()} to convert to ${headUnit.plural}`
-        : `${from} is ${headline.text} ${unitName(headUnit, headline.value)}`;
-  } else {
-    const kind = getCategory(unit.category)?.name.toLowerCase() ?? '';
-    announcement = `${from} in ${rows.length} units of ${kind}`.trim();
-  }
-  return { ...base, headline, rows, message: null, announcement };
+  const kind = getCategory(unit.category)?.name.toLowerCase() ?? '';
+  const announcement = `${from} in ${rows.length} units of ${kind}`.trim();
+  return { ...base, rows, message: null, announcement };
 }
 
 /**
@@ -711,8 +691,8 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
       });
     case 'use': {
       // The box holds a new number and unit at once, so its old chunks no longer apply; Escape
-      // then clears the number, then the unit, as for a conversion loaded from a URL. A headline
-      // that took the box's old unit starts over the same way.
+      // then clears the number, then the unit, as for a conversion loaded from a URL. The other
+      // box, if it took the box's old unit, starts over the same way.
       const otherId = other(action.box);
       const entries = { ...history.entries, [action.box]: [] };
       if (present[otherId].unit !== history.present[otherId].unit) entries[otherId] = [];

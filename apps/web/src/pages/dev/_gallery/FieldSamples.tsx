@@ -162,16 +162,13 @@ function OpenSample() {
 }
 
 /**
- * The table layout's rows for 250 mL with cups heading them, from the real table view: milliliters
- * marked as the unit in the box, one copy confirmed. A second table shows a value with no answer.
+ * The table layout's rows for 250 mL, from the real table view: milliliters marked as the unit in
+ * the box, one copy confirmed. A second table shows a value with no answer. Their titles are for
+ * screen readers; on the page the category label over the box names the table.
  */
 function TableSample() {
   const table = selectTable(
-    {
-      ...initialState,
-      a: { text: '250', unit: 'milliliter' },
-      b: { text: '', unit: 'us-cup' },
-    },
+    { ...initialState, a: { text: '250', unit: 'milliliter' } },
     { ...ENV, tier: 'basic' },
   );
   if (!table) return null;
@@ -179,7 +176,6 @@ function TableSample() {
     <>
       <ConversionTable
         title="Volume"
-        headline={table.headline}
         rows={table.rows}
         message={null}
         copied="liter"
@@ -188,7 +184,6 @@ function TableSample() {
       />
       <ConversionTable
         title="Length"
-        headline={null}
         rows={[]}
         message="Too large to convert"
         copied={null}

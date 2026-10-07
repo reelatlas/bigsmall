@@ -96,7 +96,7 @@ export function useConverter(layout: Layout | null): ConverterController {
     return () => window.clearTimeout(timer);
   }, [state, env.separators]);
 
-  // Two boxes say the pair's sentence; the table says its own, which names the headline if any.
+  // Two boxes say the pair's sentence; the table says how many units it shows the value in.
   const spoken = layout === 'table' ? (table?.announcement ?? null) : view.announcement;
   const [announcement, setAnnouncement] = useState<string | null>(null);
   useEffect(() => {

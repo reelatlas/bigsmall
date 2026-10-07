@@ -488,3 +488,25 @@ Format:
 **What happened.** The table layout became the default, with two boxes a remembered choice. The island is server-rendered before anyone's choice is known, and it learns the choice only after hydrating, so a two-box visitor would have seen the table's one box first, then the second box appear.
 **Rule.** Treat a layout like the theme: the inline script applies the saved choice to `<html data-layout>` before paint, the server's markup carries both layouts' empty state, and custom variants (`layout-table:hidden`, `layout-boxes:hidden`) show the right one until the island takes over. A browser test blocks the island's code and checks both. Keep the island's first render identical to the server's (both states), and render one layout only once hydrated.
 **Promoted** to docs/DESIGN-SYSTEM.md, "Patterns".
+
+## 2026-10-07 — A count that stood in for room broke in a wider box
+
+**What happened.** On 2026-10-06 the number's size moved from a character count to measurement, but the chip still gave up its name past six characters, a count tuned for two boxes side by side. The table layout's box is wider, and its chip dropped "milliliters" with room to spare.
+**Rule.** Everything in a row that competes for room is decided by measuring that row, in one pass and a fixed order: `useFieldFit` tries the row with the chip's name, and only when the text does not fit at its largest size hides the name and steps the text down. To be measured, a part that may give way is hidden (`hidden`), not left out of the DOM.
+**Promoted** to docs/DESIGN-SYSTEM.md, "Fields", "Type that steps to fit", and "Decide by the box, not the layout".
+
+## 2026-10-07 — The compiler lint and refs passed into a custom hook
+
+**What happened.** `useFieldFit` takes refs as arguments. Setting `hidden` on `name.current` inside the hook failed `react-hooks/immutability` (a hook argument cannot be modified), and reading only `name.current` inside a `useCallback` that listed `[name]` failed `react-hooks/preserve-manual-memoization`: the compiler inferred the dependency as `name.current`, not `name`.
+**Rule.** In a custom hook, do the DOM work in a module-level function and pass it the ref object itself (`fitField(name, texts)`), reading `.current` there. The hook body then neither changes an argument nor depends on a `.current`.
+
+## 2026-10-07 — A column spanning two rows stretches the first
+
+**What happened.** The table layout's calculator spans the rows of the box and the table. With both rows `auto`, a calculator taller than the two together would spread its extra height over both, opening a gap between the box and the table.
+**Rule.** Make the rows `auto 1fr` (`grid-rows-[auto_1fr]`): an item crossing a flexible row sends its extra height to that row alone, so the first stays as tall as the box. A browser test checks that the gap under the box is the same with the calculator open.
+**Promoted** to docs/DESIGN-SYSTEM.md, "Responsive layout".
+
+## 2026-10-07 — A half-typed number parses as a unit query
+
+**What happened.** The table layout opens its list once a unit is being typed. Keying that off the parser's `query` would have flashed the list open on the way to a number: `parse` reads `-` and `.` as queries before a digit follows, `1e` and `1e-` as the number 1 with the query `e` or `e-` before the exponent's digits, and `2(3` as 2 with the query `(3`.
+**Rule.** Behavior that should follow "a unit is being typed" checks the query for a character numbers and sums are not written with (a letter or a symbol), and treats a lone `e`, `E`, `e-`, or `e+` right after a number as an exponent on its way (`typingUnit` in `SmartInput.tsx`). A browser test types each of these and checks the list stays closed.

@@ -14,7 +14,7 @@ test('typing a number and unit highlights the match; Enter locks it and scopes t
 }) => {
   await page.goto('/');
   await ready(page);
-  const { first, second, labelA, labelB } = boxes(page);
+  const { first, second, label } = boxes(page);
 
   await first.fill('5 ml');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
@@ -26,8 +26,7 @@ test('typing a number and unit highlights the match; Enter locks it and scopes t
   await first.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
   await expect(first).toHaveValue('5');
-  await expect(labelA).toHaveText('Volume');
-  await expect(labelB).toHaveText('');
+  await expect(label).toHaveText('Volume');
 
   await second.click();
   await expect(page.getByRole('option', { name: /^cups cup$/ })).toBeVisible();
@@ -63,7 +62,7 @@ test('an ambiguous symbol shows both meanings instead of guessing', async ({ pag
 test('keyboard: arrows and Enter pick a category, then a unit', async ({ page }) => {
   await page.goto('/');
   await ready(page);
-  const { first, back, labelA, scope } = boxes(page);
+  const { first, back, label, scope } = boxes(page);
 
   await first.click();
   await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
@@ -73,7 +72,7 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
   await expect(page.getByRole('option', { name: /^feet ft$/ })).toBeVisible();
   await expect(back).toBeVisible();
   await expect(scope).toHaveText('Length');
-  await expect(labelA).toHaveText('');
+  await expect(label).toHaveText('');
 
   // Down from nothing skips the Back row and goes to the first unit.
   await first.press('ArrowDown');
@@ -84,7 +83,7 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
   await arrowTo(first, page.getByRole('option', { name: /^feet ft$/ }));
   await first.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove feet' })).toBeVisible();
-  await expect(labelA).toHaveText('Length');
+  await expect(label).toHaveText('Length');
 });
 
 test('the arrow keys reach the Back row, and Enter on it goes back', async ({ page }) => {
@@ -381,9 +380,8 @@ test('a query with no match in the scoped category widens to every category', as
   await second.fill('fahr');
   await page.getByRole('option', { name: /Fahrenheit Temperature/ }).click();
 
-  // The label moves to the box that switched the category and simply names the new one.
-  await expect(boxes(page).labelB).toHaveText('Temperature');
-  await expect(boxes(page).labelA).toHaveText('');
+  // The label simply names the new category.
+  await expect(boxes(page).label).toHaveText('Temperature');
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Remove Fahrenheit' })).toBeVisible();
   await expect(first).toHaveValue('5');
@@ -446,7 +444,7 @@ test('the converter has no WCAG violations with the list open', async ({ page })
 test('Back and Escape go up to the categories from any unit list', async ({ page }) => {
   await page.goto('/?a=milliliter&v=250&s=a');
   await ready(page);
-  const { first, back, labelA, scope } = boxes(page);
+  const { first, back, label, scope } = boxes(page);
 
   await page.getByRole('button', { name: 'Change unit: milliliters' }).click();
   await expect(page.getByRole('option', { name: /^liters L$/ })).toBeVisible();
@@ -464,7 +462,7 @@ test('Back and Escape go up to the categories from any unit list', async ({ page
   await page.getByRole('option', { name: /^Weight$/ }).click();
   await expect(page.getByRole('option', { name: /^kilograms kg$/ })).toBeVisible();
   await expect(scope).toHaveText('Weight');
-  await expect(labelA).toHaveText('Volume');
+  await expect(label).toHaveText('Volume');
   await first.press('Escape');
   await expect(page.getByRole('option', { name: /^Weight$/ })).toHaveAttribute(
     'aria-selected',
@@ -481,7 +479,7 @@ test('with the list closed, Escape clears the unit first when it was the last th
   // The second box has its unit, so Enter leaves the caret in the first.
   await page.goto('/?b=us-cup');
   await ready(page);
-  const { first, labelA, scope } = boxes(page);
+  const { first, scope } = boxes(page);
 
   await first.fill('250 ml');
   await first.press('Enter');
@@ -491,7 +489,6 @@ test('with the list closed, Escape clears the unit first when it was the last th
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toHaveCount(0);
   await expect(page.getByRole('option', { name: /^liters L$/ })).toBeVisible();
   await expect(scope).toHaveText('Volume');
-  await expect(labelA).toHaveText('');
 
   await first.press('Escape');
   await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
@@ -596,6 +593,19 @@ test('a long number steps down in size and stays on one line; a result shows its
   await expect(page.locator('[data-marker]')).toHaveText('E');
 });
 
+test('the calculator opens under the boxes, flush left', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/?a=milliliter&b=us-cup&v=250&s=a');
+  await ready(page);
+  const { second, label } = boxes(page);
+
+  await page.getByRole('button', { name: 'Calculator' }).click();
+  const calculator = (await page.getByRole('group', { name: 'Calculator' }).boundingBox())!;
+  const box = (await second.boundingBox())!;
+  expect(calculator.y).toBeGreaterThan(box.y + box.height);
+  expect(Math.abs(calculator.x - (await label.boundingBox())!.x)).toBeLessThan(1);
+});
+
 test('undo drops the unit but keeps the number; redo restores it', async ({ page }) => {
   await page.goto('/');
   await ready(page);
@@ -614,64 +624,60 @@ test('undo drops the unit but keeps the number; redo restores it', async ({ page
   await expect(first).toHaveValue('250');
 });
 
-test('the category label sits under the box that drives the conversion', async ({ page }) => {
+test('the category label sits over the first box, left-aligned with its value, whichever box drives', async ({
+  page,
+}) => {
   await page.goto('/?a=milliliter&b=us-cup&v=5&s=a');
   await ready(page);
-  const { first, second, labelA, labelB } = boxes(page);
+  const { first, second, label } = boxes(page);
 
-  await expect(labelA).toHaveText('Volume');
-  await expect(labelB).toHaveText('');
-  const box = await first.boundingBox();
-  const label = await labelA.boundingBox();
-  expect(label!.y).toBeGreaterThan(box!.y + box!.height - 1);
+  await expect(label).toHaveText('Volume');
+  const placed = (await label.boundingBox())!;
+  expect(placed.y + placed.height).toBeLessThan((await first.boundingBox())!.y);
 
+  // Typing in the second box makes it drive; the label stays where it is.
   await second.fill('2');
-  await expect(labelB).toHaveText('Volume');
-  await expect(labelA).toHaveText('');
+  await expect(first).toHaveValue('473.176473');
+  await expect(label).toHaveText('Volume');
+  expect(await label.boundingBox()).toEqual(placed);
 
-  // In both boxes the label starts where the value starts, right under what was typed.
-  const textLeft = await labelB.evaluate((el) => {
+  // It starts where the first box's value starts.
+  const textLeft = await label.evaluate((el) => {
     const range = document.createRange();
     range.selectNodeContents(el);
     return range.getBoundingClientRect().left;
   });
-  const valueLeft = (await second.boundingBox())!.x;
+  const valueLeft = (await first.boundingBox())!.x;
   expect(Math.abs(textLeft - valueLeft)).toBeLessThan(2);
 });
 
-test('before any number, the box that got its unit first keeps the label', async ({ page }) => {
+test('the label names the category once either box has a unit', async ({ page }) => {
   await page.goto('/');
   await ready(page);
-  const { first, second, labelA, labelB } = boxes(page);
+  const { second, label } = boxes(page);
 
+  await expect(label).toHaveText('');
   await second.fill('ml');
   await second.press('Enter');
-  await expect(labelB).toHaveText('Volume');
-  await first.fill('cup');
-  await first.press('Enter');
-  await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
-  await expect(labelB).toHaveText('Volume');
-  await expect(labelA).toHaveText('');
+  await expect(label).toHaveText('Volume');
 });
 
 test('the category label follows the locked unit and clears with it', async ({ page }) => {
   await page.goto('/?a=mile&b=kilometer&v=1&s=a');
   await ready(page);
-  const { labelA, labelB } = boxes(page);
+  const { label } = boxes(page);
 
-  await expect(labelA).toHaveText('Length');
+  await expect(label).toHaveText('Length');
   // The first box keeps its number but loses its unit, so the category now comes from the second.
   await page.getByRole('button', { name: 'Remove miles' }).click();
-  await expect(labelB).toHaveText('Length');
-  await expect(labelA).toHaveText('');
+  await expect(label).toHaveText('Length');
   // Removing a unit refocuses the field, which opens its list inside the remaining category; Escape goes
   // up to the categories, then closes, so the list does not cover the other box on phones.
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('listbox')).toHaveCount(0);
   await page.getByRole('button', { name: 'Remove kilometers' }).click();
-  await expect(labelA).toHaveText('');
-  await expect(labelB).toHaveText('');
+  await expect(label).toHaveText('');
 });
 
 test('a value too large or too small to convert says so instead of showing 0', async ({ page }) => {
@@ -813,20 +819,26 @@ test('a query that matches nothing says so and offers the categories', async ({ 
   await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
 });
 
-test('the chip collapses to its symbol while an out-of-range message needs the room', async ({
+test('the chip gives up its name only when a message needs the room, measured on resize', async ({
   page,
 }) => {
-  // A short result ("1,000") leaves the chip at full width until the message needs the room.
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/?a=kilometer&b=meter&v=1&s=a');
   await ready(page);
   const { first } = boxes(page);
   const chip = page.getByRole('button', { name: 'Change unit: meters' });
+  const name = chip.getByText('meters', { exact: true });
 
-  // The name, then the symbol, the way a list row reads.
+  // The name, then the symbol, the way a list row reads; a message with room beside it keeps both.
   await expect(chip).toHaveText('metersm');
   await first.fill('1e308');
   await expect(page.getByText('Too large to convert')).toBeVisible();
-  await expect(chip).toHaveText('m');
+  await expect(name).toBeVisible();
+
+  // On a narrow screen the message needs the room, so the name goes first, the symbol staying.
+  await page.setViewportSize({ width: 320, height: 720 });
+  await expect(name).toBeHidden();
+  await expect(chip.getByText('m', { exact: true })).toBeVisible();
 });
 
 test('Enter on typed arithmetic gives its value and keeps the unit', async ({ page }) => {

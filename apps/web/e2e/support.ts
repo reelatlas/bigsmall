@@ -75,9 +75,8 @@ export function boxes(page: Page) {
     first: page.getByRole('combobox', { name: 'First value' }),
     second: page.getByRole('combobox', { name: 'Second value' }),
     back: page.getByRole('option', { name: 'Back to categories' }),
-    /** The category label under each box; only the box the conversion is anchored on shows it. */
-    labelA: page.locator('[data-category-label="a"]'),
-    labelB: page.locator('[data-category-label="b"]'),
+    /** The category label over the boxes, in both layouts. */
+    label: page.locator('[data-category-label]'),
     /** The category an open list is inside, shown on its Back row. */
     scope: page.locator('[data-scope-name]'),
   };

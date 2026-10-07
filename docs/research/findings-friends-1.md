@@ -22,12 +22,14 @@ Sean's own notes the same day build on these: filtering the table's units, writi
 ## Sean's decisions (2026-10-07)
 
 - Two layouts with a switch: the table, the default, and two boxes, with swap moved into the toolbar right of the calculator. The choice is remembered.
-- In the table, a headline row for the conversion's second unit; tapping any row moves it into the box, and everything converts from it.
+- In the table, a headline row for the conversion's second unit (dropped the same day, ADR 0010); tapping any row moves it into the box, and everything converts from it.
 - Basic mode lists the basic units with "Show all N units".
 - Every category at once waits.
 - No A/B test: the switch, and the five-person test run on the table layout.
 
 Built on 2026-10-07: swap in the toolbar first, then the table, its headline, moving a row into the box, the switch beside the theme menu, and rows at 6 significant digits (docs/UX-SPEC.md §1, §10; ADR 0009, outcome notes). The test script is rewritten for the table.
+
+Revised the same day after Sean tried it: the headline is gone, since the table already shows every unit and the second unit matters only with two boxes, where it is kept (ADR 0010); the category label sits over the box in both layouts; and the calculator takes a column of its own beside the table.
 
 ## What the five-person test should now learn
 
@@ -35,4 +37,4 @@ The test (docs/research/usability-test-1.md) no longer decides whether to build 
 
 - whether people find that tapping a row moves it into the box, and expect it to;
 - whether anyone looks for a second box, or finds the switch;
-- whether the headline reads as the answer a shared link meant.
+- whether anyone opening a link that names two units, in the table, misses which unit was meant.

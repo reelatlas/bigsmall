@@ -1,4 +1,5 @@
 import type { Unit } from '@bigsmall/core';
+import type { Ref } from 'react';
 import { cx } from '../lib/recipes';
 import { CloseIcon } from './icons';
 
@@ -6,6 +7,11 @@ export interface UnitChipProps {
   unit: Unit;
   /** Show the symbol only, when the field needs the room. The name stays in the labels. */
   compact: boolean;
+  /**
+   * The name's element, for a field that measures whether it has room for it (useFieldFit in
+   * lib/fit-step.ts). Compact hides it rather than leaving it out, so it can be measured.
+   */
+  nameRef?: Ref<HTMLSpanElement>;
   /** Called when the user activates the chip body, to change the unit. */
   onOpen: () => void;
   /** Called when the user removes the chip. */
@@ -25,7 +31,7 @@ const HOVER = 'transition-colors hover:bg-surface/40';
  * reads (SuggestionPanel), which open the unit list, plus a remove control. Collapsed, the symbol
  * stands alone in the ink color.
  */
-export function UnitChip({ unit, compact, onOpen, onRemove }: UnitChipProps) {
+export function UnitChip({ unit, compact, nameRef, onOpen, onRemove }: UnitChipProps) {
   // Both buttons stay out of the Tab order: the field's own keys change and remove the unit
   // (docs/UX-SPEC.md §5). They stay clickable and visible to screen readers.
   const tabIndex = -1;
@@ -39,7 +45,9 @@ export function UnitChip({ unit, compact, onOpen, onRemove }: UnitChipProps) {
         className={cx('inline-flex rounded-l-nested', HOVER)}
       >
         <span className={BODY}>
-          {!compact && <span>{unit.plural}</span>}
+          <span ref={nameRef ?? null} hidden={compact}>
+            {unit.plural}
+          </span>
           <span className={cx('font-numeric font-semibold', !compact && 'text-ink-muted')}>
             {unit.symbol}
           </span>

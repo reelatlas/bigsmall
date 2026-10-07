@@ -4,6 +4,7 @@ import {
   search,
   suggest,
   type CategoryId,
+  type ParsedInput,
   type SearchOptions,
   type Separators,
   type Suggestion,
@@ -13,6 +14,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type ChangeEvent,
@@ -29,7 +31,7 @@ import {
 } from '../../components/SuggestionPanel';
 import { NumberText, runningValue } from '../../components/NumberText';
 import { UnitChip } from '../../components/UnitChip';
-import { useFitStep } from '../../lib/fit-step';
+import { useFieldFit, type FitText } from '../../lib/fit-step';
 import { cx, FIELD_ROW, NUMBER_SIZES, SHELL, SHELL_BORDERED } from '../../lib/recipes';
 import { evaluatedText } from './calculator';
 import type { BoxView, EscapeTarget, HistoryAction, Mode } from './state';
@@ -54,6 +56,13 @@ export interface SmartInputProps {
   trailing?: ReactNode;
   /** Enter committed or kept the box's unit and closed the list; the converter decides whether the caret moves on (docs/UX-SPEC.md §5). */
   onEnter: () => void;
+  /**
+   * When the list opens by itself (docs/UX-SPEC.md §3). 'eagerly' (two boxes): on focus and on
+   * any typing. 'on-request' (the table layout, whose rows it would cover): only once a unit is
+   * being typed, never on focus or while only a number is typed. Either way Enter, ↓ ↑, the chip,
+   * and removing the unit open it.
+   */
+  listOpens?: 'eagerly' | 'on-request';
 }
 
 /**
@@ -62,9 +71,6 @@ export interface SmartInputProps {
  * 'top' forces the categories; a CategoryId forces that category.
  */
 type Level = 'top' | CategoryId;
-
-/** A number longer than this many characters collapses the chip to its symbol, so the number keeps its size as long as it can. */
-const COMPACT_CHIP_AFTER = 6;
 
 /** How many units of the other box's category an empty box suggests ("L, tsp, tbsp…"). */
 const SCOPED_EXAMPLES = 3;
@@ -78,8 +84,8 @@ const TEXT_LAYER =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 
 /**
- * "Too large to convert" in place of a value shrinks the same way a long number does, and as a
- * last resort wraps to two lines, so it is never cut off.
+ * "Too large to convert" in place of a value shrinks the same way a long number does, the chip's
+ * name giving way first, and as a last resort wraps to two lines, so it is never cut off.
  */
 const OUT_OF_RANGE =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-medium text-danger';
@@ -109,10 +115,13 @@ export function SmartInput({
   counterpart,
   trailing,
   onEnter,
+  listOpens = 'eagerly',
 }: SmartInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
   const outOfRangeRef = useRef<HTMLDivElement>(null);
+  const chipNameRef = useRef<HTMLSpanElement>(null);
   const idBase = useId();
   const inputId = `${idBase}-input`;
   const listboxId = `${idBase}-listbox`;
@@ -148,9 +157,18 @@ export function SmartInput({
         ? scopedExamples(box.scope, counterpart, listOptions.tier)
         : examples;
 
-  const sizeClass = NUMBER_SIZES[useFitStep(textLayerRef, TEXT_LAYER, NUMBER_SIZES)];
-  const outOfRangeClass =
-    OUT_OF_RANGE_SIZES[useFitStep(outOfRangeRef, OUT_OF_RANGE, OUT_OF_RANGE_SIZES)];
+  // The row is measured, not counted: in any box, wide or narrow, the chip keeps its name while
+  // the value or message fits beside it at full size, then the text steps down.
+  const fitTexts = useMemo<readonly FitText[]>(
+    () => [
+      { ref: textLayerRef, base: TEXT_LAYER, steps: NUMBER_SIZES },
+      { ref: outOfRangeRef, base: OUT_OF_RANGE, steps: OUT_OF_RANGE_SIZES },
+    ],
+    [],
+  );
+  const fit = useFieldFit(rowRef, chipNameRef, fitTexts);
+  const sizeClass = NUMBER_SIZES[fit.steps[0] ?? 0];
+  const outOfRangeClass = OUT_OF_RANGE_SIZES[fit.steps[1] ?? 0];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
   const syncScroll = () => {
@@ -271,8 +289,14 @@ export function SmartInput({
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.value;
     dispatch({ type: 'input', box: box.id, text: value, at: performance.now() });
+    const parsed = parse(value, env.separators);
+    if (listOpens === 'on-request' && !typingUnit(parsed)) {
+      // A number on its own keeps the table in view: the list closes until a unit is typed.
+      closePanel();
+      return;
+    }
     setOpen(true);
-    setActive(parse(value, env.separators).query ? firstResult : -1);
+    setActive(parsed.query ? firstResult : -1);
   };
 
   /**
@@ -360,8 +384,9 @@ export function SmartInput({
 
   const onFocus = (event: FocusEvent<HTMLInputElement>) => {
     // Back in a box that holds an uncommitted query, its best match is highlighted again;
-    // otherwise the list rests on the box's unit, so it opens where the box is.
-    reopen();
+    // otherwise the list rests on the box's unit, so it opens where the box is. A list opened
+    // on request waits to be asked.
+    if (listOpens === 'eagerly') reopen();
     if (!box.isSource && event.currentTarget.value) event.currentTarget.select();
   };
 
@@ -401,7 +426,7 @@ export function SmartInput({
         <label htmlFor={inputId} className="sr-only">
           {label}
         </label>
-        <div className={FIELD_ROW}>
+        <div ref={rowRef} className={FIELD_ROW}>
           <div className="relative min-w-0 flex-1 self-stretch">
             <input
               ref={inputRef}
@@ -452,10 +477,10 @@ export function SmartInput({
             // Out of the Tab order: Tab goes to the next box, and the field's own keys do what
             // the chip does (Down or typing lists the units; Backspace on an empty field or
             // Escape removes the unit). Pointers and screen readers still reach both buttons.
-            // A message needs the room a long number does, so it also collapses the chip.
             <UnitChip
               unit={box.unit}
-              compact={box.text.length > COMPACT_CHIP_AFTER || box.message !== null}
+              compact={fit.compact}
+              nameRef={chipNameRef}
               onOpen={() => {
                 showList(box.unit ? box.unit.category : null);
                 focusInput();
@@ -525,6 +550,19 @@ function buildList(text: string, scope: CategoryId | null, options: ListOptions)
     firstResult: hasBack ? 1 : 0,
     items: [...(hasBack ? [BACK_ITEM] : []), ...listed.map(toSuggestionItem)],
   };
+}
+
+/**
+ * Whether typing has reached a unit: the text holds a query with a letter or a symbol in it,
+ * beyond the characters numbers and sums are written with. The parser reads a half-typed number
+ * as a query ("-" before "-5", "1e" before "1e5"), so those, and a lone "e" after a number, which
+ * may be an exponent on its way, wait for the next key.
+ */
+function typingUnit(parsed: ParsedInput): boolean {
+  const { query } = parsed;
+  if (!query) return false;
+  if (parsed.valueText !== undefined && /^[eE][-+−]?$/.test(query)) return false;
+  return /[^\s\d.,+\-−*/×÷^()]/u.test(query);
 }
 
 /**

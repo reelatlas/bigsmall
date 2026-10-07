@@ -77,7 +77,7 @@ export interface CalculatorProps {
   onClose: () => void;
   /** Move focus onto = when it mounts, which is what opening does. False for gallery samples. */
   focusOnOpen?: boolean;
-  /** Under the keys: the buttons that send the value to a box. */
+  /** Under the keys: the buttons that send the value to a box, sharing the row's width. */
   footer?: ReactNode;
 }
 
@@ -262,7 +262,8 @@ export function Calculator({
           </Button>
         ))}
       </div>
-      {footer && <div className="mt-2 grid grid-cols-2 gap-2">{footer}</div>}
+      {/* One column per send button, shared equally: two split the row, one fills it. */}
+      {footer && <div className="mt-2 grid auto-cols-fr grid-flow-col gap-2">{footer}</div>}
     </div>
   );
 }

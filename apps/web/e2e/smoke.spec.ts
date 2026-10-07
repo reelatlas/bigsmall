@@ -349,6 +349,7 @@ for (const width of [320, 375, 414, 430, 520]) {
           left: Math.round(menus.left - header.left),
           right: Math.round(header.right - menus.right),
           themeFirst: trigger.right <= link.left,
+          rowGap: Math.round(menus.top - name.bottom),
           padLeft: Math.round(content.left - trigger.left),
           padRight: Math.round(trigger.right - content.right),
         };
@@ -357,6 +358,8 @@ for (const width of [320, 375, 414, 430, 520]) {
       expect(m.ownLine, theme.id).toBe(ownLine);
       expect(m.themeFirst, theme.id).toBe(ownLine);
       expect(ownLine ? m.left : m.right, theme.id).toBe(0);
+      // A wrapped row of menus keeps 20 px of air under the name.
+      if (ownLine) expect(m.rowGap, theme.id).toBe(20);
       // The theme's name sits in the middle of its trigger, with no wide gap after it.
       if (width < 640) expect(Math.abs(m.padLeft - m.padRight), theme.id).toBeLessThanOrEqual(10);
     }

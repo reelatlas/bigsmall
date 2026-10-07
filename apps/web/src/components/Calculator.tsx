@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  type ButtonHTMLAttributes,
-  type ReactNode,
-} from 'react';
+import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { NUMBER_SIZES, useFitStep } from '../lib/fit-step';
 import { FIELD_ROW } from '../lib/shell';
 import { Button, type ButtonVariant } from './Button';
@@ -137,13 +130,17 @@ export function Calculator({
     if (line) line.scrollLeft = line.scrollWidth;
   });
 
-  // Opening moves focus in, onto =, so typing and Enter reach the calculator at once.
-  useEffect(() => {
+  // Opening moves focus in, onto =, so typing and Enter reach the calculator at once. Layout
+  // effects commit with the render; Preact runs plain effects after paint, a frame too late for
+  // keys typed straight after the click that opened it.
+  useLayoutEffect(() => {
     if (focusOnOpen) groupRef.current?.querySelector<HTMLElement>(`[${STOP}="equals"]`)?.focus();
   }, [focusOnOpen]);
 
-  // Native listeners, like the converter's undo keys: the group is not itself interactive.
-  useEffect(() => {
+  // Native listeners, like the converter's undo keys: the group is not itself interactive. Bound
+  // in a layout effect too, so a key typed straight after another reaches the onPress that knows
+  // the latest entry.
+  useLayoutEffect(() => {
     const group = groupRef.current;
     if (!group) return;
     const stops = () => [...group.querySelectorAll<HTMLElement>(`[${STOP}]`)];

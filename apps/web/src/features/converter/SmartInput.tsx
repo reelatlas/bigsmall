@@ -222,7 +222,7 @@ export function SmartInput({
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
+    const value = event.currentTarget.value;
     dispatch({ type: 'input', box: box.id, text: value, at: performance.now() });
     setOpen(true);
     setActive(parse(value, env.separators).query ? firstResult : -1);
@@ -295,7 +295,7 @@ export function SmartInput({
     // Enter takes it just as it would have before the box was left.
     setOpen(true);
     setActive(query ? firstResult : -1);
-    if (!box.isSource && event.target.value) event.target.select();
+    if (!box.isSource && event.currentTarget.value) event.currentTarget.select();
   };
 
   // Leaving the box only closes the list: a query stays as typed until Enter or a pick.
@@ -342,7 +342,7 @@ export function SmartInput({
               autoComplete="off"
               autoCapitalize="off"
               autoCorrect="off"
-              spellCheck={false}
+              spellcheck={false}
               enterKeyHint="done"
               placeholder={placeholder}
               value={box.text}

@@ -2,7 +2,16 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "react",
+    "jsxImportSource": "preact",
+    // Source keeps importing from 'react'; Vite aliases it to preact/compat (astro.config.mjs) and
+    // these paths give TypeScript the same view (preactjs.com/guide/v10/typescript). No baseUrl:
+    // paths resolve from this file, and TypeScript 7 drops baseUrl.
+    "paths": {
+      "react": ["./node_modules/preact/compat/"],
+      "react/jsx-runtime": ["./node_modules/preact/jsx-runtime"],
+      "react-dom": ["./node_modules/preact/compat/"],
+      "react-dom/*": ["./node_modules/preact/compat/*"]
+    },
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,

@@ -5,7 +5,7 @@ import { expect, type Page } from '@playwright/test';
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 /**
- * The converter island is server-rendered; keystrokes typed before React hydrates are lost, so
+ * The converter island is server-rendered; keystrokes typed before it hydrates are lost, so
  * every test waits for the island's ready mark after navigating and before typing.
  */
 export async function ready(page: Page) {

@@ -7,7 +7,7 @@ How the code is organized, where the boundaries are, and how to extend it withou
 ```
 bigsmall/
 ├── packages/core        @bigsmall/core — the engine. Pure TypeScript. Zero runtime deps. No DOM.
-└── apps/web             @bigsmall/web  — the site. Astro shell, React islands, Tailwind over tokens.
+└── apps/web             @bigsmall/web  — the site. Astro shell, Preact islands (React API), Tailwind over tokens.
 ```
 
 Two packages, one direction of dependency: `web` imports `core`, never the reverse. The pnpm workspace makes this a physical boundary, `packages/core/tsconfig.json` has no DOM library, and ESLint forbids framework and DOM imports inside core and internal-path imports from web (ADR 0003).
@@ -41,17 +41,17 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 
 ## apps/web
 
-| Path                      | Responsibility                                                                                                                                                                                                                                                                |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/layouts/Base.astro`  | HTML shell, meta, global CSS, and the inline script: the pre-paint theme, the header-menu controller, and the Ctrl or ⌘ key labels                                                                                                                                            |
-| `src/pages/`              | Routes. `index.astro` is the converter; `dev/gallery.astro` renders every component in every theme                                                                                                                                                                            |
-| `src/components/`         | Design-system components: Button, UnitChip, SuggestionPanel, Keycap, Calculator, NumberText, ToolbarDivider, icons (React); ThemePicker, ShortcutsHelp, HeaderMenus, which places them, Wordmark and ThemeArt (Astro); wordmark-motion.ts, the wordmark's script. Tokens only |
-| `src/features/<name>/`    | Product features composed from components and core (`converter/` holds the converter island)                                                                                                                                                                                  |
-| `src/lib/`                | Shared helpers with no markup of their own (see below)                                                                                                                                                                                                                        |
-| `src/styles/global.css`   | Tailwind import, theme imports, the token → utility bridge, custom utilities, base styles                                                                                                                                                                                     |
-| `src/styles/themes/*.css` | One token set per theme                                                                                                                                                                                                                                                       |
-| `test/`                   | Node-only unit tests: the converter reducer, view, and history; the URL; the theme contract and contrast                                                                                                                                                                      |
-| `e2e/`                    | Playwright on desktop and mobile Chromium: converter behavior, smoke, theme and shortcuts menus, axe accessibility                                                                                                                                                            |
+| Path                      | Responsibility                                                                                                                                                                                                                                                              |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/layouts/Base.astro`  | HTML shell, meta, global CSS, and the inline script: the pre-paint theme, the header-menu controller, and the Ctrl or ⌘ key labels                                                                                                                                          |
+| `src/pages/`              | Routes. `index.astro` is the converter; `dev/gallery.astro` renders every component in every theme                                                                                                                                                                          |
+| `src/components/`         | Design-system components: Button, UnitChip, SuggestionPanel, Keycap, Calculator, NumberText, ToolbarDivider, icons (TSX); ThemePicker, ShortcutsHelp, HeaderMenus, which places them, Wordmark and ThemeArt (Astro); wordmark-motion.ts, the wordmark's script. Tokens only |
+| `src/features/<name>/`    | Product features composed from components and core (`converter/` holds the converter island)                                                                                                                                                                                |
+| `src/lib/`                | Shared helpers with no markup of their own (see below)                                                                                                                                                                                                                      |
+| `src/styles/global.css`   | Tailwind import, theme imports, the token → utility bridge, custom utilities, base styles                                                                                                                                                                                   |
+| `src/styles/themes/*.css` | One token set per theme                                                                                                                                                                                                                                                     |
+| `test/`                   | Node-only unit tests: the converter reducer, view, and history; the URL; the theme contract and contrast                                                                                                                                                                    |
+| `e2e/`                    | Playwright on desktop and mobile Chromium: converter behavior, smoke, theme and shortcuts menus, axe accessibility                                                                                                                                                          |
 
 ### `src/lib`
 
@@ -82,7 +82,7 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 
 ### Islands and the inline script
 
-Astro renders every page to static HTML. JavaScript ships only for components marked `client:*`, and only React islands carry React; a React component used without a directive (the icons inside Astro components) renders to plain markup. Rule of thumb: if a thing can be HTML plus a few lines of inline script, it is not an island. The header menus are the worked example: ThemePicker and ShortcutsHelp are Astro markup driven by one controller in the inline script of `Base.astro` (`[data-shell]`, `[data-shell-toggle]`, `[data-open]`, `[data-pinned]`, `[data-shell-hover]`, `[data-shell-initial]`), so they work before any bundle loads and add none (ADR 0002, outcome note).
+Astro renders every page to static HTML. JavaScript ships only for components marked `client:*`, and only islands carry the framework: Preact, with `preact/compat` answering the components' `'react'` imports (ADR 0007). A TSX component used without a directive (the icons inside Astro components) renders to plain markup. Rule of thumb: if a thing can be HTML plus a few lines of inline script, it is not an island. The header menus are the worked example: ThemePicker and ShortcutsHelp are Astro markup driven by one controller in the inline script of `Base.astro` (`[data-shell]`, `[data-shell-toggle]`, `[data-open]`, `[data-pinned]`, `[data-shell-hover]`, `[data-shell-initial]`), so they work before any bundle loads and add none (ADR 0002, outcome note).
 
 ### Theming
 
@@ -90,7 +90,7 @@ A theme is a set of CSS custom properties on `[data-theme="id"]`. Components con
 
 ### State and URLs
 
-The converter state lives in the React island and serializes to the URL as `?a=<unit id>&b=<unit id>&v=<number>&s=<a|b>`; `v` and `s` appear only with a number. Preferences (today, only the theme) live in `localStorage`. There is no server state (ADR 0001).
+The converter state lives in the island and serializes to the URL as `?a=<unit id>&b=<unit id>&v=<number>&s=<a|b>`; `v` and `s` appear only with a number. Preferences (today, only the theme) live in `localStorage`. There is no server state (ADR 0001).
 
 ## Build and runtime
 
@@ -116,7 +116,7 @@ The converter state lives in the React island and serializes to the URL as `?a=<
 
 ## Conventions
 
-- File names: kebab-case for `.ts`/`.css` modules, PascalCase for React and Astro components.
+- File names: kebab-case for `.ts`/`.css` modules, PascalCase for TSX and Astro components.
 - Imports: from `@bigsmall/core` only; relative paths inside a package.
 - No default exports in TypeScript modules. Astro components and tool config files (`astro.config.mjs`, `eslint.config.js`, `playwright.config.ts`, `vitest.config.ts`) are the exceptions, by framework design.
 - Comments explain why, not what. Decisions go in `docs/decisions/`, surprises in `docs/LEARNINGS.md`.

@@ -102,6 +102,8 @@ export default tseslint.config(
                 'react',
                 'react-*',
                 'react/*',
+                'preact',
+                'preact/*',
                 'astro',
                 'astro:*',
                 '@bigsmall/web',

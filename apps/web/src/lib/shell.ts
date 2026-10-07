@@ -2,7 +2,7 @@
  * The fluid shell (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it
  * opens drawn as one shape over the page. The placeholder around it carries `group`, a fixed
  * size, and `data-open` while open; the shell takes SHELL, one of the two resting styles, and its
- * own position and radius. SmartInput (React) and the header menus (Astro, driven by the inline
+ * own position and radius. SmartInput (TSX) and the header menus (Astro, driven by the inline
  * script in layouts/Base.astro) all build from these, so the shape never drifts between them.
  */
 

@@ -23,7 +23,7 @@ function visit(url) {
   seen.set(url, gzipSync(source).length);
   if (!url.endsWith('.js')) return;
   // Follow static and dynamic imports, in any quotes (Vite writes dynamic ones in backticks), so
-  // the island's React chunk and code loaded on demand are both counted.
+  // the island's framework chunk and code loaded on demand are both counted.
   const text = source.toString('utf8');
   const importRe = /(?:from\s*|import\s*\(\s*)["'`]([^"'`]+)["'`]/g;
   for (const match of text.matchAll(importRe)) {

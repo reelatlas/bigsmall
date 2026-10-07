@@ -301,3 +301,33 @@ Format:
 
 **What happened.** The wordmark's live line became `absolute` when it started to play, so the box that held it lost its height and the header jumped. A browser test that clicked the heading timed out waiting for it to stop moving.
 **Rule.** Before floating a layer, fix its box at the size it had, width and height both, and release the size when the layer returns to flow.
+
+## 2026-10-06 — preact/compat's useSyncExternalStore has no server snapshot
+
+**What happened.** On Preact, `useIsHydrated` read the browser value on the server and while hydrating, because compat's `useSyncExternalStore` ignores the third argument. The server HTML already carried the ready mark, and `useSlot` touched `document` during the server render.
+**Rule.** For "has this island hydrated", use a store per component that turns true when first subscribed (subscription happens after the first commit, never on the server). Anything browser-only in render waits for `useIsHydrated()`. (ADR 0007)
+
+## 2026-10-06 — Preact runs effects after paint
+
+**What happened.** On Preact the calculator lost keys: typing `12*3` showed `1×3`, and keys typed right after the click that opened it went to the toggle. React flushes effects at once after a click or key press; Preact runs them a frame later, so for a frame the key listener held the previous entry and focus had not moved in.
+**Rule.** Work that must be done before the next key (moving focus in, binding a listener that closes over the latest state) runs in `useLayoutEffect`. Plain effects are for work that can wait a frame.
+
+## 2026-10-06 — Preact drops a camelCase attribute set to false
+
+**What happened.** `spellCheck={false}` rendered nothing under Preact, on the server and in the browser, so the field could underline unit names. Preact sets a prop as a DOM property when the element has one by that name, and otherwise as an attribute, which `false` removes; `spellCheck` is not a property, `spellcheck` is.
+**Rule.** Write boolean attributes by their DOM property name (`spellcheck`, `autofocus`) when the value can be `false`. compat also types `event.target` as a plain `EventTarget`: an element's own events read `event.currentTarget`.
+
+## 2026-10-06 — Preact never warns about hydration mismatches
+
+**What happened.** React logs a mismatch between the server HTML and the first client render; Preact only attaches handlers to the server's DOM and stays silent, so a mismatch would persist unseen.
+**Rule.** Keep the first client render identical to the server's: no browser-only values (storage, `matchMedia`, `navigator`) in render until `useIsHydrated()` is true, or read them in an effect.
+
+## 2026-10-06 — pnpm's release-age policy holds back a package published today
+
+**What happened.** `@astrojs/preact` 6.0.6 came out the day of the switch; installing it made pnpm add a release-age exception to `pnpm-workspace.yaml`.
+**Rule.** Take the newest release old enough to pass the policy (6.0.5 here) rather than adding an exception, unless the newer one fixes something we need.
+
+## 2026-10-06 — Measure a framework switch on a branch before deciding it
+
+**What happened.** The case for Preact had been an estimate ("about 30 KB back"). A spike in a separate worktree measured 55.3 KB back, a faster time to interactive, and the four compat differences above, with the full suite green, before the owner chose.
+**Rule.** For a change of foundation, run the spike on its own branch and worktree (its own dev server port), and bring the owner measured numbers and the list of source changes it took.

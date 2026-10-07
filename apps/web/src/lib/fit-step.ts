@@ -21,7 +21,7 @@ export const NUMBER_SIZES = [
  * resort, which then always fits; `base` is its full class list without the size step.
  *
  * The measurement writes the element's class directly, then the chosen step is rendered through
- * React with the identical string, so the DOM and the tree never disagree.
+ * the island with the identical string, so the DOM and the tree never disagree.
  */
 export function useFitStep(
   ref: RefObject<HTMLElement | null>,

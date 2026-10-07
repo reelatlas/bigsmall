@@ -63,7 +63,7 @@ What would change the answer: accounts with cross-device sync of favorites (need
 
 ## 5. Architecture
 
-Two layers with a hard boundary (ADR 0003). `packages/core` is pure TypeScript with zero runtime dependencies and no DOM: units, conversion, parsing, search, and formatting. `apps/web` is the Astro site with one React island for the converter: everything the user sees. The module map, data flow, and how to extend each part are in `docs/ARCHITECTURE.md`.
+Two layers with a hard boundary (ADR 0003). `packages/core` is pure TypeScript with zero runtime dependencies and no DOM: units, conversion, parsing, search, and formatting. `apps/web` is the Astro site with one island for the converter, written against the React API and run on Preact through `preact/compat` (ADR 0007): everything the user sees. The module map, data flow, and how to extend each part are in `docs/ARCHITECTURE.md`.
 
 - **Data model.** `Category` and `Unit` in `packages/core/src/types.ts`. Conversion always goes `from → base → to`, never through an intermediate unit: linear units multiply by a factor; non-linear units (temperature now, fuel economy later) use a `toBase`/`fromBase` pair. Every unit cites its source.
 - **Converter state.** `apps/web/src/features/converter/state.ts`: each box's text and unit, the source box, and the mode, with undo history around them. The calculator's entry lives beside them in the converter, outside the undo history; a send is one undoable step.
@@ -71,20 +71,20 @@ Two layers with a hard boundary (ADR 0003). `packages/core` is pure TypeScript w
 
 ## 6. Stack (ADR 0002, accepted)
 
-| Concern               | Choice                                                  | Why                                                                                                                                                                  |
-| --------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Framework             | **Astro** with a **React** island                       | Static HTML by default, zero JS outside the converter, static page generation for later SEO pages, built-in view transitions                                         |
-| Language              | **TypeScript** (strict)                                 | Catches unit-data mistakes at compile time                                                                                                                           |
-| Styling               | **Tailwind CSS v4** over **CSS custom properties**      | Tokens are plain CSS variables so themes are just variable sets; Tailwind for speed and consistency                                                                  |
-| Accessible primitives | **Native elements + a hand-built combobox** (ADR 0006)  | React Aria was tried and removed at milestone 2: its button machinery alone cost 12 KB gzipped, and the hybrid number-and-unit field does not fit a library combobox |
-| Package manager       | **pnpm** workspaces                                     | Fast; the workspace enforces the core/web boundary physically                                                                                                        |
-| Tests                 | **Vitest** (core), **Playwright** + **axe** (web)       | Table-driven golden tests for math; end-to-end plus automated accessibility checks                                                                                   |
-| Lint/format           | **ESLint** (flat) + **Prettier**                        | Boring, complete coverage of `.astro`, `.tsx`, and `.css`                                                                                                            |
-| Perf gates            | Bundle size check now; **Lighthouse CI** at milestone 5 | Budgets fail the build                                                                                                                                               |
-| Hosting               | **Cloudflare Pages**                                    | Free, global edge, preview deploy per pull request, free cookieless analytics                                                                                        |
-| Repo                  | **GitHub**                                              | Actions for CI, PR previews                                                                                                                                          |
+| Concern               | Choice                                                   | Why                                                                                                                                                                  |
+| --------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework             | **Astro** with a **Preact** island (React API, ADR 0007) | Static HTML by default, zero JS outside the converter, static page generation for later SEO pages, built-in view transitions                                         |
+| Language              | **TypeScript** (strict)                                  | Catches unit-data mistakes at compile time                                                                                                                           |
+| Styling               | **Tailwind CSS v4** over **CSS custom properties**       | Tokens are plain CSS variables so themes are just variable sets; Tailwind for speed and consistency                                                                  |
+| Accessible primitives | **Native elements + a hand-built combobox** (ADR 0006)   | React Aria was tried and removed at milestone 2: its button machinery alone cost 12 KB gzipped, and the hybrid number-and-unit field does not fit a library combobox |
+| Package manager       | **pnpm** workspaces                                      | Fast; the workspace enforces the core/web boundary physically                                                                                                        |
+| Tests                 | **Vitest** (core), **Playwright** + **axe** (web)        | Table-driven golden tests for math; end-to-end plus automated accessibility checks                                                                                   |
+| Lint/format           | **ESLint** (flat) + **Prettier**                         | Boring, complete coverage of `.astro`, `.tsx`, and `.css`                                                                                                            |
+| Perf gates            | Bundle size check now; **Lighthouse CI** at milestone 5  | Budgets fail the build                                                                                                                                               |
+| Hosting               | **Cloudflare Pages**                                     | Free, global edge, preview deploy per pull request, free cookieless analytics                                                                                        |
+| Repo                  | **GitHub**                                               | Actions for CI, PR previews                                                                                                                                          |
 
-The alternatives (SvelteKit, Next.js, an all-React Vite framework) and why they lost are in ADR 0002. The milestone 2 bundle check removed React Aria (ADR 0006).
+The alternatives (SvelteKit, Next.js, an all-React Vite framework) and why they lost are in ADR 0002. The milestone 2 bundle check removed React Aria (ADR 0006), and the island moved from React to Preact through `preact/compat` when the budget ran out (ADR 0007).
 
 ## 7. Repo structure
 
@@ -141,7 +141,7 @@ Rules: every theme passes the same contrast checks; decoration costs nothing whe
 | CLS                                       | ≈ 0                                                                                          |
 | Lighthouse                                | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100                             |
 
-The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 86.5 KB JS and 5.7 KB CSS; with the wordmark at play and theme art, 89.2 KB JS and 5.9 KB CSS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
+The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 86.5 KB JS and 5.7 KB CSS; with the wordmark at play and theme art, 89.2 KB JS and 5.9 KB CSS; on Preact (ADR 0007), 33.9 KB JS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
 
 ## 10. Accessibility targets
 
@@ -221,7 +221,7 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 
 ## 15. Decisions (made 2026-10-06)
 
-1. **Stack.** Astro + React + TypeScript + Tailwind v4 (ADR 0002, accepted). Re-examined against an all-React Vite framework the same day and kept; the operating rule is React for interaction, Astro for structure.
+1. **Stack.** Astro + React + TypeScript + Tailwind v4 (ADR 0002, accepted). Re-examined against an all-React Vite framework the same day and kept; the operating rule is TSX components for interaction, Astro for structure. The island's runtime became Preact (decision 10).
 2. **Primary categories.** The eight in `docs/UNITS-CATALOG.md`: Length, Weight, Volume, Temperature, Area, Speed, Time, Data.
 3. **Themes.** Framework and palettes for all six now; polish one at a time in milestone 4, `sakura` first (docs/THEMING.md).
 4. **Locale defaults.** Detect from the browser, fall back to US; manual override in settings later. Implemented as `regionDefaults` in core.
@@ -230,6 +230,7 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 7. **Commit rules.** Nothing commits on a keystroke. Enter commits the highlighted best match, or a pick does; Tab and clicking away never commit, so moving between boxes never changes what was typed (`docs/UX-SPEC.md` §5).
 8. **Token guard.** `pnpm lint` rejects raw colors, palette colors, one-off arbitrary values, untokened radii, shadows, fonts, and literal durations and delays in components. A flagged need is matched to an existing token or brought to the owner as a proposed new one (`docs/DESIGN-SYSTEM.md`, "Token guard").
 9. **Control edges.** Fields, the theme menu, and secondary buttons are edged in a new `--edge` token at 3:1 against the page and the surface (WCAG 1.4.11); `--line` stays for dividers. A trial: reverting its one commit restores the lighter edges.
+10. **Framework.** The island runs on Preact through `preact/compat` (ADR 0007): 89.2 KB of JavaScript became 33.9 KB with no change to how components are written, and the 90 KB budget stays, so the room goes to the product. Owner's choice after a measured spike.
 
 Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (check `.app`, `.io`, `.co`, `.tools` availability early).
 
@@ -237,7 +238,7 @@ Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (che
 
 - **Ambiguous symbols** (`m`, `oz`, `ton`, `gal`, `cup`, `cal`, `hp`, `mpg`, `kB`). The disambiguation UX decides whether the smart input feels magical or annoying. Test it early.
 - **Explicit commit.** Decided: nothing commits on a keystroke, and only Enter or a pick commits (decision 7). The risk left is people who never press Enter; the usability test watches for it.
-- **Bundle size.** Resolved at M2 by removing React Aria (ADR 0006), and at its ceiling: 89.2 KB JS gzipped after the calculator, arithmetic, and the wordmark at play, against the 90 KB gate. React's runtime is about 64 KB of that. Before milestone 3 adds more, the owner decides between moving the island to Preact (ADR 0002 kept it as the lever, about 30 KB back) and another budget.
+- **Bundle size.** Resolved at M2 by removing React Aria (ADR 0006), then at its ceiling (89.2 KB of 90) until the island moved to Preact (ADR 0007): 33.9 KB, about 56 KB of headroom under the same gate. As formulas and units grow, unit data loads per category against its own budget (§9) so the code that runs first stays small.
 - **Themes vs. speed.** Decoration must be free when inactive. Fonts are the main cost; system fonts for the defaults.
 - **Locale number parsing.** `1,5` means 1.5 in much of the world. Use the browser locale and show the detected format.
 - **Definitions that vary.** Month, year, cup, calorie, horsepower, ton. Each needs a stated definition in the UI and a note in the catalog.

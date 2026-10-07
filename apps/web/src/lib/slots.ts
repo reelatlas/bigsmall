@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useIsHydrated } from './hydrated';
 
 /**
  * Places in a page's static markup that an island fills once it runs. The markup reserves each
@@ -9,16 +9,10 @@ export const SLOTS = {
   headerActions: 'header-actions',
 } as const;
 
-const subscribe = () => () => {};
-
 /**
  * The slot's element in the browser, and null while rendering on the server or hydrating, so a
  * portal into it renders on the client only, the way useIsHydrated flips (lib/hydrated.ts).
  */
 export function useSlot(id: string): HTMLElement | null {
-  return useSyncExternalStore(
-    subscribe,
-    () => document.getElementById(id),
-    () => null,
-  );
+  return useIsHydrated() ? document.getElementById(id) : null;
 }

@@ -1,6 +1,9 @@
 ---
+import { SHELL, SHELL_GHOST } from '../lib/shell';
 import { SHORTCUTS } from '../lib/shortcuts';
+import { Button } from './Button';
 import { KeyboardIcon } from './icons';
+import { Keycap } from './Keycap';
 
 interface Props {
   id?: string;
@@ -12,22 +15,22 @@ const titleId = `${id}-title`;
 ---
 
 <!--
-  The keyboard shortcuts map. At rest it is a borderless icon button like undo, redo, and clear
-  all; open, the same shell takes the fluid-shell edge, surface, and shadow and grows left and down
-  from the icon over the page, the way the theme menu grows out of its trigger. A mouse resting on
-  it opens it for a look, a click pins it open, and Escape or a click elsewhere closes it, so the
-  content can be hovered, dismissed, and stays put until then (WCAG 1.4.13). The inline script in
-  layouts/Base.astro drives it, so it adds no bundle; the icon is a React component rendered to
-  static HTML. Hidden on touch-first devices, which have no keyboard to use, and below the sm
-  breakpoint, where a panel growing left from beside the theme menu would run off the screen.
-  The list itself lives in src/lib/shortcuts.ts.
+  The keyboard shortcuts map. At rest it is the same ghost icon button as undo, redo, and clear
+  all; open, its shell (lib/shell.ts) takes the fluid-shell edge, surface, and shadow and grows
+  left and down from the icon over the page, the way the theme menu grows out of its trigger. A
+  mouse resting on it opens it for a look, a click pins it open, and Escape, a click elsewhere,
+  or focus leaving closes it, so the content can be hovered, dismissed, and stays put until then
+  (WCAG 1.4.13). The inline script in layouts/Base.astro drives it, so it adds no bundle; Button
+  and the icon are React components rendered to static HTML. Hidden on touch-first devices, which
+  have no keyboard to use, and below the sm breakpoint, where a panel growing left from beside the
+  theme menu would run off the screen. The list itself lives in src/lib/shortcuts.ts.
 -->
 <div
   class="group relative hidden size-12 sm:block pointer-coarse:hidden"
   data-shell
   data-shell-hover
 >
-  <div class="absolute top-0 right-0 overflow-hidden rounded-md border-2 border-transparent group-data-open:z-20 group-data-open:border-accent group-data-open:bg-surface group-data-open:shadow-md">
+  <div class={`absolute top-0 right-0 rounded-md ${SHELL} ${SHELL_GHOST}`}>
     <div class="flex items-center">
       <h2
         id={titleId}
@@ -35,20 +38,23 @@ const titleId = `${id}-title`;
       >
         Keyboard shortcuts
       </h2>
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        square
         data-shell-toggle
         aria-expanded="false"
         aria-controls={panelId}
         aria-label="Keyboard shortcuts"
-        class="flex size-11 shrink-0 items-center justify-center rounded-md text-ink-muted transition-[background-color] duration-[var(--motion-fast)] ease-standard outline-none hover:bg-surface-raised hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus group-data-open:focus-visible:-outline-offset-2"
+        className="group-data-open:focus-ring-inset"
       >
         <KeyboardIcon />
-      </button>
+      </Button>
     </div>
     <div
       id={panelId}
-      class="hidden w-72 max-w-[calc(100vw-2rem)] border-t border-line px-3 py-2 group-data-open:block"
+      role="group"
+      aria-labelledby={titleId}
+      class="hidden w-72 border-t border-line px-3 py-2 group-data-open:block"
     >
       <dl>
         {SHORTCUTS.map((shortcut) => (
@@ -60,9 +66,7 @@ const titleId = `${id}-title`;
                   {alternative > 0 && <span>or</span>}
                   <span class="inline-flex items-center gap-1">
                     {combo.map((key) => (
-                      <kbd class="min-w-6 rounded-sm border border-line bg-surface-raised px-1.5 py-0.5 text-center font-numeric text-ink">
-                        {key === 'Mod' ? <span data-mod-key>Ctrl</span> : key}
-                      </kbd>
+                      <Keycap label={key} />
                     ))}
                   </span>
                 </>

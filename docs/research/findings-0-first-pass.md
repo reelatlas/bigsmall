@@ -80,3 +80,22 @@ Noticed, not changed: the URL stores the parsed number (`v=123456789012345680` a
 | A green edge lingered around the keyboard icon after its menu closed                       | The icon uses the button focus ring, and the open edge comes and goes with the panel, without a fade                                                                                                         |
 | Copying gave no feedback                                                                   | The copy icon turns into a check in the success color, announced as "Copied"; it reverts when the mouse leaves (after at least a second) or after two seconds without a mouse                                |
 | The shortcuts map should be shorter, without group headings                                | One list of six in Sean's wording; arrows as two keycaps with nothing between, "or" between alternatives                                                                                                     |
+
+## Hygiene pass — in progress (next session starts here)
+
+Two read-only audits (docs against code, code hygiene) ran on 2026-10-06. The code fixes are done, tested, and committed: visible focus on every button (Tailwind v4's `outline-none` was hiding the ring), header menus closing when focus leaves them, arrow keys previewing themes without closing the menu, reduced motion that actually zeroes the theme tokens, the URL keeping a German "1.000" as 1000, a 44 px chip remove target, motion and corner utilities in the bridge, one fluid-shell recipe (`src/lib/shell.ts`), one timing module (`src/lib/timing.ts`), shared e2e helpers (`e2e/support.ts`), a gallery of real states, dead code removed (`canExtend`, unused theme helpers and icon, unused exports), and new tests for each. Rewritten docs: UX-SPEC (now current behavior only), usability-test-1, README, ARCHITECTURE, TESTING, DESIGN-SYSTEM, THEMING.
+
+**Remaining doc work (do first next session):**
+
+1. **PLAN.md**: §3 UX concept (no chips, no auto-lock, display order); §5 architecture tree and the data-model and state drafts → point to ARCHITECTURE.md and `types.ts`/`state.ts`; URL format `?a=<unit>&b=<unit>&v=&s=`; §6 Lighthouse not yet in CI, drop the React Aria and SvelteKit notes; §8 token names → point to DESIGN-SYSTEM; §9/§16 bundle now about 82 KB; precision is 10 digits, not 12; §13 swap shipped in M2, M4's picker, contrast tests, and gallery exist; §16 "auto-lock vs explicit pick" decided (nothing commits on a keystroke); add docs/research to §12.
+2. **UNITS-CATALOG.md**: "auto-lock" wording (L9, L121) → aliases change ranking and what Enter, Tab, and leaving a box commit; the chip shows no definition note (planned); list every unit with a note; drop "(proposed)"; recipe must name `golden/index.ts`.
+3. **LEARNINGS.md**: add "Superseded" lines to the focus-edge entry (border plus inset ring), the onBrowse entry (callback removed; keep the general rule), and the auto-lock wording; new entries: `outline-none` hides Tailwind v4 focus rings; unlayered theme tokens beat a layered reduced-motion override; Astro passes children to React as markup (Keycap takes `label`); radios fire change on every arrow key; dev toolbar in Tab walks; a `div` with `aria-label` needs a role.
+4. **ADRs**: append an outcome note to 0002 (both header menus are inline-script driven); 0006: Space is not handled, the theme menu is radios, the Back row is an option.
+5. **CLAUDE.md**: rule 5 already names the header menus; update rule 6 (axe runs on `/` in every theme and on the gallery once; a keyboard walk checks focus) and rule 7 (bundle budget gates CI; Lighthouse joins at M5); add recipes for a shortcut, a header menu, and UI timings.
+6. **DESIGN-SYSTEM.md** is current; **ARCHITECTURE.md** lib table needs `timing.ts`, `shell.ts`; components list needs `Keycap`, `HeaderMenus`.
+
+**Open decisions for Sean:**
+
+- **Field edge contrast.** `--line` is under 3:1 against `--canvas` in every theme, so a field's resting edge does not meet WCAG 1.4.11 by itself. Recommendation: a new `--edge` token at 3:1 or better for control edges, keeping `--line` for dividers. This visibly darkens field borders, so it is your call.
+- **Commit rules.** Enter commits the highlighted best match (`kilom` → kilometers), but Tab and clicking away commit only an exact match. Keep as is and watch it in the usability test, or make Tab accept the highlight too.
+- **Lint guard for raw values.** A lint rule that rejects raw colors and arbitrary token values in class strings; today review catches them.

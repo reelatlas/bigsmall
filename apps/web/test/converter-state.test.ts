@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
+  escapeTarget,
+  HISTORY_LIMIT,
+  initialHistory,
   initialState,
   reduce,
+  reduceWithHistory,
   selectView,
   type ConverterState,
+  type History,
+  type HistoryAction,
 } from '../src/features/converter/state';
+import { TYPING_CHUNK_MS } from '../src/lib/timing';
 
 const EN = { separators: { decimal: '.', group: ',' } };
 
@@ -95,6 +102,20 @@ describe('reduce', () => {
     expect(s).toEqual({ ...initialState, mode: 'advanced' });
   });
 
+  it('setText replaces a box’s text without moving the source', () => {
+    const s = run(
+      { type: 'input', box: 'a', text: '5 me', at: 0 },
+      { type: 'setText', box: 'a', text: '5' },
+    );
+    expect(s.a.text).toBe('5');
+    expect(s.source).toBe('a');
+    const t = run(
+      { type: 'input', box: 'a', text: '5', at: 0 },
+      { type: 'setText', box: 'b', text: '7' },
+    );
+    expect(t.source).toBe('a');
+  });
+
   it('hydrate merges the restored boxes', () => {
     const s = run({ type: 'hydrate', state: { a: { text: '2', unit: 'foot' }, source: 'a' } });
     expect(s.a).toEqual({ text: '2', unit: 'foot' });
@@ -115,7 +136,7 @@ describe('selectView', () => {
     expect(v.b.text).toBe('0.02113376419');
     expect(v.result).toMatchObject({ box: 'b', text: '0.02113376419' });
     expect(v.announcement).toBe('5 milliliters is 0.02113376419 cups');
-    expect(v.outOfRange).toBeNull();
+    expect(v.b.message).toBeNull();
     expect(v.anchor).toBe('a');
   });
 
@@ -167,7 +188,7 @@ describe('selectView', () => {
     );
     const v = selectView(s, EN);
     expect(v.result).toBeNull();
-    expect(v.outOfRange).toBe('large');
+    expect(v.result).toBeNull();
     expect(v.b.text).toBe('');
     expect(v.b.message).toBe('Too large to convert');
     expect(v.a.message).toBeNull();
@@ -181,7 +202,7 @@ describe('selectView', () => {
       { type: 'lock', box: 'b', unit: 'kilometer' },
     );
     const v = selectView(s, EN);
-    expect(v.outOfRange).toBe('small');
+    expect(v.result).toBeNull();
     expect(v.b.message).toBe('Too small to convert');
   });
 
@@ -204,7 +225,7 @@ describe('selectView', () => {
       { type: 'lock', box: 'b', unit: 'millimeter' },
     );
     const v = selectView(s, EN);
-    expect(v.outOfRange).toBeNull();
+    expect(v.b.message).toBeNull();
     expect(v.b.text).toBe('0');
   });
 
@@ -321,15 +342,6 @@ describe('source handoff', () => {
     expect(v.result).toBeNull();
   });
 });
-
-import {
-  initialHistory,
-  escapeTarget,
-  reduceWithHistory,
-  TYPING_CHUNK_MS,
-  type History,
-  type HistoryAction,
-} from '../src/features/converter/state';
 
 function steps(...actions: HistoryAction[]): History {
   return actions.reduce(reduceWithHistory, initialHistory);
@@ -480,6 +492,19 @@ describe('history', () => {
     h = undo(h);
     expect(h.present.a.text).toBe('');
     expect(undo(h)).toBe(h);
+  });
+
+  it('keeps at most HISTORY_LIMIT steps, dropping the oldest', () => {
+    const actions: HistoryAction[] = [];
+    for (let i = 1; i <= HISTORY_LIMIT + 10; i += 1) {
+      actions.push(type('a', String(i), i * (TYPING_CHUNK_MS + 1)));
+    }
+    const h = steps(...actions);
+    expect(h.past).toHaveLength(HISTORY_LIMIT);
+    let undone = h;
+    for (let i = 0; i < HISTORY_LIMIT; i += 1) undone = undo(undone);
+    expect(undone.present.a.text).toBe('10');
+    expect(undo(undone)).toBe(undone);
   });
 
   it('a new action clears the redo stack', () => {

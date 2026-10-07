@@ -1,6 +1,6 @@
 # Usability test 1 — the smart input
 
-Milestone 2 exit gate (docs/PLAN.md §13). Five people, about 20 minutes each, one at a time. The goal is to learn whether the two-box idea is understood without explanation and where the smart input surprises people. Nothing here measures speed.
+Milestone 2 exit gate (docs/PLAN.md §13). Five people, about 20 minutes each, one at a time. The goal is to learn whether the two-box idea is understood without explanation and where the smart input surprises people. Nothing here measures speed. The behavior being tested is described in docs/UX-SPEC.md; its open questions are §15.
 
 ## Who
 
@@ -12,13 +12,17 @@ Five participants, recruited from people who are not working on the project:
 
 ## Setup
 
-Until a public preview exists, run it from your machine on the same Wi-Fi:
+Until a public preview exists, run a production build from your machine on the same Wi-Fi. The dev server is slower to start on a phone, and anything typed before the page is ready is lost (docs/UX-SPEC.md §13).
 
 ```bash
-pnpm dev --host
+pnpm build
 ```
 
-The terminal prints a `Network:` address such as `http://192.168.1.20:4321`. Open it on the participant's phone or laptop. Use the Daylight theme. Do not demo anything first.
+```bash
+pnpm preview --host
+```
+
+The terminal prints a `Network:` address such as `http://192.168.1.20:4321`. Open it on the participant's phone or laptop. Before they start, open the Theme menu and pick Daylight, since the page otherwise follows the device's dark mode or an earlier choice. Do not demo anything first.
 
 Record with the participant's consent: screen capture plus audio, or just notes if they prefer. Ask them to think aloud.
 
@@ -28,14 +32,16 @@ Opening (read aloud): "This is an early version of a unit converter. I'm testing
 
 Then the tasks, one at a time. Do not explain the interface between tasks. If they are stuck for a full minute, note it and move on.
 
-| #   | Task (read aloud)                                                                       | What we are watching                                                                          |
-| --- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| 1   | "You have a recipe that calls for 250 ml of milk. How many cups is that?"               | Do they type the number and unit together? Do they expect a dropdown? Does the lock surprise? |
-| 2   | "It's 72 degrees Fahrenheit outside. What is that in Celsius?"                          | Typing "f" or "72 f" vs the name; do they notice the chip; does the result read as a result?  |
-| 3   | "Now go the other way: what is 30 Celsius in Fahrenheit?" (same pair already on screen) | Do they find the swap control, or retype, or edit the other box directly?                     |
-| 4   | "Convert 5 ounces to grams."                                                            | The ambiguity moment: two kinds of ounce appear. Do they pick correctly without reading?      |
-| 5   | "Send this conversion to a friend." (any conversion on screen)                          | Do they look for a share button, copy the URL, or copy the number?                            |
-| 6   | "How far is 10 kilometers in miles? Then clear everything and start over."              | Discovery of the chip's remove control, Backspace behavior, and whether "clear" is findable.  |
+| #   | Task (read aloud)                                                                       | What we are watching                                                                                                                                                                                                               |
+| --- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | "You have a recipe that calls for 250 ml of milk. How many cups is that?"               | Do they type the number and unit together, or look for a dropdown? How do they commit the unit: Enter, picking a row, Tab, or clicking away? Do they notice nothing converts until both boxes have a committed unit?               |
+| 2   | "It's 72 degrees Fahrenheit outside. What is that in Celsius?"                          | Typing "f" or "72 f" vs the name; do they notice the chip; does the result read as a result?                                                                                                                                       |
+| 3   | "Now go the other way: what is 30 Celsius in Fahrenheit?" (same pair already on screen) | Do they use swap, retype, or type into the other box? Does the category label moving under the box they typed in tell them which side is driving?                                                                                  |
+| 4   | "Convert 5 ounces to grams."                                                            | Two ounces appear, weight and fluid, and the weight ounce is highlighted first. Do they check which one before pressing Enter? Note whether they press Enter, pick a row, or click away (clicking away with "oz" commits neither). |
+| 5   | "Send this conversion to a friend." (any conversion on screen)                          | Do they look for a share button, copy the URL, or copy the number? Do they notice the copy check?                                                                                                                                  |
+| 6   | "How far is 10 kilometers in miles? Then clear everything and start over."              | Which way do they clear: the eraser button, the chip's ×, Backspace, Escape, or undo? Does Escape stepping back one chunk at a time surprise them?                                                                                 |
+
+For a keyboard-only participant, add: "Convert 3 feet to meters using only the keyboard." Watch Tab between the boxes, the arrow keys (including reaching Back), Escape, and whether they find the keyboard shortcuts map.
 
 Closing questions (after the last task): "What did you expect to happen that didn't?" · "If you could change one thing, what?" · "Would you use this instead of what you use now? Why?"
 
@@ -46,13 +52,18 @@ One row per participant and task. Copy into `docs/research/findings-1.md`.
 | Participant | Task | Completed (yes / with help / no) | Time (rough) | Surprises, quotes, errors |
 | ----------- | ---- | -------------------------------- | ------------ | ------------------------- |
 
-Also log every no-match query and every mistyped unit you see; they go straight into aliases (docs/UNITS-CATALOG.md §5).
+Also log:
+
+- every no-match query and every mistyped unit; they go straight into aliases (docs/UNITS-CATALOG.md §5);
+- every phrasing like "250 ml to cups" or "in cups", which the planned connective form would handle (docs/UX-SPEC.md §14);
+- whether anyone finds undo, redo, clear all, the chip as something to click, or the shortcuts map without being told.
 
 ## What decides the next step
 
 - **Proceed to milestone 3 as planned** if four of five complete tasks 1, 2, and 4 without help.
-- **Rework the lock behavior first** (docs/UX-SPEC.md §5) if two or more people are confused when a unit locks "by itself", or if they fight it when typing a longer unit.
+- **Rework the commit rules** (docs/UX-SPEC.md §5) if two or more people leave a unit uncommitted, or expect Tab or clicking away to accept the highlighted row the way Enter does.
 - **Rework the ambiguity rows** if people pick the wrong ounce in task 4 more than once.
-- **Add visible labels or a visible "from/to" cue** if people cannot tell which box is driving in task 3.
+- **Strengthen the driving cue** if people cannot tell which box is driving in task 3; the next step would be visible "from" and "to" labels.
+- **Tune Escape and the 700 ms typing chunks** (docs/UX-SPEC.md §9) if two or more people are surprised by what Escape takes back.
 
 Write the findings and the decision in `docs/research/findings-1.md`, then update docs/UX-SPEC.md before changing behavior (CLAUDE.md rule 8).

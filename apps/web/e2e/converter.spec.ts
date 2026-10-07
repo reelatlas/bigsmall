@@ -1,11 +1,14 @@
-import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
+import { COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
+import { expectNoA11yViolations, ready } from './support';
 
-const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
-
-/** The island is server-rendered; typing before React hydrates would be lost, so tests wait for the ready mark. */
-async function ready(page: Page) {
-  await page.locator('section[data-hydrated]').waitFor();
+/** Press ArrowDown until `option` is the highlighted row, so tests do not hard-code list order. */
+async function arrowTo(field: Locator, option: Locator) {
+  for (let step = 0; step < 25; step += 1) {
+    if ((await option.getAttribute('aria-selected')) === 'true') return;
+    await field.press('ArrowDown');
+  }
+  await expect(option).toHaveAttribute('aria-selected', 'true');
 }
 
 function boxes(page: Page) {
@@ -87,8 +90,13 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
   await expect(scope).toHaveText('Length');
   await expect(labelA).toHaveText('');
 
-  // Down from nothing skips the Back row: six presses land on feet, the sixth unit.
-  for (let i = 0; i < 6; i += 1) await first.press('ArrowDown');
+  // Down from nothing skips the Back row and goes to the first unit.
+  await first.press('ArrowDown');
+  await expect(page.getByRole('option', { name: /^meters m$/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  await arrowTo(first, page.getByRole('option', { name: /^feet ft$/ }));
   await first.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove feet' })).toBeVisible();
   await expect(labelA).toHaveText('Length');
@@ -116,11 +124,7 @@ test('the arrow keys reach the Back row, and Enter on it goes back', async ({ pa
 
   // Down from the last row wraps to Back too. The category is picked with the keyboard so the
   // mouse pointer is not left over the list, where hovering would move the highlight.
-  for (let i = 0; i < 3; i += 1) await first.press('ArrowDown');
-  await expect(page.getByRole('option', { name: /^Volume$/ })).toHaveAttribute(
-    'aria-selected',
-    'true',
-  );
+  await arrowTo(first, page.getByRole('option', { name: /^Volume$/ }));
   await first.press('Enter');
   await expect(back).toBeVisible();
   await first.press('ArrowUp');
@@ -210,30 +214,30 @@ test('a query with no match in the scoped category widens to every category', as
   await expect(first).toHaveValue('5');
 });
 
-test('both boxes can be copied', async ({ page, context, browserName }) => {
-  test.skip(browserName !== 'chromium', 'clipboard permissions are Chromium-only in CI');
+test('both boxes can be copied, and the copy confirms with a check', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/?a=mile&b=kilometer&v=2&s=a');
   await ready(page);
+  const copySecond = page.getByRole('button', { name: 'Copy second value' });
+  const copyFirst = page.getByRole('button', { name: 'Copy first value' });
+  const checks = page.locator('[data-copied]');
 
-  await page.getByRole('button', { name: 'Copy second value' }).click();
-  const copied = page.getByRole('button', { name: 'Copied' });
-  await expect(copied).toBeVisible();
-  await expect(copied.locator('[data-copied]')).toBeVisible();
+  await copySecond.click();
+  await expect(copySecond.locator('[data-copied]')).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('3.218688');
 
   // The check moves to whichever box was copied last.
-  await page.getByRole('button', { name: 'Copy first value' }).click();
-  await expect(copied).toHaveCount(1);
+  await copyFirst.click();
+  await expect(copyFirst.locator('[data-copied]')).toBeVisible();
+  await expect(checks).toHaveCount(1);
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');
 
   // It stays while the mouse rests on the button and reverts once the mouse leaves.
-  await page.waitForTimeout(2200);
-  await expect(copied).toBeVisible();
+  await page.waitForTimeout(COPIED_MS + 200);
+  await expect(checks).toHaveCount(1);
   await page.mouse.move(0, 0);
-  await expect(page.getByRole('button', { name: 'Copy first value' })).toBeVisible();
-  await expect(copied).toHaveCount(0);
+  await expect(checks).toHaveCount(0);
 });
 
 test('the converter has no WCAG violations with the list open', async ({ page }) => {
@@ -242,9 +246,7 @@ test('the converter has no WCAG violations with the list open', async ({ page })
   const { second } = boxes(page);
   await second.click();
   await expect(page.getByRole('listbox')).toBeVisible();
-
-  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
-  expect(results.violations).toEqual([]);
+  await expectNoA11yViolations(page);
 });
 
 test('Back and Escape go up to the categories from any unit list', async ({ page }) => {
@@ -338,7 +340,7 @@ test('typing in bursts makes separate steps for Escape and for undo', async ({ p
   const { first } = boxes(page);
 
   await first.pressSequentially('25');
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(TYPING_CHUNK_MS + 200);
   await first.pressSequentially('0');
   await expect(first).toHaveValue('250');
   await first.press('Escape');
@@ -554,4 +556,74 @@ test('the hint sits above the boxes', async ({ page }) => {
   const hintBox = await hint.boundingBox();
   const fieldBox = await boxes(page).first.boundingBox();
   expect(hintBox!.y + hintBox!.height).toBeLessThanOrEqual(fieldBox!.y);
+});
+
+test('Backspace on an empty box removes its unit and lists that category', async ({ page }) => {
+  await page.goto('/?a=milliliter&v=5&s=a');
+  await ready(page);
+  const { first, scope } = boxes(page);
+
+  await first.click();
+  await first.press('End');
+  await first.press('Backspace');
+  await expect(first).toHaveValue('');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await first.press('Backspace');
+  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(scope).toHaveText('Volume');
+});
+
+test('Ctrl+Y and Ctrl+Shift+Z both redo', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.fill('250 ml');
+  await first.press('Enter');
+  await first.press('Control+z');
+  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await first.press('Control+y');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await first.press('Control+z');
+  await first.press('Control+Shift+z');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+});
+
+test('a query that matches nothing says so and offers the categories', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.fill('xyzzy');
+  await expect(page.getByText('No unit matches “xyzzy”. Try ml, feet, or °F.')).toBeVisible();
+  await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
+});
+
+test('the chip collapses to its symbol while an out-of-range message needs the room', async ({
+  page,
+}) => {
+  // A short result ("1,000") leaves the chip at full width until the message needs the room.
+  await page.goto('/?a=kilometer&b=meter&v=1&s=a');
+  await ready(page);
+  const { first } = boxes(page);
+  const chip = page.getByRole('button', { name: 'Change unit: meters' });
+
+  await expect(chip).toHaveText('mmeters');
+  await first.fill('1e308');
+  await expect(page.getByText('Too large to convert')).toBeVisible();
+  await expect(chip).toHaveText('m');
+});
+
+test.describe('in a German locale', () => {
+  test.use({ locale: 'de-DE' });
+
+  test('the URL keeps the number the user meant', async ({ page }) => {
+    await page.goto('/?a=kilometer&b=meter');
+    await ready(page);
+    const { first, second } = boxes(page);
+
+    await first.fill('1.000');
+    await expect(second).toHaveValue('1.000.000');
+    await expect(page).toHaveURL(/v=1000&s=a/);
+  });
 });

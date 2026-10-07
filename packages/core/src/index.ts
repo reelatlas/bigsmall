@@ -8,7 +8,7 @@ export type { ConversionErrorCode } from './convert';
 export { categories, units, getUnit, getCategory, unitsIn } from './units';
 export { regionDefaults } from './region';
 export type { RegionDefaults, UnitPreference } from './region';
-export { localeSeparators } from './locale';
+export { DEFAULT_SEPARATORS, localeSeparators } from './locale';
 export type { Separators } from './locale';
 export { parse } from './parse';
 export type { ParsedInput } from './parse';

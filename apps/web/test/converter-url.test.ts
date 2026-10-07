@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { initialState, reduce } from '../src/features/converter/state';
 import { paramsToState, stateToParams } from '../src/features/converter/url';
 
+const EN = { decimal: '.', group: ',' };
+const DE = { decimal: ',', group: '.' };
+
 describe('stateToParams', () => {
   it('writes units, the typed value, and which side holds it', () => {
     const s = [
@@ -9,18 +12,26 @@ describe('stateToParams', () => {
       { type: 'lock', box: 'a', unit: 'milliliter' } as const,
       { type: 'lock', box: 'b', unit: 'us-cup' } as const,
     ].reduce(reduce, initialState);
-    expect(stateToParams(s).toString()).toBe('a=milliliter&b=us-cup&v=5&s=a');
+    expect(stateToParams(s, EN).toString()).toBe('a=milliliter&b=us-cup&v=5&s=a');
   });
 
   it('omits what is not set', () => {
-    expect(stateToParams(initialState).toString()).toBe('');
+    expect(stateToParams(initialState, EN).toString()).toBe('');
     const onlyB = reduce(initialState, { type: 'lock', box: 'b', unit: 'kelvin' });
-    expect(stateToParams(onlyB).toString()).toBe('b=kelvin');
+    expect(stateToParams(onlyB, EN).toString()).toBe('b=kelvin');
   });
 
   it('writes the value canonically, not as typed', () => {
     const s = reduce(initialState, { type: 'input', box: 'b', text: '1,000.5 km', at: 0 });
-    expect(stateToParams(s).toString()).toBe('v=1000.5&s=b');
+    expect(stateToParams(s, EN).toString()).toBe('v=1000.5&s=b');
+  });
+
+  it('reads the typed number with the user’s separators', () => {
+    const s = reduce(initialState, { type: 'input', box: 'a', text: '1.000', at: 0 });
+    expect(stateToParams(s, DE).toString()).toBe('v=1000&s=a');
+    expect(stateToParams(s, EN).toString()).toBe('v=1&s=a');
+    const decimal = reduce(initialState, { type: 'input', box: 'a', text: '2,5', at: 0 });
+    expect(stateToParams(decimal, DE).toString()).toBe('v=2.5&s=a');
   });
 });
 
@@ -31,7 +42,7 @@ describe('paramsToState', () => {
       { type: 'lock', box: 'b', unit: 'foot' } as const,
       { type: 'lock', box: 'a', unit: 'meter' } as const,
     ].reduce(reduce, initialState);
-    const back = paramsToState(stateToParams(s));
+    const back = paramsToState(stateToParams(s, EN));
     expect(back).toEqual({
       a: { text: '', unit: 'meter' },
       b: { text: '2', unit: 'foot' },

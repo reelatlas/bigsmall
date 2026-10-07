@@ -47,10 +47,11 @@ export interface SearchOptions {
 
 export interface SearchResponse {
   results: SearchResult[];
-  /** True when basic mode showed advanced units because nothing basic matched. */
+  /**
+   * True when basic mode showed advanced units because nothing basic matched. Nothing reads it
+   * yet; the planned "Advanced units" label will (docs/UX-SPEC.md §14, modes).
+   */
   escalated: boolean;
-  /** True when a longer key in scope starts with the query, so more typing could change the match. */
-  canExtend: boolean;
 }
 
 interface Query {
@@ -187,11 +188,7 @@ function idleResults(options: SearchOptions): SearchResponse {
       results.push({ kind: 'category', category, matchClass: 0, matchedKey: category.name });
     }
   }
-  return {
-    results: results.slice(0, options.limit ?? DEFAULT_LIMIT),
-    escalated: false,
-    canExtend: false,
-  };
+  return { results: results.slice(0, options.limit ?? DEFAULT_LIMIT), escalated: false };
 }
 
 /**
@@ -257,24 +254,9 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
     compareRanked(a, b, options.system),
   );
 
-  // A longer key that belongs to the one unit the query already names exactly does not count:
-  // "ml" should lock even though milliliter also answers to "mls".
-  const exactUnitIds = new Set(
-    [...bestUnit.values()]
-      .filter((r) => r.result.matchClass <= 2)
-      .map((r) => (r.result.kind === 'unit' ? r.result.unit.id : '')),
-  );
-  const soleExact = exactUnitIds.size === 1 ? [...exactUnitIds][0] : null;
-  const extendsQuery = (k: { compact: string; unit?: Unit }) =>
-    k.compact.length > q.compact.length &&
-    k.compact.startsWith(q.compact) &&
-    (soleExact === null || k.unit?.id !== soleExact);
-  const canExtend = scopedUnitKeys.some(extendsQuery) || scopedCategoryKeys.some(extendsQuery);
-
   return {
     results: ranked.slice(0, options.limit ?? DEFAULT_LIMIT).map((r) => r.result),
     escalated,
-    canExtend,
   };
 }
 

@@ -1,4 +1,4 @@
-import type { Separators } from './locale';
+import { DEFAULT_SEPARATORS, type Separators } from './locale';
 
 /** What the user typed, split into the number (if any) and the unit query (if any). */
 export interface ParsedInput {
@@ -14,9 +14,9 @@ export interface ParsedInput {
    * 'large' beyond about ±1.8e308 ("1e400"), 'small' when nonzero digits round to zero ("1e-400").
    */
   outOfRange?: 'large' | 'small';
+  /** Index of the exponent marker ("e" or "E") within `valueText`, so the UI can set it apart. */
+  exponentAt?: number;
 }
-
-const DEFAULT_SEPARATORS: Separators = { decimal: '.', group: ',' };
 
 // Characters that are easy to get wrong as escapes, so they are named once.
 const NBSP = String.fromCharCode(0x00a0);
@@ -52,6 +52,8 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
   const value = toNumber(valueText, separators);
 
   const result: ParsedInput = { raw: text, valueText };
+  const exponentAt = valueText.search(EXPONENT_MARK);
+  if (exponentAt >= 0) result.exponentAt = exponentAt;
   if (!Number.isFinite(value)) result.outOfRange = 'large';
   else if (value === 0 && NONZERO_DIGIT.test(valueText.split(EXPONENT_MARK)[0] ?? '')) {
     result.outOfRange = 'small';
@@ -64,7 +66,7 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
 function toNumber(text: string, separators: Separators): number {
   let body = text.split(UNICODE_MINUS).join('-');
   let exponent = '';
-  const expIndex = body.search(/[eE]/);
+  const expIndex = body.search(EXPONENT_MARK);
   if (expIndex >= 0) {
     exponent = body.slice(expIndex + 1);
     body = body.slice(0, expIndex);

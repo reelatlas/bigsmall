@@ -5,7 +5,8 @@ import { useCallback, useEffect, useLayoutEffect, useState, type RefObject } fro
  * its width on one line. It measures before paint after every render, and again whenever the
  * element resizes, so a number shrinks as it grows and takes the room back when the field widens
  * or a chip disappears. The element must clip (`overflow-hidden`) and keep its content on one
- * line (`whitespace-pre`); `base` is its full class list without the size step.
+ * line (`whitespace-pre` or `whitespace-nowrap`), except that a final step may wrap as a last
+ * resort, which then always fits; `base` is its full class list without the size step.
  *
  * The measurement writes the element's class directly, then the chosen step is rendered through
  * React with the identical string, so the DOM and the tree never disagree.

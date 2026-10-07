@@ -95,7 +95,6 @@ describe('search: match classes', () => {
     const r = search('xyzzy');
     expect(r.results).toEqual([]);
     expect(r.escalated).toBe(false);
-    expect(r.canExtend).toBe(false);
   });
 });
 
@@ -159,21 +158,6 @@ describe('search: categories and scope', () => {
     const metric = ids(search('second', { system: 'metric' }));
     expect(us.indexOf('foot-per-second')).toBeLessThan(us.indexOf('meter-per-second'));
     expect(metric.indexOf('meter-per-second')).toBeLessThan(metric.indexOf('foot-per-second'));
-  });
-
-  it('reports whether more typing could change the match', () => {
-    expect(search('c').canExtend).toBe(true);
-    expect(search('cm').canExtend).toBe(true);
-    expect(search('m').canExtend).toBe(true);
-    expect(search('celsius').canExtend).toBe(false);
-    expect(search('mph').canExtend).toBe(false);
-  });
-
-  it('ignores longer keys of the unit the query already names', () => {
-    expect(search('ml').canExtend).toBe(false);
-    expect(search('kg').canExtend).toBe(false);
-    expect(search('fl oz').canExtend).toBe(false);
-    expect(search('oz').canExtend).toBe(true);
   });
 });
 

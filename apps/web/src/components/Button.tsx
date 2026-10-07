@@ -3,7 +3,8 @@ import type { ButtonHTMLAttributes } from 'react';
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
+  /** ghost: icon actions on the page (swap, undo, copy). secondary: bordered text button. primary: filled. */
+  variant: ButtonVariant;
   /** Square 44 px button for a lone icon. Pass `aria-label`. */
   square?: boolean;
   /** Sits inside a field, so its corners nest inside the field's corners (docs/DESIGN-SYSTEM.md, "Fields"). */
@@ -11,11 +12,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 // Native <button>: accessible by default, no runtime. Tokens only: every color, radius, and
-// duration here resolves to a theme variable.
+// duration here resolves to a theme variable. Keyboard focus shows the base focus ring.
 const base =
-  'inline-flex min-h-11 items-center justify-center gap-2 font-medium ' +
-  'transition-[background-color,opacity] duration-[var(--motion-fast)] ease-standard ' +
-  'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ' +
+  'inline-flex min-h-11 items-center justify-center gap-2 font-medium transition-[background-color,color,opacity] ' +
   'disabled:opacity-50 active:opacity-80';
 
 // Secondary buttons share the fields' two-pixel edge, so every bordered control has one weight.
@@ -26,7 +25,7 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 export function Button({
-  variant = 'primary',
+  variant,
   square = false,
   nested = false,
   className,

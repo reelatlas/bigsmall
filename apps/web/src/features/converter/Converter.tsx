@@ -89,11 +89,12 @@ export function Converter() {
         nested
         // Out of the Tab order so Tab goes box to box; focusing a result selects it for Ctrl+C.
         tabIndex={-1}
-        aria-label={copied === box.id ? 'Copied' : `Copy ${label}`}
+        aria-label={`Copy ${label}`}
         onClick={() => copy(value, box.id)}
         {...pointerProps(box.id)}
       >
-        {/* A check in the success color confirms the copy; see useCopied for when it reverts. */}
+        {/* A check in the success color confirms the copy (the status line announces it);
+            useCopied decides when it reverts. */}
         {copied === box.id ? <CheckIcon className="text-success" data-copied /> : <CopyIcon />}
       </Button>
     );
@@ -103,11 +104,11 @@ export function Converter() {
    * The category label sits under the box the conversion is anchored on, left-aligned with the
    * value in both boxes so it reads right beside what the user typed. It says both what kind of
    * units these are and which side is driving; after a switch of category it simply names the
-   * new one, under the box that switched it.
+   * new one, under the box that switched it. Not a live region: the result announcement already
+   * names the units (docs/UX-SPEC.md §12).
    */
-  const caption = (id: BoxId) => (
+  const categoryLabel = (id: BoxId) => (
     <p
-      aria-live="polite"
       data-category-label={id}
       className="mt-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted"
     >
@@ -115,7 +116,7 @@ export function Converter() {
     </p>
   );
 
-  const field = (box: BoxView, label: string, counterpart: BoxView, placement: string) => (
+  const renderBox = (box: BoxView, label: string, counterpart: BoxView, placement: string) => (
     <div className={`min-w-0 ${placement}`}>
       <SmartInput
         box={box}
@@ -129,7 +130,7 @@ export function Converter() {
         counterpart={counterpart.unit}
         trailing={copyButton(box, label.toLowerCase())}
       />
-      {caption(box.id)}
+      {categoryLabel(box.id)}
     </div>
   );
 
@@ -141,6 +142,7 @@ export function Converter() {
       data-hydrated={hydrated ? '' : undefined}
     >
       <div className="mb-2 flex items-start justify-between gap-3">
+        {/* pt-3 centers the first line of the hint on the 44 px toolbar buttons. */}
         <p id={hintId} className="pt-3 text-sm text-ink-muted">
           Type a number, unit, or both. Once each box has a unit, typing in one updates the other.
         </p>
@@ -149,6 +151,7 @@ export function Converter() {
             variant="ghost"
             square
             aria-label="Undo"
+            aria-keyshortcuts="Control+Z Meta+Z"
             title={apple ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)'}
             disabled={!canUndo}
             onClick={() => dispatch({ type: 'undo' })}
@@ -159,14 +162,15 @@ export function Converter() {
             variant="ghost"
             square
             aria-label="Redo"
+            aria-keyshortcuts="Control+Y Control+Shift+Z Meta+Shift+Z Meta+Y"
             title={apple ? 'Redo (⇧⌘Z)' : 'Redo (Ctrl+Y)'}
             disabled={!canRedo}
             onClick={() => dispatch({ type: 'redo' })}
           >
             <RedoIcon />
           </Button>
-          {/* Clearing is a different kind of step from undo and redo, so a thin rule sets it apart. */}
-          <span aria-hidden="true" className="mx-1 h-6 w-px bg-line" />
+          {/* Clearing is a different kind of step from undo and redo, so a divider sets it apart. */}
+          <span aria-hidden="true" className="mx-1 h-6 border-l border-line" />
           <Button
             variant="ghost"
             square
@@ -182,11 +186,12 @@ export function Converter() {
 
       {/*
         The DOM order is first box, second box, swap, so Tab goes from one value straight to the
-        other; the grid still draws swap between them (docs/UX-SPEC.md §18).
+        other; the grid still draws swap between them (docs/UX-SPEC.md §8). sm:pt-2.5 centers the
+        44 px swap button on the 64 px fields.
       */}
       <div className="grid grid-cols-1 items-start gap-x-3 gap-y-2 sm:grid-cols-[1fr_auto_1fr]">
-        {field(view.a, 'First value', view.b, 'row-start-1 sm:col-start-1')}
-        {field(view.b, 'Second value', view.a, 'row-start-3 sm:col-start-3 sm:row-start-1')}
+        {renderBox(view.a, 'First value', view.b, 'row-start-1 sm:col-start-1')}
+        {renderBox(view.b, 'Second value', view.a, 'row-start-3 sm:col-start-3 sm:row-start-1')}
         <div className="row-start-2 flex justify-center sm:col-start-2 sm:row-start-1 sm:pt-2.5">
           <Button
             variant="ghost"
@@ -199,6 +204,7 @@ export function Converter() {
         </div>
       </div>
 
+      {/* The two live regions (docs/UX-SPEC.md §12): the result, once it settles; and action feedback. */}
       <p aria-live="polite" className="sr-only">
         {announcement ?? ''}
       </p>

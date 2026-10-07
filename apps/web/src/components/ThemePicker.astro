@@ -1,5 +1,7 @@
 ---
-import { THEMES } from '../lib/themes';
+import { SHELL, SHELL_BORDERED } from '../lib/shell';
+import { DEFAULT_LIGHT, THEMES } from '../lib/themes';
+import { ChevronDownIcon } from './icons';
 
 interface Props {
   id?: string;
@@ -7,48 +9,40 @@ interface Props {
 
 const { id = 'theme' } = Astro.props;
 const menuId = `${id}-menu`;
+const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
 ---
 
 <!--
-  Same fluid shape as a smart input: a fixed-height placeholder keeps the layout still while the
-  shell inside grows over the page when open. No bundle needed: the pre-paint script in
-  layouts/Base.astro toggles [data-open], applies the chosen radio, and persists it. The options
-  are native radios, so arrow keys, Space, and screen readers work without any script. Option rows
-  use rounded-sm: the md corner minus the 4 px inset, so their curves nest in the shell's. The shell's
-  two-pixel edge turns accent while anything inside has focus; that is the focus indicator.
+  The theme menu: a fluid shell (lib/shell.ts) whose trigger and options are one shape, growing
+  over the page when open. No bundle: the inline script in layouts/Base.astro opens and closes it
+  (data-shell), applies and saves the chosen radio, and fills in the current name. The options are
+  native radios, so arrow keys, Space, and screen readers work without any script. The shell's
+  edge turns accent while anything inside has focus, which is the trigger's focus indicator. Option
+  rows use rounded-nested-md, the md corner minus the border and gutter, so the curves nest.
 -->
 <div class="group relative h-12 w-44" data-shell>
-  <div class="absolute inset-x-0 top-0 overflow-hidden rounded-md border-2 border-line bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard focus-within:border-accent group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md">
+  <div class={`absolute inset-x-0 top-0 rounded-md ${SHELL} ${SHELL_BORDERED}`}>
     <button
       type="button"
       data-shell-toggle
       aria-expanded="false"
       aria-controls={menuId}
-      class="flex h-11 w-full items-center justify-between gap-2 px-3 text-sm text-ink outline-none hover:bg-surface-raised"
+      class="flex h-11 w-full items-center justify-between gap-2 px-3 text-sm text-ink transition-colors outline-none hover:bg-surface-raised"
     >
       <span class="text-ink-muted">Theme</span>
       <span class="flex items-center gap-1">
-        <span data-theme-name>{THEMES[0]?.name}</span>
-        <svg
-          class="text-ink-muted transition-transform duration-[var(--motion-fast)] ease-standard group-data-open:rotate-180"
+        <span data-theme-name>{defaultName}</span>
+        <ChevronDownIcon
           width="16"
           height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M6 9l6 6 6-6"></path>
-        </svg>
+          className="text-ink-muted transition-transform group-data-open:rotate-180"
+        />
       </span>
     </button>
     <fieldset id={menuId} class="hidden border-t border-line p-1 group-data-open:block">
       <legend class="sr-only">Theme</legend>
       {THEMES.map((t) => (
-        <label class="flex min-h-11 cursor-pointer items-center rounded-sm px-2 text-sm text-ink hover:bg-surface-raised has-checked:bg-accent-soft has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-focus">
+        <label class="flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink focus-ring-within-inset hover:bg-surface-raised has-checked:bg-accent-soft">
           <input
             type="radio"
             name={`${id}-option`}
@@ -56,7 +50,7 @@ const menuId = `${id}-menu`;
             data-theme-option
             data-shell-initial
             class="sr-only"
-            checked={t.id === 'daylight'}
+            checked={t.id === DEFAULT_LIGHT}
           />
           {t.name}
         </label>

@@ -38,7 +38,7 @@ function luminance(hex: string): number {
 }
 
 /** Contrast ratio per WCAG 2.x, always >= 1. */
-export function contrast(fg: string, bg: string): number {
+function contrast(fg: string, bg: string): number {
   const a = luminance(fg);
   const b = luminance(bg);
   const [light, dark] = a > b ? [a, b] : [b, a];

@@ -8,7 +8,7 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 ## Current status
 
-Milestones 0 (setup), 1 (core engine), and the code of 2 (smart input) complete on 2026-10-06. Six rounds of Sean's first-pass feedback are applied and recorded in `docs/research/findings-0-first-pass.md`; the behavior they settled is in `docs/UX-SPEC.md` §15–§18. The converter works end to end: two linked smart inputs, live results, typing chunks for Escape and undo, numbers that fit their field, out-of-range messages, a category label under the box driving the conversion, clear all, a keyboard shortcuts map, URL state, about 82 KB gzipped. Milestone 2 closes when the five-person usability test in `docs/research/usability-test-1.md` has been run and its findings recorded. Next after that: milestone 3 (keypad, modes, persistence, advanced tiers). Progress and definitions of done are in `docs/PLAN.md` §13.
+Milestones 0 (setup), 1 (core engine), and the code of 2 (smart input) complete on 2026-10-06. Six rounds of Sean's feedback are applied; `docs/UX-SPEC.md` describes current behavior. A hygiene pass is in progress: code done, remaining doc work and open decisions listed at the end of `docs/research/findings-0-first-pass.md`, which is where the next session starts. The converter works end to end: two linked smart inputs, live results, typing chunks for Escape and undo, numbers that fit their field, out-of-range messages, a category label under the box driving the conversion, clear all, a keyboard shortcuts map, URL state, about 82 KB gzipped. Milestone 2 closes when the five-person usability test in `docs/research/usability-test-1.md` has been run and its findings recorded. Next after that: milestone 3 (keypad, modes, persistence, advanced tiers). Progress and definitions of done are in `docs/PLAN.md` §13.
 
 ## Non-negotiables
 
@@ -35,7 +35,7 @@ pnpm e2e            # Playwright + axe (first time: pnpm --filter @bigsmall/web 
 pnpm lint
 pnpm format         # or format:check
 pnpm typecheck      # tsc for core, astro check for web
-pnpm check          # lint + typecheck + test + build, same as CI
+pnpm check          # lint + format check + typecheck + test + build + bundle check: CI's verify job
 ```
 
 ## Recipes

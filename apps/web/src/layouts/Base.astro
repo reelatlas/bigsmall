@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { APPLE_PLATFORM } from '../lib/platform';
+import { PEEK_CLOSE_MS, PEEK_OPEN_MS } from '../lib/timing';
 import { DEFAULT_DARK, DEFAULT_LIGHT, THEMES, THEME_STORAGE_KEY } from '../lib/themes';
 
 interface Props {
@@ -30,6 +31,8 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         dark: DEFAULT_DARK,
         applePlatform: APPLE_PLATFORM.source,
         applePlatformFlags: APPLE_PLATFORM.flags,
+        peekOpen: PEEK_OPEN_MS,
+        peekClose: PEEK_CLOSE_MS,
       }}
     >
       // Runs inline before first paint: applies the saved theme (no flash) and drives the header
@@ -121,7 +124,7 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
               setOpen(shell, false, false);
             }
           },
-          open ? 120 : 200,
+          open ? peekOpen : peekClose,
         );
         peekTimers.set(shell, timer);
       };
@@ -139,14 +142,39 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         } catch {
           // Storage blocked (private mode): the choice lasts for this page only.
         }
+        // A click picks and closes. Arrow keys move through the radios and fire change on every
+        // step, so a keyboard choice previews live and the menu stays open until Enter or Escape.
         const shell = option.closest('[data-shell]');
-        if (shell) {
+        if (shell && !option.matches(':focus-visible')) {
           setOpen(shell, false, false);
           toggleOf(shell)?.focus();
         }
       });
+      // Focus leaving an open shell closes it, so a menu never stays drawn over the control that
+      // now has focus (WCAG 2.4.11). A click on non-focusable content inside the shell moves focus
+      // nowhere; while the mouse is over the shell that is not leaving it.
+      document.addEventListener('focusout', (event) => {
+        const shell =
+          event.target instanceof Element ? event.target.closest('[data-shell][data-open]') : null;
+        if (!shell) return;
+        const next = event.relatedTarget;
+        if (next instanceof Node ? shell.contains(next) : shell.matches(':hover')) return;
+        setOpen(shell, false, false);
+      });
       // Escape closes any open shell, hovered or pinned; focus returns to its toggle if it was inside.
       document.addEventListener('keydown', (event) => {
+        // Enter on a theme option keeps the previewed theme and closes the menu.
+        if (event.key === 'Enter' && event.target instanceof Element) {
+          const shell = event.target.matches('[data-theme-option]')
+            ? event.target.closest('[data-shell][data-open]')
+            : null;
+          if (shell) {
+            event.preventDefault();
+            setOpen(shell, false, false);
+            toggleOf(shell)?.focus();
+          }
+          return;
+        }
         if (event.key !== 'Escape') return;
         for (const shell of document.querySelectorAll('[data-shell][data-open]')) {
           const focusWasInside = shell.contains(document.activeElement);

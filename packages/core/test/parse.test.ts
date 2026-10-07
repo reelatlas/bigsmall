@@ -79,6 +79,7 @@ describe('parse', () => {
       valueText: '1e400',
       query: 'km',
       outOfRange: 'large',
+      exponentAt: 1,
     });
     expect(parse('-1e400').outOfRange).toBe('large');
     expect(parse('9'.repeat(400)).outOfRange).toBe('large');
@@ -90,6 +91,13 @@ describe('parse', () => {
     expect(parse('0e-400')).toMatchObject({ value: 0 });
     expect(parse('0.000')).toMatchObject({ value: 0 });
     expect(parse('0e-400').outOfRange).toBeUndefined();
+  });
+
+  it('reports where the exponent marker sits in the number', () => {
+    expect(parse('1.5E21 km').exponentAt).toBe(3);
+    expect(parse('2e-3').exponentAt).toBe(1);
+    expect(parse('25').exponentAt).toBeUndefined();
+    expect(parse('5 e').exponentAt).toBeUndefined();
   });
 
   it('keeps the largest and smallest doubles in range', () => {

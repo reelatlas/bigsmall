@@ -14,8 +14,8 @@ const SCIENTIFIC_BELOW = 1e-6;
 const DEFAULT_PRECISION = 10;
 
 /**
- * Format a conversion result for display. Returns an empty string for NaN or infinities;
- * callers show their own message for those (they come from ConversionError paths anyway).
+ * Format a conversion result for display. Returns an empty string for NaN or infinities, which
+ * is how a result too large for a double reaches the UI; callers show their own message for it.
  */
 export function formatNumber(value: number, options: FormatOptions = {}): string {
   if (!Number.isFinite(value)) return '';

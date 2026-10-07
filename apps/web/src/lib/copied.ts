@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
-
-/** The check stays at least this long, so a quick click-and-move still shows it. */
-export const COPIED_MIN_MS = 1000;
-/** Without a mouse resting on the button (keyboard, touch), the check reverts after this. */
-export const COPIED_MS = 2000;
+import { COPIED_MIN_MS, COPIED_MS } from './timing';
 
 /**
  * Which of several copy buttons last copied, so it can show a check in place of its icon.

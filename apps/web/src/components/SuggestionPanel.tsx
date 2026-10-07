@@ -12,17 +12,23 @@ export type SuggestionItem =
 
 export const BACK_ITEM: SuggestionItem = { kind: 'back', key: '#back' };
 
+/** The id of a row, for the combobox's aria-activedescendant. One scheme for the panel and its host. */
+export function optionIdFor(listId: string, index: number): string {
+  return `${listId}-option-${index}`;
+}
+
 export interface SuggestionPanelProps {
   id: string;
+  /** Accessible name of the listbox, such as "First value suggestions". */
+  label: string;
   items: SuggestionItem[];
   activeIndex: number;
-  optionId: (index: number) => string;
   /** What the user typed to get these rows; the letters it matches are set heavier. */
   query?: string | undefined;
   /** The category the list is inside, shown on the Back row. */
   scopeName?: string | undefined;
-  /** Shown above the list, such as "No unit matches …". */
-  message?: string | undefined;
+  /** Shown above the list when nothing matches: "No unit matches …". */
+  notFound?: string | undefined;
   /** When true, unit rows show their category, which is how ambiguous symbols are told apart. */
   showCategory: boolean;
   onPick: (item: SuggestionItem) => void;
@@ -48,12 +54,12 @@ const backRow = 'group sticky top-0 z-10 mb-1 cursor-pointer border-b border-lin
  */
 export function SuggestionPanel({
   id,
+  label,
   items,
   activeIndex,
-  optionId,
   query,
   scopeName,
-  message,
+  notFound,
   showCategory,
   onPick,
   onHover,
@@ -61,7 +67,7 @@ export function SuggestionPanel({
   const hasBack = items[0]?.kind === 'back';
   return (
     <div className="border-t border-line p-2">
-      {message && <p className="px-2 pt-1 pb-2 text-sm text-ink-muted">{message}</p>}
+      {notFound && <p className="px-2 pt-1 pb-2 text-sm text-ink-muted">{notFound}</p>}
       {/*
         With a pinned Back row, scrolling to a row keeps it clear of the pin. tabIndex -1: Chrome
         makes a scrolling list with no focusable children a Tab stop, which would catch Tab on its
@@ -70,7 +76,7 @@ export function SuggestionPanel({
       <ul
         role="listbox"
         id={id}
-        aria-label="Suggestions"
+        aria-label={label}
         tabIndex={-1}
         className={`max-h-72 scroll-thin overflow-y-auto ${hasBack ? 'scroll-pt-14' : ''}`}
       >
@@ -82,7 +88,7 @@ export function SuggestionPanel({
             <li
               key={item.key}
               role="option"
-              id={optionId(index)}
+              id={optionIdFor(id, index)}
               aria-selected={active}
               aria-label={back ? 'Back to categories' : undefined}
               data-active={active || undefined}

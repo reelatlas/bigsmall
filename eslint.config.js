@@ -60,6 +60,7 @@ export default tseslint.config(
                 'astro:*',
                 '@bigsmall/web',
                 '@bigsmall/web/*',
+                '**/apps/web/**',
               ],
               message: 'packages/core must stay framework-free (ADR 0003).',
             },

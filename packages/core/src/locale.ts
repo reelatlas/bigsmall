@@ -4,7 +4,8 @@ export interface Separators {
   group: string;
 }
 
-const FALLBACK: Separators = { decimal: '.', group: ',' };
+/** The separators used when a locale gives none: a period for decimals and a comma for grouping. */
+export const DEFAULT_SEPARATORS: Separators = { decimal: '.', group: ',' };
 
 /**
  * Separators for a BCP 47 locale such as "en-US" or "de-DE". With no locale, the runtime default.
@@ -13,10 +14,10 @@ const FALLBACK: Separators = { decimal: '.', group: ',' };
 export function localeSeparators(locale?: string): Separators {
   try {
     const parts = new Intl.NumberFormat(locale, { useGrouping: true }).formatToParts(1234567.5);
-    const group = parts.find((p) => p.type === 'group')?.value ?? FALLBACK.group;
-    const decimal = parts.find((p) => p.type === 'decimal')?.value ?? FALLBACK.decimal;
+    const group = parts.find((p) => p.type === 'group')?.value ?? DEFAULT_SEPARATORS.group;
+    const decimal = parts.find((p) => p.type === 'decimal')?.value ?? DEFAULT_SEPARATORS.decimal;
     return { decimal, group };
   } catch {
-    return { ...FALLBACK };
+    return { ...DEFAULT_SEPARATORS };
   }
 }

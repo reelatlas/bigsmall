@@ -8,6 +8,7 @@ import {
   type Separators,
   type Unit,
 } from '@bigsmall/core';
+import { TYPING_CHUNK_MS } from '../../lib/timing';
 
 /**
  * Converter state and the pure reducer over it (docs/UX-SPEC.md §3, §6, §7).
@@ -15,6 +16,7 @@ import {
  */
 
 export type BoxId = 'a' | 'b';
+/** The list's tier. Only 'basic' is reachable today; the mode toggle arrives in milestone 3 (docs/UX-SPEC.md §14). */
 export type Mode = 'basic' | 'advanced';
 
 export interface BoxState {
@@ -31,7 +33,10 @@ export interface ConverterState {
   mode: Mode;
 }
 
-export const EMPTY_BOX: BoxState = { text: '', unit: null };
+/** The part of the state a URL or a later persistence layer restores, through the `hydrate` action. */
+export type Restorable = Partial<Pick<ConverterState, 'a' | 'b' | 'source' | 'mode'>>;
+
+const EMPTY_BOX: BoxState = { text: '', unit: null };
 
 export const initialState: ConverterState = {
   a: EMPTY_BOX,
@@ -40,7 +45,7 @@ export const initialState: ConverterState = {
   mode: 'basic',
 };
 
-export function other(box: BoxId): BoxId {
+function other(box: BoxId): BoxId {
   return box === 'a' ? 'b' : 'a';
 }
 
@@ -54,7 +59,7 @@ export type Action =
   | { type: 'swap' }
   | { type: 'clear' }
   | { type: 'setMode'; mode: Mode }
-  | { type: 'hydrate'; state: Partial<Pick<ConverterState, 'a' | 'b' | 'source' | 'mode'>> };
+  | { type: 'hydrate'; state: Restorable };
 
 export function reduce(state: ConverterState, action: Action): ConverterState {
   switch (action.type) {
@@ -135,7 +140,7 @@ export interface ConverterResult {
 /** Why a conversion has no displayable answer: beyond what a double holds, or rounded to zero. */
 export type OutOfRange = 'large' | 'small';
 
-export const OUT_OF_RANGE_MESSAGE: Record<OutOfRange, string> = {
+const OUT_OF_RANGE_MESSAGE: Record<OutOfRange, string> = {
   large: 'Too large to convert',
   small: 'Too small to convert',
 };
@@ -150,8 +155,6 @@ export interface ConverterView {
    */
   anchor: BoxId | null;
   result: ConverterResult | null;
-  /** Set when the source holds a number but the conversion cannot be shown. */
-  outOfRange: OutOfRange | null;
   /**
    * Sentence for the live region: "5 milliliters is 0.02113376419 cups", or
    * "1e308 kilometers is too large to convert to millimeters".
@@ -226,7 +229,6 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
     category,
     anchor,
     result,
-    outOfRange,
     announcement,
   };
 }
@@ -254,9 +256,6 @@ function unitName(unit: Unit, value: number): string {
 // less than TYPING_CHUNK_MS apart belong together, and a space starts a new chunk. A lock,
 // unlock, swap, or clear is its own entry. Escape steps back through the same chunks, one box
 // at a time, and each step is itself undoable.
-
-/** Longest pause between two keystrokes that still belong to one typing chunk, in ms. */
-export const TYPING_CHUNK_MS = 700;
 
 /** What Escape can step back through in one box: a chunk of typing (with the text it started from) or the unit. */
 export type BoxEntry = { kind: 'text'; before: string } | { kind: 'unit' };

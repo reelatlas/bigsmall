@@ -1,4 +1,12 @@
-import { getCategory, search, suggest, type CategoryId, type Unit } from '@bigsmall/core';
+import {
+  getCategory,
+  parse,
+  search,
+  suggest,
+  type CategoryId,
+  type ParsedInput,
+  type Unit,
+} from '@bigsmall/core';
 import {
   useEffect,
   useId,
@@ -10,9 +18,15 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
-import { BACK_ITEM, SuggestionPanel, type SuggestionItem } from '../../components/SuggestionPanel';
+import {
+  BACK_ITEM,
+  optionIdFor,
+  SuggestionPanel,
+  type SuggestionItem,
+} from '../../components/SuggestionPanel';
 import { UnitChip } from '../../components/UnitChip';
 import { useFitStep } from '../../lib/fit-step';
+import { FIELD_ROW, SHELL, SHELL_BORDERED } from '../../lib/shell';
 import type { BoxView, EscapeTarget, HistoryAction, Mode } from './state';
 import type { ConverterEnv } from './useConverter';
 
@@ -25,7 +39,7 @@ export interface SmartInputProps {
   mode: Mode;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
-  /** What Escape takes back once the list is closed: the latest chunk of typing, or the unit (docs/UX-SPEC.md §17). */
+  /** What Escape takes back once the list is closed: the latest chunk of typing, or the unit (docs/UX-SPEC.md §9). */
   escapeTarget: EscapeTarget;
   /** Placeholder while the box has no unit and nothing scopes it, such as "5 ml, feet, °F…". */
   examples: string;
@@ -38,11 +52,9 @@ export interface SmartInputProps {
 /**
  * The list has two levels: the categories, and one category's units. Without an override the
  * level follows the box (a locked unit, or the other box's unit, puts it inside that category).
- * 'all' forces the top level; a CategoryId forces that category.
+ * 'top' forces the categories; a CategoryId forces that category.
  */
-interface Override {
-  scope: 'all' | CategoryId;
-}
+type Level = 'top' | CategoryId;
 
 /** Type sizes the number steps down through until it fits on one line, largest first. */
 const SIZE_STEPS = [
@@ -56,20 +68,20 @@ const SIZE_STEPS = [
 const COMPACT_CHIP = 6;
 
 /**
- * The visible text lives in this layer over the field, whose own text is transparent. That is
- * what lets the exponent marker in "1.5E21" carry weight: a field cannot style part of its value.
- * The layer is also what the size steps are measured against.
+ * The text layer: the visible value lives here, over a field whose own text is transparent. That
+ * is what lets the exponent marker in "1.5E21" carry weight, since a field cannot style part of
+ * its value. The size steps are measured against this layer (docs/DESIGN-SYSTEM.md, "Fields").
  */
-const MIRROR =
+const TEXT_LAYER =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 
 /**
  * "Too large to convert" in place of a value shrinks the same way a long number does, and as a
  * last resort wraps to two lines, so it is never cut off.
  */
-const MESSAGE =
+const OUT_OF_RANGE =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-medium text-danger';
-const MESSAGE_STEPS = [
+const OUT_OF_RANGE_STEPS = [
   'text-base whitespace-nowrap sm:text-lg',
   'text-sm whitespace-nowrap',
   'text-xs whitespace-nowrap',
@@ -77,11 +89,11 @@ const MESSAGE_STEPS = [
 ] as const;
 
 /**
- * One box of the converter: a text field that takes a number, a unit, or both, with the locked
+ * One box of the converter: a text field that takes a number, a unit, or both, with the committed
  * unit shown as a chip and a suggestion list that grows out of the field over the page
- * (docs/UX-SPEC.md §2–§5, §14–§17). Hand-built on the WAI-ARIA combobox pattern (ADR 0006).
- * Nothing locks on a keystroke: the best match is highlighted and Enter, a pick, or leaving the
- * field commits it.
+ * (docs/UX-SPEC.md §3, §5, §7–§9). Hand-built on the WAI-ARIA combobox pattern (ADR 0006).
+ * Nothing commits on a keystroke: the best match is highlighted, Enter or a pick commits it, and
+ * Tab or leaving the box commits an exact match.
  */
 export function SmartInput({
   box,
@@ -96,24 +108,24 @@ export function SmartInput({
   trailing,
 }: SmartInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const mirrorRef = useRef<HTMLDivElement>(null);
-  const messageRef = useRef<HTMLDivElement>(null);
+  const textLayerRef = useRef<HTMLDivElement>(null);
+  const outOfRangeRef = useRef<HTMLDivElement>(null);
   const idBase = useId();
   const inputId = `${idBase}-input`;
   const listboxId = `${idBase}-listbox`;
-  const messageId = `${idBase}-message`;
-  const optionId = (index: number) => `${idBase}-option-${index}`;
+  const outOfRangeId = `${idBase}-out-of-range`;
 
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
-  const [override, setOverride] = useState<Override | null>(null);
+  const [level, setLevel] = useState<Level | null>(null);
 
-  const scope = override ? (override.scope === 'all' ? null : override.scope) : box.scope;
+  const scope = level ? (level === 'top' ? null : level) : box.scope;
   const searchOptions = {
     category: scope,
     separators: env.separators,
     system: env.system,
-    tier: mode,
+    // The UI's modes map onto core's tiers: basic lists basic units, advanced lists them all.
+    tier: mode === 'basic' ? 'basic' : 'all',
   } as const;
 
   // A query that finds nothing inside the category widens to every category on its own, so a
@@ -123,7 +135,9 @@ export function SmartInput({
   const widened = scope !== null && query !== '' && scoped.search.results.length === 0;
   const suggestion = widened ? suggest(box.text, { ...searchOptions, category: null }) : scoped;
   const noMatch = query !== '' && suggestion.search.results.length === 0;
-  const listed = noMatch ? search('', { tier: mode }).results : suggestion.search.results;
+  const listed = noMatch
+    ? search('', { tier: searchOptions.tier }).results
+    : suggestion.search.results;
 
   // Inside a category the Back row comes first, so the arrow keys reach it like any other row;
   // the best match is the first row after it.
@@ -138,7 +152,7 @@ export function SmartInput({
     ),
   ];
 
-  const message = noMatch ? `No unit matches “${query}”. Try ml, feet, or °F.` : undefined;
+  const notFound = noMatch ? `No unit matches “${query}”. Try ml, feet, or °F.` : undefined;
 
   // What the empty field suggests: a number once it has a unit, a few units of its category
   // once the other box has chosen one, otherwise this box's own examples. A message about the
@@ -148,24 +162,25 @@ export function SmartInput({
     : box.unit
       ? '0'
       : box.scope
-        ? scopedExamples(box.scope, counterpart, mode)
+        ? scopedExamples(box.scope, counterpart, searchOptions.tier)
         : examples;
 
-  const sizeClass = SIZE_STEPS[useFitStep(mirrorRef, MIRROR, SIZE_STEPS)];
-  const messageClass = MESSAGE_STEPS[useFitStep(messageRef, MESSAGE, MESSAGE_STEPS)];
+  const sizeClass = SIZE_STEPS[useFitStep(textLayerRef, TEXT_LAYER, SIZE_STEPS)];
+  const outOfRangeClass =
+    OUT_OF_RANGE_STEPS[useFitStep(outOfRangeRef, OUT_OF_RANGE, OUT_OF_RANGE_STEPS)];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
   const syncScroll = () => {
-    if (mirrorRef.current && inputRef.current) {
-      mirrorRef.current.scrollLeft = inputRef.current.scrollLeft;
+    if (textLayerRef.current && inputRef.current) {
+      textLayerRef.current.scrollLeft = inputRef.current.scrollLeft;
     }
   };
   useLayoutEffect(syncScroll);
 
   const focusInput = () => inputRef.current?.focus();
 
-  const showList = (next: Override | null) => {
-    setOverride(next);
+  const showList = (next: Level | null) => {
+    setLevel(next);
     setOpen(true);
     setActive(-1);
   };
@@ -173,7 +188,7 @@ export function SmartInput({
   const closePanel = () => {
     setOpen(false);
     setActive(-1);
-    setOverride(null);
+    setLevel(null);
   };
 
   const lock = (unit: Unit) => {
@@ -184,7 +199,7 @@ export function SmartInput({
   const unlock = (thenList: boolean) => {
     const category = box.unit?.category ?? null;
     dispatch({ type: 'unlock', box: box.id });
-    if (thenList && category) showList({ scope: category });
+    if (thenList && category) showList(category);
     else closePanel();
   };
 
@@ -197,14 +212,14 @@ export function SmartInput({
 
   const pick = (item: SuggestionItem) => {
     if (item.kind === 'back') {
-      showList({ scope: 'all' });
+      showList('top');
     } else if (item.kind === 'unit') {
       lock(item.unit);
     } else {
       if (box.isSource && query) {
         dispatch({ type: 'setText', box: box.id, text: suggestion.parsed.valueText ?? '' });
       }
-      showList({ scope: item.category.id });
+      showList(item.category.id);
     }
     focusInput();
   };
@@ -212,9 +227,8 @@ export function SmartInput({
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     dispatch({ type: 'input', box: box.id, text: value, at: performance.now() });
-    const next = suggest(value, searchOptions);
     setOpen(true);
-    setActive(next.parsed.query ? firstResult : -1);
+    setActive(parse(value, env.separators).query ? firstResult : -1);
   };
 
   /**
@@ -223,7 +237,7 @@ export function SmartInput({
    */
   const escape = () => {
     if (open && scope !== null) {
-      showList({ scope: 'all' });
+      showList('top');
       return;
     }
     if (open) {
@@ -233,7 +247,7 @@ export function SmartInput({
     if (escapeTarget === null) return;
     const category = box.unit?.category ?? null;
     dispatch({ type: 'stepBack', box: box.id });
-    if (escapeTarget === 'unit' && category) showList({ scope: category });
+    if (escapeTarget === 'unit' && category) showList(category);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -295,28 +309,26 @@ export function SmartInput({
 
   useEffect(() => {
     if (open && active >= 0) {
-      document.getElementById(`${idBase}-option-${active}`)?.scrollIntoView({ block: 'nearest' });
+      document.getElementById(optionIdFor(listboxId, active))?.scrollIntoView({ block: 'nearest' });
     }
-  }, [open, active, idBase]);
+  }, [open, active, listboxId]);
 
   const scopeName = scope ? getCategory(scope)?.name : undefined;
 
   // A fixed-height placeholder keeps the page layout still; the shell inside it grows downward
-  // over the page when the list opens, so field and list read as one shape. The edge is a real
-  // two-pixel border, which nothing inside can paint over. Inside, the chip and the trailing
-  // button keep the same 8 px from the top, bottom, and right edges (docs/DESIGN-SYSTEM.md, "Fields").
+  // over the page when the list opens, so field and list read as one shape (lib/shell.ts). Inside,
+  // the chip and the trailing button keep the same 8 px from the top, bottom, and right edges
+  // (docs/DESIGN-SYSTEM.md, "Fields").
   return (
-    <div className="relative h-16 min-w-0">
+    <div className="group relative h-16 min-w-0" data-open={open || undefined}>
       <div
-        className={`absolute inset-x-0 top-0 overflow-hidden rounded-lg border-2 bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard focus-within:border-accent ${
-          open ? 'z-20 border-accent shadow-md' : 'border-line shadow-sm'
-        }`}
+        className={`absolute inset-x-0 top-0 rounded-lg shadow-sm ${SHELL} ${SHELL_BORDERED}`}
         onBlur={onBlur}
       >
         <label htmlFor={inputId} className="sr-only">
           {label}
         </label>
-        <div className="flex h-15 items-center gap-2 pr-2 pl-4">
+        <div className={FIELD_ROW}>
           <div className="relative min-w-0 flex-1 self-stretch">
             <input
               ref={inputRef}
@@ -325,9 +337,11 @@ export function SmartInput({
               role="combobox"
               aria-expanded={open}
               aria-controls={open ? listboxId : undefined}
-              aria-activedescendant={open && active >= 0 ? optionId(active) : undefined}
+              aria-activedescendant={
+                open && active >= 0 ? optionIdFor(listboxId, active) : undefined
+              }
               aria-autocomplete="list"
-              aria-describedby={box.message ? `${describedBy} ${messageId}` : describedBy}
+              aria-describedby={box.message ? `${describedBy} ${outOfRangeId}` : describedBy}
               autoComplete="off"
               autoCapitalize="off"
               autoCorrect="off"
@@ -341,11 +355,15 @@ export function SmartInput({
               onScroll={syncScroll}
               className={`${sizeClass} h-full w-full bg-transparent font-numeric text-transparent caret-ink outline-none selection:bg-accent-soft placeholder:text-ink-muted`}
             />
-            <div ref={mirrorRef} aria-hidden="true" className={`${MIRROR} ${sizeClass}`}>
-              <NumberText text={box.text} valueText={suggestion.parsed.valueText} />
+            <div ref={textLayerRef} aria-hidden="true" className={`${TEXT_LAYER} ${sizeClass}`}>
+              <NumberText text={box.text} parsed={suggestion.parsed} />
             </div>
             {/* Always rendered, so its size is re-measured on resize; empty when there is no message. */}
-            <div ref={messageRef} id={messageId} className={`${MESSAGE} ${messageClass}`}>
+            <div
+              ref={outOfRangeRef}
+              id={outOfRangeId}
+              className={`${OUT_OF_RANGE} ${outOfRangeClass}`}
+            >
               {box.message ?? ''}
             </div>
           </div>
@@ -359,7 +377,7 @@ export function SmartInput({
               compact={box.text.length > COMPACT_CHIP || box.message !== null}
               inTabOrder={false}
               onOpen={() => {
-                showList(box.unit ? { scope: box.unit.category } : null);
+                showList(box.unit ? box.unit.category : null);
                 focusInput();
               }}
               onRemove={() => {
@@ -373,12 +391,12 @@ export function SmartInput({
         {open && (
           <SuggestionPanel
             id={listboxId}
+            label={`${label} suggestions`}
             items={items}
             activeIndex={active}
-            optionId={optionId}
             query={noMatch ? undefined : query}
             scopeName={scopeName}
-            message={message}
+            notFound={notFound}
             showCategory={scope === null || widened}
             onPick={pick}
             onHover={setActive}
@@ -393,8 +411,12 @@ export function SmartInput({
  * A few units an empty box could take once the other box has chosen its category, in display
  * order (most common first) and without the other box's unit: "L, tsp, tbsp…" beside milliliters.
  */
-function scopedExamples(scope: CategoryId, counterpart: Unit | null, mode: Mode): string {
-  const symbols = search('', { category: scope, tier: mode })
+function scopedExamples(
+  scope: CategoryId,
+  counterpart: Unit | null,
+  tier: 'basic' | 'all',
+): string {
+  const symbols = search('', { category: scope, tier })
     .results.flatMap((result) =>
       result.kind === 'unit' && result.unit.id !== counterpart?.id ? [result.unit.symbol] : [],
     )
@@ -404,14 +426,13 @@ function scopedExamples(scope: CategoryId, counterpart: Unit | null, mode: Mode)
 
 /**
  * The field's text with the exponent marker set in a heavier weight, so "1.5E21" reads as a
- * number with an exponent rather than a run of characters. Only the marker inside the parsed
- * number counts; an "e" that is still part of a unit query stays regular.
+ * number with an exponent rather than a run of characters. The parser says where the marker is,
+ * so an "e" that is still part of a unit query stays regular.
  */
-function NumberText({ text, valueText }: { text: string; valueText: string | undefined }) {
-  const start = valueText ? text.indexOf(valueText) : -1;
-  const markerAt = valueText ? valueText.search(/[eE]/) : -1;
-  if (!valueText || start < 0 || markerAt < 0) return text;
-  const markerIndex = start + markerAt;
+function NumberText({ text, parsed }: { text: string; parsed: ParsedInput }) {
+  const start = parsed.valueText ? text.indexOf(parsed.valueText) : -1;
+  if (parsed.exponentAt === undefined || start < 0) return text;
+  const markerIndex = start + parsed.exponentAt;
   return (
     <>
       {text.slice(0, markerIndex)}

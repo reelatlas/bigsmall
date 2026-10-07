@@ -2,7 +2,8 @@
  * Theme registry and token contract.
  * The CSS lives in src/styles/themes/<id>.css; this file is the single list of what exists
  * and what every theme must define. test/themes.test.ts enforces the contract and WCAG contrast.
- * Keep the pre-paint script in src/layouts/Base.astro in sync with STORAGE_KEY and the defaults.
+ * The inline script in src/layouts/Base.astro applies and saves themes; it receives the ids, names,
+ * storage key, and defaults from here through define:vars, so this file stays the one source.
  */
 
 export const THEME_STORAGE_KEY = 'bigsmall:theme';
@@ -114,23 +115,3 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = 
   ['focus', 'canvas', 3],
   ['focus', 'surface', 3],
 ];
-
-export function isThemeId(value: unknown): value is ThemeId {
-  return typeof value === 'string' && THEMES.some((t) => t.id === value);
-}
-
-/** The theme currently applied to the document. Falls back to the light default. */
-export function readCurrentTheme(): ThemeId {
-  const current = document.documentElement.dataset['theme'];
-  return isThemeId(current) ? current : DEFAULT_LIGHT;
-}
-
-/** Apply a theme now and remember it. Storage may be unavailable (private mode); the theme still applies. */
-export function applyTheme(id: ThemeId): void {
-  document.documentElement.dataset['theme'] = id;
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, id);
-  } catch {
-    // Storage blocked: the choice lasts for this page only.
-  }
-}

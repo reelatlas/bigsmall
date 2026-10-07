@@ -1,7 +1,7 @@
 /**
  * Canonical forms for matching typed text against unit and category keys.
- * Both the search index and the registry integrity test use these, so a collision
- * in the test means a collision the user would hit.
+ * The search index, matched-letter spans (highlight.ts), and the registry integrity test all use
+ * these, so a collision in the test means a collision the user would hit.
  */
 
 const DEGREE_SIGNS = /[°º˚]/g;

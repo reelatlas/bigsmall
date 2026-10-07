@@ -1,19 +1,24 @@
-import { getUnit, parse } from '@bigsmall/core';
-import type { BoxId, ConverterState } from './state';
+import { getUnit, parse, type Separators } from '@bigsmall/core';
+import type { BoxId, ConverterState, Restorable } from './state';
 
 /**
- * The conversion in the URL, so links and bookmarks reproduce it (docs/UX-SPEC.md §10):
- *   /?a=milliliter&b=us-cup&v=5&s=a
+ * The conversion in the URL, so links and bookmarks reproduce it (docs/UX-SPEC.md §11):
+ *   ?a=milliliter&b=us-cup&v=5&s=a
  * a, b: unit ids · v: the typed number in canonical form · s: which box holds v.
  */
 
-export const PARAM = { a: 'a', b: 'b', value: 'v', source: 's' } as const;
+const PARAM = { a: 'a', b: 'b', value: 'v', source: 's' } as const;
 
-export function stateToParams(state: ConverterState): URLSearchParams {
+/**
+ * The state as URL parameters. The typed text is read with the user's separators, so "1.000" in
+ * German is written as v=1000, not v=1. The value is written canonically (a period decimal, no
+ * grouping), so reading it back needs no locale.
+ */
+export function stateToParams(state: ConverterState, separators: Separators): URLSearchParams {
   const params = new URLSearchParams();
   if (state.a.unit) params.set(PARAM.a, state.a.unit);
   if (state.b.unit) params.set(PARAM.b, state.b.unit);
-  const value = parse(state[state.source].text).value;
+  const value = parse(state[state.source].text, separators).value;
   if (value !== undefined) {
     params.set(PARAM.value, String(value));
     params.set(PARAM.source, state.source);
@@ -21,10 +26,8 @@ export function stateToParams(state: ConverterState): URLSearchParams {
   return params;
 }
 
-export type HydratedState = Partial<Pick<ConverterState, 'a' | 'b' | 'source'>>;
-
 /** Reads a URL back into state. Unknown units are dropped; a second unit from another category is dropped too. */
-export function paramsToState(params: URLSearchParams): HydratedState | null {
+export function paramsToState(params: URLSearchParams): Restorable | null {
   const unitA = validUnit(params.get(PARAM.a));
   let unitB = validUnit(params.get(PARAM.b));
   if (unitA && unitB && getUnit(unitA)?.category !== getUnit(unitB)?.category) unitB = null;

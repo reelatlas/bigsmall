@@ -1,6 +1,6 @@
 # Theming
 
-Last updated: 2026-10-06 (milestone 0). How themes work, how to author one, and where each theme stands.
+How themes work, how to author one, and where each theme stands.
 
 ## Decision (2026-10-06)
 
@@ -10,8 +10,8 @@ Build the framework for all themes now so the mechanism is proven and every them
 
 1. Each theme is a CSS file in `apps/web/src/styles/themes/<id>.css` that sets every token in the contract on `[data-theme='<id>']` and declares `color-scheme` so native controls match.
 2. `daylight` also targets `:root`, so a page with no attribute is still fully styled.
-3. The pre-paint script in `src/layouts/Base.astro` reads `localStorage` (`bigsmall:theme`), falls back to `prefers-color-scheme` (`midnight` for dark, `daylight` for light), and sets `data-theme` on `<html>` before the first paint. No flash.
-4. The same script handles any `[data-theme-picker]` select by event delegation, so switching works before any JavaScript bundle loads and on pages with no islands.
+3. The inline script in `src/layouts/Base.astro` reads `localStorage` (`bigsmall:theme`), falls back to `prefers-color-scheme` (`midnight` for dark, `daylight` for light), and sets `data-theme` on `<html>` before the first paint. No flash.
+4. The same script drives the theme menu (`ThemePicker`, radios marked `data-theme-option` inside a `data-shell`) by event delegation, so switching works before any JavaScript bundle loads and on pages with no islands. A click picks and closes; arrow keys preview themes live until Enter or Escape.
 5. Components never know which theme is active. They use semantic tokens through Tailwind utilities (docs/DESIGN-SYSTEM.md).
 6. Theme ids, the storage key, and the defaults live once in `src/lib/themes.ts` and are injected into the inline script with Astro's `define:vars`.
 
@@ -31,11 +31,11 @@ A theme that fails any of these fails `pnpm test`, and therefore CI.
 
 ## Authoring a theme
 
-1. Add the id to `ThemeId` and an entry to `THEMES` in `src/lib/themes.ts` (name, scheme, status, blurb).
-2. Copy `daylight.css` or `midnight.css` to `themes/<id>.css`, change the selector, and set every token.
+1. Add the id to `ThemeId` and an entry to `THEMES` in `src/lib/themes.ts` (name, scheme, status, blurb). The theme menu and the browser tests read this list, so nothing else needs the name.
+2. Copy `daylight.css` or `midnight.css` to `themes/<id>.css`, change the selector, set every token, and add its `@import` to `src/styles/global.css` with the others.
 3. Run `pnpm test`. Adjust colors until every contrast pair passes. Prefer adjusting `--ink-muted`, `--accent`, and `--on-accent`; they fail most often.
-4. Open `/dev/gallery` and check every component in the new card. Check the full page with the picker too, since nested cards do not show scrollbars or native controls.
-5. Run `pnpm e2e` for the axe pass across themes.
+4. Open `/dev/gallery` and check every component in the new card. Check the full page with the theme menu too, since nested cards do not show scrollbars or the header menus in their theme.
+5. Run `pnpm e2e`: axe runs on the page in every registered theme, and the reduced-motion test checks its motion tokens.
 6. Update the status table below.
 
 Rules that keep themes cheap:
@@ -62,5 +62,5 @@ Recommended polish order: `sakura` first (a light theme stress-tests decoration 
 
 ## Known gaps
 
-- The gallery cards cannot preview native control styling (`<select>`, scrollbars); use the page-level picker for that.
+- The gallery cards cannot preview scrollbars or the header menus in their own theme; use the page-level theme menu for that.
 - Per-theme fonts and decoration stylesheets are not implemented yet; the loading mechanism (load on activation, preload only the active theme) is designed in docs/PLAN.md §8 and lands in milestone 4.

@@ -1,11 +1,13 @@
 import {
+  DEFAULT_SEPARATORS,
   localeSeparators,
   regionDefaults,
   type Separators,
   type UnitPreference,
 } from '@bigsmall/core';
 import { useEffect, useMemo, useReducer, useState } from 'react';
-import { detectRegion } from '../../lib/region';
+import { browserLocale, detectRegion } from '../../lib/region';
+import { ANNOUNCE_MS, URL_WRITE_MS } from '../../lib/timing';
 import {
   escapeTarget,
   initialHistory,
@@ -27,22 +29,19 @@ export interface ConverterEnv {
 
 const SERVER_ENV: ConverterEnv = {
   locale: undefined,
-  separators: { decimal: '.', group: ',' },
+  separators: DEFAULT_SEPARATORS,
   system: 'us',
 };
 
 function detectEnv(): ConverterEnv {
   if (typeof navigator === 'undefined') return SERVER_ENV;
-  const locale = navigator.languages?.[0] ?? navigator.language ?? undefined;
+  const locale = browserLocale();
   return {
     locale,
     separators: localeSeparators(locale),
     system: regionDefaults(detectRegion()).system,
   };
 }
-
-const URL_DEBOUNCE_MS = 250;
-const ANNOUNCE_DEBOUNCE_MS = 600;
 
 export interface ConverterController {
   state: ConverterState;
@@ -73,18 +72,18 @@ export function useConverter(): ConverterController {
   // Keep the URL in step with the state, without flooding history.
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      const params = stateToParams(state).toString();
+      const params = stateToParams(state, env.separators).toString();
       const url = `${window.location.pathname}${params ? `?${params}` : ''}${window.location.hash}`;
       if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
         window.history.replaceState(null, '', url);
       }
-    }, URL_DEBOUNCE_MS);
+    }, URL_WRITE_MS);
     return () => window.clearTimeout(timer);
-  }, [state]);
+  }, [state, env.separators]);
 
   const [announcement, setAnnouncement] = useState<string | null>(null);
   useEffect(() => {
-    const timer = window.setTimeout(() => setAnnouncement(view.announcement), ANNOUNCE_DEBOUNCE_MS);
+    const timer = window.setTimeout(() => setAnnouncement(view.announcement), ANNOUNCE_MS);
     return () => window.clearTimeout(timer);
   }, [view.announcement]);
 

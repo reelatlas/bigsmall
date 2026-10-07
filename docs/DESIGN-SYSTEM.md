@@ -1,52 +1,61 @@
 # Design system
 
-Last updated: 2026-10-06 (milestone 0). Tokens, the Tailwind bridge, component rules, and the component inventory.
+Tokens, the Tailwind bridge, the patterns every control follows, and the component inventory. Behavior lives in docs/UX-SPEC.md; this file is how things look and are built.
 
 ## Token layers
 
 1. **Semantic tokens** are what components use. They describe a role, never a color: `--ink` is "the text color", whatever a theme makes it.
 2. **Themes** assign values to semantic tokens in `apps/web/src/styles/themes/<id>.css`. A theme is nothing but a token set plus, later, an optional decoration stylesheet.
-3. **Component tokens** exist only when a component needs its own knob. None yet. Prefer a semantic token.
+3. **Derived tokens** are computed once in the bridge from semantic tokens (the nested corner radii). They follow every theme automatically.
+4. **Component tokens** exist only when a component needs its own knob. None yet. Prefer a semantic token.
 
-Raw values (a hex color, a pixel radius) never appear inside a component. If a design needs something the tokens cannot express, add a token, document it here, and define it in every theme. The theme contract test fails until every theme has it.
+Raw values (a hex color, a pixel radius, a literal duration) never appear inside a component. If a design needs something the tokens cannot express, add a token, document it here, and define it in every theme. The theme contract test fails until every theme has it.
 
 ## Semantic tokens
 
-| Token                                             | Role                                                                     |
-| ------------------------------------------------- | ------------------------------------------------------------------------ |
-| `--canvas`                                        | Page background                                                          |
-| `--surface`                                       | Cards, inputs, panels                                                    |
-| `--surface-raised`                                | Hover states, popovers, anything sitting on a surface                    |
-| `--ink`                                           | Primary text                                                             |
-| `--ink-muted`                                     | Secondary text, labels, hints. Still body-text contrast (4.5:1)          |
-| `--accent`                                        | The one brand color: primary buttons, active states, links               |
-| `--on-accent`                                     | Text and icons placed on `--accent`                                      |
-| `--accent-soft`                                   | Tinted backgrounds: selected rows, chips, highlights                     |
-| `--line`                                          | Borders and dividers                                                     |
-| `--focus`                                         | Focus ring. Often equals `--accent`; dark themes may pick a brighter hue |
-| `--danger`, `--success`                           | Error and success text and indicators                                    |
-| `--type-display`, `--type-body`, `--type-numeric` | Font stacks for headings, running text, and numbers                      |
-| `--shape-sm`, `--shape-md`, `--shape-lg`          | Border radii                                                             |
-| `--elevation-sm`, `--elevation-md`                | Shadows (or glows, in neo-noir)                                          |
-| `--motion-fast`, `--motion-base`, `--motion-slow` | Durations. Forced to 0ms under `prefers-reduced-motion`                  |
-| `--motion-ease`                                   | The theme's easing curve                                                 |
+| Token                                             | Role                                                                               |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `--canvas`                                        | Page background                                                                    |
+| `--surface`                                       | Cards, fields, panels                                                              |
+| `--surface-raised`                                | Hover states and anything sitting on a surface; visibly different from `--surface` |
+| `--ink`                                           | Primary text                                                                       |
+| `--ink-muted`                                     | Secondary text, labels, hints. Still body-text contrast (4.5:1)                    |
+| `--accent`                                        | The one brand color: active edges, primary buttons, links                          |
+| `--on-accent`                                     | Text and icons placed on `--accent`                                                |
+| `--accent-soft`                                   | Tinted backgrounds: selected rows, chips                                           |
+| `--line`                                          | Borders and dividers                                                               |
+| `--focus`                                         | Focus ring. Often equals `--accent`; dark themes may pick a brighter hue           |
+| `--danger`, `--success`                           | Error and success text and indicators (the out-of-range message, the copy check)   |
+| `--type-display`, `--type-body`, `--type-numeric` | Font stacks for headings, running text, and numbers                                |
+| `--shape-sm`, `--shape-md`, `--shape-lg`          | Border radii                                                                       |
+| `--elevation-sm`, `--elevation-md`                | Shadows (or glows, in neo-noir)                                                    |
+| `--motion-fast`, `--motion-base`, `--motion-slow` | Durations. Zeroed under `prefers-reduced-motion` (see "Motion")                    |
+| `--motion-ease`                                   | The theme's easing curve                                                           |
 
-The full list is the single source of truth in `apps/web/src/lib/themes.ts` (`TOKEN_CONTRACT`).
+The full list is the single source of truth in `apps/web/src/lib/themes.ts` (`TOKEN_CONTRACT`), with the contrast pairs every theme must pass (`CONTRAST_PAIRS`).
 
 ## Tailwind bridge
 
 `apps/web/src/styles/global.css` maps tokens into Tailwind's theme with `@theme inline`, so utilities keep the `var()` reference and re-theme at runtime:
 
-| Utility                                                                       | Resolves to                                                                       |
-| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `bg-canvas`, `bg-surface`, `bg-surface-raised`, `bg-accent`, `bg-accent-soft` | color tokens                                                                      |
-| `text-ink`, `text-ink-muted`, `text-on-accent`, `text-danger`, `text-success` | color tokens                                                                      |
-| `border-line`, `outline-focus`, `ring-focus`                                  | color tokens                                                                      |
-| `font-display`, `font-body`, `font-numeric`                                   | type tokens                                                                       |
-| `rounded-sm`, `rounded-md`, `rounded-lg`                                      | shape tokens                                                                      |
-| `rounded-nested`                                                              | derived: `--shape-lg` minus the field's 2 px border and 8 px inset, never below 0 |
-| `shadow-sm`, `shadow-md`                                                      | elevation                                                                         |
-| `ease-standard`, `duration-[var(--motion-fast)]`                              | motion                                                                            |
+| Utility                                                                       | Resolves to                                                                                 |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `bg-canvas`, `bg-surface`, `bg-surface-raised`, `bg-accent`, `bg-accent-soft` | color tokens                                                                                |
+| `text-ink`, `text-ink-muted`, `text-on-accent`, `text-danger`, `text-success` | color tokens                                                                                |
+| `border-line`, `border-accent`, `outline-focus`                               | color tokens                                                                                |
+| `font-display`, `font-body`, `font-numeric`                                   | type tokens; `font-numeric` also turns on tabular digits                                    |
+| `rounded-sm`, `rounded-md`, `rounded-lg`                                      | shape tokens                                                                                |
+| `rounded-nested`, `rounded-nested-md`                                         | derived: the shell's corner minus its border and inset (see "Corners")                      |
+| `shadow-sm`, `shadow-md`                                                      | elevation tokens                                                                            |
+| `duration-fast`, `duration-base`, `duration-slow`, `ease-standard`            | motion tokens; every `transition-*` utility already defaults to fast and the theme's easing |
+
+Custom utilities, also in `global.css`:
+
+| Utility                   | Use                                                                                     |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| `scroll-thin`             | Thin, themed, arrow-less scrollbars for lists inside rounded shells                     |
+| `focus-ring-inset`        | Draws the focus ring inside the element, for a control flush against an edge that clips |
+| `focus-ring-within-inset` | The same ring on a wrapper whose descendant has focus (the theme menu's radio labels)   |
 
 Layout and spacing use Tailwind's default scale (`p-4`, `gap-2`, `max-w-2xl`). Those are not themed.
 
@@ -54,68 +63,114 @@ Layout and spacing use Tailwind's default scale (`p-4`, `gap-2`, `max-w-2xl`). T
 
 Every component in `apps/web/src/components/`:
 
-1. Uses tokens only. No hex, no rgb, no px radii, no literal durations.
-2. Is keyboard-operable with a visible focus ring (`focus-visible:outline-focus`).
+1. Uses tokens only: no hex, rgb, px radii, or literal durations, and no arbitrary-value utilities where a token utility exists (`duration-fast`, not `duration-[var(--motion-fast)]`).
+2. Is keyboard-operable with a visible focus indicator (see "Focus"). A browser test tabs through the page and fails on any stop without one.
 3. Has an accessible name: visible label, `aria-label`, or `aria-labelledby`.
-4. Has a touch target of at least 44 × 44 CSS px (`min-h-11`), per WCAG 2.5.8 best practice.
+4. Has a touch target of at least 44 × 44 CSS px (`min-h-11`, `size-11`, `w-11`), per WCAG 2.5.8 best practice.
 5. Works at 320 px wide and 400 % zoom without horizontal scrolling.
-6. Respects reduced motion (the motion tokens handle this when used consistently).
-7. Appears in `/dev/gallery` so every theme can be checked against it.
+6. Respects reduced motion by using the motion tokens.
+7. Appears in `/dev/gallery` in the variants and states that ship, so every theme can be checked against it.
 8. Passes the Playwright axe suite on desktop and mobile.
 
-Prefer native elements when they are good enough (`<select>`, `<dialog>`, `<button>`). The smart input is the one hand-built composite control (WAI-ARIA combobox pattern, ADR 0006). A new composite starts from that pattern and the axe suite, and brings in a library only for a measured need recorded in an ADR.
+Prefer native elements when they are good enough (`<button>`, radios, `<dialog>`). The smart input is the one hand-built composite control (WAI-ARIA combobox pattern, ADR 0006). A new composite starts from that pattern and the axe suite, and brings in a library only for a measured need recorded in an ADR.
 
-## Inventory
+## Patterns
 
-| Component         | Kind           | Notes                                                                                                                                                                                                                                                                                                              |
-| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Button`          | React (native) | Variants primary, secondary (2 px edge), and ghost; `square` for a lone icon with `aria-label`; `nested` for corners inside a field. Native `<button>`, no runtime                                                                                                                                                 |
-| `ThemePicker`     | Astro          | Fluid shell with a native radio group; the inline script in Base.astro opens, closes, applies, and persists it, so it needs no bundle                                                                                                                                                                              |
-| `ShortcutsHelp`   | Astro          | A ghost icon button left of the theme menu that grows into a fluid shell with the keyboard shortcuts map from `src/lib/shortcuts.ts`; Ctrl or ⌘ by platform (`src/lib/platform.ts`); opens while a mouse rests on it, pins on click, closes on Escape or a click outside; hidden on touch-first devices; no bundle |
-| `UnitChip`        | React          | The locked unit inside a smart input: bold symbol and muted name on one baseline, which open the unit list, plus a remove control; `inTabOrder={false}` when the host's keys cover both                                                                                                                            |
-| `SuggestionPanel` | React          | The listbox inside a smart input's shell: a pinned Back row first inside a category, unit rows (name, then bold symbol right-aligned), category rows, matched letters heavier; virtual focus via `aria-activedescendant`                                                                                           |
-| `icons`           | React          | Inline SVG icons drawn for this project (swap, close, copy, check, chevrons, undo, redo, eraser, keyboard), also rendered to static HTML from Astro; decorative, `aria-hidden`                                                                                                                                     |
+### Edges and borders
 
-Arriving in milestone 3: `Keypad`, `Sheet`, `Toggle`, `LiveResult`. `SmartInput` lives in `features/converter/` because it composes core search with these primitives.
+- **2 px is a control's edge.** Fields, the theme menu, and secondary buttons share `border-2`, so no control looks lighter-edged than its neighbor. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights once ate into it.
+- **1 px is a divider or a keycap.** The line under a field or the Back row, the toolbar divider (`border-l`), and keycaps use `border`.
+- **Open is accent.** A shell's edge is `border-line` at rest and `border-accent` while open or while something inside has focus.
+- Known gap: `--line` is subtle against `--canvas` (under 3:1 in every theme), so a field's resting edge does not meet WCAG 1.4.11 on its own. Recorded as an open decision in docs/research/findings-0-first-pass.md.
 
-## Adding a component
+### Focus
 
-1. Check the inventory. Extend before you add.
-2. Create `src/components/<Name>.tsx` (React) or `<Name>.astro` (no interaction).
-3. Style with the utilities above. Run `pnpm lint`; raw values will be caught in review until a stylelint rule lands.
-4. Add it to `src/pages/dev/gallery.astro`.
-5. Run `pnpm e2e`. Fix any axe violation before merging.
-6. Add a row to the inventory table.
+- **One ring.** The base layer gives every `:focus-visible` element a 2 px `--focus` outline offset by 2 px. Buttons, chips, and links rely on it and add nothing.
+- **Never pair `outline-none` with focus utilities.** In Tailwind v4, `outline-none` sets the outline style to none, and `focus-visible:outline-2` then draws nothing (docs/LEARNINGS.md).
+- **Inset where an edge clips.** `focus-ring-inset` on the shortcuts toggle while its shell is open; `focus-ring-within-inset` on the theme menu's option labels.
+- **Shell edges for fields and the theme menu.** The field's input and the theme trigger set `outline-none`; their shell's accent edge (`focus-within:border-accent`) is the indicator.
+- **The list is never focused.** Rows are virtually focused through `aria-activedescendant`; the listbox has `tabIndex={-1}` so Chrome does not make it a Tab stop.
 
-## Copy
+### Motion
 
-- **Sentence case** for every label, button, heading, message, and theme name: "Search all categories", "Neo-noir", "Copy result". The only capitals inside a phrase are proper names.
+- Components write `transition-colors` (or `transition-[border-color,box-shadow]`, `transition-transform`) and nothing else: the bridge makes every transition default to `--motion-fast` and `--motion-ease`.
+- Buttons, chips, and shell edges fade; list rows and theme options change instantly, so keyboard movement never lags.
+- Reduced motion zeroes the motion tokens with an unlayered rule placed after the theme imports (a layered rule loses to the themes' unlayered token blocks), and a blanket `!important` rule stops any other transition or animation. A browser test checks the tokens read `0ms` in every theme.
+
+### Corners
+
+An element inset inside a rounded shell uses the shell's radius minus the inset, border included, so the curves stay concentric; an inner corner as round as the outer one looks swollen.
+
+- `rounded-nested`: inside a field or its list (`lg` shell, 2 px border, 8 px inset). The chip, the copy button (`Button nested`), and list rows.
+- `rounded-nested-md`: inside a menu (`md` shell, 2 px border, 4 px gutter). The theme menu's options.
+
+### Fluid shells
+
+A control that opens a list or panel keeps both in one shape, drawn over the page so nothing reflows. The recipe lives in `src/lib/shell.ts` and every instance builds from it:
+
+- A **placeholder** with `group relative` and a fixed size holds the layout: `h-16` for a field, `h-12` for the theme menu, `size-12` for the shortcuts map. It carries `data-open` while open.
+- The **shell** inside takes `SHELL` (2 px edge, `overflow-hidden`, and the open state: `z-20`, accent edge, `shadow-md`), one resting style, and its own position and radius.
+  - `SHELL_BORDERED`: bordered at rest, `bg-surface`, accent on `focus-within`. Fields (`rounded-lg`, plus `shadow-sm` at rest) and the theme menu (`rounded-md`, no resting shadow).
+  - `SHELL_GHOST`: a borderless icon button at rest that becomes a card when open. The shortcuts map (`rounded-md`), anchored with `absolute top-0 right-0` so it grows left and takes its width from its panel.
+- The list or panel renders inside the shell, in flow, under a `border-t` divider. `overflow-hidden` clips it to the corners; the shell's own border is never clipped.
+- `SmartInput` sets `data-open` from React state. The header menus share one controller in the inline script of `Base.astro`: `[data-shell]`, `[data-shell-toggle]`, `[data-open]`, `[data-pinned]` (a click opened it), `[data-shell-hover]` (a resting mouse also opens it), and `[data-shell-initial]` (what takes focus on open). It closes a shell on Escape, a click outside, or focus leaving it. A new header menu reuses this markup and needs no script.
+
+### Fields
+
+- **Row.** `FIELD_ROW` (`src/lib/shell.ts`): 60 px tall inside the 2 px border, `pl-4 pr-2 gap-2`. The 44 px chip and trailing button keep the same 8 px from the top, bottom, and right edges, and the value starts 16 px in.
+- **Text layer.** The value is drawn by an `aria-hidden` layer over an input whose own text is transparent (`text-transparent caret-ink selection:bg-accent-soft`). The input keeps the caret, selection, focus, mobile keyboards, and the accessibility tree; the layer gets the typography, which is how the exponent marker in `1.5E21` is `font-semibold` (core's parser reports where it is). The layer matches the input's font, size, and line box, follows its horizontal scroll, and is `pointer-events-none`.
+- **Size steps.** `useFitStep` (`src/lib/fit-step.ts`) picks the largest of five steps (`text-2xl sm:text-3xl` down to `text-base`) at which the layer's text fits on one line, measured before paint on every render and on resize. The out-of-range message uses the same hook with three sizes and a last step that wraps.
+- **Chip.** Symbol and plural on one baseline (`items-baseline`). It collapses to its symbol when the value is longer than six characters or a message shows.
+- **Buttons inside a field** (the chip's two, copy) are out of the Tab order, because the field's own keys do the same jobs.
+- **Messages.** "Too large to convert" is drawn over the field in `text-danger` in place of the placeholder and joins the input's `aria-describedby`.
+- **Category label** under a field: `text-sm font-medium text-ink-muted`, inset `px-4.5` (the 2 px border plus the 16 px value inset) so it starts where the value starts.
+
+### Lists
+
+- Rows sit in a `p-2` gutter, each `rounded-nested px-2`, so a highlight sits inside the edge with the same 8 px as the chip and the row text starts 16 px in, under the value.
+- A unit row is "name … symbol": the plural in ink, the symbol right-aligned in `font-numeric font-semibold text-ink-muted`. When the list spans categories, the category follows the name in `text-xs text-ink-muted`.
+- **Matched letters** are set heavier and nothing else changes: names `font-semibold`, category names `font-bold`, a symbol's matched part `text-ink`. The span comes from core's `matchSpan`.
+- **The Back row** is the list's first option, pinned with `sticky top-0`, a `bg-surface` fill, and a divider under it; because it lives inside the scrolling list it shares the rows' edges, and `scroll-pt-14` keeps a row scrolled into view clear of it.
+- Lists scroll with `scroll-thin` inside the gutter. Highlights: `data-active:bg-accent-soft`, `hover:bg-surface-raised`, no transition.
+
+### Icon buttons and the toolbar
+
+- An icon-only action on the page is `Button variant="ghost" square` with an `aria-label`: swap, undo, redo, clear all, copy (also `nested`, inside a field), and the shortcuts map at rest. Disabled ones drop to 50 % opacity.
+- The toolbar's divider between redo and clear all is `h-6 border-l border-line`.
+- A successful copy swaps the icon for `CheckIcon` in `text-success`, which every theme keeps at 3:1 on the surface (a graphic, WCAG 1.4.11).
+- Keycaps (`Keycap`) are `rounded-sm border border-line bg-surface-raised font-numeric text-xs`.
+
+### Copy
+
+- **Sentence case** for every label, button, heading, message, and theme name: "Clear all", "Neo-noir", "Copy first value". The only capitals inside a phrase are proper names.
 - **Units follow the standards, not the sentence-case rule.** Symbols are case-sensitive and never altered: mL, kB, °F, km/h. Unit names are lowercase, including ones named after people (kelvin, newton), except "Celsius" and "Fahrenheit", which the SI Brochure and NIST write capitalized. Chips and rows show the plural name ("milliliters") next to the symbol.
 - **Category names** are single capitalized words as labels: Length, Weight, Volume.
 - **Short and plain.** No exclamation marks, no jargon in user-facing text. Error and empty-state text says what to try next.
 
-## Controls
+## Inventory
 
-One look for every control: `min-h-11`, `rounded-md`, `border-2 border-line`, `bg-surface`, `hover:bg-surface-raised`, and the focus ring from `--focus`. Every bordered control (secondary buttons, the theme menu, fields) shares the same 2 px edge, so no control looks lighter-edged than its neighbor. Icon-only actions that sit on the page (swap, undo, redo, clear all, copy, the shortcuts map at rest) are ghost buttons: no border, the page behind them, `hover:bg-surface-raised`, and the `focus-visible` ring. A copy button confirms with a check in `text-success`, which every theme keeps at 3:1 on the surface (a graphic, WCAG 1.4.11). Fields are the larger variant of the same language (see "Fields" below). A control that opens something keeps field and list in one shape (see "Fluid shells"); nothing uses a native popup, because the OS draws it in its own colors.
+| Component         | Kind  | Notes                                                                                                                                                                         |
+| ----------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`          | React | Native `<button>`, no runtime. `variant` (required): ghost, secondary (2 px edge), primary. `square` for a lone icon with `aria-label`; `nested` inside a field               |
+| `UnitChip`        | React | The committed unit inside a field: bold symbol and muted name on one baseline, which open the unit list, plus a 44 px remove control; `compact` and `inTabOrder` are explicit |
+| `SuggestionPanel` | React | The listbox inside a field's shell: Back row, unit rows, category rows, matched letters. `optionIdFor` gives the row ids the combobox points at                               |
+| `Keycap`          | React | One key as printed; `label="Mod"` reads Ctrl, or ⌘ on Apple devices                                                                                                           |
+| `icons`           | React | Inline SVG icons drawn for this project: swap, close, copy, check, chevron right and down, undo, redo, eraser, keyboard. Decorative, `aria-hidden`                            |
+| `HeaderMenus`     | Astro | The header's menus in their fixed order: the shortcuts map, then the theme menu                                                                                               |
+| `ThemePicker`     | Astro | Fluid shell with a native radio group; the inline script opens it, applies and saves the choice, and lets arrow keys preview themes until Enter                               |
+| `ShortcutsHelp`   | Astro | Ghost icon button that grows into the shortcuts map from `src/lib/shortcuts.ts`; peeks on hover, pins on click; hidden on touch-first devices and below `sm`                  |
 
-**Nested corners.** An element inset inside a rounded shell uses the shell's radius minus the inset, border included, so the two curves stay concentric; an inner corner as round as the outer one looks swollen. Inside a field and its list (an `lg` shell, 2 px border, 8 px inset) that is `rounded-nested`; inside the theme menu (an `md` shell, 4 px inset) it is `rounded-sm`, which is close to `md` minus 6 px in every theme.
+React components used in Astro files without a `client:` directive (the icons, `Button`, and `Keycap` inside the header menus) render to static HTML and ship no JavaScript. `SmartInput` lives in `features/converter/` because it composes core search with these components. Arriving in milestone 3: a keypad, a sheet for it on phones, and a mode toggle.
 
-**Matched letters.** In a list, the letters a query matches are set heavier and nothing else changes: unit names go `font-semibold`, category names `font-bold`, and a symbol's muted text turns `text-ink`. The match comes from core's `matchSpan`, which folds text the way search does.
+## The gallery
 
-Popovers float. A list grows inside its control's shell over the page and never pushes content down.
+`/dev/gallery` renders one card per theme, each pinned with `data-theme`, holding: the color tokens; a numeric type sample; the real field in frozen states (a result with an exponent, a collapsed chip, and the copy check; an out-of-range message; an open list mid-search inside a category); the ghost icon buttons, one disabled; the secondary and primary buttons; and keycaps. The header menus use the page theme. axe checks the page in CI.
 
-Tints come from the tokens, never from new colors: a chip at rest is `bg-accent-soft`; hovered, it lays `bg-surface/40` over that so it stays recognizably the chip.
+## Adding a component
 
-### Fluid shells
-
-A control that opens a list keeps field and list in one shape: a `relative` placeholder with a fixed height holds an `absolute inset-x-0 top-0 overflow-hidden` shell with the border, corners, and surface. The placeholder is as tall as the closed shell including its border: `h-16` for a field whose row is `h-15`, `h-12` for the theme control whose toggle is `h-11`.
-
-The edge is a real two-pixel border (`border-2`): `border-line` at rest, `border-accent` while open or while anything inside has focus (`focus-within`), with `shadow-md` when open and no ring or outer outline. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights used to eat into it. That accent edge is also the focus indicator for the field and for the theme toggle.
-
-Inside a field's shell, the list renders in flow under a `border-t` divider, with its rows in a `p-2` gutter: each row is `rounded-nested px-2`, so a hover or selected highlight sits visibly inside the edge with the same 8 px as the chip, and the row text starts 16 px in, exactly under the number. Lists scroll with `scroll-thin` (thin, themed scrollbars) inside the same gutter. Inside a category the Back row is the list's first option, pinned with `sticky top-0` and a divider under it; because it lives inside the scrolling list, its category name shares the symbol column's right edge whether or not a scrollbar shows, and `scroll-pt-14` keeps a row scrolled into view clear of it. The theme menu uses a `p-1` gutter with `rounded-sm px-2` rows to match its smaller shell and 12 px trigger text. `overflow-hidden` on the shell clips descendants to the rounded corners; the shell's own border is never clipped. The page never reflows; the shell grows over it. `SmartInput`, `ThemePicker`, and `ShortcutsHelp` are the instances; another should reuse the pattern rather than invent a popover. The header menus share one controller in the inline script of `Base.astro`: `[data-shell]` with a `[data-shell-toggle]`, `[data-open]` while open, `[data-pinned]` once a click opened it, `[data-shell-hover]` to also open while a mouse rests on it, and `[data-shell-initial]` for what takes focus on open. A shell anchored at the page edge (`ShortcutsHelp`) grows from its right edge with `absolute top-0 right-0` and takes its width from its panel.
-
-### Fields
-
-A field is a fluid shell, `rounded-lg`, with an `h-15` row inside its 2 px border: `pl-4 pr-2 gap-2`. The 44 px chip and trailing button therefore keep the same 8 px from the top, bottom, and right edges, with `rounded-nested` corners, and the number starts 16 px in. The chip's symbol and name sit on one baseline (`items-baseline`), not merely centered, since they are different sizes. Buttons inside a field (the chip's two, copy) are out of the Tab order when the field's own keys do the same job, so Tab goes from field to field. A message about the value ("Too large to convert") is drawn over the field in `text-danger` in place of a placeholder, and joins the field's `aria-describedby`. The value is drawn by a text layer over a field whose own text is transparent (`text-transparent caret-ink selection:bg-accent-soft`): the `<input>` keeps the caret, selection, focus, mobile keyboards, and the accessibility tree, and the `aria-hidden` layer gets the typography, which is how the exponent marker in `1.5E21` can be `font-semibold`. The layer matches the field's font, size, and line box, follows its horizontal scroll, and is `pointer-events-none`. Both carry the same size step, chosen by `useFitStep` (`src/lib/fit-step.ts`): the largest of five steps (`text-2xl sm:text-3xl` down to `text-base`) at which the layer's content fits on one line, re-measured before paint on every render and on resize. A future field with styled text reuses the layer and the hook; nothing else styles a field's text.
-
-Native popups (a `<select>` list, a date picker) cannot take the design language, so a themed menu uses native inputs inside a fluid shell instead: `ThemePicker` is a radio group, which gives arrow keys, Space, and screen reader semantics for free.
+1. Check the inventory. Extend before you add.
+2. Create `src/components/<Name>.tsx` (React) or `<Name>.astro` (static, or driven by the inline script).
+3. Style with the utilities above and the patterns in this file. Run `pnpm lint`.
+4. Add it to `src/pages/dev/gallery.astro` in its real variants and states.
+5. Run `pnpm e2e`. Fix any axe violation before merging.
+6. Add a row to the inventory table.

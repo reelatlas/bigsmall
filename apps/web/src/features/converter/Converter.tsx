@@ -11,7 +11,8 @@ const COPIED_MS = 1500;
 
 /** The converter island: category label, two linked smart inputs, swap, undo and redo, status lines, live region. */
 export function Converter() {
-  const { state, view, env, dispatch, canUndo, canRedo, announcement } = useConverter();
+  const { state, view, env, dispatch, canUndo, canRedo, escapeTargets, announcement } =
+    useConverter();
   const hydrated = useIsHydrated();
   const hintId = useId();
   const sectionRef = useRef<HTMLElement>(null);
@@ -96,6 +97,7 @@ export function Converter() {
           mode={state.mode}
           env={env}
           dispatch={dispatch}
+          escapeTarget={escapeTargets.a}
           onBrowse={onBrowse}
           trailing={copyButton(view.a, 'first value')}
         />
@@ -116,6 +118,7 @@ export function Converter() {
           mode={state.mode}
           env={env}
           dispatch={dispatch}
+          escapeTarget={escapeTargets.b}
           onBrowse={onBrowse}
           trailing={copyButton(view.b, 'second value')}
         />

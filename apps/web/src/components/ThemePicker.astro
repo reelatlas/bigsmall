@@ -13,16 +13,17 @@ const menuId = `${id}-menu`;
   Same fluid shape as a smart input: a fixed-height placeholder keeps the layout still while the
   shell inside grows over the page when open. No bundle needed: the pre-paint script in
   layouts/Base.astro toggles [data-open], applies the chosen radio, and persists it. The options
-  are native radios, so arrow keys, Space, and screen readers work without any script.
+  are native radios, so arrow keys, Space, and screen readers work without any script. The shell's
+  two-pixel edge turns accent while anything inside has focus; that is the focus indicator.
 -->
-<div class="group relative h-11 w-44" data-theme-shell>
-  <div class="absolute inset-x-0 top-0 overflow-hidden rounded-md border border-line bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard group-data-open:z-20 group-data-open:border-accent group-data-open:ring-1 group-data-open:ring-accent group-data-open:ring-inset group-data-open:shadow-md">
+<div class="group relative h-12 w-44" data-theme-shell>
+  <div class="absolute inset-x-0 top-0 overflow-hidden rounded-md border-2 border-line bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard focus-within:border-accent group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md">
     <button
       type="button"
       data-theme-toggle
       aria-expanded="false"
       aria-controls={menuId}
-      class="flex h-11 w-full items-center justify-between gap-2 rounded-md px-3 text-sm text-ink outline-none hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus group-data-open:rounded-b-none"
+      class="flex h-11 w-full items-center justify-between gap-2 px-3 text-sm text-ink outline-none hover:bg-surface-raised"
     >
       <span class="text-ink-muted">Theme</span>
       <span class="flex items-center gap-1">
@@ -43,10 +44,10 @@ const menuId = `${id}-menu`;
         </svg>
       </span>
     </button>
-    <fieldset id={menuId} class="hidden border-t border-line py-1 group-data-open:block">
+    <fieldset id={menuId} class="hidden border-t border-line p-1 group-data-open:block">
       <legend class="sr-only">Theme</legend>
       {THEMES.map((t) => (
-        <label class="flex min-h-11 cursor-pointer items-center px-3 text-sm text-ink hover:bg-surface-raised has-checked:bg-accent-soft has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-focus">
+        <label class="flex min-h-11 cursor-pointer items-center rounded-md px-2 text-sm text-ink hover:bg-surface-raised has-checked:bg-accent-soft has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-focus">
           <input
             type="radio"
             name={`${id}-option`}

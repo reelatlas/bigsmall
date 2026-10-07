@@ -49,7 +49,8 @@ export function other(box: BoxId): BoxId {
 }
 
 export type Action =
-  | { type: 'input'; box: BoxId; text: string }
+  /** A keystroke or paste. `at` is a monotonic time in ms; only gaps between inputs matter. */
+  | { type: 'input'; box: BoxId; text: string; at: number }
   /** Replace a box's text without making it the source (used to drop a query after a category pick). */
   | { type: 'setText'; box: BoxId; text: string }
   | { type: 'lock'; box: BoxId; unit: string }
@@ -208,26 +209,54 @@ function unitName(unit: Unit, value: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// Undo and redo (docs/UX-SPEC.md §14). The most recent interaction is what gets undone:
-// a run of typing in one box is one entry; a lock, unlock, or swap is its own entry.
+// Undo, redo, and Escape (docs/UX-SPEC.md §14, §17). The most recent interaction is what gets
+// undone. Typing is grouped into chunks the way editors coalesce undo: keystrokes in one box
+// less than TYPING_CHUNK_MS apart belong together, and a space starts a new chunk. A lock,
+// unlock, swap, or clear is its own entry. Escape steps back through the same chunks, one box
+// at a time, and each step is itself undoable.
 
-export interface History {
-  past: ConverterState[];
-  present: ConverterState;
-  future: ConverterState[];
-  /** The box whose typing run is in progress, so consecutive keystrokes share one entry. */
-  run: BoxId | null;
+/** Longest pause between two keystrokes that still belong to one typing chunk, in ms. */
+export const TYPING_CHUNK_MS = 700;
+
+/** What Escape can step back through in one box: a chunk of typing (with the text it started from) or the unit. */
+export type BoxEntry = { kind: 'text'; before: string } | { kind: 'unit' };
+
+export type EscapeTarget = 'text' | 'unit' | null;
+
+type Entries = Record<BoxId, BoxEntry[]>;
+
+interface Snapshot {
+  state: ConverterState;
+  entries: Entries;
 }
 
-export type HistoryAction = Action | { type: 'undo' } | { type: 'redo' };
+export interface History {
+  past: Snapshot[];
+  present: ConverterState;
+  future: Snapshot[];
+  /** The typing chunk in progress: which box, and when its latest keystroke landed. */
+  run: { box: BoxId; at: number } | null;
+  /** Per box, oldest first, what Escape can step back through. */
+  entries: Entries;
+}
+
+export type HistoryAction =
+  | Action
+  | { type: 'undo' }
+  | { type: 'redo' }
+  /** Escape with the list closed: take back the latest thing put into this box. */
+  | { type: 'stepBack'; box: BoxId };
 
 export const HISTORY_LIMIT = 50;
+
+const NO_ENTRIES: Entries = { a: [], b: [] };
 
 export const initialHistory: History = {
   past: [],
   present: initialState,
   future: [],
   run: null,
+  entries: NO_ENTRIES,
 };
 
 function sameState(a: ConverterState, b: ConverterState): boolean {
@@ -241,14 +270,88 @@ function sameState(a: ConverterState, b: ConverterState): boolean {
   );
 }
 
-function push(
+/** True when the new text extends the old one with a space: the space opens a new chunk. */
+function startsWord(before: string, after: string): boolean {
+  return after.length > before.length && after.startsWith(before) && after[before.length] === ' ';
+}
+
+/** A chunk can be stepped back through only while its starting text is still a proper prefix of the text. */
+function isCheckpoint(before: string, text: string): boolean {
+  return before.length < text.length && text.startsWith(before);
+}
+
+/** Whether the box's stored text is what the user sees (the view shows a result instead for a derived number). */
+function showsText(state: ConverterState, box: BoxId): boolean {
+  return state.source === box || parse(state[box].text).query !== undefined;
+}
+
+/** Index of the latest entry Escape can act on in this box, or -1. */
+function latestEntry(entries: BoxEntry[], state: ConverterState, box: BoxId): number {
+  const current = state[box];
+  const textCounts = showsText(state, box);
+  for (let i = entries.length - 1; i >= 0; i -= 1) {
+    const entry = entries[i]!;
+    const applies =
+      entry.kind === 'unit'
+        ? current.unit !== null
+        : textCounts && isCheckpoint(entry.before, current.text);
+    if (applies) return i;
+  }
+  return -1;
+}
+
+/**
+ * What Escape would take back in this box once its list is closed: the latest chunk of typing
+ * still present in the text, or the unit. Without a usable entry (a conversion loaded from the
+ * URL, say) it falls back to the text, then the unit.
+ */
+export function escapeTarget(history: History, box: BoxId): EscapeTarget {
+  const state = history.present;
+  const index = latestEntry(history.entries[box], state, box);
+  if (index >= 0) return history.entries[box][index]!.kind;
+  if (showsText(state, box) && state[box].text !== '') return 'text';
+  if (state[box].unit !== null) return 'unit';
+  return null;
+}
+
+function withoutUnit(entries: BoxEntry[]): BoxEntry[] {
+  for (let i = entries.length - 1; i >= 0; i -= 1) {
+    if (entries[i]!.kind === 'unit') return [...entries.slice(0, i), ...entries.slice(i + 1)];
+  }
+  return entries;
+}
+
+function commit(
   history: History,
-  entry: ConverterState,
   present: ConverterState,
-  run: BoxId | null,
+  run: History['run'],
+  entries: Entries,
+  entryState: ConverterState = history.present,
 ): History {
-  const past = [...history.past, entry].slice(-HISTORY_LIMIT);
-  return { past, present, future: [], run };
+  const snapshot: Snapshot = { state: entryState, entries: history.entries };
+  const past = [...history.past, snapshot].slice(-HISTORY_LIMIT);
+  return { past, present, future: [], run, entries };
+}
+
+function stepBack(history: History, box: BoxId): History {
+  const target = escapeTarget(history, box);
+  if (target === null) return history;
+  const log = history.entries[box];
+  const index = latestEntry(log, history.present, box);
+  const kept = index >= 0 ? log.slice(0, index) : log;
+  const entry = index >= 0 ? log[index] : undefined;
+  const present =
+    target === 'unit'
+      ? reduce(history.present, { type: 'unlock', box })
+      : reduce(history.present, {
+          type: 'input',
+          box,
+          text: entry?.kind === 'text' ? entry.before : '',
+          at: 0,
+        });
+  if (sameState(present, history.present))
+    return { ...history, entries: { ...history.entries, [box]: kept } };
+  return commit(history, present, null, { ...history.entries, [box]: kept });
 }
 
 export function reduceWithHistory(history: History, action: HistoryAction): History {
@@ -257,44 +360,74 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
     if (!previous) return history;
     return {
       past: history.past.slice(0, -1),
-      present: { ...previous, notice: null },
-      future: [history.present, ...history.future],
+      present: { ...previous.state, notice: null },
+      future: [{ state: history.present, entries: history.entries }, ...history.future],
       run: null,
+      entries: previous.entries,
     };
   }
   if (action.type === 'redo') {
     const next = history.future[0];
     if (!next) return history;
     return {
-      past: [...history.past, history.present],
-      present: { ...next, notice: null },
+      past: [...history.past, { state: history.present, entries: history.entries }],
+      present: { ...next.state, notice: null },
       future: history.future.slice(1),
       run: null,
+      entries: next.entries,
     };
   }
+  if (action.type === 'stepBack') return stepBack(history, action.box);
 
   const present = reduce(history.present, action);
   if (sameState(present, history.present)) return { ...history, present };
 
   switch (action.type) {
     case 'hydrate':
-      return { past: [], present, future: [], run: null };
+      return { past: [], present, future: [], run: null, entries: NO_ENTRIES };
     case 'setText':
     case 'setMode':
       return { ...history, present };
-    case 'input':
-      if (history.run === action.box) return { ...history, present };
-      return push(history, history.present, present, action.box);
+    case 'input': {
+      const { box, at } = action;
+      // The chunk starts from what the user saw: a derived box shows a result, not its stale text.
+      const before = showsText(history.present, box) ? history.present[box].text : '';
+      const run = { box, at };
+      const continues =
+        history.run?.box === box &&
+        at - history.run.at <= TYPING_CHUNK_MS &&
+        !startsWord(before, action.text);
+      if (continues) return { ...history, present, run };
+      const entries = {
+        ...history.entries,
+        [box]: [...history.entries[box], { kind: 'text', before } satisfies BoxEntry],
+      };
+      return commit(history, present, run, entries);
+    }
     case 'lock': {
       // Undoing a lock keeps the number and drops the unit, so the entry is "before, minus the query".
-      const before = history.present[action.box];
-      const entry: ConverterState = {
+      const { box } = action;
+      const before = history.present[box];
+      const entryState: ConverterState = {
         ...history.present,
-        [action.box]: { text: parse(before.text).valueText ?? '', unit: before.unit },
+        [box]: { text: parse(before.text).valueText ?? '', unit: before.unit },
       };
-      return push(history, entry, present, null);
+      const entries = { ...history.entries };
+      if (before.unit === null) entries[box] = [...entries[box], { kind: 'unit' }];
+      const otherId = other(box);
+      if (history.present[otherId].unit !== null && present[otherId].unit === null) {
+        entries[otherId] = withoutUnit(entries[otherId]);
+      }
+      return commit(history, present, null, entries, entryState);
     }
-    default:
-      return push(history, history.present, present, null);
+    case 'unlock':
+      return commit(history, present, null, {
+        ...history.entries,
+        [action.box]: withoutUnit(history.entries[action.box]),
+      });
+    case 'swap':
+      return commit(history, present, null, { a: history.entries.b, b: history.entries.a });
+    case 'clear':
+      return commit(history, present, null, NO_ENTRIES);
   }
 }

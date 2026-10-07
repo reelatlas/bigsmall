@@ -8,7 +8,7 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 ## Current status
 
-Milestones 0 (setup), 1 (core engine), and the code of 2 (smart input) complete on 2026-10-06. Four rounds of first-pass feedback are applied; the fifth is recorded and pending in `docs/research/findings-0-first-pass.md` under "Fourth pass — pending", which is where the next session starts. The converter works end to end: two linked smart inputs, live results, URL state, 79 KB gzipped. Milestone 2 closes when the five-person usability test in `docs/research/usability-test-1.md` has been run and its findings recorded. Next after that: milestone 3 (keypad, modes, persistence, advanced tiers). Progress and definitions of done are in `docs/PLAN.md` §13.
+Milestones 0 (setup), 1 (core engine), and the code of 2 (smart input) complete on 2026-10-06. Five rounds of Sean's first-pass feedback are applied and recorded in `docs/research/findings-0-first-pass.md`; the behavior they settled is in `docs/UX-SPEC.md` §15–§17. The converter works end to end: two linked smart inputs, live results, typing chunks for Escape and undo, numbers that fit their field, URL state, about 80 KB gzipped. Milestone 2 closes when the five-person usability test in `docs/research/usability-test-1.md` has been run and its findings recorded. Next after that: milestone 3 (keypad, modes, persistence, advanced tiers). Progress and definitions of done are in `docs/PLAN.md` §13.
 
 ## Non-negotiables
 

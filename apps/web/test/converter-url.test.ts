@@ -5,7 +5,7 @@ import { paramsToState, stateToParams } from '../src/features/converter/url';
 describe('stateToParams', () => {
   it('writes units, the typed value, and which side holds it', () => {
     const s = [
-      { type: 'input', box: 'a', text: '5 ml' } as const,
+      { type: 'input', box: 'a', text: '5 ml', at: 0 } as const,
       { type: 'lock', box: 'a', unit: 'milliliter' } as const,
       { type: 'lock', box: 'b', unit: 'us-cup' } as const,
     ].reduce(reduce, initialState);
@@ -19,7 +19,7 @@ describe('stateToParams', () => {
   });
 
   it('writes the value canonically, not as typed', () => {
-    const s = reduce(initialState, { type: 'input', box: 'b', text: '1,000.5 km' });
+    const s = reduce(initialState, { type: 'input', box: 'b', text: '1,000.5 km', at: 0 });
     expect(stateToParams(s).toString()).toBe('v=1000.5&s=b');
   });
 });
@@ -27,7 +27,7 @@ describe('stateToParams', () => {
 describe('paramsToState', () => {
   it('round-trips', () => {
     const s = [
-      { type: 'input', box: 'b', text: '2' } as const,
+      { type: 'input', box: 'b', text: '2', at: 0 } as const,
       { type: 'lock', box: 'b', unit: 'foot' } as const,
       { type: 'lock', box: 'a', unit: 'meter' } as const,
     ].reduce(reduce, initialState);

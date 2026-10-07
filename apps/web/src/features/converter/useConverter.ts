@@ -7,11 +7,14 @@ import {
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import { detectRegion } from '../../lib/region';
 import {
+  escapeTarget,
   initialHistory,
   reduceWithHistory,
   selectView,
+  type BoxId,
   type ConverterState,
   type ConverterView,
+  type EscapeTarget,
   type HistoryAction,
 } from './state';
 import { paramsToState, stateToParams } from './url';
@@ -48,6 +51,8 @@ export interface ConverterController {
   dispatch: (action: HistoryAction) => void;
   canUndo: boolean;
   canRedo: boolean;
+  /** Per box, what Escape takes back once its list is closed. */
+  escapeTargets: Record<BoxId, EscapeTarget>;
   /** Debounced copy of the view's announcement, so screen readers are not flooded while typing. */
   announcement: string | null;
 }
@@ -90,6 +95,7 @@ export function useConverter(): ConverterController {
     dispatch,
     canUndo: history.past.length > 0,
     canRedo: history.future.length > 0,
+    escapeTargets: { a: escapeTarget(history, 'a'), b: escapeTarget(history, 'b') },
     announcement,
   };
 }

@@ -26,7 +26,7 @@ test('typing a number and unit highlights the match; Enter locks it and scopes t
 
   await first.fill('5 ml');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
-  await expect(page.getByRole('option', { name: /^mL milliliters/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^milliliters Volume mL$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -37,10 +37,10 @@ test('typing a number and unit highlights the match; Enter locks it and scopes t
   await expect(label).toHaveText('Volume');
 
   await second.click();
-  await expect(page.getByRole('option', { name: /^cup cups$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^cups cup$/ })).toBeVisible();
   await expect(page.getByRole('option', { name: /Fahrenheit/ })).toHaveCount(0);
 
-  await page.getByRole('option', { name: /^cup cups$/ }).click();
+  await page.getByRole('option', { name: /^cups cup$/ }).click();
   await expect(second).toHaveValue('0.02113376419');
   await expect(page).toHaveURL(/a=milliliter&b=us-cup&v=5&s=a/);
 });
@@ -77,7 +77,7 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
   await expect(back).toHaveCount(0);
   await first.press('ArrowDown');
   await first.press('Enter');
-  await expect(page.getByRole('option', { name: /^ft feet$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^feet ft$/ })).toBeVisible();
   await expect(back).toBeVisible();
   await expect(label).toHaveText('Length');
 
@@ -182,7 +182,7 @@ test('Back and Escape go up to the categories from any unit list', async ({ page
   const { first, back, label } = boxes(page);
 
   await page.getByRole('button', { name: 'Change unit: milliliters' }).click();
-  await expect(page.getByRole('option', { name: /^L liters$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^liters L$/ })).toBeVisible();
   await expect(back).toBeVisible();
   await expect(label).toHaveText('Volume');
   await back.click();
@@ -190,7 +190,7 @@ test('Back and Escape go up to the categories from any unit list', async ({ page
   await expect(back).toHaveCount(0);
 
   await page.getByRole('option', { name: /^Weight$/ }).click();
-  await expect(page.getByRole('option', { name: /^kg kilograms$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^kilograms kg$/ })).toBeVisible();
   await expect(label).toHaveText('Weight');
   await first.press('Escape');
   await expect(page.getByRole('option', { name: /^Weight$/ })).toBeVisible();
@@ -213,7 +213,7 @@ test('with the list closed, Escape clears the unit first when it was the last th
 
   await first.press('Escape');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
-  await expect(page.getByRole('option', { name: /^L liters$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^liters L$/ })).toBeVisible();
   await expect(label).toHaveText('Volume');
 
   await first.press('Escape');
@@ -227,7 +227,7 @@ test('with the list closed, Escape clears the unit first when it was the last th
   await expect(first).toHaveValue('');
 });
 
-test('with the list closed, Escape clears the text first when typing was the last thing done', async ({
+test('with the list closed, Escape takes back the typing done after the lock, then the unit', async ({
   page,
 }) => {
   await page.goto('/');
@@ -245,12 +245,78 @@ test('with the list closed, Escape clears the text first when typing was the las
   await first.press('Escape');
   await expect(page.getByRole('listbox')).toHaveCount(0);
 
+  // The "0" was its own chunk of typing, so one Escape takes back just that.
   await first.press('Escape');
-  await expect(first).toHaveValue('');
+  await expect(first).toHaveValue('250');
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
 
   await first.press('Escape');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(page.getByRole('listbox')).toBeVisible();
+  await first.press('Escape');
+  await first.press('Escape');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  await first.press('Escape');
+  await expect(first).toHaveValue('');
+});
+
+test('typing in bursts makes separate steps for Escape and for undo', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.pressSequentially('25');
+  await page.waitForTimeout(900);
+  await first.pressSequentially('0');
+  await expect(first).toHaveValue('250');
+  await first.press('Escape');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+
+  await first.press('Escape');
+  await expect(first).toHaveValue('25');
+  await first.press('Escape');
+  await expect(first).toHaveValue('');
+
+  await first.press('Control+z');
+  await expect(first).toHaveValue('25');
+  await first.press('Control+z');
+  await expect(first).toHaveValue('250');
+  await first.press('Control+z');
+  await expect(first).toHaveValue('25');
+});
+
+test('a space splits the number from the unit text, so Escape keeps the number', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  const { first } = boxes(page);
+
+  await first.pressSequentially('5 ml');
+  await expect(page.getByRole('option', { name: /^milliliters Volume mL$/ })).toBeVisible();
+  await first.press('Escape');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  await first.press('Escape');
+  await expect(first).toHaveValue('5');
+});
+
+test('a long number steps down in size and stays on one line; a result shows its exponent in bold', async ({
+  page,
+}) => {
+  await page.goto('/?a=kilometer&b=millimeter&v=1&s=a');
+  await ready(page);
+  const { first, second } = boxes(page);
+  const fontSize = (box: typeof first) =>
+    box.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+
+  const short = await fontSize(first);
+  await first.fill('123456789012345678');
+  await expect(second).toHaveValue('1.23456789E23');
+  expect(await fontSize(first)).toBeLessThan(short);
+  const fits = await first.evaluate((el) => el.scrollWidth <= el.clientWidth);
+  expect(fits).toBe(true);
+
+  await expect(page.locator('[data-marker]')).toHaveText('E');
 });
 
 test('undo drops the unit but keeps the number; redo restores it', async ({ page }) => {

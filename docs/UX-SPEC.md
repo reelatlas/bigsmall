@@ -55,7 +55,7 @@ Transitions:
 
 ## 4. Matching and ranking
 
-A query is matched against each unit's symbol, name, plural, and aliases, and against each category's name and aliases.
+A query is matched against each unit's symbol, name, plural, and aliases. A category row appears only when the query starts the category's name (`vol` → Volume) or equals one of its everyday aliases exactly (`fluids`, `temp`). Aliases never match by prefix or substring, and categories are never fuzzy-matched, because the no-match state lists every category anyway (changed in the fourth pass, §17).
 
 Match classes, strongest first:
 
@@ -183,3 +183,12 @@ Sean's first use of the milestone 2 build. Each item is now implemented and cove
 - **A category label** sits above the boxes: the category being browsed while a list is open, otherwise the locked category. It disappears when the last unit is removed.
 - **One fluid shape, drawn over the page.** The list grows out of the field inside one rounded border, as in milestone 2, but the shell is absolutely positioned inside a fixed-height placeholder so nothing below moves.
 - **The theme menu uses the same shape:** trigger and options in one shell, native radios inside, driven by the pre-paint script. The system select popup is gone because its square, OS-colored list could not match the design language.
+
+## 17. Fourth pass (2026-10-06)
+
+- **The edge is a real border.** Shells (fields, lists, the theme menu) draw a two-pixel border, line-colored at rest and accent while open or focused, instead of a one-pixel border plus an inset ring. Rows and the scrollbar sit in a small gutter inside it with their own rounded corners, so a highlight never touches the edge (docs/DESIGN-SYSTEM.md, "Fluid shells").
+- **Typing comes in chunks.** Keystrokes in one box less than 700 ms apart form one chunk; a longer pause, or a space, starts a new one, so "5 ml" is "5" and then " ml". Undo and redo step through chunks. Escape, once the list is closed, takes back the latest thing put into this box, one chunk or the unit at a time, and each Escape step is itself undoable. A conversion loaded from a URL has no chunks, so Escape clears the text, then the unit. The window (`TYPING_CHUNK_MS`) is a candidate for tuning in the usability test.
+- **Unit rows read "name … symbol".** The plural name on the left, the symbol right-aligned in muted numeric type; a row that needs disambiguation shows its category after the name. The chip keeps "symbol name".
+- **Category rows only on the category word** (§4).
+- **The exponent marker carries weight.** In a value such as `1.5E21`, the `E` is set semibold so the exponent reads as structure rather than as another digit. Only the marker inside the parsed number counts; an `e` still being typed as part of a unit stays regular. Drawn by a text layer over a transparent-text field (docs/DESIGN-SYSTEM.md, "Fields").
+- **Numbers fit the field.** The type size steps down through five sizes until the number fits on one line beside its chip, measured on every change and resize rather than by character count, and steps back up when room returns. The chip still collapses to its symbol past six characters so the number keeps its size as long as it can. Beyond the smallest size the number scrolls inside the field; wrapping a very long number is a later idea. This replaces the nine-character rule in §15.

@@ -15,10 +15,12 @@ export function SuggestionSample() {
   const noop = () => undefined;
 
   return (
-    <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-sm">
-      <div className="flex min-h-14 items-center gap-2 px-3">
+    <div className="overflow-hidden rounded-lg border-2 border-line bg-surface shadow-sm">
+      <div className="flex h-13 items-center gap-2 px-3">
+        <span className="flex-1 font-numeric text-2xl">
+          2.5<span className="font-semibold">E</span>-7
+        </span>
         {milliliter && <UnitChip unit={milliliter} onRemove={noop} />}
-        <span className="font-numeric text-2xl">5</span>
       </div>
       <SuggestionPanel
         id={`${id}-listbox`}

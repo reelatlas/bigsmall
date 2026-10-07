@@ -66,13 +66,13 @@ Prefer native elements when they are good enough (`<select>`, `<dialog>`, `<butt
 
 ## Inventory
 
-| Component         | Kind           | Notes                                                                                                                      |
-| ----------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `Button`          | React (native) | `variant="primary"                                                                                                         | "secondary" | "ghost"`, `square`for a lone icon with`aria-label`. Native `<button>`, no runtime |
-| `ThemePicker`     | Astro          | Fluid shell with a native radio group; the pre-paint script opens, closes, applies, and persists it, so it needs no bundle |
-| `UnitChip`        | React          | The locked unit inside a smart input: symbol, plural, remove control                                                       |
-| `SuggestionPanel` | React          | The listbox under a smart input: unit, category, and escape-hatch rows, virtual focus via `aria-activedescendant`          |
-| `icons`           | React          | Inline SVG icons (swap, close, copy, chevron); decorative, `aria-hidden`                                                   |
+| Component         | Kind           | Notes                                                                                                                                                                                |
+| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Button`          | React (native) | `variant="primary"                                                                                                                                                                   | "secondary" | "ghost"`, `square`for a lone icon with`aria-label`. Native `<button>`, no runtime |
+| `ThemePicker`     | Astro          | Fluid shell with a native radio group; the pre-paint script opens, closes, applies, and persists it, so it needs no bundle                                                           |
+| `UnitChip`        | React          | The locked unit inside a smart input: symbol, plural, remove control                                                                                                                 |
+| `SuggestionPanel` | React          | The listbox inside a smart input's shell: unit rows (name, then symbol right-aligned), category rows, and the Back row, inset in a gutter; virtual focus via `aria-activedescendant` |
+| `icons`           | React          | Inline SVG icons (swap, close, copy, chevron); decorative, `aria-hidden`                                                                                                             |
 
 Arriving in milestone 3: `Keypad`, `Sheet`, `Toggle`, `LiveResult`. `SmartInput` lives in `features/converter/` because it composes core search with these primitives.
 
@@ -94,14 +94,22 @@ Arriving in milestone 3: `Keypad`, `Sheet`, `Toggle`, `LiveResult`. `SmartInput`
 
 ## Controls
 
-One look for every control: `min-h-11`, `rounded-md`, `border-line`, `bg-surface`, `hover:bg-surface-raised`, and the focus ring from `--focus`. Buttons, the theme select's trigger, and chip buttons all use it. Fields are the larger variant of the same language: `min-h-14`, `rounded-lg`, accent border while focused. A native control keeps its native popup (the theme select on a phone opens the system picker); only its trigger is styled.
+One look for every control: `min-h-11`, `rounded-md`, `border-line`, `bg-surface`, `hover:bg-surface-raised`, and the focus ring from `--focus`. Buttons, the theme menu's trigger, and chip buttons all use it. Fields are the larger variant of the same language (see "Fields" below). A control that opens something keeps field and list in one shape (see "Fluid shells"); nothing uses a native popup, because the OS draws it in its own colors.
 
-Popovers float. A suggestion list is absolutely positioned under its field (`absolute inset-x-0 top-full z-20 mt-1`) with its own `rounded-lg border border-line bg-surface shadow-md` surface, and never pushes content down.
+Popovers float. A list grows inside its control's shell over the page and never pushes content down.
 
 Tints come from the tokens, never from new colors: a chip at rest is `bg-accent-soft`; hovered, it lays `bg-surface/40` over that so it stays recognizably the chip.
 
 ### Fluid shells
 
-A control that opens a list keeps field and list in one shape: a `relative` placeholder with a fixed height (`h-14` for fields, `h-11` for controls) holds an `absolute inset-x-0 top-0 overflow-hidden` shell with the border, corners, and surface. `overflow-hidden` is what keeps a row's hover or selected highlight inside the rounded corners; the shell's own focus outline is not clipped by it. When open or focused the shell shows a single two-pixel accent edge (`border-accent` plus `ring-1 ring-inset ring-accent`, no outer outline) and `shadow-md`, and the list renders inside it in flow with a `border-t`. Lists scroll with `scroll-thin`: thin, themed, arrow-less scrollbars that stay inside the rounded corners. The page never reflows; the shell grows over it. `SmartInput` and `ThemePicker` are the two instances; a third should reuse the pattern rather than invent a popover.
+A control that opens a list keeps field and list in one shape: a `relative` placeholder with a fixed height holds an `absolute inset-x-0 top-0 overflow-hidden` shell with the border, corners, and surface. The placeholder is as tall as the closed shell including its border: `h-14` for a field whose row is `h-13`, `h-12` for the theme control whose toggle is `h-11`.
+
+The edge is a real two-pixel border (`border-2`): `border-line` at rest, `border-accent` while open or while anything inside has focus (`focus-within`), with `shadow-md` when open and no ring or outer outline. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights used to eat into it. That accent edge is also the focus indicator for the field and for the theme toggle.
+
+Inside, the list renders in flow under a `border-t` divider, with its rows in a `p-1` gutter: each row is `rounded-md px-2`, so a hover or selected highlight sits visibly inside the edge, and the text still lines up with the field's `px-3`. Lists scroll with `scroll-thin` (thin, themed scrollbars) inside the same gutter. `overflow-hidden` on the shell clips descendants to the rounded corners; the shell's own border is never clipped. The page never reflows; the shell grows over it. `SmartInput` and `ThemePicker` are the two instances; a third should reuse the pattern rather than invent a popover.
+
+### Fields
+
+A field is a fluid shell with an `h-13` row inside its border, `rounded-lg`, `px-3`. The value is drawn by a text layer over a field whose own text is transparent (`text-transparent caret-ink selection:bg-accent-soft`): the `<input>` keeps the caret, selection, focus, mobile keyboards, and the accessibility tree, and the `aria-hidden` layer gets the typography, which is how the exponent marker in `1.5E21` can be `font-semibold`. The layer matches the field's font, size, and line box, follows its horizontal scroll, and is `pointer-events-none`. Both carry the same size step, chosen by `useFitStep` (`src/lib/fit-step.ts`): the largest of five steps (`text-2xl sm:text-3xl` down to `text-base`) at which the layer's content fits on one line, re-measured before paint on every render and on resize. A future field with styled text reuses the layer and the hook; nothing else styles a field's text.
 
 Native popups (a `<select>` list, a date picker) cannot take the design language, so a themed menu uses native inputs inside a fluid shell instead: `ThemePicker` is a radio group, which gives arrow keys, Space, and screen reader semantics for free.

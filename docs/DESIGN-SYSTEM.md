@@ -194,6 +194,10 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 - **Sending**: two `SendButton`s under the keys, secondary, reading "Use in 1st" plus the box's unit symbol in semibold, with the copy check (`CopiedIcon`) while a send is confirmed, and `aria-disabled` while there is nothing to send.
 - **Focus**: =, the send buttons, and close carry `data-calculator-stop`, the stops Tab cycles through; the other keys are `tabIndex={-1}`. What Tab, Enter, a click, and a send do with focus is in docs/UX-SPEC.md §8.
 
+### Links
+
+- A link is ink, underlined in the accent (`underline decoration-accent decoration-2 underline-offset-4`), and at least 44 px tall when it stands on its own line (`inline-flex min-h-11 items-center`). The accent passes 3:1 against the page in every theme, enough for an underline, but not the 4.5:1 text needs, so the words stay ink. The one link today is the not-found page's way back.
+
 ### Copy
 
 - **Sentence case** for every label, button, heading, message, and theme name: "Clear all", "Neo-noir", "Copy first value". The only capitals inside a phrase are proper names.

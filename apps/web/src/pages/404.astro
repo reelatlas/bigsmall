@@ -1,0 +1,30 @@
+---
+import PageHeader from '../components/PageHeader.astro';
+import Base from '../layouts/Base.astro';
+import { SITE } from '../lib/site';
+
+/*
+ * What any unknown address shows; the host serves it with a 404 status. It keeps the site's
+ * header, so the theme menu and the wordmark work here too, and says what to do next
+ * (docs/UX-SPEC.md §1). The link is ink with an accent underline: ink keeps body-text contrast
+ * in every theme, which the accent only promises for edges (docs/DESIGN-SYSTEM.md, "Links").
+ */
+---
+
+<Base title={`Page not found · ${SITE.name}`} noindex>
+  <main class="mx-auto max-w-4xl px-4 py-8 sm:py-12">
+    <PageHeader />
+    <section class="mt-10 max-w-prose" aria-labelledby="not-found">
+      <h2 id="not-found" class="font-display text-xl font-semibold">
+        Page not found
+      </h2>
+      <p class="mt-2 text-ink-muted">Address may be mistyped or the page may have moved.</p>
+      <a
+        href="/"
+        class="mt-4 inline-flex min-h-11 items-center font-medium underline decoration-accent decoration-2 underline-offset-4"
+      >
+        Go to the converter
+      </a>
+    </section>
+  </main>
+</Base>

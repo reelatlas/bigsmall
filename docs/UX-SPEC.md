@@ -11,6 +11,8 @@ Current behavior of the milestone 2 build, 2026-10-06. This document describes w
 - **Two boxes.** Side by side from the `sm` breakpoint (640 px), stacked below it. A ghost swap button sits between them. Each box is a field (a text input, the unit chip once a unit is chosen, and a copy button once it holds a number) whose suggestion list grows out of it over the page, never pushing content down.
 - **Category label.** Under the box the conversion is anchored on (§6), left-aligned with the value.
 - **Calculator.** When open, a scratch pad below the boxes (§8).
+- **Not found.** Any unknown address shows the site's header, then "Page not found", "Address may be mistyped or the page may have moved.", and a link back to the converter.
+- **Title and description.** The converter page's title is "bigsmall · unit converter", and search results and link previews describe it as "An efficient unit converter."
 - Field geometry, corners, and the fluid-shell pattern are in docs/DESIGN-SYSTEM.md ("Fields", "Fluid shells").
 
 ## 2. Parsing

@@ -141,7 +141,7 @@ Rules: every theme passes the same contrast checks; decoration costs nothing whe
 | CLS                                       | ≈ 0                                                                                          |
 | Lighthouse                                | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100                             |
 
-The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 86.5 KB JS and 5.7 KB CSS; with the wordmark at play and theme art, 89.2 KB JS and 5.9 KB CSS; on Preact (ADR 0007), 33.9 KB JS; with the tuned wordmark, 38.2 KB JS and 6.2 KB CSS; after the pre-launch tidy-up (2026-10-07), 39.6 KB JS and 6.3 KB CSS (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
+The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 86.5 KB JS and 5.7 KB CSS; with the wordmark at play and theme art, 89.2 KB JS and 5.9 KB CSS; on Preact (ADR 0007), 33.9 KB JS; with the tuned wordmark, 38.2 KB JS and 6.2 KB CSS; after the pre-launch tidy-up, 39.6 KB JS and 6.3 KB CSS; with launch prep (the not-found page, the head tags), 40.0 KB JS and 6.5 KB CSS (2026-10-07, `pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
 
 ## 10. Accessibility targets
 
@@ -166,19 +166,20 @@ WCAG 2.2 AA throughout. Specifically:
 
 ## 12. Documentation system
 
-| Doc                        | Purpose                                           | Updated when                   |
-| -------------------------- | ------------------------------------------------- | ------------------------------ |
-| `CLAUDE.md`                | Conventions and rules for every working session   | Rules change                   |
-| `docs/PLAN.md`             | Vision, scope, architecture, milestones           | Scope or plan changes          |
-| `docs/UX-SPEC.md`          | Exact UI behavior                                 | Before any behavior change     |
-| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources           | Units or categories change     |
-| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend     | Structure changes              |
-| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                   | Tokens or components change    |
-| `docs/THEMING.md`          | How to author and QA a theme                      | Theming mechanism changes      |
-| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates     | Test approach changes          |
-| `docs/decisions/NNNN-*.md` | Why we chose what we chose                        | A decision is made or reversed |
-| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices           | Something is learned           |
-| `docs/research/`           | Usability test scripts, feedback rounds, findings | A test or feedback round runs  |
+| Doc                        | Purpose                                                      | Updated when                   |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------ |
+| `CLAUDE.md`                | Conventions and rules for every working session              | Rules change                   |
+| `docs/PLAN.md`             | Vision, scope, architecture, milestones                      | Scope or plan changes          |
+| `docs/UX-SPEC.md`          | Exact UI behavior                                            | Before any behavior change     |
+| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources                      | Units or categories change     |
+| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend                | Structure changes              |
+| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                              | Tokens or components change    |
+| `docs/THEMING.md`          | How to author and QA a theme                                 | Theming mechanism changes      |
+| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates                | Test approach changes          |
+| `docs/DEPLOYMENT.md`       | How the site is built and served; setup, releases, rollbacks | Hosting or domains change      |
+| `docs/decisions/NNNN-*.md` | Why we chose what we chose                                   | A decision is made or reversed |
+| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices                      | Something is learned           |
+| `docs/research/`           | Usability test scripts, feedback rounds, findings            | A test or feedback round runs  |
 
 Rule of thumb: if a future session would have to rediscover it, write it down.
 
@@ -191,7 +192,7 @@ Rule of thumb: if a future session would have to rediscover it, write it down.
 | M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.**                                                                                      |
 | M3  | **Complete converter** | Basic/advanced modes, persistence, remaining basic-tier categories, advanced categories loaded on demand. Shipped early: swap (M2); the calculator (a scratch pad with + − × ÷ ^ whose number can be sent to either box), arithmetic in the boxes, and Copy URL (2026-10-06) |
 | M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem` designed and polished: fonts and decoration (per-theme art shipped early, 2026-10-06). The picker, the contrast test, the gallery, and the bundle budget already exist                                                |
-| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                                                                                                        |
+| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing. Shipped early: the domain, and the MVP live on `bigsmall.work` for friends' feedback, tagged `v0.1.0` (2026-10-07; docs/DEPLOYMENT.md)                                                |
 
 ## 14. Setup checklist
 
@@ -209,11 +210,11 @@ For a new machine:
 
 ### Accounts
 
-| Account                                                        | Needed by | Cost                                                      |
-| -------------------------------------------------------------- | --------- | --------------------------------------------------------- |
-| GitHub                                                         | M0        | free                                                      |
-| Vercel (`reelatlas`), hosting and preview deploys (ADR 0008)   | launch    | free (Hobby, non-commercial; Pro if bigsmall earns money) |
-| Porkbun, `bigsmall.work` and `bigsmall.diy`, bought 2026-10-07 | launch    | ~$10–20/yr each                                           |
+| Account                                                        | Needed by | Cost                                                                        |
+| -------------------------------------------------------------- | --------- | --------------------------------------------------------------------------- |
+| GitHub                                                         | M0        | free                                                                        |
+| Vercel (`reelatlas`), hosting and preview deploys (ADR 0008)   | launch    | Pro, the team's plan at setup (Hobby would do, for non-commercial use only) |
+| Porkbun, `bigsmall.work` and `bigsmall.diy`, bought 2026-10-07 | launch    | ~$10–20/yr each                                                             |
 
 ### Not needed
 

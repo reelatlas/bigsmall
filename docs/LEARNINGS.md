@@ -456,3 +456,13 @@ Format:
 **What happened.** Sean noticed that moving the mouse over an open list scrolled it. A hovered row became the highlight, and the effect that scrolls the highlight into view, written for the arrow keys, then scrolled any partly hidden row in, sliding new rows under a still cursor.
 **Rule.** Record why the highlight moved and reveal it accordingly: the keyboard scrolls the row in, a list opening on a row centers it, and the pointer leaves the scroll alone. A browser test points at the partly hidden rows at the list's edges and checks the list stays put.
 **Promoted** to docs/UX-SPEC.md, "§3 The suggestion list".
+
+## 2026-10-07 — Vercel picks pnpm from the lockfile, and only up to 10
+
+**What happened.** Setting up hosting, Vercel's documentation showed it maps a `lockfileVersion: 9.0` lockfile to pnpm 9 or 10 and offers no newer pnpm on its own, while this repository pins pnpm 12.9.1, whose settings (`allowBuilds`) pnpm 10 does not read.
+**Rule.** Turn on Corepack in the Vercel project (`ENABLE_EXPERIMENTAL_COREPACK=1`) so the root `packageManager` field decides, and keep what the Astro preset does not cover in `apps/web/vercel.json` rather than the dashboard. After bumping pnpm, check the version in the next build log (docs/DEPLOYMENT.md).
+
+## 2026-10-07 — A page kept out of search names no canonical address
+
+**What happened.** The first launch build gave the not-found page a canonical link to `/404/`, though it answers every unknown address, and gave the `/dev` pages both `noindex` and a canonical link, which tell search engines opposite things.
+**Rule.** One prop decides both: `Base`'s `noindex` writes the robots tag in place of the canonical link. A browser test checks the converter page names its canonical address and the dev pages name none.

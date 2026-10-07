@@ -58,6 +58,7 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 
 | File                 | Responsibility                                                                                                                                                                                                                                                                         |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `site.ts`            | `SITE`: what the site says about itself to browsers, search engines, and link previews (its name, the converter page's title, the description)                                                                                                                                         |
 | `themes.ts`          | Theme registry, the token contract, and the contrast pairs the theme test enforces                                                                                                                                                                                                     |
 | `region.ts`          | `browserLocale()` and `detectRegion()`: the browser's locale, for number formats, and its region, for unit-family defaults                                                                                                                                                             |
 | `platform.ts`        | `APPLE_PLATFORM`, `isApplePlatform()`: whether shortcuts read ⌘ or Ctrl, matched case-insensitively (Chromium reports "macOS", Safari "MacIntel"); the inline script receives the pattern through `define:vars`                                                                        |
@@ -102,7 +103,7 @@ The converter state lives in the island and serializes to the URL (format in doc
 - `pnpm dev` runs the Astro dev server; `pnpm build` writes a static site to `apps/web/dist`; `pnpm preview` serves that build.
 - Core ships as TypeScript source (`exports` points at `src/index.ts`); Vite compiles it with the app. No build step for core.
 - `scripts/bundle-size.mjs` measures what the converter page ships, gzipped; `pnpm bundle:check` enforces the budgets (docs/PLAN.md §9).
-- Hosting is Vercel, with `bigsmall.work` as the main domain (ADR 0008). The build is a static site, so any static host can serve it.
+- Hosting is Vercel, with `bigsmall.work` as the main domain (ADR 0008). The Vercel project is `apps/web` with its Astro preset, and `apps/web/vercel.json` adds the headers; setup, releases, and rollbacks are in docs/DEPLOYMENT.md. The build is a static site, so any static host can serve it.
 - A few kilobytes of code load with the page and run nothing until needed (the wordmark's motion). `import()` is only for code far larger than the preload helper Vite wraps it in (about 0.8 KB gzipped), and a new chunk must show up in `pnpm bundle`.
 
 ## How to extend

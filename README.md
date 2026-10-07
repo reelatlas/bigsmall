@@ -1,6 +1,6 @@
 # bigsmall
 
-A unit converter that gets out of your way. Type a number, a unit, or both into either box and bigsmall figures out the rest.
+An efficient unit converter. Type a number, a unit, or both into either box and bigsmall figures out the rest. Live at [bigsmall.work](https://bigsmall.work).
 
 **Status:** milestones 0 (setup) and 1 (core engine) are done, and the code of milestone 2 (the smart input) is done; it closes with a five-person usability test. See [docs/PLAN.md](docs/PLAN.md) §13.
 

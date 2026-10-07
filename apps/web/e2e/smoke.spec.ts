@@ -13,6 +13,31 @@ for (const path of ['/', '/dev/gallery', '/dev/wordmark-lab']) {
   });
 }
 
+test('an unknown address shows the not-found page, with the way back', async ({ page }) => {
+  const response = await page.goto('/no-such-page');
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
+  await expectNoA11yViolations(page);
+  await page.getByRole('link', { name: 'Go to the converter' }).click();
+  await expect(page).toHaveURL('/');
+});
+
+test('pages tell search engines and link previews what they are; dev pages stay out of search', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://bigsmall.work/',
+  );
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  for (const path of ['/dev/gallery', '/dev/wordmark-lab']) {
+    await page.goto(path);
+    await expect(page.locator('meta[name="robots"]'), path).toHaveAttribute('content', 'noindex');
+    await expect(page.locator('link[rel="canonical"]'), path).toHaveCount(0);
+  }
+});
+
 test('a conversion loads from the URL', async ({ page }) => {
   await page.goto('/?a=mile&b=kilometer&v=1&s=a');
   await expect(page.getByRole('combobox', { name: 'Second value' })).toHaveValue('1.609344');

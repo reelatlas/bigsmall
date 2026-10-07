@@ -1,21 +1,20 @@
 ---
 import '../styles/global.css';
 import { APPLE_PLATFORM } from '../lib/platform';
+import { SITE } from '../lib/site';
 import { PEEK_CLOSE_MS, PEEK_OPEN_MS } from '../lib/timing';
 import { DEFAULT_DARK, DEFAULT_LIGHT, THEMES, THEME_STORAGE_KEY } from '../lib/themes';
 
 interface Props {
   title: string;
   description?: string;
-  /** Ask search engines not to index the page (the /dev pages). */
+  /** Ask search engines not to index the page (the /dev pages, the not-found page); it then names no canonical address. */
   noindex?: boolean;
 }
 
-const {
-  title,
-  description = 'A unit converter that gets out of your way.',
-  noindex = false,
-} = Astro.props;
+const { title, description = SITE.description, noindex = false } = Astro.props;
+// Absolute addresses on the main domain (astro.config.mjs `site`), as link previews require.
+const canonical = new URL(Astro.url.pathname, Astro.site);
 const themeIds = THEMES.map((t) => t.id);
 const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
 ---
@@ -28,7 +27,13 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
     <meta name="color-scheme" content="light dark" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
     <script
       define:vars={{
         ids: themeIds,

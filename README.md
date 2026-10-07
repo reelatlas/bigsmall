@@ -6,7 +6,7 @@ A unit converter that gets out of your way. Type a number, a unit, or both into 
 
 ## Why
 
-The existing converters have the math right and the experience wrong: dense pages, two scrolling list boxes, a "Convert" button, and little thought for phones. bigsmall keeps the math and rebuilds the experience. One smart field per side, results as you type, basic units by default with advanced ones a keystroke away, a keypad for touch (planned), and themes that feel like somewhere.
+The existing converters have the math right and the experience wrong: dense pages, two scrolling list boxes, a "Convert" button, and little thought for phones. bigsmall keeps the math and rebuilds the experience. One smart field per side, results as you type, basic units by default with advanced ones a keystroke away, a calculator for anyone who would rather tap, and themes that feel like somewhere.
 
 ## Principles
 

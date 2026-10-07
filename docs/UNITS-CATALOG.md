@@ -41,12 +41,12 @@ Every unit record carries `source` and `exact`. Exact factors are written as the
 
 Two tiers at two levels:
 
-- **Category tier.** Basic categories appear in the empty-state chips and in basic-mode searches. Advanced categories appear when searched or when advanced mode is on.
+- **Category tier.** Basic categories appear in the list an empty box opens and in basic-mode searches. Advanced categories appear when searched or when advanced mode is on.
 - **Unit tier.** Within any category, basic units appear first; advanced units appear under "Show all" or when searched directly.
 
 ### Group: everyday (basic categories)
 
-The eight primary categories shown as empty-state chips are marked ★.
+The eight primary categories, the ones an empty box lists, are marked ★.
 
 The ★ rows ship today with exactly these basic units; the other rows, and every advanced column, are the plan for milestone 3.
 
@@ -103,7 +103,7 @@ Currency (live rates), Clothing and shoe sizes (lookup tables), Sound (logarithm
 
 | Category or unit           | Why it is special                                        | Approach                                                                            |
 | -------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Temperature                | Affine: offset plus scale                                | `toBase` / `fromBase` functions; base is kelvin                                     |
+| Temperature                | Affine: offset plus scale                                | Add the `offset`, then multiply by the `factor`; base is kelvin                     |
 | Temperature interval       | Linear, but 1 °C step ≠ 1 °C reading                     | Separate category                                                                   |
 | Fuel economy, pace         | Reciprocal relationships (L/100 km vs km/L)              | `toBase` / `fromBase` with 1/x; "Undefined for 0"                                   |
 | Data                       | Decimal (kB = 1000 B) vs binary (KiB = 1024 B)           | Both families as distinct units; `KB` alias maps to decimal with a hint             |
@@ -118,7 +118,9 @@ Currency (live rates), Clothing and shoe sizes (lookup tables), Sound (logarithm
 
 ## 5. Aliases and disambiguation
 
-Each unit lists the aliases people actually type: symbols with and without case (`ml`, `mL`), spellings (`litre`, `liter`), plurals, abbreviations (`tbsp`, `tbs`, `T`), and regional names. Category aliases cover everyday words (`distance`, `how far`, `fluids`, `liquid`, `temp`, `hot`, `storage`).
+Each unit lists the aliases people actually type: symbols with and without case (`ml`, `mL`), spellings (`litre`, `liter`), plurals, abbreviations (`tbsp`, `tbs`), and regional names. Category aliases cover everyday words (`distance`, `how far`, `fluids`, `liquid`, `temp`, `hot`, `storage`).
+
+An alias is added only when people really type it to mean that unit. It counts as an exact match, so it outranks every prefix match in other categories (`kilo` puts kilogram above kilometer, docs/UX-SPEC.md §4). An alias that makes a symbol ambiguous is deliberate (`oz` on fluid ounce), and the list then shows each unit with its category.
 
 Ambiguity watchlist (exact matches across categories or variants): `m`, `oz`, `ton`, `gal`, `pt`, `qt`, `cup`, `cal`, `hp`, `mpg`, `kB`, `lb` (mass vs force), `mi`, `min`, `s`. Nothing commits until Enter or a pick, and for these the list shows every candidate with its category, so the choice is visible before committing.
 
@@ -127,7 +129,8 @@ No-match queries are the best signal for missing aliases. Log them (locally in d
 ## 6. Adding a category or unit
 
 1. Create or open `packages/core/src/units/<category>.ts`.
-2. Add the unit with `id`, `name`, `plural`, `symbol`, `aliases`, `system`, `tier`, `factor` or function pair, `exact`, `source`, and a `note` when its definition has a variant.
-3. Add at least one golden row from the cited source in `packages/core/test/golden/<category>.ts`. A new category's golden file is also listed in `test/golden/index.ts`.
+2. Add the unit with `id`, `category`, `name`, `plural`, `symbol`, `aliases`, `system`, `tier`, its `kind` with a `factor` (plus an `offset` when affine) or a function pair, `exact`, `source`, and a `note` when its definition has a variant.
+3. Add at least one golden row from the cited source in `packages/core/test/golden/<category>.ts`.
 4. Add the unit to this catalog under the right tier.
 5. If the unit introduces a definition choice (like cup), add it to the special-logic table.
+6. A new category also needs its id in `CategoryId` (`src/types.ts`), its file registered in `src/units/index.ts`, its golden file listed in `test/golden/index.ts`, and its id in the category lists of `test/registry.test.ts` and `test/search.test.ts`, all under `packages/core`.

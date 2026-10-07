@@ -22,3 +22,7 @@ Ship everything with the page. Unit data lives in TypeScript inside `packages/co
 - Offline works for free once a service worker is added.
 - Currency, if added, calls an external rate API from the browser with caching. Still no database.
 - Accounts and sync, if ever wanted, are a separate ADR.
+
+## Hosting outcome (2026-10-07)
+
+The site is hosted on Vercel rather than Cloudflare Pages (ADR 0008). It is still a static CDN with no server and no database, so this decision stands as written.

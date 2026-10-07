@@ -4,15 +4,17 @@ What is tested where, how to run it, and what CI blocks on.
 
 ## Layers
 
-| Layer      | Tool                               | Lives in              | Covers                                                                                                                                                                                                                                           |
-| ---------- | ---------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Core unit  | Vitest                             | `packages/core/test/` | Golden conversions from sourced fixtures, round trips, unit kinds, errors, registry integrity, region policy, the parser, search and ranking, formatting, matched-letter spans                                                                   |
-| Web unit   | Vitest (node)                      | `apps/web/test/`      | The converter reducer, view, anchor, out-of-range messages, history, typing chunks and Escape steps; the calculator's keys; the URL; the wordmark's phrases, mix, line breaks, type steps, and flip frames; the theme contract and WCAG contrast |
-| End to end | Playwright + axe-core              | `apps/web/e2e/`       | Real flows on desktop and mobile Chromium, zero WCAG 2.2 AA violations, every theme                                                                                                                                                              |
-| Static     | ESLint, Prettier, tsc, astro check | repo root             | Boundaries (ADR 0003), a11y lint for JSX and Astro, the token guard (no raw values in components), types, formatting                                                                                                                             |
-| Budget     | `scripts/bundle-size.mjs`          | repo root             | What the converter page ships, gzipped, against 90 KB JS and 20 KB CSS                                                                                                                                                                           |
+| Layer      | Tool                               | Lives in              | Covers                                                                                                                                                                                                                                                                                  |
+| ---------- | ---------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Core unit  | Vitest                             | `packages/core/test/` | Golden conversions from sourced fixtures, round trips, unit kinds, errors, registry integrity, region policy, the parser, search and ranking, formatting, matched-letter spans                                                                                                          |
+| Web unit   | Vitest (node)                      | `apps/web/test/`      | The converter reducer, view, anchor, out-of-range messages, history, typing chunks and Escape steps; the calculator's keys; the URL; the wordmark's phrases, mix, line breaks, type steps, and flip frames; the theme contract and WCAG contrast; Astro templates free of HTML comments |
+| End to end | Playwright + axe-core              | `apps/web/e2e/`       | Real flows on desktop and mobile Chromium, zero WCAG 2.2 AA violations, every theme                                                                                                                                                                                                     |
+| Static     | ESLint, Prettier, tsc, astro check | repo root             | Boundaries (ADR 0003), a11y lint for JSX and Astro, the token guard (no raw values in components), types, formatting                                                                                                                                                                    |
+| Budget     | `scripts/bundle-size.mjs`          | repo root             | What the converter page ships, gzipped, against 90 KB JS and 20 KB CSS                                                                                                                                                                                                                  |
 
 Lighthouse CI joins in milestone 5 (docs/PLAN.md §9).
+
+The browser suite skips a test only on a project it does not apply to: hover, the keyboard walk, and single-viewport checks on the phone, and the touch-only check on desktop. Counts are not kept here, since they change with every feature; `pnpm test` and `pnpm e2e` print them.
 
 ## Commands
 
@@ -44,6 +46,10 @@ Adding a unit means adding at least one row that exercises it; a test fails when
 
 `packages/core/test/registry.test.ts` fails on: duplicate or malformed ids, a unit in an unknown category, a category whose base unit is missing or not linear with factor 1, a missing source, fewer than three basic units in a category, a note over 140 characters, a non-positive factor, a change to the category order, and search-key collisions (name, plural, symbol, alias) within a category. Collisions across categories are allowed; they are the ambiguity the UI shows with category labels (`oz` today; docs/UX-SPEC.md §3).
 
+## Parser
+
+`packages/core/test/parse.test.ts` holds the number grammar and the arithmetic. `/` and `-` belong to arithmetic and to unit symbols alike, so each new operator gets a test beside a unit that uses the same character (`5 km/h` is 5 and `km/h`; `5 -ft` is 5 and `-ft`).
+
 ## Theme contract
 
 `apps/web/test/themes.test.ts` parses each theme CSS file and checks the token contract and the contrast pairs from `src/lib/themes.ts`. A failing pair prints both colors and the achieved ratio.
@@ -56,9 +62,15 @@ Adding a unit means adding at least one row that exercises it; a test fails when
   - `smoke.spec.ts`, the checks that span the site: every page (the converter, the gallery, the wordmark lab) and every theme pass axe; a conversion loads from the URL; every Tab stop shows focus; reduced motion zeroes the motion tokens in every theme.
   - `header.spec.ts`: the theme menu applies, persists, previews with the arrows, and closes; the shortcuts map opens on hover, pins on click, closes on Escape, passes axe open, is hidden on touch devices, and reads ⌘ on a simulated Mac and Ctrl elsewhere; at 320 to 520 px the name keeps its art and the menus wrap under it, theme menu first, or share its line.
   - `wordmark.spec.ts`: hovering the heading plays the wordmark without clipping and keeps its name, the menus do not, and reduced motion keeps it still; the art follows the theme, flips to a symbol, and comes home; every phrase fits the name's width in every theme (the lab's sheet); the lab copies its settings as code and loads an earlier version.
-  - `converter.spec.ts`, the flows in docs/UX-SPEC.md §2–§9 and §11: nothing commits on a keystroke, Tab, or a click away, and Enter or a pick commits; the arrows reach the Back row; a list opens resting on the box's unit; Tab goes box to box; the list floats; swap; widening to other categories; copy, Copy URL, and their checks; axe with the list open; Back and Escape levels; Escape steps through typing chunks and units; undo and redo; the category label under the anchor box; out-of-range messages that fit; placeholders; matched letters; long numbers that shrink; clear all; the hint and toolbar above the boxes; arithmetic with Enter as equals; a German locale's URL.
+  - `converter.spec.ts`, the flows in docs/UX-SPEC.md §2–§9 and §11: nothing commits on a keystroke, Tab, or a click away, and Enter or a pick commits; the arrows reach the Back row; a list opens resting on the box's unit; moving the mouse over a list never scrolls it; Tab goes box to box; the list floats; swap; widening to other categories; copy, Copy URL, and their checks; axe with the list open; Back and Escape levels; Escape steps through typing chunks and units; undo and redo; the category label under the anchor box; out-of-range messages that fit; placeholders; matched letters; long numbers that shrink; clear all; the hint and toolbar above the boxes; arithmetic with Enter as equals; a German locale's URL.
   - `calculator.spec.ts`: the calculator's keyboard, Tab cycle, Escape steps, sends and the focus after them, and the message when its number has no value.
 - Playwright starts `pnpm dev` on `127.0.0.1:4321` and reuses a running server locally. If tests fail wholesale right after a batch of file edits while lint and types pass, the reused dev server is serving stale modules: restart it and run again (docs/LEARNINGS.md).
+- Keep at least one browser test per flow in docs/UX-SPEC.md: the reducer tests cover rules, and the browser tests cover the sequences people perform.
+- A test of the keyboard highlight reaches its state with the keyboard, or moves the pointer off the list first, since a pointer moving over a row highlights it.
+- A visually hidden input is reached the way a person reaches it, through its visible label (`pickTheme` clicks the theme menu's labels), and checked with `toBeChecked()`, which needs no visibility.
+- The focus walk skips anything inside `astro-dev-toolbar`, which only the dev server has, and reads an indicator only after transitions finish (`settled`).
+- Script-driven motion is checked by state, not timing: tests set the lab's controls (play without hovering, the art's chance at 1) and assert what lands. A background tab pauses `requestAnimationFrame`.
+- Behavior that differs by platform gets a test that fakes the other platform (`page.addInitScript`), since the machine running the tests only exercises its own.
 
 ## CI
 
@@ -73,7 +85,7 @@ Both jobs run on a named image (`ubuntu-26.04`) with every action on its newest 
 
 ## Before launch (manual, milestone 5)
 
-- Screen reader pass: VoiceOver on iOS Safari, NVDA on Windows Chrome. Result announcement, suggestion navigation, keypad.
+- Screen reader pass: VoiceOver on iOS Safari, NVDA on Windows Chrome. Result announcement, suggestion navigation, the calculator.
 - Keyboard-only pass through the whole converter.
 - 400 % zoom at 1280 px wide; 320 px wide at 100 %.
 - Reduced motion enabled: no ambient animation in any theme.

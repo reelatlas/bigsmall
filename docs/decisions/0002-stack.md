@@ -1,7 +1,7 @@
 # 0002 — Astro + React island + TypeScript + Tailwind v4
 
 Date: 2026-10-06
-Status: accepted (confirmed 2026-10-06; re-examined the same day, see the last section)
+Status: accepted (confirmed 2026-10-06; re-examined the same day, see the last section). Partly superseded: the accessible primitives by ADR 0006, the island's runtime by ADR 0007, hosting by ADR 0008
 
 ## Context
 

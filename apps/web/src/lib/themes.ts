@@ -107,6 +107,8 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = 
   // "Too large to convert" is drawn inside a field.
   ['danger', 'surface', 4.5],
   ['success', 'canvas', 4.5],
+  // The check a copy button shows is a graphic inside a field (WCAG 1.4.11).
+  ['success', 'surface', 3],
   ['accent', 'canvas', 3],
   ['accent', 'surface', 3],
   ['focus', 'canvas', 3],

@@ -83,7 +83,7 @@ test('the shortcuts map opens on hover, stays when clicked, and closes on Escape
 
   await toggle.hover();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  await expect(page.getByText('Choose the highlighted suggestion')).toBeVisible();
+  await expect(page.getByText('Confirm input or selection')).toBeVisible();
   await page.mouse.move(5, 5);
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 

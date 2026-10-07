@@ -1,14 +1,20 @@
 import { getCategory } from '@bigsmall/core';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { Button } from '../../components/Button';
-import { CopyIcon, EraserIcon, RedoIcon, SwapIcon, UndoIcon } from '../../components/icons';
+import {
+  CheckIcon,
+  CopyIcon,
+  EraserIcon,
+  RedoIcon,
+  SwapIcon,
+  UndoIcon,
+} from '../../components/icons';
+import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { isApplePlatform } from '../../lib/platform';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
 import { useConverter } from './useConverter';
-
-const COPIED_MS = 1500;
 
 /** What each empty box suggests before anything scopes it; the second shows a category can be typed too. */
 const EXAMPLES: Record<BoxId, string> = {
@@ -29,7 +35,7 @@ export function Converter() {
   const apple = hydrated && isApplePlatform();
   const hintId = useId();
   const sectionRef = useRef<HTMLElement>(null);
-  const [copiedBox, setCopiedBox] = useState<BoxId | null>(null);
+  const { copied, markCopied, pointerProps } = useCopied<BoxId>();
   const categoryName = view.category ? getCategory(view.category)?.name : undefined;
   const isEmpty = !state.a.text && !state.a.unit && !state.b.text && !state.b.unit;
 
@@ -62,10 +68,9 @@ export function Converter() {
   const copy = async (value: number, box: BoxId) => {
     try {
       await navigator.clipboard.writeText(String(value));
-      setCopiedBox(box);
-      window.setTimeout(() => setCopiedBox(null), COPIED_MS);
+      markCopied(box);
     } catch {
-      // Clipboard blocked: nothing to do, the value is visible in the field.
+      // Clipboard blocked: no check, and the value is still visible in the field.
     }
   };
 
@@ -84,10 +89,12 @@ export function Converter() {
         nested
         // Out of the Tab order so Tab goes box to box; focusing a result selects it for Ctrl+C.
         tabIndex={-1}
-        aria-label={copiedBox === box.id ? 'Copied' : `Copy ${label}`}
+        aria-label={copied === box.id ? 'Copied' : `Copy ${label}`}
         onClick={() => copy(value, box.id)}
+        {...pointerProps(box.id)}
       >
-        <CopyIcon />
+        {/* A check in the success color confirms the copy; see useCopied for when it reverts. */}
+        {copied === box.id ? <CheckIcon className="text-success" data-copied /> : <CopyIcon />}
       </Button>
     );
   };
@@ -194,6 +201,9 @@ export function Converter() {
 
       <p aria-live="polite" className="sr-only">
         {announcement ?? ''}
+      </p>
+      <p role="status" className="sr-only">
+        {copied ? 'Copied' : ''}
       </p>
     </section>
   );

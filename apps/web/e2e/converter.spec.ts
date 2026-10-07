@@ -217,12 +217,23 @@ test('both boxes can be copied', async ({ page, context, browserName }) => {
   await ready(page);
 
   await page.getByRole('button', { name: 'Copy second value' }).click();
-  await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible();
+  const copied = page.getByRole('button', { name: 'Copied' });
+  await expect(copied).toBeVisible();
+  await expect(copied.locator('[data-copied]')).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('3.218688');
 
+  // The check moves to whichever box was copied last.
   await page.getByRole('button', { name: 'Copy first value' }).click();
-  await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible();
+  await expect(copied).toHaveCount(1);
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');
+
+  // It stays while the mouse rests on the button and reverts once the mouse leaves.
+  await page.waitForTimeout(2200);
+  await expect(copied).toBeVisible();
+  await page.mouse.move(0, 0);
+  await expect(page.getByRole('button', { name: 'Copy first value' })).toBeVisible();
+  await expect(copied).toHaveCount(0);
 });
 
 test('the converter has no WCAG violations with the list open', async ({ page }) => {

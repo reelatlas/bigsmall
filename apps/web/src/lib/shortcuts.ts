@@ -1,7 +1,6 @@
 /**
- * Every keyboard shortcut the site supports, in one place, for the shortcuts map in the header
- * (components/ShortcutsHelp.astro). A shortcut that is added or changed in code is added or
- * changed here in the same change (docs/UX-SPEC.md §19).
+ * The keyboard shortcuts shown in the header's shortcuts map (components/ShortcutsHelp.astro).
+ * A shortcut added or changed in code changes here in the same change (docs/UX-SPEC.md §19).
  */
 
 /**
@@ -12,38 +11,22 @@ export type Key = string;
 
 export interface Shortcut {
   action: string;
-  /** Alternatives; each is the keys pressed together, in order. */
+  /** Alternatives, shown separated by "or"; each is the keys pressed together, in order. */
   keys: readonly (readonly Key[])[];
 }
 
-export interface ShortcutGroup {
-  title: string;
-  shortcuts: readonly Shortcut[];
-}
-
-export const SHORTCUT_GROUPS: readonly ShortcutGroup[] = [
+export const SHORTCUTS: readonly Shortcut[] = [
+  { action: 'Confirm input or selection', keys: [['Enter']] },
+  // The two arrows share one group so they sit side by side with nothing between them.
+  { action: 'Move through menu', keys: [['↑', '↓']] },
+  { action: 'Back one step', keys: [['Esc']] },
+  { action: 'Toggle boxes', keys: [['Tab'], ['Shift', 'Tab']] },
+  { action: 'Undo', keys: [['Mod', 'Z']] },
   {
-    title: 'In a box',
-    shortcuts: [
-      { action: 'Choose the highlighted suggestion', keys: [['Enter']] },
-      { action: 'Move through the suggestions', keys: [['↑'], ['↓']] },
-      { action: 'Go back one step', keys: [['Esc']] },
-      { action: 'Remove the unit from an empty box', keys: [['Backspace']] },
-      { action: 'Go to the other box', keys: [['Tab'], ['Shift', 'Tab']] },
-      { action: 'Copy the selected number', keys: [['Mod', 'C']] },
-    ],
-  },
-  {
-    title: 'Anywhere in the converter',
-    shortcuts: [
-      { action: 'Undo', keys: [['Mod', 'Z']] },
-      {
-        action: 'Redo',
-        keys: [
-          ['Mod', 'Y'],
-          ['Mod', 'Shift', 'Z'],
-        ],
-      },
+    action: 'Redo',
+    keys: [
+      ['Mod', 'Y'],
+      ['Mod', 'Shift', 'Z'],
     ],
   },
 ];

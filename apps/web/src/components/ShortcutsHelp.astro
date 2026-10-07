@@ -1,5 +1,5 @@
 ---
-import { SHORTCUT_GROUPS } from '../lib/shortcuts';
+import { SHORTCUTS } from '../lib/shortcuts';
 import { KeyboardIcon } from './icons';
 
 interface Props {
@@ -48,34 +48,29 @@ const titleId = `${id}-title`;
     </div>
     <div
       id={panelId}
-      class="hidden w-88 max-w-[calc(100vw-2rem)] border-t border-line px-3 py-2 group-data-open:block"
+      class="hidden w-72 max-w-[calc(100vw-2rem)] border-t border-line px-3 py-2 group-data-open:block"
     >
-      {SHORTCUT_GROUPS.map((group, index) => (
-        <section class={index > 0 ? 'mt-3' : undefined} aria-labelledby={`${id}-group-${index}`}>
-          <h3 id={`${id}-group-${index}`} class="py-1 text-xs font-medium text-ink-muted">
-            {group.title}
-          </h3>
-          <dl>
-            {group.shortcuts.map((shortcut) => (
-              <div class="flex min-h-8 items-center justify-between gap-3">
-                <dt class="text-sm text-ink">{shortcut.action}</dt>
-                <dd class="flex shrink-0 items-center gap-1 text-xs text-ink-muted">
-                  {shortcut.keys.map((combo, alternative) => (
-                    <>
-                      {alternative > 0 && <span class="px-0.5">or</span>}
-                      {combo.map((key) => (
-                        <kbd class="min-w-6 rounded-sm border border-line bg-surface-raised px-1.5 py-0.5 text-center font-numeric text-ink">
-                          {key === 'Mod' ? <span data-mod-key>Ctrl</span> : key}
-                        </kbd>
-                      ))}
-                    </>
-                  ))}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      ))}
+      <dl>
+        {SHORTCUTS.map((shortcut) => (
+          <div class="flex min-h-8 items-center justify-between gap-3">
+            <dt class="text-sm text-ink">{shortcut.action}</dt>
+            <dd class="flex shrink-0 items-center gap-1.5 text-xs text-ink-muted">
+              {shortcut.keys.map((combo, alternative) => (
+                <>
+                  {alternative > 0 && <span>or</span>}
+                  <span class="inline-flex items-center gap-1">
+                    {combo.map((key) => (
+                      <kbd class="min-w-6 rounded-sm border border-line bg-surface-raised px-1.5 py-0.5 text-center font-numeric text-ink">
+                        {key === 'Mod' ? <span data-mod-key>Ctrl</span> : key}
+                      </kbd>
+                    ))}
+                  </span>
+                </>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
     </div>
   </div>
 </div>

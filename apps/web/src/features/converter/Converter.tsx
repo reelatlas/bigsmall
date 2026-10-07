@@ -235,7 +235,7 @@ export function Converter() {
         <p id={hintId} className="text-sm text-ink-muted">
           Type a number, unit, or both. Once each box has a unit, typing in one updates the other.
         </p>
-        <div className="flex shrink-0 items-center gap-1 self-end">
+        <div className="-ml-3 flex shrink-0 items-center gap-1 self-start">
           <Button
             variant="ghost"
             square

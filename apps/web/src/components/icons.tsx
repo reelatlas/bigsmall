@@ -123,3 +123,22 @@ export function LinkIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function CalculatorIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="5" y="2.5" width="14" height="19" rx="2" />
+      <path d="M8.5 6.5h7v3h-7z" />
+      <path d="M9 13.5h.01M12 13.5h.01M15 13.5h.01M9 17h.01M12 17h.01M15 17h.01" />
+    </Icon>
+  );
+}
+
+export function BackspaceIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M9 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6.5-7z" />
+      <path d="M12.5 9.5l5 5M17.5 9.5l-5 5" />
+    </Icon>
+  );
+}

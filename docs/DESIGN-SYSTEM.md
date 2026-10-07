@@ -160,6 +160,14 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 - A successful copy swaps the icon for `CheckIcon` in `text-success`, which every theme keeps at 3:1 on the surface (a graphic, WCAG 1.4.11).
 - Keycaps (`Keycap`) are `rounded-sm border border-line bg-surface-raised font-numeric text-xs`.
 
+### Keypad
+
+- A card below the boxes: `rounded-lg border border-line bg-surface p-3 shadow-sm`, at most `max-w-sm`, centered.
+- Keys are `Button`s at `min-h-12` with `font-numeric text-lg` in a four-column grid (`gap-2`): digits, the decimal mark, C, and ⌫ secondary (edged); the four operators `soft`; = primary. C and 0 span two columns.
+- The switch for which box it fills is `Segmented`: radios in a `bg-surface-raised` track, the chosen one `bg-accent text-on-accent`, which every theme keeps at 3:1 against the surface.
+- The box it fills shows the accent edge, the one focus shows (`data-targeted:border-accent` on the field's shell).
+- Arithmetic's running value follows it in the field's text layer in `text-ink-muted` ("5 + 3 = 8").
+
 ### Copy
 
 - **Sentence case** for every label, button, heading, message, and theme name: "Clear all", "Neo-noir", "Copy first value". The only capitals inside a phrase are proper names.
@@ -169,18 +177,20 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 
 ## Inventory
 
-| Component         | Kind  | Notes                                                                                                                                                                         |
-| ----------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Button`          | React | Native `<button>`, no runtime. `variant` (required): ghost, secondary (2 px edge), primary. `square` for a lone icon with `aria-label`; `nested` inside a field               |
-| `UnitChip`        | React | The committed unit inside a field: bold symbol and muted name on one baseline, which open the unit list, plus a 44 px remove control; `compact` and `inTabOrder` are explicit |
-| `SuggestionPanel` | React | The listbox inside a field's shell: Back row, unit rows, category rows, matched letters. `optionIdFor` gives the row ids the combobox points at                               |
-| `Keycap`          | React | One key as printed; `label="Mod"` reads Ctrl, or ⌘ on Apple devices                                                                                                           |
-| `icons`           | React | Inline SVG icons drawn for this project: swap, close, copy, check, chevron right and down, undo, redo, eraser, keyboard, link. Decorative, `aria-hidden`                      |
-| `HeaderMenus`     | Astro | The header's controls in their fixed order: the shortcuts map, the actions slot (`actions` prop; copy link on the converter page), then the theme menu                        |
-| `ThemePicker`     | Astro | Fluid shell with a native radio group; the inline script opens it, applies and saves the choice, and lets arrow keys preview themes until Enter                               |
-| `ShortcutsHelp`   | Astro | Ghost icon button that grows into the shortcuts map from `src/lib/shortcuts.ts`; peeks on hover, pins on click; hidden on touch-first devices and below `sm`                  |
+| Component         | Kind  | Notes                                                                                                                                                                                    |
+| ----------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`          | React | Native `<button>`, no runtime. `variant` (required): ghost, secondary (2 px edge), soft (accent-soft fill), primary. `square` for a lone icon with `aria-label`; `nested` inside a field |
+| `UnitChip`        | React | The committed unit inside a field: bold symbol and muted name on one baseline, which open the unit list, plus a 44 px remove control; `compact` and `inTabOrder` are explicit            |
+| `SuggestionPanel` | React | The listbox inside a field's shell: Back row, unit rows, category rows, matched letters. `optionIdFor` gives the row ids the combobox points at                                          |
+| `Keycap`          | React | One key as printed; `label="Mod"` reads Ctrl, or ⌘ on Apple devices                                                                                                                      |
+| `Keypad`          | React | The calculator's keys in a card: a labelled group of native buttons, 48 px tall, with typed keys pressing them; what a key does is the caller's                                          |
+| `Segmented`       | React | A choice between a few options side by side: native radios in labels, the chosen one in the accent fill (the keypad's switch)                                                            |
+| `icons`           | React | Inline SVG icons drawn for this project: swap, close, copy, check, chevron right and down, undo, redo, eraser, keyboard, link, calculator, backspace. Decorative, `aria-hidden`          |
+| `HeaderMenus`     | Astro | The header's controls in their fixed order: the shortcuts map, the actions slot (`actions` prop; copy link on the converter page), then the theme menu                                   |
+| `ThemePicker`     | Astro | Fluid shell with a native radio group; the inline script opens it, applies and saves the choice, and lets arrow keys preview themes until Enter                                          |
+| `ShortcutsHelp`   | Astro | Ghost icon button that grows into the shortcuts map from `src/lib/shortcuts.ts`; peeks on hover, pins on click; hidden on touch-first devices and below `sm`                             |
 
-React components used in Astro files without a `client:` directive (the icons, `Button`, and `Keycap` inside the header menus) render to static HTML and ship no JavaScript. `SmartInput` lives in `features/converter/` because it composes core search with these components. Arriving in milestone 3: a keypad, a sheet for it on phones, and a mode toggle.
+React components used in Astro files without a `client:` directive (the icons, `Button`, and `Keycap` inside the header menus) render to static HTML and ship no JavaScript. `SmartInput` lives in `features/converter/` because it composes core search with these components. Arriving in milestone 3: a mode toggle; later, the keypad docked as a sheet on phones.
 
 ## The gallery
 

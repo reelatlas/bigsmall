@@ -1,8 +1,9 @@
 import { getCategory } from '@bigsmall/core';
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
 import {
+  CalculatorIcon,
   CheckIcon,
   CopyIcon,
   EraserIcon,
@@ -11,10 +12,13 @@ import {
   SwapIcon,
   UndoIcon,
 } from '../../components/icons';
+import { Keypad, type KeypadKey } from '../../components/Keypad';
+import { Segmented, type SegmentedOption } from '../../components/Segmented';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
+import { pressKey } from './keypad';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
 import { linkFor } from './url';
@@ -32,7 +36,8 @@ const EXAMPLES: Record<BoxId, string> = {
 /**
  * The converter island: the hint with undo, redo, and clear all, two linked smart inputs with
  * swap between them, the category label under the box the conversion is anchored on, and the
- * live region. It also draws the copy-link button into the header's slot (docs/UX-SPEC.md §7).
+ * live region; the keypad below the boxes when it is open (docs/UX-SPEC.md §8). It also draws the
+ * copy-link button into the header's slot (§7).
  */
 export function Converter() {
   const { state, view, env, dispatch, canUndo, canRedo, escapeTargets, announcement } =
@@ -44,6 +49,14 @@ export function Converter() {
   const sectionRef = useRef<HTMLElement>(null);
   const { copied, markCopied, pointerProps } = useCopied<CopyTarget>();
   const headerActions = useSlot(SLOTS.headerActions);
+  const keypadId = useId();
+  const keypadToggleId = useId();
+  const [keypadOpen, setKeypadOpen] = useState(false);
+  // The keypad fills the box last focused, or the source box before any box was focused.
+  const [focusedBox, setFocusedBox] = useState<BoxId | null>(null);
+  // The text = just gave a box: the next digit starts over, as on a calculator.
+  const [evaluated, setEvaluated] = useState<{ box: BoxId; text: string } | null>(null);
+  const target = focusedBox ?? state.source;
   const categoryName = view.category ? getCategory(view.category)?.name : undefined;
   const isEmpty = !state.a.text && !state.a.unit && !state.b.text && !state.b.unit;
 
@@ -81,6 +94,38 @@ export function Converter() {
       // Clipboard blocked: no check, and the value or the address is still visible.
     }
   };
+
+  const closeKeypad = () => {
+    setKeypadOpen(false);
+    document.getElementById(keypadToggleId)?.focus();
+  };
+
+  /** A key press becomes typing or a step of its own in the box the keypad fills (keypad.ts). */
+  const press = (key: KeypadKey) => {
+    const shown = view[target];
+    const showsResult =
+      (!shown.isSource && view.result?.box === target) ||
+      (evaluated?.box === target && evaluated.text === state[target].text);
+    const edit = pressKey({ text: shown.text, showsResult }, key, env);
+    setEvaluated(key === 'equals' && edit ? { box: target, text: edit.text } : null);
+    if (!edit) return;
+    dispatch(
+      edit.kind === 'type'
+        ? { type: 'input', box: target, text: edit.text, at: performance.now() }
+        : { type: 'replace', box: target, text: edit.text },
+    );
+  };
+
+  /** One side of the keypad's switch: "First", plus the box's unit symbol once it has one. */
+  const fills = (id: BoxId, word: string): SegmentedOption<BoxId> => ({
+    value: id,
+    label: (
+      <>
+        {word}
+        {view[id].unit && <span className="font-semibold">{view[id].unit.symbol}</span>}
+      </>
+    ),
+  });
 
   /** Both boxes get a copy control whenever they hold a number, so the control never jumps sides. */
   const copyButton = (box: BoxView, label: string) => {
@@ -137,6 +182,8 @@ export function Converter() {
         examples={EXAMPLES[box.id]}
         counterpart={counterpart.unit}
         trailing={copyButton(box, label.toLowerCase())}
+        keypad={keypadOpen ? (target === box.id ? 'target' : 'other') : 'closed'}
+        onFocusBox={() => setFocusedBox(box.id)}
       />
       {categoryLabel(box.id)}
     </div>
@@ -149,12 +196,28 @@ export function Converter() {
       className="mt-6"
       data-hydrated={hydrated ? '' : undefined}
     >
-      <div className="mb-2 flex items-start justify-between gap-3">
-        {/* pt-3 centers the first line of the hint on the 44 px toolbar buttons. */}
-        <p id={hintId} className="pt-3 text-sm text-ink-muted">
+      {/* On phones the hint takes the full width and the buttons sit on their own line under it. */}
+      <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        {/* sm:pt-3 centers the first line of the hint on the 44 px toolbar buttons beside it. */}
+        <p id={hintId} className="text-sm text-ink-muted sm:pt-3">
           Type a number, unit, or both. Once each box has a unit, typing in one updates the other.
         </p>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1 self-end sm:self-auto">
+          <Button
+            variant="ghost"
+            square
+            id={keypadToggleId}
+            aria-label="Calculator"
+            title="Calculator"
+            aria-expanded={keypadOpen}
+            aria-controls={keypadOpen ? keypadId : undefined}
+            onClick={() => (keypadOpen ? closeKeypad() : setKeypadOpen(true))}
+            className="aria-expanded:bg-accent-soft aria-expanded:text-ink"
+          >
+            <CalculatorIcon />
+          </Button>
+          {/* Opening the keypad is a different kind of action from undo and redo. */}
+          <span aria-hidden="true" className="mx-1 h-6 border-l border-line" />
           <Button
             variant="ghost"
             square
@@ -211,6 +274,22 @@ export function Converter() {
           </Button>
         </div>
       </div>
+
+      {keypadOpen && (
+        <div id={keypadId} className="mx-auto mt-4 max-w-sm">
+          <Keypad decimalMark={env.separators.decimal} onPress={press} onClose={closeKeypad}>
+            <div className="mb-3">
+              <Segmented
+                legend="Calculator fills"
+                name={`${keypadId}-fills`}
+                options={[fills('a', 'First'), fills('b', 'Second')]}
+                value={target}
+                onChange={setFocusedBox}
+              />
+            </div>
+          </Keypad>
+        </div>
+      )}
 
       {/* The two live regions (docs/UX-SPEC.md §12): the result, once it settles; and action feedback. */}
       <p aria-live="polite" className="sr-only">

@@ -188,11 +188,34 @@ describe('selectView', () => {
     );
     const v = selectView(s, EN);
     expect(v.result).toBeNull();
-    expect(v.result).toBeNull();
     expect(v.b.text).toBe('');
     expect(v.b.message).toBe('Too large to convert');
     expect(v.a.message).toBeNull();
     expect(v.announcement).toBe('1e308 kilometers is too large to convert to millimeters');
+  });
+
+  it('converts arithmetic by its value and names the value, not the sum, aloud', () => {
+    const s = run(
+      { type: 'input', box: 'a', text: '5+3', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'liter' },
+    );
+    const v = selectView(s, EN);
+    expect(v.a.text).toBe('5+3');
+    expect(v.b.text).toBe('0.008');
+    expect(v.announcement).toBe('8 milliliters is 0.008 liters');
+  });
+
+  it('says so when arithmetic divides by zero', () => {
+    const s = run(
+      { type: 'input', box: 'a', text: '5/0', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'liter' },
+    );
+    const v = selectView(s, EN);
+    expect(v.result).toBeNull();
+    expect(v.b.message).toBe('Can’t divide by zero');
+    expect(v.announcement).toBe('Can’t divide by zero');
   });
 
   it('says "too small" when a nonzero result underflows to zero', () => {
@@ -363,6 +386,14 @@ describe('history', () => {
     const h = steps(type('a', '2', 0), type('a', '25', 200), type('a', '250', 400));
     expect(h.past).toHaveLength(1);
     expect(undo(h).present.a.text).toBe('');
+  });
+
+  it('replace is a step of its own, so undo brings the arithmetic back', () => {
+    const h = steps(type('a', '5+3', 0), { type: 'replace', box: 'a', text: '8' });
+    expect(h.past).toHaveLength(2);
+    expect(h.present.a.text).toBe('8');
+    expect(undo(h).present.a.text).toBe('5+3');
+    expect(redo(undo(h)).present.a.text).toBe('8');
   });
 
   it('a pause longer than the window starts a new chunk', () => {

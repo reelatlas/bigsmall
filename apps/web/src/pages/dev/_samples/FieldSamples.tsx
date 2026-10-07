@@ -2,6 +2,8 @@ import { DEFAULT_SEPARATORS, getUnit, parse, search } from '@bigsmall/core';
 import { useId } from 'react';
 import { Button } from '../../../components/Button';
 import { CheckIcon } from '../../../components/icons';
+import { Keypad } from '../../../components/Keypad';
+import { Segmented } from '../../../components/Segmented';
 import {
   BACK_ITEM,
   SuggestionPanel,
@@ -18,13 +20,18 @@ import { FIELD_ROW, SHELL, SHELL_BORDERED } from '../../../lib/shell';
 const ENV: ConverterEnv = { locale: 'en-US', separators: DEFAULT_SEPARATORS, system: 'us' };
 const noop = () => undefined;
 
-function frozen(text: string, unitId: string, message: string | null = null): BoxView {
+function frozen(
+  text: string,
+  unitId: string,
+  message: string | null = null,
+  isSource = false,
+): BoxView {
   const unit = getUnit(unitId) ?? null;
   return {
-    id: 'b',
+    id: isSource ? 'a' : 'b',
     text,
     unit,
-    isSource: false,
+    isSource,
     parsed: parse(text),
     scope: unit?.category ?? null,
     message,
@@ -45,6 +52,8 @@ function ResultSample({ label }: { label: string }) {
       escapeTarget={null}
       examples=""
       counterpart={null}
+      keypad="closed"
+      onFocusBox={noop}
       trailing={
         <Button variant="ghost" square nested tabIndex={-1} aria-label="Copy sample value">
           <CheckIcon className="text-success" />
@@ -68,7 +77,52 @@ function OutOfRangeSample({ label }: { label: string }) {
       escapeTarget={null}
       examples=""
       counterpart={null}
+      keypad="closed"
+      onFocusBox={noop}
     />
+  );
+}
+
+/** Arithmetic typed in the box the keypad fills: the accent edge and the running value. */
+function ArithmeticSample({ label }: { label: string }) {
+  const hint = useId();
+  return (
+    <SmartInput
+      box={frozen('12×3', 'liter', null, true)}
+      label={label}
+      describedBy={hint}
+      mode="basic"
+      env={ENV}
+      dispatch={noop}
+      escapeTarget={null}
+      examples=""
+      counterpart={null}
+      keypad="target"
+      onFocusBox={noop}
+    />
+  );
+}
+
+/** The keypad with its switch, the way it opens below the boxes. */
+function KeypadSample({ theme }: { theme: string }) {
+  const name = useId();
+  return (
+    <div className="max-w-sm">
+      <Keypad decimalMark="." onPress={noop} onClose={noop}>
+        <div className="mb-3">
+          <Segmented
+            legend={`${theme} calculator fills sample`}
+            name={name}
+            options={[
+              { value: 'a', label: 'First' },
+              { value: 'b', label: 'Second' },
+            ]}
+            value="a"
+            onChange={noop}
+          />
+        </div>
+      </Keypad>
+    </div>
   );
 }
 
@@ -115,7 +169,9 @@ export function FieldSamples({ theme }: { theme: string }) {
     <div className="grid gap-3">
       <ResultSample label={`${theme} result sample`} />
       <OutOfRangeSample label={`${theme} out-of-range sample`} />
+      <ArithmeticSample label={`${theme} arithmetic sample`} />
       <OpenSample />
+      <KeypadSample theme={theme} />
     </div>
   );
 }

@@ -250,3 +250,18 @@ Format:
 
 **What happened.** `ubuntu-latest` moves from Ubuntu 24.04 to 26.04 between October 19 and November 19, 2026 (actions/runner-images#14748), so during the rollout one commit could run on either image. Playwright supports 26.04 from 1.61, including the system packages `--with-deps` installs; the lockfile has 1.63.
 **Rule.** Both jobs name their image (`ubuntu-26.04`), so the OS changes in a commit we can test and revert. Before moving to a new image, check that the locked Playwright lists it as supported (its release notes, or `hostPlatform.ts` in its source), and include the workflow's action tags and image in the milestone pin review (ADR 0005).
+
+## 2026-10-06 — Playwright cannot check a visually hidden radio
+
+**What happened.** A test called `check()` on a radio styled `sr-only` inside a segmented control, and it timed out: Playwright waits for the element to be visible and stable before it clicks, and a one-pixel clipped input never is.
+**Rule.** Reach a visually hidden input the way a person does, by clicking its visible label (`locator('label').filter({ hasText })`). Assert its state with `toBeChecked()`, which needs no visibility.
+
+## 2026-10-06 — Every header or toolbar addition gets a phone-width check
+
+**What happened.** The copy-link button and the wider spacing beside it pushed the header past 343 px of a 375 px phone, so the header wrapped onto two lines; the calculator button squeezed the hint beside the toolbar to five lines. Desktop screenshots showed neither.
+**Rule.** After adding anything to a row that shares space, measure it at 360 px wide, the narrowest common phone, before calling it done. Prefer giving way at small sizes (a word that becomes screen-reader-only, a row that stacks) over shrinking targets.
+
+## 2026-10-06 — Arithmetic and unit names share characters
+
+**What happened.** Reading arithmetic in the boxes risked turning `5 km/h` into 5 km divided by h, and `5 -ft` into a subtraction. Symbols like `/` and `-` belong to both grammars.
+**Rule.** An operator joins the arithmetic only when another number, a sign, or `(` follows it, or when it ends the text (the user is still typing); anything else ends the arithmetic and starts the unit query. Every new operator gets a test beside a unit that uses the same character.

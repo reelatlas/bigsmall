@@ -52,6 +52,8 @@ function other(box: BoxId): BoxId {
 export type Action =
   /** A keystroke or paste. `at` is a monotonic time in ms; only gaps between inputs matter. */
   | { type: 'input'; box: BoxId; text: string; at: number }
+  /** A whole new text as one undoable step: arithmetic turned into its value (= or Enter), or the keypad's C. */
+  | { type: 'replace'; box: BoxId; text: string }
   /** Replace a box's text without making it the source (used to drop a query after a category pick). */
   | { type: 'setText'; box: BoxId; text: string }
   | { type: 'lock'; box: BoxId; unit: string }
@@ -64,6 +66,7 @@ export type Action =
 export function reduce(state: ConverterState, action: Action): ConverterState {
   switch (action.type) {
     case 'input':
+    case 'replace':
       return {
         ...state,
         [action.box]: { ...state[action.box], text: action.text },
@@ -137,12 +140,13 @@ export interface ConverterResult {
   text: string;
 }
 
-/** Why a conversion has no displayable answer: beyond what a double holds, or rounded to zero. */
-export type OutOfRange = 'large' | 'small';
+/** Why a conversion has no answer to show: beyond what a double holds, rounded to zero, or a division by zero. */
+export type NoAnswer = 'large' | 'small' | 'divide-by-zero';
 
-const OUT_OF_RANGE_MESSAGE: Record<OutOfRange, string> = {
+const NO_ANSWER_MESSAGE: Record<NoAnswer, string> = {
   large: 'Too large to convert',
   small: 'Too small to convert',
+  'divide-by-zero': 'Can’t divide by zero',
 };
 
 export interface ConverterView {
@@ -179,17 +183,17 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
   const sourceParsed = parse(state[sourceId].text, options.separators);
 
   let result: ConverterResult | null = null;
-  let outOfRange: OutOfRange | null = null;
+  let noAnswer: NoAnswer | null = null;
   if (sourceUnit && targetUnit) {
-    if (sourceParsed.outOfRange) {
-      outOfRange = sourceParsed.outOfRange;
+    if (sourceParsed.outOfRange || sourceParsed.invalid) {
+      noAnswer = sourceParsed.outOfRange ?? sourceParsed.invalid ?? null;
     } else if (sourceParsed.value !== undefined) {
       // A result a double cannot hold comes back as Infinity or as a 0 that underflowed.
       const value = safeConvert(sourceParsed.value, sourceUnit, targetUnit);
       if (value !== undefined) {
         const text = formatNumber(value, options.locale ? { locale: options.locale } : {});
-        if (!text) outOfRange = 'large';
-        else if (value === 0 && sourceParsed.value !== 0) outOfRange = 'small';
+        if (!text) noAnswer = 'large';
+        else if (value === 0 && sourceParsed.value !== 0) noAnswer = 'small';
         else result = { box: targetId, value, text };
       }
     }
@@ -208,17 +212,22 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
       isSource,
       parsed: isSource ? sourceParsed : parse(text, options.separators),
       scope: unit?.category ?? otherUnit?.category ?? null,
-      message: !isSource && !typingQuery && outOfRange ? OUT_OF_RANGE_MESSAGE[outOfRange] : null,
+      message: !isSource && !typingQuery && noAnswer ? NO_ANSWER_MESSAGE[noAnswer] : null,
     };
   };
 
   let announcement: string | null = null;
-  if (sourceUnit && targetUnit && (result || outOfRange)) {
+  if (sourceUnit && targetUnit && (result || noAnswer)) {
     const amount = sourceParsed.value ?? Number.NaN;
-    const from = `${sourceParsed.valueText ?? ''} ${unitName(sourceUnit, amount)}`.trim();
-    announcement = result
-      ? `${from} is ${result.text} ${unitName(targetUnit, result.value)}`
-      : `${from} is too ${outOfRange} to convert to ${targetUnit.plural}`;
+    // Arithmetic is announced by its value ("8 milliliters"), not by what was typed ("5+3").
+    const typed =
+      sourceParsed.expression && sourceParsed.value !== undefined
+        ? formatNumber(sourceParsed.value, options.locale ? { locale: options.locale } : {})
+        : (sourceParsed.valueText ?? '');
+    const from = `${typed} ${unitName(sourceUnit, amount)}`.trim();
+    if (result) announcement = `${from} is ${result.text} ${unitName(targetUnit, result.value)}`;
+    else if (noAnswer === 'divide-by-zero') announcement = NO_ANSWER_MESSAGE[noAnswer];
+    else announcement = `${from} is too ${noAnswer} to convert to ${targetUnit.plural}`;
   }
 
   const anchor: BoxId | null = category ? (sourceUnit ? sourceId : targetId) : null;
@@ -427,6 +436,8 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
     case 'setText':
     case 'setMode':
       return { ...history, present };
+    case 'replace':
+      return commit(history, present, null, history.entries);
     case 'input': {
       const { box, at } = action;
       // The chunk starts from what the user saw: a derived box shows a result, not its stale text.

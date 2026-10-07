@@ -79,7 +79,7 @@ describe('parse', () => {
       valueText: '1e400',
       query: 'km',
       outOfRange: 'large',
-      exponentAt: 1,
+      exponentMarks: [1],
     });
     expect(parse('-1e400').outOfRange).toBe('large');
     expect(parse('9'.repeat(400)).outOfRange).toBe('large');
@@ -93,11 +93,12 @@ describe('parse', () => {
     expect(parse('0e-400').outOfRange).toBeUndefined();
   });
 
-  it('reports where the exponent marker sits in the number', () => {
-    expect(parse('1.5E21 km').exponentAt).toBe(3);
-    expect(parse('2e-3').exponentAt).toBe(1);
-    expect(parse('25').exponentAt).toBeUndefined();
-    expect(parse('5 e').exponentAt).toBeUndefined();
+  it('reports where the exponent markers sit in the number', () => {
+    expect(parse('1.5E21 km').exponentMarks).toEqual([3]);
+    expect(parse('2e-3').exponentMarks).toEqual([1]);
+    expect(parse('1e3 + 2E4').exponentMarks).toEqual([1, 7]);
+    expect(parse('25').exponentMarks).toBeUndefined();
+    expect(parse('5 e').exponentMarks).toBeUndefined();
   });
 
   it('keeps the largest and smallest doubles in range', () => {
@@ -119,5 +120,68 @@ describe('localeSeparators', () => {
   it('round-trips with parse', () => {
     const de = localeSeparators('de-DE');
     expect(parse('1.234,5 km', de).value).toBe(1234.5);
+  });
+});
+
+const TIMES = String.fromCharCode(0x00d7);
+const DIVIDE = String.fromCharCode(0x00f7);
+
+describe('parse arithmetic', () => {
+  const arithmetic: Case[] = [
+    { text: '5+3', value: 8, valueText: '5+3' },
+    { text: '5 + 3 ft', value: 8, query: 'ft', valueText: '5 + 3' },
+    { text: `2${TIMES}3 cm`, value: 6, query: 'cm' },
+    { text: `10${DIVIDE}4`, value: 2.5 },
+    { text: `9${MINUS}4`, value: 5 },
+    { text: '2*3/4', value: 1.5 },
+    { text: '2+3*4', value: 14 },
+    { text: '(2+3)*4', value: 20 },
+    { text: '-2*3', value: -6 },
+    { text: `2${TIMES}${MINUS}3`, value: -6 },
+    { text: '5 - -3', value: 8 },
+    { text: '1/2 cup', value: 0.5, query: 'cup' },
+    { text: '1,000+2,000', separators: EN, value: 3000 },
+    { text: '1.000+2.000', separators: DE, value: 3000 },
+    { text: '1,5+2,5', separators: DE, value: 4 },
+    { text: '1e3+1', value: 1001 },
+  ];
+  for (const c of arithmetic) {
+    it(`evaluates ${JSON.stringify(c.text)}`, () => {
+      const parsed = parse(c.text, c.separators);
+      expect(parsed.value).toBeCloseTo(c.value!, 12);
+      expect(parsed.query).toBe(c.query);
+      expect(parsed.expression).toBe(true);
+      if (c.valueText) expect(parsed.valueText).toBe(c.valueText);
+    });
+  }
+
+  it('leaves a unit with a slash, and anything that is not arithmetic, to the query', () => {
+    expect(parse('5 km/h')).toMatchObject({ value: 5, query: 'km/h' });
+    expect(parse('m/s')).toEqual({ raw: 'm/s', query: 'm/s' });
+    expect(parse('5 -ft')).toMatchObject({ value: 5, valueText: '5', query: '-ft' });
+    expect(parse('5 ft').expression).toBeUndefined();
+    expect(parse('-5').expression).toBeUndefined();
+  });
+
+  it('reads unfinished arithmetic as far as it goes while the user types', () => {
+    expect(parse('5+')).toMatchObject({ value: 5, valueText: '5+' });
+    expect(parse('5+').expression).toBeUndefined();
+    expect(parse(`5${TIMES}${MINUS}`)).toMatchObject({ value: 5 });
+    expect(parse('5*(')).toMatchObject({ value: 5, valueText: '5*(' });
+    expect(parse('(5+3')).toMatchObject({ value: 8, expression: true });
+    expect(parse('5.')).toMatchObject({ value: 5, valueText: '5.' });
+    expect(parse('5.5.')).toMatchObject({ value: 5.5 });
+    expect(parse('5,', DE)).toMatchObject({ value: 5, valueText: '5,' });
+  });
+
+  it('says when arithmetic divides by zero, overflows, or rounds to zero', () => {
+    expect(parse('5/0')).toMatchObject({ invalid: 'divide-by-zero', expression: true });
+    expect(parse('5/0').value).toBeUndefined();
+    expect(parse('0/0').invalid).toBe('divide-by-zero');
+    expect(parse('1e308*10').outOfRange).toBe('large');
+    expect(parse('1e-200*1e-200').outOfRange).toBe('small');
+    expect(parse('1e-400+1').value).toBe(1);
+    expect(parse('5-5')).toMatchObject({ value: 0 });
+    expect(parse('5-5').outOfRange).toBeUndefined();
   });
 });

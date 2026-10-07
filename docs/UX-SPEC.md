@@ -4,15 +4,16 @@ Current behavior of the milestone 2 build, 2026-10-06. This document describes w
 
 ## 1. Layout
 
-- **Header.** The site name on the left. On the right, a keyboard icon that opens the shortcuts map (§10), the copy-link button (§7), then the theme menu.
-- **Hint row.** Above the boxes: "Type a number, unit, or both. Once each box has a unit, typing in one updates the other." On its right: undo, redo, a thin rule, and clear all, all ghost icon buttons.
+- **Header.** The site name on the left. On the right, a keyboard icon that opens the shortcuts map (§10), the copy-link button (§7), then the theme menu. Below the `sm` breakpoint the theme menu shows only the theme's name (the word "Theme" stays for screen readers), so the header keeps one line on a 360 px phone.
+- **Hint row.** Above the boxes: "Type a number, unit, or both. Once each box has a unit, typing in one updates the other." On its right: the calculator icon, a thin rule, undo, redo, a thin rule, and clear all, all ghost icon buttons. Below `sm` the hint takes the full width and the buttons sit on their own line under it, right-aligned.
 - **Two boxes.** Side by side from the `sm` breakpoint (640 px), stacked below it. A ghost swap button sits between them. Each box is a field (a text input, the unit chip once a unit is chosen, and a copy button once it holds a number) whose suggestion list grows out of it over the page, never pushing content down.
 - **Category label.** Under the box the conversion is anchored on (§6), left-aligned with the value.
+- **Keypad.** When open, a panel below the boxes (§8).
 - Field geometry, corners, and the fluid-shell pattern are in docs/DESIGN-SYSTEM.md ("Fields", "Fluid shells").
 
 ## 2. Parsing
 
-Each box's text is parsed on every keystroke into `{ raw, value?, valueText?, query?, outOfRange? }` (`packages/core/src/parse.ts`): a leading number, if any, and the rest as a unit query in its original case.
+Each box's text is parsed on every keystroke into `{ raw, value?, valueText?, query?, outOfRange?, invalid?, expression?, exponentMarks? }` (`packages/core/src/parse.ts`): a leading number or arithmetic, if any, and the rest as a unit query in its original case.
 
 **Number grammar.** Optional sign (`-`, `+`, or the Unicode minus), digit groups separated by `.`, `,`, a non-breaking space, or a narrow non-breaking space, an optional fraction, an optional exponent (`1e6`, `2.5E-3`), and the leading-separator forms `.5` and `,5`. Which mark is the decimal:
 
@@ -22,7 +23,11 @@ Each box's text is parsed on every keystroke into `{ raw, value?, valueText?, qu
 
 Non-breaking spaces always group. Whitespace between the number and the unit is optional.
 
-**Out of range.** A number a double cannot hold is still a number: `1e400` sets `outOfRange: 'large'`, and nonzero digits that round to zero (`1e-400`) set `'small'`; `value` is absent in both cases.
+A decimal mark still waiting for its digits belongs to the number (`5.` on the way to `5.5` is 5).
+
+**Arithmetic.** The number can be arithmetic: numbers joined by `+ − × ÷` (or `-`, `*`, `/`), with signs and parentheses, `×` and `÷` before `+` and `−`, spacing optional (`2 × 3 ft` is 6 and `ft`). It ends where something else begins, so `5 km/h` is still 5 and `km/h`: an operator joins the arithmetic only before another number, a sign, or `(`, or at the very end. Unfinished arithmetic is read as far as it goes while typing: a trailing operator or `(` is ignored and open parentheses close at the end (`5 +` is 5, `(5 + 3` is 8). `expression` is set once an operation was evaluated. A small hand-written parser in core does it, never `eval`. Not yet: `^`, `x` as times, implied multiplication (`2(3)`).
+
+**Out of range.** A number a double cannot hold is still a number: `1e400` sets `outOfRange: 'large'`, and nonzero digits that round to zero (`1e-400`) set `'small'`; arithmetic that overflows or underflows does the same; `value` is absent in both cases. Dividing by zero sets `invalid: 'divide-by-zero'`, also without a value.
 
 **Query.** Whatever follows the number, trimmed, in its original case. Search folds it (§4); the parser does not.
 
@@ -36,6 +41,9 @@ Non-breaking spaces always group. Whitespace between the number and the unit is 
 | `1,000.5 km` (en-US) | 1000.5 | `km`     |
 | `1.000,5 km` (de-DE) | 1000.5 | `km`     |
 | `fluids`             | —      | `fluids` |
+| `2 × 3 ft`           | 6      | `ft`     |
+| `1/2 cup`            | 0.5    | `cup`    |
+| `5 km/h`             | 5      | `km/h`   |
 
 ## 3. The suggestion list
 
@@ -80,7 +88,7 @@ Match classes, strongest first:
 
 Nothing commits on a keystroke: while typing, the best match is highlighted and the text stays editable.
 
-- **Enter** commits the highlighted row. While typing, the highlight sits on the best match, so Enter takes it even when it is a prefix match (`kilom` + Enter → kilometers). Enter on a category row or the Back row moves between levels instead. With nothing highlighted, Enter commits an exact match if the query names exactly one unit. Enter closes the list and keeps focus in the box.
+- **Enter** commits the highlighted row. While typing, the highlight sits on the best match, so Enter takes it even when it is a prefix match (`kilom` + Enter → kilometers). Enter on a category row or the Back row moves between levels instead. With nothing highlighted, Enter commits an exact match if the query names exactly one unit; failing that, when the box holds arithmetic, Enter replaces it with its value (`5 + 3` becomes `8`, the unit stays), one undoable step. Enter closes the list and keeps focus in the box.
 - **Picking a row** with a click or tap commits it.
 - **Tab and leaving the box never commit**, not even an exact match. The text stays as typed, so moving between boxes never changes anything; back in the box, the best match is highlighted again for Enter.
 - Committing keeps the number and drops the query: `5 ml` becomes `5` with the mL chip. Picking a category row while a query is typed, in either box, keeps the number and drops the query.
@@ -99,13 +107,14 @@ Nothing commits on a keystroke: while typing, the best match is highlighted and 
 
 - A conversion runs whenever both boxes have a unit and the source has a number. The derived box shows the result formatted to 10 significant digits, trailing zeros trimmed, with the locale's grouping; magnitudes from 1e15 up, or below 1e-6, switch to exponent form (`1.23456789E23`).
 - **The exponent marker** in a value is semibold, so `1.5E21` reads as a number with an exponent. Only a marker inside the parsed number counts.
+- **Running value.** While a box holds arithmetic and nothing else, its value follows it in the field in the muted color: `5 + 3 = 8`. The conversion uses that value as it changes.
 - **Numbers fit.** A long number steps down through five type sizes until it fits on one line beside the chip, re-measured on every change and on resize, and steps back up when room returns. Past the smallest size it scrolls inside the field. Once the number is longer than six characters the chip collapses to its symbol.
-- **Out of range.** When the typed number is beyond what a double holds (`1e400`), or the result is (`1e308 km` in millimeters), the derived box says "Too large to convert" in place of a value; when a nonzero value rounds to zero (`1e-320 mm` in kilometers), it says "Too small to convert". Never a bare 0. The message shrinks through three sizes and wraps to two lines only as a last resort, and the chip collapses to its symbol while it shows.
+- **Out of range.** When the typed number is beyond what a double holds (`1e400`), or the result is (`1e308 km` in millimeters), the derived box says "Too large to convert" in place of a value; when a nonzero value rounds to zero (`1e-320 mm` in kilometers), it says "Too small to convert". Arithmetic that divides by zero makes it say "Can’t divide by zero". Never a bare 0. The message shrinks through three sizes and wraps to two lines only as a last resort, and the chip collapses to its symbol while it shows.
 - **Copy.** Each box has a copy button whenever it holds a number; it copies the full-precision value. A successful copy swaps the icon for a check in the success color and announces "Copied". With a mouse, the check stays while the pointer rests on the button and reverts when it leaves, after at least a second; without a mouse (keyboard, touch) it reverts after two seconds. Copying the other box moves the check there.
 - **Copy link.** A link icon in the header, between the shortcuts map and the theme menu, copies the address of the current conversion (§11). The address is built from the converter's state at the moment of the click, so it is current even inside the URL's write delay; with nothing entered it is the bare page address. It confirms exactly like the box copy buttons, and the status region says "Link copied". Unlike the shortcuts map it shows on every device, phones included. The button is drawn by the converter island into a slot the header reserves, so it appears after hydration without moving anything.
-- **Announcements.** A polite live region says "5 milliliters is 0.1690701102 fluid ounces" once the result settles (600 ms after the last change), or "1e308 kilometers is too large to convert to millimeters".
+- **Announcements.** A polite live region says "5 milliliters is 0.1690701102 fluid ounces" once the result settles (600 ms after the last change), or "1e308 kilometers is too large to convert to millimeters". For arithmetic it names the value (`5 + 3` mL: "8 milliliters is …"), and for a division by zero it says "Can’t divide by zero".
 
-## 8. Keyboard
+## 8. Keyboard and keypad
 
 | Key                                        | In a box                                                                                                          |
 | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
@@ -118,6 +127,19 @@ Nothing commits on a keystroke: while typing, the best match is highlighted and 
 | Ctrl/⌘+Z, Ctrl/⌘+Y, Ctrl/⌘+Shift+Z         | Undo and redo, anywhere inside the converter, replacing the field's own text undo                                 |
 
 The chip's buttons and the copy buttons are out of the Tab order because the field's own keys do the same jobs; pointers and screen readers still reach them. The list itself is not a Tab stop. Swap follows the second box in the DOM so Tab goes box to box; the grid still draws it between them.
+
+### The keypad
+
+A calculator for anyone who would rather tap than type.
+
+- **Opening.** The calculator icon at the left of the toolbar opens the keypad below the boxes and closes it again; while open, the icon shows an accent-soft fill (`aria-expanded`). Escape inside the keypad closes it and returns focus to the icon.
+- **Which box it fills.** A two-option switch tops the keypad: "First" and "Second", each with its unit symbol once it has one. It starts on the box last focused, else the source box, and focusing a box while the keypad is open moves it there. The box it fills shows its accent edge.
+- **Keys**, 48 px or taller: `C` (two columns), `⌫`, `÷`; `7 8 9 ×`; `4 5 6 −`; `1 2 3 +`; `0` (two columns), the decimal mark, `=`.
+- **What they do.** Digits and the decimal mark (the locale's, `.` or `,`) add to the box, or start it fresh when it shows a result: the other box's conversion, or the value `=` just gave. An operator adds to whatever the box shows, so a result can be carried on (`× 2`); a second operator in a row replaces the first, except `−` after `×` or `÷`, which starts a negative number. On an empty box only `−` works. The decimal mark is ignored when the number has one, and starts a number as `0.`. `⌫` deletes the last character; `C` empties the box and keeps its unit; `=` replaces the arithmetic with its value, as Enter does (§5).
+- **History.** Presses go through the same parser and history as typing: presses less than 700 ms apart are one chunk for undo and Escape, and `=` and `C` are steps of their own.
+- **A keyboard inside the keypad.** With focus on a key, typing a digit, `.` or `,`, `+ - * /`, `=`, or Backspace presses the matching key. Enter and Space press the focused key, as for any button.
+- **Phones.** While the keypad is open the boxes ask for no on-screen keyboard (`inputmode="none"`), so the keypad takes its place; units are still picked from the list (tap a box or its chip). Closing the keypad brings the system keyboard back.
+- **Accessibility.** The keypad is a group named "Calculator", like its icon; each key is a native button named in words ("plus", "divided by", "decimal point", "backspace", "clear"); the switch is a native radio group. Values are announced through the conversion announcement (§7).
 
 ## 9. Undo, redo, and Escape
 
@@ -171,14 +193,13 @@ Both are fluid shells driven by the inline script in `layouts/Base.astro`, so th
 
 Not built yet; each item names its milestone in docs/PLAN.md §13.
 
-**Owner's ideas, logged 2026-10-06**, built in this order: copy link (built, §7), the keypad as a calculator, then the header animation and theme art together. Back highlighting the category it came from (§3) and "Toggle inputs" (§10) shipped at once. Later, maybe: on phones, the native share sheet in place of copy link.
+**Owner's ideas, logged 2026-10-06**, built in this order: copy link (built, §7), the keypad as a calculator with `+ − × ÷` from the start (built, §8), then the header animation and theme art together. Back highlighting the category it came from (§3) and "Toggle inputs" (§10) shipped at once. Later, maybe: on phones, the native share sheet in place of copy link, and the keypad docked to the bottom of the screen.
 
-- **Keypad as a calculator.** For anyone who would rather tap than type, not only touch users: an icon button opens it (placement open), and the keypad itself has a switch for which box it fills, first or second. Merges with the planned keypad below. Open question: digits only first, or arithmetic (`+ − × ÷`) from the start, which needs the expression parser (input flexibility, phase 3).
 - **Header animation.** Hovering the header plays conversions: units, numbers, and arrows turning into one another in text and symbols, ASCII in spirit, perhaps a few emoji. While the pointer rests on the header the conversions rotate through at a leisurely pace; moving the pointer speeds them up, and the faster it moves the faster they go, accelerating quickly, then easing back to the leisurely pace when it slows or stops. Decorative: `aria-hidden`, the heading still reads "bigsmall", no layout shift, loaded on first hover so it costs nothing before, and measured against the bundle budget. People who turn motion off in their system settings see it still; an in-app motion switch can join the settings later. Original content only (ADR 0004).
 - **Theme art.** A small piece of art beside the site name for each theme: Sakura a cherry blossom, Midnight a full moon, Daylight a sun in a yellow that pairs with its green, Neo-noir a neon Tokyo street or tower, Hardhat a hard hat, Theorem a chalkboard with a piece of chalk. Recommended as inline SVG drawn for bigsmall in each theme's own tokens, since emoji look different on every system and cannot follow a palette. Decorative (`aria-hidden`), loaded with its theme. Belongs with the theme polish of milestone 4.
 
 - **Modes (milestone 3).** `basic` (default) lists basic-tier units with a final "Show all N units" row; `advanced` lists all units. When a query matches only advanced units, show them under an "Advanced units" label without changing the mode. The mode persists. The reducer already has a `setMode` action; nothing dispatches it yet.
-- **Keypad (milestone 3).** An icon button opens it (see the calculator idea above); docked to the bottom on narrow screens, beside the boxes on wide ones. Keys: `0–9`, the locale's decimal separator, backspace, clear, negate, and a target switch between the boxes; 48 px minimum. Keypad input goes through the same parser as typing. Phase 2: `+ − × ÷ =`, `½ ¼ ⅛`, `′ ″`.
+- **Keypad, phase 2.** `( )`, `½ ¼ ⅛`, and `′ ″` keys; the open state remembered with the other preferences.
 - **Persistence (milestone 3).** Mode, precision, locale override, the last conversion, up to ten recent pairs, and pinned pairs in `localStorage`.
 - **Early keystrokes (milestone 3).** An inline listener records keystrokes typed before hydration and the island adopts them, the same approach as the header menus.
 - **URL keeps the typed text (milestone 3).** Today `v` holds the parsed double, so eighteen typed digits come back rounded after a reload.
@@ -187,7 +208,7 @@ Not built yet; each item names its milestone in docs/PLAN.md §13.
 - **Input flexibility (principle, phased).** The box accepts what people naturally type and never punishes formatting.
   - Spacing never matters (built). Both decimal marks work (built); when an input is ambiguous, offer the other reading and show the understood number in a quiet line under the field (planned).
   - Phase 2: fractions (`1/2`, `3 1/4`), feet and inches (`5'10"`), and the connective form (`5 ml to cups`, `5 ml in cups`), where the part after the connective sets the other box's unit.
-  - Phase 3: math inside the box (`2*3 ft`, `(5+7)/2 cm`, `2^10 bytes`): operators `+ − × ÷ * / ^ ( )`, Unicode minus and multiplication signs, and `x` as multiply between two numbers, evaluated by a small dependency-free parser in core, never `eval`. Enter means equals: it evaluates the expression in place and the chip stays. While typing an expression, a line under the field shows the evaluated value (`= 1024`). A partial expression keeps the last good result and shows a soft hint, not an error. The keypad grows the same operators.
+  - Phase 3, math inside the box: built for `+ − × ÷ * / ( )` with Enter as equals and the running value in the field (§2, §5, §7). Still to come: `^` (`2^10 bytes`), `x` as times between two numbers, and a soft hint for arithmetic that cannot be read.
 
 ## 15. Open questions for the usability test
 

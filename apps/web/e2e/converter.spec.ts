@@ -681,6 +681,75 @@ test('the chip collapses to its symbol while an out-of-range message needs the r
   await expect(chip).toHaveText('m');
 });
 
+test('the calculator fills the chosen box, shows the running value, and = gives it', async ({
+  page,
+}) => {
+  await page.goto('/?a=milliliter&b=liter&v=1&s=a');
+  await ready(page);
+  const { first, second } = boxes(page);
+  const toggle = page.getByRole('button', { name: 'Calculator' });
+  const keypad = page.getByRole('group', { name: 'Calculator' });
+  const key = (name: string) => keypad.getByRole('button', { name, exact: true });
+  const fills = (name: string) => keypad.getByRole('radio', { name: new RegExp(`^${name}`) });
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expectNoA11yViolations(page);
+  // Before any box is focused it fills the source box; the boxes ask for no on-screen keyboard.
+  await expect(fills('First')).toBeChecked();
+  await expect(first).toHaveAttribute('inputmode', 'none');
+
+  await key('clear').click();
+  await expect(first).toHaveValue('');
+  for (const name of ['1', '2', 'plus', '3']) await key(name).click();
+  await expect(first).toHaveValue('12+3');
+  await expect(page.locator('[data-running]')).toHaveText(' = 15');
+  await expect(second).toHaveValue('0.015');
+  await key('equals').click();
+  await expect(first).toHaveValue('15');
+  // After =, a digit starts over, as on a calculator; undo takes it back, then the =.
+  await key('4').click();
+  await expect(first).toHaveValue('4');
+  await page.keyboard.press('Control+z');
+  await expect(first).toHaveValue('15');
+  await page.keyboard.press('Control+z');
+  await expect(first).toHaveValue('12+3');
+
+  // The other box: a digit replaces its result and makes it the source.
+  await keypad.locator('label').filter({ hasText: 'Second' }).click();
+  await key('2').click();
+  await expect(second).toHaveValue('2');
+  await expect(first).toHaveValue('2,000');
+
+  // Focusing a box moves the keypad there; typed keys press keypad keys while focus is inside.
+  await first.focus();
+  await expect(fills('First')).toBeChecked();
+  await key('clear').focus();
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('7*2=');
+  await expect(first).toHaveValue('14');
+
+  await page.keyboard.press('Escape');
+  await expect(keypad).toHaveCount(0);
+  await expect(toggle).toBeFocused();
+  await expect(first).not.toHaveAttribute('inputmode', 'none');
+});
+
+test('Enter on typed arithmetic gives its value and keeps the unit', async ({ page }) => {
+  await page.goto('/?a=milliliter&b=liter&v=1&s=a');
+  await ready(page);
+  const { first, second } = boxes(page);
+
+  await first.fill('2 × 3');
+  await expect(second).toHaveValue('0.006');
+  await first.press('Enter');
+  await expect(first).toHaveValue('6');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+
+  await first.fill('5/0');
+  await expect(second).toHaveAccessibleDescription(/Can’t divide by zero/);
+});
+
 test.describe('in a German locale', () => {
   test.use({ locale: 'de-DE' });
 

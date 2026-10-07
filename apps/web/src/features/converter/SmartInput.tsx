@@ -1,4 +1,5 @@
 import {
+  formatNumber,
   getCategory,
   parse,
   search,
@@ -30,8 +31,12 @@ import {
 import { UnitChip } from '../../components/UnitChip';
 import { useFitStep } from '../../lib/fit-step';
 import { FIELD_ROW, SHELL, SHELL_BORDERED } from '../../lib/shell';
+import { evaluatedText } from './keypad';
 import type { BoxView, EscapeTarget, HistoryAction, Mode } from './state';
 import type { ConverterEnv } from './useConverter';
+
+/** This box's part in the keypad: closed, the box it fills, or the other one. */
+export type KeypadRole = 'closed' | 'target' | 'other';
 
 export interface SmartInputProps {
   box: BoxView;
@@ -50,6 +55,10 @@ export interface SmartInputProps {
   counterpart: Unit | null;
   /** Rendered at the end of the field, such as the copy button. */
   trailing?: ReactNode;
+  /** While the keypad is open the field asks for no on-screen keyboard, and its target shows its edge. */
+  keypad: KeypadRole;
+  /** The field took focus, so the keypad can follow it. */
+  onFocusBox: () => void;
 }
 
 /**
@@ -109,6 +118,8 @@ export function SmartInput({
   examples,
   counterpart,
   trailing,
+  keypad,
+  onFocusBox,
 }: SmartInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
@@ -184,6 +195,12 @@ export function SmartInput({
     dispatch({ type: 'unlock', box: box.id });
     if (thenList && category) showList(category);
     else closePanel();
+  };
+
+  /** Enter with nothing to commit on arithmetic: it becomes its value, the unit staying (docs/UX-SPEC.md §5). */
+  const evaluate = () => {
+    const text = evaluatedText(box.text, env);
+    if (text !== null) dispatch({ type: 'replace', box: box.id, text });
   };
 
   /** Commit the exact match, if the query names exactly one unit: Enter with no row highlighted. */
@@ -274,7 +291,7 @@ export function SmartInput({
           break;
         }
         if (item) pick(item);
-        else commitExact();
+        else if (!commitExact()) evaluate();
         closePanel();
         break;
       }
@@ -297,6 +314,7 @@ export function SmartInput({
     setOpen(true);
     setActive(query ? firstResult : -1);
     if (!box.isSource && event.target.value) event.target.select();
+    onFocusBox();
   };
 
   // Leaving the box only closes the list: a query stays as typed until Enter or a pick.
@@ -319,8 +337,10 @@ export function SmartInput({
   // (docs/DESIGN-SYSTEM.md, "Fields").
   return (
     <div className="group relative h-16 min-w-0" data-open={open || undefined}>
+      {/* The box the keypad fills shows the accent edge, as a focused box does. */}
       <div
-        className={`absolute inset-x-0 top-0 rounded-lg shadow-sm ${SHELL} ${SHELL_BORDERED}`}
+        className={`absolute inset-x-0 top-0 rounded-lg shadow-sm ${SHELL} ${SHELL_BORDERED} data-targeted:border-accent`}
+        data-targeted={keypad === 'target' || undefined}
         onBlur={onBlur}
       >
         <label htmlFor={inputId} className="sr-only">
@@ -345,6 +365,7 @@ export function SmartInput({
               autoCorrect="off"
               spellCheck={false}
               enterKeyHint="done"
+              inputMode={keypad === 'closed' ? undefined : 'none'}
               placeholder={placeholder}
               value={box.text}
               onChange={onChange}
@@ -354,7 +375,11 @@ export function SmartInput({
               className={`${sizeClass} h-full w-full bg-transparent font-numeric text-transparent caret-ink outline-none selection:bg-accent-soft placeholder:text-ink-muted`}
             />
             <div ref={textLayerRef} aria-hidden="true" className={`${TEXT_LAYER} ${sizeClass}`}>
-              <NumberText text={box.text} parsed={suggestion.parsed} />
+              <NumberText
+                text={box.text}
+                parsed={suggestion.parsed}
+                running={runningValue(suggestion.parsed, env.locale)}
+              />
             </div>
             {/* Always rendered, so its size is re-measured on resize; empty when there is no message. */}
             <div
@@ -470,21 +495,48 @@ function scopedExamples(
 }
 
 /**
- * The field's text with the exponent marker set in a heavier weight, so "1.5E21" reads as a
- * number with an exponent rather than a run of characters. The parser says where the marker is,
- * so an "e" that is still part of a unit query stays regular.
+ * The field's text with each exponent marker set in a heavier weight, so "1.5E21" reads as a
+ * number with an exponent rather than a run of characters, then the running value of arithmetic
+ * in the muted color ("5 + 3 = 8"). The parser says where the markers are, so an "e" that is
+ * still part of a unit query stays regular.
  */
-function NumberText({ text, parsed }: { text: string; parsed: ParsedInput }) {
+function NumberText({
+  text,
+  parsed,
+  running,
+}: {
+  text: string;
+  parsed: ParsedInput;
+  running: string | null;
+}) {
   const start = parsed.valueText ? text.indexOf(parsed.valueText) : -1;
-  if (parsed.exponentAt === undefined || start < 0) return text;
-  const markerIndex = start + parsed.exponentAt;
+  const marks = start < 0 ? [] : (parsed.exponentMarks ?? []).map((at) => start + at);
+  const pieces: ReactNode[] = [];
+  let from = 0;
+  for (const at of marks) {
+    pieces.push(
+      text.slice(from, at),
+      <span key={at} className="font-semibold" data-marker>
+        {text[at]}
+      </span>,
+    );
+    from = at + 1;
+  }
+  pieces.push(text.slice(from));
   return (
     <>
-      {text.slice(0, markerIndex)}
-      <span className="font-semibold" data-marker>
-        {text[markerIndex]}
-      </span>
-      {text.slice(markerIndex + 1)}
+      {pieces}
+      {running !== null && (
+        <span className="text-ink-muted" data-running>
+          {` = ${running}`}
+        </span>
+      )}
     </>
   );
+}
+
+/** The value of a box holding arithmetic and nothing else, formatted as results are. */
+function runningValue(parsed: ParsedInput, locale: string | undefined): string | null {
+  if (!parsed.expression || parsed.value === undefined || parsed.query) return null;
+  return formatNumber(parsed.value, locale ? { locale } : {});
 }

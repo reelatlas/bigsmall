@@ -1,9 +1,12 @@
 import type { ButtonHTMLAttributes } from 'react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'soft' | 'ghost';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** ghost: icon actions on the page (swap, undo, copy). secondary: bordered text button. primary: filled. */
+  /**
+   * ghost: icon actions on the page (swap, undo, copy). secondary: bordered text button. soft: a
+   * tinted key that sets itself apart from its neighbors (the keypad's operators). primary: filled.
+   */
   variant: ButtonVariant;
   /** Square 44 px button for a lone icon. Pass `aria-label`. */
   square?: boolean;
@@ -21,6 +24,7 @@ const base =
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-on-accent hover:opacity-90',
   secondary: 'border-2 border-edge bg-surface text-ink hover:bg-surface-raised',
+  soft: 'bg-accent-soft text-ink hover:opacity-90',
   ghost: 'text-ink-muted hover:bg-surface-raised hover:text-ink',
 };
 

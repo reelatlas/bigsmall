@@ -1,7 +1,6 @@
 ---
 import { Button } from '../../components/Button';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
-import HeaderMenus from '../../components/HeaderMenus.astro';
 import ThemeArt from '../../components/ThemeArt.astro';
 import {
   CopyIcon,
@@ -15,117 +14,100 @@ import {
 } from '../../components/icons';
 import { Keycap } from '../../components/Keycap';
 import { FieldSamples } from './_gallery/FieldSamples';
-import Base from '../../layouts/Base.astro';
+import DevPage from '../../layouts/DevPage.astro';
 import { THEMES, TOKEN_CONTRACT } from '../../lib/themes';
 
-// Development page: every component in every theme, in the variants and states that ship, for
-// visual QA (docs/THEMING.md). Each card pins its own theme via data-theme; custom properties
-// cascade, so the subtree re-themes. The header menus use the page theme.
+// Every component in every theme, in the variants and states that ship, for visual QA
+// (docs/THEMING.md). Each card pins its own theme via data-theme; custom properties cascade, so
+// the subtree re-themes. The header, the wordmark and its menus, uses the page theme.
 const swatches = TOKEN_CONTRACT.colors;
 ---
 
-<Base title="bigsmall · gallery" description="Every component in every theme.">
-  <main class="mx-auto max-w-5xl px-4 py-10">
-    <header class="@container flex flex-wrap items-center justify-between gap-x-4 gap-y-5">
-      <div>
-        <h1 class="font-display text-3xl font-semibold tracking-tight">Gallery</h1>
-        <p class="mt-1 text-ink-muted">
-          The theme menu changes the page theme. Each card below is pinned to its own theme.
-        </p>
-      </div>
-      <HeaderMenus />
-    </header>
+<DevPage title="gallery" description="Every component in every theme.">
+  <Fragment slot="intro">
+    Component gallery. Every component in the variants and states that ship, once per theme. The
+    theme menu changes the page theme and the header with it; each card below is pinned to its own.
+  </Fragment>
 
-    <div class="mt-8 grid gap-6 md:grid-cols-2">
-      {THEMES.map((t) => (
-        <section
-          data-theme={t.id}
-          aria-labelledby={`theme-${t.id}`}
-          class="rounded-lg border border-line bg-canvas p-5 text-ink shadow-md"
-        >
-          <div class="flex items-baseline justify-between gap-3">
-            <h2
-              id={`theme-${t.id}`}
-              class="flex items-center gap-2 font-display text-xl font-semibold"
-            >
-              {t.name}
-              <ThemeArt theme={t.id} />
-            </h2>
-            <span class="text-xs text-ink-muted">
-              {t.scheme} · {t.status}
-            </span>
-          </div>
-          <p class="mt-1 text-sm text-ink-muted">{t.blurb}</p>
-
-          <ul class="mt-4 flex flex-wrap gap-x-3 gap-y-2" aria-label={`${t.name} color tokens`}>
-            {swatches.map((name) => (
-              <li class="flex items-center gap-1.5 text-xs">
-                <span
-                  class="inline-block size-4 rounded-sm border border-line"
-                  style={`background: var(--${name})`}
-                  aria-hidden="true"
-                />
-                {name}
-              </li>
-            ))}
-          </ul>
-
-          <p class="mt-4 font-numeric text-3xl font-semibold tracking-tight">1,234,567.89</p>
-          <p class="text-sm text-ink-muted">Numeric type: tabular digits in font-numeric</p>
-
-          <div class="mt-4">
-            <FieldSamples client:idle theme={t.name} />
-          </div>
-
-          <div
-            role="group"
-            class="mt-4 flex flex-wrap items-center gap-1"
-            aria-label="Icon buttons"
+  <div class="mt-8 grid gap-6 md:grid-cols-2">
+    {THEMES.map((t) => (
+      <section
+        data-theme={t.id}
+        aria-labelledby={`theme-${t.id}`}
+        class="rounded-lg border border-line bg-canvas p-5 text-ink shadow-md"
+      >
+        <div class="flex items-baseline justify-between gap-3">
+          <h2
+            id={`theme-${t.id}`}
+            class="flex items-center gap-2 font-display text-xl font-semibold"
           >
-            <Button variant="ghost" square aria-label="Swap sides sample">
-              <SwapIcon />
-            </Button>
-            <Button variant="ghost" square aria-label="Undo sample">
-              <UndoIcon />
-            </Button>
-            <Button variant="ghost" square aria-label="Redo sample, disabled" disabled>
-              <RedoIcon />
-            </Button>
-            <ToolbarDivider />
-            <Button variant="ghost" square aria-label="Clear all sample">
-              <EraserIcon />
-            </Button>
-            <Button variant="ghost" square aria-label="Copy sample">
-              <CopyIcon />
-            </Button>
-            <Button variant="ghost" square aria-label="Keyboard shortcuts sample">
-              <KeyboardIcon />
-            </Button>
-            <Button variant="ghost" square aria-label="Copy URL sample">
-              <LinkIcon />
-            </Button>
-            <Button
-              variant="ghost"
-              square
-              on
-              aria-pressed="true"
-              aria-label="Calculator sample, on"
-            >
-              <CalculatorIcon />
-            </Button>
-          </div>
+            {t.name}
+            <ThemeArt theme={t.id} />
+          </h2>
+          <span class="text-xs text-ink-muted">
+            {t.scheme} · {t.status}
+          </span>
+        </div>
+        <p class="mt-1 text-sm text-ink-muted">{t.blurb}</p>
 
-          <div class="mt-3 flex flex-wrap items-center gap-3">
-            <Button variant="secondary">Secondary</Button>
-            <Button variant="primary">Primary</Button>
-            <span class="flex items-center gap-1 text-xs text-ink-muted">
-              <Keycap label="Mod" />
-              <Keycap label="Shift" />
-              <Keycap label="Z" />
-            </span>
-          </div>
-        </section>
-      ))}
-    </div>
-  </main>
-</Base>
+        <ul class="mt-4 flex flex-wrap gap-x-3 gap-y-2" aria-label={`${t.name} color tokens`}>
+          {swatches.map((name) => (
+            <li class="flex items-center gap-1.5 text-xs">
+              <span
+                class="inline-block size-4 rounded-sm border border-line"
+                style={`background: var(--${name})`}
+                aria-hidden="true"
+              />
+              {name}
+            </li>
+          ))}
+        </ul>
+
+        <p class="mt-4 font-numeric text-3xl font-semibold tracking-tight">1,234,567.89</p>
+        <p class="text-sm text-ink-muted">Numeric type: tabular digits in font-numeric</p>
+
+        <div class="mt-4">
+          <FieldSamples client:idle theme={t.name} />
+        </div>
+
+        <div role="group" class="mt-4 flex flex-wrap items-center gap-1" aria-label="Icon buttons">
+          <Button variant="ghost" square aria-label="Swap sides sample">
+            <SwapIcon />
+          </Button>
+          <Button variant="ghost" square aria-label="Undo sample">
+            <UndoIcon />
+          </Button>
+          <Button variant="ghost" square aria-label="Redo sample, disabled" disabled>
+            <RedoIcon />
+          </Button>
+          <ToolbarDivider />
+          <Button variant="ghost" square aria-label="Clear all sample">
+            <EraserIcon />
+          </Button>
+          <Button variant="ghost" square aria-label="Copy sample">
+            <CopyIcon />
+          </Button>
+          <Button variant="ghost" square aria-label="Keyboard shortcuts sample">
+            <KeyboardIcon />
+          </Button>
+          <Button variant="ghost" square aria-label="Copy URL sample">
+            <LinkIcon />
+          </Button>
+          <Button variant="ghost" square on aria-pressed="true" aria-label="Calculator sample, on">
+            <CalculatorIcon />
+          </Button>
+        </div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-3">
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="primary">Primary</Button>
+          <span class="flex items-center gap-1 text-xs text-ink-muted">
+            <Keycap label="Mod" />
+            <Keycap label="Shift" />
+            <Keycap label="Z" />
+          </span>
+        </div>
+      </section>
+    ))}
+  </div>
+</DevPage>

@@ -1,28 +1,20 @@
 ---
-import HeaderMenus from '../../components/HeaderMenus.astro';
-import Wordmark from '../../components/Wordmark.astro';
-import Base from '../../layouts/Base.astro';
+import DevPage from '../../layouts/DevPage.astro';
 import { WordmarkLab } from './_wordmark-lab/WordmarkLab';
 
 /*
- * Development page: the wordmark at play with every setting on a slider (docs/DESIGN-SYSTEM.md,
- * "Tuning labs"). The header is the real one, in the page theme; settings apply live, persist in
- * this browser, and "Copy settings" gives the values to paste into lib/timing.ts and
- * lib/wordmark.ts, where they become the defaults.
+ * The wordmark at play with every setting on a slider (docs/DESIGN-SYSTEM.md, "Tuning labs"). The
+ * header is the real one, in the page theme; settings apply live, persist in this browser, and
+ * "Copy settings" gives the values to paste into lib/timing.ts and lib/wordmark.ts, where they
+ * become the defaults.
  */
 ---
 
-<Base title="bigsmall · wordmark lab" description="Tune the wordmark at play.">
-  <main class="mx-auto max-w-5xl px-4 py-10">
-    <header class="@container flex flex-wrap items-center justify-between gap-x-4 gap-y-5">
-      <Wordmark manual />
-      <HeaderMenus />
-    </header>
-    <p class="mt-2 max-w-prose text-sm text-ink-muted">
-      Wordmark lab. Hover the name and its art to play it with the settings below, or play it
-      without hovering. The theme menu switches the page theme, and the sheet of phrases at the
-      bottom refits to it.
-    </p>
-    <WordmarkLab client:load />
-  </main>
-</Base>
+<DevPage title="wordmark lab" description="Tune the wordmark at play." manual>
+  <Fragment slot="intro">
+    Wordmark lab. Hover the name and its art to play it with the settings below, or play it without
+    hovering. The theme menu switches the page theme, and the sheet of phrases at the bottom refits
+    to it.
+  </Fragment>
+  <WordmarkLab client:load />
+</DevPage>

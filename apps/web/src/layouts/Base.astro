@@ -7,9 +7,15 @@ import { DEFAULT_DARK, DEFAULT_LIGHT, THEMES, THEME_STORAGE_KEY } from '../lib/t
 interface Props {
   title: string;
   description?: string;
+  /** Ask search engines not to index the page (the /dev pages). */
+  noindex?: boolean;
 }
 
-const { title, description = 'A unit converter that gets out of your way.' } = Astro.props;
+const {
+  title,
+  description = 'A unit converter that gets out of your way.',
+  noindex = false,
+} = Astro.props;
 const themeIds = THEMES.map((t) => t.id);
 const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
 ---
@@ -22,6 +28,7 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
     <meta name="color-scheme" content="light dark" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <script
       define:vars={{
         ids: themeIds,

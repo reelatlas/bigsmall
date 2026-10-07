@@ -1,0 +1,24 @@
+---
+import HeaderMenus from './HeaderMenus.astro';
+import Wordmark from './Wordmark.astro';
+
+interface Props {
+  /** Reserve the slot the page's island fills with its header actions (HeaderMenus). */
+  actions?: boolean;
+  /** The wordmark waits for the page to play it, as on the wordmark lab (Wordmark). */
+  manual?: boolean;
+}
+
+const { actions = false, manual = false } = Astro.props;
+
+/*
+ * The header every page shares: the wordmark with its theme art, then the header menus. The
+ * header is an @container, so where it is too narrow for the menus beside the name they take a
+ * line of their own, 20 px under it (HeaderMenus, docs/UX-SPEC.md §1).
+ */
+---
+
+<header class="@container flex flex-wrap items-center justify-between gap-x-4 gap-y-5">
+  <Wordmark manual={manual} />
+  <HeaderMenus actions={actions} />
+</header>

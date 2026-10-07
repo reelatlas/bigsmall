@@ -43,7 +43,7 @@ pnpm check          # lint + format check + typecheck + test + build + bundle ch
 - **Add a unit:** `packages/core/src/units/<category>.ts` with `source` and `exact`; add the aliases people type; add a golden row in `packages/core/test/golden/`; run `pnpm test`. Details in `docs/UNITS-CATALOG.md` §6.
 - **Add a component:** `docs/DESIGN-SYSTEM.md` "Adding a component".
 - **Add a theme:** `docs/THEMING.md` "Authoring a theme".
-- **Add a page:** `apps/web/src/pages/`, use `layouts/Base.astro`, islands only where there is real interaction.
+- **Add a page:** `apps/web/src/pages/`, use `layouts/Base.astro` with `components/PageHeader.astro` (a `/dev` page uses `layouts/DevPage.astro`, which also keeps it out of search), islands only where there is real interaction.
 - **Add a keyboard shortcut:** handle the key in code, add it to `apps/web/src/lib/shortcuts.ts` (the shortcuts map renders from it), and describe it in `docs/UX-SPEC.md` §8.
 - **Add a header menu:** reuse the shell controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`) and the shell recipes in `src/lib/recipes.ts`, and place it in `components/HeaderMenus.astro`. No new script.
 - **Add a UI delay:** a named constant in `apps/web/src/lib/timing.ts`, never a literal number of milliseconds.

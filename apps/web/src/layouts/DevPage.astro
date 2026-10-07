@@ -1,0 +1,30 @@
+---
+import PageHeader from '../components/PageHeader.astro';
+import Base from './Base.astro';
+
+interface Props {
+  /** The page's name, after the site's in the title: "gallery". */
+  title: string;
+  description: string;
+  /** The wordmark waits for the page to play it (the wordmark lab). */
+  manual?: boolean;
+}
+
+const { title, description, manual = false } = Astro.props;
+
+/*
+ * A development page under /dev: the site's header, a line saying what the page is for, then its
+ * tools. Nothing on the site links here, and search engines are asked not to index it, so the
+ * live site keeps it for the owner without showing it to visitors (docs/ARCHITECTURE.md).
+ */
+---
+
+<Base title={`bigsmall · ${title}`} description={description} noindex>
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <PageHeader manual={manual} />
+    <p class="mt-2 max-w-prose text-sm text-ink-muted">
+      <slot name="intro" />
+    </p>
+    <slot />
+  </main>
+</Base>

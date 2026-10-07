@@ -90,15 +90,16 @@ export function Converter() {
   };
 
   /**
-   * The category label sits under the box the conversion is anchored on, at that box's outer
-   * edge, so it says both what kind of units these are and which side is driving. A switch of
-   * category shows here first ("Switched to Temperature") until the next change.
+   * The category label sits under the box the conversion is anchored on, left-aligned with the
+   * value in both boxes so it reads right beside what the user typed. It says both what kind of
+   * units these are and which side is driving. A switch of category shows here first
+   * ("Switched to Temperature") until the next change.
    */
   const caption = (id: BoxId) => (
     <p
       aria-live="polite"
       data-category-label={id}
-      className={`mt-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted ${id === 'b' ? 'text-right' : ''}`}
+      className="mt-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted"
     >
       {view.anchor === id ? (view.notice ?? categoryName ?? '') : ''}
     </p>

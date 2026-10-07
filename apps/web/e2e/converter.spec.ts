@@ -411,6 +411,15 @@ test('the category label sits under the box that drives the conversion', async (
   await second.fill('2');
   await expect(labelB).toHaveText('Volume');
   await expect(labelA).toHaveText('');
+
+  // In both boxes the label starts where the value starts, right under what was typed.
+  const textLeft = await labelB.evaluate((el) => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    return range.getBoundingClientRect().left;
+  });
+  const valueLeft = (await second.boundingBox())!.x;
+  expect(Math.abs(textLeft - valueLeft)).toBeLessThan(2);
 });
 
 test('before any number, the box that got its unit first keeps the label', async ({ page }) => {

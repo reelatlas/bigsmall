@@ -232,7 +232,7 @@ export const WORDMARK_TUNING: WordmarkTuning = {
   gain: 3.5,
   decay: 0.92,
   response: 0.4,
-  artAway: 1,
+  artAway: 0.45,
   artBack: 0.5,
   smallest: 'text-sm',
   twoLinesFrom: 'text-base',

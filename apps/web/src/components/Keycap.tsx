@@ -1,6 +1,6 @@
 /**
  * One key as printed on a keyboard, for shortcut maps and hints. The key comes in as a prop, not
- * children: Astro hands children to a React component as rendered markup, so a "Mod" child would
+ * children: Astro hands children to an island component as rendered markup, so a "Mod" child would
  * never be recognized. "Mod" reads Ctrl, or ⌘ on Apple devices (the inline script swaps it).
  */
 export function Keycap({ label }: { label: string }) {

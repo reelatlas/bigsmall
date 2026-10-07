@@ -46,10 +46,10 @@ const EXAMPLES: Record<BoxId, string> = {
 };
 
 /**
- * The converter island: the hint with undo, redo, and clear all, two linked smart inputs with
- * swap between them, the category label under the box the conversion is anchored on, and the
- * live region; the calculator below the boxes when it is open (docs/UX-SPEC.md §8). It also draws the
- * Copy URL button into the header's slot (§7).
+ * The converter island: the hint and the toolbar (the calculator, undo, redo, clear all), two
+ * linked smart inputs with swap between them, the category label under the box the conversion is
+ * anchored on, and the live regions; the calculator below the boxes when it is open
+ * (docs/UX-SPEC.md §8). It also draws the Copy URL button into the header's slot (§7).
  */
 export function Converter() {
   const { state, view, env, dispatch, canUndo, canRedo, escapeTargets, announcement } =
@@ -220,8 +220,8 @@ export function Converter() {
       data-hydrated={hydrated ? '' : undefined}
     >
       {/*
-        The hint has a line of its own, and the toolbar the next one, right-aligned over the
-        boxes it acts on, so what to do and the tools to do it with read apart (docs/UX-SPEC.md §1).
+        The hint has a line of its own, and the toolbar the next one, flush left over the boxes it
+        acts on, so what to do and the tools to do it with read apart (docs/UX-SPEC.md §1).
       */}
       <div className="mb-2 flex flex-col gap-1">
         <p id={hintId} className="text-sm text-ink-muted">

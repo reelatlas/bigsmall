@@ -87,8 +87,8 @@ export interface CalculatorProps {
  * Shift+Tab cycle through close, =, and each send button, and Enter presses whichever has focus,
  * so focus always shows what Enter will do. Escape is the caller's (step back, then close). The
  * other keys stay out of the Tab order, and a click on one returns the keyboard to the calculator
- * without moving focus off the key Enter would press. Clicking elsewhere on the page leaves it open. What a key does is
- * the caller's (features/converter/calculator.ts).
+ * without moving focus off the key Enter would press. Clicking elsewhere on the page leaves it
+ * open. What a key does is the caller's (features/converter/calculator.ts).
  */
 export function Calculator({
   display,

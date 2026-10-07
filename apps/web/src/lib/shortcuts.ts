@@ -1,6 +1,6 @@
 /**
  * The keyboard shortcuts shown in the header's shortcuts map (components/ShortcutsHelp.astro).
- * A shortcut added or changed in code changes here in the same change (docs/UX-SPEC.md §19).
+ * A shortcut added or changed in code changes here in the same change (docs/UX-SPEC.md §10).
  */
 
 /**

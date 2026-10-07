@@ -233,7 +233,7 @@ export function play(
     target = next;
     ({ glyphs, plan } = prepare(line, next, room, fitSteps(tuning.smallest, tuning.twoLinesFrom)));
     // Now and then the art flips to a symbol or back to its drawing, and it comes home with the
-    // name. Where the art is hidden (phones), it rests on its drawing.
+    // name. Where the art does not show (its box has no size), it rests on its drawing.
     artTo = artShowing;
     if (!artVisible()) {
       artTo = null;

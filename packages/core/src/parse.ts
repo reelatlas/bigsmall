@@ -206,9 +206,9 @@ interface Evaluation {
 
 /**
  * The value of scanned arithmetic: ^ first (from the right, and before a sign, so −2^2 is −4),
- * then × and ÷, then + and −. Unfinished input is read as far as it
- * goes: a trailing operator, sign, or "(" is ignored and open parentheses close at the end, so
- * "5 +" is 5 and "(5 + 3" is 8 while the user types.
+ * then × and ÷, then + and −. Unfinished input is read as far as it goes: a trailing operator,
+ * sign, or "(" is ignored and open parentheses close at the end, so "5 +" is 5 and "(5 + 3" is 8
+ * while the user types.
  */
 function evaluate(scanned: readonly Token[]): Evaluation {
   let length = scanned.length;

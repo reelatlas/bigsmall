@@ -74,9 +74,9 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
   await expect(scope).toHaveText('Length');
   await expect(label).toHaveText('');
 
-  // Down from nothing skips the Back row and goes to the first unit.
+  // Down from nothing skips the Back row and goes to the first unit: inches, for a US visitor.
   await first.press('ArrowDown');
-  await expect(page.getByRole('option', { name: /^m meters$/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^in inches$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -87,14 +87,15 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
 });
 
 test('the arrow keys reach the Back row, and Enter on it goes back', async ({ page }) => {
-  await page.goto('/?a=milliliter&v=250&s=a');
+  // Teaspoons, the first unit of Volume for a US visitor.
+  await page.goto('/?a=us-teaspoon&v=2&s=a');
   await ready(page);
   const { first, back } = boxes(page);
 
   await first.click();
   await expect(back).toBeVisible();
   // The list opens resting on the box's unit.
-  await expect(page.getByRole('option', { name: /^mL milliliters$/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^tsp teaspoons$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -104,7 +105,7 @@ test('the arrow keys reach the Back row, and Enter on it goes back', async ({ pa
   await first.press('Enter');
   await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
   await expect(back).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove teaspoons' })).toBeVisible();
   // Back lands on the category it came from, so Enter would go straight back in.
   await expect(page.getByRole('option', { name: /^Volume$/ })).toHaveAttribute(
     'aria-selected',
@@ -116,7 +117,7 @@ test('the arrow keys reach the Back row, and Enter on it goes back', async ({ pa
   await arrowTo(first, page.getByRole('option', { name: /^Volume$/ }));
   await first.press('Enter');
   await expect(back).toBeVisible();
-  // Back in Volume, the list rests on milliliters again; Up reaches Back, Up again the last row,
+  // Back in Volume, the list rests on teaspoons again; Up reaches Back, Up again the last row,
   // and Down from there wraps to Back.
   await first.press('ArrowUp');
   await expect(back).toHaveAttribute('aria-selected', 'true');
@@ -717,7 +718,8 @@ test('placeholders show examples, then units from the category the other box cho
   await expect(second).toHaveAttribute('placeholder', '2 kg, inches, speed…');
   await first.fill('5 ml');
   await first.press('Enter');
-  await expect(second).toHaveAttribute('placeholder', 'L, tsp, tbsp…');
+  // The first units of Volume as a US visitor's list shows them, leaving out milliliters.
+  await expect(second).toHaveAttribute('placeholder', 'tsp, tbsp, fl oz…');
 });
 
 test('a unit row reads symbol on the left, name on the right', async ({ page }) => {

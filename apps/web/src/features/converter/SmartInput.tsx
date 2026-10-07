@@ -154,7 +154,7 @@ export function SmartInput({
     : box.unit
       ? '0'
       : box.scope
-        ? scopedExamples(box.scope, counterpart, listOptions.tier)
+        ? scopedExamples(box.scope, counterpart, listOptions)
         : examples;
 
   // The row is measured, not counted: in any box, wide or narrow, the chip keeps its name while
@@ -566,15 +566,16 @@ function typingUnit(parsed: ParsedInput): boolean {
 }
 
 /**
- * A few units an empty box could take once the other box has chosen its category, in display
- * order (most common first) and without the other box's unit: "L, tsp, tbsp…" beside milliliters.
+ * A few units an empty box could take once the other box has chosen its category, in the order
+ * its list shows them (the visitor's system first, smallest first) and without the other box's
+ * unit: "tsp, tbsp, fl oz…" beside milliliters, for a US visitor.
  */
 function scopedExamples(
   scope: CategoryId,
   counterpart: Unit | null,
-  tier: 'basic' | 'all',
+  { tier, system }: Pick<ListOptions, 'tier' | 'system'>,
 ): string {
-  const symbols = search('', { category: scope, tier })
+  const symbols = search('', { category: scope, tier, system })
     .results.flatMap((result) =>
       result.kind === 'unit' && result.unit.id !== counterpart?.id ? [result.unit.symbol] : [],
     )

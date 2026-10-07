@@ -21,7 +21,81 @@ describe('search: idle lists', () => {
     ]);
   });
 
-  it('empty query with a locked category lists its units in display order', () => {
+  it('lists a category’s units with the visitor’s own system first, each system smallest first', () => {
+    expect(ids(search('', { category: 'length', system: 'us' }))).toEqual([
+      'inch',
+      'foot',
+      'yard',
+      'mile',
+      'millimeter',
+      'centimeter',
+      'meter',
+      'kilometer',
+    ]);
+    expect(ids(search('', { category: 'length', system: 'metric' }))).toEqual([
+      'millimeter',
+      'centimeter',
+      'meter',
+      'kilometer',
+      'inch',
+      'foot',
+      'yard',
+      'mile',
+    ]);
+    expect(ids(search('', { category: 'volume', system: 'us' }))).toEqual([
+      'us-teaspoon',
+      'us-tablespoon',
+      'us-fluid-ounce',
+      'us-cup',
+      'us-pint',
+      'us-quart',
+      'us-gallon',
+      'milliliter',
+      'liter',
+    ]);
+    // The hectare is metric, so it sits among the metric units by size.
+    expect(ids(search('', { category: 'area', system: 'metric' }))).toEqual([
+      'square-centimeter',
+      'square-meter',
+      'hectare',
+      'square-kilometer',
+      'square-inch',
+      'square-foot',
+      'acre',
+      'square-mile',
+    ]);
+  });
+
+  it('puts units of neither system last, and regional variants with their own visitors', () => {
+    expect(ids(search('', { category: 'speed', system: 'metric' }))).toEqual([
+      'kilometer-per-hour',
+      'meter-per-second',
+      'foot-per-second',
+      'mile-per-hour',
+      'knot',
+    ]);
+    // The stone is British: with UK visitors' own units, after metric for US visitors.
+    expect(ids(search('', { category: 'mass', system: 'imperial' }))).toEqual([
+      'ounce',
+      'pound',
+      'stone',
+      'milligram',
+      'gram',
+      'kilogram',
+      'tonne',
+    ]);
+    expect(ids(search('', { category: 'mass', system: 'us' }))).toEqual([
+      'ounce',
+      'pound',
+      'milligram',
+      'gram',
+      'kilogram',
+      'tonne',
+      'stone',
+    ]);
+  });
+
+  it('keeps temperature in its everyday order, the visitor’s own scale first; metric with no preference', () => {
     expect(ids(search('', { category: 'temperature' }))).toEqual([
       'celsius',
       'fahrenheit',
@@ -32,6 +106,17 @@ describe('search: idle lists', () => {
       'fahrenheit',
       'kelvin',
     ]);
+    expect(ids(search('', { category: 'temperature', system: 'us' }))).toEqual([
+      'fahrenheit',
+      'celsius',
+      'kelvin',
+    ]);
+    expect(ids(search('', { category: 'temperature', system: 'imperial' }))).toEqual([
+      'celsius',
+      'fahrenheit',
+      'kelvin',
+    ]);
+    expect(ids(search('', { category: 'length' }))[0]).toBe('millimeter');
   });
 });
 

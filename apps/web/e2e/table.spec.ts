@@ -183,7 +183,8 @@ test('keyboard: the rows are one Tab stop, the arrows move, Enter moves a unit i
 
   await page.keyboard.press('Shift+Tab');
   await expect(buttons.first()).toBeFocused();
-  await page.keyboard.press('ArrowDown');
+  // Liters, the last row for a US visitor: their own units first, then metric, smallest first.
+  await page.keyboard.press('End');
   await expect(row(page, 'liter').getByRole('button').first()).toBeFocused();
   await page.keyboard.press('Control+c');
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);

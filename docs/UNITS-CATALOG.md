@@ -128,7 +128,7 @@ No-match queries are the best signal for missing aliases. Log them (locally in d
 
 ## 6. Adding a category or unit
 
-1. Create or open `packages/core/src/units/<category>.ts`.
+1. Create or open `packages/core/src/units/<category>.ts`. Write units most common first: lists order them by the visitor's system and by size (ADR 0011), and this order breaks ties and orders a category with no size (temperature).
 2. Add the unit with `id`, `category`, `name`, `plural`, `symbol`, `aliases`, `system`, `tier`, its `kind` with a `factor` (plus an `offset` when affine) or a function pair, `exact`, `source`, and a `note` when its definition has a variant.
 3. Add at least one golden row from the cited source in `packages/core/test/golden/<category>.ts`.
 4. Add the unit to this catalog under the right tier.

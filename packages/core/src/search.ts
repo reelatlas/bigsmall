@@ -1,5 +1,6 @@
 import type { Separators } from './locale';
 import { compactKey } from './normalize';
+import { orderUnits } from './order';
 import { parse, type ParsedInput } from './parse';
 import type { UnitPreference } from './region';
 import type { Category, CategoryId, Tier, Unit, UnitSystem } from './types';
@@ -39,7 +40,10 @@ export interface SearchOptions {
   category?: CategoryId | null;
   /** 'basic' hides advanced units unless nothing basic matches. Default 'basic'. */
   tier?: Tier | 'all';
-  /** Preferred unit family, used to break ties (docs/UX-SPEC.md §4). */
+  /**
+   * Preferred unit family: it orders a category's units listed with nothing typed (order.ts) and
+   * breaks ties between typed matches (docs/UX-SPEC.md §3, §4).
+   */
   system?: UnitPreference;
   /** Maximum results. Default 20. */
   limit?: number;
@@ -177,9 +181,11 @@ function idleResults(options: SearchOptions): SearchResponse {
   const tierMode = options.tier ?? 'basic';
   const results: SearchResult[] = [];
   if (options.category) {
-    for (const unit of units) {
-      if (unit.category !== options.category) continue;
-      if (tierMode === 'basic' && unit.tier !== 'basic') continue;
+    const listed = units.filter(
+      (unit) =>
+        unit.category === options.category && (tierMode !== 'basic' || unit.tier === 'basic'),
+    );
+    for (const unit of orderUnits(listed, options.system)) {
       results.push({ kind: 'unit', unit, matchClass: 0, matchedKey: unit.name, field: 'name' });
     }
   } else {

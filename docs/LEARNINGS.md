@@ -467,6 +467,11 @@ Format:
 **What happened.** The first launch build gave the not-found page a canonical link to `/404/`, though it answers every unknown address, and gave the `/dev` pages both `noindex` and a canonical link, which tell search engines opposite things.
 **Rule.** One prop decides both: `Base`'s `noindex` writes the robots tag in place of the canonical link. A browser test checks the converter page names its canonical address and the dev pages name none.
 
+## 2026-10-07 — Tab leaving the page for the browser is correct
+
+**What happened.** Sean noticed that Tab and Shift+Tab, past the first or last control, move focus into Chrome's own controls (the tabs, the address bar, Ask Gemini) and asked whether focus should stay in the app.
+**Rule.** Never hold focus inside a page: that is a keyboard trap (WCAG 2.1.2), and keyboard users need the Tab cycle to reach the address bar and other tabs. Only a modal dialog holds focus, and only while it is open. Within the page, order the DOM so Tab reaches what matters first, as the boxes do (docs/UX-SPEC.md §8).
+
 ## 2026-10-07 — Move focus to another field after the commit renders
 
 **What happened.** Enter that commits a unit now moves the caret to the other box. Focusing it inside the key handler would run its focus handler with the props from before the commit: a box that just got its category would highlight the row the unscoped list had there, the Back row, instead of the best match.

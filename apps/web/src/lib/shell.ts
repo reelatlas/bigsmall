@@ -11,7 +11,7 @@ export const SHELL =
   'overflow-hidden border-2 transition-[border-color,box-shadow] group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md';
 
 /** Bordered at rest (fields, the theme menu). The accent edge also shows keyboard focus inside. */
-export const SHELL_BORDERED = 'border-line bg-surface focus-within:border-accent';
+export const SHELL_BORDERED = 'border-edge bg-surface focus-within:border-accent';
 
 /** A borderless icon button at rest (the shortcuts map) that becomes a card when open. */
 export const SHELL_GHOST = 'border-transparent group-data-open:bg-surface';

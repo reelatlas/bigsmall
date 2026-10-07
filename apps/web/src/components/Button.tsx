@@ -20,7 +20,7 @@ const base =
 // Secondary buttons share the fields' two-pixel edge, so every bordered control has one weight.
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-on-accent hover:opacity-90',
-  secondary: 'border-2 border-line bg-surface text-ink hover:bg-surface-raised',
+  secondary: 'border-2 border-edge bg-surface text-ink hover:bg-surface-raised',
   ghost: 'text-ink-muted hover:bg-surface-raised hover:text-ink',
 };
 

@@ -158,6 +158,7 @@ Both are fluid shells driven by the inline script in `layouts/Base.astro`, so th
 - Each box is a WAI-ARIA combobox: focus stays in the input and `aria-activedescendant` points at the highlighted row, the Back row included (ADR 0006).
 - Two live regions only: the conversion announcement (polite, debounced) and action feedback ("Copied", status). The category label is plain text; the copy button keeps its name. An out-of-range message joins the derived box's description.
 - Every control is at least 44 × 44 px, keyboard-operable, and visibly focused; fields and the theme menu show focus with their accent edge, buttons with the focus ring. Every theme passes the axe suite.
+- A field's resting edge, and a secondary button's, has 3:1 contrast against the page and the field in every theme (WCAG 1.4.11), so a box reads as a box before anyone focuses it.
 
 ## 13. Edge cases
 

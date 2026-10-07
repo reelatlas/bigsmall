@@ -83,6 +83,7 @@ export const TOKEN_CONTRACT = {
     'on-accent',
     'accent-soft',
     'line',
+    'edge',
     'focus',
     'danger',
     'success',
@@ -114,4 +115,7 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = 
   ['accent', 'surface', 3],
   ['focus', 'canvas', 3],
   ['focus', 'surface', 3],
+  // A control's resting edge (fields, secondary buttons) is what identifies it (WCAG 1.4.11).
+  ['edge', 'canvas', 3],
+  ['edge', 'surface', 3],
 ];

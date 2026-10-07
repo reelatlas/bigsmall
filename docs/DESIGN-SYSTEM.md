@@ -13,24 +13,25 @@ Raw values (a hex color, a pixel radius, a literal duration) never appear inside
 
 ## Semantic tokens
 
-| Token                                             | Role                                                                               |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `--canvas`                                        | Page background                                                                    |
-| `--surface`                                       | Cards, fields, panels                                                              |
-| `--surface-raised`                                | Hover states and anything sitting on a surface; visibly different from `--surface` |
-| `--ink`                                           | Primary text                                                                       |
-| `--ink-muted`                                     | Secondary text, labels, hints. Still body-text contrast (4.5:1)                    |
-| `--accent`                                        | The one brand color: active edges, primary buttons, links                          |
-| `--on-accent`                                     | Text and icons placed on `--accent`                                                |
-| `--accent-soft`                                   | Tinted backgrounds: selected rows, chips                                           |
-| `--line`                                          | Borders and dividers                                                               |
-| `--focus`                                         | Focus ring. Often equals `--accent`; dark themes may pick a brighter hue           |
-| `--danger`, `--success`                           | Error and success text and indicators (the out-of-range message, the copy check)   |
-| `--type-display`, `--type-body`, `--type-numeric` | Font stacks for headings, running text, and numbers                                |
-| `--shape-sm`, `--shape-md`, `--shape-lg`          | Border radii                                                                       |
-| `--elevation-sm`, `--elevation-md`                | Shadows (or glows, in neo-noir)                                                    |
-| `--motion-fast`, `--motion-base`, `--motion-slow` | Durations. Zeroed under `prefers-reduced-motion` (see "Motion")                    |
-| `--motion-ease`                                   | The theme's easing curve                                                           |
+| Token                                             | Role                                                                                                                |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `--canvas`                                        | Page background                                                                                                     |
+| `--surface`                                       | Cards, fields, panels                                                                                               |
+| `--surface-raised`                                | Hover states and anything sitting on a surface; visibly different from `--surface`                                  |
+| `--ink`                                           | Primary text                                                                                                        |
+| `--ink-muted`                                     | Secondary text, labels, hints. Still body-text contrast (4.5:1)                                                     |
+| `--accent`                                        | The one brand color: active edges, primary buttons, links                                                           |
+| `--on-accent`                                     | Text and icons placed on `--accent`                                                                                 |
+| `--accent-soft`                                   | Tinted backgrounds: selected rows, chips                                                                            |
+| `--line`                                          | Dividers and decorative borders: list headers, the toolbar rule, keycaps, cards                                     |
+| `--edge`                                          | A control's resting edge: fields, the theme menu, secondary buttons. 3:1 or more against `--canvas` and `--surface` |
+| `--focus`                                         | Focus ring. Often equals `--accent`; dark themes may pick a brighter hue                                            |
+| `--danger`, `--success`                           | Error and success text and indicators (the out-of-range message, the copy check)                                    |
+| `--type-display`, `--type-body`, `--type-numeric` | Font stacks for headings, running text, and numbers                                                                 |
+| `--shape-sm`, `--shape-md`, `--shape-lg`          | Border radii                                                                                                        |
+| `--elevation-sm`, `--elevation-md`                | Shadows (or glows, in neo-noir)                                                                                     |
+| `--motion-fast`, `--motion-base`, `--motion-slow` | Durations. Zeroed under `prefers-reduced-motion` (see "Motion")                                                     |
+| `--motion-ease`                                   | The theme's easing curve                                                                                            |
 
 The full list is the single source of truth in `apps/web/src/lib/themes.ts` (`TOKEN_CONTRACT`), with the contrast pairs every theme must pass (`CONTRAST_PAIRS`).
 
@@ -42,7 +43,7 @@ The full list is the single source of truth in `apps/web/src/lib/themes.ts` (`TO
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `bg-canvas`, `bg-surface`, `bg-surface-raised`, `bg-accent`, `bg-accent-soft` | color tokens                                                                                |
 | `text-ink`, `text-ink-muted`, `text-on-accent`, `text-danger`, `text-success` | color tokens                                                                                |
-| `border-line`, `border-accent`, `outline-focus`                               | color tokens                                                                                |
+| `border-edge`, `border-line`, `border-accent`, `outline-focus`                | color tokens                                                                                |
 | `font-display`, `font-body`, `font-numeric`                                   | type tokens; `font-numeric` also turns on tabular digits                                    |
 | `rounded-sm`, `rounded-md`, `rounded-lg`                                      | shape tokens                                                                                |
 | `rounded-nested`, `rounded-nested-md`                                         | derived: the shell's corner minus its border and inset (see "Corners")                      |
@@ -95,10 +96,10 @@ Prefer native elements when they are good enough (`<button>`, radios, `<dialog>`
 
 ### Edges and borders
 
-- **2 px is a control's edge.** Fields, the theme menu, and secondary buttons share `border-2`, so no control looks lighter-edged than its neighbor. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights once ate into it.
+- **2 px is a control's edge.** Fields, the theme menu, and secondary buttons share `border-2` in `--edge`, so no control looks lighter-edged than its neighbor. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights once ate into it.
 - **1 px is a divider or a keycap.** The line under a field or the Back row, the toolbar divider (`border-l`), and keycaps use `border`.
-- **Open is accent.** A shell's edge is `border-line` at rest and `border-accent` while open or while something inside has focus.
-- Known gap: `--line` is subtle against `--canvas` (under 3:1 in every theme), so a field's resting edge does not meet WCAG 1.4.11 on its own. Recorded as an open decision in docs/research/findings-0-first-pass.md.
+- **Open is accent.** A shell's edge is `border-edge` at rest and `border-accent` while open or while something inside has focus.
+- **A control's edge identifies it.** `--edge` passes 3:1 against the page and the surface in every theme, so a field's resting edge meets WCAG 1.4.11 by itself, and the theme test enforces it. `--line` stays subtle because a divider only groups. Each theme's `--edge` is its `--line` moved toward `--ink` to the first step past 3:1. Introduced 2026-10-06 as a trial the owner may roll back (findings-0, sixth pass).
 
 ### Focus
 

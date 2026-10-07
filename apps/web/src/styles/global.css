@@ -28,6 +28,7 @@
   --color-on-accent: var(--on-accent);
   --color-accent-soft: var(--accent-soft);
   --color-line: var(--line);
+  --color-edge: var(--edge);
   --color-focus: var(--focus);
   --color-danger: var(--danger);
   --color-success: var(--success);

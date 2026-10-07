@@ -9,7 +9,7 @@ What is tested where, how to run it, and what CI blocks on.
 | Core unit  | Vitest                             | `packages/core/test/` | Golden conversions from sourced fixtures, round trips, unit kinds, errors, registry integrity, region policy, the parser, search and ranking, formatting, matched-letter spans |
 | Web unit   | Vitest (node)                      | `apps/web/test/`      | The converter reducer, view, anchor, out-of-range messages, history, typing chunks and Escape steps; the URL; the theme contract and WCAG contrast                             |
 | End to end | Playwright + axe-core              | `apps/web/e2e/`       | Real flows on desktop and mobile Chromium, zero WCAG 2.2 AA violations, every theme                                                                                            |
-| Static     | ESLint, Prettier, tsc, astro check | repo root             | Boundaries (ADR 0003), a11y lint for JSX and Astro, types, formatting                                                                                                          |
+| Static     | ESLint, Prettier, tsc, astro check | repo root             | Boundaries (ADR 0003), a11y lint for JSX and Astro, the token guard (no raw values in components), types, formatting                                                           |
 | Budget     | `scripts/bundle-size.mjs`          | repo root             | What the converter page ships, gzipped, against 90 KB JS and 20 KB CSS                                                                                                         |
 
 Lighthouse CI joins in milestone 5 (docs/PLAN.md §9).

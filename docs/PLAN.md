@@ -228,6 +228,7 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 5. **Toolchain.** Latest where compatible, accessibility tooling never dropped (ADR 0005). TypeScript 6 until the ecosystem supports 7.
 6. **Input flexibility.** Spacing, locale number formats, typed math, and Enter-as-equals are a standing UX principle, phased in `docs/UX-SPEC.md` §14.
 7. **Commit rules.** Nothing commits on a keystroke. Enter commits the highlighted best match, or a pick does; Tab and clicking away never commit, so moving between boxes never changes what was typed (`docs/UX-SPEC.md` §5).
+8. **Token guard.** `pnpm lint` rejects raw colors, palette colors, one-off arbitrary values, untokened radii, shadows, fonts, and literal durations and delays in components. A flagged need is matched to an existing token or brought to the owner as a proposed new one (`docs/DESIGN-SYSTEM.md`, "Token guard").
 
 Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (check `.app`, `.io`, `.co`, `.tools` availability early).
 

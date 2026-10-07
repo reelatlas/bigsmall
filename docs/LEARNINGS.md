@@ -230,3 +230,8 @@ Format:
 
 **What happened.** In German, "1.000" (one thousand) went into the link as `v=1`: the URL writer parsed the text with the default separators, where "1.000" is one.
 **Rule.** Every call that parses typed text passes the user's separators. Web functions that do it take them as a required argument (`stateToParams(state, separators)`), so a caller cannot fall back to the defaults by forgetting. A browser test loads the page in `de-DE`.
+
+## 2026-10-06 — A lint rule can guard class strings without a plugin
+
+**What happened.** The token guard had to read class lists in React and Astro files. ESLint's built-in `no-restricted-syntax` matches string literals and template parts by regex (`Literal[value=/…/]`), and the Astro parser presents `class` and `class:list` strings as the same nodes, so one rule covers both without a Tailwind plugin or a new dependency.
+**Rule.** Write guard patterns without "/" (a selector's regex ends at the first slash). Before trusting a new pattern, lint a scratch file of deliberate violations and of allowed look-alikes, then delete it.

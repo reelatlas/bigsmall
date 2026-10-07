@@ -9,7 +9,7 @@ Tokens, the Tailwind bridge, the patterns every control follows, and the compone
 3. **Derived tokens** are computed once in the bridge from semantic tokens (the nested corner radii). They follow every theme automatically.
 4. **Component tokens** exist only when a component needs its own knob. None yet. Prefer a semantic token.
 
-Raw values (a hex color, a pixel radius, a literal duration) never appear inside a component. If a design needs something the tokens cannot express, add a token, document it here, and define it in every theme. The theme contract test fails until every theme has it.
+Raw values (a hex color, a pixel radius, a literal duration) never appear inside a component, and `pnpm lint` enforces it (see "Token guard"). If a design needs something the tokens cannot express, add a token, document it here, and define it in every theme. The theme contract test fails until every theme has it.
 
 ## Semantic tokens
 
@@ -58,6 +58,23 @@ Custom utilities, also in `global.css`:
 | `focus-ring-within-inset` | The same ring on a wrapper whose descendant has focus (the theme menu's radio labels)   |
 
 Layout and spacing use Tailwind's default scale (`p-4`, `gap-2`, `max-w-2xl`). Those are not themed.
+
+## Token guard
+
+`pnpm lint` checks every string in `apps/web/src`, which is where class lists live, and fails on a value that bypasses the tokens. The patterns are in `eslint.config.js` (`RAW_VALUES`).
+
+| Flagged                                                                                  | Use instead                                                                       |
+| ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Raw colors: hex, `rgb()`, `hsl()`, `oklch()`, `color-mix()`                              | A color token: `bg-surface`, `text-ink`, `border-line`                            |
+| Tailwind palette colors: `bg-red-500`, `text-white`                                      | A color token. The palette does not follow the theme                              |
+| Arbitrary values holding a length, color, time, or variable: `w-[37px]`, `bg-(--accent)` | The token utility, or the spacing scale                                           |
+| Numbered durations and stock easings: `duration-150`, `ease-in-out`                      | `duration-fast`, `duration-base`, `duration-slow`, `ease-standard`                |
+| Radii, shadows, and fonts outside the tokens: `rounded-xl`, `shadow-lg`, `font-mono`     | `rounded-sm/md/lg`, `rounded-nested`, `shadow-sm/md`, `font-display/body/numeric` |
+| A number of milliseconds in `setTimeout` or `setInterval`                                | A named constant in `src/lib/timing.ts`                                           |
+
+Allowed: arbitrary values that name structure rather than a value (`transition-[border-color,box-shadow]`, `grid-cols-[1fr_auto_1fr]`), the spacing scale, and `var(--token)` where the gallery paints its swatches. Raw values belong in the theme files and the bridge, which are CSS and outside the guard.
+
+**When it flags something.** Use the existing token if one fits. If none does, the need is a design decision: bring it to the owner with a recommendation (reuse a token, or add one to every theme) before building on it. Never silence the guard with a disable comment.
 
 ## Component rules
 

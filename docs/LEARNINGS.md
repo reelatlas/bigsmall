@@ -356,3 +356,8 @@ Format:
 
 **What happened.** Checking the wordmark in a background browser tab, frames did not advance between script calls; a screenshot ran a frame or two, so captures showed a change just starting.
 **Rule.** Verify script-driven motion with state rather than timing: the lab's hold and show, and assertions on what lands. Time-based checks belong in the foreground or in Playwright.
+
+## 2026-10-06 — A scrolling code block fails axe only where the font is wide
+
+**What happened.** The lab's settings code scrolled sideways on a phone in CI, where Linux's monospace is wider, and axe flagged it as a scrollable region without keyboard access; on Windows it fit and passed. At 320 px the lab also ran 14 px wide: a `<select>` is as wide as its longest option, and a grid's automatic column cannot shrink below an input's built-in width.
+**Rule.** Let code on a page wrap (`whitespace-pre-wrap wrap-break-word`) rather than scroll. Give form controls in a narrow column `w-full min-w-0`, and a grid of them a shrinkable column (`grid-cols-1`, which is `minmax(0, 1fr)`). Check a new page at 320 px with a script that lists anything past the right edge.

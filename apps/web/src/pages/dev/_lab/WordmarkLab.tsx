@@ -241,7 +241,7 @@ function Panel({
   return (
     <fieldset
       className={[
-        'grid min-w-0 content-start gap-4 rounded-lg border border-line bg-surface p-5',
+        'grid min-w-0 grid-cols-1 content-start gap-4 rounded-lg border border-line bg-surface p-5',
         className,
       ]
         .filter(Boolean)
@@ -445,7 +445,7 @@ const Sheet = memo(function Sheet({
   );
 });
 
-const SELECT = 'min-h-11 rounded-md border-2 border-edge bg-surface px-3 text-ink';
+const SELECT = 'min-h-11 w-full min-w-0 rounded-md border-2 border-edge bg-surface px-3 text-ink';
 const CHECK = 'flex min-h-11 items-center gap-2 text-sm';
 
 export function WordmarkLab() {
@@ -781,7 +781,7 @@ export function WordmarkLab() {
           <p className="text-sm text-ink-muted">
             Paste the copied settings in chat, or over the defaults in the two files they name.
           </p>
-          <pre className="overflow-x-auto rounded-md bg-surface-raised p-4 font-numeric text-xs">
+          <pre className="rounded-md bg-surface-raised p-4 font-numeric text-xs wrap-break-word whitespace-pre-wrap">
             {code}
           </pre>
         </Panel>

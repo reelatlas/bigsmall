@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { DEFAULT_LIGHT, THEMES } from '../src/lib/themes';
 import { PEEK_CLOSE_MS, WORDMARK_TIMING } from '../src/lib/timing';
+import { WORDMARK_TUNING } from '../src/lib/wordmark';
 import { expectNoA11yViolations, ready, settled } from './support';
 
 const themeToggle = (page: Page) => page.getByRole('button', { name: /^Theme/ });
@@ -297,4 +298,21 @@ test('the lab copies its settings as code', async ({ page, context, isMobile }) 
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toContain('restMs: 2400,');
   expect(copied).toContain('export const WORDMARK_TUNING');
+  for (const key of Object.keys(WORDMARK_TUNING)) expect(copied, key).toContain(`  ${key}: `);
+  expect(copied).toContain("twoLinesFrom: 'text-base',");
+});
+
+test('the lab loads an earlier version’s settings to compare or roll back', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'one viewport is enough');
+  await openLab(page);
+  const rest = page.getByLabel('Rest', { exact: true });
+  await expect(rest).toHaveValue(String(WORDMARK_TIMING.restMs));
+  await page.getByLabel('Earlier version').selectOption('v0');
+  await page.getByRole('button', { name: 'Load', exact: true }).click();
+  await expect(rest).toHaveValue('1800');
+  await page.getByRole('button', { name: /^Reset to shipped/ }).click();
+  await expect(rest).toHaveValue(String(WORDMARK_TIMING.restMs));
 });

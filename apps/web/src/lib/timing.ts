@@ -26,17 +26,18 @@ export const PEEK_OPEN_MS = 120;
 export const PEEK_CLOSE_MS = 200;
 
 /**
- * The header wordmark (docs/UX-SPEC.md §1). Wordmark.astro hands these to its motion code.
+ * The header wordmark (docs/UX-SPEC.md §1). Wordmark.astro hands these to its motion code;
+ * /dev/wordmark-lab tunes them, and keeps the ones that shipped before as presets.
  */
 export const WORDMARK_TIMING = {
   /** The resting pace while hovered, and the fastest it may go. */
-  restMs: 1800,
+  restMs: 2000,
   fastMs: 110,
   /** The first change after the pointer arrives comes this soon, so the header answers at once. */
   firstMs: 250,
   /** At rest, how far apart the letters land in a change, and how often a flipping letter changes. */
   stepMs: 45,
-  flipMs: 40,
-  /** On a touch screen, a tap on the header plays the wordmark this long. */
+  flipMs: 34,
+  /** On a touch screen, a tap on the heading plays the wordmark this long. */
   tapMs: 4000,
 } as const;

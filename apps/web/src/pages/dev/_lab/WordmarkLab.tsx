@@ -21,6 +21,7 @@ import {
 } from '../../../components/wordmark-motion';
 import { useCopied } from '../../../lib/copied';
 import { WORDMARK_TIMING } from '../../../lib/timing';
+import { PRESETS, SHIPPED } from './presets';
 import {
   ART_GLYPHS,
   ART_STEPS,
@@ -77,8 +78,17 @@ function save(settings: WordmarkSettings): void {
   }
 }
 
-/** The settings as code, to paste over the defaults in lib/timing.ts and lib/wordmark.ts. */
+/** A setting's value as it is written in code. */
+const literal = (value: unknown) => (typeof value === 'string' ? `'${value}'` : String(value));
+
+/**
+ * The settings as code, to paste over the defaults in lib/timing.ts and lib/wordmark.ts. Every
+ * setting is listed from the shipped objects' own keys, so one added later cannot be left out.
+ */
 function snippet({ timing, tuning }: WordmarkSettings): string {
+  const settings = (Object.keys(WORDMARK_TUNING) as (keyof WordmarkTuning)[]).filter(
+    (key) => key !== 'mix',
+  );
   return [
     '// apps/web/src/lib/timing.ts',
     'export const WORDMARK_TIMING = {',
@@ -90,12 +100,7 @@ function snippet({ timing, tuning }: WordmarkSettings): string {
     '  mix: {',
     ...PHRASE_KINDS.map((kind) => `    ${kind}: ${tuning.mix[kind]},`),
     '  },',
-    `  gain: ${tuning.gain},`,
-    `  decay: ${tuning.decay},`,
-    `  response: ${tuning.response},`,
-    `  artAway: ${tuning.artAway},`,
-    `  artBack: ${tuning.artBack},`,
-    `  smallest: '${tuning.smallest}',`,
+    ...settings.map((key) => `  ${key}: ${literal(tuning[key])},`),
     '};',
   ].join('\n');
 }
@@ -524,6 +529,14 @@ export function WordmarkLab() {
       tuning: { ...s.tuning, mix: { ...s.tuning.mix, [kind]: value } },
     }));
 
+  const [preset, setPreset] = useState(PRESETS[0]?.id ?? '');
+  const loadPreset = (presetId: string) => {
+    const found = PRESETS.find((each) => each.id === presetId);
+    if (!found) return;
+    setSettings(structuredClone(found.settings));
+    setSolo('all');
+  };
+
   const total = PHRASE_KINDS.reduce((sum, kind) => sum + settings.tuning.mix[kind], 0);
   const code = snippet(settings);
   const copy = async () => {
@@ -763,7 +776,7 @@ export function WordmarkLab() {
         </Panel>
 
         <Panel title="Settings" className="lg:col-span-3">
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap items-end gap-3">
             <Button variant="primary" onClick={copy} {...pointerProps('settings')}>
               {copied === 'settings' ? <CheckIcon /> : <CopyIcon />}
               Copy settings
@@ -775,11 +788,33 @@ export function WordmarkLab() {
                 setSolo('all');
               }}
             >
-              Reset to shipped
+              Reset to shipped ({SHIPPED})
             </Button>
+            <div className="grid min-w-0 gap-1 text-sm">
+              <label htmlFor={`${id}-preset`}>Earlier version</label>
+              <div className="flex gap-2">
+                <select
+                  id={`${id}-preset`}
+                  value={preset}
+                  onChange={(event) => setPreset(event.currentTarget.value)}
+                  className={SELECT}
+                >
+                  {PRESETS.map((each) => (
+                    <option key={each.id} value={each.id}>
+                      {each.label}
+                    </option>
+                  ))}
+                </select>
+                <Button variant="secondary" onClick={() => loadPreset(preset)}>
+                  Load
+                </Button>
+              </div>
+            </div>
           </div>
           <p className="text-sm text-ink-muted">
-            Paste the copied settings in chat, or over the defaults in the two files they name.
+            Paste the copied settings in chat, or over the defaults in the two files they name. An
+            earlier version loads the settings that shipped then, to compare, or to copy and send
+            back as the defaults.
           </p>
           <pre className="rounded-md bg-surface-raised p-4 font-numeric text-xs wrap-break-word whitespace-pre-wrap">
             {code}

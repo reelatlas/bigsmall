@@ -2,8 +2,8 @@
  * The header's wordmark at play (docs/UX-SPEC.md §1, "The wordmark at play"): what "bigsmall" can
  * turn into, how often each kind comes up, and the split-flap frames between one phrase and the
  * next. Pure, so the variety and the frame math are unit-tested; components/wordmark-motion.ts
- * puts it on the page, and /dev/wordmark-lab tunes it. Every figure is a standard value (SI,
- * CODATA, NIST); the wordplay is ours (ADR 0004).
+ * puts it on the page, and /dev/wordmark-lab tunes it. Every figure is a standard or published
+ * value (SI, CODATA, NIST, the IAU's nominal solar values); the wordplay is ours (ADR 0004).
  */
 
 export const WORDMARK = 'bigsmall';
@@ -46,7 +46,9 @@ const ANALOGIES = list(
     'pumpkin:pea|melon:seed|bonfire:spark|volcano:candle|avalanche:flake|glacier:snowflake|iceberg:ice cube|' +
     'tsunami:ripple|storm:drizzle|thunder:whisper|roar:squeak|Pacific:puddle|river:trickle|forest:leaf|' +
     'canyon:crack|cathedral:brick|stadium:seat|blimp:bubble|mansion:mousehole|marathon:step|century:second|' +
-    'light-year:inch',
+    'light-year:inch|mountain:molehill|metropolis:hamlet|castle:sandcastle|jumbo jet:kite|galleon:raft|' +
+    'orca:guppy|rhino:tick|giraffe:gecko|organ:kazoo|symphony:hum|saga:limerick|banquet:snack|star:ember|' +
+    'sea:sip|giant:pixie',
 );
 /** Idioms of size and measure. */
 const IDIOMS = list(
@@ -63,7 +65,9 @@ const EQUATIONS = list(
     'λ = c/f|v = fλ|ΔS ≥ 0|KE = ½mv²|W = Fd|ρ = m/V|E = hf|λ = h/p|F = −kx|s = ½at²|Δx·Δp ≥ ℏ/2|S = k ln W|' +
     'T² ∝ a³|F = qvB|Q = mcΔT|P = F/A|P = ρgh|F = ρgV|τ = r × F|L = Iω|ω = 2πf|g = GM/r²|n = c/v|j = σT⁴|' +
     'ΔG = ΔH − TΔS|∇·B = 0|∇·E = ρ/ε₀|pH = −log[H⁺]|A = πr²|C = 2πr|V = 4πr³/3|i² = −1|φ² = φ + 1|' +
-    '0.999… = 1|Σ2⁻ⁿ = 2|eˣ = Σxⁿ/n!|sin²θ + cos²θ = 1|E² = (pc)² + (mc²)²|1 + 1 = 10₂',
+    '0.999… = 1|Σ2⁻ⁿ = 2|eˣ = Σxⁿ/n!|sin²θ + cos²θ = 1|E² = (pc)² + (mc²)²|1 + 1 = 10₂|g ≈ π² m/s²|' +
+    'ζ(2) = π²/6|R = Nₐk|E = pc|v = √(2gh)|T = 2π√(L/g)|F = q(E + v × B)|c = 1/√(ε₀µ₀)|ΔE·Δt ≥ ℏ/2|' +
+    'n₁ sin θ₁ = n₂ sin θ₂|∮B·dl = µ₀I|sin x ≈ x|eˣ ≈ 1 + x|(1 + 1/n)ⁿ → e|a = v²/r|ε = −dΦ/dt',
 );
 /** Constants of nature and of mathematics. */
 const CONSTANTS = list(
@@ -71,7 +75,10 @@ const CONSTANTS = list(
     'G ≈ 6.674e−11|R ≈ 8.314 J/mol·K|σ ≈ 5.670e−8|ε₀ ≈ 8.854e−12 F/m|qₑ ≈ 1.602e−19 C|mₑ ≈ 9.109e−31 kg|' +
     'mₚ ≈ 1.673e−27 kg|α ≈ 1/137|ℓₚ ≈ 1.616e−35 m|tₚ ≈ 5.391e−44 s|M☉ ≈ 1.988e30 kg|M⊕ ≈ 5.972e24 kg|' +
     'R⊕ ≈ 6371 km|CMB ≈ 2.725 K|sound ≈ 343 m/s|π ≈ 3.14159|τ = 2π|φ ≈ 1.618|e ≈ 2.71828|γ ≈ 0.5772|' +
-    '√2 ≈ 1.41421|√3 ≈ 1.732|ln 2 ≈ 0.693|googol = 10¹⁰⁰',
+    '√2 ≈ 1.41421|√3 ≈ 1.732|ln 2 ≈ 0.693|googol = 10¹⁰⁰|µ₀ ≈ 1.257e−6 N/A²|mₙ ≈ 1.675e−27 kg|' +
+    'a₀ ≈ 5.292e−11 m|R∞ ≈ 1.097e7 m⁻¹|F ≈ 96_485 C/mol|Φ₀ ≈ 2.068e−15 Wb|Z₀ ≈ 376.7 Ω|b ≈ 2.898e−3 m·K|' +
+    'kₑ ≈ 8.988e9 N·m²/C²|T☉ ≈ 5772 K|R☉ ≈ 695_700 km|L☉ ≈ 3.828e26 W|g☾ ≈ 1.62 m/s²|c ≈ 186_282 mi/s|' +
+    'ℏc ≈ 197.3 MeV·fm|mₑc² ≈ 511 keV|t₀ ≈ 13.8 Gyr|v⊕ ≈ 29.8 km/s|d☾ ≈ 384_400 km',
 );
 /** Conversions, the site's own trade. */
 const CONVERSIONS = list(
@@ -85,7 +92,10 @@ const CONVERSIONS = list(
     '1 KiB = 1024 B|1 MiB = 1024 KiB|1 GB = 1000 MB|1 d = 86_400 s|1 h = 3600 s|1 wk = 604_800 s|' +
     '1 yr ≈ 3.156e7 s|1 atm = 101_325 Pa|1 bar = 100 kPa|1 psi ≈ 6.895 kPa|1 mmHg ≈ 133.3 Pa|1 cal = 4.184 J|' +
     '1 kWh = 3.6 MJ|1 BTU ≈ 1055 J|1 eV ≈ 1.602e−19 J|1 hp ≈ 745.7 W|1 N ≈ 0.2248 lbf|1 J = 1 N·m|' +
-    '1 W = 1 J/s|1 rad ≈ 57.3°|360° = 2π rad',
+    '1 W = 1 J/s|1 rad ≈ 57.3°|360° = 2π rad|0 K = −459.67 °F|1 mi = 1760 yd|1 yd = 0.9144 m|' +
+    '1 lb = 7000 gr|1 cup = 16 tbsp|1 pt = 2 cups|1 gal = 128 fl oz|1 ft² ≈ 0.0929 m²|1 m³ = 1000 L|' +
+    '1 Mbps = 125 kB/s|1 mpg ≈ 0.425 km/L|1 lbf ≈ 4.448 N|1 MPa ≈ 145 psi|1 kcal = 4.184 kJ|' +
+    '1 ly ≈ 63_241 AU|1 pc ≈ 206_265 AU|1 kn = 1 nmi/h',
 );
 /** Wordplay on the name itself. */
 const NAME = list(
@@ -93,16 +103,20 @@ const NAME = list(
     'big ∝ 1/small|big → small|small → big|big ⇄ small|∑small = big|∫small = big|d(big) = small|' +
     'small × 10ⁿ = big|big ÷ 10ⁿ = small|f(big) = small|bigsmall²|√bigsmall|smallbig|llamsgib|big.small|' +
     'big/small|big..small|[big, small]|{big, small}|⟨big∣small⟩|‖big‖ > ‖small‖|<bigsmall/>|bigsmall()|' +
-    'big && small|big ?? small|lim small→0|big → ∞|small → 0|Δbig/Δsmall|log(big)|small⁻¹|big!|big² ≫ small²',
+    'big && small|big ?? small|lim small→0|big → ∞|small → 0|Δbig/Δsmall|log(big)|small⁻¹|big!|big² ≫ small²|' +
+    'BIGˢᵐᵃˡˡ|ᵇⁱᵍSMALL',
 );
 /** Text art. */
 const ART = list(
   '▇▆▅▄▃▂▁|▁▂▃▄▅▆▇|▁▃▅▇▅▃▁|█▓▒░|░▒▓█|⣿⣶⣤⣀|●•·|■▪·|◉◎○|●●●···|■■□□|O o ·|oOo|◆◇◆◇|▲△▴▵|★☆✦✧|' +
-    '≋≋≋≋≋≋|∿∿∿∿|big→→small|‹‹big››|›››small',
+    '≋≋≋≋≋≋|∿∿∿∿|big→→small|‹‹big››|›››small|◐◑◒◓|◴◵◶◷|◜◝◞◟|▏▎▍▌▋▊▉█|█▉▊▋▌▍▎▏|⣀⣤⣶⣿|⠁⠃⠇⡇⣇⣧⣷⣿|' +
+    '∙∘○◯|◯○∘∙|·∙•●|◇◈◆|□▣■|❚❙❘|≫>›|‹<≪|O○◦·|Oo.oO|•○●○•|⋆✦★✦⋆|♩♪♫♬|⌢⌣⌢⌣|·:∴∷|▂▄▆█▆▄▂|' +
+    'BIG ʙɪɢ ᴮᴵᴳ|kMGTPE|mµnpfa|10⁰ 10¹ 10²',
 );
 /** What the theme's art can flip to: a symbol or a short expression. */
 export const ART_GLYPHS: readonly string[] = list(
-  'π|∞|Σ|∫|Δ|λ|µ|Ω|φ|ℏ|∂|∇|√|≈|∝|±|÷|°|%|e|c²|x²|10ⁿ|n!|½|∅|⊂|≫|∴|∎|★',
+  'π|∞|Σ|∫|Δ|λ|µ|Ω|φ|ℏ|∂|∇|√|≈|∝|±|÷|°|%|e|c²|x²|10ⁿ|n!|½|∅|⊂|≫|∴|∎|★|θ|ψ|σ|τ|ε|η|ω|Γ|Φ|Ψ|Λ|ℓ|' +
+    'ℵ|∮|∏|⊗|⊕|≡|≠|∀|∃|⅓|¾|i²|2ⁿ|hν|mc²|dx',
 );
 
 /** The kinds of phrase, in the order the lab lists them. */
@@ -204,21 +218,21 @@ export const WORDMARK_TUNING: WordmarkTuning = {
   mix: {
     big: 8,
     small: 8,
-    both: 4,
+    both: 6,
     letters: 10,
     pairs: 8,
     analogies: 18,
     idioms: 10,
-    equations: 14,
-    constants: 6,
-    conversions: 6,
-    name: 6,
-    art: 2,
+    equations: 16,
+    constants: 10,
+    conversions: 13,
+    name: 7,
+    art: 9,
   },
   gain: 3.5,
   decay: 0.92,
   response: 0.4,
-  artAway: 0.2,
+  artAway: 1,
   artBack: 0.5,
   smallest: 'text-sm',
   twoLinesFrom: 'text-base',

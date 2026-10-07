@@ -226,9 +226,11 @@ export function SmartInput({
   };
 
   /** Enter with nothing to commit on arithmetic: it becomes its value, the unit staying (docs/UX-SPEC.md §5). */
-  const evaluate = () => {
+  const evaluate = (): boolean => {
     const text = evaluatedText(box.text, env);
-    if (text !== null) dispatch({ type: 'replace', box: box.id, text });
+    if (text === null) return false;
+    dispatch({ type: 'replace', box: box.id, text });
+    return true;
   };
 
   /** Commit the exact match, if the query names exactly one unit: Enter with no row highlighted. */
@@ -334,7 +336,11 @@ export function SmartInput({
         // does what it does with no row, evaluating any arithmetic, and closes.
         const own = item?.kind === 'unit' && item.unit.id === box.unit?.id;
         if (item && !own) pick(item);
-        else if (!commitExact()) evaluate();
+        else if (!commitExact() && evaluate() && !box.unit) {
+          // A sum worked out in a box with no unit leaves the list open: a unit comes next.
+          setOpen(true);
+          break;
+        }
         closePanel();
         onEnter();
         break;

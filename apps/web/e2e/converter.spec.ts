@@ -826,6 +826,25 @@ test('Enter on typed arithmetic gives its value and keeps the unit', async ({ pa
   await expect(second).toHaveAccessibleDescription(/Can’t divide by zero/);
 });
 
+test('Enter on a sum in a box with no unit gives its value and leaves the list open for one', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  const { first, second } = boxes(page);
+
+  await first.fill('6*3');
+  await first.press('Enter');
+  await expect(first).toHaveValue('18');
+  await expect(page.getByRole('option', { name: /^Volume$/ })).toBeVisible();
+
+  // The unit comes next; once it is chosen, Enter moves on to the second box.
+  await first.pressSequentially(' ml');
+  await first.press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await expect(second).toBeFocused();
+});
+
 test.describe('in a German locale', () => {
   test.use({ locale: 'de-DE' });
 

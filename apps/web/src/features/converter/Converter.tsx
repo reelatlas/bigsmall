@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Button } from '../../components/Button';
 import { CopyIcon, EraserIcon, RedoIcon, SwapIcon, UndoIcon } from '../../components/icons';
 import { useIsHydrated } from '../../lib/hydrated';
+import { isApplePlatform } from '../../lib/platform';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
 import { useConverter } from './useConverter';
@@ -24,6 +25,8 @@ export function Converter() {
   const { state, view, env, dispatch, canUndo, canRedo, escapeTargets, announcement } =
     useConverter();
   const hydrated = useIsHydrated();
+  // Tooltips name the platform's keys; until hydration they read as on the server (Ctrl).
+  const apple = hydrated && isApplePlatform();
   const hintId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const [copiedBox, setCopiedBox] = useState<BoxId | null>(null);
@@ -92,8 +95,8 @@ export function Converter() {
   /**
    * The category label sits under the box the conversion is anchored on, left-aligned with the
    * value in both boxes so it reads right beside what the user typed. It says both what kind of
-   * units these are and which side is driving. A switch of category shows here first
-   * ("Switched to Temperature") until the next change.
+   * units these are and which side is driving; after a switch of category it simply names the
+   * new one, under the box that switched it.
    */
   const caption = (id: BoxId) => (
     <p
@@ -101,7 +104,7 @@ export function Converter() {
       data-category-label={id}
       className="mt-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted"
     >
-      {view.anchor === id ? (view.notice ?? categoryName ?? '') : ''}
+      {view.anchor === id ? (categoryName ?? '') : ''}
     </p>
   );
 
@@ -139,7 +142,7 @@ export function Converter() {
             variant="ghost"
             square
             aria-label="Undo"
-            title="Undo (Ctrl+Z)"
+            title={apple ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)'}
             disabled={!canUndo}
             onClick={() => dispatch({ type: 'undo' })}
           >
@@ -149,7 +152,7 @@ export function Converter() {
             variant="ghost"
             square
             aria-label="Redo"
-            title="Redo (Ctrl+Y)"
+            title={apple ? 'Redo (⇧⌘Z)' : 'Redo (Ctrl+Y)'}
             disabled={!canRedo}
             onClick={() => dispatch({ type: 'redo' })}
           >
@@ -179,7 +182,7 @@ export function Converter() {
         {field(view.b, 'Second value', view.a, 'row-start-3 sm:col-start-3 sm:row-start-1')}
         <div className="row-start-2 flex justify-center sm:col-start-2 sm:row-start-1 sm:pt-2.5">
           <Button
-            variant="secondary"
+            variant="ghost"
             square
             aria-label="Swap sides"
             onClick={() => dispatch({ type: 'swap' })}

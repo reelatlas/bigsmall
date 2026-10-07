@@ -64,6 +64,19 @@ const MIRROR =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 
 /**
+ * "Too large to convert" in place of a value shrinks the same way a long number does, and as a
+ * last resort wraps to two lines, so it is never cut off.
+ */
+const MESSAGE =
+  'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-medium text-danger';
+const MESSAGE_STEPS = [
+  'text-base whitespace-nowrap sm:text-lg',
+  'text-sm whitespace-nowrap',
+  'text-xs whitespace-nowrap',
+  'text-xs leading-tight whitespace-normal',
+] as const;
+
+/**
  * One box of the converter: a text field that takes a number, a unit, or both, with the locked
  * unit shown as a chip and a suggestion list that grows out of the field over the page
  * (docs/UX-SPEC.md §2–§5, §14–§17). Hand-built on the WAI-ARIA combobox pattern (ADR 0006).
@@ -84,6 +97,7 @@ export function SmartInput({
 }: SmartInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<HTMLDivElement>(null);
   const idBase = useId();
   const inputId = `${idBase}-input`;
   const listboxId = `${idBase}-listbox`;
@@ -138,6 +152,7 @@ export function SmartInput({
         : examples;
 
   const sizeClass = SIZE_STEPS[useFitStep(mirrorRef, MIRROR, SIZE_STEPS)];
+  const messageClass = MESSAGE_STEPS[useFitStep(messageRef, MESSAGE, MESSAGE_STEPS)];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
   const syncScroll = () => {
@@ -329,22 +344,19 @@ export function SmartInput({
             <div ref={mirrorRef} aria-hidden="true" className={`${MIRROR} ${sizeClass}`}>
               <NumberText text={box.text} valueText={suggestion.parsed.valueText} />
             </div>
-            {box.message && (
-              <div
-                id={messageId}
-                className="pointer-events-none absolute inset-0 flex items-center text-base font-medium text-danger sm:text-lg"
-              >
-                <span className="truncate">{box.message}</span>
-              </div>
-            )}
+            {/* Always rendered, so its size is re-measured on resize; empty when there is no message. */}
+            <div ref={messageRef} id={messageId} className={`${MESSAGE} ${messageClass}`}>
+              {box.message ?? ''}
+            </div>
           </div>
           {box.unit && (
             // Out of the Tab order: Tab goes to the next box, and the field's own keys do what
             // the chip does (Down or typing lists the units; Backspace on an empty field or
             // Escape removes the unit). Pointers and screen readers still reach both buttons.
+            // A message needs the room a long number does, so it also collapses the chip.
             <UnitChip
               unit={box.unit}
-              compact={box.text.length > COMPACT_CHIP}
+              compact={box.text.length > COMPACT_CHIP || box.message !== null}
               inTabOrder={false}
               onOpen={() => {
                 showList(box.unit ? { scope: box.unit.category } : null);

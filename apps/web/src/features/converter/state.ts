@@ -1,7 +1,6 @@
 import {
   convert,
   formatNumber,
-  getCategory,
   getUnit,
   parse,
   type CategoryId,
@@ -30,8 +29,6 @@ export interface ConverterState {
   /** The box the user edited last. Its value is the truth; the other box is derived from it. */
   source: BoxId;
   mode: Mode;
-  /** One-line status such as "Switched to Temperature". Cleared on the next input. */
-  notice: string | null;
 }
 
 export const EMPTY_BOX: BoxState = { text: '', unit: null };
@@ -41,7 +38,6 @@ export const initialState: ConverterState = {
   b: EMPTY_BOX,
   source: 'a',
   mode: 'basic',
-  notice: null,
 };
 
 export function other(box: BoxId): BoxId {
@@ -69,7 +65,6 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
         // Only a number makes a box the source; typing a bare unit must not blank the other box.
         // A number too large or too small to hold still counts, so the other box can say so.
         source: parse(action.text).valueText !== undefined ? action.box : state.source,
-        notice: null,
       };
 
     case 'setText':
@@ -82,7 +77,6 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       const next: ConverterState = {
         ...state,
         [action.box]: { text: parse(box.text).valueText ?? '', unit: unit.id },
-        notice: null,
       };
       const otherId = other(action.box);
       // Before any number is typed, the first box to get a unit becomes the source: it set the
@@ -91,22 +85,22 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       if (!sourceHasNumber && state[otherId].unit === null) next.source = action.box;
       const otherUnit = state[otherId].unit ? getUnit(state[otherId].unit) : undefined;
       if (otherUnit && otherUnit.category !== unit.category) {
-        // No silent cross-category pairs: the other box loses its unit and keeps its number only if it was the source.
+        // No cross-category pairs: the other box loses its unit and keeps its number only if it
+        // was the source. The category label moving to this box shows the switch.
         next[otherId] = {
           text: state.source === otherId ? (parse(state[otherId].text).valueText ?? '') : '',
           unit: null,
         };
-        next.notice = `Switched to ${getCategory(unit.category)?.name ?? unit.category}`;
       }
       return next;
     }
 
     case 'unlock':
-      return { ...state, [action.box]: { ...state[action.box], unit: null }, notice: null };
+      return { ...state, [action.box]: { ...state[action.box], unit: null } };
 
     case 'swap':
       // Units and texts trade places; the typed value stays the source so nothing is re-rounded.
-      return { ...state, a: state.b, b: state.a, source: other(state.source), notice: null };
+      return { ...state, a: state.b, b: state.a, source: other(state.source) };
 
     case 'clear':
       return { ...initialState, mode: state.mode };
@@ -115,7 +109,7 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       return { ...state, mode: action.mode };
 
     case 'hydrate':
-      return { ...state, ...action.state, notice: null };
+      return { ...state, ...action.state };
   }
 }
 
@@ -163,7 +157,6 @@ export interface ConverterView {
    * "1e308 kilometers is too large to convert to millimeters".
    */
   announcement: string | null;
-  notice: string | null;
 }
 
 export interface ViewOptions {
@@ -235,7 +228,6 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
     result,
     outOfRange,
     announcement,
-    notice: state.notice,
   };
 }
 
@@ -408,7 +400,7 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
     if (!previous) return history;
     return {
       past: history.past.slice(0, -1),
-      present: { ...previous.state, notice: null },
+      present: previous.state,
       future: [{ state: history.present, entries: history.entries }, ...history.future],
       run: null,
       entries: previous.entries,
@@ -419,7 +411,7 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
     if (!next) return history;
     return {
       past: [...history.past, { state: history.present, entries: history.entries }],
-      present: { ...next.state, notice: null },
+      present: next.state,
       future: history.future.slice(1),
       run: null,
       entries: next.entries,

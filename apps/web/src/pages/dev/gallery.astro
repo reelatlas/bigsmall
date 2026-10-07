@@ -1,5 +1,6 @@
 ---
 import { Button } from '../../components/Button';
+import ShortcutsHelp from '../../components/ShortcutsHelp.astro';
 import ThemePicker from '../../components/ThemePicker.astro';
 import { SuggestionSample } from './_samples/SuggestionSample';
 import Base from '../../layouts/Base.astro';
@@ -19,7 +20,10 @@ const swatches = TOKEN_CONTRACT.colors;
           The picker changes the page theme. Each card below is pinned to its own theme.
         </p>
       </div>
-      <ThemePicker />
+      <div class="flex items-start gap-2">
+        <ShortcutsHelp />
+        <ThemePicker />
+      </div>
     </header>
 
     <div class="mt-8 grid gap-6 md:grid-cols-2">

@@ -44,7 +44,7 @@ describe('reduce', () => {
     expect(s.a.unit).toBeNull();
   });
 
-  it('locking a different category in the other box clears the first unit and explains', () => {
+  it('locking a different category in the other box clears the first unit', () => {
     const s = run(
       { type: 'input', box: 'a', text: '5', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
@@ -52,7 +52,6 @@ describe('reduce', () => {
     );
     expect(s.a).toEqual({ text: '5', unit: null });
     expect(s.b.unit).toBe('fahrenheit');
-    expect(s.notice).toBe('Switched to Temperature');
   });
 
   it('a derived box that loses its unit also loses its stale text', () => {
@@ -96,10 +95,9 @@ describe('reduce', () => {
     expect(s).toEqual({ ...initialState, mode: 'advanced' });
   });
 
-  it('hydrate merges and clears any notice', () => {
+  it('hydrate merges the restored boxes', () => {
     const s = run({ type: 'hydrate', state: { a: { text: '2', unit: 'foot' }, source: 'a' } });
     expect(s.a).toEqual({ text: '2', unit: 'foot' });
-    expect(s.notice).toBeNull();
   });
 });
 
@@ -282,7 +280,7 @@ describe('anchor', () => {
       { type: 'lock', box: 'b', unit: 'fahrenheit' },
     );
     expect(v.anchor).toBe('b');
-    expect(v.notice).toBe('Switched to Temperature');
+    expect(v.category).toBe('temperature');
   });
 });
 

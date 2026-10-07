@@ -52,7 +52,7 @@ Adding a unit means adding at least one row that exercises it; a test fails when
 - Every page gets an axe pass with the WCAG 2.0/2.1/2.2 A and AA tags. Violations fail the test.
 - The theme test applies each theme to the live page and runs axe again.
 - The converter island marks itself `data-hydrated` once React has attached. `converter.spec.ts` calls `ready(page)` after every `goto` before typing; without it keystrokes land before hydration and are reset. Things handled by inline scripts (the theme picker) are interactive immediately.
-- `converter.spec.ts` covers the flows in docs/UX-SPEC.md: typing locks a unit and scopes the other box, the second box takes over as source, ambiguous symbols show both meanings, keyboard-only category and unit picking, Space locking an extendable match, swap, cross-category switching with its notice, copy, and an axe pass with the listbox open.
+- `converter.spec.ts` covers the flows in docs/UX-SPEC.md: typing locks a unit and scopes the other box, the second box takes over as source, ambiguous symbols show both meanings, keyboard-only category and unit picking, Space locking an extendable match, swap, cross-category switching, copy, and an axe pass with the listbox open.
 - Playwright starts `pnpm dev` on `127.0.0.1:4321` and reuses a running server locally. If every converter test times out on the ready mark while lint and types pass, the reused dev server is serving stale modules after rapid file rewrites: stop it (or touch the rewritten files) and run again.
 
 ## CI

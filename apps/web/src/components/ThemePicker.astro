@@ -17,11 +17,11 @@ const menuId = `${id}-menu`;
   use rounded-sm: the md corner minus the 4 px inset, so their curves nest in the shell's. The shell's
   two-pixel edge turns accent while anything inside has focus; that is the focus indicator.
 -->
-<div class="group relative h-12 w-44" data-theme-shell>
+<div class="group relative h-12 w-44" data-shell>
   <div class="absolute inset-x-0 top-0 overflow-hidden rounded-md border-2 border-line bg-surface transition-[border-color,box-shadow] duration-[var(--motion-fast)] ease-standard focus-within:border-accent group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md">
     <button
       type="button"
-      data-theme-toggle
+      data-shell-toggle
       aria-expanded="false"
       aria-controls={menuId}
       class="flex h-11 w-full items-center justify-between gap-2 px-3 text-sm text-ink outline-none hover:bg-surface-raised"
@@ -54,6 +54,7 @@ const menuId = `${id}-menu`;
             name={`${id}-option`}
             value={t.id}
             data-theme-option
+            data-shell-initial
             class="sr-only"
             checked={t.id === 'daylight'}
           />

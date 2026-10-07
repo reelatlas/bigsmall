@@ -202,8 +202,9 @@ test('a query with no match in the scoped category widens to every category', as
   await second.fill('fahr');
   await page.getByRole('option', { name: /Fahrenheit Temperature/ }).click();
 
-  // The switch is announced where the category label now sits: under the box that switched it.
-  await expect(boxes(page).labelB).toHaveText('Switched to Temperature');
+  // The label moves to the box that switched the category and simply names the new one.
+  await expect(boxes(page).labelB).toHaveText('Temperature');
+  await expect(boxes(page).labelA).toHaveText('');
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Remove Fahrenheit' })).toBeVisible();
   await expect(first).toHaveValue('5');
@@ -463,7 +464,10 @@ test('a value too large or too small to convert says so instead of showing 0', a
   const { first, second } = boxes(page);
 
   await first.fill('1e308');
-  await expect(page.getByText('Too large to convert')).toBeVisible();
+  const message = page.getByText('Too large to convert');
+  await expect(message).toBeVisible();
+  // It shrinks like a long number instead of being cut off, on phones too.
+  expect(await message.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
   await expect(second).toHaveValue('');
   await expect(second).toHaveAttribute('placeholder', '');
   await expect(page.getByRole('button', { name: 'Copy second value' })).toHaveCount(0);

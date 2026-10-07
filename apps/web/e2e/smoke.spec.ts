@@ -72,3 +72,54 @@ test('every theme passes axe when applied to the page', async ({ page }) => {
     expect(results.violations, id).toEqual([]);
   }
 });
+
+test('the shortcuts map opens on hover, stays when clicked, and closes on Escape', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
+  await page.goto('/');
+  const toggle = page.getByRole('button', { name: 'Keyboard shortcuts' });
+
+  await toggle.hover();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByText('Choose the highlighted suggestion')).toBeVisible();
+  await page.mouse.move(5, 5);
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+  await toggle.click();
+  await page.mouse.move(5, 5);
+  await page.waitForTimeout(400);
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await settled(page);
+  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+  expect(results.violations).toEqual([]);
+
+  await page.keyboard.press('Escape');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('the shortcuts map is hidden on touch-first devices', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'desktop shows the shortcuts map');
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeHidden();
+});
+
+test('shortcuts name ⌘ on Apple devices and Ctrl elsewhere', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
+  const undo = page.getByRole('button', { name: 'Undo' });
+
+  await page.goto('/');
+  await page.locator('section[data-hydrated]').waitFor();
+  await expect(page.locator('[data-mod-key]').first()).toHaveText('Ctrl');
+  await expect(undo).toHaveAttribute('title', 'Undo (Ctrl+Z)');
+
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' });
+    Object.defineProperty(navigator, 'userAgentData', { get: () => ({ platform: 'macOS' }) });
+  });
+  await page.reload();
+  await page.locator('section[data-hydrated]').waitFor();
+  await expect(page.locator('[data-mod-key]').first()).toHaveText('⌘');
+  await expect(undo).toHaveAttribute('title', 'Undo (⌘Z)');
+});

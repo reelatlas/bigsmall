@@ -18,7 +18,7 @@ import {
   fitPhrase,
   type WordmarkPlayer,
   type WordmarkSettings,
-} from '../../../components/wordmark-motion';
+} from '../../../lib/wordmark-motion';
 import { useCopied } from '../../../lib/copied';
 import { WORDMARK_TIMING } from '../../../lib/timing';
 import { PRESETS, SHIPPED } from './presets';

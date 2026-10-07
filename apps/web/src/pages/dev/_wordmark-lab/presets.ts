@@ -1,4 +1,4 @@
-import type { WordmarkSettings } from '../../../components/wordmark-motion';
+import type { WordmarkSettings } from '../../../lib/wordmark-motion';
 
 /**
  * The version shipping now: WORDMARK_TIMING (lib/timing.ts) and WORDMARK_TUNING (lib/wordmark.ts)

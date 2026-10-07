@@ -14,7 +14,7 @@ const { manual = false } = Astro.props;
   The site name with its theme's art beside it. Hovering the heading, the name and its art, plays
   it (docs/UX-SPEC.md §1, "The wordmark at play"): nothing runs until the first hover or tap, and
   never under reduced motion. The static name is the heading's text, so crawlers and screen
-  readers read "bigsmall"; while it plays, wordmark-motion.ts hides the live line from screen
+  readers read "bigsmall"; while it plays, lib/wordmark-motion.ts hides the live line from screen
   readers and keeps the name for them. The art's line shows the symbol the art flips to.
 -->
 <h1
@@ -39,7 +39,7 @@ const { manual = false } = Astro.props;
 <script>
   import { WORDMARK_TIMING } from '../lib/timing';
   import { WORDMARK_TUNING } from '../lib/wordmark';
-  import { play } from './wordmark-motion';
+  import { play } from '../lib/wordmark-motion';
 
   // Nothing runs until the heading is hovered or tapped, and never under reduced motion. The code
   // loads with the page rather than on demand: on-demand loading would add a preload helper

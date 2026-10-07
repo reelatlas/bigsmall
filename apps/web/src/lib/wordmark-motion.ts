@@ -1,4 +1,4 @@
-import type { WORDMARK_TIMING } from '../lib/timing';
+import type { WORDMARK_TIMING } from './timing';
 import {
   ART_STEPS,
   fitSteps,
@@ -12,7 +12,7 @@ import {
   WORDMARK_SIZES,
   type FitStep,
   type WordmarkTuning,
-} from '../lib/wordmark';
+} from './wordmark';
 
 /** What the play runs on: WORDMARK_TIMING and WORDMARK_TUNING, or the lab's live copies. */
 export interface WordmarkSettings {

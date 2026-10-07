@@ -8,7 +8,7 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 ## Current status
 
-Milestones 0 (setup) and 1 (core engine) are complete, and milestone 2's code is done; it closes when the five-person usability test (`docs/research/usability-test-1.md`) has run. Progress and definitions of done live in `docs/PLAN.md` §13, current behavior in `docs/UX-SPEC.md` (§14 lists what is planned), and Sean's feedback rounds in `docs/research/findings-0-first-pass.md`, whose twelfth pass is the pre-launch tidy-up of 2026-10-07. The MVP is ready to go live on Vercel at `bigsmall.work` (ADR 0008): the repository side is done, and the owner's one-time Vercel and Porkbun steps are in `docs/DEPLOYMENT.md`; once live it is tagged `v0.1.0`. Next, in a session of its own: the explorations in `docs/PLAN.md` §2 (every category at once, more categories, search, analytics), then milestone 3.
+Milestones 0 (setup) and 1 (core engine) are complete, and milestone 2's code is done; it closes when the five-person usability test (`docs/research/usability-test-1.md`) has run. Progress and definitions of done live in `docs/PLAN.md` §13, current behavior in `docs/UX-SPEC.md` (§14 lists what is planned), and Sean's feedback rounds in `docs/research/findings-0-first-pass.md`, whose twelfth pass is the pre-launch tidy-up of 2026-10-07. The MVP is live at `https://bigsmall.work` on Vercel since 2026-10-07, tagged `v0.1.0` (ADR 0008); `bigsmall.diy` and both `www` names redirect to it, and every push to `main` that passes CI deploys (`docs/DEPLOYMENT.md`). Next, in a session of its own: the explorations in `docs/PLAN.md` §2 (every category at once, more categories, search, analytics), then milestone 3.
 
 ## Non-negotiables
 

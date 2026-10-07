@@ -366,3 +366,8 @@ Format:
 
 **What happened.** The lab's "Copy settings" listed each setting by hand, and the two-line setting added later was missing from the code the owner copied; nothing was lost only because it had not been changed.
 **Rule.** Generate an export from the object it exports (its keys, in order), and test that every key appears in the output.
+
+## 2026-10-06 — The browser pane's "type" inserts text; key handlers need key presses
+
+**What happened.** Checking the calculator in the browser pane, the computer tool's `type` action left the display unchanged: it inserts text, which a focused button ignores, so no keydown reached the calculator's listener. `key` sent real presses but "shift+6" arrived as "6", not "^". Five keydown events dispatched in one script also all read the entry from before the first, since Preact renders between tasks, not between events of one task.
+**Rule.** Drive key handlers in the pane with `key` actions (or on-screen buttons for shifted symbols), and in scripts one task per key. Playwright's `keyboard.type` sends real key events and is the reference.

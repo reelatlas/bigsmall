@@ -61,6 +61,13 @@ const STOP = 'data-calculator-stop';
 export interface CalculatorProps {
   /** What the display shows, such as a NumberText; empty shows a muted 0. */
   display: ReactNode;
+  /**
+   * Why the entry has no value ("Too large"), shown at the right of the display in the danger
+   * color and joined to the description of = (and of the caller's send buttons, by `messageId`).
+   */
+  message?: string | null;
+  /** The message's id, for the caller's buttons to name it in `aria-describedby`. */
+  messageId?: string;
   /** The visitor's decimal mark, "." or ",". */
   decimalMark: string;
   onPress: (key: CalculatorKey) => void;
@@ -85,6 +92,8 @@ export interface CalculatorProps {
  */
 export function Calculator({
   display,
+  message = null,
+  messageId,
   decimalMark,
   onPress,
   onEscape,
@@ -181,11 +190,21 @@ export function Calculator({
         group.querySelector<HTMLElement>(`[${STOP}="equals"]`)?.focus();
       }
     };
+    // After a send, focus goes back to =, so the next keys start a new entry and Enter cannot
+    // send the same number again. A send with nothing to send leaves focus where it is.
+    const onClick = (event: MouseEvent) => {
+      const send = (event.target as Element).closest(`[${STOP}="send"]`);
+      if (send && send.getAttribute('aria-disabled') !== 'true') {
+        group.querySelector<HTMLElement>(`[${STOP}="equals"]`)?.focus();
+      }
+    };
     group.addEventListener('keydown', onKeyDown);
     group.addEventListener('mousedown', onMouseDown);
+    group.addEventListener('click', onClick);
     return () => {
       group.removeEventListener('keydown', onKeyDown);
       group.removeEventListener('mousedown', onMouseDown);
+      group.removeEventListener('click', onClick);
     };
   }, [onPress, onEscape]);
 
@@ -216,6 +235,15 @@ export function Calculator({
           <div ref={displayRef} className={`${DISPLAY_TEXT} ${size}`} data-entry>
             {display || <span className="text-ink-muted">0</span>}
           </div>
+          {message && (
+            <span
+              id={messageId}
+              className="shrink-0 text-sm font-medium text-danger"
+              data-calculator-message
+            >
+              {message}
+            </span>
+          )}
         </div>
       </div>
       <div className="grid grid-cols-4 gap-2">
@@ -224,6 +252,7 @@ export function Calculator({
             key={def.key}
             variant={def.variant}
             aria-label={def.name}
+            aria-describedby={def.key === 'equals' && message ? messageId : undefined}
             tabIndex={def.key === 'equals' ? undefined : -1}
             data-calculator-stop={def.key === 'equals' ? 'equals' : undefined}
             onClick={() => onPress(def.key)}

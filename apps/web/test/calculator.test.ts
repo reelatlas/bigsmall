@@ -1,6 +1,8 @@
+import { parse } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import type { CalculatorKey } from '../src/components/Calculator';
 import {
+  entryMessage,
   evaluatedText,
   placeNumber,
   pressKey,
@@ -105,5 +107,25 @@ describe('evaluatedText', () => {
     expect(evaluatedText('1000*2', EN)).toBe('2,000');
     expect(evaluatedText('1000*2', DE)).toBe('2.000');
     expect(evaluatedText('2 × 3 ft', EN)).toBe('6 ft');
+  });
+});
+
+describe('entryMessage', () => {
+  const message = (text: string) => entryMessage(parse(text, EN.separators));
+
+  it('says why an entry has no value to use', () => {
+    expect(message('9^999')).toBe('Too large');
+    expect(message(`${MINUS}9^999`)).toBe('Too large');
+    expect(message('1E400')).toBe('Too large');
+    expect(message(`1E${MINUS}400`)).toBe('Too small');
+    expect(message(`5${DIVIDE}0`)).toBe('Can’t divide by zero');
+    expect(message(`(${MINUS}8)^0.5`)).toBe('No real answer');
+  });
+
+  it('says nothing while the entry has a value, or is not a number yet', () => {
+    expect(message('9^99')).toBeNull();
+    expect(message('12×3')).toBeNull();
+    expect(message('')).toBeNull();
+    expect(message(MINUS)).toBeNull();
   });
 });

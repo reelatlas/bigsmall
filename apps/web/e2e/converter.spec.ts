@@ -726,6 +726,8 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
   await page.keyboard.press('Enter');
   await expect(second).toHaveValue('36');
   await expect(first).toHaveValue('36,000');
+  // After a send, focus is back on =, so Enter cannot send the same number again.
+  await expect(key('equals')).toBeFocused();
   await expect(
     page.getByRole('status').filter({ hasText: 'Sent to the second value' }),
   ).toHaveCount(1);
@@ -774,6 +776,34 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
   await expect(calculator).toHaveCount(0);
   await toggle.click();
   await expect(entry).toHaveText('4E256');
+});
+
+test('the calculator says why its number has no value to use', async ({ page }) => {
+  await page.goto('/?a=milliliter&b=liter&v=1&s=a');
+  await ready(page);
+  await page.getByRole('button', { name: 'Calculator' }).click();
+  const calculator = page.getByRole('group', { name: 'Calculator' });
+  const message = calculator.locator('[data-calculator-message]');
+  const equals = calculator.getByRole('button', { name: 'equals', exact: true });
+  const useIn = calculator.getByRole('button', { name: /^Use in 1st/ });
+
+  // A large exponent: the display says so, and nothing can be sent until it is back in range.
+  await page.keyboard.type('9^999');
+  await expect(message).toHaveText('Too large');
+  await expect(equals).toHaveAccessibleDescription('Too large');
+  await expect(useIn).toHaveAttribute('aria-disabled', 'true');
+  await expect(useIn).toHaveAccessibleDescription('Too large');
+  await page.keyboard.press('Backspace');
+  await expect(message).toHaveCount(0);
+  await expect(useIn).not.toHaveAttribute('aria-disabled', 'true');
+
+  await calculator.getByRole('button', { name: 'clear', exact: true }).click();
+  await page.keyboard.type('1e-999');
+  await expect(message).toHaveText('Too small');
+  await calculator.getByRole('button', { name: 'clear', exact: true }).click();
+  await page.keyboard.type('5/0');
+  await expect(message).toHaveText('Can’t divide by zero');
+  await expectNoA11yViolations(page);
 });
 
 test('Enter on typed arithmetic gives its value and keeps the unit', async ({ page }) => {

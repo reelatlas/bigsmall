@@ -1,6 +1,6 @@
-import { formatNumber, parse, type Separators } from '@bigsmall/core';
+import { formatNumber, parse, type ParsedInput, type Separators } from '@bigsmall/core';
 import type { CalculatorKey } from '../../components/Calculator';
-import { EMPTY_CALC, type CalculatorState } from './state';
+import { EMPTY_CALC, type CalculatorState, type NoAnswer } from './state';
 
 /**
  * The calculator's rules (docs/UX-SPEC.md §8, "The calculator"): what each key does to its own
@@ -45,6 +45,27 @@ export function evaluatedText(text: string, env: CalculatorEnv): string | null {
   if (!parsed.expression || parsed.value === undefined) return null;
   const value = formatValue(parsed.value, env);
   return parsed.query ? `${value} ${parsed.query}` : value;
+}
+
+/**
+ * What the display says when the entry has no value to use: shorter than a box's "Too large to
+ * convert", since nothing is being converted yet.
+ */
+const NO_VALUE: Record<NoAnswer, string> = {
+  large: 'Too large',
+  small: 'Too small',
+  'divide-by-zero': 'Can’t divide by zero',
+  'not-real': 'No real answer',
+};
+
+/**
+ * Why the entry has no value, said in the display beside it: a number or a result beyond what a
+ * double holds ("9^999", "1E400"), one that rounds to zero ("1E−400"), a division by zero, or a
+ * power with no real value. Null when the entry has a value or is not a number yet.
+ */
+export function entryMessage(parsed: ParsedInput): string | null {
+  const problem = parsed.outOfRange ?? parsed.invalid;
+  return problem ? NO_VALUE[problem] : null;
 }
 
 /** = and C make a whole new entry, a step of their own; every other key is typing, chunked. */

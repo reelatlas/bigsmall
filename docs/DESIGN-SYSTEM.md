@@ -171,10 +171,10 @@ A control that opens a list or panel keeps both in one shape, drawn over the pag
 
 - A card below the boxes, at most `max-w-sm` and centered: `rounded-lg border border-line bg-surface p-3 shadow-sm`, all in the `Calculator` component.
 - **Header**: the title "Calculator" (`text-sm font-medium text-ink-muted`, labelling the group) and a ghost close button.
-- **Display**: a field's geometry, `rounded-lg border-2 border-edge bg-surface` around `FIELD_ROW`, so it is the same size as the boxes; the entry in `font-numeric` stepping down through `NUMBER_SIZES` (`src/lib/fit-step.ts`) and keeping its end in view past the smallest; drawn by `NumberText`, so exponent markers and the running value look as they do in a box; a muted 0 when empty.
+- **Display**: a field's geometry, `rounded-lg border-2 border-edge bg-surface` around `FIELD_ROW`, so it is the same size as the boxes; the entry in `font-numeric` stepping down through `NUMBER_SIZES` (`src/lib/fit-step.ts`) and keeping its end in view past the smallest; drawn by `NumberText`, so exponent markers and the running value look as they do in a box; a muted 0 when empty; at the row's right, why the entry has no value ("Too large"), in `text-sm font-medium text-danger` like a box's out-of-range message.
 - **Keys** are `Button`s at `min-h-12` with `font-numeric text-lg`, four to a row (`gap-2`): digits secondary; C, ⌫, E, and the decimal mark `tonal`; the five operators `soft`; = primary.
 - **Sending**: two `SendButton`s under the keys, secondary, reading "Use in 1st" plus the box's unit symbol in semibold, with the copy check (`CheckIcon` in `text-success`) while a send is confirmed, and `aria-disabled` while there is nothing to send.
-- **Focus**: =, the send buttons, and close carry `data-calculator-stop`; Tab cycles through them in that order and Enter presses the focused one. Other keys are `tabIndex={-1}` and a click on them never moves focus.
+- **Focus**: =, the send buttons, and close carry `data-calculator-stop`; Tab cycles through them in that order and Enter presses the focused one. Other keys are `tabIndex={-1}` and a click on them never moves focus. After a send, focus returns to =.
 
 ### Copy
 

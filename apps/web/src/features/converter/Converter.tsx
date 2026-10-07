@@ -19,7 +19,7 @@ import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
-import { formatValue, isStepKey, placeNumber, pressKey } from './calculator';
+import { entryMessage, formatValue, isStepKey, placeNumber, pressKey } from './calculator';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
 import { linkFor } from './url';
@@ -57,6 +57,7 @@ export function Converter() {
   // Tooltips name the platform's keys; until hydration they read as on the server (Ctrl).
   const apple = hydrated && isApplePlatform();
   const hintId = useId();
+  const calcMessageId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const { copied, markCopied, pointerProps } = useCopied<Confirmable>();
   const headerActions = useSlot(SLOTS.headerActions);
@@ -67,6 +68,8 @@ export function Converter() {
   const entry = state.calc;
   const entryParsed = parse(entry.text, env.separators);
   const entryValue = entryParsed.value;
+  // Why the entry has no value to use or send, said in the display: "Too large".
+  const calcMessage = entryMessage(entryParsed);
   const categoryName = view.category ? getCategory(view.category)?.name : undefined;
   const isEmpty = !state.a.text && !state.a.unit && !state.b.text && !state.b.unit;
 
@@ -151,6 +154,7 @@ export function Converter() {
       symbol={view[id].unit?.symbol}
       confirmed={copied === `use-${id}`}
       unavailable={entryValue === undefined}
+      aria-describedby={calcMessage ? calcMessageId : undefined}
       onClick={() => send(id)}
       {...pointerProps(`use-${id}`)}
     />
@@ -316,6 +320,8 @@ export function Converter() {
                 />
               )
             }
+            message={calcMessage}
+            messageId={calcMessageId}
             decimalMark={env.separators.decimal}
             onPress={press}
             onEscape={escapeCalculator}

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { ANNOUNCE_MS } from '../src/lib/timing';
 import { chooseLayout, MARGIN_MS, ready } from './support';
 
@@ -67,7 +67,7 @@ test('the list keeps the rows in view: closed on focus and while typing a number
 
   // Letters reach a unit: the list opens on the best match, and closes again with them gone.
   await box(page).fill('300 cu');
-  await expect(page.getByRole('option', { name: /^cups cup$/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^cup cups$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -86,6 +86,33 @@ test('the list keeps the rows in view: closed on focus and while typing a number
   await expect(list).toHaveCount(0);
   await page.getByRole('button', { name: 'Change unit: milliliters' }).click();
   await expect(list).toBeVisible();
+});
+
+test('a row reads value and symbol, then the name: values right-aligned, symbols and names in columns', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/?a=milliliter&v=250&s=a');
+  await ready(page);
+  await expect(row(page, 'liter').getByRole('button').first()).toHaveAccessibleName(
+    /^0\.25 L liters/,
+  );
+  const cells = await page.locator('li[data-row] > button:first-child').evaluateAll((buttons) =>
+    buttons.map((button) => {
+      const [value, symbol, name] = [...button.children].map((cell) =>
+        cell.getBoundingClientRect(),
+      );
+      return { valueRight: value!.right, symbolLeft: symbol!.left, nameLeft: name!.left };
+    }),
+  );
+  const same = (pick: (cell: (typeof cells)[number]) => number) =>
+    new Set(cells.map((cell) => Math.round(pick(cell)))).size;
+  expect(same((cell) => cell.valueRight)).toBe(1);
+  expect(same((cell) => cell.symbolLeft)).toBe(1);
+  expect(same((cell) => cell.nameLeft)).toBe(1);
+  // The names sit on the right: past the middle of the row on a wide table.
+  const card = (await page.getByRole('region', { name: 'Volume' }).boundingBox())!;
+  expect(cells[0]!.nameLeft).toBeGreaterThan(card.x + card.width / 2);
 });
 
 test('a row moves into the box with its value; undo takes it back', async ({ page }) => {
@@ -244,29 +271,48 @@ test('the calculator takes a column beside the box and table from md, and sits b
   expect(Math.abs(narrow.calculator.x - (await label(page).boundingBox())!.x)).toBeLessThan(1);
 });
 
-test('in the wider box the chip keeps its name beside a long number; two boxes give it up first', async ({
+test('the chip gives up its name before the number shrinks, sooner in one of two boxes', async ({
   page,
 }) => {
+  // Numbers are set in the system's font, so how many digits fit differs by machine: the test
+  // types every length from 1 to 20 digits and checks the rule, not a count.
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/?a=milliliter&v=1&s=a');
   await ready(page);
   const name = page
     .getByRole('button', { name: 'Change unit: milliliters' })
     .getByText('milliliters', { exact: true });
-  const fontSize = (field: ReturnType<typeof box>) =>
+  const fontSize = (field: Locator) =>
     field.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-  const largest = await fontSize(box(page));
+  const sweep = async (field: Locator) => {
+    await field.fill('1');
+    const largest = await fontSize(field);
+    const seen: { digits: number; named: boolean; full: boolean }[] = [];
+    for (let digits = 1; digits <= 20; digits += 1) {
+      await field.fill('12345678901234567890'.slice(0, digits));
+      seen.push({
+        digits,
+        named: await name.isVisible(),
+        full: (await fontSize(field)) === largest,
+      });
+    }
+    return seen;
+  };
+  const firstUnnamed = (seen: Awaited<ReturnType<typeof sweep>>) =>
+    seen.find((step) => !step.named)?.digits ?? Infinity;
 
-  await box(page).fill('1234567890123');
-  await expect(name).toBeVisible();
-  await expect.poll(() => fontSize(box(page))).toBe(largest);
-
-  // Each of two boxes is narrower: the name gives way first, so the number keeps its size.
+  const table = await sweep(box(page));
   await page.getByTitle('Two boxes').click();
-  await expect(name).toBeHidden();
-  const first = page.getByRole('combobox', { name: 'First value' });
-  await expect(first).toHaveValue('1234567890123');
-  await expect.poll(() => fontSize(first)).toBe(largest);
+  const two = await sweep(page.getByRole('combobox', { name: 'First value' }));
+
+  for (const step of [...table, ...two]) {
+    expect(step.named && !step.full, `${step.digits} digits: name kept, number shrunk`).toBe(false);
+  }
+  // The wide box keeps the name past the six characters it once gave up at.
+  expect(table.some((step) => step.digits > 6 && step.named)).toBe(true);
+  // One of two boxes gives it up sooner, and the number then keeps its size for a while.
+  expect(firstUnnamed(two)).toBeLessThan(firstUnnamed(table));
+  expect(two.some((step) => !step.named && step.full)).toBe(true);
 });
 
 test('the switch changes layout, keeps the conversion, and remembers the choice', async ({

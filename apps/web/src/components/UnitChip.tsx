@@ -27,7 +27,7 @@ const BODY = 'inline-flex items-baseline gap-2 self-center px-3';
 const HOVER = 'transition-colors hover:bg-surface/40';
 
 /**
- * The locked unit inside a smart input: its name, then its symbol, the way a row of the unit list
+ * The locked unit inside a smart input: its symbol, then its name, the way a row of the unit list
  * reads (SuggestionPanel), which open the unit list, plus a remove control. Collapsed, the symbol
  * stands alone in the ink color.
  */
@@ -45,11 +45,11 @@ export function UnitChip({ unit, compact, nameRef, onOpen, onRemove }: UnitChipP
         className={cx('inline-flex rounded-l-nested', HOVER)}
       >
         <span className={BODY}>
-          <span ref={nameRef ?? null} hidden={compact}>
-            {unit.plural}
-          </span>
           <span className={cx('font-numeric font-semibold', !compact && 'text-ink-muted')}>
             {unit.symbol}
+          </span>
+          <span ref={nameRef ?? null} hidden={compact}>
+            {unit.plural}
           </span>
         </span>
       </button>

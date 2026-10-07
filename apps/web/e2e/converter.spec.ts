@@ -18,7 +18,7 @@ test('typing a number and unit highlights the match; Enter locks it and scopes t
 
   await first.fill('5 ml');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
-  await expect(page.getByRole('option', { name: /^milliliters Volume mL$/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^mL milliliters Volume$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -29,10 +29,10 @@ test('typing a number and unit highlights the match; Enter locks it and scopes t
   await expect(label).toHaveText('Volume');
 
   await second.click();
-  await expect(page.getByRole('option', { name: /^cups cup$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^cup cups$/ })).toBeVisible();
   await expect(page.getByRole('option', { name: /Fahrenheit/ })).toHaveCount(0);
 
-  await page.getByRole('option', { name: /^cups cup$/ }).click();
+  await page.getByRole('option', { name: /^cup cups$/ }).click();
   await expect(second).toHaveValue('0.02113376419');
   await expect(page).toHaveURL(/a=milliliter&b=us-cup&v=5&s=a/);
 });
@@ -69,18 +69,18 @@ test('keyboard: arrows and Enter pick a category, then a unit', async ({ page })
   await expect(back).toHaveCount(0);
   await first.press('ArrowDown');
   await first.press('Enter');
-  await expect(page.getByRole('option', { name: /^feet ft$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^ft feet$/ })).toBeVisible();
   await expect(back).toBeVisible();
   await expect(scope).toHaveText('Length');
   await expect(label).toHaveText('');
 
   // Down from nothing skips the Back row and goes to the first unit.
   await first.press('ArrowDown');
-  await expect(page.getByRole('option', { name: /^meters m$/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^m meters$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
-  await arrowTo(first, page.getByRole('option', { name: /^feet ft$/ }));
+  await arrowTo(first, page.getByRole('option', { name: /^ft feet$/ }));
   await first.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove feet' })).toBeVisible();
   await expect(label).toHaveText('Length');
@@ -94,7 +94,7 @@ test('the arrow keys reach the Back row, and Enter on it goes back', async ({ pa
   await first.click();
   await expect(back).toBeVisible();
   // The list opens resting on the box's unit.
-  await expect(page.getByRole('option', { name: /^milliliters mL$/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^mL milliliters$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -129,7 +129,7 @@ test('opening a box that has a unit rests the list on that unit', async ({ page 
   await page.goto('/?a=us-pint&b=us-cup&v=2&s=a');
   await ready(page);
   const { first } = boxes(page);
-  const pints = page.getByRole('option', { name: /^pints pt$/ });
+  const pints = page.getByRole('option', { name: /^pt pints$/ });
 
   // Focus opens it on the unit the box holds; Enter there keeps the unit and closes.
   await first.focus();
@@ -164,7 +164,7 @@ test('moving the mouse over the list highlights rows but never scrolls it', asyn
   const { first } = boxes(page);
   await first.click();
   const list = page.getByRole('listbox');
-  await expect(page.getByRole('option', { name: /^meters m$/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^m meters$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -220,7 +220,7 @@ test('on a closed list with nothing to commit, Enter opens it again', async ({ p
   await page.goto('/?a=celsius&b=fahrenheit&v=20&s=a');
   await ready(page);
   const { first } = boxes(page);
-  const celsius = page.getByRole('option', { name: /^Celsius °C$/ });
+  const celsius = page.getByRole('option', { name: /^°C Celsius$/ });
 
   // Focus opens the list on the box's unit; Enter keeps it and closes, and Enter opens it again.
   await first.focus();
@@ -292,7 +292,7 @@ test('Tab and clicking away never commit; back in the box, Enter takes the match
   await expect(second).toHaveValue('kilom');
 
   await first.focus();
-  await expect(page.getByRole('option', { name: /^gigabytes/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^GB gigabytes/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -301,7 +301,7 @@ test('Tab and clicking away never commit; back in the box, Enter takes the match
   await expect(first).toHaveValue('3');
   // The second box still needs a unit, so the caret moves on to it, its best match highlighted.
   await expect(second).toBeFocused();
-  await expect(page.getByRole('option', { name: /^kilometers Length km$/ })).toHaveAttribute(
+  await expect(page.getByRole('option', { name: /^km kilometers Length$/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
@@ -321,7 +321,7 @@ test('picking a category from a typed word drops the word, in either box', async
   await expect(back).toBeVisible();
   await expect(scope).toHaveText('Volume');
   await expect(second).toHaveValue('');
-  await expect(page.getByRole('option', { name: /^milliliters mL$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^mL milliliters$/ })).toBeVisible();
 });
 
 test('Tab goes from the toolbar to the first box, then straight to the second', async ({
@@ -447,7 +447,7 @@ test('Back and Escape go up to the categories from any unit list', async ({ page
   const { first, back, label, scope } = boxes(page);
 
   await page.getByRole('button', { name: 'Change unit: milliliters' }).click();
-  await expect(page.getByRole('option', { name: /^liters L$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^L liters$/ })).toBeVisible();
   await expect(back).toBeVisible();
   await expect(scope).toHaveText('Volume');
   await back.click();
@@ -460,7 +460,7 @@ test('Back and Escape go up to the categories from any unit list', async ({ page
 
   // Browsing another category names it on the Back row; the label keeps the locked category.
   await page.getByRole('option', { name: /^Weight$/ }).click();
-  await expect(page.getByRole('option', { name: /^kilograms kg$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^kg kilograms$/ })).toBeVisible();
   await expect(scope).toHaveText('Weight');
   await expect(label).toHaveText('Volume');
   await first.press('Escape');
@@ -487,7 +487,7 @@ test('with the list closed, Escape clears the unit first when it was the last th
 
   await first.press('Escape');
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toHaveCount(0);
-  await expect(page.getByRole('option', { name: /^liters L$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^L liters$/ })).toBeVisible();
   await expect(scope).toHaveText('Volume');
 
   await first.press('Escape');
@@ -567,7 +567,7 @@ test('a space splits the number from the unit text, so Escape keeps the number',
   const { first } = boxes(page);
 
   await first.pressSequentially('5 ml');
-  await expect(page.getByRole('option', { name: /^milliliters Volume mL$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^mL milliliters Volume$/ })).toBeVisible();
   await first.press('Escape');
   await expect(page.getByRole('listbox')).toHaveCount(0);
   await first.press('Escape');
@@ -720,15 +720,31 @@ test('placeholders show examples, then units from the category the other box cho
   await expect(second).toHaveAttribute('placeholder', 'L, tsp, tbsp…');
 });
 
+test('a unit row reads symbol, then name, with the names lined up whatever the symbol', async ({
+  page,
+}) => {
+  await page.goto('/?a=milliliter&v=250&s=a');
+  await ready(page);
+  await page.getByRole('button', { name: 'Change unit: milliliters' }).click();
+  const options = page.getByRole('option', { name: /milliliters|fluid ounces|tablespoons/ });
+  await expect(options).toHaveCount(3);
+
+  await expect(page.getByRole('option', { name: /^fl oz fluid ounces$/ })).toBeVisible();
+  const nameLefts = await options.evaluateAll((rows) =>
+    rows.map((row) => Math.round(row.children[1]!.getBoundingClientRect().left)),
+  );
+  expect(new Set(nameLefts).size).toBe(1);
+});
+
 test('the letters a query matches are set heavier in the list', async ({ page }) => {
   await page.goto('/');
   await ready(page);
   const { first } = boxes(page);
 
   await first.fill('me');
-  const meters = page.getByRole('option', { name: /^meters Length m$/ });
+  const meters = page.getByRole('option', { name: /^m meters Length$/ });
   await expect(meters.locator('[data-match]')).toHaveText('me');
-  const kilometers = page.getByRole('option', { name: /^kilometers Length km$/ });
+  const kilometers = page.getByRole('option', { name: /^km kilometers Length$/ });
   await expect(kilometers.locator('[data-match]')).toHaveText('me');
   const weight = await meters
     .locator('[data-match]')
@@ -829,8 +845,8 @@ test('the chip gives up its name only when a message needs the room, measured on
   const chip = page.getByRole('button', { name: 'Change unit: meters' });
   const name = chip.getByText('meters', { exact: true });
 
-  // The name, then the symbol, the way a list row reads; a message with room beside it keeps both.
-  await expect(chip).toHaveText('metersm');
+  // The symbol, then the name, the way a list row reads; a message with room beside it keeps both.
+  await expect(chip).toHaveText('mmeters');
   await first.fill('1e308');
   await expect(page.getByText('Too large to convert')).toBeVisible();
   await expect(name).toBeVisible();

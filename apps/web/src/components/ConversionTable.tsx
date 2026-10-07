@@ -38,11 +38,20 @@ export interface ConversionTableProps {
 }
 
 /**
+ * A row reads "250 mL … milliliters": the value right-aligned in equal-width digits, so values
+ * line up at their last digit; the symbol after it in a column of its own, left-aligned, so the
+ * quantity reads as one; then, past a column that takes the spare width, the name, left-aligned in
+ * a column on the right that shrinks before anything else on a narrow screen, where a long name
+ * wraps and hyphenates; then the copy button.
+ */
+const ROWS = 'grid grid-cols-[auto_auto_minmax(0,1fr)_minmax(0,max-content)_auto] gap-y-0.5';
+
+/**
  * The table layout's rows (docs/UX-SPEC.md §1): a value in every unit of its category. A row is a
  * button that moves its unit into the box; its copy button sits beside it, never inside. The rows
  * are one Tab stop with the arrow keys between them (a roving tabindex), and Ctrl/⌘+C copies the
  * focused row, so the copy buttons stay out of the Tab order, as in the boxes. Columns line up
- * across rows through a subgrid.
+ * across rows through a subgrid (ROWS).
  */
 export function ConversionTable({
   title,
@@ -98,11 +107,11 @@ export function ConversionTable({
         {message ? (
           <p className="px-2 py-2.5 font-medium text-danger">{message}</p>
         ) : (
-          <ul className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-y-0.5">
+          <ul className={ROWS}>
             {rows.map((row, index) => (
               <li
                 key={row.id}
-                className="col-span-4 grid grid-cols-subgrid items-center"
+                className="col-span-5 grid grid-cols-subgrid items-center"
                 data-row={row.id}
               >
                 <button
@@ -119,14 +128,10 @@ export function ConversionTable({
                     if (!row.inBox && row.hasValue) onUse(row);
                   }}
                   className={cx(
-                    'col-span-3 grid min-h-11 grid-cols-subgrid items-center gap-x-3 rounded-nested px-2 text-left',
+                    'col-span-4 grid min-h-11 grid-cols-subgrid items-center gap-x-1.5 rounded-nested px-2 text-left',
                     row.inBox ? 'cursor-default bg-accent-soft' : 'hover:bg-surface-raised',
                   )}
                 >
-                  <span className="min-w-0 text-ink">
-                    {row.name}
-                    {row.inBox && <span className="sr-only">, in the box</span>}
-                  </span>
                   <span
                     className={cx(
                       'text-right font-numeric whitespace-nowrap',
@@ -137,6 +142,10 @@ export function ConversionTable({
                   </span>
                   <span className="font-numeric font-semibold whitespace-nowrap text-ink-muted">
                     {row.symbol}
+                  </span>
+                  <span className="col-start-4 min-w-0 break-words hyphens-auto text-ink">
+                    {row.name}
+                    {row.inBox && <span className="sr-only">, in the box</span>}
                   </span>
                 </button>
                 {row.hasValue ? (

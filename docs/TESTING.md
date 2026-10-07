@@ -65,6 +65,8 @@ Adding a unit means adding at least one row that exercises it; a test fails when
 
 Both must pass. There is no manual override; fix the code or fix the test.
 
+Both jobs run on a named image (`ubuntu-26.04`) with every action on its newest major. The comment above the jobs lists the pins and why; review them with the rest at each milestone (ADR 0005).
+
 ## Before launch (manual, milestone 5)
 
 - Screen reader pass: VoiceOver on iOS Safari, NVDA on Windows Chrome. Result announcement, suggestion navigation, keypad.

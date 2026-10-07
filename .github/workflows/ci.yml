@@ -9,14 +9,20 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Each action is on its newest major, all running on Node 24 (ADR 0005). Deliberate pins, each
+# explained in docs/LEARNINGS.md:
+# - ubuntu-26.04, not ubuntu-latest: the newest LTS, which Playwright supports from 1.61. A named
+#   image means the OS changes in a commit we make, not in a runner rollout.
+# - pnpm/action-setup@v6.1.0, not @v6: the v6 tag still points at 6.0.10, which predates pnpm 12
+#   support (pnpm/action-setup#289). Return to @v6 once the tag moves.
 jobs:
   verify:
     name: Lint, format, typecheck, test, build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: pnpm
@@ -30,11 +36,11 @@ jobs:
 
   e2e:
     name: Browser and accessibility checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: pnpm
@@ -43,7 +49,7 @@ jobs:
       - run: pnpm e2e
         env:
           CI: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report

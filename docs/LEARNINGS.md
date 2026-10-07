@@ -240,3 +240,13 @@ Format:
 
 **What happened.** One `--line` token served both the fields' borders and the dividers. Tuned for dividers, it sat near 1.5:1 against the page, so a field's edge failed WCAG 1.4.11 (3:1 for what identifies a control) in every theme. Darkening `--line` would have made every divider heavy too.
 **Rule.** Keep two tokens: `--edge` for what identifies a control, at 3:1 or more against the page and the surface (in the theme test), and `--line` for grouping, free to stay quiet. Derive a theme's edge from its line, moved toward its ink, so it keeps the theme's tint.
+
+## 2026-10-06 — An action's major tag can lag its newest release
+
+**What happened.** CI warned that checkout, setup-node, and pnpm/action-setup v4 target Node 20. That is each action's own runtime (`runs.using` in its `action.yml`), separate from the Node 24 our code runs on. The current majors (checkout 7, setup-node 7, upload-artifact 7, pnpm/action-setup 6) run on Node 24 with our inputs unchanged. But pnpm/action-setup's `v6` tag still points at 6.0.10, and pnpm 12 support only arrived in 6.1.0 (pnpm/action-setup#289, open).
+**Rule.** Before bumping an action, resolve its major tag to a release (`gh api repos/<owner>/<repo>/git/refs/tags/v6`) and read the notes up to the newest. When the tag lags, pin the exact release with the reason in the workflow (6.1.0 is an immutable release, so that tag cannot move), and go back to the major tag at a milestone review once it catches up. Weigh `pnpm/setup` then too: the successor for pnpm 11 and later, it also installs Node, so it would replace two steps.
+
+## 2026-10-06 — CI runs on a named Ubuntu image
+
+**What happened.** `ubuntu-latest` moves from Ubuntu 24.04 to 26.04 between October 19 and November 19, 2026 (actions/runner-images#14748), so during the rollout one commit could run on either image. Playwright supports 26.04 from 1.61, including the system packages `--with-deps` installs; the lockfile has 1.63.
+**Rule.** Both jobs name their image (`ubuntu-26.04`), so the OS changes in a commit we can test and revert. Before moving to a new image, check that the locked Playwright lists it as supported (its release notes, or `hostPlatform.ts` in its source), and include the workflow's action tags and image in the milestone pin review (ADR 0005).

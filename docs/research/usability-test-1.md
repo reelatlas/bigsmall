@@ -2,6 +2,8 @@
 
 Milestone 2 exit gate (docs/PLAN.md §13). Five people, about 20 minutes each, one at a time. The goal is to learn whether the two-box idea is understood without explanation and where the smart input surprises people. Nothing here measures speed. The behavior being tested is described in docs/UX-SPEC.md; its open questions are §15.
 
+**Revise before running.** The table layout becomes the default (ADR 0009, docs/UX-SPEC.md §14). Once it is built, the tasks and what we watch are rewritten for it, with two boxes on the switch's other side; docs/research/findings-friends-1.md lists what the test should now learn.
+
 ## Who
 
 Five participants, recruited from people who are not working on the project:

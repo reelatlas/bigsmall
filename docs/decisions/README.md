@@ -4,16 +4,17 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 
 ## Index
 
-| #                                       | Title                                                       | Status                                          |
-| --------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------- |
-| [0001](0001-no-database.md)             | No database for v1                                          | accepted                                        |
-| [0002](0002-stack.md)                   | Astro + React island + TypeScript + Tailwind v4             | accepted; partly superseded by 0006, 0007, 0008 |
-| [0003](0003-core-ui-boundary.md)        | Hard boundary between core engine and UI                    | accepted                                        |
-| [0004](0004-originality-and-sources.md) | Original code; factors verified against standards bodies    | accepted                                        |
-| [0005](0005-toolchain-policy.md)        | Latest tooling where compatible, a11y tooling never dropped | accepted                                        |
-| [0006](0006-smart-input-combobox.md)    | Hand-built WAI-ARIA combobox; React Aria removed            | accepted                                        |
-| [0007](0007-preact-compat.md)           | The island runs on Preact through preact/compat             | accepted                                        |
-| [0008](0008-hosting-and-domains.md)     | Hosting on Vercel, with bigsmall.work as the main domain    | accepted                                        |
+| #                                       | Title                                                                       | Status                                          |
+| --------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------- |
+| [0001](0001-no-database.md)             | No database for v1                                                          | accepted                                        |
+| [0002](0002-stack.md)                   | Astro + React island + TypeScript + Tailwind v4                             | accepted; partly superseded by 0006, 0007, 0008 |
+| [0003](0003-core-ui-boundary.md)        | Hard boundary between core engine and UI                                    | accepted                                        |
+| [0004](0004-originality-and-sources.md) | Original code; factors verified against standards bodies                    | accepted                                        |
+| [0005](0005-toolchain-policy.md)        | Latest tooling where compatible, a11y tooling never dropped                 | accepted                                        |
+| [0006](0006-smart-input-combobox.md)    | Hand-built WAI-ARIA combobox; React Aria removed                            | accepted                                        |
+| [0007](0007-preact-compat.md)           | The island runs on Preact through preact/compat                             | accepted                                        |
+| [0008](0008-hosting-and-domains.md)     | Hosting on Vercel, with bigsmall.work as the main domain                    | accepted                                        |
+| [0009](0009-two-layouts.md)             | One converter, two layouts: the table by default, two boxes behind a switch | accepted                                        |
 
 ## Template
 

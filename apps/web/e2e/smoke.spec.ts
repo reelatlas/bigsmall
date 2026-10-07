@@ -144,6 +144,20 @@ test('the shortcuts map opens on hover, stays when clicked, and closes on Escape
   await toggle.hover();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expect(page.getByText('Confirm input or selection')).toBeVisible();
+  // The open edge goes with the panel: a fading edge would leave a green square behind.
+  const shell = toggle.locator('xpath=ancestor::*[@data-shell]/*[1]');
+  const edgeFades = await shell.evaluate((el) => {
+    const style = getComputedStyle(el);
+    const durations = style.transitionDuration.split(',').map((d) => parseFloat(d));
+    return style.transitionProperty
+      .split(',')
+      .some(
+        (property, i) =>
+          ['border-color', 'all'].includes(property.trim()) &&
+          (durations[i % durations.length] ?? 0) > 0,
+      );
+  });
+  expect(edgeFades).toBe(false);
   await page.mouse.move(5, 5);
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 

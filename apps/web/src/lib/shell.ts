@@ -8,12 +8,20 @@
 
 /** The edge, clip, and open state every shell shares: an accent edge and a shadow while open. */
 export const SHELL =
-  'overflow-hidden border-2 transition-[border-color,box-shadow] group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md';
+  'overflow-hidden border-2 group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md';
 
-/** Bordered at rest (fields, the theme menu). The accent edge also shows keyboard focus inside. */
-export const SHELL_BORDERED = 'border-edge bg-surface focus-within:border-accent';
+/**
+ * Bordered at rest (fields, the theme menu). The accent edge also shows keyboard focus inside,
+ * and it eases between edge and accent because the shell itself stays in view.
+ */
+export const SHELL_BORDERED =
+  'border-edge bg-surface transition-[border-color,box-shadow] focus-within:border-accent';
 
-/** A borderless icon button at rest (the shortcuts map) that becomes a card when open. */
+/**
+ * A borderless icon button at rest (the shortcuts map) that becomes a card when open. No
+ * transition: its panel appears and vanishes at once, so an edge that faded would be left behind
+ * as a green square around the icon (docs/LEARNINGS.md, "A focus-within edge lingers").
+ */
 export const SHELL_GHOST = 'border-transparent group-data-open:bg-surface';
 
 /**

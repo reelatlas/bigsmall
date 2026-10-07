@@ -190,6 +190,7 @@ Format:
 
 **What happened.** The shortcuts shell showed its accent edge whenever anything inside had focus. After a click closed the panel, focus stayed on the icon, so a green square remained around it with nothing open, and closing by hover faded the edge out after the panel had vanished.
 **Rule.** A trigger that is borderless at rest uses the button's own `focus-visible` ring, which a mouse click does not trigger, and its open edge comes and goes with `[data-open]` without a transition, so the edge and the panel always change together. Keep `focus-within` edges for controls that are bordered at rest, such as fields and the theme menu.
+**Came back (2026-10-06).** The hygiene pass merged the shells into one recipe (`src/lib/shell.ts`) and put the fields' edge transition in the shared part, so the shortcuts map faded its green edge again. The transition now lives in `SHELL_BORDERED` only, and a browser test fails if the ghost edge can animate. See "Merging recipes can undo a fix" below.
 
 ## 2026-10-06 — Astro renders React components to static HTML when no client directive is given
 
@@ -265,3 +266,8 @@ Format:
 
 **What happened.** Reading arithmetic in the boxes risked turning `5 km/h` into 5 km divided by h, and `5 -ft` into a subtraction. Symbols like `/` and `-` belong to both grammars.
 **Rule.** An operator joins the arithmetic only when another number, a sign, or `(` follows it, or when it ends the text (the user is still typing); anything else ends the arithmetic and starts the unit query. Every new operator gets a test beside a unit that uses the same character.
+
+## 2026-10-06 — Merging recipes can undo a fix
+
+**What happened.** Three shells were merged into one class recipe to stop them drifting apart. The shared part took the fields' `transition-[border-color,box-shadow]`, which the shortcuts map had dropped on purpose to fix a lingering green edge, and the bug came back unnoticed until Sean saw it.
+**Rule.** A shared recipe holds only what every variant does the same way; anything a variant does differently, motion included, stays in the variant. When merging, compare each instance's computed style before and after, and turn the fix being preserved into a test (here, "the ghost edge cannot animate").

@@ -614,15 +614,19 @@ test('clear all empties both boxes, and undo brings them back', async ({ page })
   await expect(second).toHaveValue('1.609344');
 });
 
-test('the hint sits above the boxes', async ({ page }) => {
+test('the hint has a line of its own, and the toolbar sits under it, over the boxes', async ({
+  page,
+}) => {
   await page.goto('/');
   await ready(page);
   const hint = page.getByText(
     'Type a number, unit, or both. Once each box has a unit, typing in one updates the other.',
   );
-  const hintBox = await hint.boundingBox();
-  const fieldBox = await boxes(page).first.boundingBox();
-  expect(hintBox!.y + hintBox!.height).toBeLessThanOrEqual(fieldBox!.y);
+  const hintBox = (await hint.boundingBox())!;
+  const toolbar = (await page.getByRole('button', { name: 'Undo' }).boundingBox())!;
+  const fieldBox = (await boxes(page).first.boundingBox())!;
+  expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(toolbar.y);
+  expect(toolbar.y + toolbar.height).toBeLessThanOrEqual(fieldBox.y);
 });
 
 test('Backspace on an empty box removes its unit and lists that category', async ({ page }) => {

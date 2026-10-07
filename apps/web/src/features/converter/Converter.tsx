@@ -223,13 +223,15 @@ export function Converter() {
       className="mt-6"
       data-hydrated={hydrated ? '' : undefined}
     >
-      {/* On phones the hint takes the full width and the buttons sit on their own line under it. */}
-      <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-        {/* sm:pt-3 centers the first line of the hint on the 44 px toolbar buttons beside it. */}
-        <p id={hintId} className="text-sm text-ink-muted sm:pt-3">
+      {/*
+        The hint has a line of its own, and the toolbar the next one, right-aligned over the
+        boxes it acts on, so what to do and the tools to do it with read apart (docs/UX-SPEC.md §1).
+      */}
+      <div className="mb-2 flex flex-col gap-1">
+        <p id={hintId} className="text-sm text-ink-muted">
           Type a number, unit, or both. Once each box has a unit, typing in one updates the other.
         </p>
-        <div className="flex shrink-0 items-center gap-1 self-end sm:self-auto">
+        <div className="flex shrink-0 items-center gap-1 self-end">
           <Button
             variant="ghost"
             square

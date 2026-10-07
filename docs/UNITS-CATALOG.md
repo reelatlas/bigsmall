@@ -6,12 +6,12 @@ Draft v0.2, 2026-10-06. Taxonomy, tiers, special-logic units, and verification s
 
 Milestone 1 (2026-10-06): all eight primary categories ship their basic tier, 54 units, every one cited and covered by a golden test row. Base units: meter, kilogram, liter, kelvin, square meter, meter per second, second, byte. Advanced tiers arrive in milestone 3.
 
-Alias decisions so far (each one changes what auto-locks, see docs/UX-SPEC.md §5):
+Alias decisions so far (each one changes the ranking, and so which row Enter takes; see docs/UX-SPEC.md §4 and §5):
 
 - `kilo`/`kilos` → kilogram, `cc` → milliliter, `kph`/`kmh` → kilometer per hour: colloquial, so they count as exact matches.
-- `oz` is also an alias of fluid ounce on purpose: it makes "oz" ambiguous, so the UI asks instead of guessing.
+- `oz` is also an alias of fluid ounce on purpose: it makes "oz" ambiguous, so the list shows both ounces, each with its category, and the choice is visible before Enter.
 - No `ton` alias on the metric ton (US short ton and UK long ton arrive in milestone 3 with locale ranking), and no lowercase `b` for bit (it would collide with byte's `B` inside the category).
-- Unit `note` fields carry the definition for anything with a variant: cup, the US liquid family, tonne, month, year, decimal data prefixes.
+- Unit `note` fields carry the definition for anything with a variant or a common mix-up: bit and byte; the decimal data prefixes (kB, MB, GB, TB); tonne, ounce, and stone; knot; kelvin; month and year; and the US liquid family (teaspoon, tablespoon, fluid ounce, cup, pint, quart, gallon). The UI does not show notes yet (docs/UX-SPEC.md §14).
 
 ## 1. Coverage research
 
@@ -48,7 +48,9 @@ Two tiers at two levels:
 
 The eight primary categories shown as empty-state chips are marked ★.
 
-| Category      | ★   | Basic units (proposed)                                   | Advanced units (examples)                                                                                              |
+The ★ rows ship today with exactly these basic units; the other rows, and every advanced column, are the plan for milestone 3.
+
+| Category      | ★   | Basic units                                              | Advanced units (examples)                                                                                              |
 | ------------- | --- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Length        | ★   | mm, cm, m, km, in, ft, yd, mi                            | µm, nm, nautical mile, mil/thou, furlong, fathom, chain, light-year, AU, parsec, ångström, US survey foot, pica, point |
 | Weight (mass) | ★   | mg, g, kg, t (metric ton), oz, lb, st                    | µg, carat, grain, troy oz, short ton, long ton, slug, dalton, hundredweight                                            |
@@ -99,33 +101,33 @@ Currency (live rates), Clothing and shoe sizes (lookup tables), Sound (logarithm
 
 ## 4. Special logic
 
-| Category or unit           | Why it is special                                        | Approach                                                                             |
-| -------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Temperature                | Affine: offset plus scale                                | `toBase` / `fromBase` functions; base is kelvin                                      |
-| Temperature interval       | Linear, but 1 °C step ≠ 1 °C reading                     | Separate category                                                                    |
-| Fuel economy, pace         | Reciprocal relationships (L/100 km vs km/L)              | `toBase` / `fromBase` with 1/x; "Undefined for 0"                                    |
-| Data                       | Decimal (kB = 1000 B) vs binary (KiB = 1024 B)           | Both families as distinct units; `KB` alias maps to decimal with a hint              |
-| Time: month, year          | No single definition                                     | Mean Gregorian: 1 year = 365.2425 d, 1 month = year/12; definition shown in the chip |
-| Calorie                    | `cal` (thermochemical, 4.184 J) vs food Calorie (= kcal) | Two units; `Calorie`/`Cal` alias to kcal with a hint                                 |
-| Horsepower                 | Mechanical (745.6999 W) vs metric PS (735.49875 W)       | Two units; `hp` → mechanical by default                                              |
-| Ton                        | Short (US), long (UK), metric                            | Three units; `ton` is ambiguous → locale default highlighted                         |
-| Gallon, pint, quart, fl oz | US vs imperial                                           | Two units each; locale default highlighted                                           |
-| Cup                        | US customary 236.588 mL, US legal 240 mL, metric 250 mL  | US customary default; others advanced                                                |
-| Typography px              | Depends on dpi                                           | Assume 96 dpi; state it                                                              |
-| Mach                       | Depends on conditions                                    | Standard sea level 340.29 m/s; state it                                              |
+| Category or unit           | Why it is special                                        | Approach                                                                            |
+| -------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Temperature                | Affine: offset plus scale                                | `toBase` / `fromBase` functions; base is kelvin                                     |
+| Temperature interval       | Linear, but 1 °C step ≠ 1 °C reading                     | Separate category                                                                   |
+| Fuel economy, pace         | Reciprocal relationships (L/100 km vs km/L)              | `toBase` / `fromBase` with 1/x; "Undefined for 0"                                   |
+| Data                       | Decimal (kB = 1000 B) vs binary (KiB = 1024 B)           | Both families as distinct units; `KB` alias maps to decimal with a hint             |
+| Time: month, year          | No single definition                                     | Mean Gregorian: 1 year = 365.2425 d, 1 month = year/12; definition in the unit note |
+| Calorie                    | `cal` (thermochemical, 4.184 J) vs food Calorie (= kcal) | Two units; `Calorie`/`Cal` alias to kcal with a hint                                |
+| Horsepower                 | Mechanical (745.6999 W) vs metric PS (735.49875 W)       | Two units; `hp` → mechanical by default                                             |
+| Ton                        | Short (US), long (UK), metric                            | Three units; `ton` is ambiguous → locale default highlighted                        |
+| Gallon, pint, quart, fl oz | US vs imperial                                           | Two units each; locale default highlighted                                          |
+| Cup                        | US customary 236.588 mL, US legal 240 mL, metric 250 mL  | US customary default; others advanced                                               |
+| Typography px              | Depends on dpi                                           | Assume 96 dpi; state it                                                             |
+| Mach                       | Depends on conditions                                    | Standard sea level 340.29 m/s; state it                                             |
 
 ## 5. Aliases and disambiguation
 
 Each unit lists the aliases people actually type: symbols with and without case (`ml`, `mL`), spellings (`litre`, `liter`), plurals, abbreviations (`tbsp`, `tbs`, `T`), and regional names. Category aliases cover everyday words (`distance`, `how far`, `fluids`, `liquid`, `temp`, `hot`, `storage`).
 
-Ambiguity watchlist (exact matches across categories or variants): `m`, `oz`, `ton`, `gal`, `pt`, `qt`, `cup`, `cal`, `hp`, `mpg`, `kB`, `lb` (mass vs force), `mi`, `min`, `s`. These never auto-lock; the panel shows candidates with category labels.
+Ambiguity watchlist (exact matches across categories or variants): `m`, `oz`, `ton`, `gal`, `pt`, `qt`, `cup`, `cal`, `hp`, `mpg`, `kB`, `lb` (mass vs force), `mi`, `min`, `s`. Nothing commits until Enter or a pick, and for these the list shows every candidate with its category, so the choice is visible before committing.
 
 No-match queries are the best signal for missing aliases. Log them (locally in dev, via analytics later) and review before each release.
 
 ## 6. Adding a category or unit
 
 1. Create or open `packages/core/src/units/<category>.ts`.
-2. Add the unit with `id`, `name`, `plural`, `symbol`, `aliases`, `system`, `tier`, `factor` or function pair, `exact`, `source`.
-3. Add at least one golden test row from the cited source.
+2. Add the unit with `id`, `name`, `plural`, `symbol`, `aliases`, `system`, `tier`, `factor` or function pair, `exact`, `source`, and a `note` when its definition has a variant.
+3. Add at least one golden row from the cited source in `packages/core/test/golden/<category>.ts`. A new category's golden file is also listed in `test/golden/index.ts`.
 4. Add the unit to this catalog under the right tier.
 5. If the unit introduces a definition choice (like cup), add it to the special-logic table.

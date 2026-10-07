@@ -94,7 +94,11 @@ export function SuggestionPanel({
               data-active={active || undefined}
               className={back ? backRow : row}
               onMouseDown={(event) => event.preventDefault()}
-              onMouseEnter={() => onHover(index)}
+              // Movement, not entry: rows that render under a still pointer (after Back, say)
+              // must not take the highlight from the row the keyboard or Back put it on.
+              onMouseMove={() => {
+                if (!active) onHover(index);
+              }}
               onClick={() => onPick(item)}
             >
               {back ? (

@@ -198,7 +198,7 @@ export function selectView(state: ConverterState, options: ViewOptions): Convert
   const box = (id: BoxId, unit: Unit | null, otherUnit: Unit | null): BoxView => {
     const isSource = id === sourceId;
     const stored = state[id].text;
-    const typingQuery = parse(stored).query !== undefined;
+    const typingQuery = parse(stored, options.separators).query !== undefined;
     // A derived box shows the result unless the user is typing a unit query into it.
     const text = isSource || typingQuery ? stored : (result?.text ?? '');
     return {

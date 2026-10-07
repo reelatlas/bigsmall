@@ -5,6 +5,9 @@ import {
   suggest,
   type CategoryId,
   type ParsedInput,
+  type SearchOptions,
+  type Separators,
+  type Suggestion,
   type Unit,
 } from '@bigsmall/core';
 import {
@@ -92,8 +95,8 @@ const OUT_OF_RANGE_STEPS = [
  * One box of the converter: a text field that takes a number, a unit, or both, with the committed
  * unit shown as a chip and a suggestion list that grows out of the field over the page
  * (docs/UX-SPEC.md §3, §5, §7–§9). Hand-built on the WAI-ARIA combobox pattern (ADR 0006).
- * Nothing commits on a keystroke: the best match is highlighted, Enter or a pick commits it, and
- * Tab or leaving the box commits an exact match.
+ * Nothing commits on a keystroke: the best match is highlighted and Enter or a pick commits it.
+ * Tab and leaving the box never commit, so moving between boxes never changes what was typed.
  */
 export function SmartInput({
   box,
@@ -120,37 +123,17 @@ export function SmartInput({
   const [level, setLevel] = useState<Level | null>(null);
 
   const scope = level ? (level === 'top' ? null : level) : box.scope;
-  const searchOptions = {
-    category: scope,
+  const listOptions = {
     separators: env.separators,
     system: env.system,
     // The UI's modes map onto core's tiers: basic lists basic units, advanced lists them all.
     tier: mode === 'basic' ? 'basic' : 'all',
   } as const;
-
-  // A query that finds nothing inside the category widens to every category on its own, so a
-  // unit from elsewhere is always one pick away.
-  const scoped = suggest(box.text, searchOptions);
-  const query = scoped.parsed.query ?? '';
-  const widened = scope !== null && query !== '' && scoped.search.results.length === 0;
-  const suggestion = widened ? suggest(box.text, { ...searchOptions, category: null }) : scoped;
-  const noMatch = query !== '' && suggestion.search.results.length === 0;
-  const listed = noMatch
-    ? search('', { tier: searchOptions.tier }).results
-    : suggestion.search.results;
-
-  // Inside a category the Back row comes first, so the arrow keys reach it like any other row;
-  // the best match is the first row after it.
-  const hasBack = scope !== null;
-  const firstResult = hasBack ? 1 : 0;
-  const items: SuggestionItem[] = [
-    ...(hasBack ? [BACK_ITEM] : []),
-    ...listed.map((result): SuggestionItem =>
-      result.kind === 'unit'
-        ? { kind: 'unit', key: result.unit.id, unit: result.unit }
-        : { kind: 'category', key: `#${result.category.id}`, category: result.category },
-    ),
-  ];
+  const { suggestion, query, widened, noMatch, items, firstResult } = buildList(
+    box.text,
+    scope,
+    listOptions,
+  );
 
   const notFound = noMatch ? `No unit matches “${query}”. Try ml, feet, or °F.` : undefined;
 
@@ -162,7 +145,7 @@ export function SmartInput({
     : box.unit
       ? '0'
       : box.scope
-        ? scopedExamples(box.scope, counterpart, searchOptions.tier)
+        ? scopedExamples(box.scope, counterpart, listOptions.tier)
         : examples;
 
   const sizeClass = SIZE_STEPS[useFitStep(textLayerRef, TEXT_LAYER, SIZE_STEPS)];
@@ -203,20 +186,35 @@ export function SmartInput({
     else closePanel();
   };
 
-  /** Commit the exact match, if the query names exactly one unit. Used by Enter, Tab, and blur. */
+  /** Commit the exact match, if the query names exactly one unit: Enter with no row highlighted. */
   const commitExact = (): boolean => {
     if (!suggestion.exact) return false;
     lock(suggestion.exact);
     return true;
   };
 
+  /**
+   * Up to the categories with the category just left highlighted, so Enter goes straight back
+   * in. When a query hides that row, the best match is highlighted instead, as while typing.
+   */
+  const goUp = () => {
+    const top = buildList(box.text, null, listOptions);
+    const left = top.items.findIndex(
+      (item) => item.kind === 'category' && item.category.id === scope,
+    );
+    setLevel('top');
+    setOpen(true);
+    setActive(left >= 0 ? left : top.query ? top.firstResult : -1);
+  };
+
   const pick = (item: SuggestionItem) => {
     if (item.kind === 'back') {
-      showList('top');
+      goUp();
     } else if (item.kind === 'unit') {
       lock(item.unit);
     } else {
-      if (box.isSource && query) {
+      // Entering a category drops the query that found it, in either box, and keeps any number.
+      if (query) {
         dispatch({ type: 'setText', box: box.id, text: suggestion.parsed.valueText ?? '' });
       }
       showList(item.category.id);
@@ -237,7 +235,7 @@ export function SmartInput({
    */
   const escape = () => {
     if (open && scope !== null) {
-      showList('top');
+      goUp();
       return;
     }
     if (open) {
@@ -267,8 +265,8 @@ export function SmartInput({
         if (count) setActive((i) => (i <= 0 ? count - 1 : i - 1));
         break;
       case 'Enter': {
-        // Commit and close, like clicking out, while keeping focus here. Back and category rows
-        // move between the list's levels instead, so the list stays open.
+        // Commit and close while keeping focus here. Back and category rows move between the
+        // list's levels instead, so the list stays open.
         event.preventDefault();
         const item = open && active >= 0 ? items[active] : undefined;
         if (item?.kind === 'category' || item?.kind === 'back') {
@@ -284,9 +282,6 @@ export function SmartInput({
         event.preventDefault();
         escape();
         break;
-      case 'Tab':
-        commitExact();
-        break;
       case 'Backspace':
         if (box.unit && event.currentTarget.value === '') {
           event.preventDefault();
@@ -297,13 +292,16 @@ export function SmartInput({
   };
 
   const onFocus = (event: FocusEvent<HTMLInputElement>) => {
+    // Back in a box that holds an uncommitted query, its best match is highlighted again, so
+    // Enter takes it just as it would have before the box was left.
     setOpen(true);
+    setActive(query ? firstResult : -1);
     if (!box.isSource && event.target.value) event.target.select();
   };
 
+  // Leaving the box only closes the list: a query stays as typed until Enter or a pick.
   const onBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
-    commitExact();
     closePanel();
   };
 
@@ -405,6 +403,53 @@ export function SmartInput({
       </div>
     </div>
   );
+}
+
+/** What a list needs besides its scope: the visitor's number format, unit family, and tier. */
+type ListOptions = Required<Pick<SearchOptions, 'system' | 'tier'>> & { separators: Separators };
+
+interface ListModel {
+  suggestion: Suggestion;
+  /** The unit query; '' when only a number, or nothing, is typed. */
+  query: string;
+  /** A query found nothing in the scope, so the list widened to every category. */
+  widened: boolean;
+  /** A query found nothing anywhere, so the list offers the categories. */
+  noMatch: boolean;
+  items: SuggestionItem[];
+  /** The best match's row: the first, or the one after Back. */
+  firstResult: number;
+}
+
+/**
+ * The rows a box lists at one level: the scope's units, or the categories without a scope. A
+ * query that finds nothing inside the scope widens to every category on its own, so a unit from
+ * elsewhere is always one pick away. Inside a category the Back row comes first, so the arrow
+ * keys reach it like any other row.
+ */
+function buildList(text: string, scope: CategoryId | null, options: ListOptions): ListModel {
+  const scoped = suggest(text, { ...options, category: scope });
+  const query = scoped.parsed.query ?? '';
+  const widened = scope !== null && query !== '' && scoped.search.results.length === 0;
+  const suggestion = widened ? suggest(text, { ...options, category: null }) : scoped;
+  const noMatch = query !== '' && suggestion.search.results.length === 0;
+  const listed = noMatch ? search('', { tier: options.tier }).results : suggestion.search.results;
+  const hasBack = scope !== null;
+  return {
+    suggestion,
+    query,
+    widened,
+    noMatch,
+    firstResult: hasBack ? 1 : 0,
+    items: [
+      ...(hasBack ? [BACK_ITEM] : []),
+      ...listed.map((result): SuggestionItem =>
+        result.kind === 'unit'
+          ? { kind: 'unit', key: result.unit.id, unit: result.unit }
+          : { kind: 'category', key: `#${result.category.id}`, category: result.category },
+      ),
+    ],
+  };
 }
 
 /**

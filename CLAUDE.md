@@ -8,7 +8,7 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 ## Current status
 
-Milestones 0 (setup), 1 (core engine), and the code of 2 (smart input) complete on 2026-10-06. Six rounds of Sean's feedback are applied; `docs/UX-SPEC.md` describes current behavior. A hygiene pass is in progress: code done, remaining doc work and open decisions listed at the end of `docs/research/findings-0-first-pass.md`, which is where the next session starts. The converter works end to end: two linked smart inputs, live results, typing chunks for Escape and undo, numbers that fit their field, out-of-range messages, a category label under the box driving the conversion, clear all, a keyboard shortcuts map, URL state, about 82 KB gzipped. Milestone 2 closes when the five-person usability test in `docs/research/usability-test-1.md` has been run and its findings recorded. Next after that: milestone 3 (keypad, modes, persistence, advanced tiers). Progress and definitions of done are in `docs/PLAN.md` §13.
+Milestones 0 (setup), 1 (core engine), and the code of 2 (smart input) complete on 2026-10-06. Sean's feedback rounds are applied and recorded in `docs/research/findings-0-first-pass.md`, the last being a hygiene pass that brought every doc to current behavior. `docs/UX-SPEC.md` describes current behavior; its §14 lists what is planned, including Sean's queued ideas (copy link, keypad as a calculator, header animation, theme art). The converter works end to end: two linked smart inputs, live results, typing chunks for Escape and undo, numbers that fit their field, out-of-range messages, a category label under the box driving the conversion, clear all, a keyboard shortcuts map, URL state, about 82 KB gzipped. Milestone 2 closes when the five-person usability test in `docs/research/usability-test-1.md` has been run and its findings recorded. Next after that: milestone 3 (keypad, modes, persistence, advanced tiers). Progress and definitions of done are in `docs/PLAN.md` §13.
 
 ## Non-negotiables
 
@@ -17,8 +17,8 @@ Milestones 0 (setup), 1 (core engine), and the code of 2 (smart input) complete 
 3. **No one-off values.** Colors, type, radii, shadows, and motion come from semantic tokens through the Tailwind bridge (`bg-canvas`, `text-ink`, `rounded-md`...). No raw hex, rgb, px radii, or literal durations inside components. A new visual need means a new token in every theme, documented in `docs/DESIGN-SYSTEM.md`.
 4. **No one-off components.** Check `apps/web/src/components` first. Extend rather than fork. Every component appears in `/dev/gallery`.
 5. **React for interaction, Astro for structure.** Anything the user interacts with is a React component. Astro files only scaffold pages and static content. Exception: the header menus (theme picker, keyboard shortcuts map) are plain HTML driven by the inline script in `Base.astro`, so they work before any bundle loads and add none. (ADR 0002, re-examination)
-6. **Accessibility is a requirement.** Keyboard-operable, visible focus, labelled, 44 px targets, works at 320 px and 400 % zoom, respects reduced motion. Every theme passes the contrast test. Playwright runs axe on every page in every theme.
-7. **Budgets are tests.** Lint, format, types, unit tests, build, and the browser suite all gate CI. Performance budgets join at milestone 2.
+6. **Accessibility is a requirement.** Keyboard-operable, visible focus, labelled, 44 px targets, works at 320 px and 400 % zoom, respects reduced motion. Every theme passes the contrast test. Playwright runs axe on the converter in every theme and on the gallery, and a keyboard walk checks that every Tab stop shows focus.
+7. **Budgets are tests.** Lint, format, types, unit tests, build, the bundle budget, and the browser suite all gate CI. Lighthouse budgets join at milestone 5.
 8. **Behavior is specified before it is built.** A UI behavior change updates `docs/UX-SPEC.md` in the same change.
 9. **Decisions are recorded.** Anything you would explain twice becomes an ADR in `docs/decisions/`.
 10. **Learnings are logged.** A gotcha, workaround, or best practice found during work gets a dated entry in `docs/LEARNINGS.md` in the same change.
@@ -44,6 +44,9 @@ pnpm check          # lint + format check + typecheck + test + build + bundle ch
 - **Add a component:** `docs/DESIGN-SYSTEM.md` "Adding a component".
 - **Add a theme:** `docs/THEMING.md` "Authoring a theme".
 - **Add a page:** `apps/web/src/pages/`, use `layouts/Base.astro`, islands only where there is real interaction.
+- **Add a keyboard shortcut:** handle the key in code, add it to `apps/web/src/lib/shortcuts.ts` (the shortcuts map renders from it), and describe it in `docs/UX-SPEC.md` §8.
+- **Add a header menu:** reuse the shell controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`) and the classes in `src/lib/shell.ts`, and place it in `components/HeaderMenus.astro`. No new script.
+- **Add a UI delay:** a named constant in `apps/web/src/lib/timing.ts`, never a literal number of milliseconds.
 
 ## Commits
 

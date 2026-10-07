@@ -27,3 +27,10 @@ After milestone 2's first build the converter page measured 91.4 KB of gzipped J
 - One composite control to maintain by hand. Its keyboard and ARIA contract lives in `SmartInput.tsx` and is pinned by the browser tests.
 - No component library dependency. ADR 0002's "React Aria Components" row is superseded by this decision.
 - The milestone 2 bundle is 79.1 KB JS and 4.4 KB CSS gzipped; `pnpm bundle:check` fails CI above 90 KB and 20 KB.
+
+## Outcome notes (2026-10-06)
+
+- **Space is not handled.** Decision 1 listed it, but the input leaves Space alone: it types a space, which also starts a new typing chunk for undo.
+- **The Back row is an option.** Inside a category the list's first row is "← Back", a `role="option"` like the others, so `aria-activedescendant` and the arrow keys reach it and Enter on it goes up a level.
+- **Commits.** Only Enter and a pick commit a unit. Tab and leaving the box never commit, so moving between boxes never changes what was typed (owner decision; docs/UX-SPEC.md §5).
+- **The theme menu is native radios** in a header shell, per decision 2, not a second listbox.

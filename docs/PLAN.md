@@ -15,10 +15,10 @@ Positioning in one line: _type anything into either box and get the answer._
 - **Two linked smart inputs.** Each accepts a number, a unit, or both (`5 ml`, `ml`, `5`). Typing in one updates the other instantly. Either box can be the source.
 - **Smart search.** Empty box shows categories. Typing a unit narrows to matching units across categories. Typing a category word (`fluids`, `temp`) narrows to that category. Once one box has a unit, the other is scoped to the same category.
 - **Manual selection.** Everything reachable by tapping, with no typing required.
-- **Keypad.** A toggleable on-screen keypad that targets the active box, for touch-only use.
+- **Keypad.** An on-screen keypad behind an icon button, for anyone who would rather tap than type, with a switch for which box it fills (docs/UX-SPEC.md §14).
 - **Basic and advanced modes.** Basic shows the common units of the common categories. Advanced reveals everything. Searching for an advanced unit escalates automatically.
 - **Themes.** Two neutral defaults (light, dark) plus distinctive aesthetic themes. Theme choice persists.
-- **Shareable URLs.** The current conversion is in the URL, so links and bookmarks work.
+- **Shareable URLs.** The current conversion is in the URL, so links and bookmarks work; a copy-link button in the header copies it.
 - **Fast, accessible, responsive.** See budgets and targets below.
 
 ### Later
@@ -27,7 +27,7 @@ Positioning in one line: _type anything into either box and get the answer._
 - PWA: installable, works offline. This covers most of the "app" ambition with no app store.
 - Currency (needs live rates from an API, still no database).
 - Ingredient-aware cooking conversions (cups of flour to grams).
-- Expression input: typed math in the box (`2^10 bytes`, `(5+7)/2 cm`), Enter as equals, operator keys on the keypad, fraction and feet-and-inches entry. Principle and phasing in `docs/UX-SPEC.md` §13.
+- Expression input: typed math in the box (`2^10 bytes`, `(5+7)/2 cm`), Enter as equals, operator keys on the keypad, fraction and feet-and-inches entry. Principle and phasing in `docs/UX-SPEC.md` §14.
 - Native wrapper (Capacitor) only if the PWA proves insufficient.
 
 ### Out of scope
@@ -38,12 +38,12 @@ Time zones and calendar math, clothing and shoe sizes, decibels, number-base con
 
 Full behavior lives in `docs/UX-SPEC.md`. The short version:
 
-1. Both boxes start empty, showing the primary categories as chips.
-2. The user types into either box. The parser splits the text into an optional number and an optional unit query.
-3. Suggestions update on every keystroke. An unambiguous exact match locks the unit into a chip. Ambiguous matches (`oz`, `ton`, `cup`, `gal`) show their category so the user can pick.
-4. When one box has a unit, the other box's suggestions are scoped to that category and ordered by the most common counterpart.
-5. Once both boxes have a unit, the result appears live in whichever box was not edited last. Editing either side makes it the source.
-6. A swap button flips the pair. A keypad button docks a keypad that targets the active box.
+1. Both boxes start empty; focusing one lists the categories.
+2. The user types a number, a unit, or both into either box. The parser splits the text into an optional number and an optional unit query.
+3. Suggestions update on every keystroke with the best match highlighted, but nothing commits on a keystroke: Enter or a pick puts the unit into a chip, and Tab or clicking away leaves the text as typed. Ambiguous matches (`oz`, later `ton`, `cup`, `gal`) name their category so the choice is visible.
+4. When one box has a unit, the other box's list is scoped to that category, most common units first.
+5. Once both boxes have a unit, the result appears live in the box that is not the source. Typing a number into either box makes it the source.
+6. Swap flips the pair; undo, redo, and clear all sit above the boxes. A keypad (milestone 3) will target either box.
 
 The smart input is the whole product. It is the first thing to build and the first thing to test with people.
 
@@ -63,97 +63,28 @@ What would change the answer: accounts with cross-device sync of favorites (need
 
 ## 5. Architecture
 
-Two layers with a hard boundary (ADR 0003):
+Two layers with a hard boundary (ADR 0003). `packages/core` is pure TypeScript with zero runtime dependencies and no DOM: units, conversion, parsing, search, and formatting. `apps/web` is the Astro site with one React island for the converter: everything the user sees. The module map, data flow, and how to extend each part are in `docs/ARCHITECTURE.md`.
 
-```
-packages/core      pure TypeScript, zero runtime deps, no DOM
-  units/           one file per category: length.ts, volume.ts, ...
-  convert.ts       convert(value, fromUnit, toUnit)
-  parse.ts         "5 ml" -> { value: 5, query: "ml" }
-  search.ts        unit and category search with ranking
-  format.ts        significant figures, locale grouping, exponent switch
-  index.ts         public API
+- **Data model.** `Category` and `Unit` in `packages/core/src/types.ts`. Conversion always goes `from → base → to`, never through an intermediate unit: linear units multiply by a factor; non-linear units (temperature now, fuel economy later) use a `toBase`/`fromBase` pair. Every unit cites its source.
+- **Converter state.** `apps/web/src/features/converter/state.ts`: each box's text and unit, the source box, and the mode, with undo history around them. The keypad's state arrives with the keypad.
+- **URL.** The state serializes to `?a=<unit id>&b=<unit id>&v=<number>&s=<a|b>` (docs/UX-SPEC.md §11), so sharing, bookmarks, and later SEO pages use one mechanism.
 
-apps/web           Astro site with one React island for the converter
-  components/      design-system components (Button, Chip, Field, Sheet, Keypad, ...)
-  features/        converter/ (SmartInput, ConverterShell, Suggestions, Keypad)
-  styles/          tokens.css, themes/*.css
-  pages/           index, /[category]/[from]-to-[to] (later), /dev/gallery
-```
+## 6. Stack (ADR 0002, accepted)
 
-### Core data model (draft)
+| Concern               | Choice                                                  | Why                                                                                                                                                                  |
+| --------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework             | **Astro** with a **React** island                       | Static HTML by default, zero JS outside the converter, static page generation for later SEO pages, built-in view transitions                                         |
+| Language              | **TypeScript** (strict)                                 | Catches unit-data mistakes at compile time                                                                                                                           |
+| Styling               | **Tailwind CSS v4** over **CSS custom properties**      | Tokens are plain CSS variables so themes are just variable sets; Tailwind for speed and consistency                                                                  |
+| Accessible primitives | **Native elements + a hand-built combobox** (ADR 0006)  | React Aria was tried and removed at milestone 2: its button machinery alone cost 12 KB gzipped, and the hybrid number-and-unit field does not fit a library combobox |
+| Package manager       | **pnpm** workspaces                                     | Fast; the workspace enforces the core/web boundary physically                                                                                                        |
+| Tests                 | **Vitest** (core), **Playwright** + **axe** (web)       | Table-driven golden tests for math; end-to-end plus automated accessibility checks                                                                                   |
+| Lint/format           | **ESLint** (flat) + **Prettier**                        | Boring, complete coverage of `.astro`, `.tsx`, and `.css`                                                                                                            |
+| Perf gates            | Bundle size check now; **Lighthouse CI** at milestone 5 | Budgets fail the build                                                                                                                                               |
+| Hosting               | **Cloudflare Pages**                                    | Free, global edge, preview deploy per pull request, free cookieless analytics                                                                                        |
+| Repo                  | **GitHub**                                              | Actions for CI, PR previews                                                                                                                                          |
 
-```ts
-type Category = {
-  id: string; // "length"
-  name: string; // "Length"
-  aliases: string[]; // ["distance", "how far"]
-  baseUnit: string; // "meter"
-  tier: 'basic' | 'advanced';
-  group:
-    | 'everyday'
-    | 'mechanics'
-    | 'fluids'
-    | 'heat'
-    | 'electromagnetism'
-    | 'light'
-    | 'radiation'
-    | 'digital';
-};
-
-type Unit = {
-  id: string; // "milliliter"
-  category: string; // "volume"
-  name: string; // "milliliter"
-  plural: string; // "milliliters"
-  symbol: string; // "mL"
-  aliases: string[]; // ["ml", "millilitre", "cc", "cubic centimeter"]
-  system: 'si' | 'metric' | 'us' | 'imperial' | 'other';
-  tier: 'basic' | 'advanced';
-  factor?: number; // 1 unit = factor base units (linear units)
-  toBase?: (v: number) => number; // non-linear units (temperature, fuel economy)
-  fromBase?: (v: number) => number;
-  exact: boolean; // factor is exact by definition
-  source: string; // "NIST SP 811 §B.8" or "BIPM SI Brochure 9th ed. §2.3.1"
-};
-```
-
-Conversion is always `from -> base -> to`, never chained through intermediate units. Linear units multiply; non-linear units use their function pair.
-
-### Converter state (draft)
-
-```ts
-type BoxState = { text: string; value: number | null; unit: string | null };
-type ConverterState = {
-  a: BoxState;
-  b: BoxState;
-  source: 'a' | 'b'; // which box was edited last
-  category: string | null; // locked once either box has a unit
-  mode: 'basic' | 'advanced';
-  keypad: { open: boolean; target: 'a' | 'b' };
-};
-```
-
-State serializes to the URL (`/?a=5ml&b=cup`) so sharing, bookmarks, and later SEO pages all use one mechanism.
-
-## 6. Stack (proposed, ADR 0002)
-
-| Concern               | Choice                                                 | Why                                                                                                                                                                  |
-| --------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Framework             | **Astro** with a **React** island                      | Static HTML by default, zero JS outside the converter, static page generation for later SEO pages, built-in view transitions                                         |
-| Language              | **TypeScript** (strict)                                | Catches unit-data mistakes at compile time                                                                                                                           |
-| Styling               | **Tailwind CSS v4** over **CSS custom properties**     | Tokens are plain CSS variables so themes are just variable sets; Tailwind for speed and consistency                                                                  |
-| Accessible primitives | **Native elements + a hand-built combobox** (ADR 0006) | React Aria was tried and removed at milestone 2: its button machinery alone cost 12 KB gzipped, and the hybrid number-and-unit field does not fit a library combobox |
-| Package manager       | **pnpm** workspaces                                    | Fast; the workspace enforces the core/web boundary physically                                                                                                        |
-| Tests                 | **Vitest** (core), **Playwright** + **axe** (web)      | Table-driven golden tests for math; end-to-end plus automated accessibility checks                                                                                   |
-| Lint/format           | **ESLint** (flat) + **Prettier**                       | Boring, complete coverage of `.astro`, `.tsx`, and `.css`                                                                                                            |
-| Perf gates            | **Lighthouse CI**, bundle size check                   | Budgets fail the build                                                                                                                                               |
-| Hosting               | **Cloudflare Pages**                                   | Free, global edge, preview deploy per pull request, free cookieless analytics                                                                                        |
-| Repo                  | **GitHub**                                             | Actions for CI, PR previews                                                                                                                                          |
-
-Alternative worth naming: **SvelteKit** gives smaller bundles and built-in motion. It loses the React component ecosystem and React Aria. Choose it only if bundle size proves to be the deciding factor after the first measurement. **Next.js** is not recommended: heavier runtime and server features this project never uses.
-
-Bundle check at milestone 2: if the converter island exceeds budget, swap React Aria for a lighter headless library (Base UI or Downshift) before writing more UI.
+The alternatives (SvelteKit, Next.js, an all-React Vite framework) and why they lost are in ADR 0002. The milestone 2 bundle check removed React Aria (ADR 0006).
 
 ## 7. Repo structure
 
@@ -168,11 +99,12 @@ bigsmall/
 │   ├── UX-SPEC.md
 │   ├── UNITS-CATALOG.md
 │   ├── LEARNINGS.md
-│   ├── ARCHITECTURE.md          (scaffold)
-│   ├── DESIGN-SYSTEM.md         (scaffold)
-│   ├── THEMING.md               (scaffold)
-│   ├── TESTING.md               (scaffold)
-│   └── decisions/               ADRs
+│   ├── ARCHITECTURE.md
+│   ├── DESIGN-SYSTEM.md
+│   ├── THEMING.md
+│   ├── TESTING.md
+│   ├── decisions/               ADRs
+│   └── research/                usability test scripts and findings
 ├── packages/
 │   └── core/                    @bigsmall/core
 └── apps/
@@ -181,13 +113,7 @@ bigsmall/
 
 ## 8. Design system and theming
 
-Three token layers:
-
-1. **Primitives.** Raw palettes and scales (`--pink-200`, `--space-4`). Never used in components.
-2. **Semantic tokens.** What components consume: `--bg`, `--surface`, `--text`, `--text-muted`, `--accent`, `--accent-contrast`, `--border`, `--focus`, `--radius-md`, `--font-display`, `--font-body`, `--font-numeric`, `--shadow-md`, `--dur-base`, `--ease`.
-3. **Component tokens.** Only where a component needs its own knob (`--chip-bg`).
-
-A theme is a `[data-theme="name"]` block that reassigns semantic tokens, plus an optional decoration stylesheet for atmosphere (petals, rain streaks, blueprint grid). Components never know which theme is active.
+Tokens, the Tailwind bridge, and the component rules are in `docs/DESIGN-SYSTEM.md`; building a theme is in `docs/THEMING.md`. In short: components use semantic tokens only (`bg-canvas`, `text-ink`, `rounded-md`). A theme is a `[data-theme="name"]` block that sets every semantic token, plus an optional decoration stylesheet for atmosphere (petals, rain streaks, blueprint grid). Components never know which theme is active.
 
 Theme roster (working names, to be designed):
 
@@ -215,7 +141,7 @@ Rules: every theme passes the same contrast checks; decoration costs nothing whe
 | CLS                                       | ≈ 0                                                                                          |
 | Lighthouse                                | Performance ≥ 95, Accessibility 100, Best Practices 100, SEO 100                             |
 
-Enforced in CI from milestone 2 onward. Measured 2026-10-06 after milestone 2: 79.1 KB JS and 4.4 KB CSS gzipped (`pnpm bundle`). Lighthouse joins at milestone 5.
+The JS and CSS budgets gate CI (`pnpm bundle:check`). Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped (`pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
 
 ## 10. Accessibility targets
 
@@ -236,35 +162,36 @@ WCAG 2.2 AA throughout. Specifically:
 - **Golden tests.** A fixture file of known conversions taken from those sources. Every unit appears in at least one row. Tests assert relative error ≤ 1e-12.
 - **Round-trip tests.** For every unit, `fromBase(toBase(x)) ≈ x` for several magnitudes.
 - **Spot checks against the incumbents.** A small set of conversions compared against the two reference sites as a sanity check only. Disagreements are resolved by the standards source, never by the site. See ADR 0004.
-- **Arithmetic.** Double precision via the base unit. Display formatting at up to 12 significant digits with trailing zeros trimmed hides floating-point noise. Move to a decimal library only if a real test case fails.
+- **Arithmetic.** Double precision via the base unit. Display formatting at 10 significant digits with trailing zeros trimmed hides floating-point noise. Move to a decimal library only if a real test case fails.
 
 ## 12. Documentation system
 
-| Doc                        | Purpose                                         | Updated when                   |
-| -------------------------- | ----------------------------------------------- | ------------------------------ |
-| `CLAUDE.md`                | Conventions and rules for every working session | Rules change                   |
-| `docs/PLAN.md`             | Vision, scope, architecture, milestones         | Scope or plan changes          |
-| `docs/UX-SPEC.md`          | Exact UI behavior                               | Before any behavior change     |
-| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources         | Units or categories change     |
-| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend   | Structure changes              |
-| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                 | Tokens or components change    |
-| `docs/THEMING.md`          | How to author and QA a theme                    | Theming mechanism changes      |
-| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates   | Test approach changes          |
-| `docs/decisions/NNNN-*.md` | Why we chose what we chose                      | A decision is made or reversed |
-| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices         | Something is learned           |
+| Doc                        | Purpose                                           | Updated when                   |
+| -------------------------- | ------------------------------------------------- | ------------------------------ |
+| `CLAUDE.md`                | Conventions and rules for every working session   | Rules change                   |
+| `docs/PLAN.md`             | Vision, scope, architecture, milestones           | Scope or plan changes          |
+| `docs/UX-SPEC.md`          | Exact UI behavior                                 | Before any behavior change     |
+| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources           | Units or categories change     |
+| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend     | Structure changes              |
+| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                   | Tokens or components change    |
+| `docs/THEMING.md`          | How to author and QA a theme                      | Theming mechanism changes      |
+| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates     | Test approach changes          |
+| `docs/decisions/NNNN-*.md` | Why we chose what we chose                        | A decision is made or reversed |
+| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices           | Something is learned           |
+| `docs/research/`           | Usability test scripts, feedback rounds, findings | A test or feedback round runs  |
 
 Rule of thumb: if a future session would have to rediscover it, write it down.
 
 ## 13. Milestones
 
-| #   | Milestone              | Done when                                                                                                                                                                               |
-| --- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**                                                 |
-| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                             |
-| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.** |
-| M3  | **Complete converter** | Keypad, basic/advanced modes, swap, persistence, remaining basic-tier categories, advanced categories loaded on demand                                                                  |
-| M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem`; theme picker; per-theme contrast and gallery QA; perf budgets in CI                                                             |
-| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                   |
+| #   | Milestone              | Done when                                                                                                                                                                                       |
+| --- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**                                                         |
+| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                                     |
+| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.**         |
+| M3  | **Complete converter** | Keypad, basic/advanced modes, persistence, remaining basic-tier categories, advanced categories loaded on demand (swap shipped in M2)                                                           |
+| M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem` designed and polished: fonts, decoration, per-theme art. The picker, the contrast test, the gallery, and the bundle budget already exist |
+| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                           |
 
 ## 14. Setup checklist
 
@@ -299,15 +226,16 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 3. **Themes.** Framework and palettes for all six now; polish one at a time in milestone 4, `sakura` first (docs/THEMING.md).
 4. **Locale defaults.** Detect from the browser, fall back to US; manual override in settings later. Implemented as `regionDefaults` in core.
 5. **Toolchain.** Latest where compatible, accessibility tooling never dropped (ADR 0005). TypeScript 6 until the ecosystem supports 7.
-6. **Input flexibility.** Spacing, locale number formats, typed math, and Enter-as-equals are a standing UX principle, phased in `docs/UX-SPEC.md` §13.
+6. **Input flexibility.** Spacing, locale number formats, typed math, and Enter-as-equals are a standing UX principle, phased in `docs/UX-SPEC.md` §14.
+7. **Commit rules.** Nothing commits on a keystroke. Enter commits the highlighted best match, or a pick does; Tab and clicking away never commit, so moving between boxes never changes what was typed (`docs/UX-SPEC.md` §5).
 
 Still open: SEO pages in v1 (proposed yes, built at M5) and the domain name (check `.app`, `.io`, `.co`, `.tools` availability early).
 
 ## 16. Risks and open questions
 
 - **Ambiguous symbols** (`m`, `oz`, `ton`, `gal`, `cup`, `cal`, `hp`, `mpg`, `kB`). The disambiguation UX decides whether the smart input feels magical or annoying. Test it early.
-- **Auto-lock vs. explicit pick.** Locking a unit the instant it matches is fast but can surprise. Default proposal is in `docs/UX-SPEC.md`; validate in M2.
-- **Bundle size.** Resolved at M2: 79.1 KB JS gzipped after removing React Aria (ADR 0006). `pnpm bundle:check` gates CI at 90 KB.
+- **Explicit commit.** Decided: nothing commits on a keystroke, and only Enter or a pick commits (decision 7). The risk left is people who never press Enter; the usability test watches for it.
+- **Bundle size.** Resolved at M2 by removing React Aria (ADR 0006): 82.0 KB JS gzipped now, and `pnpm bundle:check` gates CI at 90 KB. Every new feature is measured against the 8 KB that remains.
 - **Themes vs. speed.** Decoration must be free when inactive. Fonts are the main cost; system fonts for the defaults.
 - **Locale number parsing.** `1,5` means 1.5 in much of the world. Use the browser locale and show the detected format.
 - **Definitions that vary.** Month, year, cup, calorie, horsepower, ton. Each needs a stated definition in the UI and a note in the catalog.

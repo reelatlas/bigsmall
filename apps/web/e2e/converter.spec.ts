@@ -121,6 +121,11 @@ test('the arrow keys reach the Back row, and Enter on it goes back', async ({ pa
   await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
   await expect(back).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  // Back lands on the category it came from, so Enter would go straight back in.
+  await expect(page.getByRole('option', { name: /^Volume$/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
 
   // Down from the last row wraps to Back too. The category is picked with the keyboard so the
   // mouse pointer is not left over the list, where hovering would move the highlight.
@@ -132,7 +137,7 @@ test('the arrow keys reach the Back row, and Enter on it goes back', async ({ pa
   await expect(back).toHaveAttribute('aria-selected', 'true');
 });
 
-test('Enter commits the box and closes the list, like clicking out', async ({ page }) => {
+test('Enter commits the box and closes the list, keeping focus', async ({ page }) => {
   await page.goto('/');
   await ready(page);
   const { first } = boxes(page);
@@ -145,15 +150,51 @@ test('Enter commits the box and closes the list, like clicking out', async ({ pa
   await expect(first).toBeFocused();
 });
 
-test('leaving the field commits an exact match too', async ({ page }) => {
+test('Tab and clicking away never commit; back in the box, Enter takes the match', async ({
+  page,
+}) => {
   await page.goto('/');
   await ready(page);
-  const { first } = boxes(page);
+  const { first, second } = boxes(page);
+  const chips = page.getByRole('button', { name: /^Remove/ });
 
+  // Even an exact match stays as typed when Tab moves on.
   await first.fill('3 gb');
   await first.press('Tab');
+  await expect(second).toBeFocused();
+  await expect(chips).toHaveCount(0);
+  await expect(first).toHaveValue('3 gb');
+
+  await second.fill('kilom');
+  await page.getByRole('heading', { level: 1 }).click();
+  await expect(chips).toHaveCount(0);
+  await expect(second).toHaveValue('kilom');
+
+  await first.focus();
+  await expect(page.getByRole('option', { name: /^gigabytes/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  await first.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove gigabytes' })).toBeVisible();
   await expect(first).toHaveValue('3');
+});
+
+test('picking a category from a typed word drops the word, in either box', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const { second, back, scope } = boxes(page);
+
+  await second.fill('vol');
+  await expect(page.getByRole('option', { name: /^Volume$/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  await second.press('Enter');
+  await expect(back).toBeVisible();
+  await expect(scope).toHaveText('Volume');
+  await expect(second).toHaveValue('');
+  await expect(page.getByRole('option', { name: /^milliliters mL$/ })).toBeVisible();
 });
 
 test('Tab goes from the first box straight to the second, then to swap', async ({ page }) => {
@@ -261,6 +302,10 @@ test('Back and Escape go up to the categories from any unit list', async ({ page
   await back.click();
   await expect(page.getByRole('option', { name: /^Length$/ })).toBeVisible();
   await expect(back).toHaveCount(0);
+  await expect(page.getByRole('option', { name: /^Volume$/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
 
   // Browsing another category names it on the Back row; the label keeps the locked category.
   await page.getByRole('option', { name: /^Weight$/ }).click();
@@ -268,7 +313,10 @@ test('Back and Escape go up to the categories from any unit list', async ({ page
   await expect(scope).toHaveText('Weight');
   await expect(labelA).toHaveText('Volume');
   await first.press('Escape');
-  await expect(page.getByRole('option', { name: /^Weight$/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /^Weight$/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
   await first.press('Escape');
   await expect(page.getByRole('listbox')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();

@@ -41,39 +41,41 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 
 ## apps/web
 
-| Path                      | Responsibility                                                                                                                     |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `src/layouts/Base.astro`  | HTML shell, meta, global CSS, and the inline script: the pre-paint theme, the header-menu controller, and the Ctrl or ⌘ key labels |
-| `src/pages/`              | Routes. `index.astro` is the converter; `dev/gallery.astro` renders every component in every theme                                 |
-| `src/components/`         | Design-system components: Button, UnitChip, SuggestionPanel, icons (React); ThemePicker, ShortcutsHelp (Astro). Tokens only        |
-| `src/features/<name>/`    | Product features composed from components and core (`converter/` holds the converter island)                                       |
-| `src/lib/`                | Shared helpers with no markup of their own (see below)                                                                             |
-| `src/styles/global.css`   | Tailwind import, theme imports, the token → utility bridge, custom utilities, base styles                                          |
-| `src/styles/themes/*.css` | One token set per theme                                                                                                            |
-| `test/`                   | Node-only unit tests: the converter reducer, view, and history; the URL; the theme contract and contrast                           |
-| `e2e/`                    | Playwright on desktop and mobile Chromium: converter behavior, smoke, theme and shortcuts menus, axe accessibility                 |
+| Path                      | Responsibility                                                                                                                                                          |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/layouts/Base.astro`  | HTML shell, meta, global CSS, and the inline script: the pre-paint theme, the header-menu controller, and the Ctrl or ⌘ key labels                                      |
+| `src/pages/`              | Routes. `index.astro` is the converter; `dev/gallery.astro` renders every component in every theme                                                                      |
+| `src/components/`         | Design-system components: Button, UnitChip, SuggestionPanel, Keycap, icons (React); ThemePicker, ShortcutsHelp, and HeaderMenus, which places them (Astro). Tokens only |
+| `src/features/<name>/`    | Product features composed from components and core (`converter/` holds the converter island)                                                                            |
+| `src/lib/`                | Shared helpers with no markup of their own (see below)                                                                                                                  |
+| `src/styles/global.css`   | Tailwind import, theme imports, the token → utility bridge, custom utilities, base styles                                                                               |
+| `src/styles/themes/*.css` | One token set per theme                                                                                                                                                 |
+| `test/`                   | Node-only unit tests: the converter reducer, view, and history; the URL; the theme contract and contrast                                                                |
+| `e2e/`                    | Playwright on desktop and mobile Chromium: converter behavior, smoke, theme and shortcuts menus, axe accessibility                                                      |
 
 ### `src/lib`
 
-| File           | Responsibility                                                                                                 |
-| -------------- | -------------------------------------------------------------------------------------------------------------- |
-| `themes.ts`    | Theme registry, the token contract, and the contrast pairs the theme test enforces                             |
-| `region.ts`    | `detectRegion()`: the browser's region for unit-family defaults                                                |
-| `platform.ts`  | `APPLE_PLATFORM`, `isApplePlatform()`: whether shortcuts read ⌘ or Ctrl; the inline script uses the pattern    |
-| `shortcuts.ts` | `SHORTCUTS`: the list the shortcuts map shows                                                                  |
-| `hydrated.ts`  | `useIsHydrated()`: a `useSyncExternalStore` that flips once on the client, for the island's ready mark         |
-| `fit-step.ts`  | `useFitStep()`: picks the largest type size at which an element's text fits on one line, re-measured on resize |
-| `copied.ts`    | `useCopied()`: which copy button shows its check, and when it reverts                                          |
+| File           | Responsibility                                                                                                             |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `themes.ts`    | Theme registry, the token contract, and the contrast pairs the theme test enforces                                         |
+| `region.ts`    | `detectRegion()`: the browser's region for unit-family defaults                                                            |
+| `platform.ts`  | `APPLE_PLATFORM`, `isApplePlatform()`: whether shortcuts read ⌘ or Ctrl; the inline script uses the pattern                |
+| `shortcuts.ts` | `SHORTCUTS`: the list the shortcuts map shows                                                                              |
+| `hydrated.ts`  | `useIsHydrated()`: a `useSyncExternalStore` that flips once on the client, for the island's ready mark                     |
+| `fit-step.ts`  | `useFitStep()`: picks the largest type size at which an element's text fits on one line, re-measured on resize             |
+| `copied.ts`    | `useCopied()`: which copy button shows its check, and when it reverts                                                      |
+| `timing.ts`    | Every UI delay as a named constant: typing chunks, URL writes, announcements, copy feedback, hover peek                    |
+| `shell.ts`     | The fluid-shell class recipe the fields and the header menus share (`SHELL`, `SHELL_BORDERED`, `SHELL_GHOST`, `FIELD_ROW`) |
 
 ### The converter (`apps/web/src/features/converter`)
 
-| File              | Responsibility                                                                                                                                                                                                                                                                          |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `state.ts`        | `reduce` (input, setText, lock, unlock, swap, clear, setMode, hydrate); `selectView` (texts, scope, result, `outOfRange` and per-box `message`, `anchor`, announcement); `reduceWithHistory` (undo, redo, `stepBack`, typing chunks, 50 steps) and `escapeTarget`. Pure; tested in node |
-| `url.ts`          | `stateToParams` / `paramsToState`: the conversion as `?a=&b=&v=&s=`                                                                                                                                                                                                                     |
-| `useConverter.ts` | Owns the history reducer, detects locale and region once, restores from the URL after hydration, writes the URL (debounced), paces the live region, exposes each box's Escape target                                                                                                    |
-| `SmartInput.tsx`  | One box: field, text layer, chip, copy slot, out-of-range message, and the suggestion listbox with its Back row. The WAI-ARIA combobox pattern by hand (ADR 0006)                                                                                                                       |
-| `Converter.tsx`   | The island: hint with undo, redo, and clear all; the two boxes, swap, copy buttons, category labels; Ctrl/⌘ undo and redo; live regions; the `data-hydrated` mark                                                                                                                       |
+| File              | Responsibility                                                                                                                                                                                                                                                                                 |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `state.ts`        | `reduce` (input, setText, lock, unlock, swap, clear, setMode, hydrate); `selectView` (texts, scope, result, per-box `message` for out-of-range values, `anchor`, announcement); `reduceWithHistory` (undo, redo, `stepBack`, typing chunks, 50 steps) and `escapeTarget`. Pure; tested in node |
+| `url.ts`          | `stateToParams` / `paramsToState`: the conversion as `?a=&b=&v=&s=`                                                                                                                                                                                                                            |
+| `useConverter.ts` | Owns the history reducer, detects locale and region once, restores from the URL after hydration, writes the URL (debounced), paces the live region, exposes each box's Escape target                                                                                                           |
+| `SmartInput.tsx`  | One box: field, text layer, chip, copy slot, out-of-range message, and the suggestion listbox with its Back row. The WAI-ARIA combobox pattern by hand (ADR 0006)                                                                                                                              |
+| `Converter.tsx`   | The island: hint with undo, redo, and clear all; the two boxes, swap, copy buttons, category labels; Ctrl/⌘ undo and redo; live regions; the `data-hydrated` mark                                                                                                                              |
 
 ### Islands and the inline script
 
@@ -103,7 +105,8 @@ The converter state lives in the React island and serializes to the URL as `?a=<
 | Add a component   | Create it in `src/components/`, tokens only, keyboard and label checked, add it to the gallery. See docs/DESIGN-SYSTEM.md                                                                                                                                              |
 | Add a feature     | Create `src/features/<name>/`, compose components, import core only through `@bigsmall/core`                                                                                                                                                                           |
 | Add a shortcut    | Handle the key in code, add it to `src/lib/shortcuts.ts`, and describe it in docs/UX-SPEC.md §8                                                                                                                                                                        |
-| Add a header menu | Reuse the shell controller: markup with `data-shell` and `data-shell-toggle` like ThemePicker; no new script                                                                                                                                                           |
+| Add a header menu | Reuse the shell controller: markup with `data-shell` and `data-shell-toggle` like ThemePicker, placed in `HeaderMenus.astro`; no new script                                                                                                                            |
+| Add a UI delay    | A named constant in `src/lib/timing.ts`; never a literal number of milliseconds                                                                                                                                                                                        |
 | Add a theme       | Follow docs/THEMING.md. The contract test fails until every token exists and every pair passes contrast                                                                                                                                                                |
 | Add a page        | `src/pages/<route>.astro` using `Base.astro`. Islands only where there is real interaction                                                                                                                                                                             |
 | Change behavior   | Update docs/UX-SPEC.md in the same change                                                                                                                                                                                                                              |

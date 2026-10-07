@@ -44,3 +44,5 @@ Operating rule so the two component models never blur: **React for everything th
 Revisit if more than a handful of Astro components accumulate interaction, or if navigation between pair pages needs preserved converter state beyond what Astro's `transition:persist` provides.
 
 Milestone 2 outcome: React Aria Components was removed after measurement; the smart input is a hand-built WAI-ARIA combobox and other controls are native elements (ADR 0006). The rest of this decision stands.
+
+Header menus outcome (2026-10-06): the keyboard shortcuts map joined the theme picker as a second header menu on the same inline-script controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`), with one shell recipe in `src/lib/shell.ts`. The exception therefore covers the header menus, not only the theme picker. A third header menu reuses the controller rather than adding script; a header control that needs the converter's state, or a React hook, is an island instead.

@@ -20,7 +20,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   // The two arrows share one group so they sit side by side with nothing between them.
   { action: 'Move through menu', keys: [['↑', '↓']] },
   { action: 'Back one step', keys: [['Esc']] },
-  { action: 'Toggle boxes', keys: [['Tab'], ['Shift', 'Tab']] },
+  { action: 'Toggle inputs', keys: [['Tab'], ['Shift', 'Tab']] },
   { action: 'Undo', keys: [['Mod', 'Z']] },
   {
     action: 'Redo',

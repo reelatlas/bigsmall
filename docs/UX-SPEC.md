@@ -39,9 +39,9 @@ Non-breaking spaces always group. Whitespace between the number and the unit is 
 
 ## 3. The suggestion list
 
-**Opening.** Focusing a box opens its list; so do typing, the arrow keys, and clicking the chip. A focused result box selects its text, so typing replaces it and Ctrl/⌘+C copies it.
+**Opening.** Focusing a box opens its list; so do typing, the arrow keys, and clicking the chip. A box that holds an uncommitted query opens with its best match highlighted again, so Enter takes it. A focused result box selects its text, so typing replaces it and Ctrl/⌘+C copies it.
 
-**Two levels.** The top level lists the categories. Inside a category, the list shows that category's units with a **Back row** first: "← Back" and the category name, pinned while the list scrolls. A box is inside a category when it has a unit, or when the other box has one (its scope); picking a category row, or Back, moves between the levels.
+**Two levels.** The top level lists the categories. Inside a category, the list shows that category's units with a **Back row** first: "← Back" and the category name, pinned while the list scrolls. A box is inside a category when it has a unit, or when the other box has one (its scope); picking a category row, or Back, moves between the levels. Going back up highlights the category just left, so Enter goes straight back in; when a typed query hides that row, the best match is highlighted instead.
 
 **What it lists.**
 
@@ -55,7 +55,7 @@ Non-breaking spaces always group. Whitespace between the number and the unit is 
 - A unit row reads "name … symbol": the plural name on the left, the symbol right-aligned and semibold like the chip's. When the list spans categories (top level, or a widened search) each unit row also names its category, which is how `oz` (weight) and `fl oz` (volume) are told apart.
 - A category row shows its name and a chevron.
 - The letters the query matches are set heavier, under the same folding search uses (`me` marks "**me**ters" and "kilo**me**ters"; `floz` marks all of "fl oz"). A unit found through an alias the row does not show gets no mark.
-- Hovering a row highlights it.
+- Moving the pointer over a row highlights it. A row that appears under a still pointer, as after Back, does not take the highlight.
 
 **Placeholders.** An empty box with its own unit shows "0". With no unit, it shows examples: "5 ml, feet, °F…" in the first box, "2 kg, inches, speed…" in the second (which shows a category can be typed). Once the other box has a unit, an empty box lists three units of that category instead ("L, tsp, tbsp…" beside milliliters), never the other box's own unit.
 
@@ -82,8 +82,8 @@ Nothing commits on a keystroke: while typing, the best match is highlighted and 
 
 - **Enter** commits the highlighted row. While typing, the highlight sits on the best match, so Enter takes it even when it is a prefix match (`kilom` + Enter → kilometers). Enter on a category row or the Back row moves between levels instead. With nothing highlighted, Enter commits an exact match if the query names exactly one unit. Enter closes the list and keeps focus in the box.
 - **Picking a row** with a click or tap commits it.
-- **Tab and leaving the box** commit only an exact match: a query that names exactly one unit within the scope (`3 gb` → gigabytes). A partial query (`kilom`) or an ambiguous one (`oz` with no scope) stays uncommitted text.
-- Committing keeps the number and drops the query: `5 ml` becomes `5` with the mL chip. Picking a category row while a number and query are typed keeps the number and drops the query.
+- **Tab and leaving the box never commit**, not even an exact match. The text stays as typed, so moving between boxes never changes anything; back in the box, the best match is highlighted again for Enter.
+- Committing keeps the number and drops the query: `5 ml` becomes `5` with the mL chip. Picking a category row while a query is typed, in either box, keeps the number and drops the query.
 - **The chip.** Clicking its body lists the units of its category to change it; its × removes the unit and puts the caret back in the box. Backspace on an empty box removes the unit and lists its category's units.
 
 ## 6. Two boxes: source, scope, and anchor
@@ -113,7 +113,7 @@ Nothing commits on a keystroke: while typing, the best match is highlighted and 
 | Up from the first unit, Down from the last | Highlight the Back row                                                                                            |
 | Esc                                        | Back one step (§9)                                                                                                |
 | Backspace                                  | On an empty box with a unit: remove the unit                                                                      |
-| Tab, Shift+Tab                             | Commit an exact match, then go to the other box: first box, second box, then swap                                 |
+| Tab, Shift+Tab                             | Go to the other box without committing anything: first box, second box, then swap                                 |
 | Ctrl/⌘+Z, Ctrl/⌘+Y, Ctrl/⌘+Shift+Z         | Undo and redo, anywhere inside the converter, replacing the field's own text undo                                 |
 
 The chip's buttons and the copy buttons are out of the Tab order because the field's own keys do the same jobs; pointers and screen readers still reach them. The list itself is not a Tab stop. Swap follows the second box in the DOM so Tab goes box to box; the grid still draws it between them.
@@ -122,7 +122,7 @@ The chip's buttons and the copy buttons are out of the Tab order because the fie
 
 - **Typing comes in chunks.** Keystrokes in one box less than 700 ms apart form one chunk; a longer pause, or a space, starts a new one, so `5 ml` is "5" and then " ml". Each chunk, each committed or removed unit, each swap, and each clear is one step. Undo and redo step through them (up to 50); undoing a unit commit keeps the number and removes the unit. Loading a conversion from a URL starts a fresh history.
 - **Escape is "back", one step at a time.**
-  1. Inside a category: up to the categories.
+  1. Inside a category: up to the categories, with that category highlighted.
   2. At the categories: close the list.
   3. List closed: take back the latest thing put into this box, one chunk of typing or the unit, newest first. Taking back a unit lists that category's units. A conversion loaded from a URL has no chunks, so Escape clears the text, then the unit.
 - Each Escape step is itself a step that undo can reverse.
@@ -139,7 +139,7 @@ Both are fluid shells driven by the inline script in `layouts/Base.astro`, so th
   | Confirm input or selection | Enter                  |
   | Move through menu          | ↑ ↓                    |
   | Back one step              | Esc                    |
-  | Toggle boxes               | Tab or Shift Tab       |
+  | Toggle inputs              | Tab or Shift Tab       |
   | Undo                       | Ctrl Z                 |
   | Redo                       | Ctrl Y or Ctrl Shift Z |
 
@@ -162,15 +162,22 @@ Both are fluid shells driven by the inline script in `layouts/Base.astro`, so th
 ## 13. Edge cases
 
 - Negative values are allowed for every unit, with no warning.
-- A pasted value with a unit (`5 ml`) is parsed like typing; the unit commits on Enter, Tab, or leaving the box like any typed query.
+- A pasted value with a unit (`5 ml`) is parsed like typing; the unit commits on Enter or a pick, like any typed query.
 - Typing before the page hydrates is lost (the island is server-rendered); tests wait for the `data-hydrated` mark. Fix planned (§14).
 
 ## 14. Planned
 
 Not built yet; each item names its milestone in docs/PLAN.md §13.
 
+**Owner's ideas, logged 2026-10-06** (Sean's list; the order to build them is to be confirmed). Two more from the same list shipped at once: Back highlights the category it came from (§3), and the shortcuts map says "Toggle inputs" (§10).
+
+- **Copy link.** A ghost icon button in the header between the keyboard icon and the theme menu that copies the page's URL (the conversion, §11) and confirms the way the box copy buttons do (§7): the check in the success color, "Copied" in the status region, the same timing. It must copy the latest conversion even inside the URL's 250 ms write delay, so it reads the converter's state rather than the address bar; rendering it from the converter island into a fixed-size header slot does that without a second island. On touch-first devices, the native share sheet may serve better than copy.
+- **Keypad as a calculator.** For anyone who would rather tap than type, not only touch users: an icon button opens it (placement open), and the keypad itself has a switch for which box it fills, first or second. Merges with the planned keypad below. Open question: digits only first, or arithmetic (`+ − × ÷`) from the start, which needs the expression parser (input flexibility, phase 3).
+- **Header animation.** Hovering the header plays conversions: units, numbers, and arrows turning into one another in text and symbols, ASCII in spirit, perhaps a few emoji. A slow drift at rest; faster pointer movement speeds it up, and a still pointer settles back to a steady pace. Decorative: `aria-hidden`, the heading still reads "bigsmall", static under reduced motion, no layout shift, loaded on first hover so it costs nothing before, and measured against the bundle budget. Original content only (ADR 0004).
+- **Theme art.** A small piece of art beside the site name for each theme: Sakura a cherry blossom, Midnight a full moon, Daylight a sun in a yellow that pairs with its green, Neo-noir a neon Tokyo street or tower, Hardhat a hard hat, Theorem a chalkboard with a piece of chalk. Recommended as inline SVG drawn for bigsmall in each theme's own tokens, since emoji look different on every system and cannot follow a palette. Decorative (`aria-hidden`), loaded with its theme. Belongs with the theme polish of milestone 4.
+
 - **Modes (milestone 3).** `basic` (default) lists basic-tier units with a final "Show all N units" row; `advanced` lists all units. When a query matches only advanced units, show them under an "Advanced units" label without changing the mode. The mode persists. The reducer already has a `setMode` action; nothing dispatches it yet.
-- **Keypad (milestone 3).** A toggle near the boxes; docked to the bottom on narrow screens, beside the boxes on wide ones. Keys: `0–9`, the locale's decimal separator, backspace, clear, negate, and a target switch between the boxes; 48 px minimum. Keypad input goes through the same parser as typing. Phase 2: `+ − × ÷ =`, `½ ¼ ⅛`, `′ ″`.
+- **Keypad (milestone 3).** An icon button opens it (see the calculator idea above); docked to the bottom on narrow screens, beside the boxes on wide ones. Keys: `0–9`, the locale's decimal separator, backspace, clear, negate, and a target switch between the boxes; 48 px minimum. Keypad input goes through the same parser as typing. Phase 2: `+ − × ÷ =`, `½ ¼ ⅛`, `′ ″`.
 - **Persistence (milestone 3).** Mode, precision, locale override, the last conversion, up to ten recent pairs, and pinned pairs in `localStorage`.
 - **Early keystrokes (milestone 3).** An inline listener records keystrokes typed before hydration and the island adopts them, the same approach as the header menus.
 - **URL keeps the typed text (milestone 3).** Today `v` holds the parsed double, so eighteen typed digits come back rounded after a reload.
@@ -185,7 +192,7 @@ Not built yet; each item names its milestone in docs/PLAN.md §13.
 
 The script is docs/research/usability-test-1.md. The questions this build raises:
 
-1. Do people commit the unit they typed, or expect Tab or clicking away to accept the highlighted row the way Enter does (§5)?
+1. Do people press Enter or pick a row to commit the unit they typed? Anyone who tabs or clicks away expecting a commit will see nothing convert (§5).
 2. Do they notice that nothing converts until both boxes have a committed unit?
 3. Does Escape stepping back one chunk at a time, and removing the unit, surprise anyone? Is 700 ms the right chunk window?
 4. Do people find undo, redo, and clear all, and the chip as something to click?
@@ -194,4 +201,4 @@ The script is docs/research/usability-test-1.md. The questions this build raises
 
 ## 16. Change history
 
-The converter's behavior was settled in six rounds of the owner's feedback on 2026-10-06. Each round's observations and changes are in docs/research/findings-0-first-pass.md; each rule above is the current outcome.
+The converter's behavior was settled in successive rounds of the owner's feedback on 2026-10-06. Each round's observations and changes are in docs/research/findings-0-first-pass.md; each rule above is the current outcome.

@@ -197,6 +197,8 @@ Both are fluid shells driven by the inline script in `layouts/Base.astro`, so th
 
 Not built yet; each item names its milestone in docs/PLAN.md §13.
 
+- **The wordmark at play, tuned (next).** Owner feedback on the first version: play only while the pointer is over the name and its art, let the art flip too, slow the resting pace, set long phrases (equations, analogies, idioms) in a smaller type size, show descenders whole, add many more analogies and equations, and tune it all on a lab page with sliders. Details in docs/research/findings-0-first-pass.md, "Tenth pass — pending".
+
 **Owner's ideas, logged 2026-10-06**, all built: copy link (§7), the calculator (§8), and the wordmark at play with theme art (§1). Back highlighting the category it came from (§3) and "Toggle inputs" (§10) shipped at once. Later, maybe: on phones, the native share sheet in place of copy link, and the calculator docked to the bottom of the screen.
 
 - **Modes (milestone 3).** `basic` (default) lists basic-tier units with a final "Show all N units" row; `advanced` lists all units. When a query matches only advanced units, show them under an "Advanced units" label without changing the mode. The mode persists. The reducer already has a `setMode` action; nothing dispatches it yet.

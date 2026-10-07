@@ -18,7 +18,7 @@ Positioning in one line: _type anything into either box and get the answer._
 - **Calculator.** A scratch pad behind an icon button, for anyone who would rather tap than type or wants to work a number out first; its number goes into either box only when sent (docs/UX-SPEC.md §8).
 - **Basic and advanced modes.** Basic shows the common units of the common categories. Advanced reveals everything. Searching for an advanced unit escalates automatically.
 - **Themes.** Two neutral defaults (light, dark) plus distinctive aesthetic themes. Theme choice persists.
-- **Shareable URLs.** The current conversion is in the URL, so links and bookmarks work; a copy-link button in the header copies it.
+- **Shareable URLs.** The current conversion is in the URL, so links and bookmarks work; a Copy URL button in the header copies it.
 - **Fast, accessible, responsive.** See budgets and targets below.
 
 ### Later
@@ -37,7 +37,7 @@ Directions Sean wants to explore after the MVP is shared; none is designed or sc
 - **Every category at once.** An option to show all categories as collapsible sections below the boxes, each expanding to show the current value in every unit of that category, like a full conversion table. To work out: when it shows (only with a number?), how it relates to basic and advanced modes, its size on a phone, and its cost with many units.
 - **Many more categories and units.** The catalog's plan (docs/UNITS-CATALOG.md §3: fuel economy, energy, pressure, power, angle, and the advanced groups) and more formulas, each category's data loaded on demand against its own budget (§9), every unit cited (ADR 0004).
 - **Search visibility (SEO).** The pair pages already planned for launch (one static page per popular unit pair), plus the technical basics (canonical domain, sitemap, robots, titles and descriptions, structured data, social cards) and Google Search Console and Bing Webmaster Tools.
-- **Analytics and monitoring.** Cookieless traffic analytics, product events (what people convert, calculator and copy-link use, themes chosen), real-user speed (Core Web Vitals), search performance, and optionally errors and uptime; each script counted against the budget.
+- **Analytics and monitoring.** Cookieless traffic analytics, product events (what people convert, calculator and Copy URL use, themes chosen), real-user speed (Core Web Vitals), search performance, and optionally errors and uptime; each script counted against the budget.
 
 ### Out of scope
 
@@ -193,14 +193,14 @@ Rule of thumb: if a future session would have to rediscover it, write it down.
 
 ## 13. Milestones
 
-| #   | Milestone              | Done when                                                                                                                                                                                                                                                                   |
-| --- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**                                                                                                                                     |
-| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                                                                                                                 |
-| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.**                                                                                     |
-| M3  | **Complete converter** | Basic/advanced modes, persistence, remaining basic-tier categories, advanced categories loaded on demand. Shipped early: swap (M2); the calculator (a scratch pad with + − × ÷ whose number can be sent to either box), arithmetic in the boxes, and copy link (2026-10-06) |
-| M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem` designed and polished: fonts and decoration (per-theme art shipped early, 2026-10-06). The picker, the contrast test, the gallery, and the bundle budget already exist                                               |
-| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                                                                                                       |
+| #   | Milestone              | Done when                                                                                                                                                                                                                                                                  |
+| --- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**                                                                                                                                    |
+| M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                                                                                                                |
+| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending.**                                                                                    |
+| M3  | **Complete converter** | Basic/advanced modes, persistence, remaining basic-tier categories, advanced categories loaded on demand. Shipped early: swap (M2); the calculator (a scratch pad with + − × ÷ whose number can be sent to either box), arithmetic in the boxes, and Copy URL (2026-10-06) |
+| M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem` designed and polished: fonts and decoration (per-theme art shipped early, 2026-10-06). The picker, the contrast test, the gallery, and the bundle budget already exist                                              |
+| M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing                                                                                                                                                                                      |
 
 ## 14. Setup checklist
 

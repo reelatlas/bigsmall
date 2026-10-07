@@ -132,7 +132,7 @@ for (const width of [320, 375, 414, 430, 520]) {
         const header = box('main > header');
         const name = box('main > header h1');
         const menus = box('[data-header-menus]');
-        const link = box('[aria-label="Copy link"]');
+        const copyUrl = box('[aria-label="Copy URL"]');
         const shown = document.querySelector('[data-theme-name]')!;
         const trigger = shown.closest('button')!.getBoundingClientRect();
         const content = shown.parentElement!.getBoundingClientRect();
@@ -141,7 +141,7 @@ for (const width of [320, 375, 414, 430, 520]) {
           ownLine: menus.top >= name.bottom,
           left: Math.round(menus.left - header.left),
           right: Math.round(header.right - menus.right),
-          themeFirst: trigger.right <= link.left,
+          themeFirst: trigger.right <= copyUrl.left,
           rowGap: Math.round(menus.top - name.bottom),
           padLeft: Math.round(content.left - trigger.left),
           padRight: Math.round(trigger.right - content.right),

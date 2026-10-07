@@ -27,11 +27,11 @@ export function stateToParams(state: ConverterState, separators: Separators): UR
 }
 
 /**
- * The address of this conversion, which copy link puts on the clipboard: the page's own address
+ * The URL of this conversion, which Copy URL puts on the clipboard: the page's own address
  * with the state's parameters, built from the state itself rather than from the address bar, so
  * it is current even inside the URL's write delay.
  */
-export function linkFor(
+export function urlFor(
   state: ConverterState,
   separators: Separators,
   page: Pick<Location, 'origin' | 'pathname'>,

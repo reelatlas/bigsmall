@@ -5,7 +5,7 @@ import { useIsHydrated } from './hydrated';
  * slot's size, so nothing moves when the island's content arrives.
  */
 export const SLOTS = {
-  /** In the header between the shortcuts map and the theme menu: the converter's copy link. */
+  /** In the header between the shortcuts map and the theme menu: the converter's Copy URL button. */
   headerActions: 'header-actions',
 } as const;
 

@@ -294,7 +294,7 @@ test('both boxes can be copied, and the copy confirms with a check', async ({ pa
   await expect(checks).toHaveCount(0);
 });
 
-test('copy link copies the current conversion and confirms with a check', async ({
+test('Copy URL copies the current conversion and confirms with a check', async ({
   page,
   context,
 }) => {
@@ -302,15 +302,15 @@ test('copy link copies the current conversion and confirms with a check', async 
   await page.goto('/?a=mile&b=kilometer&v=2&s=a');
   await ready(page);
   const { first } = boxes(page);
-  const copyLink = page.getByRole('button', { name: 'Copy link' });
+  const copyUrl = page.getByRole('button', { name: 'Copy URL' });
 
-  // Typed just before the click, so the address bar may not have caught up; the link has.
+  // Typed just before the click, so the address bar may not have caught up; the copied URL has.
   await first.fill('3');
-  await copyLink.click();
-  await expect(copyLink.locator('[data-copied]')).toBeVisible();
-  await expect(page.getByRole('status').filter({ hasText: 'Link copied' })).toHaveCount(1);
-  const link = await page.evaluate(() => navigator.clipboard.readText());
-  expect(new URL(link).search).toBe('?a=mile&b=kilometer&v=3&s=a');
+  await copyUrl.click();
+  await expect(copyUrl.locator('[data-copied]')).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'URL copied' })).toHaveCount(1);
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(new URL(copied).search).toBe('?a=mile&b=kilometer&v=3&s=a');
 });
 
 test('the converter has no WCAG violations with the list open', async ({ page }) => {

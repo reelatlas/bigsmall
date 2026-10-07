@@ -22,18 +22,18 @@ import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, formatValue, isStepKey, placeNumber, pressKey } from './calculator';
 import { SmartInput } from './SmartInput';
 import type { BoxId, BoxView } from './state';
-import { linkFor } from './url';
+import { urlFor } from './url';
 import { useConverter } from './useConverter';
 
 /**
- * The buttons that confirm with a check: copying a box's value or the link, and sending the
+ * The buttons that confirm with a check: copying a box's value or the page's URL, and sending the
  * calculator's value to a box. What the status region says for each.
  */
-type Confirmable = BoxId | 'link' | `use-${BoxId}`;
+type Confirmable = BoxId | 'url' | `use-${BoxId}`;
 const CONFIRMATION: Record<Confirmable, string> = {
   a: 'Copied',
   b: 'Copied',
-  link: 'Link copied',
+  url: 'URL copied',
   'use-a': 'Sent to the first value',
   'use-b': 'Sent to the second value',
 };
@@ -48,7 +48,7 @@ const EXAMPLES: Record<BoxId, string> = {
  * The converter island: the hint with undo, redo, and clear all, two linked smart inputs with
  * swap between them, the category label under the box the conversion is anchored on, and the
  * live region; the calculator below the boxes when it is open (docs/UX-SPEC.md §8). It also draws the
- * copy-link button into the header's slot (§7).
+ * Copy URL button into the header's slot (§7).
  */
 export function Converter() {
   const { state, view, env, dispatch, canUndo, canRedo, escapeTargets, announcement } =
@@ -350,12 +350,12 @@ export function Converter() {
           <Button
             variant="ghost"
             square
-            aria-label="Copy link"
-            title="Copy link"
-            onClick={() => copy(linkFor(state, env.separators, window.location), 'link')}
-            {...pointerProps('link')}
+            aria-label="Copy URL"
+            title="Copy URL"
+            onClick={() => copy(urlFor(state, env.separators, window.location), 'url')}
+            {...pointerProps('url')}
           >
-            {copied === 'link' ? <CheckIcon className="text-success" data-copied /> : <LinkIcon />}
+            {copied === 'url' ? <CheckIcon className="text-success" data-copied /> : <LinkIcon />}
           </Button>,
           headerActions,
         )}

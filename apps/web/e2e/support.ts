@@ -2,6 +2,9 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, type Locator, type Page } from '@playwright/test';
 import type { ThemeMeta } from '../src/lib/themes';
 
+/** How long past a delay a test waits for its effect, so a slow machine still sees it land. */
+export const MARGIN_MS = 200;
+
 /** The rules axe checks: WCAG 2.0, 2.1, and 2.2 at levels A and AA. */
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 

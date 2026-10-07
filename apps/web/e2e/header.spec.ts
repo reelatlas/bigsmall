@@ -1,7 +1,14 @@
 import { expect, test } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { PEEK_CLOSE_MS } from '../src/lib/timing';
-import { applyTheme, expectNoA11yViolations, pickTheme, ready, themeToggle } from './support';
+import {
+  applyTheme,
+  expectNoA11yViolations,
+  MARGIN_MS,
+  pickTheme,
+  ready,
+  themeToggle,
+} from './support';
 
 // The header's menus (docs/UX-SPEC.md §10) and how the header wraps on narrow screens (§1).
 
@@ -81,7 +88,7 @@ test('the shortcuts map opens on hover, stays when clicked, and closes on Escape
 
   await toggle.click();
   await page.mouse.move(5, 5);
-  await page.waitForTimeout(PEEK_CLOSE_MS * 2);
+  await page.waitForTimeout(PEEK_CLOSE_MS + MARGIN_MS);
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expectNoA11yViolations(page);
 

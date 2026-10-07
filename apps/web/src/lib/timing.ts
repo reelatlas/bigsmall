@@ -25,6 +25,12 @@ export const PEEK_OPEN_MS = 120;
 /** A hover-opened header menu closes this long after the mouse leaves (§10). */
 export const PEEK_CLOSE_MS = 200;
 
+/** One frame at 60 Hz: the wordmark times its pace against it, and a flipping letter never changes faster. */
+export const FRAME_MS = 1000 / 60;
+
+/** However fast the pointer moves, the wordmark's letters land at least this far apart. */
+export const WORDMARK_MIN_STEP_MS = 4;
+
 /**
  * The header wordmark (docs/UX-SPEC.md §1). Wordmark.astro hands these to its motion code;
  * /dev/wordmark-lab tunes them, and keeps the ones that shipped before as presets.

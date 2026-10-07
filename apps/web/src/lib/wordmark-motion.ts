@@ -1,4 +1,4 @@
-import type { WORDMARK_TIMING } from './timing';
+import { FRAME_MS, WORDMARK_MIN_STEP_MS, type WORDMARK_TIMING } from './timing';
 import {
   ART_STEPS,
   fitSteps,
@@ -34,8 +34,14 @@ export interface WordmarkPlayer {
   pace(): number;
 }
 
-/** Frames are timed against a 60 Hz frame, so the pace eases back alike on faster screens. */
-const FRAME_MS = 1000 / 60;
+/** A phrase fits when its text is within this much of the room: widths are fractional, and a rounding difference is not overflow. */
+const FIT_TOLERANCE_PX = 0.5;
+
+/** A flip glyph may be as much wider than its letter as the phrase leaves room for, less this share for kerning. */
+const FLAP_STRETCH_MARGIN = 0.97;
+
+/** Glyphs are measured at this size: their widths are only compared, so any size will do. */
+const MEASURE_PX = 100;
 
 /** Sets a step on a line: its size in place of any other, and tight leading for two lines. */
 export function setStep(line: HTMLElement, step: FitStep): void {
@@ -69,7 +75,7 @@ export function fitPhrase(
   steps: readonly FitStep[],
 ): Fitted {
   line.style.transform = '';
-  const fits = (width: number) => width <= room + 0.5;
+  const fits = (width: number) => width <= room + FIT_TOLERANCE_PX;
   for (const step of steps) {
     setStep(line, step);
     if (step.lines === 1) {
@@ -111,7 +117,7 @@ export function prepare(
   steps: readonly FitStep[],
 ): Change {
   const glyphs = [...fitPhrase(line, phrase, room, steps).text];
-  const stretch = Math.max(1, (room / Math.max(textWidth(line), 1)) * 0.97);
+  const stretch = Math.max(1, (room / Math.max(textWidth(line), 1)) * FLAP_STRETCH_MARGIN);
   return { glyphs, plan: flapPlan(glyphs, glyphWidths(line), stretch) };
 }
 
@@ -121,7 +127,7 @@ let canvas: CanvasRenderingContext2D | null | undefined;
 /** Measures glyphs in an element's font, cached per font. Widths are relative: any size will do. */
 function glyphWidths(element: HTMLElement): (glyph: string) => number {
   const style = getComputedStyle(element);
-  const font = `${style.fontStyle} ${style.fontWeight} 100px ${style.fontFamily}`;
+  const font = `${style.fontStyle} ${style.fontWeight} ${MEASURE_PX}px ${style.fontFamily}`;
   const known = widths.get(font) ?? new Map<string, number>();
   widths.set(font, known);
   canvas ??= document.createElement('canvas').getContext('2d');
@@ -263,8 +269,8 @@ export function play(
     const f = pace(speed, tuning.gain);
     const active = pinned || held || hovering || now < tapUntil;
     if (changing) {
-      landed += elapsed / Math.max(4, timing.stepMs * f);
-      turns += elapsed / Math.max(16, timing.flipMs * f);
+      landed += elapsed / Math.max(WORDMARK_MIN_STEP_MS, timing.stepMs * f);
+      turns += elapsed / Math.max(FRAME_MS, timing.flipMs * f);
       const done = Math.floor(landed);
       const turn = Math.floor(turns);
       const text = flapFrame(glyphs, plan, done, turn);

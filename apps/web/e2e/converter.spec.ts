@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
-import { arrowTo, boxes, expectNoA11yViolations, ready } from './support';
+import { arrowTo, boxes, expectNoA11yViolations, MARGIN_MS, ready } from './support';
 
 // The converter's flows (docs/UX-SPEC.md §2–§9, §11): the two boxes, their lists, and their history.
 
@@ -335,7 +335,7 @@ test('both boxes can be copied, and the copy confirms with a check', async ({ pa
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');
 
   // It stays while the mouse rests on the button and reverts once the mouse leaves.
-  await page.waitForTimeout(COPIED_MS + 200);
+  await page.waitForTimeout(COPIED_MS + MARGIN_MS);
   await expect(checks).toHaveCount(1);
   await page.mouse.move(0, 0);
   await expect(checks).toHaveCount(0);
@@ -467,7 +467,7 @@ test('typing in bursts makes separate steps for Escape and for undo', async ({ p
   const { first } = boxes(page);
 
   await first.pressSequentially('25');
-  await page.waitForTimeout(TYPING_CHUNK_MS + 200);
+  await page.waitForTimeout(TYPING_CHUNK_MS + MARGIN_MS);
   await first.pressSequentially('0');
   await expect(first).toHaveValue('250');
   await first.press('Escape');

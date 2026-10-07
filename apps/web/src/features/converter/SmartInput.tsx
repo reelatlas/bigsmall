@@ -60,8 +60,11 @@ export interface SmartInputProps {
  */
 type Level = 'top' | CategoryId;
 
-/** Numbers longer than this collapse the chip to its symbol, so the number keeps its size as long as it can. */
-const COMPACT_CHIP = 6;
+/** A number longer than this many characters collapses the chip to its symbol, so the number keeps its size as long as it can. */
+const COMPACT_CHIP_AFTER = 6;
+
+/** How many units of the other box's category an empty box suggests ("L, tsp, tbsp…"). */
+const SCOPED_EXAMPLES = 3;
 
 /**
  * The text layer: the visible value lives here, over a field whose own text is transparent. That
@@ -426,7 +429,7 @@ export function SmartInput({
             // A message needs the room a long number does, so it also collapses the chip.
             <UnitChip
               unit={box.unit}
-              compact={box.text.length > COMPACT_CHIP || box.message !== null}
+              compact={box.text.length > COMPACT_CHIP_AFTER || box.message !== null}
               inTabOrder={false}
               onOpen={() => {
                 showList(box.unit ? box.unit.category : null);
@@ -519,6 +522,6 @@ function scopedExamples(
     .results.flatMap((result) =>
       result.kind === 'unit' && result.unit.id !== counterpart?.id ? [result.unit.symbol] : [],
     )
-    .slice(0, 3);
+    .slice(0, SCOPED_EXAMPLES);
   return `${symbols.join(', ')}…`;
 }

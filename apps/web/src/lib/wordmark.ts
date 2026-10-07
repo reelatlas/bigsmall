@@ -226,6 +226,15 @@ export const WORDMARK_TUNING: WordmarkTuning = {
   twoLinesFrom: 'text-base',
 };
 
+/** The letters kind swaps one letter, or up to this many. */
+const MAX_LETTER_SWAPS = 3;
+
+/** How often a swapped letter takes a look-alike ("ι" for "i") rather than its capital. */
+const LOOKALIKE_CHANCE = 0.7;
+
+/** nextPhrase draws again at most this often to avoid the phrase showing; a mix with one phrase then repeats it. */
+const MAX_REDRAWS = 20;
+
 function pick<T>(items: readonly T[], random: () => number): T {
   return items[Math.floor(random() * items.length)]!;
 }
@@ -233,12 +242,13 @@ function pick<T>(items: readonly T[], random: () => number): T {
 /** The name with one to three letters swapped for a look-alike or a capital: "bιgσmall", "bigSmall". */
 function letters(random: () => number): string {
   const glyphs = [...WORDMARK];
-  const swaps = 1 + Math.floor(random() * 3);
+  const swaps = 1 + Math.floor(random() * MAX_LETTER_SWAPS);
   for (let n = 0; n < swaps; n += 1) {
     const at = Math.floor(random() * glyphs.length);
     const letter = WORDMARK[at]!;
     const options = LOOKALIKES[letter];
-    glyphs[at] = options && random() < 0.7 ? pick([...options], random) : letter.toUpperCase();
+    glyphs[at] =
+      options && random() < LOOKALIKE_CHANCE ? pick([...options], random) : letter.toUpperCase();
   }
   return glyphs.join('');
 }
@@ -278,7 +288,7 @@ export function nextPhrase(
 ): string {
   for (let tries = 0; ; tries += 1) {
     const phrase = DRAW[kindOf(mix, random)](random);
-    if (phrase !== current || tries > 20) return phrase;
+    if (phrase !== current || tries >= MAX_REDRAWS) return phrase;
   }
 }
 
@@ -320,6 +330,14 @@ export function catalog(): Record<PhraseKind, readonly string[]> {
 const FLAP = [...'0123456789+−×÷=≈<>∞πΣΔλµΩ°%#*'];
 /** Narrow ones, for narrow letters (i, l, punctuation) that few of the others fit. */
 const FLAP_NARROW = [...'|!:;·.,ı'];
+/** With fewer than this many main glyphs that fit, a position flips through the narrow ones too. */
+const MIN_FLAP_CHOICES = 3;
+
+/**
+ * Two large primes from spatial hashing that scatter a position and a turn into a flap glyph: the
+ * frames look random but are the same every time for the same plan, so tests can pin them.
+ */
+const FLAP_HASH = [73856093, 19349663] as const;
 
 /**
  * For each glyph of a phrase, the glyphs its position may flip through before it lands: only
@@ -340,7 +358,7 @@ export function flapPlan(
     const room = widthOf(glyph) * stretch;
     const fits = (flap: string) => flap !== glyph && widthOf(flap) <= room;
     const main = FLAP.filter(fits);
-    return main.length >= 3 ? main : [...main, ...FLAP_NARROW.filter(fits)];
+    return main.length >= MIN_FLAP_CHOICES ? main : [...main, ...FLAP_NARROW.filter(fits)];
   });
 }
 
@@ -357,7 +375,7 @@ export function flapFrame(
   let text = '';
   for (const [at, glyph] of glyphs.entries()) {
     const options = plan[at] ?? [];
-    const flap = (Math.imul(at + 1, 73856093) ^ Math.imul(turn + 1, 19349663)) >>> 0;
+    const flap = (Math.imul(at + 1, FLAP_HASH[0]) ^ Math.imul(turn + 1, FLAP_HASH[1])) >>> 0;
     text += at < landed || options.length === 0 ? glyph : (options[flap % options.length] ?? glyph);
   }
   return text;

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { TYPING_CHUNK_MS } from '../src/lib/timing';
-import { boxes, expectNoA11yViolations, ready } from './support';
+import { boxes, expectNoA11yViolations, MARGIN_MS, ready } from './support';
 
 // The calculator scratch pad (docs/UX-SPEC.md §8, "The calculator").
 
@@ -62,9 +62,9 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
 
   // Escape takes back one burst of typing at a time, then closes once the display is empty.
   await page.keyboard.type('12345');
-  await page.waitForTimeout(TYPING_CHUNK_MS + 150);
+  await page.waitForTimeout(TYPING_CHUNK_MS + MARGIN_MS);
   await page.keyboard.type('678');
-  await page.waitForTimeout(TYPING_CHUNK_MS + 150);
+  await page.waitForTimeout(TYPING_CHUNK_MS + MARGIN_MS);
   await page.keyboard.type('9');
   await page.keyboard.press('Backspace');
   await page.keyboard.type('+1');

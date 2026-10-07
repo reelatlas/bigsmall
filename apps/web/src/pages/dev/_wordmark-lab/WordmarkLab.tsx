@@ -28,7 +28,7 @@ import {
   type WordmarkSettings,
 } from '../../../lib/wordmark-motion';
 import { useCopied } from '../../../lib/copied';
-import { WORDMARK_TIMING } from '../../../lib/timing';
+import { FRAME_MS, WORDMARK_TIMING } from '../../../lib/timing';
 import { PRESETS, SHIPPED } from './presets';
 import {
   ART_GLYPHS,
@@ -163,7 +163,7 @@ const TIMING_SLIDERS: ReadonlyArray<{
   {
     key: 'flipMs',
     label: 'Flip',
-    min: 16,
+    min: Math.ceil(FRAME_MS),
     max: 200,
     step: 1,
     hint: 'At rest, how often a flipping letter shows a new glyph.',

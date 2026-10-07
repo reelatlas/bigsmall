@@ -13,6 +13,7 @@ One file per decision, numbered, never edited after acceptance except to change 
 | [0005](0005-toolchain-policy.md)        | Latest tooling where compatible, a11y tooling never dropped | accepted |
 | [0006](0006-smart-input-combobox.md)    | Hand-built WAI-ARIA combobox; React Aria removed            | accepted |
 | [0007](0007-preact-compat.md)           | The island runs on Preact through preact/compat             | accepted |
+| [0008](0008-hosting-and-domains.md)     | Hosting on Vercel, with bigsmall.work as the main domain    | accepted |
 
 ## Template
 

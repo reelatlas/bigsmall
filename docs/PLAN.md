@@ -218,11 +218,11 @@ For a new machine:
 
 ### Accounts
 
-| Account                            | Needed by               | Cost       |
-| ---------------------------------- | ----------------------- | ---------- |
-| GitHub                             | M0                      | free       |
-| Cloudflare (Pages + Web Analytics) | M2, for preview deploys | free       |
-| Domain registrar                   | M5                      | ~$10–20/yr |
+| Account                                                        | Needed by | Cost                                                      |
+| -------------------------------------------------------------- | --------- | --------------------------------------------------------- |
+| GitHub                                                         | M0        | free                                                      |
+| Vercel (`reelatlas`), hosting and preview deploys (ADR 0008)   | launch    | free (Hobby, non-commercial; Pro if bigsmall earns money) |
+| Porkbun, `bigsmall.work` and `bigsmall.diy`, bought 2026-10-07 | launch    | ~$10–20/yr each                                           |
 
 ### Not needed
 
@@ -241,7 +241,9 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 9. **Control edges.** Fields, the theme menu, and secondary buttons are edged in a new `--edge` token at 3:1 against the page and the surface (WCAG 1.4.11); `--line` stays for dividers. A trial: reverting its one commit restores the lighter edges.
 10. **Framework.** The island runs on Preact through `preact/compat` (ADR 0007): 89.2 KB of JavaScript became 33.9 KB with no change to how components are written, and the 90 KB budget stays, so the room goes to the product. Owner's choice after a measured spike.
 
-Still open: SEO pages in v1 (proposed yes, built at M5). Domains bought 2026-10-07: `bigsmall.fyi` and `bigsmall.work`; to decide before launch: which is canonical (the other redirects to it), and hosting on Vercel, the owner's preference, in place of Cloudflare Pages (ADR 0002), recorded as an ADR when chosen.
+11. **Hosting and domains.** Vercel, with `bigsmall.work` as the main domain and `bigsmall.diy` redirecting to it (ADR 0008). The main domain can change later with a redirect flip; settle it before SEO work.
+
+Still open: SEO pages in v1 (proposed yes, built at M5), and the analytics tool (to explore with the owner).
 
 ## 16. Risks and open questions
 

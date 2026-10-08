@@ -31,7 +31,7 @@ The system's own docs are the yardstick, so read them before judging anything: `
 ## 4. Sort every finding
 
 - **Fix now**: mechanical, with no change to how anything looks or behaves. Dead code; a stale comment, docblock, or doc row; a class list repeated in two files becoming a recipe with identical output; a one-off component moving into `components/` unchanged; a missing gallery sample, inventory row, test, or learning; a test asserting one tool's text or one machine's font.
-- **Ask Sean**: anything that changes a look, a behavior, or the token set. A value no token expresses (recommend reusing token X, or adding token Y to every theme); a new variant that looks different; an inconsistency between the layouts or between similar controls; retiring a lab or a doc; a new dependency. One line each, the recommendation first, then the alternative, in plain terms. Never decide these quietly.
+- **Ask Sean**: anything that changes a look, a behavior, or the token set. A value no token expresses (recommend reusing token X, or adding token Y to every theme); a new variant that looks different; an inconsistency between similar controls or states (two menus, a control with and without a unit in the box); retiring a lab or a doc; a new dependency. One line each, the recommendation first, then the alternative, in plain terms. Never decide these quietly.
 - **Later**: a real improvement too big for this pass. Write it into `docs/PLAN.md` (§2 explorations, or the milestone it belongs to) with enough context to pick up cold.
 
 ## 5. Fix

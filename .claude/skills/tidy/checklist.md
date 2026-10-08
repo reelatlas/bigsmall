@@ -32,16 +32,16 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - Sizes from the scale, numbers in `font-numeric` (tabular digits), faces only through `font-display`, `font-body`, `font-numeric`.
 - Text that must fit steps down a ladder in `recipes.ts` through `useFitStep`, `useFieldFit`, or `fitPhrase`: never a third way, never clipped, never a size in between.
 
-## Layout and the two layouts
+## Layout
 
-- Fit is decided by measuring the box (`useFieldFit`) or by a container query at the smallest stock size above the widest case, measured in every theme; never by which layout it is, a breakpoint standing in for a width, or a count of characters.
-- What differs between the layouts is declared once: `TableLayout.tsx`'s grid, `Converter.tsx`'s `layout-*` variants, or a prop. Never inside a shared component.
-- A change to a shared component is checked in both layouts, at 320 px and wide.
-- The server's page carries both layouts' empty state, and the first client render matches the server's.
+- Fit is decided by measuring the box (`useFieldFit`) or by a container query at the smallest stock size above the widest case, measured in every theme; never by where a component sits, a breakpoint standing in for a width, or a count of characters.
+- Where the converter places its pieces is declared once, as named class lists (`TableLayout.tsx`'s `TABLE_GRID` and its cells) or a prop; never inside a shared component, which sets no outer margin (component rule 13).
+- A change to a shared component is checked at 320 px and wide, in the converter and in the gallery.
+- The server's page carries the converter's empty state, and the first client render matches the server's.
 
 ## Behavior and keys
 
-- Every behavior is in `docs/UX-SPEC.md`; code and spec agree. When they disagree, check the findings log and the ADRs for which was intended; fix the doc if the code is right, and ask Sean if neither says.
+- Every behavior is in `docs/UX-SPEC.md`; code and spec agree. When they disagree, check the findings log, the ADRs, and the research doc behind the feature for which was intended; fix the doc if the code is right, and ask Sean if neither says.
 - Work that must happen before the next key runs in a layout effect; keys on a wrapper use native listeners; a widget answers its keys only while focus is inside it, unless an ADR records otherwise.
 - Every keyboard shortcut is in `src/lib/shortcuts.ts` and `UX-SPEC.md` §8.
 - No conversion math in the UI; core imports nothing from the DOM, the framework, or `apps/web` (ADR 0003).
@@ -51,7 +51,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 
 - Names, roles, and `aria-*` on the element itself; a composite follows the WAI-ARIA combobox pattern (ADR 0006, ADR 0012); no control inside another.
 - Every Tab stop shows focus; 44 px targets; motion only through the motion tokens.
-- axe is clean in every theme, on both layouts, with each list or menu open, and on the gallery (`e2e/smoke.spec.ts` and the feature specs).
+- axe is clean in every theme, with each list or menu open, and on the gallery (`e2e/smoke.spec.ts` and the feature specs).
 
 ## Copy and formats
 
@@ -64,7 +64,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 
 - Unused exports: for each export in scope, search its name across `apps/web` and `packages`; one hit (its own definition) means dead, unless it is core's public API (`packages/core/src/index.ts`).
 - Unused props, options, recipes, constants, test helpers, e2e selectors, files, and custom CSS utilities in `src/styles/global.css`.
-- An option that existed for one caller that has since gone (a layout-only prop after that layout got its own component).
+- An option that existed for one caller that has since gone (a layout-only prop after that layout got its own component; `useFieldFit`'s list of texts after the field's second text left with two boxes), and a recipe whose other users were removed, which moves back beside its one use.
 - Comments and docblocks that name a function, file, prop, or behavior that no longer exists. Read every docblock in the files that changed.
 - `TODO`, `FIXME`, and `XXX`: each becomes a fix, a `docs/PLAN.md` item, or goes.
 - A prototype the product now duplicates: once a lab's pattern has shipped, the product is the reference. Whether the lab stays is Sean's call.

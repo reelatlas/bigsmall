@@ -599,3 +599,8 @@ Format:
 
 **What happened.** The angle's degree has the symbol `°`. Search folded every degree sign away, so `°F` would match `F`, which left the degree's symbol an empty key: the registry test refused it, and `45°` could not find the degree.
 **Rule.** A fold that drops a mark drops it only where it belongs to something else: the degree sign before a letter (`°F`, `° C`), kept alone. Where a mark should also be findable (a typed `°` starting `°C`), index a second form of the key that keeps it (`compactKeyWithDegree`) rather than bending the fold. Highlighting folds one character at a time, so a rule that looks at a neighbor is handled there by pulling the mark into a match that starts after it (`degreeBeforeLetter`), or the marked letters drift. Before adding a symbol that is all punctuation (`′`, `″`) or a letter with a mark, check what `compactKey` makes of it: `Å` folds to `a`, which would make the ångström the exact match for a lone `a`, so it waits.
+
+## 2026-10-08 — A browser test that counts registry data reads the count from core
+
+**What happened.** Adding categories and units broke browser tests that had the counts written in: eight tiles, nine volume rows, five speed rows, the start's two rows of tiles, and walks that pressed ↓ a set number of times to reach the last row. Each was right when written and wrong the moment the catalog grew.
+**Rule.** A test that counts what the registry holds imports it from `@bigsmall/core` (`categories.length`, `unitsIn('volume').length`) and derives the rest from it (rows of tiles, steps to the last row). It still names the units it checks by id, so a reordering fails loudly where it should.

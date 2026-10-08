@@ -437,3 +437,15 @@ Sean's answers on the more-categories build, before it shipped (2026-10-08).
 | Mach is obscure, and the US survey foot is not worth including                                                                                   | Both left out                                                                                                                                                  |
 | Runner pace, and showing fractions like 1/4 or 5/8, are for a later design                                                                       | Logged together in docs/PLAN.md §2                                                                                                                             |
 | Keep knowing which units are specialist: a filter toggling basic or advanced comes later                                                         | Every unit keeps its tier, and search and the table can already ask for the basic ones alone; the filter is logged (docs/PLAN.md §2)                           |
+
+## Tidy pass, fifth
+
+What the tidy skill found since the fourth pass (2026-10-08): the menu and spacing trials, early keystrokes and whole digits in links, five categories, 76 units, and the new listed order. No look or behavior changed.
+
+| Observation                                                                                        | What changed                                                                                             |
+| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Two docblocks still spoke of basic and advanced modes (the `Tier` type, search's `escalated` flag) | Rewritten for ADR 0016 and the later everyday-only filter                                                |
+| The catalog's alias decisions predated today's units                                               | `ton` and `mpg`, the millibar, the calories, `gr`, and `c` recorded; the notes list covers the new units |
+| "Undefined for 0" had a unit test but no browser test                                              | Added to the no-answer browser test                                                                      |
+| Browser tests had counts written in, which the new units broke                                     | They read counts from core now; a learning records the rule                                              |
+| Architecture, plan, and testing rows behind the code                                               | Search's ranking row, the primary-categories decision, and the testing row brought up to date            |

@@ -234,7 +234,7 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 ## 15. Decisions (made 2026-10-06)
 
 1. **Stack.** Astro + React + TypeScript + Tailwind v4 (ADR 0002, accepted). Re-examined against an all-React Vite framework the same day and kept; the operating rule is TSX components for interaction, Astro for structure. The island's runtime became Preact (decision 10).
-2. **Primary categories.** The eight in `docs/UNITS-CATALOG.md`: Length, Weight, Volume, Temperature, Area, Speed, Time, Data.
+2. **Primary categories.** The eight in `docs/UNITS-CATALOG.md`: Length, Weight, Volume, Temperature, Area, Speed, Time, Data. Fuel economy, Energy, Pressure, Power, and Angle joined them on 2026-10-08 (docs/UNITS-CATALOG.md §0).
 3. **Themes.** Framework and palettes for all six now; polish one at a time in milestone 4, `sakura` first (docs/THEMING.md).
 4. **Locale defaults.** Detect from the browser, fall back to US; manual override in settings later. Implemented as `regionDefaults` in core.
 5. **Toolchain.** Latest where compatible, accessibility tooling never dropped (ADR 0005). TypeScript 6 until the ecosystem supports 7.

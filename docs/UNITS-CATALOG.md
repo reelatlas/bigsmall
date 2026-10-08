@@ -12,8 +12,10 @@ Alias decisions so far (each one changes the ranking, and so which row Enter tak
 
 - `kilo`/`kilos` → kilogram, `cc` → milliliter, `kph`/`kmh` → kilometer per hour: colloquial, so they count as exact matches.
 - `oz` is also an alias of fluid ounce on purpose: it makes "oz" ambiguous, so the list shows both ounces, each with its category, and the choice is visible before Enter.
-- No `ton` alias on the metric ton (US short ton and UK long ton arrive in milestone 3 with locale ranking), and no lowercase `b` for bit (it would collide with byte's `B` inside the category).
-- Unit `note` fields carry the definition for anything with a variant or a common mix-up: bit and byte; the decimal data prefixes (kB, MB, GB, TB); tonne, ounce, and stone; knot; kelvin; month and year; and the US liquid family (teaspoon, tablespoon, fluid ounce, cup, pint, quart, gallon). The UI does not show notes yet (docs/UX-SPEC.md §14).
+- No alias claims `ton` or `mpg`: typing either offers every ton (short, long, metric) or both mpgs, the visitor's everyday one first (2026-10-08). No lowercase `b` for bit (it would collide with byte's `B` inside the category).
+- `mbar` and `millibar` → hectopascal, the same size, an alias rather than a second row; `food calories` and `large calories` → kilocalorie, while `cal` and `calories` are the small calorie, the standard (Sean, 2026-10-08).
+- `gr` is the grain's symbol, and grams answer to `g`; typing `gr` offers grains, then grams (Sean, 2026-10-08). `c` is Celsius's alias and the speed of light's symbol; the everyday unit leads.
+- Unit `note` fields carry the definition for anything with a variant or a common mix-up, and since 2026-10-08 for the specialist and newer units that need one (the atmosphere, the mercury columns, the calories, the BTU and the therm, the horsepowers, the UK measures, the tons): bit and byte; the decimal data prefixes (kB, MB, GB, TB); tonne, ounce, and stone; knot; kelvin; month and year; and the US liquid family (teaspoon, tablespoon, fluid ounce, cup, pint, quart, gallon). The UI does not show notes yet (docs/UX-SPEC.md §14).
 
 ## 1. Coverage research
 

@@ -23,7 +23,7 @@ export const CARD = 'rounded-lg border border-line bg-surface';
  * The card of the table's place (the start's tiles, the category's units, the matches), the list
  * the box's cursor moves through: a control's 2 px edge, like the box above it, since it is the
  * box's popup (ADR 0012) and holds the rows people pick. Its rows' corners nest in it
- * (rounded-nested). Sean, 2026-10-08: the color kept, the width a trial.
+ * (rounded-nested). Sean, 2026-10-08.
  */
 export const LIST_CARD = 'rounded-lg border-2 border-edge bg-surface';
 

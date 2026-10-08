@@ -644,8 +644,13 @@ test('the hint has a line of its own; the toolbar under it ends in the category 
     field: (await box(page).boundingBox())!,
     start: (await tiles(page).boundingBox())!,
   });
-  // Wide: the menu at the toolbar's right end, its edge on the column's, over the box.
+  // Wide: the menu at the toolbar's right end, its edge on the column's, over the box; the first
+  // button's edge on the column's too, so a fill lines up with the table.
   const wide = await geometry();
+  const calculatorButton = (await page
+    .getByRole('button', { name: 'Calculator', exact: true })
+    .boundingBox())!;
+  expect(Math.abs(calculatorButton.x - wide.start.x)).toBeLessThanOrEqual(1);
   expect(wide.hint.y + wide.hint.height).toBeLessThanOrEqual(wide.undo.y);
   const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
   expect(Math.abs(middle(wide.menu) - middle(wide.undo))).toBeLessThan(4);

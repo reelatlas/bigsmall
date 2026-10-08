@@ -40,8 +40,11 @@ const TABLE_GRID =
  */
 const TABLE_TOOLS_ROW =
   'mb-2 flex max-w-xl flex-wrap items-center justify-between gap-x-4 gap-y-2 md:col-start-1 md:row-start-1';
-/** The tools: their first glyph lined up with the hint and the box. */
-const TABLE_TOOLS = '-ml-3 flex shrink-0 items-center gap-1';
+/**
+ * The tools: the first button's edge on the box's, so a filled one (switched on, hovered) lines up
+ * with the box and the table, its glyph inside the column as their text is.
+ */
+const TABLE_TOOLS = 'flex shrink-0 items-center gap-1';
 const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
 /** 16 px under the box or the calculator; a container, so the categories go four across once it has the room. */
 const TABLE_ROWS_CELL = '@container mt-4 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';

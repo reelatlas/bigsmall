@@ -20,7 +20,10 @@ export interface CategoryMenuProps {
   value: CategoryId | null;
   /** While a unit is typed, how many of each category's units match it. */
   counts?: Partial<Record<CategoryId, number>> | undefined;
-  /** A choice was made, with Enter or a click: the menu has closed. */
+  /**
+   * A choice was made, with Enter, a click, or a tap: the menu has closed. Focus goes back to the
+   * trigger unless this moves it on.
+   */
   onChoose: (id: CategoryId) => void;
   /** Its name as a control of the toolbar it sits in (`data-tool`, ADR 0014), if it is in one. */
   tool?: string;
@@ -51,6 +54,9 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   const choose = (id: CategoryId) => {
     setOpen(false);
     onChoose(id);
+    // Unless the host moved focus on (the converter puts the caret in the box after a click or a
+    // key), it comes back to the trigger, as the theme menu's does, off a choice about to hide.
+    if (rootRef.current?.contains(document.activeElement)) trigger.current?.focus();
   };
 
   // Opening moves focus onto the chosen category, or the first, as the theme menu does.
@@ -166,9 +172,14 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
             return (
               // A pointer's pick chooses at once. Not on click: the arrows check radios with a
               // click of their own (docs/LEARNINGS.md, "Radios fire change on every arrow key").
+              // A tap ends on the choice: the menu has closed by then, and the browser's mouse
+              // events and click after it would land on what it uncovered, the box, bringing a
+              // touch screen's keyboard up (docs/LEARNINGS.md, "A tap's click lands on what it
+              // uncovered").
               <label
                 key={category.id}
                 onPointerUp={() => choose(category.id)}
+                onTouchEnd={(event) => event.preventDefault()}
                 className={cx(MENU_OPTION, 'justify-between gap-2')}
               >
                 <input

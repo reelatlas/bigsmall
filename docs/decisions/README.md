@@ -20,6 +20,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0012](0012-table-as-unit-list.md)      | The table is the unit list: a category menu, and a cursor in the field      | accepted                                        |
 | [0013](0013-one-layout.md)              | One layout: the table; two boxes and the layout switch retire               | accepted                                        |
 | [0014](0014-planes.md)                  | The arrow keys move between the page's planes: two toolbars and the box     | accepted                                        |
+| [0015](0015-touch-keyboard.md)          | On a touch screen, the keyboard comes up only from the box                  | accepted                                        |
 
 ## Template
 

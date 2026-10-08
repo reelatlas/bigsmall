@@ -16,6 +16,7 @@ import { CategoryTiles } from '../../components/CategoryTiles';
 import { ConversionTable, type ConversionTableProps } from '../../components/ConversionTable';
 import { UnitMatches } from '../../components/UnitMatches';
 import { ValueField } from '../../components/ValueField';
+import { pressedByTouch } from '../../lib/modality';
 import { stepPlane } from '../../lib/planes';
 import { evaluatedText } from './calculator';
 import { noMatchMessage, type BoxView, type HistoryAction, type TableView } from './state';
@@ -147,6 +148,11 @@ export function TableLayout({
   const setPosition = (next: number | null) => setCursor({ view: viewKey, position: next });
   /** Set when typing elsewhere lands in the field: the caret goes after the text it added. */
   const caretToEnd = useRef(false);
+  /**
+   * Whether the caret came into the field with a tap, so a touch screen's keyboard is up: its
+   * Enter, labelled Done, puts the keyboard away once it has done its job (ADR 0015).
+   */
+  const tappedIn = useRef(false);
 
   const number = box.parsed.valueText ?? '';
   const rowCount =
@@ -281,11 +287,15 @@ export function TableLayout({
     return () => document.removeEventListener('keydown', onKeyDown);
   });
 
+  // Only while the field has focus: after a tap it has none, and setting a selection could bring a
+  // touch screen's keyboard back up.
   useLayoutEffect(() => {
     if (!caretToEnd.current) return;
     caretToEnd.current = false;
     const input = inputRef.current;
-    input?.setSelectionRange(input.value.length, input.value.length);
+    if (input && input === document.activeElement) {
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
   });
 
   // The row the arrows reach stays in view, as the page scrolls.
@@ -334,10 +344,15 @@ export function TableLayout({
     }
   };
 
-  /** A click or tap takes what it is on and leaves the caret in the field, for the keys to go on from there. */
+  /**
+   * A click or tap takes what it is on. After a click the caret is back in the field, for the keys
+   * to go on from there; after a tap a touch screen's keyboard stays down, and goes away if it was
+   * up, so the table being picked from stays in view (ADR 0015).
+   */
   const pick = (index: number) => {
     takeRow(index);
-    inputRef.current?.focus();
+    if (pressedByTouch()) inputRef.current?.blur();
+    else inputRef.current?.focus();
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -396,6 +411,9 @@ export function TableLayout({
         else if (worked !== null) dispatch({ type: 'replace', text: worked });
         else if (box.unit) setPosition(null);
         else if (rowCount > 0) setPosition(0);
+        // On a touch screen's keyboard Enter reads Done: what it did stands, and the keyboard goes
+        // away, so the table shows (ADR 0015).
+        if (tappedIn.current) inputRef.current?.blur();
         return;
       }
       case 'Escape':
@@ -481,12 +499,20 @@ export function TableLayout({
             tool="category"
             onChoose={(category) => {
               choose(category);
-              inputRef.current?.focus();
+              // After a tap focus stays with the menu, so no keyboard comes up (ADR 0015).
+              if (!pressedByTouch()) inputRef.current?.focus();
             }}
           />
           <div className={TABLE_TOOLS}>{tools}</div>
         </div>
-        <div ref={fieldRef} className={TABLE_BOX_CELL} data-plane="box">
+        <div
+          ref={fieldRef}
+          className={TABLE_BOX_CELL}
+          data-plane="box"
+          onFocus={(event: FocusEvent<HTMLDivElement>) => {
+            if (event.target === inputRef.current) tappedIn.current = pressedByTouch();
+          }}
+        >
           <ValueField
             inputRef={inputRef}
             label="Value"
@@ -506,13 +532,14 @@ export function TableLayout({
             trailing={copyButton}
             onChange={onChange}
             onKeyDown={onKeyDown}
-            // The chip is a readout here: clicking it puts the caret in the field, where the
-            // arrows reach the units; its × takes the unit out and keeps the category's table.
+            // The chip is a readout here, and part of the box: clicking or tapping it puts the
+            // caret in the field, where the arrows reach the units. Its × takes the unit out and
+            // keeps the category's table, the caret back in the field after a click, not a tap.
             onChipOpen={() => inputRef.current?.focus()}
             onChipRemove={() => {
               dispatch({ type: 'unlock' });
               setPosition(null);
-              inputRef.current?.focus();
+              if (!pressedByTouch()) inputRef.current?.focus();
             }}
           />
         </div>

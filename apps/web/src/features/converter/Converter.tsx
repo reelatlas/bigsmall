@@ -16,6 +16,7 @@ import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
+import { pressedByTouch } from '../../lib/modality';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
@@ -67,10 +68,13 @@ export function Converter() {
   const calcMessage = entryMessage(entryParsed);
   const isEmpty = !state.text && !state.unit && !state.category;
 
-  /** Clear all (undoable like any other step), and the caret back in the box. */
+  /**
+   * Clear all (undoable like any other step), and the caret back in the box after a click or a
+   * key; after a tap focus stays put, so no keyboard comes up (ADR 0015).
+   */
   const clearAll = () => {
     dispatch({ type: 'clear' });
-    inputRef.current?.focus();
+    if (!pressedByTouch()) inputRef.current?.focus();
   };
 
   // Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes anywhere inside the converter,

@@ -252,3 +252,16 @@ Sean asked to build the chosen prototype into the product (2026-10-07), and for 
 | Build option A, the category menu, from the selection lab           | Built as docs/research/table-selection.md planned (ADR 0012): the table layout's box with a category menu, the start's tiles, the units with dashes until there is a number and a unit, the matches grouped by category, the cursor in the field, the Escape ladder, and typing from anywhere |
 | The lab's pieces were one-offs inside the lab                       | Each became a component in the gallery (`ValueField`, `CategoryMenu`, `CategoryTiles`, `UnitMatches`, `MatchedText`), the menu and the theme menu share recipes, and SmartInput lost its table-only option                                                                                    |
 | A systematic tidy-up after a lab, a feature, or a while without one | A project skill, `/tidy`, in `.claude/skills/tidy/`                                                                                                                                                                                                                                           |
+
+## Tidy pass, 2026-10-07: after option A
+
+The first run of `/tidy`, over everything since the launch tag (`v0.1.0`): the table layout, the listed order, the selection lab, and option A.
+
+| Found                                                                                                       | What changed                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| A unit's symbol was styled in four components (chip, list, table, matches), and a label's type in two files | Two recipes, `unitSymbol()` and `LABEL`, with identical output                                                        |
+| "No unit matches … Try ml, feet, or °F." was written in both layouts                                        | One `noMatchMessage()` in the converter's state                                                                       |
+| The table's pieces each set their own top margin                                                            | The table layout spaces them (`TABLE_ROWS_CELL`); a new component rule says a component sets no outer margin          |
+| Comments still described the category label in both layouts and the chip always opening a list              | Corrected, with the design system's chip row                                                                          |
+| `CLAUDE.md`'s status had grown into one long changelog                                                      | Five lines of where things stand, each pointing to its doc                                                            |
+| The selection lab still holds its own copies of what the product now has                                    | Brought to Sean: keep it for comparing B and C, or retire it (git and docs/research/table-selection.md keep the rest) |

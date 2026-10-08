@@ -221,14 +221,19 @@ export function Converter() {
     <section
       ref={sectionRef}
       aria-label="Unit converter"
-      className="mt-6"
+      className="@container mt-6"
       data-hydrated={hydrated ? '' : undefined}
     >
       {/*
         The hint has a line of its own, and the toolbar the next one, over the box it acts on, so
-        what to do and the tools to do it with read apart (docs/UX-SPEC.md §1).
+        what to do and the tools to do it with read apart (docs/UX-SPEC.md §1). Spaced by what
+        shows under it (docs/DESIGN-SYSTEM.md, "Space by what shows"): 16 px over a toolbar on one
+        line, whose menu starts with its edge right under the hint, and 8 px where the toolbar
+        wraps and its icons, each glyph 12 px inside its button, come first. The converter is a
+        container, and 384 px (@sm) is the stock size above the widest theme's one-line toolbar,
+        362 px in Theorem.
       */}
-      <p id={hintId} className="mb-2 text-sm text-ink-muted">
+      <p id={hintId} className="mb-2 text-sm text-ink-muted @sm:mb-4">
         {HINT}
       </p>
 

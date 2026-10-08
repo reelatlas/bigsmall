@@ -31,6 +31,7 @@ describe('matchSpan', () => {
     expect(marked('km²', 'm2')).toBe('m²');
     expect(marked('°F', 'f')).toBe('°F');
     expect(marked('°F', '°f')).toBe('°F');
+    expect(marked('°', '°')).toBe('°');
     expect(marked('degrees Fahrenheit', 'fahr')).toBe('Fahr');
   });
 

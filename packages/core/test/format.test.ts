@@ -49,12 +49,20 @@ describe('formatNumber', () => {
 });
 
 describe('normalizeKey and compactKey', () => {
-  it('removes degree signs, periods, and accents; lowercases; collapses spaces', () => {
+  it('removes a degree sign before a letter, periods, and accents; lowercases; collapses spaces', () => {
     expect(normalizeKey('°F')).toBe('f');
+    expect(normalizeKey('° c')).toBe('c');
     expect(normalizeKey('℃')).toBe('c');
+    expect(normalizeKey('ºF')).toBe('f');
     expect(normalizeKey('Fl. Oz.')).toBe('fl oz');
     expect(normalizeKey('  square   Metre ')).toBe('square metre');
     expect(normalizeKey('Litre')).toBe('litre');
+  });
+
+  it('keeps a degree sign on its own, the angle’s degree, and its look-alikes as it', () => {
+    expect(normalizeKey('°')).toBe('°');
+    expect(normalizeKey('º')).toBe('°');
+    expect(normalizeKey('˚')).toBe('°');
   });
 
   it('maps superscripts and micro signs to ASCII', () => {

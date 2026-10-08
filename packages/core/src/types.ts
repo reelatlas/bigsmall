@@ -5,7 +5,18 @@
 
 /** Quantity categories known to the engine. Extend this union when adding a category file. */
 export type CategoryId =
-  'length' | 'mass' | 'volume' | 'temperature' | 'area' | 'speed' | 'time' | 'data';
+  | 'length'
+  | 'mass'
+  | 'volume'
+  | 'temperature'
+  | 'area'
+  | 'speed'
+  | 'time'
+  | 'data'
+  | 'energy'
+  | 'pressure'
+  | 'power'
+  | 'angle';
 
 /** Basic units appear by default; advanced units appear on request or when searched directly. */
 export type Tier = 'basic' | 'advanced';

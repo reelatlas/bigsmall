@@ -16,12 +16,9 @@ import { TYPING_CHUNK_MS } from '../../lib/timing';
 
 /**
  * The converter's state and the pure reducer over it (docs/UX-SPEC.md §1, §7, §9): one box, the
- * category its table lists, the mode, and the calculator's entry, with one undo history for all of
- * it. No React, no DOM: everything here is unit-tested in node.
+ * category its table lists, and the calculator's entry, with one undo history for all of it. No
+ * React, no DOM: everything here is unit-tested in node.
  */
-
-/** The list's tier. Only 'basic' is reachable today; the mode toggle arrives in milestone 3 (docs/UX-SPEC.md §14). */
-export type Mode = 'basic' | 'advanced';
 
 /** The calculator's own entry (docs/UX-SPEC.md §8). `fresh` is true right after =, when a digit starts over. */
 export interface CalculatorState {
@@ -40,7 +37,6 @@ export interface ConverterState {
    * in place; clear empties it.
    */
   category: CategoryId | null;
-  mode: Mode;
   /**
    * The calculator's scratch entry. It lives here, outside the conversion, so one history holds
    * everything: undo goes from a send back into the arithmetic that produced it.
@@ -52,7 +48,7 @@ export interface ConverterState {
 export type TextTarget = 'box' | 'calc';
 
 /** The part of the state a URL or a later persistence layer restores, through the `hydrate` action. */
-export type Restorable = Partial<Pick<ConverterState, 'text' | 'unit' | 'mode'>>;
+export type Restorable = Partial<Pick<ConverterState, 'text' | 'unit'>>;
 
 export const EMPTY_CALC: CalculatorState = { text: '', fresh: false };
 
@@ -60,7 +56,6 @@ export const initialState: ConverterState = {
   text: '',
   unit: null,
   category: null,
-  mode: 'basic',
   calc: EMPTY_CALC,
 };
 
@@ -84,7 +79,6 @@ export type Action =
   /** The unit taken out of the box (the chip's ×, Backspace on an empty box): its category stays. */
   | { type: 'unlock' }
   | { type: 'clear' }
-  | { type: 'setMode'; mode: Mode }
   | { type: 'hydrate'; state: Restorable };
 
 export function reduce(state: ConverterState, action: Action): ConverterState {
@@ -119,10 +113,7 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
 
     case 'clear':
       // Clear all empties the conversion; the calculator's scratch entry is not part of it.
-      return { ...initialState, mode: state.mode, calc: state.calc };
-
-    case 'setMode':
-      return { ...state, mode: action.mode };
+      return { ...initialState, calc: state.calc };
 
     case 'hydrate': {
       // A URL holds a unit, not a category: the unit names it.
@@ -261,8 +252,10 @@ export type TableView = StartView | UnitsView | MatchesView;
 export interface TableOptions extends NumberEnv {
   /** The visitor's unit family, listed first. */
   system: UnitPreference;
-  tier: 'basic' | 'all';
 }
+
+/** Every unit and category, specialist ones too: the table has no basic and advanced modes (docs/UX-SPEC.md §3). */
+const EVERY_TIER = 'all';
 
 /** What the table shows under the box: the matches while a unit is typed, else the category's units, else the start. */
 export function selectTable(state: ConverterState, options: TableOptions): TableView {
@@ -270,7 +263,7 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   const unit = state.unit ? (getUnit(state.unit) ?? null) : null;
   const category = unit?.category ?? state.category;
   const base = {
-    categories: search('', { tier: options.tier }).results.flatMap((result) =>
+    categories: search('', { tier: EVERY_TIER }).results.flatMap((result) =>
       result.kind === 'category' ? [result.category] : [],
     ),
   };
@@ -292,10 +285,8 @@ function selectUnits(
   const listed = search('', {
     category,
     system: options.system,
-    tier: options.tier,
+    tier: EVERY_TIER,
   }).results.flatMap((result) => (result.kind === 'unit' ? [result.unit] : []));
-  // A unit from beyond the mode's tier, reached by search, still shows where it is in use.
-  if (unit && !listed.some((u) => u.id === unit.id)) listed.push(unit);
   const kind = getCategory(category)?.name.toLowerCase() ?? '';
   const base = { ...shared, kind: 'units', category } as const;
 
@@ -375,7 +366,7 @@ function selectMatches(
 ): MatchesView {
   const { results } = search(query, {
     system: options.system,
-    tier: options.tier,
+    tier: EVERY_TIER,
     prefer: current,
     limit: MATCH_LIMIT,
   });
@@ -489,7 +480,6 @@ function sameState(a: ConverterState, b: ConverterState): boolean {
     a.text === b.text &&
     a.unit === b.unit &&
     a.category === b.category &&
-    a.mode === b.mode &&
     a.calc.text === b.calc.text &&
     a.calc.fresh === b.calc.fresh
   );
@@ -582,8 +572,6 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
   switch (action.type) {
     case 'hydrate':
       return { past: [], present, future: [], run: null, chunks: [] };
-    case 'setMode':
-      return { ...history, present };
     case 'input':
       return typed(history, present, 'box', history.present.text, action.text, action.at);
     case 'calcType':

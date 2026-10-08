@@ -3,7 +3,7 @@ import { categories, compactKey, getUnit, units, unitsIn } from '../src/index';
 
 /** Data-integrity rules every unit and category must satisfy. Fails fast when a new entry is malformed. */
 describe('registry integrity', () => {
-  it('registers the eight primary categories in display order', () => {
+  it('registers the everyday categories in display order', () => {
     expect(categories.map((c) => c.id)).toEqual([
       'length',
       'mass',
@@ -13,6 +13,10 @@ describe('registry integrity', () => {
       'speed',
       'time',
       'data',
+      'energy',
+      'pressure',
+      'power',
+      'angle',
     ]);
   });
 

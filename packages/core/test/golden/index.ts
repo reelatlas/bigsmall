@@ -1,7 +1,11 @@
+import { angle } from './angle';
 import { area } from './area';
 import { data } from './data';
+import { energy } from './energy';
 import { length } from './length';
 import { mass } from './mass';
+import { power } from './power';
+import { pressure } from './pressure';
 import { speed } from './speed';
 import { temperature } from './temperature';
 import { time } from './time';
@@ -18,6 +22,10 @@ export const golden: Record<string, GoldenRow[]> = {
   speed,
   time,
   data,
+  energy,
+  pressure,
+  power,
+  angle,
 };
 
 export type { GoldenRow } from './types';

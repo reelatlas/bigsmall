@@ -1,3 +1,4 @@
+import { categories } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
 import { box, menu, ready, themeToggle } from './support';
 
@@ -88,10 +89,10 @@ test('the arrows move between the header, the toolbar, and the box, round from e
   await expect(menu(page)).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(box(page)).toBeFocused();
-  // Down through the start's two rows of categories, then on round to the header.
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('ArrowDown');
+  // Down into the start's categories, four across, through each row, then on round to the header.
+  for (let row = 0; row <= Math.ceil(categories.length / 4); row += 1) {
+    await page.keyboard.press('ArrowDown');
+  }
   await expect(shortcuts(page)).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(menu(page)).toBeFocused();

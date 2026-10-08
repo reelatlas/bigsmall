@@ -1,8 +1,12 @@
 import type { Category, CategoryId, Unit } from '../types';
+import { angle, angleUnits } from './angle';
 import { area, areaUnits } from './area';
 import { data, dataUnits } from './data';
+import { energy, energyUnits } from './energy';
 import { length, lengthUnits } from './length';
 import { mass, massUnits } from './mass';
+import { power, powerUnits } from './power';
+import { pressure, pressureUnits } from './pressure';
 import { speed, speedUnits } from './speed';
 import { temperature, temperatureUnits } from './temperature';
 import { time, timeUnits } from './time';
@@ -18,6 +22,10 @@ export const categories: readonly Category[] = [
   speed,
   time,
   data,
+  energy,
+  pressure,
+  power,
+  angle,
 ];
 
 /** Every unit the engine knows. Order within a category is display order (most common first). */
@@ -30,6 +38,10 @@ export const units: readonly Unit[] = [
   ...speedUnits,
   ...timeUnits,
   ...dataUnits,
+  ...energyUnits,
+  ...pressureUnits,
+  ...powerUnits,
+  ...angleUnits,
 ];
 
 const unitById: ReadonlyMap<string, Unit> = new Map(units.map((u) => [u.id, u]));

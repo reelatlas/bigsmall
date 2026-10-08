@@ -594,3 +594,8 @@ Format:
 
 **What happened.** Keys typed into the converter's box before its island loaded went into the server's plain field and were then lost. Preact's hydration leaves the field's value alone, but the island's state starts empty, so the first render after it (the URL's restore, or any key) set the field back to that empty text.
 **Rule.** An island whose field may hold text before it loads reads the field in a layout effect at hydration and adopts it into its state, before anything renders again. Keys typed with nothing focused can be kept the same way: an inline script moves focus into the field on the first one, so the field receives the key.
+
+## 2026-10-08 — A symbol made only of a mark folds to nothing
+
+**What happened.** The angle's degree has the symbol `°`. Search folded every degree sign away, so `°F` would match `F`, which left the degree's symbol an empty key: the registry test refused it, and `45°` could not find the degree.
+**Rule.** A fold that drops a mark drops it only where it belongs to something else: the degree sign before a letter (`°F`, `° C`), kept alone. Highlighting folds one character at a time, so a rule that looks at a neighbor is mirrored there (`degreeBeforeLetter`), or the marked letters drift. Before adding a symbol that is all punctuation (`′`, `″`), check what `compactKey` makes of it.

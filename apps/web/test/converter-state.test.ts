@@ -72,14 +72,13 @@ describe('reduce', () => {
     expect(s).toMatchObject({ text: '250', unit: null, category: 'volume' });
   });
 
-  it('clear resets everything but the mode and the calculator’s entry', () => {
+  it('clear resets everything but the calculator’s entry', () => {
     const s = run(
-      { type: 'setMode', mode: 'advanced' },
       { type: 'calcType', text: '42', fresh: false, at: 0 },
       { type: 'use', unit: 'milliliter', text: '5' },
       { type: 'clear' },
     );
-    expect(s).toEqual({ ...initialState, mode: 'advanced', calc: { text: '42', fresh: false } });
+    expect(s).toEqual({ ...initialState, calc: { text: '42', fresh: false } });
   });
 
   it('hydrate restores the box, and its unit names the category', () => {
@@ -101,7 +100,7 @@ describe('selectBox', () => {
 });
 
 describe('selectTable', () => {
-  const options = { ...EN, locale: 'en-US', system: 'us' as const, tier: 'basic' as const };
+  const options = { ...EN, locale: 'en-US', system: 'us' as const };
   const view = (...actions: Action[]) => selectTable(run(...actions), options);
   /** The category's units, as the table shows them once there is one. */
   const table = (...actions: Action[]) => {
@@ -204,15 +203,15 @@ describe('selectTable', () => {
   });
 
   it('puts the current category first among equal matches, hiding none, and names it', () => {
-    const anywhere = matches('250 p');
+    const anywhere = matches('250 o');
     expect(anywhere.rows[0]?.category.id).toBe('mass');
     expect(anywhere.category).toBeNull();
-    const inVolume = matches('250 p', { type: 'chooseCategory', category: 'volume' });
+    const inVolume = matches('250 o', { type: 'chooseCategory', category: 'volume' });
     expect(inVolume.rows[0]?.category.id).toBe('volume');
     expect(inVolume.rows.map((row) => row.category.id)).toContain('mass');
     // The category stays named while a unit is typed, chosen alone or with a unit in the box.
     expect(inVolume.category).toBe('volume');
-    expect(matches('250 p', ml()).category).toBe('volume');
+    expect(matches('250 o', ml()).category).toBe('volume');
   });
 
   it('offers a category whose name is typed, leading its group, counted with no units', () => {

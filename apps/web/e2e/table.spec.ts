@@ -1,3 +1,4 @@
+import { categories } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { ANNOUNCE_MS, COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
@@ -40,7 +41,7 @@ test('the start lists the categories; a number alone keeps them; Enter goes into
   await expect(page.getByRole('combobox')).toHaveCount(1);
   await expect(menu(page)).toHaveText(/^Category$/);
   await expect(box(page)).toHaveAttribute('placeholder', 'Number or unit');
-  await expect(tiles(page).getByRole('option')).toHaveCount(8);
+  await expect(tiles(page).getByRole('option')).toHaveCount(categories.length);
 
   // A number, a half-typed one, or a sum keeps the categories in view.
   for (const text of ['250', '-', '1e', '6*3']) {
@@ -134,7 +135,8 @@ test('a typed unit lists matches from every category, grouped, without values', 
 }) => {
   await page.goto('/');
   await ready(page);
-  await box(page).fill('250 p');
+  // "o" starts no category's name ("p" would start Pressure's, whose row would lead).
+  await box(page).fill('250 o');
   await expect(matches(page)).toBeVisible();
   await expect(page.locator('[data-row]')).toHaveCount(0);
   const groups = matches(page).getByRole('group');
@@ -150,18 +152,18 @@ test('a typed unit lists matches from every category, grouped, without values', 
 
   // Enter takes the best match, with the number as typed.
   await box(page).press('Enter');
-  await expect(page.getByRole('button', { name: 'Remove pounds' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove ounces' })).toBeVisible();
   await expect(box(page)).toHaveValue('250');
   await expect(page.getByRole('region', { name: 'Weight' })).toBeVisible();
 
   // Inside a category, its own matches come first; a click takes any match.
   await box(page).press('End');
-  await page.keyboard.type(' p');
+  await page.keyboard.type(' o');
   await expect(groups.first()).toHaveAccessibleName('Weight');
   await matches(page)
-    .getByRole('option', { name: /^pt pints/ })
+    .getByRole('option', { name: /^fl oz fluid ounces/ })
     .click();
-  await expect(page.getByRole('button', { name: 'Remove pints' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove fluid ounces' })).toBeVisible();
   await expect(box(page)).toHaveValue('250');
   await expect(page.getByRole('region', { name: 'Volume' })).toBeVisible();
 });
@@ -223,7 +225,7 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   await ready(page);
   await menu(page).click();
   const radios = page.getByRole('group', { name: 'Category' }).getByRole('radio');
-  await expect(radios).toHaveCount(8);
+  await expect(radios).toHaveCount(categories.length);
   await expect(page.getByRole('radio', { name: 'Volume' })).toBeFocused();
   // Open, the trigger heads the list with the word "Category"; the list's fill marks the choice.
   await expect(menu(page)).toHaveText('Category');

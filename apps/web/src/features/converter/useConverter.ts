@@ -65,10 +65,7 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
   const state = history.present;
   const [env] = useState(detectEnv);
   const box = useMemo(() => selectBox(state, env), [state, env]);
-  const table = useMemo(
-    () => selectTable(state, { ...env, tier: state.mode === 'basic' ? 'basic' : 'all' }),
-    [state, env],
-  );
+  const table = useMemo(() => selectTable(state, env), [state, env]);
 
   // Restore the conversion from the URL once, at hydration (the server renders the empty state).
   // Text typed into the box before then, in the server's field, is kept: it replaces the URL's

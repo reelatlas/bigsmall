@@ -1,4 +1,4 @@
-import { compactKey } from './normalize';
+import { compactKey, degreeBeforeLetter } from './normalize';
 
 /** A run of characters in a label, as UTF-16 offsets: `text.slice(start, end)`. */
 export interface TextSpan {
@@ -14,7 +14,8 @@ export interface TextSpan {
  * before the match joins it, so "f" marks all of "°F".
  *
  * Each character is folded on its own and remembers where it came from, which is exact because
- * normalizeKey has no rule that spans characters except whitespace, which compactKey drops.
+ * normalizeKey's only rules that span characters are whitespace, which compactKey drops, and a
+ * degree sign before a letter, which folds away here too.
  */
 export function matchSpan(text: string, query: string): TextSpan | null {
   const target = compactKey(query);
@@ -27,7 +28,7 @@ export function matchSpan(text: string, query: string): TextSpan | null {
   const ignorable = new Set<number>();
   for (let i = 0; i < text.length;) {
     const char = String.fromCodePoint(text.codePointAt(i) ?? 0);
-    const piece = compactKey(char);
+    const piece = degreeBeforeLetter(text, i) ? '' : compactKey(char);
     if (piece === '') ignorable.add(i);
     for (let k = 0; k < piece.length; k += 1) origin.push(i);
     folded += piece;

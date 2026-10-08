@@ -18,6 +18,10 @@ describe('search: idle lists', () => {
       '#speed',
       '#time',
       '#data',
+      '#energy',
+      '#pressure',
+      '#power',
+      '#angle',
     ]);
   });
 
@@ -117,6 +121,39 @@ describe('search: idle lists', () => {
       'kelvin',
     ]);
     expect(ids(search('', { category: 'length' }))[0]).toBe('millimeter');
+  });
+
+  it('orders the newer categories by the same rule: own system, the other, then neither', () => {
+    expect(ids(search('', { category: 'pressure', system: 'us', tier: 'all' }))).toEqual([
+      'inch-of-mercury',
+      'pound-per-square-inch',
+      'pascal',
+      'hectopascal',
+      'millimeter-of-mercury',
+      'kilopascal',
+      'bar',
+      'megapascal',
+      'atmosphere',
+    ]);
+    expect(ids(search('', { category: 'power', system: 'metric', tier: 'all' }))).toEqual([
+      'watt',
+      'metric-horsepower',
+      'kilowatt',
+      'megawatt',
+      'gigawatt',
+      'btu-per-hour',
+      'horsepower',
+      'ton-of-refrigeration',
+    ]);
+    // Angles have no customary system: SI and the units it accepts, then the others.
+    expect(ids(search('', { category: 'angle', system: 'us', tier: 'all' }))).toEqual([
+      'arcsecond',
+      'arcminute',
+      'degree',
+      'radian',
+      'gradian',
+      'revolution',
+    ]);
   });
 });
 
@@ -246,8 +283,10 @@ describe('search: categories and scope', () => {
   });
 
   it('ranks a preferred category first among equal matches, hiding none', () => {
-    expect(ids(search('p', { system: 'us' })).slice(0, 2)).toEqual(['pound', 'us-pint']);
-    expect(ids(search('p', { system: 'us', prefer: 'volume' })).slice(0, 2)).toEqual([
+    // Units only: "p" also starts Pressure and Power, and categories lead their class.
+    const unitIds = (response: SearchResponse) => ids(response).filter((id) => !id.startsWith('#'));
+    expect(unitIds(search('p', { system: 'us' })).slice(0, 2)).toEqual(['pound', 'us-pint']);
+    expect(unitIds(search('p', { system: 'us', prefer: 'volume' })).slice(0, 2)).toEqual([
       'us-pint',
       'pound',
     ]);
@@ -291,6 +330,16 @@ describe('resolveExact', () => {
   it('resolves colloquial aliases', () => {
     expect(resolveExact('kilo')?.id).toBe('kilogram');
     expect(resolveExact('cc')?.id).toBe('milliliter');
+    expect(resolveExact('mbar')?.id).toBe('hectopascal');
+    expect(resolveExact('food calories')?.id).toBe('kilocalorie');
+  });
+
+  it('reads a degree sign on its own as the angle, and before a letter as the scale', () => {
+    expect(resolveExact('°')?.id).toBe('degree');
+    expect(resolveExact('º')?.id).toBe('degree');
+    expect(resolveExact('°C')?.id).toBe('celsius');
+    expect(resolveExact('degrees')?.id).toBe('degree');
+    expect(suggest('45°').exact?.id).toBe('degree');
   });
 });
 

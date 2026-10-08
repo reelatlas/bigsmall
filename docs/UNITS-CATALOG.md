@@ -4,7 +4,9 @@ Draft v0.2, 2026-10-06. Taxonomy, tiers, special-logic units, and verification s
 
 ## 0. Implementation status
 
-Milestone 1 (2026-10-06): all eight primary categories ship their basic tier, 54 units, every one cited and covered by a golden test row. Base units: meter, kilogram, liter, kelvin, square meter, meter per second, second, byte. Advanced tiers arrive in milestone 3.
+Milestone 1 (2026-10-06): all eight primary categories ship their basic tier, 54 units, every one cited and covered by a golden test row. Base units: meter, kilogram, liter, kelvin, square meter, meter per second, second, byte.
+
+2026-10-08: Energy, Pressure, Power, and Angle join, 35 units with their specialist ones, every one cited and covered by a golden row (base units: joule, pascal, watt, radian). With the modes dropped, the table lists every unit, specialist ones included, and the tier only ranks matches (ADR 0016). Next: Fuel economy, then the specialist units of the first eight categories.
 
 Alias decisions so far (each one changes the ranking, and so which row Enter takes; see docs/UX-SPEC.md §4 and §5):
 
@@ -41,14 +43,14 @@ Every unit record carries `source` and `exact`. Exact factors are written as the
 
 Two tiers at two levels:
 
-- **Category tier.** Basic categories appear in the list an empty box opens and in basic-mode searches. Advanced categories appear when searched or when advanced mode is on.
-- **Unit tier.** Within any category, basic units appear first; advanced units appear under "Show all" or when searched directly.
+- **Category tier.** Every category the engine has is listed on the start and in the category menu (ADR 0016). The advanced groups below are planned for loading on demand (milestone 3); how a long list of categories is divided is decided when they arrive.
+- **Unit tier.** Every unit is listed in its category's table, basic and advanced alike, in the listed order (ADR 0011, ADR 0016). The tier ranks matches only: among equal matches, basic before advanced. An advanced unit is one someone converts for a trade, a hobby, or the news; retired units, units that depend on conditions, a second name for a unit already listed (an alias instead), and curiosities stay out.
 
 ### Group: everyday (basic categories)
 
-The eight primary categories, the ones an empty box lists, are marked ★.
+The categories that ship are marked ★: the first eight since milestone 1, and Energy, Pressure, Power, and Angle since 2026-10-08.
 
-The ★ rows ship today with exactly these basic units; the other rows, and every advanced column, are the plan for milestone 3.
+The ★ rows ship with exactly these basic units. For Energy, Pressure, Power, and Angle the advanced column is what shipped, with what was left out after "not:"; for the others it is the plan.
 
 | Category      | ★   | Basic units                                              | Advanced units (examples)                                                                                              |
 | ------------- | --- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -61,10 +63,10 @@ The ★ rows ship today with exactly these basic units; the other rows, and ever
 | Time          | ★   | ms, s, min, h, day, week, month, year                    | µs, ns, fortnight, decade, century, millennium, sidereal day/year, shake                                               |
 | Data          | ★   | bit, B, kB, MB, GB, TB                                   | KiB, MiB, GiB, TiB, PB, kbit/Mbit/Gbit, nibble                                                                         |
 | Fuel economy  |     | mpg (US), mpg (UK), L/100 km, km/L                       | mi/L, gal/100 mi                                                                                                       |
-| Energy        |     | J, kJ, cal, kcal, Wh, kWh, BTU                           | MJ, GJ, erg, eV, ft·lbf, therm, hp·h, ton of TNT                                                                       |
-| Pressure      |     | Pa, kPa, bar, psi, atm, mmHg, inHg                       | hPa/mbar, MPa, kgf/cm², ksi, torr, inH₂O                                                                               |
-| Power         |     | W, kW, MW, hp (mechanical)                               | metric hp (PS), BTU/h, ton of refrigeration, ft·lbf/s                                                                  |
-| Angle         |     | °, rad, grad                                             | arcminute, arcsecond, turn, NATO mil                                                                                   |
+| Energy        | ★   | J, kJ, cal, kcal, Wh, kWh, BTU                           | MJ, GJ, ft·lbf, therm (US), eV; not: erg, hp·h, ton of TNT                                                             |
+| Pressure      | ★   | Pa, kPa, bar, psi, atm, mmHg, inHg                       | hPa (millibar its alias), MPa; not: kgf/cm², ksi, torr, inH₂O                                                          |
+| Power         | ★   | W, kW, MW, hp (mechanical)                               | metric hp (PS), BTU/h, ton of refrigeration, GW; not: ft·lbf/s                                                         |
+| Angle         | ★   | °, rad, grad                                             | arcminute, arcsecond, revolution; not: NATO mil                                                                        |
 | Cooking       |     | (a lens over Volume and Weight, not a separate category) | ingredient-aware conversions later                                                                                     |
 
 ### Group: mechanics (advanced)
@@ -101,20 +103,24 @@ Currency (live rates), Clothing and shoe sizes (lookup tables), Sound (logarithm
 
 ## 4. Special logic
 
-| Category or unit           | Why it is special                                        | Approach                                                                            |
-| -------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Temperature                | Affine: offset plus scale                                | Add the `offset`, then multiply by the `factor`; base is kelvin                     |
-| Temperature interval       | Linear, but 1 °C step ≠ 1 °C reading                     | Separate category                                                                   |
-| Fuel economy, pace         | Reciprocal relationships (L/100 km vs km/L)              | `toBase` / `fromBase` with 1/x; "Undefined for 0"                                   |
-| Data                       | Decimal (kB = 1000 B) vs binary (KiB = 1024 B)           | Both families as distinct units; `KB` alias maps to decimal with a hint             |
-| Time: month, year          | No single definition                                     | Mean Gregorian: 1 year = 365.2425 d, 1 month = year/12; definition in the unit note |
-| Calorie                    | `cal` (thermochemical, 4.184 J) vs food Calorie (= kcal) | Two units; `Calorie`/`Cal` alias to kcal with a hint                                |
-| Horsepower                 | Mechanical (745.6999 W) vs metric PS (735.49875 W)       | Two units; `hp` → mechanical by default                                             |
-| Ton                        | Short (US), long (UK), metric                            | Three units; `ton` is ambiguous → locale default highlighted                        |
-| Gallon, pint, quart, fl oz | US vs imperial                                           | Two units each; locale default highlighted                                          |
-| Cup                        | US customary 236.588 mL, US legal 240 mL, metric 250 mL  | US customary default; others advanced                                               |
-| Typography px              | Depends on dpi                                           | Assume 96 dpi; state it                                                             |
-| Mach                       | Depends on conditions                                    | Standard sea level 340.29 m/s; state it                                             |
+| Category or unit           | Why it is special                                                                      | Approach                                                                                                                                                                                                  |
+| -------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Temperature                | Affine: offset plus scale                                                              | Add the `offset`, then multiply by the `factor`; base is kelvin                                                                                                                                           |
+| Temperature interval       | Linear, but 1 °C step ≠ 1 °C reading                                                   | Separate category                                                                                                                                                                                         |
+| Fuel economy, pace         | Reciprocal relationships (L/100 km vs km/L)                                            | `toBase` / `fromBase` with 1/x; "Undefined for 0"                                                                                                                                                         |
+| Data                       | Decimal (kB = 1000 B) vs binary (KiB = 1024 B)                                         | Both families as distinct units; `KB` alias maps to decimal with a hint                                                                                                                                   |
+| Time: month, year          | No single definition                                                                   | Mean Gregorian: 1 year = 365.2425 d, 1 month = year/12; definition in the unit note                                                                                                                       |
+| Calorie                    | `cal` (thermochemical, 4.184 J) vs food Calorie (= kcal)                               | Two units. Search folds case, so `Cal` cannot differ from `cal`: `cal` and `calories` are the small calorie; `kcal`, `food calories`, and `large calories` the kilocalorie; each note says which is which |
+| Horsepower                 | Mechanical (745.6999 W) vs metric PS (735.49875 W)                                     | Two units; `hp` and `bhp` are mechanical, `PS` and `cv` metric                                                                                                                                            |
+| Ton                        | Short (US), long (UK), metric                                                          | Three units; `ton` is ambiguous → locale default highlighted                                                                                                                                              |
+| Gallon, pint, quart, fl oz | US vs imperial                                                                         | Two units each; locale default highlighted                                                                                                                                                                |
+| Cup                        | US customary 236.588 mL, US legal 240 mL, metric 250 mL                                | US customary default; others advanced                                                                                                                                                                     |
+| Typography px              | Depends on dpi                                                                         | Assume 96 dpi; state it                                                                                                                                                                                   |
+| Mach                       | Depends on conditions                                                                  | Standard sea level 340.29 m/s; state it                                                                                                                                                                   |
+| mmHg, inHg                 | A mercury column depends on its density and on gravity                                 | Conventional: 13 595.1 kg/m³ under gₙ = 9.80665 m/s², as NIST SP 811 lists them                                                                                                                           |
+| BTU, therm                 | Several definitions (International Table, thermochemical, 59 °F; the EC and US therms) | The International Table BTU; the US therm, the unit of US gas bills                                                                                                                                       |
+| Millibar                   | The same size as the hectopascal                                                       | An alias of the hectopascal, not a second row                                                                                                                                                             |
+| Degree sign                | `°` alone is an angle; before C or F it belongs to the scale                           | Folded away only before a letter (`normalize.ts`), so `45°` finds the degree and `°F` Fahrenheit                                                                                                          |
 
 ## 5. Aliases and disambiguation
 
@@ -122,7 +128,7 @@ Each unit lists the aliases people actually type: symbols with and without case 
 
 An alias is added only when people really type it to mean that unit. It counts as an exact match, so it outranks every prefix match in other categories (`kilo` puts kilogram above kilometer, docs/UX-SPEC.md §4). An alias that makes a symbol ambiguous is deliberate (`oz` on fluid ounce), and the list then shows each unit with its category.
 
-Ambiguity watchlist (exact matches across categories or variants): `m`, `oz`, `ton`, `gal`, `pt`, `qt`, `cup`, `cal`, `hp`, `mpg`, `kB`, `lb` (mass vs force), `mi`, `min`, `s`. Nothing commits until Enter or a pick, and for these the list shows every candidate with its category, so the choice is visible before committing.
+Ambiguity watchlist (exact matches across categories or variants): `m`, `oz`, `ton`, `gal`, `pt`, `qt`, `cup`, `cal`, `hp`, `mpg`, `kB`, `lb` (mass vs force), `mi`, `min`, `s`, `degrees` (the Temperature category's word and the angle's unit), and `′` `″` (arcminute and arcsecond, which planned feet-and-inches entry may write for feet and inches). Nothing commits until Enter or a pick, and for these the list shows every candidate with its category, so the choice is visible before committing.
 
 No-match queries are the best signal for missing aliases. Log them (locally in dev, via analytics later) and review before each release.
 

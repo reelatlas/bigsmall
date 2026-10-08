@@ -88,7 +88,7 @@ function CalculatorSample() {
 
 /** The table's view of a state, from the real selector. */
 function tableOf(state: Partial<ConverterState>): TableView {
-  return selectTable({ ...initialState, ...state }, { ...ENV, tier: 'basic' });
+  return selectTable({ ...initialState, ...state }, ENV);
 }
 
 /**

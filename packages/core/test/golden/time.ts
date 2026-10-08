@@ -28,4 +28,18 @@ export const time: GoldenRow[] = [
     expected: 730.485 / 7,
     source: 'Derived: 2 × 365.2425 / 7',
   },
+  {
+    value: 1,
+    from: 'microsecond',
+    to: 'millisecond',
+    expected: 0.001,
+    source: 'BIPM SI Brochure, 9th ed. (2019), Table 7: micro = 10⁻⁶, milli = 10⁻³',
+  },
+  {
+    value: 1,
+    from: 'nanosecond',
+    to: 'second',
+    expected: 1e-9,
+    source: 'BIPM SI Brochure, 9th ed. (2019), Table 7: nano = 10⁻⁹',
+  },
 ];

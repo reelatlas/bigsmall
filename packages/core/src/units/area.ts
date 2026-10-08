@@ -128,4 +128,18 @@ export const areaUnits: readonly Unit[] = [
     exact: true,
     source: YARD_POUND,
   },
+  {
+    kind: 'linear',
+    id: 'square-yard',
+    category: 'area',
+    name: 'square yard',
+    plural: 'square yards',
+    symbol: 'yd²',
+    aliases: ['sq yd', 'sqyd', 'sq. yd.', 'yard squared', 'yards squared'],
+    system: 'imperial',
+    tier: 'advanced',
+    factor: 0.83612736,
+    exact: true,
+    source: YARD_POUND,
+  },
 ];

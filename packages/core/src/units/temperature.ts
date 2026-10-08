@@ -13,6 +13,8 @@ const KELVIN = 'BIPM SI Brochure, 9th ed. (2019), §2.3.1 (kelvin)';
 const CELSIUS = 'BIPM SI Brochure, 9th ed. (2019), §2.3.1: t/°C = T/K − 273.15';
 const FAHRENHEIT = 'NIST SP 811 (2008) Appendix B.8: T/K = (t/°F + 459.67) / 1.8';
 
+const RANKINE = 'NIST SP 811 (2008) Appendix B.8: T/K = (T/°R) / 1.8';
+
 /** Temperature scales are affine: base = (value + offset) × factor, base is kelvin. */
 export const temperatureUnits: readonly Unit[] = [
   {
@@ -79,5 +81,21 @@ export const temperatureUnits: readonly Unit[] = [
     exact: true,
     source: KELVIN,
     note: 'Absolute scale. 0 K is absolute zero; there are no degrees.',
+  },
+  {
+    kind: 'affine',
+    id: 'rankine',
+    category: 'temperature',
+    name: 'Rankine',
+    plural: 'Rankine',
+    symbol: '°R',
+    aliases: ['deg r', 'degr', 'degree r', 'degrees r', 'degree rankine', 'degrees rankine'],
+    system: 'us',
+    tier: 'advanced',
+    factor: 5 / 9,
+    offset: 0,
+    exact: true,
+    source: RANKINE,
+    note: 'Absolute zero is 0 °R, with degrees the size of Fahrenheit’s. Used in US engineering.',
   },
 ];

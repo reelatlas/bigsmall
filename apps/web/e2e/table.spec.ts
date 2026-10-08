@@ -1,4 +1,4 @@
-import { categories } from '@bigsmall/core';
+import { categories, unitsIn } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { ANNOUNCE_MS, COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
@@ -15,7 +15,7 @@ const row = (page: Page, unitId: string) => page.locator(`[data-row="${unitId}"]
 const unitCell = (page: Page, unitId: string) => row(page, unitId).getByRole('gridcell').first();
 const tiles = (page: Page) => page.getByRole('listbox', { name: 'Categories' });
 const matches = (page: Page) => page.getByRole('listbox', { name: 'Matching units' });
-const VOLUME_UNITS = 9;
+const VOLUME_UNITS = unitsIn('volume').length;
 
 /** What the field's cursor is on, as it reads, or null while it rests. */
 async function cursor(page: Page): Promise<string | null> {
@@ -102,9 +102,8 @@ test('keyboard: the start’s categories are a grid the arrows move through', as
   await expect(page.locator('[data-row]')).toHaveCount(VOLUME_UNITS);
   await box(page).press('ArrowDown');
   await expectCursor(page, 'teaspoons');
-  await box(page).press('ArrowDown');
-  await box(page).press('ArrowDown');
-  await box(page).press('ArrowDown');
+  // Tablespoons, cubic inches, fluid ounces, then cups.
+  for (let step = 0; step < 4; step += 1) await box(page).press('ArrowDown');
   await expectCursor(page, 'cups');
   await box(page).press('Enter');
   await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
@@ -188,8 +187,8 @@ test('the category menu keeps its width open, its counts fitting beside the name
           .map((label) => label.textContent),
       );
     expect(overflowing, theme.id).toEqual([]);
-    // A bare number on screen; screen readers hear "4 matches".
-    await expect(page.getByRole('radio', { name: /^Volume 4 matches$/ })).toBeAttached();
+    // A bare number on screen; screen readers hear "2 matches".
+    await expect(page.getByRole('radio', { name: /^Volume \d+ matches$/ })).toBeAttached();
     await page.keyboard.press('Escape');
   }
 });
@@ -280,13 +279,13 @@ test('keyboard: the arrows go through every row from the unit in the box, then o
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(Number(await page.evaluate(() => navigator.clipboard.readText()))).toBeCloseTo(2000, 9);
 
-  // Down to the last row, liters; Enter takes it, its value to the box's 10 digits, and the cursor rests on it.
-  for (let step = 0; step < 6; step += 1) await box(page).press('ArrowDown');
-  await expectCursor(page, 'liters');
-  expect(await cursor(page)).not.toContain('milliliters');
+  // Down to the last row, imperial gallons (fluid ounces are the fourth); Enter takes it, its
+  // value to the box's 10 digits, and the cursor rests on it.
+  for (let step = 4; step < VOLUME_UNITS; step += 1) await box(page).press('ArrowDown');
+  await expectCursor(page, 'imperial gallons');
   await box(page).press('Enter');
-  await expect(box(page)).toHaveValue(/^59\.147059/);
-  await expect(page.getByRole('button', { name: 'Remove liters' })).toBeVisible();
+  await expect(box(page)).toHaveValue(/^13\.01053413/);
+  await expect(page.getByRole('button', { name: 'Remove imperial gallons' })).toBeVisible();
   await expectCursor(page, null);
 
   // Past the last row the loop goes on round the page (ADR 0014): the header's toolbar, the

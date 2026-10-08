@@ -51,4 +51,25 @@ export const temperature: GoldenRow[] = [
   },
   { value: 273.15, from: 'kelvin', to: 'fahrenheit', expected: 32, source: SP811 },
   { value: 212, from: 'fahrenheit', to: 'kelvin', expected: 373.15, source: SP811 },
+  {
+    value: 491.67,
+    from: 'rankine',
+    to: 'celsius',
+    expected: 0,
+    source: 'NIST SP 811 (2008) Appendix B.8: T/K = (T/°R) / 1.8; 491.67 / 1.8 = 273.15',
+  },
+  {
+    value: 671.67,
+    from: 'rankine',
+    to: 'fahrenheit',
+    expected: 212,
+    source: 'Derived: t/°F = T/°R − 459.67',
+  },
+  {
+    value: 1.8,
+    from: 'rankine',
+    to: 'kelvin',
+    expected: 1,
+    source: 'NIST SP 811 (2008) Appendix B.8: T/K = (T/°R) / 1.8',
+  },
 ];

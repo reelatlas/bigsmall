@@ -1,4 +1,4 @@
-import type { GoldenRow } from './types';
+import { PUBLISHED_7_DIGITS, type GoldenRow } from './types';
 
 const YP = 'International Yard and Pound Agreement (1959)';
 const HB44 = 'NIST Handbook 44, Appendix C';
@@ -53,4 +53,76 @@ export const length: GoldenRow[] = [
     source: `${SP811}: 1 in = 25.4 mm exactly`,
   },
   { value: 3, from: 'yard', to: 'foot', expected: 9, source: `${HB44}: 1 yd = 3 ft` },
+  {
+    value: 1,
+    from: 'nautical-mile',
+    to: 'meter',
+    expected: 1852,
+    source: 'NIST SP 811 (2008) Appendix B.8: nautical mile = 1.852E+03 m (exact)',
+  },
+  {
+    value: 1,
+    from: 'mil',
+    to: 'millimeter',
+    expected: 0.0254,
+    source: 'NIST SP 811 (2008) Appendix B.8: mil = 2.54E-05 m (exact)',
+  },
+  {
+    value: 1,
+    from: 'fathom',
+    to: 'foot',
+    expected: 6,
+    source: 'NIST Handbook 44, Appendix C: 1 fathom = 6 ft',
+  },
+  {
+    value: 1,
+    from: 'furlong',
+    to: 'mile',
+    expected: 0.125,
+    source: 'NIST Handbook 44, Appendix C: 1 furlong = 660 ft = 1/8 mi',
+  },
+  {
+    value: 1,
+    from: 'astronomical-unit',
+    to: 'kilometer',
+    expected: 149597870.7,
+    source: 'BIPM SI Brochure, 9th ed. (2019), Table 8: 1 au = 149 597 870 700 m',
+  },
+  {
+    value: 1,
+    from: 'light-year',
+    to: 'meter',
+    expected: 9.46073e15,
+    source: 'NIST SP 811 (2008) Appendix B.8: light year = 9.46073E+15 m',
+    tolerance: PUBLISHED_7_DIGITS,
+  },
+  {
+    value: 1,
+    from: 'parsec',
+    to: 'meter',
+    expected: 3.085678e16,
+    source: 'NIST SP 811 (2008) Appendix B.8: parsec = 3.085678E+16 m',
+    tolerance: PUBLISHED_7_DIGITS,
+  },
+  {
+    value: 1,
+    from: 'parsec',
+    to: 'light-year',
+    expected: ((648000 / Math.PI) * 149597870700) / (299792458 * 365.25 * 86400),
+    source: 'Derived: (648 000/π) au / (c × 365.25 d)',
+  },
+  {
+    value: 1,
+    from: 'micrometer',
+    to: 'millimeter',
+    expected: 0.001,
+    source: 'BIPM SI Brochure, 9th ed. (2019), Table 7: micro = 10⁻⁶, milli = 10⁻³',
+  },
+  {
+    value: 1,
+    from: 'nanometer',
+    to: 'micrometer',
+    expected: 0.001,
+    source: 'BIPM SI Brochure, 9th ed. (2019), Table 7: nano = 10⁻⁹, micro = 10⁻⁶',
+  },
 ];

@@ -124,6 +124,48 @@ describe('search: idle lists', () => {
     expect(ids(search('', { category: 'length' }))[0]).toBe('millimeter');
   });
 
+  it('lists specialist units among the everyday ones by the same rule', () => {
+    expect(ids(search('', { category: 'length', system: 'us', tier: 'all' }))).toEqual([
+      'mil',
+      'inch',
+      'foot',
+      'yard',
+      'fathom',
+      'furlong',
+      'mile',
+      'nanometer',
+      'micrometer',
+      'millimeter',
+      'centimeter',
+      'meter',
+      'kilometer',
+      'nautical-mile',
+      'astronomical-unit',
+      'light-year',
+      'parsec',
+    ]);
+    // A UK visitor's own imperial measures first; the US ones belong to neither main system.
+    expect(ids(search('', { category: 'volume', system: 'imperial', tier: 'all' }))).toEqual([
+      'cubic-inch',
+      'imperial-fluid-ounce',
+      'imperial-pint',
+      'imperial-gallon',
+      'cubic-foot',
+      'cubic-yard',
+      'milliliter',
+      'liter',
+      'cubic-meter',
+      'us-teaspoon',
+      'us-tablespoon',
+      'us-fluid-ounce',
+      'us-cup',
+      'us-pint',
+      'us-quart',
+      'us-gallon',
+      'oil-barrel',
+    ]);
+  });
+
   it('orders the newer categories by the same rule: own system, the other, then neither', () => {
     expect(ids(search('', { category: 'pressure', system: 'us', tier: 'all' }))).toEqual([
       'inch-of-mercury',
@@ -359,6 +401,13 @@ describe('resolveExact', () => {
       'mile-per-imperial-gallon',
       'mile-per-us-gallon',
     ]);
+  });
+
+  it('leaves "ton" to the visitor’s ton, offering every one', () => {
+    expect(resolveExact('ton')).toBeNull();
+    expect(ids(search('ton', { system: 'us', tier: 'all' }))[0]).toBe('short-ton');
+    expect(ids(search('ton', { system: 'imperial', tier: 'all' }))[0]).toBe('long-ton');
+    expect(ids(search('ton', { system: 'metric', tier: 'all' }))[0]).toBe('tonne');
   });
 
   it('reads a degree sign on its own as the angle, and before a letter as the scale', () => {

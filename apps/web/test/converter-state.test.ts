@@ -145,11 +145,12 @@ describe('selectTable', () => {
   it('lists every unit of the category in the listed order, the box’s own marked', () => {
     const t = table(ml());
     expect(t.category).toBe('volume');
+    // Smallest first in the visitor's own system, the specialist cubic inch among the spoons.
     expect(t.rows.map((row) => row.id).slice(0, 4)).toEqual([
       'us-teaspoon',
       'us-tablespoon',
+      'cubic-inch',
       'us-fluid-ounce',
-      'us-cup',
     ]);
     expect(t.rows.filter((row) => row.inBox).map((row) => row.id)).toEqual(['milliliter']);
     const liter = t.rows.find((row) => row.id === 'liter')!;

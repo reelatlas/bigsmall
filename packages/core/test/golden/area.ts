@@ -83,4 +83,18 @@ export const area: GoldenRow[] = [
     source: `${SP811}: square mile = 2.589988E+06 m²`,
     tolerance: PUBLISHED_7_DIGITS,
   },
+  {
+    value: 1,
+    from: 'square-yard',
+    to: 'square-foot',
+    expected: 9,
+    source: 'Derived: 3² ft²',
+  },
+  {
+    value: 1,
+    from: 'square-yard',
+    to: 'square-meter',
+    expected: 0.83612736,
+    source: 'Derived: 0.9144² m² (1959 agreement)',
+  },
 ];

@@ -16,6 +16,13 @@ const YARD_POUND =
 const STONE =
   'UK Weights and Measures Act 1985, Schedule 1: 1 stone = 14 lb; pound per the 1959 agreement';
 
+const CARAT = 'NIST SP 811 (2008) Appendix B.8: carat, metric = 2.0E-04 kg (exact)';
+const GRAIN = 'NIST SP 811 (2008) Appendix B.8: grain = 6.479891E-05 kg (exact); 7000 gr = 1 lb';
+const TROY =
+  'NIST SP 811 (2008) Appendix B.8: ounce (troy or apothecary) = 3.110348E-02 kg; exact as 480 gr';
+const TONS =
+  'NIST SP 811 (2008) Appendix B.8: ton, short (2000 lb) = 9.071847E+02 kg; ton, long (2240 lb) = 1.016047E+03 kg; pound per the 1959 agreement';
+
 export const massUnits: readonly Unit[] = [
   {
     kind: 'linear',
@@ -117,5 +124,94 @@ export const massUnits: readonly Unit[] = [
     exact: true,
     source: STONE,
     note: '14 pounds. Used for body weight in the UK and Ireland.',
+  },
+  {
+    kind: 'linear',
+    id: 'microgram',
+    category: 'mass',
+    name: 'microgram',
+    plural: 'micrograms',
+    symbol: 'µg',
+    aliases: ['microgramme', 'microgrammes', 'mcg'],
+    system: 'si',
+    tier: 'advanced',
+    factor: 1e-9,
+    exact: true,
+    source: SI,
+  },
+  {
+    kind: 'linear',
+    id: 'carat',
+    category: 'mass',
+    name: 'carat',
+    plural: 'carats',
+    symbol: 'ct',
+    aliases: ['metric carat', 'metric carats'],
+    system: 'metric',
+    tier: 'advanced',
+    factor: 2e-4,
+    exact: true,
+    source: CARAT,
+    note: 'The metric carat, 200 mg, for gemstones. A gold karat is a purity, not a weight.',
+  },
+  {
+    kind: 'linear',
+    id: 'grain',
+    category: 'mass',
+    name: 'grain',
+    plural: 'grains',
+    symbol: 'gr',
+    aliases: [],
+    system: 'imperial',
+    tier: 'advanced',
+    factor: 6.479891e-5,
+    exact: true,
+    source: GRAIN,
+    note: 'A 7,000th of a pound. Used for bullets, arrows, and powder.',
+  },
+  {
+    kind: 'linear',
+    id: 'troy-ounce',
+    category: 'mass',
+    name: 'troy ounce',
+    plural: 'troy ounces',
+    symbol: 'oz t',
+    aliases: ['troy oz', 'oz troy'],
+    system: 'other',
+    tier: 'advanced',
+    factor: 480 * 6.479891e-5,
+    exact: true,
+    source: TROY,
+    note: '480 grains, about 31.1 g. Gold, silver, and platinum are priced in it.',
+  },
+  {
+    kind: 'linear',
+    id: 'short-ton',
+    category: 'mass',
+    name: 'short ton',
+    plural: 'short tons',
+    symbol: 'ton (US)',
+    aliases: ['US ton', 'US tons', 'ton US', 'tons US', 'sh tn'],
+    system: 'us',
+    tier: 'advanced',
+    factor: 2000 * 0.45359237,
+    exact: true,
+    source: TONS,
+    note: 'The US ton, 2,000 lb.',
+  },
+  {
+    kind: 'linear',
+    id: 'long-ton',
+    category: 'mass',
+    name: 'long ton',
+    plural: 'long tons',
+    symbol: 'ton (UK)',
+    aliases: ['UK ton', 'UK tons', 'ton UK', 'tons UK', 'imperial ton', 'long tn'],
+    system: 'uk',
+    tier: 'advanced',
+    factor: 2240 * 0.45359237,
+    exact: true,
+    source: TONS,
+    note: 'The British ton, 2,240 lb.',
   },
 ];

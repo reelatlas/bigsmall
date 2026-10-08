@@ -1,6 +1,6 @@
 import { useId, useRef, type ButtonHTMLAttributes } from 'react';
 import { useColumnsFit } from '../lib/fit-step';
-import { CARD, CURSOR_ROW, cx, NO_ANSWER, rowFill, unitSymbol } from '../lib/recipes';
+import { CURSOR_ROW, cx, LIST_CARD, NO_ANSWER, rowFill, unitSymbol } from '../lib/recipes';
 import { Button } from './Button';
 import { CopiedIcon, CopyIcon } from './icons';
 import { FormattedNumber } from './NumberText';
@@ -114,7 +114,7 @@ export function ConversionTable({
       <p id={moveHintId} className="sr-only">
         Moves this unit into the box.
       </p>
-      <div className={cx(CARD, 'p-2')}>
+      <div className={cx(LIST_CARD, 'p-2')}>
         {message ? (
           <p className="px-2 py-2.5 font-medium text-danger">{message}</p>
         ) : (

@@ -13,26 +13,26 @@ Raw values (a hex color, a pixel radius, a literal duration) never appear inside
 
 ## Semantic tokens
 
-| Token                                             | Role                                                                                                                |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `--canvas`                                        | Page background                                                                                                     |
-| `--surface`                                       | Cards, fields, panels                                                                                               |
-| `--surface-raised`                                | Hover states and anything sitting on a surface; visibly different from `--surface`                                  |
-| `--ink`                                           | Primary text                                                                                                        |
-| `--ink-muted`                                     | Secondary text, labels, hints. Still body-text contrast (4.5:1)                                                     |
-| `--accent`                                        | The one brand color: active edges, primary buttons, links                                                           |
-| `--on-accent`                                     | Text and icons placed on `--accent`                                                                                 |
-| `--accent-soft`                                   | Tinted backgrounds: selected rows, chips                                                                            |
-| `--line`                                          | Dividers and decorative borders: list headers, the toolbar rule, keycaps, cards                                     |
-| `--edge`                                          | A control's resting edge: fields, the theme menu, secondary buttons. 3:1 or more against `--canvas` and `--surface` |
-| `--focus`                                         | Focus ring. Often equals `--accent`; dark themes may pick a brighter hue                                            |
-| `--danger`, `--success`                           | Error and success text and indicators (the out-of-range message, the copy check)                                    |
-| `--art-1`, `--art-2`, `--art-3`                   | The theme art's colors (`ThemeArt`). Decoration only, so they have no contrast pair                                 |
-| `--type-display`, `--type-body`, `--type-numeric` | Font stacks for headings, running text, and numbers                                                                 |
-| `--shape-sm`, `--shape-md`, `--shape-lg`          | Border radii                                                                                                        |
-| `--elevation-sm`, `--elevation-md`                | Shadows (or glows, in neo-noir)                                                                                     |
-| `--motion-fast`, `--motion-base`, `--motion-slow` | Durations. Zeroed under `prefers-reduced-motion` (see "Motion")                                                     |
-| `--motion-ease`                                   | The theme's easing curve                                                                                            |
+| Token                                             | Role                                                                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--canvas`                                        | Page background                                                                                                                                   |
+| `--surface`                                       | Cards, fields, panels                                                                                                                             |
+| `--surface-raised`                                | Hover states and anything sitting on a surface; visibly different from `--surface`                                                                |
+| `--ink`                                           | Primary text                                                                                                                                      |
+| `--ink-muted`                                     | Secondary text, labels, hints. Still body-text contrast (4.5:1)                                                                                   |
+| `--accent`                                        | The one brand color: active edges, primary buttons, links                                                                                         |
+| `--on-accent`                                     | Text and icons placed on `--accent`                                                                                                               |
+| `--accent-soft`                                   | Tinted backgrounds: selected rows, chips                                                                                                          |
+| `--line`                                          | Dividers and decorative borders: list headers, the toolbar rule, keycaps, cards                                                                   |
+| `--edge`                                          | A control's resting edge: fields, the theme menu, secondary buttons, and at 1 px the table's card. 3:1 or more against `--canvas` and `--surface` |
+| `--focus`                                         | Focus ring. Often equals `--accent`; dark themes may pick a brighter hue                                                                          |
+| `--danger`, `--success`                           | Error and success text and indicators (the out-of-range message, the copy check)                                                                  |
+| `--art-1`, `--art-2`, `--art-3`                   | The theme art's colors (`ThemeArt`). Decoration only, so they have no contrast pair                                                               |
+| `--type-display`, `--type-body`, `--type-numeric` | Font stacks for headings, running text, and numbers                                                                                               |
+| `--shape-sm`, `--shape-md`, `--shape-lg`          | Border radii                                                                                                                                      |
+| `--elevation-sm`, `--elevation-md`                | Shadows (or glows, in neo-noir)                                                                                                                   |
+| `--motion-fast`, `--motion-base`, `--motion-slow` | Durations. Zeroed under `prefers-reduced-motion` (see "Motion")                                                                                   |
+| `--motion-ease`                                   | The theme's easing curve                                                                                                                          |
 
 The full list is the single source of truth in `apps/web/src/lib/themes.ts` (`TOKEN_CONTRACT`), with the contrast pairs every theme must pass (`CONTRAST_PAIRS`).
 
@@ -101,7 +101,7 @@ Prefer native elements when they are good enough (`<button>`, radios, `<dialog>`
 
 ### Recipes
 
-A class list more than one file builds from is a recipe in `src/lib/recipes.ts`, written once so a shared shape cannot drift between Astro and TSX: the card (`CARD`), a panel's title (`PANEL_TITLE`), the fluid shells (`SHELL`, `SHELL_BORDERED`, `SHELL_GHOST`, `SHELL_PANEL`), the menus inside them (`MENU_TRIGGER`, `MENU_CHEVRON`, `MENU_OPTION`, shared by the theme menu and the category menu), a unit's symbol wherever it shows (`unitSymbol()`), the short message for a value with no answer (`NO_ANSWER`), the field row (`FIELD_ROW`), the rows a field's cursor moves through (`CURSOR_ROW`, and `rowFill()` for their fill), the type ladders (`NUMBER_SIZES`, `WORDMARK_SIZES`), and the wordmark's face and lines (`WORDMARK_FACE`, `PLAYING_LINE`, `ART_LINE`).
+A class list more than one file builds from is a recipe in `src/lib/recipes.ts`, written once so a shared shape cannot drift between Astro and TSX: the cards (`CARD`, and `LIST_CARD` for the table's place), a panel's title (`PANEL_TITLE`), the fluid shells (`SHELL`, `SHELL_BORDERED`, `SHELL_GHOST`, `SHELL_PANEL`), the menus inside them (`MENU_TRIGGER`, `MENU_CHEVRON`, `MENU_OPTION`, shared by the theme menu and the category menu), a unit's symbol wherever it shows (`unitSymbol()`), the short message for a value with no answer (`NO_ANSWER`), the field row (`FIELD_ROW`), the rows a field's cursor moves through (`CURSOR_ROW`, and `rowFill()` for their fill), the type ladders (`NUMBER_SIZES`, `WORDMARK_SIZES`), and the wordmark's face and lines (`WORDMARK_FACE`, `PLAYING_LINE`, `ART_LINE`).
 
 - A recipe whose look depends on a state is a small function returning class lists (`rowFill(selected, current)`, `unitSymbol(alone)`), so the states can never both apply and fight over one property.
 
@@ -113,7 +113,7 @@ A class list more than one file builds from is a recipe in `src/lib/recipes.ts`,
 ### Edges and borders
 
 - **2 px is a control's edge.** Fields, the theme menu, and secondary buttons share `border-2` in `--edge`, so no control looks lighter-edged than its neighbor. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights once ate into it.
-- **1 px is a divider or a keycap.** The line under a menu's trigger, between the matches' groups, the toolbar divider (`border-l`), and keycaps use `border`.
+- **1 px is a divider or a keycap.** The line under a menu's trigger, between the matches' groups, the toolbar divider (`border-l`), and keycaps use `border`. A card is 1 px too, in `--line`; the table's place (`LIST_CARD`) takes `--edge` instead, firmer, since it is the box's popup and holds the rows people pick (a trial, Sean, 2026-10-08).
 - **Open is accent.** A shell's edge is `border-edge` at rest and `border-accent` while open or while something inside has focus. The calculator's card does the same while focus is inside it: its 1 px border and a 1 px ring turn accent, 2 px like a focused box, so nothing moves.
 - **A control's edge identifies it.** `--edge` passes 3:1 against the page and the surface in every theme, so a field's resting edge meets WCAG 1.4.11 by itself, and the theme test enforces it. `--line` stays subtle because a divider only groups. Each theme's `--edge` is its `--line` moved toward `--ink` to the first step past 3:1. Introduced 2026-10-06 as a trial the owner may roll back (findings-0, sixth pass).
 
@@ -180,7 +180,7 @@ The converter's box is `ValueField`, placed by `TableLayout`: it takes a shell's
 
 - Rows sit in a `p-2` gutter, each `rounded-nested px-2`, so a highlight sits inside the edge with the same 8 px as the chip and the row text starts 16 px in, under the value.
 - **Matched letters** are set heavier and nothing else changes: names `font-semibold`, category names `font-bold`, a symbol's matched part `text-ink`. The span comes from core's `matchSpan`.
-- **The cursor's lists** (the table's units, the matches, and the start's tiles): cards with the same `p-2` gutter, each row `CURSOR_ROW` (`min-h-11 cursor-pointer rounded-nested px-2`). Their fill comes from `rowFill()`: the unit in the box in `bg-accent-soft`, the chip's color; the row the cursor is on, or the pointer is over, in `bg-surface-raised`, the muted tint of a hovered row, never an outline. The accent fill marks the selection, so the cursor takes the quieter tint. No transition, so keyboard movement never lags.
+- **The cursor's lists** (the table's units, the matches, and the start's tiles): cards (`LIST_CARD`) with the same `p-2` gutter, each row `CURSOR_ROW` (`min-h-11 cursor-pointer rounded-nested px-2`). Their fill comes from `rowFill()`: the unit in the box in `bg-accent-soft`, the chip's color; the row the cursor is on, or the pointer is over, in `bg-surface-raised`, the muted tint of a hovered row, never an outline. The accent fill marks the selection, so the cursor takes the quieter tint. No transition, so keyboard movement never lags.
 - **No value yet** is an em dash (`NO_VALUE` in the converter's state) in `text-ink-muted`, read as "no value" by screen readers, with an empty 44 px place where the copy button would be, so the columns never shift.
 - **Matches** read "symbol name", both left-aligned (`grid-cols-[auto_minmax(0,1fr)] gap-x-3`), the symbol in `unitSymbol()`, matched letters heavier through `MatchedText`. Each category's group has a header, `text-xs font-medium text-ink-muted` with the name in ink and the count beside it, and a `border-line` divider over every group after the first.
 

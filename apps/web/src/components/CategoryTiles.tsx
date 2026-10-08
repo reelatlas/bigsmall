@@ -1,5 +1,5 @@
 import type { Category } from '@bigsmall/core';
-import { CARD, CURSOR_ROW, cx, rowFill } from '../lib/recipes';
+import { CURSOR_ROW, cx, LIST_CARD, rowFill } from '../lib/recipes';
 
 export interface CategoryTilesProps {
   /** The listbox's id, which the field's combobox controls. */
@@ -26,7 +26,7 @@ export function CategoryTiles({ id, categories, cursor, itemId, onPick }: Catego
       id={id}
       role="listbox"
       aria-label="Categories"
-      className={cx(CARD, 'grid grid-cols-2 gap-1 p-2 @lg:grid-cols-4')}
+      className={cx(LIST_CARD, 'grid grid-cols-2 gap-1 p-2 @lg:grid-cols-4')}
     >
       {categories.map((category, index) => (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field

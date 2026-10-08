@@ -1,6 +1,6 @@
 import type { Category, CategoryId, Unit } from '@bigsmall/core';
 import { useId } from 'react';
-import { CARD, CURSOR_ROW, cx, rowFill, unitSymbol } from '../lib/recipes';
+import { CURSOR_ROW, cx, LIST_CARD, rowFill, unitSymbol } from '../lib/recipes';
 import { MatchedText } from './MatchedText';
 
 /** A match as the list shows it: a unit, or a category whose name matched, to open. */
@@ -55,7 +55,7 @@ export function UnitMatches({
   });
 
   return (
-    <div className={cx(CARD, 'p-2')}>
+    <div className={cx(LIST_CARD, 'p-2')}>
       {matches.length === 0 ? (
         <p className="px-2 py-2.5 text-sm text-ink-muted">{notFound}</p>
       ) : (

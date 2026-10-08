@@ -20,6 +20,13 @@ export function cx(...parts: ReadonlyArray<string | false | null | undefined>): 
 export const CARD = 'rounded-lg border border-line bg-surface';
 
 /**
+ * The card of the table's place (the start's tiles, the category's units, the matches), the list
+ * the box's cursor moves through: 1 px like any card, in a control's edge color, since it is the
+ * box's popup (ADR 0012). Introduced 2026-10-08 as a trial (Sean).
+ */
+export const LIST_CARD = 'rounded-lg border border-edge bg-surface';
+
+/**
  * A panel's title, naming its group as a label names what it labels: the calculator's and the
  * shortcuts map's, muted so the panel's content leads.
  */

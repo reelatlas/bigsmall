@@ -19,12 +19,6 @@ export function cx(...parts: ReadonlyArray<string | false | null | undefined>): 
 /** A card: one raised area of related controls (the calculator, the wordmark lab's panels). */
 export const CARD = 'rounded-lg border border-line bg-surface';
 
-/**
- * Where the calculator opens: 16 px under what it follows, at most 384 px wide
- * (docs/DESIGN-SYSTEM.md, "Calculator"). TableLayout adds its column from md.
- */
-export const CALCULATOR_PLACE = 'mt-4 max-w-sm';
-
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,
 // and `data-open` while open; the shell takes SHELL, one of the two resting styles, and its own

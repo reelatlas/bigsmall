@@ -17,7 +17,6 @@ import { ConversionTable, type ConversionTableProps } from '../../components/Con
 import { UnitMatches } from '../../components/UnitMatches';
 import { ValueField } from '../../components/ValueField';
 import { stepPlane } from '../../lib/planes';
-import { CALCULATOR_PLACE, cx } from '../../lib/recipes';
 import { evaluatedText } from './calculator';
 import { noMatchMessage, type BoxView, type HistoryAction, type TableView } from './state';
 import type { ConverterEnv } from './useConverter';
@@ -51,13 +50,14 @@ const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
 /** 16 px under the box or the calculator; a container, so the categories go four across once it has the room. */
 const TABLE_ROWS_CELL = '@container mt-4 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';
 /**
- * The calculator's column from md: a subgrid of the first three rows, and the card in it one too
- * (`*:`), its three parts in the three rows. The card's top padding shrinks to 1 px there, so its
- * title row, 44 px and its 8 px margin, sits as high as the toolbar's icons and never makes the
- * first row taller.
+ * Where the calculator opens (docs/DESIGN-SYSTEM.md, "Calculator"): 16 px under the box, at most
+ * 384 px wide. From md, a column of its own: a subgrid of the first three rows, and the card in it
+ * one too (`*:`), its three parts in the three rows. The card's top padding shrinks to 1 px there,
+ * so its title row, 44 px and its 8 px margin, sits as high as the toolbar's icons and never makes
+ * the first row taller.
  */
 const TABLE_CALCULATOR_CELL =
-  'md:col-start-2 md:row-span-3 md:row-start-1 md:mt-0 md:grid md:w-72 md:grid-rows-subgrid md:*:row-span-3 md:*:grid md:*:grid-rows-subgrid md:*:pt-px';
+  'mt-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-1 md:mt-0 md:grid md:w-72 md:grid-rows-subgrid md:*:row-span-3 md:*:grid md:*:grid-rows-subgrid md:*:pt-px';
 
 /**
  * Keys that start typing in the field when nothing on the page has focus: a letter, a digit, or
@@ -517,7 +517,7 @@ export function TableLayout({
           />
         </div>
         {calculator && (
-          <div id={calculatorId} className={cx(CALCULATOR_PLACE, TABLE_CALCULATOR_CELL)}>
+          <div id={calculatorId} className={TABLE_CALCULATOR_CELL}>
             {calculator}
           </div>
         )}

@@ -409,27 +409,44 @@ test('a row reads the value on the left, then symbol and name on the right, each
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
+  // Where each row's text actually ends or starts, not its cell, which the column sizes alike.
+  const columns = () =>
+    page.locator('[data-row] > [role="gridcell"]:first-child').evaluateAll((units) => {
+      const text = (element: Element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        return range.getBoundingClientRect();
+      };
+      return units.map((unit) => ({
+        valueRight: text(unit.firstElementChild!).right,
+        symbolRight: text(unit.querySelector('[data-symbol]')!).right,
+        nameLeft: text(unit.querySelector('[data-name]')!).left,
+      }));
+    });
+  const lineUp = async () => {
+    const cells = await columns();
+    const same = (pick: (cell: (typeof cells)[number]) => number) =>
+      new Set(cells.map((cell) => Math.round(pick(cell)))).size;
+    expect(same((cell) => cell.valueRight)).toBe(1);
+    expect(same((cell) => cell.symbolRight)).toBe(1);
+    expect(same((cell) => cell.nameLeft)).toBe(1);
+    return cells;
+  };
+
   await page.goto('/?a=milliliter&v=250');
   await ready(page);
   await expect(unitCell(page, 'liter')).toHaveAccessibleName(/^0\.25 L liters/);
-  const cells = await page
-    .locator('[data-row] > [role="gridcell"]:first-child')
-    .evaluateAll((units) =>
-      units.map((unit) => {
-        const [value, symbol, name] = [...unit.children].map((cell) =>
-          cell.getBoundingClientRect(),
-        );
-        return { valueRight: value!.right, symbolRight: symbol!.right, nameLeft: name!.left };
-      }),
-    );
-  const same = (pick: (cell: (typeof cells)[number]) => number) =>
-    new Set(cells.map((cell) => Math.round(pick(cell)))).size;
-  expect(same((cell) => cell.valueRight)).toBe(1);
-  expect(same((cell) => cell.symbolRight)).toBe(1);
-  expect(same((cell) => cell.nameLeft)).toBe(1);
+  const cells = await lineUp();
   // The names sit on the right: past the middle of the row on a wide table.
   const card = (await page.getByRole('region', { name: 'Volume' }).boundingBox())!;
   expect(cells[0]!.nameLeft).toBeGreaterThan(card.x + card.width / 2);
+
+  // Symbols line up on their last letter, an exponent hanging after it: "ha" ends where the "m"
+  // of "m²" does. Screen readers hear the symbol whole.
+  await page.goto('/?a=square-kilometer&v=1');
+  await ready(page);
+  await lineUp();
+  await expect(unitCell(page, 'square-kilometer')).toHaveAccessibleName(/^1 km² square kilometer/);
 });
 
 test('a row moves into the box with its value; undo takes it back', async ({ page }) => {

@@ -96,7 +96,8 @@ function tableOf(state: Partial<ConverterState>): TableView {
  * after a category is chosen; the start's categories, the cursor on one; 250 mL in every unit of
  * volume, milliliters marked as the unit in the box, the cursor on cups and one copy confirmed;
  * Area chosen with no unit, each value a dash, the symbols lined up on their last letter with
- * their exponents hanging after it; a value with no answer; and the matches for
+ * their exponents hanging after it; a million square kilometers in a phone's width, the names
+ * given way in every row and the exponent markers bold; a value with no answer; and the matches for
  * "250 p" from every category. The tables' titles are for screen readers; on the page the
  * category menu over the box names them.
  */
@@ -107,6 +108,7 @@ function TableSamples() {
   const start = tableOf({});
   const values = tableOf({ text: '250', unit: 'milliliter', category: 'volume' });
   const dashes = tableOf({ category: 'area' });
+  const narrow = tableOf({ text: '1000000', unit: 'square-kilometer', category: 'area' });
   const matches = tableOf({ text: '250 p' });
   const cups = values.kind === 'units' ? values.rows.findIndex((row) => row.id === 'us-cup') : -1;
   return (
@@ -149,6 +151,21 @@ function TableSamples() {
           onPick={noop}
           onCopy={noop}
         />
+      )}
+      {narrow.kind === 'units' && (
+        <div className="max-w-80">
+          <ConversionTable
+            id={`${id}-narrow`}
+            title="Area, on a phone"
+            rows={narrow.rows}
+            message={null}
+            cursor={-1}
+            itemId={itemIds('narrow')}
+            copied={null}
+            onPick={noop}
+            onCopy={noop}
+          />
+        </div>
       )}
       <ConversionTable
         id={`${id}-message`}

@@ -33,16 +33,18 @@ import type { ConverterEnv } from './useConverter';
 const TABLE_GRID =
   'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_auto_1fr] md:gap-x-4';
 /**
- * The toolbar row, as wide as the box: the tools at its left, the category menu at its right end,
- * its right edge on the box's. Where the row has no room for both, the menu wraps onto a line of
- * its own, flush left (justify-between puts a line's one item at its start), with no breakpoint:
- * the browser's own fit decides, in every theme.
+ * The toolbar row, as wide as the box: the category menu at its left, its edge on the box's, and
+ * the tools at its right end. Where the row has no room for both, the tools keep the line and the
+ * menu wraps under them, both flush left, with no breakpoint: the menu comes first in the markup,
+ * `flex-wrap-reverse` stacks a wrapped row's first line at the bottom, and justify-between puts a
+ * line's one item at its start. The browser's own fit decides, in every theme.
  */
 const TABLE_TOOLS_ROW =
-  'mb-2 flex max-w-xl flex-wrap items-center justify-between gap-x-4 gap-y-2 md:col-start-1 md:row-start-1';
+  'mb-2 flex max-w-xl flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2 md:col-start-1 md:row-start-1';
 /**
- * The tools: the first button's edge on the box's, so a filled one (switched on, hovered) lines up
- * with the box and the table, its glyph inside the column as their text is.
+ * The tools: their outer edges on the box's (the last button's at the row's right end, the first's
+ * when they wrap, flush left), so a filled one (switched on, hovered) lines up with the box and the
+ * table, its glyph inside the column as their text is.
  */
 const TABLE_TOOLS = 'flex shrink-0 items-center gap-1';
 const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
@@ -77,7 +79,7 @@ function viewKeyOf(view: TableView): string {
 }
 
 export interface TableLayoutProps {
-  /** The toolbar's buttons (the calculator, undo, redo, clear all), at the left of its row. */
+  /** The toolbar's buttons (the calculator, undo, redo, clear all), at the right end of its row. */
   tools: ReactNode;
   /** The field's input, which the host also focuses (clear all puts the caret back in it). */
   inputRef: RefObject<HTMLInputElement>;
@@ -100,13 +102,14 @@ export interface TableLayoutProps {
 }
 
 /**
- * The box and what it lists (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §8, §9): the toolbar row
- * with the category menu at its end, the field, and in the table's place the categories to start from, the category's units
- * with their values, or the units a typed query matches. The table is the unit list: the caret
- * stays in the field while a cursor the field points at (aria-activedescendant) moves through
- * whatever the table's place shows, the arrows going round from the menu through the field and
- * every row and back. Typing anywhere in the layout, or with nothing focused on the page, lands
- * in the field; Escape steps back one thing at a time, from browsing the table to an empty page.
+ * The box and what it lists (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §8, §9): the toolbar row,
+ * led by the category menu, the field, and in the table's place the categories to start from,
+ * the category's units with their values, or the units a typed query matches. The table is the
+ * unit list: the caret stays in the field while a cursor the field points at
+ * (aria-activedescendant) moves through whatever the table's place shows, the arrows going round
+ * from the menu through the field and every row and back. Typing anywhere in the layout, or with
+ * nothing focused on the page, lands in the field; Escape steps back one thing at a time, from
+ * browsing the table to an empty page.
  */
 export function TableLayout({
   tools,
@@ -471,7 +474,6 @@ export function TableLayout({
           data-plane="tools"
           data-default-tool="category"
         >
-          <div className={TABLE_TOOLS}>{tools}</div>
           <CategoryMenu
             categories={table.categories}
             value={chosen}
@@ -482,6 +484,7 @@ export function TableLayout({
               inputRef.current?.focus();
             }}
           />
+          <div className={TABLE_TOOLS}>{tools}</div>
         </div>
         <div ref={fieldRef} className={TABLE_BOX_CELL} data-plane="box">
           <ValueField

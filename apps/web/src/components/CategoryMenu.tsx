@@ -46,7 +46,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   const trigger = useRef<HTMLButtonElement>(null);
   const chosenName = categories.find((category) => category.id === value)?.name;
   /** Which edge the open menu keeps, so it grows toward the side of the page with the room. */
-  const [side, setSide] = useState<'left' | 'right'>('right');
+  const [side, setSide] = useState<'left' | 'right'>('left');
 
   const choose = (id: CategoryId) => {
     setOpen(false);

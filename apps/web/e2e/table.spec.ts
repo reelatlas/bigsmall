@@ -647,7 +647,7 @@ test('at 320 px the rows and the categories fit without scrolling sideways', asy
   expect(await overflow()).toBe(0);
 });
 
-test('the hint has a line of its own; the toolbar under it ends in the category menu, or wraps it on a phone', async ({
+test('the hint has a line of its own; the toolbar under it starts with the category menu, which wraps under the tools on a phone', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -656,30 +656,32 @@ test('the hint has a line of its own; the toolbar under it ends in the category 
   const words = 'Type a number, unit, or both to compare all at once.';
   const geometry = async () => ({
     hint: (await page.getByText(words).boundingBox())!,
-    undo: (await page.getByRole('button', { name: 'Undo' }).boundingBox())!,
+    toolbar: (await page.getByRole('toolbar', { name: 'Tools' }).boundingBox())!,
+    first: (await page.getByRole('button', { name: 'Calculator', exact: true }).boundingBox())!,
+    last: (await page.getByRole('button', { name: 'Clear all' }).boundingBox())!,
     menu: (await menu(page).boundingBox())!,
     field: (await box(page).boundingBox())!,
     start: (await tiles(page).boundingBox())!,
   });
-  // Wide: the menu at the toolbar's right end, its edge on the column's, over the box; the first
-  // button's edge on the column's too, so a fill lines up with the table.
-  const wide = await geometry();
-  const calculatorButton = (await page
-    .getByRole('button', { name: 'Calculator', exact: true })
-    .boundingBox())!;
-  expect(Math.abs(calculatorButton.x - wide.start.x)).toBeLessThanOrEqual(1);
-  expect(wide.hint.y + wide.hint.height).toBeLessThanOrEqual(wide.undo.y);
   const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
-  expect(Math.abs(middle(wide.menu) - middle(wide.undo))).toBeLessThan(4);
+  // Wide: the menu at the toolbar's left, its edge on the column's, over the box; the tools at the
+  // right end, the last button's edge on the column's too, so a fill lines up with the table.
+  const wide = await geometry();
+  expect(wide.hint.y + wide.hint.height).toBeLessThanOrEqual(wide.toolbar.y);
+  expect(Math.abs(middle(wide.menu) - middle(wide.last))).toBeLessThan(4);
+  expect(wide.menu.x + wide.menu.width).toBeLessThan(wide.first.x);
+  expect(Math.abs(wide.menu.x - wide.start.x)).toBeLessThanOrEqual(3);
   expect(
-    Math.abs(wide.menu.x + wide.menu.width - (wide.start.x + wide.start.width)),
-  ).toBeLessThanOrEqual(3);
+    Math.abs(wide.last.x + wide.last.width - (wide.start.x + wide.start.width)),
+  ).toBeLessThanOrEqual(1);
   expect(wide.menu.y + wide.menu.height).toBeLessThanOrEqual(wide.field.y);
 
-  // A phone has no room for both: the menu takes the next line, flush left, still over the box.
+  // A phone has no room for both: the tools keep the line, the first button's edge on the
+  // column's, and the menu takes the next, flush left too, still over the box.
   await page.setViewportSize({ width: 375, height: 800 });
   const narrow = await geometry();
-  expect(narrow.menu.y).toBeGreaterThanOrEqual(narrow.undo.y + narrow.undo.height);
+  expect(Math.abs(narrow.first.x - narrow.start.x)).toBeLessThanOrEqual(1);
+  expect(narrow.menu.y).toBeGreaterThanOrEqual(narrow.last.y + narrow.last.height);
   expect(Math.abs(narrow.menu.x - narrow.start.x)).toBeLessThanOrEqual(3);
   expect(narrow.menu.y + narrow.menu.height).toBeLessThanOrEqual(narrow.field.y);
   await expect(box(page)).toHaveAccessibleDescription(words);

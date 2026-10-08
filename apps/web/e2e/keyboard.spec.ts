@@ -32,11 +32,11 @@ test('each toolbar is one Tab stop, which keeps the control last used', async ({
   await page.keyboard.press('ArrowLeft');
   await expect(tool(page, 'Clear all')).toBeFocused();
   await page.keyboard.press('Home');
-  await expect(tool(page, 'Calculator')).toBeFocused();
-  await page.keyboard.press('End');
   await expect(menu(page)).toBeFocused();
-  await page.keyboard.press('Home');
-  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('End');
+  await expect(tool(page, 'Clear all')).toBeFocused();
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
   await expect(tool(page, 'Undo')).toBeFocused();
 
   // Leaving and coming back by Tab lands on the control last used.

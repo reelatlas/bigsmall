@@ -557,3 +557,8 @@ Format:
 
 **What happened.** Escape with nothing focused was made to clear the converter's box. The header's shortcuts map can be open with nothing focused (a resting mouse opens it), and its Escape closes it from a document listener in the inline script, which ran first but left the event alone, so one Escape would also have cleared the box behind the map.
 **Rule.** A listener that acts on a key from anywhere checks `event.defaultPrevented` first, and every handler that consumes the key, the inline script's included, calls `preventDefault()`, so one press does one thing. Document listeners run in the order they were added: the inline script's before any island's.
+
+## 2026-10-07 — A control that reads a stand-in for its value is right only some of the time
+
+**What happened.** The category menu took its value from the table's view, and the matches' view carried no category, so while a unit was typed the menu fell back on the box's unit. With a unit in the box that named the same category; with a category chosen and no unit, the menu read "Choose a category" while the table still ranked that category's matches first. The second tidy pass found it by trying both states.
+**Rule.** Every view a control reads carries the state the control names (the units and the matches both carry the category the converter is in; the start, by definition, has none), so no consumer rebuilds it from a stand-in that agrees only some of the time. A control's test covers each state that reaches it: here, with and without a unit in the box.

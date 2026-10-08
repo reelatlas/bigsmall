@@ -203,11 +203,16 @@ describe('selectTable', () => {
     expect(m.announcement).toBe(`${m.rows.length} matches`);
   });
 
-  it('puts the current category first among equal matches, hiding none', () => {
-    expect(matches('250 p').rows[0]?.category.id).toBe('mass');
+  it('puts the current category first among equal matches, hiding none, and names it', () => {
+    const anywhere = matches('250 p');
+    expect(anywhere.rows[0]?.category.id).toBe('mass');
+    expect(anywhere.category).toBeNull();
     const inVolume = matches('250 p', { type: 'chooseCategory', category: 'volume' });
     expect(inVolume.rows[0]?.category.id).toBe('volume');
     expect(inVolume.rows.map((row) => row.category.id)).toContain('mass');
+    // The category stays named while a unit is typed, chosen alone or with a unit in the box.
+    expect(inVolume.category).toBe('volume');
+    expect(matches('250 p', ml()).category).toBe('volume');
   });
 
   it('offers a category whose name is typed, leading its group, counted with no units', () => {

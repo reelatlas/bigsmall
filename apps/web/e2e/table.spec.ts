@@ -167,7 +167,7 @@ test('a typed unit lists matches from every category, grouped, without values', 
   await expect(page.getByRole('region', { name: 'Volume' })).toBeVisible();
 });
 
-test('a typed category name opens the category, its units with no unit chosen', async ({
+test('a typed category name opens the category with no unit chosen, and the menu keeps naming it', async ({
   page,
 }) => {
   await page.goto('/');
@@ -179,6 +179,14 @@ test('a typed category name opens the category, its units with no unit chosen', 
   await expect(box(page)).toHaveValue('5');
   await expect(menu(page)).toHaveText(/Category\s*Length/);
   await expect(row(page, 'inch')).toContainText('—');
+
+  // Typing a unit then lists the matches, and the menu still names the category, its choice checked.
+  await box(page).press('End');
+  await page.keyboard.type(' f');
+  await expect(matches(page)).toBeVisible();
+  await expect(menu(page)).toHaveText(/Category\s*Length/);
+  await menu(page).click();
+  await expect(page.getByRole('radio', { name: /^Length/ })).toBeChecked();
 });
 
 test('the category menu: the arrows move without choosing, Enter chooses, Escape closes', async ({

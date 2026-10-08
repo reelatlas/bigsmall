@@ -125,7 +125,7 @@ export function TableLayout({
   const at = position === null ? rest : Math.min(position, rowCount - 1);
   /** The arrows have moved the cursor into the table's place: Escape first brings it back. */
   const browsing = position !== null && at >= 0;
-  const chosen = table.kind === 'units' ? table.category : (box.unit?.category ?? null);
+  const chosen = table.kind === 'start' ? null : table.category;
 
   /** How many tiles the start's grid shows in a row, as laid out: two, or four with the room. */
   const tilesPerRow = () => {

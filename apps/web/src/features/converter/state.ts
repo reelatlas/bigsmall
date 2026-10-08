@@ -243,6 +243,11 @@ export interface UnitsView extends TableViewBase {
 /** While a unit is typed: matches from every category, under their category, without values. */
 export interface MatchesView extends TableViewBase {
   kind: 'matches';
+  /**
+   * The category the converter is in, the box's unit's or the one chosen, or null: its matches
+   * come first, and the category menu keeps naming it while the unit is typed.
+   */
+  category: CategoryId | null;
   /** The typed unit, whose matched letters the rows set heavier. */
   query: string;
   /** Each category's matches together, its own row first, the groups in the order of their best match. */
@@ -394,7 +399,7 @@ function selectMatches(
     rows.length === 0
       ? 'No unit matches'
       : `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`;
-  return { ...base, kind: 'matches', query, rows, counts, announcement };
+  return { ...base, kind: 'matches', category: current, query, rows, counts, announcement };
 }
 
 /**

@@ -10,7 +10,7 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
 }) => {
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  const toggle = page.getByRole('button', { name: 'Calculator' });
+  const toggle = page.getByRole('button', { name: 'Calculator', exact: true });
   const calculator = page.getByRole('group', { name: 'Calculator' });
   const key = (name: string) => calculator.getByRole('button', { name, exact: true });
   const entry = calculator.locator('[data-entry]');
@@ -98,7 +98,7 @@ test('the arrows move between the calculator’s keys; Enter presses the one wit
   test.skip(isMobile, 'the arrows need a keyboard');
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  await page.getByRole('button', { name: 'Calculator' }).click();
+  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
   const calculator = page.getByRole('group', { name: 'Calculator' });
   const key = (name: string) => calculator.getByRole('button', { name, exact: true });
   const entry = calculator.locator('[data-entry]');
@@ -180,7 +180,7 @@ test('Alt+C opens and closes the calculator; closed from inside, focus goes back
 test('the calculator says why its number has no value to use', async ({ page }) => {
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  await page.getByRole('button', { name: 'Calculator' }).click();
+  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
   const calculator = page.getByRole('group', { name: 'Calculator' });
   const message = calculator.locator('[data-calculator-message]');
   const equals = calculator.getByRole('button', { name: 'equals', exact: true });

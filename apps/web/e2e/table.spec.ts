@@ -343,7 +343,7 @@ test('the cursor shows only while focus is in the box or its table', async ({ pa
   await box(page).click();
   await box(page).press('ArrowDown');
   await expect(page.locator('[role="row"][aria-selected="true"]')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Calculator' }).click();
+  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
   await expect(page.locator('[role="row"][aria-selected="true"]')).toHaveCount(0);
 });
 
@@ -665,25 +665,33 @@ test('the hint has a line of its own; the toolbar under it starts with the categ
   });
   const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
   // Wide: the menu at the toolbar's left, its edge on the column's, over the box; the tools at the
-  // right end, the last button's edge on the column's too, so a fill lines up with the table.
-  const wide = await geometry();
-  expect(wide.hint.y + wide.hint.height).toBeLessThanOrEqual(wide.toolbar.y);
-  expect(Math.abs(middle(wide.menu) - middle(wide.last))).toBeLessThan(4);
-  expect(wide.menu.x + wide.menu.width).toBeLessThan(wide.first.x);
-  expect(Math.abs(wide.menu.x - wide.start.x)).toBeLessThanOrEqual(3);
-  expect(
-    Math.abs(wide.last.x + wide.last.width - (wide.start.x + wide.start.width)),
-  ).toBeLessThanOrEqual(1);
-  expect(wide.menu.y + wide.menu.height).toBeLessThanOrEqual(wide.field.y);
+  // right end, the last button's edge on the column's too, so a fill lines up with the table. The
+  // menu is as wide as its widest label in the theme's font, so every theme is checked.
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const wide = await geometry();
+    expect(wide.hint.y + wide.hint.height, theme.id).toBeLessThanOrEqual(wide.toolbar.y);
+    expect(Math.abs(middle(wide.menu) - middle(wide.last)), theme.id).toBeLessThan(4);
+    expect(wide.menu.x + wide.menu.width, theme.id).toBeLessThan(wide.first.x);
+    expect(Math.abs(wide.menu.x - wide.start.x), theme.id).toBeLessThanOrEqual(3);
+    expect(
+      Math.abs(wide.last.x + wide.last.width - (wide.start.x + wide.start.width)),
+      theme.id,
+    ).toBeLessThanOrEqual(1);
+    expect(wide.menu.y + wide.menu.height, theme.id).toBeLessThanOrEqual(wide.field.y);
+  }
 
   // A phone has no room for both: the tools keep the line, the first button's edge on the
   // column's, and the menu takes the next, flush left too, still over the box.
   await page.setViewportSize({ width: 375, height: 800 });
-  const narrow = await geometry();
-  expect(Math.abs(narrow.first.x - narrow.start.x)).toBeLessThanOrEqual(1);
-  expect(narrow.menu.y).toBeGreaterThanOrEqual(narrow.last.y + narrow.last.height);
-  expect(Math.abs(narrow.menu.x - narrow.start.x)).toBeLessThanOrEqual(3);
-  expect(narrow.menu.y + narrow.menu.height).toBeLessThanOrEqual(narrow.field.y);
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const narrow = await geometry();
+    expect(Math.abs(narrow.first.x - narrow.start.x), theme.id).toBeLessThanOrEqual(1);
+    expect(narrow.menu.y, theme.id).toBeGreaterThanOrEqual(narrow.last.y + narrow.last.height);
+    expect(Math.abs(narrow.menu.x - narrow.start.x), theme.id).toBeLessThanOrEqual(3);
+    expect(narrow.menu.y + narrow.menu.height, theme.id).toBeLessThanOrEqual(narrow.field.y);
+  }
   await expect(box(page)).toHaveAccessibleDescription(words);
 });
 

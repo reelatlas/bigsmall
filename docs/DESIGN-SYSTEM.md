@@ -13,26 +13,26 @@ Raw values (a hex color, a pixel radius, a literal duration) never appear inside
 
 ## Semantic tokens
 
-| Token                                             | Role                                                                                                                                              |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--canvas`                                        | Page background                                                                                                                                   |
-| `--surface`                                       | Cards, fields, panels                                                                                                                             |
-| `--surface-raised`                                | Hover states and anything sitting on a surface; visibly different from `--surface`                                                                |
-| `--ink`                                           | Primary text                                                                                                                                      |
-| `--ink-muted`                                     | Secondary text, labels, hints. Still body-text contrast (4.5:1)                                                                                   |
-| `--accent`                                        | The one brand color: active edges, primary buttons, links                                                                                         |
-| `--on-accent`                                     | Text and icons placed on `--accent`                                                                                                               |
-| `--accent-soft`                                   | Tinted backgrounds: selected rows, chips                                                                                                          |
-| `--line`                                          | Dividers and decorative borders: list headers, the toolbar rule, keycaps, cards                                                                   |
-| `--edge`                                          | A control's resting edge: fields, the theme menu, secondary buttons, and at 1 px the table's card. 3:1 or more against `--canvas` and `--surface` |
-| `--focus`                                         | Focus ring. Often equals `--accent`; dark themes may pick a brighter hue                                                                          |
-| `--danger`, `--success`                           | Error and success text and indicators (the out-of-range message, the copy check)                                                                  |
-| `--art-1`, `--art-2`, `--art-3`                   | The theme art's colors (`ThemeArt`). Decoration only, so they have no contrast pair                                                               |
-| `--type-display`, `--type-body`, `--type-numeric` | Font stacks for headings, running text, and numbers                                                                                               |
-| `--shape-sm`, `--shape-md`, `--shape-lg`          | Border radii                                                                                                                                      |
-| `--elevation-sm`, `--elevation-md`                | Shadows (or glows, in neo-noir)                                                                                                                   |
-| `--motion-fast`, `--motion-base`, `--motion-slow` | Durations. Zeroed under `prefers-reduced-motion` (see "Motion")                                                                                   |
-| `--motion-ease`                                   | The theme's easing curve                                                                                                                          |
+| Token                                             | Role                                                                                                                                  |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `--canvas`                                        | Page background                                                                                                                       |
+| `--surface`                                       | Cards, fields, panels                                                                                                                 |
+| `--surface-raised`                                | Hover states and anything sitting on a surface; visibly different from `--surface`                                                    |
+| `--ink`                                           | Primary text                                                                                                                          |
+| `--ink-muted`                                     | Secondary text, labels, hints. Still body-text contrast (4.5:1)                                                                       |
+| `--accent`                                        | The one brand color: active edges, primary buttons, links                                                                             |
+| `--on-accent`                                     | Text and icons placed on `--accent`                                                                                                   |
+| `--accent-soft`                                   | Tinted backgrounds: selected rows, chips                                                                                              |
+| `--line`                                          | Dividers and decorative borders: list headers, the toolbar rule, keycaps, cards                                                       |
+| `--edge`                                          | A control's resting edge: fields, the theme menu, secondary buttons, the table's card. 3:1 or more against `--canvas` and `--surface` |
+| `--focus`                                         | Focus ring. Often equals `--accent`; dark themes may pick a brighter hue                                                              |
+| `--danger`, `--success`                           | Error and success text and indicators (the out-of-range message, the copy check)                                                      |
+| `--art-1`, `--art-2`, `--art-3`                   | The theme art's colors (`ThemeArt`). Decoration only, so they have no contrast pair                                                   |
+| `--type-display`, `--type-body`, `--type-numeric` | Font stacks for headings, running text, and numbers                                                                                   |
+| `--shape-sm`, `--shape-md`, `--shape-lg`          | Border radii                                                                                                                          |
+| `--elevation-sm`, `--elevation-md`                | Shadows (or glows, in neo-noir)                                                                                                       |
+| `--motion-fast`, `--motion-base`, `--motion-slow` | Durations. Zeroed under `prefers-reduced-motion` (see "Motion")                                                                       |
+| `--motion-ease`                                   | The theme's easing curve                                                                                                              |
 
 The full list is the single source of truth in `apps/web/src/lib/themes.ts` (`TOKEN_CONTRACT`), with the contrast pairs every theme must pass (`CONTRAST_PAIRS`).
 
@@ -112,8 +112,8 @@ A class list more than one file builds from is a recipe in `src/lib/recipes.ts`,
 
 ### Edges and borders
 
-- **2 px is a control's edge.** Fields, the theme menu, and secondary buttons share `border-2` in `--edge`, so no control looks lighter-edged than its neighbor. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights once ate into it.
-- **1 px is a divider or a keycap.** The line under a menu's trigger, between the matches' groups, the toolbar divider (`border-l`), and keycaps use `border`. A card is 1 px too, in `--line`; the table's place (`LIST_CARD`) takes `--edge` instead, firmer, since it is the box's popup and holds the rows people pick (a trial, Sean, 2026-10-08).
+- **2 px is a control's edge.** Fields, the theme menu, secondary buttons, and the table's place (`LIST_CARD`, the box's popup, whose rows people pick) share `border-2` in `--edge`, so no control looks lighter-edged than its neighbor (the table's since Sean, 2026-10-08: the color kept, the width a trial). A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights once ate into it.
+- **1 px is a divider or a keycap.** The line under a menu's trigger, between the matches' groups, the toolbar divider (`border-l`), and keycaps use `border`. A card is 1 px in `--line` (the calculator, the lab's panels), a light frame for what comes and goes.
 - **Open is accent.** A shell's edge is `border-edge` at rest and `border-accent` while open or while something inside has focus. The calculator's card does the same while focus is inside it: its 1 px border and a 1 px ring turn accent, 2 px like a focused box, so nothing moves.
 - **A control's edge identifies it.** `--edge` passes 3:1 against the page and the surface in every theme, so a field's resting edge meets WCAG 1.4.11 by itself, and the theme test enforces it. `--line` stays subtle because a divider only groups. Each theme's `--edge` is its `--line` moved toward `--ink` to the first step past 3:1. Introduced 2026-10-06 as a trial the owner may roll back (findings-0, sixth pass).
 

@@ -1,5 +1,5 @@
 import { getCategory, type Category, type SearchResult, type Unit } from '@bigsmall/core';
-import { cx, unitSymbol } from '../lib/recipes';
+import { CURSOR_ROW, cx, rowFill, unitSymbol } from '../lib/recipes';
 import { ChevronRightIcon } from './icons';
 import { MatchedText } from './MatchedText';
 
@@ -32,6 +32,8 @@ export interface SuggestionPanelProps {
   label: string;
   items: SuggestionItem[];
   activeIndex: number;
+  /** The unit in the box, by id: its row takes the accent's soft fill, as in the table. */
+  selectedId?: string | undefined;
   /** What the user typed to get these rows; the letters it matches are set heavier. */
   query?: string | undefined;
   /** The category the list is inside, shown on the Back row. */
@@ -46,10 +48,10 @@ export interface SuggestionPanelProps {
 }
 
 // Rows sit in the same 8 px inset as the chip inside the field, with corners that nest in the
-// field's corners, so a highlight never touches the shell's edge (docs/DESIGN-SYSTEM.md).
-const ROW =
-  'flex min-h-11 cursor-pointer items-center gap-3 rounded-nested px-2 text-left ' +
-  'data-active:bg-accent-soft hover:bg-surface-raised';
+// field's corners, so a highlight never touches the shell's edge (docs/DESIGN-SYSTEM.md). Their
+// fill is the table's (rowFill): the box's unit in the accent's soft tint, the highlighted row in
+// the muted tint of a hovered one.
+const ROW = cx(CURSOR_ROW, 'flex items-center gap-3 text-left');
 
 // The Back row stays pinned at the top while the list scrolls, with a divider under it; its inner
 // span carries the highlight so the divider is never highlighted.
@@ -67,6 +69,7 @@ export function SuggestionPanel({
   label,
   items,
   activeIndex,
+  selectedId,
   query,
   scopeName,
   notFound,
@@ -102,7 +105,11 @@ export function SuggestionPanel({
               aria-selected={active}
               aria-label={back ? 'Back to categories' : undefined}
               data-active={active || undefined}
-              className={back ? BACK_ROW : ROW}
+              className={
+                back
+                  ? BACK_ROW
+                  : cx(ROW, rowFill(item.kind === 'unit' && item.unit.id === selectedId, active))
+              }
               onMouseDown={(event) => event.preventDefault()}
               // Movement, not entry: rows that render under a still pointer (after Back, say)
               // must not take the highlight from the row the keyboard or Back put it on.
@@ -112,7 +119,7 @@ export function SuggestionPanel({
               onClick={() => onPick(item)}
             >
               {back ? (
-                <span className="flex min-h-11 items-center justify-between rounded-nested px-2 text-sm text-ink-muted group-hover:bg-surface-raised group-hover:text-ink group-data-active:bg-accent-soft group-data-active:text-ink">
+                <span className="flex min-h-11 items-center justify-between rounded-nested px-2 text-sm text-ink-muted group-hover:bg-surface-raised group-hover:text-ink group-data-active:bg-surface-raised group-data-active:text-ink">
                   <span>← Back</span>
                   {scopeName && (
                     <span className="font-medium text-ink" data-scope-name>

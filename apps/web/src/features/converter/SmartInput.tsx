@@ -112,13 +112,13 @@ export function SmartInput({
 
   const notFound = noMatch ? noMatchMessage(query) : undefined;
 
-  // What the empty field suggests: a number once it has a unit, a few units of its category
-  // once the other box has chosen one, otherwise this box's own examples. A message about the
+  // What the empty field suggests: "Number" once it has a unit (never "0", which reads as a value),
+  // a few units of its category once the other box has chosen one, otherwise this box's examples. A message about the
   // conversion takes the placeholder's place, so a value that cannot be shown never reads as 0.
   const placeholder = box.message
     ? ''
     : box.unit
-      ? '0'
+      ? 'Number'
       : box.scope
         ? scopedExamples(box.scope, counterpart, listOptions)
         : examples;
@@ -374,6 +374,7 @@ export function SmartInput({
             label={`${label} suggestions`}
             items={items}
             activeIndex={active}
+            selectedId={box.unit?.id}
             query={noMatch ? undefined : query}
             scopeName={scopeName}
             notFound={notFound}

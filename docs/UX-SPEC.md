@@ -84,10 +84,10 @@ The suggestion list is the two-box layout's. The table layout has none: its tabl
 - A unit row reads "symbol … name": the symbol on the left, semibold and muted, and the plural name right-aligned, the order the chip shows them in. When the list spans categories (top level, or a widened search) each unit row also names its category, which is how `oz` (weight) and `fl oz` (volume) are told apart.
 - A category row shows its name and a chevron.
 - The letters the query matches are set heavier, under the same folding search uses (`me` marks "**me**ters" and "kilo**me**ters"; `floz` marks all of "fl oz"). A unit found through an alias the row does not show gets no mark.
-- Moving the pointer over a row highlights it. A row that appears under a still pointer, as after Back, does not take the highlight.
+- The row the keys highlight, or the pointer is over, takes the muted tint of a hovered row; the box's own unit keeps the accent-soft fill, as in the table. Moving the pointer over a row highlights it. A row that appears under a still pointer, as after Back, does not take the highlight.
 - The pointer never scrolls the list: a row partly out of view stays where it is when the pointer highlights it. Only the arrow keys bring the highlighted row into view; the wheel, trackpad, scrollbar, and touch scroll the list as they do anywhere.
 
-**Placeholders.** With two boxes, an empty box with its own unit shows "0". With no unit, it shows examples: "5 ml, feet, °F…" in the first box, "2 kg, inches, speed…" in the second (which shows a category can be typed). Once the other box has a unit, an empty box lists three units of that category instead ("L, tsp, tbsp…" beside milliliters), never the other box's own unit. The table layout's box says what it takes, never a value it might be mistaken for: "Number or unit" with no unit, "Number" with one.
+**Placeholders.** With two boxes, an empty box with its own unit shows "Number", as the table layout's does. With no unit, it shows examples: "5 ml, feet, °F…" in the first box, "2 kg, inches, speed…" in the second (which shows a category can be typed). Once the other box has a unit, an empty box lists three units of that category instead ("L, tsp, tbsp…" beside milliliters), never the other box's own unit. The table layout's box says what it takes, never a value it might be mistaken for: "Number or unit" with no unit, "Number" with one.
 
 ## 4. Matching and ranking
 

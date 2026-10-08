@@ -14,11 +14,11 @@ export interface CategoryTilesProps {
 }
 
 /**
- * Where the table layout's table will be before there is a category (docs/UX-SPEC.md §1): the
+ * The start, in the table's place before there is a category (docs/UX-SPEC.md §1): the
  * categories to start from, as tiles two across, four once their container is 512 px wide
- * (docs/DESIGN-SYSTEM.md, "Tiles by their container"). A
- * listbox the field's cursor moves through, ↑ ↓ by row and ← → across, while the caret stays in
- * the field; the field counts the tiles in a row as they are laid out (`data-tile`).
+ * (docs/DESIGN-SYSTEM.md, "Tiles by their container"). A listbox the field's cursor moves
+ * through, ↑ ↓ by row and ← → across, while the caret stays in the field; the field counts the
+ * tiles in a row as they are laid out (`data-tile`).
  */
 export function CategoryTiles({ id, categories, cursor, itemId, onPick }: CategoryTilesProps) {
   return (

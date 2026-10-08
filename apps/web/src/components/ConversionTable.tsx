@@ -63,11 +63,11 @@ const TONE: Record<ConversionRow['tone'], string> = {
 };
 
 /**
- * The table layout's units (docs/UX-SPEC.md §1): every unit of the category, with its value or a
- * dash. The field keeps focus and its cursor moves through the rows (aria-activedescendant on a
- * grid, ADR 0012), so the rows are no Tab stops; a click or tap on one is the field's to act on,
- * and focus stays in the field. Each row's copy button sits in a cell of its own beside it, out
- * of the Tab order as in the boxes. Columns line up across rows through a subgrid (ROWS).
+ * The table's units (docs/UX-SPEC.md §1): every unit of the category, with its value or a dash.
+ * The field keeps focus and its cursor moves through the rows (aria-activedescendant on a grid,
+ * ADR 0012), so the rows are no Tab stops; a click or tap on one is the field's to act on, and
+ * focus stays in the field. Each row's copy button sits in a cell of its own beside it, out of
+ * the Tab order like the box's own. Columns line up across rows through a subgrid (ROWS).
  */
 export function ConversionTable({
   id,

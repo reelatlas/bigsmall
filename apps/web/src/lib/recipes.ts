@@ -20,8 +20,8 @@ export function cx(...parts: ReadonlyArray<string | false | null | undefined>): 
 export const CARD = 'rounded-lg border border-line bg-surface';
 
 /**
- * Where the calculator opens in either layout: 16 px under what it follows, at most 384 px wide
- * (docs/DESIGN-SYSTEM.md, "Calculator"). The table layout adds its column from md (TableLayout).
+ * Where the calculator opens: 16 px under what it follows, at most 384 px wide
+ * (docs/DESIGN-SYSTEM.md, "Calculator"). TableLayout adds its column from md.
  */
 export const CALCULATOR_PLACE = 'mt-4 max-w-sm';
 
@@ -36,8 +36,8 @@ export const SHELL =
   'overflow-hidden border-2 group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md';
 
 /**
- * Bordered at rest (fields, the theme menu). The accent edge also shows keyboard focus inside,
- * and it eases between edge and accent because the shell itself stays in view.
+ * Bordered at rest (fields, the theme and category menus). The accent edge also shows keyboard
+ * focus inside, and it eases between edge and accent because the shell itself stays in view.
  */
 export const SHELL_BORDERED =
   'border-edge bg-surface transition-[border-color,box-shadow] focus-within:border-accent';
@@ -85,8 +85,8 @@ export function unitSymbol(alone = false): string {
   return cx('font-numeric font-semibold', alone ? 'text-ink' : 'text-ink-muted');
 }
 
-// Lists a field's cursor moves through (docs/DESIGN-SYSTEM.md, "Lists"): the table layout's
-// table, matches, and categories, whose rows the arrows reach while the caret stays in the field.
+// Lists a field's cursor moves through (docs/DESIGN-SYSTEM.md, "Lists"): the table, the matches,
+// and the start's categories, whose rows the arrows reach while the caret stays in the field.
 
 /** A row the cursor moves through: 44 px, inset in the card's gutter, its corners nesting in the card's. */
 export const CURSOR_ROW = 'min-h-11 cursor-pointer rounded-nested px-2';

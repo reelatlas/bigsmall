@@ -46,7 +46,7 @@ export interface SearchOptions {
    */
   system?: UnitPreference;
   /**
-   * A category to rank first among equal matches, without hiding the others: the table layout's
+   * A category to rank first among equal matches, without hiding the others: the converter's
    * current category, when a query searches every category (docs/UX-SPEC.md §4).
    */
   prefer?: CategoryId | null;

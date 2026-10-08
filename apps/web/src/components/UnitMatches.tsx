@@ -31,10 +31,10 @@ export interface UnitMatchesProps {
 const ROWS = 'grid grid-cols-[auto_minmax(0,1fr)] gap-x-3';
 
 /**
- * The table layout's matches for a typed unit (docs/UX-SPEC.md §1): units from every category,
- * without values, under a header per category with its count; a category whose name matched
- * leads its group. A listbox of groups, the field's cursor moving through the matches while the
- * caret stays in the field, so the headers are passed over.
+ * The matches for a typed unit, in the table's place (docs/UX-SPEC.md §1): units from every
+ * category, without values, under a header per category with its count; a category whose name
+ * matched leads its group. A listbox of groups, the field's cursor moving through the matches
+ * while the caret stays in the field, so the headers are passed over.
  */
 export function UnitMatches({
   id,

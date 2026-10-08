@@ -22,7 +22,7 @@ import { noMatchMessage, type BoxView, type HistoryAction, type TableView } from
 import type { ConverterEnv } from './useConverter';
 
 /**
- * The table layout from md (docs/UX-SPEC.md §1): the box and its table in the first column, and
+ * The converter from md (docs/UX-SPEC.md §1): the box and its table in the first column, and
  * the calculator in a column of its own on their right, spanning both rows; the second row takes
  * any height the calculator adds, so the table always sits right under the box. Below md the
  * calculator opens between the box and the table, flush left.
@@ -53,7 +53,7 @@ export interface TableLayoutProps {
   table: TableView;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
-  /** Id of the layout's hint, which describes the field. */
+  /** Id of the converter's hint, which describes the field. */
   describedBy: string;
   /** The field's copy button, once it holds a number. */
   copyButton: ReactNode;
@@ -67,7 +67,7 @@ export interface TableLayoutProps {
 }
 
 /**
- * The table layout's box and what it lists (ADR 0012, docs/UX-SPEC.md §1, §8, §9): the category
+ * The box and what it lists (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §8, §9): the category
  * menu, the field, and in the table's place the categories to start from, the category's units
  * with their values, or the units a typed query matches. The table is the unit list: the caret
  * stays in the field while a cursor the field points at (aria-activedescendant) moves through

@@ -24,7 +24,7 @@ export interface CategoryMenuProps {
 }
 
 /**
- * The table layout's category menu (docs/UX-SPEC.md §1): a fluid shell like the theme menu, built
+ * The converter's category menu (docs/UX-SPEC.md §1): a fluid shell like the theme menu, built
  * from the same recipes, its trigger and its choices one shape that grows over the page when
  * open. The choices are native radios. The arrows move through them without choosing, since a
  * new category takes the unit out of the box and each choice is a step to undo; Enter or a click

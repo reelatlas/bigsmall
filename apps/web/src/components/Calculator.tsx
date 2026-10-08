@@ -88,14 +88,6 @@ function equalsIn(container: ParentNode | null | undefined): HTMLElement | null 
   return container?.querySelector<HTMLElement>(`[${STOP}="equals"]`) ?? null;
 }
 
-/**
- * Puts focus on the = key of the calculator inside `container`, as opening does: for a host that
- * brings the keyboard back to an open calculator (Alt+C).
- */
-export function focusCalculator(container: ParentNode | null | undefined): void {
-  equalsIn(container)?.focus();
-}
-
 export interface CalculatorProps {
   /** What the display shows, such as a NumberText; empty shows a muted 0. */
   display: ReactNode;
@@ -187,7 +179,7 @@ export function Calculator({
   // effects commit with the render; Preact runs plain effects after paint, a frame too late for
   // keys typed straight after the click that opened it.
   useLayoutEffect(() => {
-    if (focusOnOpen) focusCalculator(groupRef.current);
+    if (focusOnOpen) equalsIn(groupRef.current)?.focus();
   }, [focusOnOpen]);
 
   // Native listeners, like the converter's undo keys: the group is not itself interactive. Bound
@@ -262,7 +254,7 @@ export function Calculator({
       if ((event.target as Element).closest(`[${STOP}]`)) return;
       event.preventDefault();
       if (!group.contains(document.activeElement)) {
-        focusCalculator(group);
+        equalsIn(group)?.focus();
       }
     };
     // After a send, focus goes back to =, so the next keys start a new entry and Enter cannot
@@ -270,7 +262,7 @@ export function Calculator({
     const onClick = (event: MouseEvent) => {
       const send = (event.target as Element).closest(`[${STOP}="send"]`);
       if (send && send.getAttribute('aria-disabled') !== 'true') {
-        focusCalculator(group);
+        equalsIn(group)?.focus();
       }
     };
     group.addEventListener('keydown', onKeyDown);

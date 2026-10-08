@@ -141,28 +141,29 @@ test('the arrows move between the calculator’s keys; Enter presses the one wit
   await expect(key('equals')).toBeFocused();
 });
 
-test('Alt+C opens the calculator, brings focus back to it, and closes it to where you were', async ({
+test('Alt+C opens and closes the calculator; closed from inside, focus goes back where it was', async ({
   page,
   isMobile,
 }) => {
   test.skip(isMobile, 'Alt+C needs a keyboard');
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  const toggle = page.getByRole('button', { name: 'Calculator' });
+  const toggle = page.getByRole('button', { name: 'Calculator', exact: true });
   const calculator = page.getByRole('group', { name: 'Calculator' });
   const equals = calculator.getByRole('button', { name: 'equals', exact: true });
   await expect(toggle).toHaveAttribute('aria-keyshortcuts', 'Alt+C');
   await expect(toggle).toHaveAttribute('title', 'Calculator (Alt+C)');
 
-  // From the box: it opens on =.
+  // From the box: it opens on =, and Alt+C inside it closes it, focus back in the box.
   await box(page).click();
   await page.keyboard.press('Alt+c');
   await expect(equals).toBeFocused();
-  // Open, with focus back in the box: Alt+C brings focus into it again.
-  await box(page).click();
   await page.keyboard.press('Alt+c');
-  await expect(equals).toBeFocused();
-  // Inside it, Alt+C closes it and puts focus back where it was.
+  await expect(calculator).toHaveCount(0);
+  await expect(box(page)).toBeFocused();
+  // Open, with focus back in the box: Alt+C just closes it, and focus stays in the box.
+  await page.keyboard.press('Alt+c');
+  await box(page).click();
   await page.keyboard.press('Alt+c');
   await expect(calculator).toHaveCount(0);
   await expect(box(page)).toBeFocused();

@@ -11,12 +11,7 @@ import {
   RedoIcon,
   UndoIcon,
 } from '../../components/icons';
-import {
-  Calculator,
-  focusCalculator,
-  SendButton,
-  type CalculatorKey,
-} from '../../components/Calculator';
+import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
 import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
@@ -100,8 +95,8 @@ export function Converter() {
   }, [dispatch]);
 
   /**
-   * Where focus goes back to when the calculator closes: the icon, when the icon opened it, or
-   * where Alt+C was pressed (docs/UX-SPEC.md §8).
+   * Where focus goes back to when the calculator closes from inside: the icon, when the icon
+   * opened it, or where Alt+C was pressed (docs/UX-SPEC.md §8).
    */
   const returnTo = useRef<HTMLElement | null>(null);
   const calculatorToggle = () => document.getElementById(calculatorToggleId);
@@ -116,9 +111,9 @@ export function Converter() {
     (focus?.isConnected ? focus : calculatorToggle())?.focus();
   };
 
-  // Alt+C (⌥C on Apple devices, where Option+C types ç) from anywhere on the page: opens the
-  // calculator; brings focus back to it when it is open and focus is elsewhere; pressed inside
-  // it, closes it and puts focus back where it was. AltGr, which is Ctrl+Alt, is left alone.
+  // Alt+C (⌥C on Apple devices, where Option+C types ç) from anywhere on the page opens the
+  // calculator and closes it. Closed from inside it, focus goes back where it was; closed from
+  // outside, focus stays put. AltGr, which is Ctrl+Alt, is left alone.
   useLayoutEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.repeat) return;
@@ -129,13 +124,9 @@ export function Converter() {
       // With nothing focused, closing comes back to the box.
       const here =
         focused instanceof HTMLElement && focused !== document.body ? focused : inputRef.current;
-      const calculator = document.getElementById(calculatorId);
       if (!calculatorOpen) openCalculator(here);
-      else if (calculator?.contains(focused)) closeCalculator();
-      else {
-        returnTo.current = here;
-        focusCalculator(calculator);
-      }
+      else if (document.getElementById(calculatorId)?.contains(focused)) closeCalculator();
+      else setCalculatorOpen(false);
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);

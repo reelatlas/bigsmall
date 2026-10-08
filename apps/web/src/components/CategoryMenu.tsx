@@ -4,7 +4,10 @@ import {
   cx,
   MENU_CHEVRON,
   MENU_OPTION,
+  MENU_ROOT,
   MENU_SHELL,
+  MENU_SIZER,
+  MENU_SIZER_LABEL,
   MENU_TRIGGER,
   SHELL_PANEL,
 } from '../lib/recipes';
@@ -107,7 +110,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   return (
     <div
       ref={rootRef}
-      className="group relative h-12"
+      className={MENU_ROOT}
       data-open={open || undefined}
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
@@ -117,9 +120,9 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           its width as categories change and while open (the theme menu's sizer). The room after
           each label is the chevron's, and open, a choice's count's: the trigger's padding and a
           choice's, with its gutter, come to the same. */}
-      <span aria-hidden="true" className="invisible grid h-0 overflow-hidden px-3 text-sm">
+      <span aria-hidden="true" className={MENU_SIZER}>
         {[EMPTY_LABEL, ...categories.map((category) => category.name)].map((label) => (
-          <span key={label} className="col-start-1 row-start-1 flex items-center gap-2">
+          <span key={label} className={MENU_SIZER_LABEL}>
             {label}
             <span className="size-4" />
           </span>

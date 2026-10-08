@@ -63,6 +63,18 @@ export const SHELL_PANEL = 'hidden border-t border-line group-data-open:block';
 // Menus (docs/DESIGN-SYSTEM.md, "Fluid shells"): a trigger and a group of radios in one shell,
 // shared by the theme menu (ThemePicker.astro) and the category menu (CategoryMenu.tsx).
 
+/** A menu's root: the toolbar row's height, holding the sizer in flow and the shell over it. */
+export const MENU_ROOT = 'group relative h-12';
+
+/**
+ * A menu's sizer, unseen: every label stacked in one cell (`MENU_SIZER_LABEL`), at the trigger's
+ * padding and type, so the menu is as wide as its widest label, open or closed.
+ */
+export const MENU_SIZER = 'invisible grid h-0 overflow-hidden px-3 text-sm';
+
+/** One label in a menu's sizer, the chevron's room after it (a `size-4` span). */
+export const MENU_SIZER_LABEL = 'col-start-1 row-start-1 flex items-center gap-2';
+
 /**
  * A ghost menu's shell (the theme and category menus): nothing at rest, so its trigger is
  * all there is to see; open, a card around the trigger and its list, the same size. The card's

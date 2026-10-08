@@ -1,5 +1,14 @@
 ---
-import { MENU_CHEVRON, MENU_OPTION, MENU_SHELL, MENU_TRIGGER, SHELL_PANEL } from '../lib/recipes';
+import {
+  MENU_CHEVRON,
+  MENU_OPTION,
+  MENU_ROOT,
+  MENU_SHELL,
+  MENU_SIZER,
+  MENU_SIZER_LABEL,
+  MENU_TRIGGER,
+  SHELL_PANEL,
+} from '../lib/recipes';
 import { DEFAULT_LIGHT, THEMES } from '../lib/themes';
 import { ChevronDownIcon } from './icons';
 
@@ -22,10 +31,10 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
  */
 ---
 
-<div class="group relative h-12" data-shell>
-  <span aria-hidden="true" class="invisible grid h-0 overflow-hidden px-3 text-sm">
+<div class={MENU_ROOT} data-shell>
+  <span aria-hidden="true" class={MENU_SIZER}>
     {THEMES.map((t) => (
-      <span class="col-start-1 row-start-1 flex items-center gap-2">
+      <span class={MENU_SIZER_LABEL}>
         <span class="max-sm:hidden">Theme</span>
         {t.name}
         <span class="size-4" />

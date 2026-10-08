@@ -15,17 +15,17 @@ export interface Shortcut {
   keys: readonly (readonly Key[])[];
 }
 
-// In the order people use them (docs/UX-SPEC.md §10). Tab, Home and End in a toolbar, and
-// Backspace on an empty box work too but are left out to keep the map short.
+// In the order people use them (docs/UX-SPEC.md §10). Tab, Home and End in a toolbar, Backspace
+// on an empty box, and Ctrl+C, which everyone knows, work too but are left out to keep it short.
+// Letters in lowercase, as most unit symbols are written.
 export const SHORTCUTS: readonly Shortcut[] = [
-  { action: 'Type from anywhere', keys: [['0–9'], ['A–Z']] },
+  { action: 'Type from anywhere', keys: [['0–9'], ['a–z']] },
   { action: 'Pick a unit or value', keys: [['Enter']] },
   { action: 'Step back or clear', keys: [['Esc']] },
   // Each pair of arrows shares one group so they sit side by side with nothing between them.
   { action: 'Move up and down the page', keys: [['↑', '↓']] },
   { action: 'Move across a toolbar', keys: [['←', '→']] },
   { action: 'Open the calculator', keys: [['Alt', 'C']] },
-  { action: 'Copy the value', keys: [['Mod', 'C']] },
   { action: 'Undo', keys: [['Mod', 'Z']] },
   {
     action: 'Redo',

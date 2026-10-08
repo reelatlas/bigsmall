@@ -166,17 +166,16 @@ The theme menu and the shortcuts map are fluid shells driven by the inline scrip
 
   | Action                    | Keys                   |
   | ------------------------- | ---------------------- |
-  | Type from anywhere        | 0–9 or A–Z             |
+  | Type from anywhere        | 0–9 or a–z             |
   | Pick a unit or value      | Enter                  |
   | Step back or clear        | Esc                    |
   | Move up and down the page | ↑ ↓                    |
   | Move across a toolbar     | ← →                    |
   | Open the calculator       | Alt C                  |
-  | Copy the value            | Ctrl C                 |
   | Undo                      | Ctrl Z                 |
   | Redo                      | Ctrl Y or Ctrl Shift Z |
 
-  Keys pressed together sit side by side; alternatives are joined by "or". Tab, Home and End in a toolbar, and Backspace on an empty box work but are left out to keep the map short. It is hidden on touch-first devices and below the `sm` breakpoint.
+  Keys pressed together sit side by side; alternatives are joined by "or". Tab, Home and End in a toolbar, Backspace on an empty box, and Ctrl C, which everyone knows, work but are left out to keep the map short. Letters are in lowercase, as most unit symbols are written. It is hidden on touch-first devices and below the `sm` breakpoint.
 
 - **Mac or Windows.** On Apple devices every Ctrl reads ⌘ and every Alt reads ⌥, in the map and in the tooltips ("Undo (⌘Z)", "Redo (⇧⌘Z)", "Calculator (⌥C)"), from one case-insensitive check in `src/lib/platform.ts`.
 

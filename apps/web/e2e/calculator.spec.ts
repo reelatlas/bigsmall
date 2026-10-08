@@ -98,17 +98,17 @@ test('the calculator says why its number has no value to use', async ({ page }) 
   const calculator = page.getByRole('group', { name: 'Calculator' });
   const message = calculator.locator('[data-calculator-message]');
   const equals = calculator.getByRole('button', { name: 'equals', exact: true });
-  const useIn = calculator.getByRole('button', { name: /^Use/ });
+  const use = calculator.getByRole('button', { name: /^Use/ });
 
   // A large exponent: the display says so, and nothing can be sent until it is back in range.
   await page.keyboard.type('9^999');
   await expect(message).toHaveText('Too large');
   await expect(equals).toHaveAccessibleDescription('Too large');
-  await expect(useIn).toHaveAttribute('aria-disabled', 'true');
-  await expect(useIn).toHaveAccessibleDescription('Too large');
+  await expect(use).toHaveAttribute('aria-disabled', 'true');
+  await expect(use).toHaveAccessibleDescription('Too large');
   await page.keyboard.press('Backspace');
   await expect(message).toHaveCount(0);
-  await expect(useIn).not.toHaveAttribute('aria-disabled', 'true');
+  await expect(use).not.toHaveAttribute('aria-disabled', 'true');
 
   await calculator.getByRole('button', { name: 'clear', exact: true }).click();
   await page.keyboard.type('1e-999');

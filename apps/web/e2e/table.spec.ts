@@ -90,7 +90,7 @@ test('keyboard: the start’s categories are a grid the arrows move through', as
   await expectCursor(page, null);
   await expect(box(page)).toBeFocused();
 
-  // A number, then Enter, goes into the categories; Enter opens one at its first unit.
+  // A number, then Enter, goes into the categories; Enter opens one.
   await page.keyboard.type('250');
   await box(page).press('Enter');
   await expectCursor(page, 'Length');
@@ -201,7 +201,7 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   await expect(menu(page)).toHaveText(/Volume/);
   await expect(radios).toBeHidden();
 
-  // Enter chooses: the number stays, the unit goes, and the cursor waits on the first unit.
+  // Enter chooses: the number stays and the unit goes.
   await menu(page).press('Enter');
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');

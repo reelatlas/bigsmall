@@ -19,11 +19,10 @@ const { actions = false } = Astro.props;
  * along its [data-tool] controls and up and down the page, driven by the inline script in
  * layouts/Base.astro.
  *
- * Spacing follows what the eye sees, not the boxes (docs/DESIGN-SYSTEM.md, "Icon buttons"): a
- * ghost icon's glyph sits 12 px inside its button and 2 px more inside its 48 px place, so two
- * icons 8 px apart show 36 px between glyphs. The bordered theme menu shows its edge, so it sits
- * 22 px from the icons, which also leaves 36 px between the last glyph and that edge. Below sm it
- * sits 8 px away (22 px seen), so a phone's header keeps one line longer.
+ * Spaced as the converter's toolbar is (docs/DESIGN-SYSTEM.md, "Icon buttons"; Sean, 2026-10-08,
+ * a trial): 4 px between buttons, their 48 px places touching, each 44 px button 2 px inside its
+ * place, and 8 px from the last button to the theme menu's edge (gap-1.5 and that 2 px), as the
+ * toolbar's dividers sit 8 px from its buttons, at every width.
  *
  * Where the page's header (an @container) is narrower than sm, 384 px, too narrow for every
  * theme's name, art, and menus on one line (Hardhat's wide name needs the most, 353 px), the menus
@@ -36,11 +35,11 @@ const { actions = false } = Astro.props;
 <div
   role="toolbar"
   aria-label="Site"
-  class="ml-auto flex items-start gap-2 sm:gap-5.5 @max-sm:ml-0 @max-sm:basis-full"
+  class="ml-auto flex items-start gap-1.5 @max-sm:ml-0 @max-sm:basis-full"
   data-header-menus
   data-plane="header"
 >
-  <div class="flex items-start gap-2">
+  <div class="flex items-start">
     <ShortcutsHelp />
     {actions && <div id={SLOTS.headerActions} class="size-12 p-0.5" />}
   </div>

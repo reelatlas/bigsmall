@@ -91,6 +91,56 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
   await expect(entry).toHaveText('4E256');
 });
 
+test('the arrows move between the calculator’s keys; Enter presses the one with focus; typing goes back to =', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the arrows need a keyboard');
+  await page.goto('/?a=milliliter&v=1');
+  await ready(page);
+  await page.getByRole('button', { name: 'Calculator' }).click();
+  const calculator = page.getByRole('group', { name: 'Calculator' });
+  const key = (name: string) => calculator.getByRole('button', { name, exact: true });
+  const entry = calculator.locator('[data-entry]');
+  const close = calculator.getByRole('button', { name: 'Close calculator' });
+  await expect(key('equals')).toBeFocused();
+
+  // Up a column and along a row; Enter presses the key with focus, which keeps it.
+  await page.keyboard.press('ArrowUp');
+  await expect(key('plus')).toBeFocused();
+  await page.keyboard.press('ArrowLeft');
+  await expect(key('3')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  await expect(entry).toHaveText('33');
+  await expect(key('3')).toBeFocused();
+
+  // Typing goes back to =, so Enter then works the sum out.
+  await page.keyboard.type('+4');
+  await expect(key('equals')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(entry).toHaveText('37');
+
+  // Down to "Use" and back up to the key it left; the top row reaches close, and nothing wraps.
+  await page.keyboard.press('ArrowDown');
+  await expect(calculator.getByRole('button', { name: /^Use/ })).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await expect(key('equals')).toBeFocused();
+  for (let row = 0; row < 4; row += 1) await page.keyboard.press('ArrowUp');
+  await expect(key('divided by')).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await expect(close).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await expect(close).toBeFocused();
+
+  // From a key the arrows reached, Tab goes on to the next stop.
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowLeft');
+  await expect(key('to the power of')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(key('equals')).toBeFocused();
+});
+
 test('the calculator says why its number has no value to use', async ({ page }) => {
   await page.goto('/?a=milliliter&v=1');
   await ready(page);

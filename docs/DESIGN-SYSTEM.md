@@ -199,7 +199,7 @@ The converter's box is `ValueField`, placed by `TableLayout`: it takes a shell's
 - **Display**: a field's geometry, `rounded-lg border-2 border-edge bg-surface` around `FIELD_ROW`, so it is the same size as the box; the entry in `font-numeric` stepping down through `NUMBER_SIZES` (`src/lib/recipes.ts`) and keeping its end in view past the smallest; drawn by `NumberText`, so exponent markers and the running value look as they do in a box; a muted 0 when empty; at the row's right, why the entry has no value ("Too large"), in `text-sm font-medium text-danger`, like a table row's "Too large".
 - **Keys** are `Button`s at `min-h-12` with `font-numeric text-lg`, four to a row (`gap-2`): digits secondary; C, ⌫, E, and the decimal mark `tonal`; the five operators `soft`; = primary.
 - **Sending**: the `SendButton` under the keys, the row's width (`grid-flow-col auto-cols-fr`, so the gallery's two states share it); secondary, reading "Use" plus the box's unit symbol in semibold, with the copy check (`CopiedIcon`) while a send is confirmed, and `aria-disabled` while there is nothing to send.
-- **Focus**: =, the send buttons, and close carry `data-calculator-stop`, the stops Tab cycles through; the other keys are `tabIndex={-1}`. What Tab, Enter, a click, and a send do with focus is in docs/UX-SPEC.md §8.
+- **Focus**: =, the send buttons, and close carry `data-calculator-stop`, the stops Tab cycles through; the other keys are `tabIndex={-1}`, reached by the arrow keys, which move by where each button sits (`nextInDirection` in `src/lib/spatial.ts`), never by an index. What Tab, Enter, a click, and a send do with focus is in docs/UX-SPEC.md §8.
 
 ### Links
 

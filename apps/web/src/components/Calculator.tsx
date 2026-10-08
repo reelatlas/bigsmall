@@ -1,6 +1,7 @@
 import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useFitStep } from '../lib/fit-step';
 import { CARD, cx, FIELD_ROW, NUMBER_SIZES } from '../lib/recipes';
+import { nextInDirection, type Box, type Direction } from '../lib/spatial';
 import { Button, type ButtonVariant } from './Button';
 import { BackspaceIcon, CloseIcon, CopiedIcon } from './icons';
 
@@ -52,6 +53,20 @@ const TYPED: Readonly<Record<string, CalculatorKey>> = {
   Backspace: 'backspace',
 };
 
+/** The arrow keys, which move focus between the calculator's buttons by where they sit. */
+const ARROWS: Readonly<Record<string, Direction>> = {
+  ArrowLeft: 'left',
+  ArrowRight: 'right',
+  ArrowUp: 'up',
+  ArrowDown: 'down',
+};
+
+/** Where an element sits on screen, for spatial navigation. */
+function boxOf(element: HTMLElement): Box & { element: HTMLElement } {
+  const { left, right, top, bottom } = element.getBoundingClientRect();
+  return { element, left, right, top, bottom };
+}
+
 /** The title, which names the calculator's group: a label over what it names. */
 const TITLE = 'text-sm font-medium text-ink-muted';
 
@@ -86,7 +101,8 @@ export interface CalculatorProps {
 
 /**
  * A calculator with its own display. While it is open it holds the keyboard: focus moves in,
- * every typed key presses its key (digits, ". ,", "+ - * / ^", "e", "=", Backspace), Tab and
+ * every typed key presses its key (digits, ". ,", "+ - * / ^", "e", "=", Backspace) and brings
+ * focus back to =, the arrow keys move focus between its buttons by where they sit, Tab and
  * Shift+Tab cycle through close, =, and each send button, and Enter presses whichever has focus,
  * so focus always shows what Enter will do. Escape is the caller's (step back, then close). The
  * other keys stay out of the Tab order, and a click on one returns the keyboard to the calculator
@@ -107,6 +123,11 @@ export function Calculator({
   const titleId = useId();
   const groupRef = useRef<HTMLDivElement>(null);
   const displayRef = useRef<HTMLDivElement>(null);
+  /**
+   * The column the arrows keep to while moving up and down, as a text editor keeps the caret's,
+   * so ↓ to the send button and back ↑ returns to the key it left. Any other move forgets it.
+   */
+  const goalX = useRef<number | null>(null);
   const size = NUMBER_SIZES[useFitStep(displayRef, DISPLAY_TEXT, NUMBER_SIZES)];
   const keys: KeyDef[] = [
     { key: 'clear', face: 'C', name: 'clear', variant: 'tonal' },
@@ -156,8 +177,10 @@ export function Calculator({
     const group = groupRef.current;
     if (!group) return;
     const stops = () => [...group.querySelectorAll<HTMLElement>(`[${STOP}]`)];
+    const equals = () => group.querySelector<HTMLElement>(`[${STOP}="equals"]`);
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
+      const active = document.activeElement as HTMLElement | null;
       if (event.key === 'Escape') {
         event.preventDefault();
         onEscape();
@@ -165,16 +188,42 @@ export function Calculator({
       }
       if (event.key === 'Tab') {
         event.preventDefault();
+        goalX.current = null;
         const all = stops();
-        const at = all.indexOf(document.activeElement as HTMLElement);
+        const at = active ? all.indexOf(active) : -1;
         const step = event.shiftKey ? -1 : 1;
-        all[at < 0 ? 0 : (at + step + all.length) % all.length]?.focus();
+        if (at >= 0) {
+          all[(at + step + all.length) % all.length]?.focus();
+          return;
+        }
+        // From a key the arrows reached, on to the next stop in reading order, or back to the one before.
+        const follows = (stop: HTMLElement) =>
+          !!active &&
+          (active.compareDocumentPosition(stop) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+        const next = event.shiftKey
+          ? (all.filter((stop) => !follows(stop)).at(-1) ?? all.at(-1))
+          : (all.find(follows) ?? all[0]);
+        next?.focus();
         return;
       }
-      if (
-        event.key === 'Enter' &&
-        !(document.activeElement as HTMLElement | null)?.hasAttribute(STOP)
-      ) {
+      const direction = ARROWS[event.key];
+      if (direction) {
+        event.preventDefault();
+        const from = active && group.contains(active) ? active : equals();
+        if (!from) return;
+        const buttons = [...group.querySelectorAll<HTMLElement>('button')].map(boxOf);
+        const start = boxOf(from);
+        const vertical = direction === 'up' || direction === 'down';
+        const goal = vertical ? (goalX.current ?? (start.left + start.right) / 2) : undefined;
+        const at = buttons.find((each) => each.element === from) ?? start;
+        const next = nextInDirection(at, buttons, direction, goal);
+        if (!next) return;
+        next.element.focus();
+        goalX.current = goal ?? null;
+        return;
+      }
+      // Enter on a button presses it, as native buttons do; Enter anywhere else inside works it out.
+      if (event.key === 'Enter' && !(active instanceof HTMLButtonElement)) {
         event.preventDefault();
         onPress('equals');
         return;
@@ -183,6 +232,9 @@ export function Calculator({
       if (!key) return;
       event.preventDefault();
       onPress(key);
+      // Typing works on the display, so Enter after it should work the sum out: focus goes back to =.
+      goalX.current = null;
+      if (active !== equals()) equals()?.focus();
     };
     // A click anywhere but on a stop leaves focus where it is, or brings it back to = if it had
     // left the calculator, so typing reaches the calculator again.

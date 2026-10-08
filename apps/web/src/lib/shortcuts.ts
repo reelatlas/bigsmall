@@ -4,8 +4,8 @@
  */
 
 /**
- * A key as shown on a keycap: "Enter", "Esc", "Tab", "Shift", "↑", a letter. "Mod" is the
- * platform's modifier and renders as Ctrl, or ⌘ on Apple devices.
+ * A key as shown on a keycap: "Enter", "Esc", "Shift", "↑", a letter, a range ("0–9"). "Mod" is
+ * the platform's modifier and renders as Ctrl, or ⌘ on Apple devices; "Alt" renders as ⌥ there.
  */
 export type Key = string;
 
@@ -15,12 +15,17 @@ export interface Shortcut {
   keys: readonly (readonly Key[])[];
 }
 
+// In the order people use them (docs/UX-SPEC.md §10). Tab, Home and End in a toolbar, and
+// Backspace on an empty box work too but are left out to keep the map short.
 export const SHORTCUTS: readonly Shortcut[] = [
-  { action: 'Confirm input or selection', keys: [['Enter']] },
-  // The two arrows share one group so they sit side by side with nothing between them.
-  { action: 'Move through menu', keys: [['↑', '↓']] },
-  { action: 'Back one step', keys: [['Esc']] },
-  { action: 'Toggle inputs', keys: [['Tab'], ['Shift', 'Tab']] },
+  { action: 'Type from anywhere', keys: [['0–9'], ['A–Z']] },
+  { action: 'Pick a unit or value', keys: [['Enter']] },
+  { action: 'Step back or clear', keys: [['Esc']] },
+  // Each pair of arrows shares one group so they sit side by side with nothing between them.
+  { action: 'Move up and down the page', keys: [['↑', '↓']] },
+  { action: 'Move across a toolbar', keys: [['←', '→']] },
+  { action: 'Open the calculator', keys: [['Alt', 'C']] },
+  { action: 'Copy the value', keys: [['Mod', 'C']] },
   { action: 'Undo', keys: [['Mod', 'Z']] },
   {
     action: 'Redo',

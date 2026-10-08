@@ -84,13 +84,15 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         apply(document.documentElement.dataset.theme),
       );
 
-      // Shortcuts name the platform's modifier key: Ctrl, or ⌘ on Apple devices (src/lib/platform.ts).
+      // Shortcuts name the platform's keys: Ctrl, or ⌘ on Apple devices, and Alt, or ⌥ there
+      // (src/lib/platform.ts).
       const apple = new RegExp(applePlatform, applePlatformFlags).test(
         navigator.userAgentData?.platform ?? navigator.platform ?? '',
       );
       if (apple) {
         document.addEventListener('DOMContentLoaded', () => {
           for (const label of document.querySelectorAll('[data-mod-key]')) label.textContent = '⌘';
+          for (const label of document.querySelectorAll('[data-alt-key]')) label.textContent = '⌥';
         });
       }
 

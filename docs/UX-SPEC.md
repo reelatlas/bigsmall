@@ -164,18 +164,21 @@ The theme menu and the shortcuts map are fluid shells driven by the inline scrip
 - **Theme menu.** A trigger showing the current theme; the options are native radios, so arrow keys and Space work. Picking a theme applies it at once, saves it, closes the menu, and returns focus to the trigger. The arrow keys apply and save each theme they reach and leave the menu open, so themes can be compared; Enter or Escape closes it on the theme reached. Without a saved choice the theme follows the system's light or dark preference.
 - **Shortcuts map.** A keyboard icon, borderless like the other icon buttons. A mouse resting on it opens the map after 120 ms and it closes 200 ms after the mouse leaves, and reaching it with the keyboard opens it until focus moves on; a click pins it open, and a second click, Escape, or a click outside closes it (WCAG 1.4.13: the map can be hovered, dismissed, and stays until then). Open, it grows left and down from the icon. It lists, from `src/lib/shortcuts.ts`:
 
-  | Action                     | Keys                   |
-  | -------------------------- | ---------------------- |
-  | Confirm input or selection | Enter                  |
-  | Move through menu          | ↑ ↓                    |
-  | Back one step              | Esc                    |
-  | Toggle inputs              | Tab or Shift Tab       |
-  | Undo                       | Ctrl Z                 |
-  | Redo                       | Ctrl Y or Ctrl Shift Z |
+  | Action                    | Keys                   |
+  | ------------------------- | ---------------------- |
+  | Type from anywhere        | 0–9 or A–Z             |
+  | Pick a unit or value      | Enter                  |
+  | Step back or clear        | Esc                    |
+  | Move up and down the page | ↑ ↓                    |
+  | Move across a toolbar     | ← →                    |
+  | Open the calculator       | Alt C                  |
+  | Copy the value            | Ctrl C                 |
+  | Undo                      | Ctrl Z                 |
+  | Redo                      | Ctrl Y or Ctrl Shift Z |
 
-  Keys pressed together sit side by side; alternatives are joined by "or". Backspace on an empty box and Ctrl C work but are left out to keep the map short. It is hidden on touch-first devices and below the `sm` breakpoint. Sean is rewriting its entries for the one box (§14); "Toggle inputs" described the two boxes.
+  Keys pressed together sit side by side; alternatives are joined by "or". Tab, Home and End in a toolbar, and Backspace on an empty box work but are left out to keep the map short. It is hidden on touch-first devices and below the `sm` breakpoint.
 
-- **Mac or Windows.** On Apple devices every Ctrl reads ⌘, in the map and in the undo and redo tooltips ("Undo (⌘Z)", "Redo (⇧⌘Z)"), from one case-insensitive check in `src/lib/platform.ts`.
+- **Mac or Windows.** On Apple devices every Ctrl reads ⌘ and every Alt reads ⌥, in the map and in the tooltips ("Undo (⌘Z)", "Redo (⇧⌘Z)", "Calculator (⌥C)"), from one case-insensitive check in `src/lib/platform.ts`.
 
 ## 11. URL and persistence
 
@@ -203,7 +206,7 @@ Not built yet; each item names its milestone in docs/PLAN.md §13.
 
 **Owner's ideas, logged 2026-10-06**, all built: copy link (§7, now named Copy URL), the calculator (§8), and the wordmark at play with theme art (§1). Later, maybe: on phones, the native share sheet in place of Copy URL, and the calculator docked to the bottom of the screen.
 
-- **The shortcuts map's entries (Sean, next, after other issues).** Rewritten for the one box: "Toggle inputs" described the two boxes; the arrows now move through the table, and typing works from anywhere. Until then the map lists the entries in §10.
+- **The shortcuts map's entries**, rewritten with Sean for the one box, built 2026-10-08 (§10), with the toolbars and planes (ADR 0014), Alt+C, and the calculator's arrows (§8).
 - **Table selection, option A**, decided 2026-10-07 in the selection lab and built the same day (ADR 0012; §1, §5, §8, §9, §12; docs/research/table-selection.md). Still open, for Sean once he has used it: an all-clear control (in the toolbar or inline), and whether a category chosen with no unit belongs in the URL.
 - **One layout**, decided 2026-10-07 (ADR 0013): two boxes and the layout switch retired, the table the converter. Their last version, consistent with the table, is in git at commit `f4563f2`; bringing them back starts from reverting the retirement.
 - **Modes (milestone 3).** `basic` (default) lists basic-tier units with a final "Show all N units" row in the table; `advanced` lists all units. When a query matches only advanced units, show them under an "Advanced units" label without changing the mode. The mode persists. The reducer already has a `setMode` action; nothing dispatches it yet.

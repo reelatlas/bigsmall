@@ -68,7 +68,7 @@ test('the shortcuts map opens on hover, stays when clicked, and closes on Escape
 
   await toggle.hover();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  await expect(page.getByText('Confirm input or selection')).toBeVisible();
+  await expect(page.getByText('Pick a unit or value')).toBeVisible();
   // The open edge goes with the panel: a fading edge would leave a green square behind.
   const shell = toggle.locator('xpath=ancestor::*[@data-shell]/*[1]');
   const edgeFades = await shell.evaluate((el) => {
@@ -102,14 +102,20 @@ test('the shortcuts map is hidden on touch-first devices', async ({ page, isMobi
   await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeHidden();
 });
 
-test('shortcuts name ⌘ on Apple devices and Ctrl elsewhere', async ({ page, isMobile }) => {
+test('shortcuts name ⌘ and ⌥ on Apple devices, Ctrl and Alt elsewhere', async ({
+  page,
+  isMobile,
+}) => {
   test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
   const undo = page.getByRole('button', { name: 'Undo' });
+  const calculator = page.getByRole('button', { name: 'Calculator', exact: true });
 
   await page.goto('/');
   await ready(page);
   await expect(page.locator('[data-mod-key]').first()).toHaveText('Ctrl');
+  await expect(page.locator('[data-alt-key]').first()).toHaveText('Alt');
   await expect(undo).toHaveAttribute('title', 'Undo (Ctrl+Z)');
+  await expect(calculator).toHaveAttribute('title', 'Calculator (Alt+C)');
 
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' });
@@ -118,7 +124,9 @@ test('shortcuts name ⌘ on Apple devices and Ctrl elsewhere', async ({ page, is
   await page.reload();
   await ready(page);
   await expect(page.locator('[data-mod-key]').first()).toHaveText('⌘');
+  await expect(page.locator('[data-alt-key]').first()).toHaveText('⌥');
   await expect(undo).toHaveAttribute('title', 'Undo (⌘Z)');
+  await expect(calculator).toHaveAttribute('title', 'Calculator (⌥C)');
 });
 
 // Under 416 px the header's menus take a line of their own, theme menu first and flush left; from

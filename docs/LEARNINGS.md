@@ -550,3 +550,8 @@ Format:
 
 **What happened.** The selection lab's category menu applied a category on every radio change, copying the theme menu, whose arrows preview themes. In the converter, choosing a category takes the unit out of the box and is an undoable step, so arrowing past three categories would have lost the unit and left three steps to undo.
 **Rule.** Previewing on change suits choices that cost nothing to try (themes). A choice that changes the user's work moves without applying, and applies on Enter or a click; Escape then closes without changing anything.
+
+## 2026-10-07 — A page-wide key must yield to what the key already did
+
+**What happened.** Escape with nothing focused was made to clear the converter's box. The header's shortcuts map can be open with nothing focused (a resting mouse opens it), and its Escape closes it from a document listener in the inline script, which ran first but left the event alone, so one Escape would also have cleared the box behind the map.
+**Rule.** A listener that acts on a key from anywhere checks `event.defaultPrevented` first, and every handler that consumes the key, the inline script's included, calls `preventDefault()`, so one press does one thing. Document listeners run in the order they were added: the inline script's before any island's.

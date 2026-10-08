@@ -182,6 +182,7 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         setOpen(shell, false, false);
       });
       // Escape closes any open shell, hovered or pinned; focus returns to its toggle if it was inside.
+      // An Escape that closed one does nothing else, so the converter's Escape from the page waits.
       document.addEventListener('keydown', (event) => {
         // Enter on a theme option keeps the previewed theme and closes the menu.
         if (event.key === 'Enter' && event.target instanceof Element) {
@@ -200,6 +201,7 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
           const focusWasInside = shell.contains(document.activeElement);
           setOpen(shell, false, false);
           if (focusWasInside) toggleOf(shell)?.focus();
+          event.preventDefault();
         }
       });
     </script>

@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type FocusEvent,
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
@@ -142,6 +143,20 @@ export function TableLayout({
   };
 
   /**
+   * The Escape ladder's steps that change the conversion, one a call: a typed unit, back to the
+   * number; the number; the unit and the category, back to the start, as clear all does. False
+   * when there is nothing left to clear.
+   */
+  const clearStep = (): boolean => {
+    if (table.kind === 'matches') dispatch({ type: 'replace', text: number });
+    else if (box.text !== '') dispatch({ type: 'replace', text: '' });
+    else if (box.unit || table.kind === 'units') dispatch({ type: 'clear' });
+    else return false;
+    setPosition(null);
+    return true;
+  };
+
+  /**
    * Typing that lands in the field from elsewhere: always after what is there, so 554 then 67
    * reads 55467; Backspace takes the last character back; Escape is how to clear.
    */
@@ -197,15 +212,20 @@ export function TableLayout({
     return () => root.removeEventListener('keydown', onKeyDown);
   });
 
-  // With nothing on the page focused, a letter or a digit starts typing in the field: the page
-  // has one job. It only types, never acts, and never with focus in another control or with
-  // Ctrl, ⌘, or Alt held (WCAG 2.1.4; ADR 0012).
+  // With nothing on the page focused, the page has one job: a letter or a digit starts typing in
+  // the field, and Escape takes the ladder's clearing steps, as it would in the field. Typing
+  // only types, never acts; neither works with focus in another control or with Ctrl, ⌘, or Alt
+  // held (WCAG 2.1.4; ADR 0012). An Escape that closed a header menu has done its job already.
   useLayoutEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.defaultPrevented || event.isComposing) return;
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       const active = document.activeElement;
       if (active && active !== document.body && active !== document.documentElement) return;
+      if (event.key === 'Escape') {
+        if (clearStep()) event.preventDefault();
+        return;
+      }
       if (!STARTS_TYPING.test(event.key)) return;
       event.preventDefault();
       typeIntoField(event.key);
@@ -332,22 +352,14 @@ export function TableLayout({
         return;
       }
       case 'Escape':
-        // One step at a time: back from browsing the table; the typed unit, back to the number;
-        // the number; the unit and the category, back to the start, as clear all does; then it
+        // One step at a time: back from browsing the table, then the clearing steps, then it
         // lets go, leaving just the page. Right after Enter the cursor only rests, so the first
         // Escape already clears.
         event.preventDefault();
         if (browsing) {
           setPosition(null);
           inputRef.current?.scrollIntoView({ block: 'nearest' });
-        } else if (table.kind === 'matches') {
-          dispatch({ type: 'replace', text: number });
-        } else if (box.text !== '') {
-          dispatch({ type: 'replace', text: '' });
-        } else if (box.unit || table.kind === 'units') {
-          dispatch({ type: 'clear' });
-          setPosition(null);
-        } else inputRef.current?.blur();
+        } else if (!clearStep()) inputRef.current?.blur();
         return;
       case 'Backspace':
         // On an empty field, Backspace takes the unit out, as the chip's × does.
@@ -395,8 +407,14 @@ export function TableLayout({
       />
     );
 
+  // The cursor shows only while focus is in the layout: leaving it, the cursor rests again.
   return (
-    <div ref={rootRef}>
+    <div
+      ref={rootRef}
+      onBlur={(event: FocusEvent<HTMLDivElement>) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPosition(null);
+      }}
+    >
       <div ref={menuRef} className="mb-2">
         <CategoryMenu
           categories={table.categories}

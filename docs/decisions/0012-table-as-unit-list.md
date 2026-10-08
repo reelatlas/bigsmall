@@ -43,3 +43,4 @@ Behavior: docs/UX-SPEC.md §1, §8, §9, §12.
 ## Outcome notes (2026-10-07)
 
 - The selection lab retired once A shipped; it is in git as of commit `f1321b0` (`apps/web/src/pages/dev/_selection-lab/`).
+- Escape works from the page too, with nothing focused: it takes the ladder's clearing steps one a press (Sean, 2026-10-07). The cursor shows only while focus is in the converter, and an Escape that closes a header menu does only that (docs/UX-SPEC.md §9).

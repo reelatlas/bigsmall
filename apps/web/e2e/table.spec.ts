@@ -304,6 +304,60 @@ test('Escape steps back: off the table, the typed unit, the number, the unit and
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
 });
 
+test('with nothing focused, Escape clears the box a step at a time, as in the box', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'Escape needs a keyboard');
+  await page.goto('/?a=milliliter&v=250');
+  await ready(page);
+  await box(page).click();
+  await box(page).press('End');
+  await page.keyboard.type(' cu');
+  await expect(matches(page)).toBeVisible();
+  // Focus leaves the converter for the page.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+
+  await page.keyboard.press('Escape');
+  await expect(box(page)).toHaveValue('250');
+  await page.keyboard.press('Escape');
+  await expect(box(page)).toHaveValue('');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(tiles(page)).toBeVisible();
+  // It clears without taking focus, and the steps can be undone.
+  await expect(box(page)).not.toBeFocused();
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+});
+
+test('the cursor shows only while focus is in the converter', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/?a=milliliter&v=250');
+  await ready(page);
+  await box(page).click();
+  await box(page).press('ArrowDown');
+  await expect(page.locator('[role="row"][aria-selected="true"]')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Calculator' }).click();
+  await expect(page.locator('[role="row"][aria-selected="true"]')).toHaveCount(0);
+});
+
+test('an Escape that closes the hovered shortcuts map does nothing else', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
+  await page.goto('/?a=milliliter&v=250');
+  await ready(page);
+  const toggle = page.getByRole('button', { name: 'Keyboard shortcuts' });
+  await toggle.hover();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Escape');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(box(page)).toHaveValue('250');
+});
+
 test('typing anywhere lands in the field, after what is there', async ({ page, isMobile }) => {
   test.skip(isMobile, 'typing from anywhere needs a keyboard');
   await page.goto('/?a=milliliter&v=554');

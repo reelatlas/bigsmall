@@ -515,3 +515,13 @@ Format:
 
 **What happened.** A browser test typed a 13-digit number into one of two boxes and expected it to keep its largest size once the chip gave up its name. It passed on Windows and failed on CI: the numbers use the system's font (`--type-numeric` is a system stack in most themes), and Linux's digits are wider, so 13 of them no longer fit. The production gate held the deploy back, as it should.
 **Rule.** A test of how text fits never hard-codes a count tuned on one machine. Check the rule across a sweep instead (the chip test types 1 to 20 digits and checks that the name never stays while the number shrinks, and that it gives way sooner in a narrower box), or pick lengths far from any edge, with room for fonts a fifth wider or narrower.
+
+## 2026-10-07 — A new island's classes can miss the dev server's CSS
+
+**What happened.** The selection lab, a new `/dev` page, rendered in the dev server with some of its Tailwind classes missing: `opacity-0` and `appearance-none` had no rules, so a native menu meant to be unseen showed through, arrow and all. Two causes stacked. The island was `client:only`, and in dev Astro inlines the CSS of the server's module graph, where a client-only island never appears. And the dev server had been running since before the file existed, so Tailwind had not scanned it. A production build scans every source and was never affected.
+**Rule.** Render islands with `client:load`, as the other labs do, so their classes reach the page's CSS. When a new file's classes are still missing in a long-running dev server, saving `src/styles/global.css`, with no change, makes Tailwind rescan; restarting the server does too.
+
+## 2026-10-07 — A menu that closes on blur shuts before a pick lands
+
+**What happened.** The selection lab's category menu closes when focus leaves it, and applies a pointer's pick on release. Picking did nothing: pressing an option's label moved focus off the focused radio (a label takes no focus), the menu closed on that blur, and the release landed on a menu already gone.
+**Rule.** In a menu that closes when focus leaves, keep focus put when a choice is pressed (`preventDefault` on `mousedown` inside the panel), as the smart input's list does for its rows. Apply the pick on release, not on click, where radios are involved: the arrow keys check radios with a click of their own.

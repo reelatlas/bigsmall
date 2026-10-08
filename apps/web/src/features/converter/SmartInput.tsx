@@ -558,7 +558,7 @@ function buildList(text: string, scope: CategoryId | null, options: ListOptions)
  * as a query ("-" before "-5", "1e" before "1e5"), so those, and a lone "e" after a number, which
  * may be an exponent on its way, wait for the next key.
  */
-function typingUnit(parsed: ParsedInput): boolean {
+export function typingUnit(parsed: ParsedInput): boolean {
   const { query } = parsed;
   if (!query) return false;
   if (parsed.valueText !== undefined && /^[eE][-+−]?$/.test(query)) return false;

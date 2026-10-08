@@ -1,0 +1,18 @@
+---
+import DevPage from '../../layouts/DevPage.astro';
+import { SelectionLab } from './_selection-lab/SelectionLab';
+
+/*
+ * Prototypes for choosing a category and a unit in the table layout without a list drawn over the
+ * table (Sean, 2026-10-07). Each is built from the real engine, table, chip, and field, but holds
+ * its own simple state: no undo, no URL. The one Sean picks is then built into the converter.
+ */
+---
+
+<DevPage title="selection lab" description="Prototypes for choosing a category and a unit.">
+  <Fragment slot="intro">
+    Selection lab. Three ways to choose a category and a unit with the table always in view. Each
+    starts empty, the way a first visit does; Start over resets it.
+  </Fragment>
+  <SelectionLab client:load />
+</DevPage>

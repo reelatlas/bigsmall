@@ -50,6 +50,7 @@ pnpm --filter @bigsmall/web brand   # redraw the icons and the link preview imag
 - **Add a UI delay:** a named constant in `apps/web/src/lib/timing.ts`, never a literal number of milliseconds.
 - **Change the icon or the link preview:** edit the mark in `apps/web/scripts/brand-assets.mjs` (or the name or description in `src/lib/site.ts`), run the `brand` command, and commit what it writes to `apps/web/public/`.
 - **Ship:** push to `main`. CI must pass before Vercel promotes the build to `bigsmall.work` (`docs/DEPLOYMENT.md`).
+- **Tidy up:** the `/tidy` skill (`.claude/skills/tidy/`) audits what changed since the last tidy, an area, or the whole system (`/tidy full`) against the design system and the docs, fixes what is mechanical, and brings look, behavior, and token changes to Sean. Offer it after a lab or a feature lands; run it when asked.
 
 ## Commits
 

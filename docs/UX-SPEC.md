@@ -208,6 +208,7 @@ Not built yet; each item names its milestone in docs/PLAN.md §13.
 
 - **The shortcuts map's entries**, rewritten with Sean for the one box, built 2026-10-08 (§10), with the toolbars and planes (ADR 0014), Alt+C, and the calculator's arrows (§8).
 - **Table selection, option A**, decided 2026-10-07 in the selection lab and built the same day (ADR 0012; §1, §5, §8, §9, §12; docs/research/table-selection.md). Still open, for Sean once he has used it: an all-clear control (in the toolbar or inline), and whether a category chosen with no unit belongs in the URL.
+- **The category menu as an inline select** (Sean, 2026-10-08): the name and a chevron without the shell's box, if the menu at the toolbar's end reads heavy once he has used it. Narrower, it would also sit beside the tools on a phone, where the boxed menu wraps under them.
 - **One layout**, decided 2026-10-07 (ADR 0013): two boxes and the layout switch retired, the table the converter. Their last version, consistent with the table, is in git at commit `f4563f2`; bringing them back starts from reverting the retirement.
 - **Modes (milestone 3).** `basic` (default) lists basic-tier units with a final "Show all N units" row in the table; `advanced` lists all units. When a query matches only advanced units, show them under an "Advanced units" label without changing the mode. The mode persists. The reducer already has a `setMode` action; nothing dispatches it yet.
 - **Calculator, phase 2.** `( )`, `½ ¼ ⅛`, and `′ ″` keys; the open state and the display remembered with the other preferences.

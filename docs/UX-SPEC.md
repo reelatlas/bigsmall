@@ -232,9 +232,9 @@ Not built yet; each item names its milestone in docs/PLAN.md §13.
   - Phase 2: mixed fractions (`3 1/4`; `1/2` already reads as a division, §2), feet and inches (`5'10"`), and the connective form (`5 ml to cups`, `5 ml in cups`), where the part after the connective names the unit to read.
   - Phase 3, math inside the box: built for `+ − × ÷ ^ * / ( )` with Enter as equals and the running value in the field (§2, §7, §8). Still to come: `x` as times between two numbers, and a soft hint for arithmetic that cannot be read.
 
-## 15. Open questions for the usability test
+## 15. Open questions for testing with people
 
-The script is docs/research/usability-test-1.md (it needs this build's model before it runs). The questions this build raises:
+For friends' feedback rounds now, and for the usability test (docs/research/usability-test-1.md, set aside 2026-10-08) if it runs. The questions this build raises:
 
 1. Do people press Enter or click a match to take the unit they typed? Anyone who tabs or clicks away expecting it to be taken will see dashes (§5).
 2. Do they start from the category tiles, the menu, or by typing? After choosing a category, do the dashes read as "pick a unit", and does a typed number then landing in the unit picked (250 cups, not 250 teaspoons converted) match what they expect?

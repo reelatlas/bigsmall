@@ -63,8 +63,8 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         for (const option of document.querySelectorAll('[data-theme-option]')) {
           option.checked = option.value === id;
         }
-        for (const name of document.querySelectorAll('[data-theme-name]')) {
-          name.textContent = names[id] || id;
+        for (const label of document.querySelectorAll('[data-theme-name]')) {
+          label.textContent = names[id] || id;
         }
       };
       const readSaved = (name) => {

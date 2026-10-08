@@ -45,6 +45,11 @@ export interface SearchOptions {
    * breaks ties between typed matches (docs/UX-SPEC.md §3, §4).
    */
   system?: UnitPreference;
+  /**
+   * A category to rank first among equal matches, without hiding the others: the table layout's
+   * current category, when a query searches every category (docs/UX-SPEC.md §4).
+   */
+  prefer?: CategoryId | null;
   /** Maximum results. Default 20. */
   limit?: number;
 }
@@ -163,12 +168,22 @@ function systemRank(system: UnitSystem, preference: UnitPreference | undefined):
   }
 }
 
-function compareRanked(a: Ranked, b: Ranked, preference: UnitPreference | undefined): number {
+function categoryOf(result: SearchResult): CategoryId {
+  return result.kind === 'unit' ? result.unit.category : result.category.id;
+}
+
+function compareRanked(a: Ranked, b: Ranked, options: SearchOptions): number {
   const ra = a.result;
   const rb = b.result;
   if (ra.matchClass !== rb.matchClass) return ra.matchClass - rb.matchClass;
   if (ra.kind !== rb.kind) return ra.kind === 'category' ? -1 : 1;
+  if (options.prefer) {
+    const preferred =
+      (categoryOf(ra) === options.prefer ? 0 : 1) - (categoryOf(rb) === options.prefer ? 0 : 1);
+    if (preferred !== 0) return preferred;
+  }
   if (ra.kind === 'unit' && rb.kind === 'unit') {
+    const preference = options.system;
     const sys = systemRank(ra.unit.system, preference) - systemRank(rb.unit.system, preference);
     if (sys !== 0) return sys;
     const tier = (ra.unit.tier === 'basic' ? 0 : 1) - (rb.unit.tier === 'basic' ? 0 : 1);
@@ -257,7 +272,7 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
   }
 
   const ranked = [...bestCategory.values(), ...unitResults].sort((a, b) =>
-    compareRanked(a, b, options.system),
+    compareRanked(a, b, options),
   );
 
   return {

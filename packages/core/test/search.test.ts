@@ -244,6 +244,27 @@ describe('search: categories and scope', () => {
     expect(us.indexOf('foot-per-second')).toBeLessThan(us.indexOf('meter-per-second'));
     expect(metric.indexOf('meter-per-second')).toBeLessThan(metric.indexOf('foot-per-second'));
   });
+
+  it('ranks a preferred category first among equal matches, hiding none', () => {
+    expect(ids(search('p', { system: 'us' })).slice(0, 2)).toEqual(['pound', 'us-pint']);
+    expect(ids(search('p', { system: 'us', prefer: 'volume' })).slice(0, 2)).toEqual([
+      'us-pint',
+      'pound',
+    ]);
+    // A stronger match still comes first: °F is an exact symbol, fl oz only a prefix.
+    expect(ids(search('f', { system: 'us', prefer: 'volume' })).slice(0, 3)).toEqual([
+      'fahrenheit',
+      'us-fluid-ounce',
+      'foot',
+    ]);
+    // Categories still lead their class.
+    expect(ids(search('t', { prefer: 'volume' })).slice(0, 4)).toEqual([
+      'tonne',
+      '#temperature',
+      '#time',
+      'us-teaspoon',
+    ]);
+  });
 });
 
 describe('resolveExact', () => {

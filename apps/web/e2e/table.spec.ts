@@ -552,7 +552,7 @@ test('a link from two boxes opens on the box that held the number', async ({ pag
   await expect(row(page, 'us-pint')).toContainText('1');
 });
 
-test('a value with no answer says so once; a row too large for a double says so', async ({
+test('a value with no answer says so once; a row too large for a double, or undefined for 0, says so', async ({
   page,
 }) => {
   await page.goto('/?a=kilometer&v=1');
@@ -566,6 +566,12 @@ test('a value with no answer says so once; a row too large for a double says so'
   await expect(millimeters).toContainText('Too large');
   await expect(millimeters.getByRole('button', { name: /^Copy/ })).toHaveCount(0);
   await expect(row(page, 'kilometer')).toContainText('1E306');
+
+  // 0 in a reciprocal unit leaves the units it divides into without a value.
+  await page.goto('/?a=mile-per-us-gallon&v=0');
+  await ready(page);
+  await expect(row(page, 'liter-per-100-kilometers')).toContainText('Undefined for 0');
+  await expect(row(page, 'kilometer-per-liter')).toContainText('0');
 });
 
 test('the live region says how many units the value is shown in', async ({ page }) => {

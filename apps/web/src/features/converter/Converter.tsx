@@ -1,5 +1,5 @@
 import { formatNumber, parse } from '@bigsmall/core';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
 import {
@@ -11,7 +11,12 @@ import {
   RedoIcon,
   UndoIcon,
 } from '../../components/icons';
-import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
+import {
+  Calculator,
+  focusCalculator,
+  SendButton,
+  type CalculatorKey,
+} from '../../components/Calculator';
 import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
@@ -93,10 +98,47 @@ export function Converter() {
     return () => section.removeEventListener('keydown', onKeyDown);
   }, [dispatch]);
 
-  const closeCalculator = () => {
-    setCalculatorOpen(false);
-    document.getElementById(calculatorToggleId)?.focus();
+  /**
+   * Where focus goes back to when the calculator closes: the icon, when the icon opened it, or
+   * where Alt+C was pressed (docs/UX-SPEC.md §8).
+   */
+  const returnTo = useRef<HTMLElement | null>(null);
+  const calculatorToggle = () => document.getElementById(calculatorToggleId);
+
+  const openCalculator = (from: HTMLElement | null) => {
+    returnTo.current = from;
+    setCalculatorOpen(true);
   };
+
+  const closeCalculator = (focus: HTMLElement | null = returnTo.current) => {
+    setCalculatorOpen(false);
+    (focus?.isConnected ? focus : calculatorToggle())?.focus();
+  };
+
+  // Alt+C (⌥C on Apple devices, where Option+C types ç) from anywhere on the page: opens the
+  // calculator; brings focus back to it when it is open and focus is elsewhere; pressed inside
+  // it, closes it and puts focus back where it was. AltGr, which is Ctrl+Alt, is left alone.
+  useLayoutEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.repeat) return;
+      const isC = event.key.toLowerCase() === 'c' || (isApplePlatform() && event.code === 'KeyC');
+      if (!isC) return;
+      event.preventDefault();
+      const focused = document.activeElement;
+      // With nothing focused, closing comes back to the box.
+      const here =
+        focused instanceof HTMLElement && focused !== document.body ? focused : inputRef.current;
+      const calculator = document.getElementById(calculatorId);
+      if (!calculatorOpen) openCalculator(here);
+      else if (calculator?.contains(focused)) closeCalculator();
+      else {
+        returnTo.current = here;
+        focusCalculator(calculator);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  });
 
   /** Keys change only the calculator's own entry (calculator.ts); the box waits for a send. */
   const press = (key: CalculatorKey) => {
@@ -166,7 +208,7 @@ export function Converter() {
       decimalMark={env.separators.decimal}
       onPress={press}
       onEscape={escapeCalculator}
-      onClose={closeCalculator}
+      onClose={() => closeCalculator()}
       footer={
         <SendButton
           symbol={box.unit?.symbol}
@@ -201,10 +243,16 @@ export function Converter() {
             square
             id={calculatorToggleId}
             aria-label="Calculator"
-            title="Calculator"
+            aria-keyshortcuts="Alt+C"
+            title={apple ? 'Calculator (⌥C)' : 'Calculator (Alt+C)'}
             aria-expanded={calculatorOpen}
             aria-controls={calculatorOpen ? calculatorId : undefined}
-            onClick={() => (calculatorOpen ? closeCalculator() : setCalculatorOpen(true))}
+            onClick={() => {
+              // Closed with the icon, focus stays on it, wherever the calculator was opened from.
+              const icon = calculatorToggle();
+              if (calculatorOpen) closeCalculator(icon);
+              else openCalculator(icon);
+            }}
             on={calculatorOpen}
           >
             <CalculatorIcon />

@@ -83,6 +83,19 @@ const DISPLAY_TEXT = 'min-w-0 flex-1 overflow-hidden font-numeric whitespace-pre
 /** Marks what Tab moves between: close, =, and each send button. Enter presses the one focused. */
 const STOP = 'data-calculator-stop';
 
+/** The = key of the calculator inside `container`, where opening puts focus. */
+function equalsIn(container: ParentNode | null | undefined): HTMLElement | null {
+  return container?.querySelector<HTMLElement>(`[${STOP}="equals"]`) ?? null;
+}
+
+/**
+ * Puts focus on the = key of the calculator inside `container`, as opening does: for a host that
+ * brings the keyboard back to an open calculator (Alt+C).
+ */
+export function focusCalculator(container: ParentNode | null | undefined): void {
+  equalsIn(container)?.focus();
+}
+
 export interface CalculatorProps {
   /** What the display shows, such as a NumberText; empty shows a muted 0. */
   display: ReactNode;
@@ -174,7 +187,7 @@ export function Calculator({
   // effects commit with the render; Preact runs plain effects after paint, a frame too late for
   // keys typed straight after the click that opened it.
   useLayoutEffect(() => {
-    if (focusOnOpen) groupRef.current?.querySelector<HTMLElement>(`[${STOP}="equals"]`)?.focus();
+    if (focusOnOpen) focusCalculator(groupRef.current);
   }, [focusOnOpen]);
 
   // Native listeners, like the converter's undo keys: the group is not itself interactive. Bound
@@ -184,7 +197,7 @@ export function Calculator({
     const group = groupRef.current;
     if (!group) return;
     const stops = () => [...group.querySelectorAll<HTMLElement>(`[${STOP}]`)];
-    const equals = () => group.querySelector<HTMLElement>(`[${STOP}="equals"]`);
+    const equals = () => equalsIn(group);
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       const active = document.activeElement as HTMLElement | null;
@@ -249,7 +262,7 @@ export function Calculator({
       if ((event.target as Element).closest(`[${STOP}]`)) return;
       event.preventDefault();
       if (!group.contains(document.activeElement)) {
-        group.querySelector<HTMLElement>(`[${STOP}="equals"]`)?.focus();
+        focusCalculator(group);
       }
     };
     // After a send, focus goes back to =, so the next keys start a new entry and Enter cannot
@@ -257,7 +270,7 @@ export function Calculator({
     const onClick = (event: MouseEvent) => {
       const send = (event.target as Element).closest(`[${STOP}="send"]`);
       if (send && send.getAttribute('aria-disabled') !== 'true') {
-        group.querySelector<HTMLElement>(`[${STOP}="equals"]`)?.focus();
+        focusCalculator(group);
       }
     };
     group.addEventListener('keydown', onKeyDown);

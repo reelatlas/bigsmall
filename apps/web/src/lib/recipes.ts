@@ -19,6 +19,12 @@ export function cx(...parts: ReadonlyArray<string | false | null | undefined>): 
 /** A card: one raised area of related controls (the calculator, the wordmark lab's panels). */
 export const CARD = 'rounded-lg border border-line bg-surface';
 
+/**
+ * A panel's title, naming its group as a label names what it labels: the calculator's and the
+ * shortcuts map's, muted so the panel's content leads.
+ */
+export const PANEL_TITLE = 'text-sm font-medium text-ink-muted';
+
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,
 // and `data-open` while open; the shell takes SHELL, one of the two resting styles, and its own

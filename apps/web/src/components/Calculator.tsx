@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useFitStep } from '../lib/fit-step';
-import { CARD, cx, FIELD_ROW, NO_ANSWER, NUMBER_SIZES } from '../lib/recipes';
+import { CARD, cx, FIELD_ROW, NO_ANSWER, NUMBER_SIZES, PANEL_TITLE } from '../lib/recipes';
 import { nextInDirection, type Box, type Direction } from '../lib/spatial';
 import { Button, type ButtonVariant } from './Button';
 import { BackspaceIcon, CloseIcon, CopiedIcon } from './icons';
@@ -66,9 +66,6 @@ function boxOf(element: HTMLElement): Box & { element: HTMLElement } {
   const { left, right, top, bottom } = element.getBoundingClientRect();
   return { element, left, right, top, bottom };
 }
-
-/** The title, which names the calculator's group: a label over what it names. */
-const TITLE = 'text-sm font-medium text-ink-muted';
 
 /**
  * The card while focus is inside it, where the keys go: its edge turns accent, 2 px like a
@@ -287,7 +284,7 @@ export function Calculator({
       className={cx(CARD, 'p-3 shadow-sm', ACTIVE)}
     >
       <div className="mb-2 flex items-center justify-between">
-        <h2 id={titleId} className={cx('pl-1', TITLE)}>
+        <h2 id={titleId} className={cx('pl-1', PANEL_TITLE)}>
           Calculator
         </h2>
         <Button

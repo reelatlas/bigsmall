@@ -1,5 +1,5 @@
 ---
-import { SHELL, SHELL_GHOST, SHELL_PANEL } from '../lib/recipes';
+import { PANEL_TITLE, SHELL, SHELL_GHOST, SHELL_PANEL } from '../lib/recipes';
 import { SHORTCUTS } from '../lib/shortcuts';
 import { Button } from './Button';
 import { KeyboardIcon } from './icons';
@@ -29,10 +29,7 @@ const titleId = 'shortcuts-title';
 >
   <div class:list={['absolute top-0 right-0 rounded-md', SHELL, SHELL_GHOST]}>
     <div class="flex items-center">
-      <h2
-        id={titleId}
-        class="hidden flex-1 px-3 text-sm font-medium text-ink group-data-open:block"
-      >
+      <h2 id={titleId} class:list={['hidden flex-1 px-3 group-data-open:block', PANEL_TITLE]}>
         Keyboard shortcuts
       </h2>
       <Button

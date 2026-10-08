@@ -134,6 +134,20 @@ test('Escape on a toolbar control goes back to the box; with the map open, it cl
   await expect(box(page)).toBeFocused();
 });
 
+test('typing on a toolbar’s control, the header’s too, lands in the box', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  await page.keyboard.press('Tab');
+  await expect(shortcuts(page)).toBeFocused();
+  await page.keyboard.type('5');
+  await expect(box(page)).toBeFocused();
+  await expect(box(page)).toHaveValue('5');
+  await page.keyboard.press('ArrowUp');
+  await expect(menu(page)).toBeFocused();
+  await page.keyboard.type('0');
+  await expect(box(page)).toHaveValue('50');
+});
+
 test('the shortcuts map shows while the keyboard is on its icon', async ({ page }) => {
   await page.goto('/');
   await ready(page);

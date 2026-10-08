@@ -52,6 +52,14 @@ const TABLE_CALCULATOR_CELL =
  */
 const STARTS_TYPING = /^[\p{L}\p{N}.,-]$/u;
 
+/**
+ * Keys that type into the field from a control beside it (a toolbar's, the chip, a copy button):
+ * any character, or Backspace. Not Space, which presses the control.
+ */
+function typesIntoField(event: globalThis.KeyboardEvent): boolean {
+  return event.key === 'Backspace' || (event.key.length === 1 && event.key !== ' ');
+}
+
 /** Which list the table's place shows, for a cursor to belong to: the start, the matches, or one category's units. */
 function viewKeyOf(view: TableView): string {
   return view.kind === 'units' ? `units:${view.category}` : view.kind;
@@ -213,7 +221,7 @@ export function TableLayout({
         return;
       }
       if (event.ctrlKey || event.metaKey || event.altKey) return;
-      if (event.key !== 'Backspace' && (event.key.length !== 1 || event.key === ' ')) return;
+      if (!typesIntoField(event)) return;
       event.preventDefault();
       typeIntoField(event.key);
     };
@@ -231,7 +239,16 @@ export function TableLayout({
       if (event.defaultPrevented || event.isComposing) return;
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       const active = document.activeElement;
-      if (active && active !== document.body && active !== document.documentElement) return;
+      if (active && active !== document.body && active !== document.documentElement) {
+        // A toolbar's control beyond the layout (the header's) types into the field too, as the
+        // converter's own toolbar does.
+        const tool = active.matches('[role="toolbar"] [data-tool]');
+        if (tool && !rootRef.current?.contains(active) && typesIntoField(event)) {
+          event.preventDefault();
+          typeIntoField(event.key);
+        }
+        return;
+      }
       if (event.key === 'Escape') {
         if (clearStep()) event.preventDefault();
         return;

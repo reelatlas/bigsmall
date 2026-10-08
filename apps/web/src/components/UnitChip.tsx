@@ -1,6 +1,6 @@
 import type { Unit } from '@bigsmall/core';
 import type { Ref } from 'react';
-import { cx } from '../lib/recipes';
+import { cx, unitSymbol } from '../lib/recipes';
 import { CloseIcon } from './icons';
 
 export interface UnitChipProps {
@@ -27,8 +27,9 @@ const BODY = 'inline-flex items-baseline gap-2 self-center px-3';
 const HOVER = 'transition-colors hover:bg-surface/40';
 
 /**
- * The locked unit inside a smart input: its symbol, then its name, which open the unit list, plus
- * a remove control. Collapsed, the symbol stands alone in the ink color.
+ * The locked unit inside a field: its symbol, then its name, plus a remove control. The body opens
+ * the unit list with two boxes and puts the caret in the field in the table layout, whose table is
+ * the list (`onOpen`). Collapsed, the symbol stands alone in the ink color.
  */
 export function UnitChip({ unit, compact, nameRef, onOpen, onRemove }: UnitChipProps) {
   // Both buttons stay out of the Tab order: the field's own keys change and remove the unit
@@ -44,9 +45,7 @@ export function UnitChip({ unit, compact, nameRef, onOpen, onRemove }: UnitChipP
         className={cx('inline-flex rounded-l-nested', HOVER)}
       >
         <span className={BODY}>
-          <span className={cx('font-numeric font-semibold', !compact && 'text-ink-muted')}>
-            {unit.symbol}
-          </span>
+          <span className={unitSymbol(compact)}>{unit.symbol}</span>
           <span ref={nameRef ?? null} hidden={compact}>
             {unit.plural}
           </span>

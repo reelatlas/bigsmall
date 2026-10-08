@@ -28,7 +28,13 @@ import {
 } from '../../components/SuggestionPanel';
 import { ValueField } from '../../components/ValueField';
 import { evaluatedText } from './calculator';
-import type { BoxView, EscapeTarget, HistoryAction, Mode } from './state';
+import {
+  noMatchMessage,
+  type BoxView,
+  type EscapeTarget,
+  type HistoryAction,
+  type Mode,
+} from './state';
 import type { ConverterEnv } from './useConverter';
 
 export interface SmartInputProps {
@@ -104,7 +110,7 @@ export function SmartInput({
     listOptions,
   );
 
-  const notFound = noMatch ? `No unit matches “${query}”. Try ml, feet, or °F.` : undefined;
+  const notFound = noMatch ? noMatchMessage(query) : undefined;
 
   // What the empty field suggests: a number once it has a unit, a few units of its category
   // once the other box has chosen one, otherwise this box's own examples. A message about the

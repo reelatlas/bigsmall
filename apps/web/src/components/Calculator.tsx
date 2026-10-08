@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useFitStep } from '../lib/fit-step';
-import { CARD, cx, FIELD_ROW, NUMBER_SIZES } from '../lib/recipes';
+import { CARD, cx, FIELD_ROW, LABEL, NUMBER_SIZES } from '../lib/recipes';
 import { Button, type ButtonVariant } from './Button';
 import { BackspaceIcon, CloseIcon, CopiedIcon } from './icons';
 
@@ -216,7 +216,7 @@ export function Calculator({
       className={cx(CARD, 'p-3 shadow-sm')}
     >
       <div className="mb-2 flex items-center justify-between">
-        <h2 id={titleId} className="pl-1 text-sm font-medium text-ink-muted">
+        <h2 id={titleId} className={cx('pl-1', LABEL)}>
           Calculator
         </h2>
         <Button

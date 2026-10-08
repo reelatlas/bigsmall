@@ -16,7 +16,7 @@ import { UnitMatches } from '../../components/UnitMatches';
 import { ValueField } from '../../components/ValueField';
 import { CALCULATOR_PLACE, cx } from '../../lib/recipes';
 import { evaluatedText } from './calculator';
-import type { BoxView, HistoryAction, TableView } from './state';
+import { noMatchMessage, type BoxView, type HistoryAction, type TableView } from './state';
 import type { ConverterEnv } from './useConverter';
 
 /**
@@ -27,8 +27,8 @@ import type { ConverterEnv } from './useConverter';
  */
 const TABLE_GRID = 'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_1fr] md:gap-x-4';
 const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-1';
-/** A container, so the categories go four across once it has the room. */
-const TABLE_ROWS_CELL = '@container max-w-xl md:col-start-1 md:row-start-2';
+/** 16 px under the box or the calculator; a container, so the categories go four across once it has the room. */
+const TABLE_ROWS_CELL = '@container mt-4 max-w-xl md:col-start-1 md:row-start-2';
 const TABLE_CALCULATOR_CELL =
   'md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:w-72 md:self-start';
 
@@ -376,7 +376,7 @@ export function TableLayout({
         matches={table.rows}
         counts={table.counts}
         query={table.query}
-        notFound={`No unit matches “${table.query}”. Try ml, feet, or °F.`}
+        notFound={noMatchMessage(table.query)}
         cursor={browsing ? at : -1}
         itemId={itemId}
         onPick={pick}

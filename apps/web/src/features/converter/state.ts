@@ -258,6 +258,11 @@ export const NO_ANSWER_MESSAGES: Record<NoAnswer, { box: string; calculator: str
   'not-real': { box: 'No real answer', calculator: 'No real answer' },
 };
 
+/** What a list says when a typed unit matches nothing, with two boxes and in the table alike (docs/UX-SPEC.md §1, §3). */
+export function noMatchMessage(query: string): string {
+  return `No unit matches “${query}”. Try ml, feet, or °F.`;
+}
+
 export interface ConverterView {
   a: BoxView;
   b: BoxView;

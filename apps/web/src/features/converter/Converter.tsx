@@ -20,7 +20,7 @@ import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { appliedLayout, applyLayout, type Layout } from '../../lib/layout';
 import { isApplePlatform } from '../../lib/platform';
-import { CALCULATOR_PLACE } from '../../lib/recipes';
+import { CALCULATOR_PLACE, cx, LABEL } from '../../lib/recipes';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { SmartInput } from './SmartInput';
@@ -408,10 +408,7 @@ export function Converter() {
             drives. It keeps its line while empty, so nothing moves when it appears. Plain text,
             not a live region: the announcement already names the units (docs/UX-SPEC.md §12).
           */}
-          <p
-            data-category-label
-            className="mb-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted"
-          >
+          <p data-category-label className={cx('mb-1.5 min-h-5 px-4.5', LABEL)}>
             {categoryName ?? ''}
           </p>
           {/* Side by side from sm and stacked below it, Tab going from one straight to the other. */}

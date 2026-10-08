@@ -26,7 +26,7 @@ export function CategoryTiles({ id, categories, cursor, itemId, onPick }: Catego
       id={id}
       role="listbox"
       aria-label="Categories"
-      className={cx(CARD, 'mt-4 grid grid-cols-2 gap-1 p-2 @lg:grid-cols-4')}
+      className={cx(CARD, 'grid grid-cols-2 gap-1 p-2 @lg:grid-cols-4')}
     >
       {categories.map((category, index) => (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field

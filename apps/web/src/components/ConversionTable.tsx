@@ -1,5 +1,5 @@
 import { useId, type ButtonHTMLAttributes } from 'react';
-import { CARD, CURSOR_ROW, cx, rowFill } from '../lib/recipes';
+import { CARD, CURSOR_ROW, cx, rowFill, unitSymbol } from '../lib/recipes';
 import { Button } from './Button';
 import { CopiedIcon, CopyIcon } from './icons';
 
@@ -85,7 +85,7 @@ export function ConversionTable({
   const moveHintId = useId();
 
   return (
-    <section aria-labelledby={titleId} className="mt-4">
+    <section aria-labelledby={titleId}>
       <h2 id={titleId} className="sr-only">
         {title}
       </h2>
@@ -124,7 +124,7 @@ export function ConversionTable({
                     {row.text}
                     {row.tone === 'empty' && <span className="sr-only">no value</span>}
                   </span>
-                  <span className="col-start-3 text-right font-numeric font-semibold whitespace-nowrap text-ink-muted">
+                  <span className={cx('col-start-3 text-right whitespace-nowrap', unitSymbol())}>
                     {row.symbol}
                   </span>
                   <span className="min-w-0 break-words hyphens-auto text-ink">

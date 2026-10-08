@@ -1,5 +1,5 @@
 import { getCategory, type Category, type SearchResult, type Unit } from '@bigsmall/core';
-import { cx } from '../lib/recipes';
+import { cx, unitSymbol } from '../lib/recipes';
 import { ChevronRightIcon } from './icons';
 import { MatchedText } from './MatchedText';
 
@@ -148,7 +148,7 @@ function RowBody({
   if (item.kind === 'unit') {
     return (
       <>
-        <span className="shrink-0 font-numeric font-semibold text-ink-muted">
+        <span className={cx('shrink-0', unitSymbol())}>
           <MatchedText text={item.unit.symbol} query={query} className="text-ink" />
         </span>
         <span className="flex-1 truncate text-right">

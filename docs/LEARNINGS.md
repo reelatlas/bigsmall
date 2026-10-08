@@ -584,3 +584,8 @@ Format:
 
 **What happened.** The category menu chose on `pointerup` and closed. On a touch screen the browser sends its mouse events and click after `touchend`, at the tap's place, so they landed on the box the closed menu had covered, focused it, and brought the keyboard up. A trace of the events in a phone-emulating browser showed it. A mouse click was not affected: its click goes to what the press and the release share.
 **Rule.** A control that closes or moves on `pointerdown` or `pointerup` ends a tap with `preventDefault()` on `touchend`, in a handler on the element itself, which stays in the page while hidden (a listener the closing render removes is gone before `touchend` arrives); or it acts on `click`.
+
+## 2026-10-08 — A memoized callback that reads only a ref's current loses its memoization
+
+**What happened.** A new fitting hook's `useCallback` read `grid.current` and listed `[grid, columns]`. The React Compiler's lint (`react-hooks/preserve-manual-memoization`) failed `pnpm check`: it inferred `grid.current` as the dependency, which is not `grid`. The other fitting hooks hand the ref itself to their measuring function and were never flagged.
+**Rule.** In a memoized callback, pass the ref to the function that reads it (`fitColumns(grid, columns)`) rather than reading `.current` in the callback, so what the compiler infers matches the dependencies listed.

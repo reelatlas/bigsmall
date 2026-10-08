@@ -34,10 +34,11 @@ export interface CategoryMenuProps {
  * from the same recipes, its trigger and its choices one shape that grows over the page when
  * open. Its trigger shows the category's name and is as wide as the widest, so the toolbar keeps
  * it on its line until there is truly no room; open, it keeps that width, as the theme menu does,
- * its counts bare numbers in the room the chevron takes. The choices are native radios. The arrows
- * move through them without choosing, since a new category takes the unit out of the box and each
- * choice is a step to undo; Enter or a click chooses, and Escape, a click outside, or focus leaving
- * closes it unchanged. While a unit is typed, each choice says how many of its units match.
+ * its trigger reading "Category" over the list and its counts bare numbers in the room the chevron
+ * takes. The choices are native radios. The arrows move through them without choosing, since a
+ * new category takes the unit out of the box and each choice is a step to undo; Enter, a click, or
+ * a tap chooses, and Escape, a click outside, or focus leaving closes it unchanged. While a unit is
+ * typed, each choice says how many of its units match.
  */
 export function CategoryMenu({ categories, value, counts, onChoose, tool }: CategoryMenuProps) {
   const menuId = useId();

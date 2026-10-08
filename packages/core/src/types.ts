@@ -19,7 +19,10 @@ export type CategoryId =
   | 'power'
   | 'angle';
 
-/** Basic units appear by default; advanced units appear on request or when searched directly. */
+/**
+ * Everyday (basic) or specialist (advanced). Specialist units are listed after every everyday one,
+ * and rank after them among equal matches; a later filter may show the everyday ones alone (ADR 0016).
+ */
 export type Tier = 'basic' | 'advanced';
 
 /**

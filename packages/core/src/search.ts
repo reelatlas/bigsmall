@@ -57,8 +57,9 @@ export interface SearchOptions {
 export interface SearchResponse {
   results: SearchResult[];
   /**
-   * True when basic mode showed advanced units because nothing basic matched. Nothing reads it
-   * yet; the planned "Advanced units" label will (docs/UX-SPEC.md §14, modes).
+   * True when a search for basic units showed advanced ones because nothing basic matched. Nothing
+   * reads it yet: the converter asks for every tier, and a later everyday-only filter would label
+   * such matches (docs/PLAN.md §2, "Everyday or every unit").
    */
   escalated: boolean;
 }

@@ -55,7 +55,7 @@ test('pages tell search engines and link previews what they are; dev pages stay 
 test('a conversion loads from the URL', async ({ page }) => {
   await page.goto('/?a=mile&b=kilometer&v=1&s=a');
   await expect(page.getByRole('combobox', { name: 'Value' })).toHaveValue('1');
-  await expect(page.locator('li[data-row="kilometer"]')).toContainText('1.60934');
+  await expect(page.locator('[data-row="kilometer"]')).toContainText('1.60934');
 });
 
 for (const layout of ['table', 'boxes'] as const) {
@@ -131,6 +131,7 @@ test('reduced motion zeroes the motion tokens in every theme', async ({ page }) 
     const duration = await page.evaluate(() =>
       getComputedStyle(document.documentElement).getPropertyValue('--motion-fast').trim(),
     );
-    expect(duration, theme.id).toBe('0ms');
+    // Zero either way: the production build's minifier writes 0ms as 0s.
+    expect(duration, theme.id).toMatch(/^0m?s$/);
   }
 });

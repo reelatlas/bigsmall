@@ -2,7 +2,6 @@ import { formatNumber, getCategory, parse } from '@bigsmall/core';
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
-import { ConversionTable } from '../../components/ConversionTable';
 import {
   CalculatorIcon,
   CopiedIcon,
@@ -21,11 +20,12 @@ import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { appliedLayout, applyLayout, type Layout } from '../../lib/layout';
 import { isApplePlatform } from '../../lib/platform';
-import { cx } from '../../lib/recipes';
+import { CALCULATOR_PLACE } from '../../lib/recipes';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { SmartInput } from './SmartInput';
 import { nextBox, type BoxId, type BoxView } from './state';
+import { TableLayout } from './TableLayout';
 import { urlFor } from './url';
 import { useConverter } from './useConverter';
 
@@ -58,18 +58,6 @@ const EXAMPLES: Record<BoxId, string> = {
   b: '2 kg, inches, speed…',
 };
 
-/**
- * The table layout from md (docs/UX-SPEC.md §1): the box and its table in the first column, and
- * the calculator in a column of its own on their right, spanning both rows; the second row takes
- * any height the calculator adds, so the table always sits right under the box. Below md, and
- * with two boxes, the calculator opens under the boxes, flush left.
- */
-const TABLE_GRID = 'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_1fr] md:gap-x-4';
-const TABLE_BOX_CELL = 'md:col-start-1 md:row-start-1';
-const TABLE_ROWS_CELL = 'md:col-start-1 md:row-start-2';
-const TABLE_CALCULATOR_CELL =
-  'md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:w-72 md:self-start';
-
 /** A box's text field, found by the mark SmartInput puts on it. */
 function boxInput(section: HTMLElement | null, id: BoxId): HTMLInputElement | null {
   return section?.querySelector<HTMLInputElement>(`input[data-box="${id}"]`) ?? null;
@@ -79,11 +67,11 @@ function boxInput(section: HTMLElement | null, id: BoxId): HTMLInputElement | nu
 type FocusRequest = { kind: 'enter'; box: BoxId } | { kind: 'box'; box: BoxId };
 
 /**
- * The converter island, in either layout (ADR 0009, docs/UX-SPEC.md §1): the hint and the
- * toolbar (calculator, swap with two boxes, undo, redo, clear all); the category label; then the
- * table layout's one box and its table, or the two linked boxes; the calculator when open, beside
- * the table or under the boxes (§8); and the live regions. It draws the Copy URL button and the
- * layout switch into the header's slots (§7, §10).
+ * The converter island, in either layout (ADR 0009, ADR 0012, docs/UX-SPEC.md §1): the hint and
+ * the toolbar (calculator, swap with two boxes, undo, redo, clear all); then the table layout
+ * (TableLayout: its category menu, its one box, and its table), or the category label and the two
+ * linked boxes; the calculator when open, beside the table or under the boxes (§8); and the live
+ * regions. It draws the Copy URL button and the layout switch into the header's slots (§7, §10).
  *
  * Until it hydrates the layout is unknown here, so the server's markup carries both layouts' empty
  * state and the layout-* variants (global.css) show the one the inline script applied. Classes
@@ -114,7 +102,13 @@ export function Converter() {
   // Why the entry has no value to use or send, said in the display: "Too large".
   const calcMessage = entryMessage(entryParsed);
   const categoryName = view.category ? getCategory(view.category)?.name : undefined;
-  const isEmpty = !state.a.text && !state.a.unit && !state.b.text && !state.b.unit;
+  // A category chosen with no unit is something to clear in the table layout, which shows it.
+  const isEmpty =
+    !state.a.text &&
+    !state.a.unit &&
+    !state.b.text &&
+    !state.b.unit &&
+    (layout === 'boxes' || !state.category);
 
   const switchLayout = (next: Layout) => {
     applyLayout(next);
@@ -218,24 +212,10 @@ export function Converter() {
     />
   );
 
-  /** A table row's full-precision value, by unit id. */
-  const rowValue = (unitId: string): number | null =>
-    table?.rows.find((row) => row.unit.id === unitId)?.value ?? null;
-
-  /**
-   * A row moves into the box: its unit, and its value to the digits a box shows, so the box reads
-   * as if the value had been typed; every row then converts from it. One undoable step.
-   */
-  const moveIntoBox = (unitId: string) => {
-    const value = rowValue(unitId);
-    if (value === null || !table) return;
-    const text = formatNumber(value, { locale: env.locale });
-    dispatch({ type: 'use', box: table.box, unit: unitId, text });
-  };
-
+  /** Copies a table row's full-precision value, not the 6 digits it shows (docs/UX-SPEC.md §7). */
   const copyRow = (unitId: string) => {
-    const value = rowValue(unitId);
-    if (value !== null) copy(String(value), `row-${unitId}`);
+    const row = table?.kind === 'units' ? table.rows.find((each) => each.id === unitId) : undefined;
+    if (row?.value != null) copy(String(row.value), `row-${unitId}`);
   };
 
   /** Both boxes get a copy control whenever they hold a number, so the control never jumps sides. */
@@ -264,14 +244,9 @@ export function Converter() {
     );
   };
 
-  const renderBox = (
-    box: BoxView,
-    label: string,
-    counterpart: BoxView,
-    options: { examples: string; className?: string },
-  ) => (
-    // Keyed by box, so the table layout's one box starts fresh when the source moves.
-    <div key={box.id} className={cx('min-w-0 flex-1', options.className)}>
+  /** One of the two boxes. */
+  const renderBox = (box: BoxView, label: string, counterpart: BoxView) => (
+    <div className="min-w-0 flex-1">
       <SmartInput
         box={box}
         label={label}
@@ -280,17 +255,45 @@ export function Converter() {
         env={env}
         dispatch={dispatch}
         escapeTarget={escapeTargets[box.id]}
-        examples={options.examples}
+        examples={EXAMPLES[box.id]}
         counterpart={counterpart.unit}
         trailing={copyButton(box, label.toLowerCase())}
         onEnter={() => setFocusRequest({ kind: 'enter', box: box.id })}
-        // The table's rows sit under the box, so its list waits to be asked (docs/UX-SPEC.md §3).
-        listOpens={layout === 'table' ? 'on-request' : 'eagerly'}
       />
     </div>
   );
 
   const source = state.source;
+
+  const calculator = calculatorOpen && (
+    <Calculator
+      display={
+        entry.text && (
+          <NumberText
+            text={entry.text}
+            parsed={entryParsed}
+            running={runningValue(entryParsed, env.locale)}
+          />
+        )
+      }
+      message={calcMessage}
+      messageId={calcMessageId}
+      decimalMark={env.separators.decimal}
+      onPress={press}
+      onEscape={escapeCalculator}
+      onClose={closeCalculator}
+      footer={
+        layout === 'table' ? (
+          sendButton(source)
+        ) : (
+          <>
+            {sendButton('a', '1st')}
+            {sendButton('b', '2nd')}
+          </>
+        )
+      }
+    />
+  );
 
   return (
     <section
@@ -377,89 +380,52 @@ export function Converter() {
       </div>
 
       {/*
-        The category label, in the same place in both layouts: over the box, or the first of two,
-        left-aligned with the value, whichever box drives. It keeps its line while empty, so
-        nothing moves when it appears. Plain text, not a live region: the announcement already
-        names the units (docs/UX-SPEC.md §12).
+        The table layout: its category menu, its one box, a column wide enough to read its rows
+        across, and its table (TableLayout).
       */}
-      <p data-category-label className="mb-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted">
-        {categoryName ?? ''}
-      </p>
-
-      <div className={cx(layout === 'table' && TABLE_GRID)}>
-        {/*
-          The table layout shows the source box alone, a column wide enough to read its rows
-          across; two boxes sit side by side from sm and stack below it, Tab going from one
-          straight to the other.
-        */}
-        <div
-          className={cx(
-            'flex flex-col gap-y-2 sm:flex-row sm:gap-x-4 layout-table:max-w-xl',
-            layout === 'table' && TABLE_BOX_CELL,
-          )}
-        >
-          {layout === 'table'
-            ? renderBox(view[source], 'Value', view[source === 'a' ? 'b' : 'a'], {
-                examples: EXAMPLES.a,
-              })
-            : [
-                renderBox(view.a, 'First value', view.b, { examples: EXAMPLES.a }),
-                renderBox(view.b, 'Second value', view.a, {
-                  examples: EXAMPLES.b,
-                  className: 'layout-table:hidden',
-                }),
-              ]}
+      {layout !== 'boxes' && table && (
+        <div className="layout-boxes:hidden">
+          <TableLayout
+            box={view[source]}
+            table={table}
+            env={env}
+            dispatch={dispatch}
+            describedBy={hintId}
+            copyButton={copyButton(view[source], 'value')}
+            calculator={layout === 'table' && calculator}
+            calculatorId={calculatorId}
+            copiedRow={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
+            onCopyRow={copyRow}
+            copyRowProps={(row) => pointerProps(`row-${row.id}`)}
+          />
         </div>
+      )}
 
-        {calculatorOpen && (
-          <div
-            id={calculatorId}
-            className={cx('mt-4 max-w-sm', layout === 'table' && TABLE_CALCULATOR_CELL)}
+      {layout !== 'table' && (
+        <div className="layout-table:hidden">
+          {/*
+            The category label over the first box, left-aligned with the value, whichever box
+            drives. It keeps its line while empty, so nothing moves when it appears. Plain text,
+            not a live region: the announcement already names the units (docs/UX-SPEC.md §12).
+          */}
+          <p
+            data-category-label
+            className="mb-1.5 min-h-5 px-4.5 text-sm font-medium text-ink-muted"
           >
-            <Calculator
-              display={
-                entry.text && (
-                  <NumberText
-                    text={entry.text}
-                    parsed={entryParsed}
-                    running={runningValue(entryParsed, env.locale)}
-                  />
-                )
-              }
-              message={calcMessage}
-              messageId={calcMessageId}
-              decimalMark={env.separators.decimal}
-              onPress={press}
-              onEscape={escapeCalculator}
-              onClose={closeCalculator}
-              footer={
-                layout === 'table' ? (
-                  sendButton(source)
-                ) : (
-                  <>
-                    {sendButton('a', '1st')}
-                    {sendButton('b', '2nd')}
-                  </>
-                )
-              }
-            />
+            {categoryName ?? ''}
+          </p>
+          {/* Side by side from sm and stacked below it, Tab going from one straight to the other. */}
+          <div className="flex flex-col gap-y-2 sm:flex-row sm:gap-x-4">
+            {renderBox(view.a, 'First value', view.b)}
+            {renderBox(view.b, 'Second value', view.a)}
           </div>
-        )}
-
-        {layout === 'table' && table && (
-          <div className={cx('max-w-xl', TABLE_ROWS_CELL)}>
-            <ConversionTable
-              title={getCategory(table.category)?.name ?? ''}
-              rows={table.rows}
-              message={table.message}
-              copied={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
-              onUse={(row) => moveIntoBox(row.id)}
-              onCopy={(row) => copyRow(row.id)}
-              copyProps={(row) => pointerProps(`row-${row.id}`)}
-            />
-          </div>
-        )}
-      </div>
+          {calculator && (
+            <div id={calculatorId} className={CALCULATOR_PLACE}>
+              {calculator}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* The two live regions (docs/UX-SPEC.md §12): the result, once it settles; and action feedback. */}
       <p aria-live="polite" className="sr-only">

@@ -525,3 +525,28 @@ Format:
 
 **What happened.** The selection lab's category menu closes when focus leaves it, and applies a pointer's pick on release. Picking did nothing: pressing an option's label moved focus off the focused radio (a label takes no focus), the menu closed on that blur, and the release landed on a menu already gone.
 **Rule.** In a menu that closes when focus leaves, keep focus put when a choice is pressed (`preventDefault` on `mousedown` inside the panel), as the smart input's list does for its rows. Apply the pick on release, not on click, where radios are involved: the arrow keys check radios with a click of their own.
+
+## 2026-10-07 — A test that reads a duration's text fails against the build
+
+**What happened.** Run against a production build for the first time (the dev server was taken), the reduced-motion test failed in every theme: it expected `--motion-fast` to read `0ms`, and the build's minifier writes it as `0s`. Reduced motion worked; only the text differed. CI runs the suite against the dev server, so the test had never met minified CSS.
+**Rule.** A test of a CSS value checks what it means (a zero duration, `/^0m?s$/`), not how one tool happens to write it. The suite should pass against a built site too, since that is what ships.
+
+## 2026-10-07 — getByRole's name matches part of a name
+
+**What happened.** The table layout's tests found its box with `getByRole('combobox', { name: 'Value' })`. Before hydration the page carries both layouts, and in the two-box layout the locator matched "First value" and "Second value" too: Playwright matches an accessible name as a case-insensitive substring unless told otherwise.
+**Rule.** When one name is contained in another on the same page ("Value" in "First value"), pass `exact: true`, or scope the locator to a container.
+
+## 2026-10-07 — A radio group with nothing checked focuses the first without checking it
+
+**What happened.** The category menu, opened before any category was chosen, moved focus onto its first radio, as the theme menu does; but with nothing checked, Enter read the checked radio, found none, and closed without choosing Length, the choice visibly in focus. In a radio group with nothing checked, focus lands on a radio without checking it, and the first arrow press checks the next one.
+**Rule.** A menu of radios that chooses on Enter takes the radio Enter was pressed on (`event.target`), not `:checked`, which is the same radio once anything is checked and the right one before.
+
+## 2026-10-07 — A cursor kept across a change it did not make lands on a stale row
+
+**What happened.** The table layout keeps where its cursor is in component state, as an index. Undo, clear all, or a send from the calculator changes what the table shows from outside the component, and the index would then point at a different row of a different list, tinted for no reason.
+**Rule.** Tie a cursor to the view it was set in (here a key for the start, the matches, or one category's units) and treat it as resting whenever the view has changed. Code that moves the view on purpose and wants the cursor somewhere (choosing a category puts it on the first unit) sets the cursor with the view it is about to show.
+
+## 2026-10-07 — Arrow keys through radios that apply would each be an undo step
+
+**What happened.** The selection lab's category menu applied a category on every radio change, copying the theme menu, whose arrows preview themes. In the converter, choosing a category takes the unit out of the box and is an undoable step, so arrowing past three categories would have lost the unit and left three steps to undo.
+**Rule.** Previewing on change suits choices that cost nothing to try (themes). A choice that changes the user's work moves without applying, and applies on Enter or a click; Escape then closes without changing anything.

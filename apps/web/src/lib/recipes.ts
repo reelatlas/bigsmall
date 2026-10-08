@@ -19,11 +19,17 @@ export function cx(...parts: ReadonlyArray<string | false | null | undefined>): 
 /** A card: one raised area of related controls (the calculator, the wordmark lab's panels). */
 export const CARD = 'rounded-lg border border-line bg-surface';
 
+/**
+ * Where the calculator opens in either layout: 16 px under what it follows, at most 384 px wide
+ * (docs/DESIGN-SYSTEM.md, "Calculator"). The table layout adds its column from md (TableLayout).
+ */
+export const CALCULATOR_PLACE = 'mt-4 max-w-sm';
+
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,
 // and `data-open` while open; the shell takes SHELL, one of the two resting styles, and its own
-// position and radius. SmartInput (TSX) and the header menus (Astro, driven by the inline script
-// in layouts/Base.astro) all build from these.
+// position and radius. The fields (ValueField), the category menu (TSX), and the header menus
+// (Astro, driven by the inline script in layouts/Base.astro) all build from these.
 
 /** The edge, clip, and open state every shell shares: an accent edge and a shadow while open. */
 export const SHELL =
@@ -43,8 +49,22 @@ export const SHELL_BORDERED =
  */
 export const SHELL_GHOST = 'border-transparent group-data-open:bg-surface';
 
-/** A header menu's panel: hidden at rest, under a divider once its shell opens. */
+/** A menu's panel: hidden at rest, under a divider once its shell opens. */
 export const SHELL_PANEL = 'hidden border-t border-line group-data-open:block';
+
+// Menus (docs/DESIGN-SYSTEM.md, "Fluid shells"): a trigger and a group of radios in one shell,
+// shared by the theme menu (ThemePicker.astro) and the category menu (CategoryMenu.tsx).
+
+/** A menu's trigger, the shell's top row: 44 px, its focus shown by the shell's accent edge. */
+export const MENU_TRIGGER =
+  'flex h-11 w-full items-center gap-2 px-3 text-sm text-ink transition-colors outline-none hover:bg-surface-raised';
+
+/** The chevron after a trigger's value, turned over while the menu is open. */
+export const MENU_CHEVRON = 'text-ink-muted transition-transform group-data-open:rotate-180';
+
+/** A menu's choice: a label around its visually hidden radio, the checked one in the accent's soft fill. */
+export const MENU_OPTION =
+  'flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink focus-ring-within-inset hover:bg-surface-raised has-checked:bg-accent-soft';
 
 // Fields (docs/DESIGN-SYSTEM.md, "Fields")
 
@@ -54,6 +74,21 @@ export const SHELL_PANEL = 'hidden border-t border-line group-data-open:block';
  * too, so it is the same size as the boxes.
  */
 export const FIELD_ROW = 'flex h-15 items-center gap-2 pr-2 pl-4';
+
+// Lists a field's cursor moves through (docs/DESIGN-SYSTEM.md, "Lists"): the table layout's
+// table, matches, and categories, whose rows the arrows reach while the caret stays in the field.
+
+/** A row the cursor moves through: 44 px, inset in the card's gutter, its corners nesting in the card's. */
+export const CURSOR_ROW = 'min-h-11 cursor-pointer rounded-nested px-2';
+
+/**
+ * A cursor row's fill: the unit in the box in the accent's soft tint, the chip's color; the row
+ * the cursor is on, or the pointer is over, in the muted tint of a hovered row. Never an outline.
+ */
+export function rowFill(selected: boolean, current: boolean): string {
+  if (selected) return 'bg-accent-soft';
+  return current ? 'bg-surface-raised' : 'hover:bg-surface-raised';
+}
 
 // Type ladders (docs/DESIGN-SYSTEM.md, "Type that steps to fit"): the sizes text steps down
 // through, largest first, until it fits. useFitStep (lib/fit-step.ts) fits a ladder in an island;

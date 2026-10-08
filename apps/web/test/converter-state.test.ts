@@ -4,6 +4,7 @@ import {
   HISTORY_LIMIT,
   initialHistory,
   initialState,
+  NO_VALUE,
   nextBox,
   reduce,
   reduceWithHistory,
@@ -120,9 +121,86 @@ describe('reduce', () => {
     expect(t.source).toBe('a');
   });
 
-  it('hydrate merges the restored boxes', () => {
+  it('hydrate merges the restored boxes, and their units name the category', () => {
     const s = run({ type: 'hydrate', state: { a: { text: '2', unit: 'foot' }, source: 'a' } });
     expect(s.a).toEqual({ text: '2', unit: 'foot' });
+    expect(s.category).toBe('length');
+    expect(run({ type: 'hydrate', state: { a: { text: '2', unit: null } } }).category).toBeNull();
+  });
+});
+
+describe('the state’s category', () => {
+  it('follows every unit put in, and stays when the unit is removed', () => {
+    const s = run({ type: 'lock', box: 'a', unit: 'milliliter' });
+    expect(s.category).toBe('volume');
+    expect(reduce(s, { type: 'unlock', box: 'a' }).category).toBe('volume');
+    expect(reduce(s, { type: 'use', box: 'a', unit: 'foot', text: '' }).category).toBe('length');
+    expect(reduce(s, { type: 'clear' }).category).toBeNull();
+  });
+
+  it('a chosen category keeps the number, drops the query, and picks no unit', () => {
+    const s = run(
+      { type: 'input', box: 'a', text: '250 cu', at: 0 },
+      { type: 'chooseCategory', box: 'a', category: 'volume' },
+    );
+    expect(s.a).toEqual({ text: '250', unit: null });
+    expect(s.category).toBe('volume');
+  });
+
+  it('a chosen category takes the unit away unless the unit is of it', () => {
+    const ml = run(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+    );
+    expect(reduce(ml, { type: 'chooseCategory', box: 'a', category: 'length' }).a).toEqual({
+      text: '250',
+      unit: null,
+    });
+    expect(reduce(ml, { type: 'chooseCategory', box: 'a', category: 'volume' }).a).toEqual({
+      text: '250',
+      unit: 'milliliter',
+    });
+  });
+
+  it('a chosen category clears the other box’s unit of another category, never a pair across', () => {
+    const pair = run(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+    );
+    expect(reduce(pair, { type: 'chooseCategory', box: 'a', category: 'volume' }).b.unit).toBe(
+      'us-cup',
+    );
+    expect(reduce(pair, { type: 'chooseCategory', box: 'a', category: 'length' }).b).toEqual({
+      text: '',
+      unit: null,
+    });
+  });
+
+  it('a unit taken from another category clears the other box’s unit too', () => {
+    const pair = run(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'lock', box: 'b', unit: 'us-cup' },
+    );
+    const s = reduce(pair, { type: 'use', box: 'a', unit: 'foot', text: '250' });
+    expect(s.a).toEqual({ text: '250', unit: 'foot' });
+    expect(s.b).toEqual({ text: '', unit: null });
+  });
+
+  it('choosing a category is one undoable step', () => {
+    const h = steps(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'chooseCategory', box: 'a', category: 'length' },
+    );
+    expect(h.present.category).toBe('length');
+    const undone = reduceWithHistory(h, { type: 'undo' });
+    expect(undone.present.a).toEqual({ text: '250', unit: 'milliliter' });
+    expect(undone.present.category).toBe('volume');
+    // A category alone, with no unit, is still a step of its own.
+    const bare = steps({ type: 'chooseCategory', box: 'a', category: 'time' });
+    expect(bare.past).toHaveLength(1);
   });
 });
 
@@ -445,20 +523,60 @@ describe('use', () => {
 
 describe('selectTable', () => {
   const options = { ...EN, locale: 'en-US', system: 'us' as const, tier: 'basic' as const };
-  const table = (...actions: Parameters<typeof reduce>[1][]) =>
+  const view = (...actions: Parameters<typeof reduce>[1][]) =>
     selectTable(run(...actions), options);
+  /** The category's units, as the table shows them once there is one. */
+  const table = (...actions: Parameters<typeof reduce>[1][]) => {
+    const shown = view(...actions);
+    if (shown.kind !== 'units') throw new Error(`expected units, got ${shown.kind}`);
+    return shown;
+  };
+  /** The matches, as the table's place shows them while a unit is typed. */
+  const matches = (text: string, ...before: Parameters<typeof reduce>[1][]) => {
+    const shown = view(...before, { type: 'input', box: 'a', text, at: 0 });
+    if (shown.kind !== 'matches') throw new Error(`expected matches, got ${shown.kind}`);
+    return shown;
+  };
 
-  it('waits for a number and a unit', () => {
-    expect(table()).toBeNull();
-    expect(table({ type: 'input', box: 'a', text: '250', at: 0 })).toBeNull();
-    expect(table({ type: 'lock', box: 'a', unit: 'milliliter' })).toBeNull();
+  it('starts from the categories, with or without a number', () => {
+    for (const shown of [view(), view({ type: 'input', box: 'a', text: '250', at: 0 })]) {
+      expect(shown.kind).toBe('start');
+      if (shown.kind !== 'start') continue;
+      expect(shown.categories.map((category) => category.id)).toContain('volume');
+      expect(shown.announcement).toBeNull();
+    }
+  });
+
+  it('lists a chosen category’s units with a dash for each until there is a number and a unit', () => {
+    const chosen = table(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'chooseCategory', box: 'a', category: 'volume' },
+    );
+    expect(chosen.rows.map((row) => row.id)).toContain('us-cup');
+    expect(chosen.rows.every((row) => row.tone === 'empty' && row.text === NO_VALUE)).toBe(true);
+    expect(chosen.rows.every((row) => row.value === null && !row.inBox)).toBe(true);
+    expect(chosen.announcement).toBe(`${chosen.rows.length} units of volume`);
+
+    // A unit with no number: dashes, the box's unit marked.
+    const bare = table({ type: 'lock', box: 'a', unit: 'milliliter' });
+    expect(bare.rows.find((row) => row.inBox)?.id).toBe('milliliter');
+    expect(bare.rows.every((row) => row.tone === 'empty')).toBe(true);
+
+    // Removing the unit leaves the table in place.
+    const removed = table(
+      { type: 'input', box: 'a', text: '250', at: 0 },
+      { type: 'lock', box: 'a', unit: 'milliliter' },
+      { type: 'unlock', box: 'a' },
+    );
+    expect(removed.category).toBe('volume');
+    expect(removed.rows.every((row) => row.tone === 'empty')).toBe(true);
   });
 
   it('lists every unit of the category in the list’s order, the box’s own marked', () => {
     const t = table(
       { type: 'input', box: 'a', text: '250', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
-    )!;
+    );
     expect(t.box).toBe('a');
     expect(t.category).toBe('volume');
     expect(t.rows.map((row) => row.id)).toContain('liter');
@@ -473,7 +591,7 @@ describe('selectTable', () => {
     const t = table(
       { type: 'input', box: 'a', text: '250', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
-    )!;
+    );
     const cups = t.rows.find((row) => row.id === 'us-cup')!;
     expect(cups.text).toBe('1.05669');
     expect(cups.value).toBeCloseTo(1.056688209, 9);
@@ -483,12 +601,12 @@ describe('selectTable', () => {
     const alone = table(
       { type: 'input', box: 'a', text: '250', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
-    )!;
+    );
     const t = table(
       { type: 'input', box: 'a', text: '250', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
       { type: 'lock', box: 'b', unit: 'us-cup' },
-    )!;
+    );
     expect(t.rows.map((row) => row.id)).toEqual(alone.rows.map((row) => row.id));
     expect(t.rows.find((row) => row.id === 'us-cup')?.text).toBe('1.05669');
     expect(t.announcement).toBe(alone.announcement);
@@ -499,7 +617,7 @@ describe('selectTable', () => {
       { type: 'input', box: 'b', text: '2', at: 0 },
       { type: 'lock', box: 'b', unit: 'liter' },
       { type: 'lock', box: 'a', unit: 'milliliter' },
-    )!;
+    );
     expect(t.box).toBe('b');
     expect(t.rows.filter((row) => row.inBox).map((row) => row.id)).toEqual(['liter']);
     expect(t.rows.find((row) => row.id === 'milliliter')?.text).toBe('2,000');
@@ -509,7 +627,7 @@ describe('selectTable', () => {
     const t = table(
       { type: 'input', box: 'a', text: '1000', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
-    )!;
+    );
     expect(t.rows.find((row) => row.id === 'liter')?.name).toBe('liter');
   });
 
@@ -517,7 +635,7 @@ describe('selectTable', () => {
     const none = table(
       { type: 'input', box: 'a', text: '1e400', at: 0 },
       { type: 'lock', box: 'a', unit: 'kilometer' },
-    )!;
+    );
     expect(none.message).toBe('Too large to convert');
     expect(none.rows).toEqual([]);
     expect(none.announcement).toBe('1e400 kilometers is too large to convert');
@@ -525,10 +643,10 @@ describe('selectTable', () => {
     const some = table(
       { type: 'input', box: 'a', text: '1e306', at: 0 },
       { type: 'lock', box: 'a', unit: 'kilometer' },
-    )!;
+    );
     const mm = some.rows.find((row) => row.id === 'millimeter')!;
     expect(mm.text).toBe('Too large');
-    expect(mm.hasValue).toBe(false);
+    expect(mm.tone).toBe('message');
     expect(mm.value).toBeNull();
   });
 
@@ -536,8 +654,48 @@ describe('selectTable', () => {
     const t = table(
       { type: 'input', box: 'a', text: '250', at: 0 },
       { type: 'lock', box: 'a', unit: 'milliliter' },
-    )!;
+    );
     expect(t.announcement).toBe(`250 milliliters in ${t.rows.length} units of volume`);
+  });
+
+  it('lists matches from every category while a unit is typed, grouped, with counts', () => {
+    const m = matches('250 p');
+    expect(m.query).toBe('p');
+    // Each category's matches stay together, in the order of their best match.
+    const groups = m.rows.map((row) => row.category.id);
+    expect(groups).toEqual([...groups].sort((a, b) => groups.indexOf(a) - groups.indexOf(b)));
+    expect(groups).toContain('mass');
+    expect(groups).toContain('volume');
+    expect(m.counts.volume).toBe(m.rows.filter((row) => row.category.id === 'volume').length);
+    expect(m.announcement).toBe(`${m.rows.length} matches`);
+  });
+
+  it('puts the current category first among equal matches, hiding none', () => {
+    expect(matches('250 p').rows[0]?.category.id).toBe('mass');
+    const inVolume = matches('250 p', { type: 'chooseCategory', box: 'a', category: 'volume' });
+    expect(inVolume.rows[0]?.category.id).toBe('volume');
+    expect(inVolume.rows.map((row) => row.category.id)).toContain('mass');
+  });
+
+  it('offers a category whose name is typed, leading its group, counted with no units', () => {
+    const m = matches('len');
+    expect(m.rows[0]).toMatchObject({ kind: 'category', category: { id: 'length' } });
+    expect(m.counts.length).toBe(0);
+    expect(m.announcement).toBe('1 match');
+  });
+
+  it('marks the unit in the box among the matches, and says when nothing matches', () => {
+    const m = matches('250 mil', { type: 'lock', box: 'a', unit: 'milliliter' });
+    expect(m.rows.filter((row) => row.kind === 'unit' && row.inBox)).toHaveLength(1);
+    const none = matches('250 xyzzy');
+    expect(none.rows).toEqual([]);
+    expect(none.announcement).toBe('No unit matches');
+  });
+
+  it('waits on a sign, a decimal mark, or an exponent on its way, as for a number', () => {
+    for (const text of ['-', '-3', '1e', '1e-', '6*3', '5.']) {
+      expect(view({ type: 'input', box: 'a', text, at: 0 }).kind, text).toBe('start');
+    }
   });
 });
 

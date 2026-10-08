@@ -5,6 +5,7 @@ import {
   getUnit,
   parse,
   search,
+  type Category,
   type CategoryId,
   type ParsedInput,
   type Separators,
@@ -41,6 +42,12 @@ export interface ConverterState {
   source: BoxId;
   mode: Mode;
   /**
+   * The conversion's category: its units', or, in the table layout, one chosen before any unit
+   * (docs/UX-SPEC.md §1). Lock, use, and chooseCategory set it; unlock keeps it, so removing the
+   * unit leaves its table in place; clear empties it. Two boxes name their units' category instead.
+   */
+  category: CategoryId | null;
+  /**
    * The calculator's scratch entry. It lives here, outside the conversion, so one history holds
    * everything: undo goes from a send back into the arithmetic that produced it.
    */
@@ -62,11 +69,32 @@ export const initialState: ConverterState = {
   b: EMPTY_BOX,
   source: 'a',
   mode: 'basic',
+  category: null,
   calc: EMPTY_CALC,
 };
 
 function other(box: BoxId): BoxId {
   return box === 'a' ? 'b' : 'a';
+}
+
+/** The category the boxes' units share, when either has one. */
+function unitsCategory(state: Pick<ConverterState, 'a' | 'b'>): CategoryId | null {
+  const id = state.a.unit ?? state.b.unit;
+  return id ? (getUnit(id)?.category ?? null) : null;
+}
+
+/**
+ * The other box once `box` is in `category`: there is never a cross-category pair, so a unit of
+ * another category goes, and its number stays only if that box was the source (docs/UX-SPEC.md §6).
+ */
+function otherBoxIn(state: ConverterState, box: BoxId, category: CategoryId): BoxState {
+  const otherId = other(box);
+  const otherUnit = state[otherId].unit ? getUnit(state[otherId].unit) : undefined;
+  if (!otherUnit || otherUnit.category === category) return state[otherId];
+  return {
+    text: state.source === otherId ? (parse(state[otherId].text).valueText ?? '') : '',
+    unit: null,
+  };
 }
 
 export type Action =
@@ -81,8 +109,17 @@ export type Action =
   /** Replace a box's text without making it the source (used to drop a query after a category pick). */
   | { type: 'setText'; box: BoxId; text: string }
   | { type: 'lock'; box: BoxId; unit: string }
-  /** A row of the table moves into the box: its unit, and its value as text; the box becomes the source. */
+  /**
+   * A unit taken into the table layout's box, from a row or a match: the unit, and the box's new
+   * text (the row's value, or the number as typed); the box becomes the source.
+   */
   | { type: 'use'; box: BoxId; unit: string; text: string }
+  /**
+   * A category chosen in the table layout (its menu, a start tile, or a category match): the box
+   * keeps its number and drops any query, and keeps its unit only if it is of that category, so a
+   * typed number is never converted from a unit nobody chose (docs/UX-SPEC.md §1).
+   */
+  | { type: 'chooseCategory'; box: BoxId; category: CategoryId }
   | { type: 'unlock'; box: BoxId }
   | { type: 'swap' }
   | { type: 'clear' }
@@ -108,42 +145,55 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       const unit = getUnit(action.unit);
       if (!unit) return state;
       const box = state[action.box];
+      const otherId = other(action.box);
+      // A switch of category clears the other box's unit; the category label then names the new one.
       const next: ConverterState = {
         ...state,
         [action.box]: { text: parse(box.text).valueText ?? '', unit: unit.id },
+        [otherId]: otherBoxIn(state, action.box, unit.category),
+        category: unit.category,
       };
-      const otherId = other(action.box);
       // Before any number is typed, the first box to get a unit becomes the source: it set the
       // category, so it leads the conversion (the table layout shows it) until a number moves it.
       const sourceHasNumber = parse(state[state.source].text).valueText !== undefined;
       if (!sourceHasNumber && state[otherId].unit === null) next.source = action.box;
-      const otherUnit = state[otherId].unit ? getUnit(state[otherId].unit) : undefined;
-      if (otherUnit && otherUnit.category !== unit.category) {
-        // No cross-category pairs: the other box loses its unit and keeps its number only if it
-        // was the source. The category label then names the new category.
-        next[otherId] = {
-          text: state.source === otherId ? (parse(state[otherId].text).valueText ?? '') : '',
-          unit: null,
-        };
-      }
       return next;
     }
 
     case 'use': {
       // The table never shows the other box, but keeps it for a switch back to two boxes. When
-      // the row is the other box's unit, the box's old unit takes its place, as swap does, so the
-      // boxes never share a unit; any other row leaves it alone (docs/UX-SPEC.md §1).
+      // the unit is the other box's, the box's old unit takes its place, as swap does, so the
+      // boxes never share a unit; a unit from a match in another category clears it, as a lock
+      // does; any other leaves it alone (docs/UX-SPEC.md §1).
       const unit = getUnit(action.unit);
       if (!unit) return state;
       const otherId = other(action.box);
-      const next: ConverterState = {
+      return {
         ...state,
         [action.box]: { text: action.text, unit: unit.id },
+        [otherId]:
+          state[otherId].unit === unit.id
+            ? { text: '', unit: state[action.box].unit }
+            : otherBoxIn(state, action.box, unit.category),
         source: action.box,
+        category: unit.category,
       };
-      if (state[otherId].unit === unit.id)
-        next[otherId] = { text: '', unit: state[action.box].unit };
-      return next;
+    }
+
+    case 'chooseCategory': {
+      const box = state[action.box];
+      const unit = box.unit ? getUnit(box.unit) : undefined;
+      const otherId = other(action.box);
+      return {
+        ...state,
+        [action.box]: {
+          text: parse(box.text).valueText ?? '',
+          // Choosing the category the box is already in changes nothing about its unit.
+          unit: unit?.category === action.category ? box.unit : null,
+        },
+        [otherId]: otherBoxIn(state, action.box, action.category),
+        category: action.category,
+      };
     }
 
     case 'unlock':
@@ -164,8 +214,11 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
     case 'setMode':
       return { ...state, mode: action.mode };
 
-    case 'hydrate':
-      return { ...state, ...action.state };
+    case 'hydrate': {
+      // A URL holds units, not a category: the units name it.
+      const next = { ...state, ...action.state };
+      return { ...next, category: unitsCategory(next) };
+    }
   }
 }
 
@@ -275,13 +328,7 @@ export function selectView(state: ConverterState, options: NumberEnv): Converter
 
   let announcement: string | null = null;
   if (sourceUnit && targetUnit && (result || noAnswer)) {
-    const amount = sourceParsed.value ?? Number.NaN;
-    // Arithmetic is announced by its value ("8 milliliters"), not by what was typed ("5+3").
-    const typed =
-      sourceParsed.expression && sourceParsed.value !== undefined
-        ? formatNumber(sourceParsed.value, { locale: options.locale })
-        : (sourceParsed.valueText ?? '');
-    const from = `${typed} ${unitName(sourceUnit, amount)}`.trim();
+    const from = spokenAmount(sourceParsed, sourceUnit, options.locale);
     if (result) announcement = `${from} is ${result.text} ${unitName(targetUnit, result.value)}`;
     else if (noAnswer === 'large' || noAnswer === 'small') {
       announcement = `${from} is too ${noAnswer} to convert to ${targetUnit.plural}`;
@@ -298,11 +345,19 @@ export function selectView(state: ConverterState, options: NumberEnv): Converter
 }
 
 // ---------------------------------------------------------------------------
-// The table layout (ADR 0009, docs/UX-SPEC.md §1): the source box's value in every unit of its
-// category. The other box's unit is kept for a switch back to two boxes, but not shown.
+// The table layout (ADR 0009, ADR 0012, docs/UX-SPEC.md §1): one box, the source, and in the
+// table's place what it needs next: the categories to start from, its category's units with
+// their values, or the units a typed query matches. The other box's unit is kept for a switch
+// back to two boxes, but not shown.
 
 /** Significant digits a row shows: few enough to compare rows at a glance. Copying gives them all. */
 export const TABLE_PRECISION = 6;
+
+/** In place of a value the table cannot show yet: no number, or no unit to convert from. */
+export const NO_VALUE = '—';
+
+/** At most this many matches while a unit is typed, as in the two-box list (docs/UX-SPEC.md §3). */
+export const MATCH_LIMIT = 20;
 
 /** A row, with what the table component shows (components/ConversionTable.tsx) and what lies behind it. */
 export interface TableRow {
@@ -312,27 +367,59 @@ export interface TableRow {
   /** Singular or plural to agree with the value ("1 cup", "2.5 cups"). */
   name: string;
   symbol: string;
-  /** The value in this unit at full precision, for copying and for moving into the box; null when a double cannot hold it. */
+  /** The value in this unit at full precision, for copying and for moving into the box; null without one. */
   value: number | null;
-  /** As the row shows it: TABLE_PRECISION significant digits, or "Too large" or "Too small". */
+  /** As the row shows it: TABLE_PRECISION significant digits, "Too large" or "Too small", or NO_VALUE. */
   text: string;
-  /** False while the text is a message: there is nothing to copy or move. */
-  hasValue: boolean;
+  /**
+   * What the text is: a value; a dash, while there is no number or no unit to convert from; or a
+   * message, when a double cannot hold the value and there is nothing to copy or move.
+   */
+  tone: 'value' | 'empty' | 'message';
   /** The unit in the box. */
   inBox: boolean;
 }
 
-export interface TableView {
-  /** The box the table converts from: the source, the one box the table layout shows. */
+/** A match while a unit is typed: a unit, or a category whose name matched, to open. */
+export type MatchRow =
+  | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean }
+  | { kind: 'category'; category: Category };
+
+interface TableViewBase {
+  /** The box the table belongs to: the source, the one box the table layout shows. */
   box: BoxId;
+  /** The categories the layout offers, in the start's tiles and in its category menu. */
+  categories: Category[];
+  /** What the live region says once the view settles, if anything. */
+  announcement: string | null;
+}
+
+/** Before any category: the categories to start from. */
+export interface StartView extends TableViewBase {
+  kind: 'start';
+}
+
+/** A category's units in the listed order: with values once the box has a number and a unit, a dash for each until then. */
+export interface UnitsView extends TableViewBase {
+  kind: 'units';
   category: CategoryId;
-  /** Every unit of the category in the list's order, the box's own among them. */
   rows: TableRow[];
   /** In place of the rows when the box's value has no answer: "Too large to convert". */
   message: string | null;
-  /** What the live region says once the table settles. */
-  announcement: string;
 }
+
+/** While a unit is typed: matches from every category, under their category, without values. */
+export interface MatchesView extends TableViewBase {
+  kind: 'matches';
+  /** The typed unit, whose matched letters the rows set heavier. */
+  query: string;
+  /** Each category's matches together, its own row first, the groups in the order of their best match. */
+  rows: MatchRow[];
+  /** How many units match, per category with any match; one that matched by name alone counts 0. */
+  counts: Partial<Record<CategoryId, number>>;
+}
+
+export type TableView = StartView | UnitsView | MatchesView;
 
 export interface TableOptions extends NumberEnv {
   /** The visitor's unit family, listed first as in the suggestion list. */
@@ -340,75 +427,161 @@ export interface TableOptions extends NumberEnv {
   tier: 'basic' | 'all';
 }
 
-/** The table, once the source box holds a number and a unit; null until then. */
-export function selectTable(state: ConverterState, options: TableOptions): TableView | null {
-  const boxId = state.source;
-  const unit = state[boxId].unit ? getUnit(state[boxId].unit) : undefined;
-  if (!unit) return null;
-  const parsed = parse(state[boxId].text, options.separators);
-  const problem = parsed.outOfRange ?? parsed.invalid;
-  if (parsed.value === undefined && !problem) return null;
-
-  const typed =
-    parsed.expression && parsed.value !== undefined
-      ? formatNumber(parsed.value, { locale: options.locale })
-      : (parsed.valueText ?? '');
-  const from = `${typed} ${unitName(unit, parsed.value ?? Number.NaN)}`.trim();
-  const base = { box: boxId, category: unit.category };
-
-  if (problem || parsed.value === undefined) {
-    const kind = problem ?? 'large';
-    return {
-      ...base,
-      rows: [],
-      message: NO_ANSWER_MESSAGES[kind].box,
-      announcement:
-        kind === 'large' || kind === 'small'
-          ? `${from} is too ${kind} to convert`
-          : NO_ANSWER_MESSAGES[kind].box,
-    };
-  }
-
-  const value = parsed.value;
-  const row = (target: Unit): TableRow => {
-    const converted = target.id === unit.id ? value : safeConvert(value, unit, target);
-    const text =
-      converted === undefined
-        ? ''
-        : formatNumber(converted, {
-            precision: TABLE_PRECISION,
-            locale: options.locale,
-          });
-    const tooSmall = converted === 0 && value !== 0;
-    const shown = text && !tooSmall ? (converted ?? null) : null;
-    return {
-      unit: target,
-      id: target.id,
-      name: unitName(target, shown ?? Number.NaN),
-      symbol: target.symbol,
-      value: shown,
-      text: !text
-        ? NO_ANSWER_MESSAGES.large.calculator
-        : tooSmall
-          ? NO_ANSWER_MESSAGES.small.calculator
-          : text,
-      hasValue: shown !== null,
-      inBox: target.id === unit.id,
-    };
+/** What the table layout shows under its box: the matches while a unit is typed, else the category's units, else the start. */
+export function selectTable(state: ConverterState, options: TableOptions): TableView {
+  const parsed = parse(state[state.source].text, options.separators);
+  const id = state[state.source].unit;
+  const unit = id ? (getUnit(id) ?? null) : null;
+  const category = unit?.category ?? state.category;
+  const base = {
+    box: state.source,
+    categories: search('', { tier: options.tier }).results.flatMap((result) =>
+      result.kind === 'category' ? [result.category] : [],
+    ),
   };
+  if (typingUnit(parsed)) return selectMatches(base, parsed.query ?? '', unit, category, options);
+  if (!category) return { ...base, kind: 'start', announcement: null };
+  return selectUnits(base, category, unit, parsed, options);
+}
 
+/** What every view of the table's place carries. */
+type ViewBase = Pick<TableViewBase, 'box' | 'categories'>;
+
+function selectUnits(
+  shared: ViewBase,
+  category: CategoryId,
+  unit: Unit | null,
+  parsed: ParsedInput,
+  options: TableOptions,
+): UnitsView {
   const listed = search('', {
-    category: unit.category,
+    category,
     system: options.system,
     tier: options.tier,
   }).results.flatMap((result) => (result.kind === 'unit' ? [result.unit] : []));
   // A unit from beyond the mode's tier, reached by search, still shows where it is in use.
-  if (!listed.some((u) => u.id === unit.id)) listed.push(unit);
-  const rows = listed.map(row);
+  if (unit && !listed.some((u) => u.id === unit.id)) listed.push(unit);
+  const kind = getCategory(category)?.name.toLowerCase() ?? '';
+  const base = { ...shared, kind: 'units', category } as const;
 
-  const kind = getCategory(unit.category)?.name.toLowerCase() ?? '';
-  const announcement = `${from} in ${rows.length} units of ${kind}`.trim();
-  return { ...base, rows, message: null, announcement };
+  const problem = parsed.outOfRange ?? parsed.invalid;
+  if (unit && problem) {
+    const from = spokenAmount(parsed, unit, options.locale);
+    return {
+      ...base,
+      rows: [],
+      message: NO_ANSWER_MESSAGES[problem].box,
+      announcement:
+        problem === 'large' || problem === 'small'
+          ? `${from} is too ${problem} to convert`
+          : NO_ANSWER_MESSAGES[problem].box,
+    };
+  }
+
+  if (!unit || parsed.value === undefined) {
+    // Nothing to convert yet: every unit, a dash for its value, so the table stays in place.
+    const rows = listed.map((target) => emptyRow(target, unit));
+    return { ...base, rows, message: null, announcement: `${rows.length} units of ${kind}` };
+  }
+
+  const value = parsed.value;
+  const rows = listed.map((target) => valueRow(target, unit, value, options.locale));
+  const from = spokenAmount(parsed, unit, options.locale);
+  return {
+    ...base,
+    rows,
+    message: null,
+    announcement: `${from} in ${rows.length} units of ${kind}`,
+  };
+}
+
+function valueRow(target: Unit, from: Unit, value: number, locale: string | undefined): TableRow {
+  const converted = target.id === from.id ? value : safeConvert(value, from, target);
+  const text =
+    converted === undefined ? '' : formatNumber(converted, { precision: TABLE_PRECISION, locale });
+  const tooSmall = converted === 0 && value !== 0;
+  const shown = text && !tooSmall ? (converted ?? null) : null;
+  return {
+    unit: target,
+    id: target.id,
+    name: unitName(target, shown ?? Number.NaN),
+    symbol: target.symbol,
+    value: shown,
+    text: !text
+      ? NO_ANSWER_MESSAGES.large.calculator
+      : tooSmall
+        ? NO_ANSWER_MESSAGES.small.calculator
+        : text,
+    tone: shown === null ? 'message' : 'value',
+    inBox: target.id === from.id,
+  };
+}
+
+function emptyRow(target: Unit, inBox: Unit | null): TableRow {
+  return {
+    unit: target,
+    id: target.id,
+    name: target.plural,
+    symbol: target.symbol,
+    value: null,
+    text: NO_VALUE,
+    tone: 'empty',
+    inBox: target.id === inBox?.id,
+  };
+}
+
+/**
+ * Matches for a typed unit from every category, by core's ranker, the current category first
+ * among equal matches without hiding the others; grouped under their category, a category whose
+ * name matched leading its group ("len" offers all of Length).
+ */
+function selectMatches(
+  base: ViewBase,
+  query: string,
+  unit: Unit | null,
+  current: CategoryId | null,
+  options: TableOptions,
+): MatchesView {
+  const { results } = search(query, {
+    system: options.system,
+    tier: options.tier,
+    prefer: current,
+    limit: MATCH_LIMIT,
+  });
+  const ranked = results.flatMap((result): MatchRow[] => {
+    if (result.kind === 'category') return [{ kind: 'category', category: result.category }];
+    const category = getCategory(result.unit.category);
+    const inBox = result.unit.id === unit?.id;
+    return category ? [{ kind: 'unit', unit: result.unit, category, inBox }] : [];
+  });
+  const order: CategoryId[] = [];
+  for (const row of ranked) if (!order.includes(row.category.id)) order.push(row.category.id);
+  const rows = order.flatMap((id) => [
+    ...ranked.filter((row) => row.category.id === id && row.kind === 'category'),
+    ...ranked.filter((row) => row.category.id === id && row.kind === 'unit'),
+  ]);
+  const counts: Partial<Record<CategoryId, number>> = {};
+  for (const row of rows) {
+    counts[row.category.id] = (counts[row.category.id] ?? 0) + (row.kind === 'unit' ? 1 : 0);
+  }
+  const announcement =
+    rows.length === 0
+      ? 'No unit matches'
+      : `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`;
+  return { ...base, kind: 'matches', query, rows, counts, announcement };
+}
+
+/**
+ * Whether typing has reached a unit: the text holds a query with a letter or a symbol in it,
+ * beyond the characters numbers and sums are written with. The parser reads a half-typed number
+ * as a query ("-" before "-5", "1e" before "1e5"), so those, and a lone "e" after a number, which
+ * may be an exponent on its way, wait for the next key.
+ */
+export function typingUnit(parsed: ParsedInput): boolean {
+  const { query } = parsed;
+  if (!query) return false;
+  if (parsed.valueText !== undefined && /^[eE][-+−]?$/.test(query)) return false;
+  return /[^\s\d.,+\-−*/×÷^()]/u.test(query);
 }
 
 /**
@@ -440,12 +613,26 @@ function unitName(unit: Unit, value: number): string {
   return value === 1 ? unit.name : unit.plural;
 }
 
+/**
+ * A typed amount as the live region says it, "250 milliliters": arithmetic by its value ("8
+ * milliliters"), not by what was typed ("5+3").
+ */
+function spokenAmount(parsed: ParsedInput, unit: Unit, locale: string | undefined): string {
+  const typed =
+    parsed.expression && parsed.value !== undefined
+      ? formatNumber(parsed.value, { locale })
+      : (parsed.valueText ?? '');
+  return `${typed} ${unitName(unit, parsed.value ?? Number.NaN)}`.trim();
+}
+
 // ---------------------------------------------------------------------------
 // Undo, redo, and Escape (docs/UX-SPEC.md §9). The most recent interaction is what gets
 // undone. Typing is grouped into chunks the way editors coalesce undo: keystrokes in one box,
 // or in the calculator, less than TYPING_CHUNK_MS apart belong together, and a space starts a
-// new chunk. A lock, unlock, swap, use, clear, send, =, or C is its own entry. Escape steps back
-// through the same chunks, one box (or the calculator) at a time, and each step is undoable.
+// new chunk. A lock, unlock, swap, use, chosen category, clear, send, =, or C is its own entry.
+// With two boxes, and in the calculator, Escape steps back through the same chunks, one box (or
+// the calculator) at a time, and each step is undoable; the table layout's Escape has steps of
+// its own (TableLayout.tsx).
 
 /** What Escape can step back through in one box: a chunk of typing (with the text it started from) or the unit. */
 export type BoxEntry = { kind: 'text'; before: string } | { kind: 'unit' };
@@ -496,6 +683,7 @@ function sameState(a: ConverterState, b: ConverterState): boolean {
     a.b.unit === b.b.unit &&
     a.source === b.source &&
     a.mode === b.mode &&
+    a.category === b.category &&
     a.calc.text === b.calc.text &&
     a.calc.fresh === b.calc.fresh
   );
@@ -689,10 +877,11 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
         b: history.entries.a,
         calc: history.entries.calc,
       });
-    case 'use': {
+    case 'use':
+    case 'chooseCategory': {
       // The box holds a new number and unit at once, so its old chunks no longer apply; Escape
       // then clears the number, then the unit, as for a conversion loaded from a URL. The other
-      // box, if it took the box's old unit, starts over the same way.
+      // box, if its unit changed, starts over the same way.
       const otherId = other(action.box);
       const entries = { ...history.entries, [action.box]: [] };
       if (present[otherId].unit !== history.present[otherId].unit) entries[otherId] = [];

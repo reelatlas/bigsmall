@@ -1,6 +1,6 @@
-# Table selection: option A, decided 2026-10-07, to build
+# Table selection: option A, decided and built 2026-10-07
 
-Sean found the table layout's suggestion list covering the very table it lists, and the list repeating the table's units. Three prototypes were built in the selection lab (`/dev/selection-lab`, `apps/web/src/pages/dev/_selection-lab/SelectionLab.tsx`) on one shared model, the table as the unit list: A, a category menu; B, category tabs; C, no category control. Sean chose **A** and refined it over several rounds the same day. This document is the behavior to build into the converter's table layout, the decisions behind it, and the plan. The lab's `TableIsTheList` component, with `control="menu"`, is the working reference for every rule below; its B and C variants stay in the lab for comparison.
+Sean found the table layout's suggestion list covering the very table it lists, and the list repeating the table's units. Three prototypes were built in the selection lab (`/dev/selection-lab`, `apps/web/src/pages/dev/_selection-lab/SelectionLab.tsx`) on one shared model, the table as the unit list: A, a category menu; B, category tabs; C, no category control. Sean chose **A** and refined it over several rounds the same day. This document was the behavior to build into the converter's table layout, the decisions behind it, and the plan; it is now built (ADR 0012), and the current behavior lives in docs/UX-SPEC.md §1, §8, §9, and §12. The lab's `TableIsTheList` component, with `control="menu"`, was the working reference; its B and C variants stay in the lab for comparison.
 
 The two-box layout keeps today's suggestion list, its keys, and its chip, unchanged. Both layouts keep one shared conversion state.
 
@@ -57,6 +57,20 @@ The caret stays in the field throughout; the table's rows, the matches, and the 
 4. **Table layout controller**: the keys above, in a component the converter renders for the table layout, the calculator still between the box and the table on a phone and in its column from `md`.
 5. **Docs**: UX-SPEC §1, §5, §8, §9, §12 rewritten for the table layout; ADR 0012 (the table as the unit list, the category menu, the selection model; partly superseding ADR 0009's table rules); DESIGN-SYSTEM (the new components, the cursor tint, the dashes); ARCHITECTURE; TESTING; findings.
 6. **Tests**: `table.spec.ts` rewritten (the menu, matches by category and across, a category match, Enter, clicks, the arrow loop, the start's grid, the Esc ladder, typing from anywhere and appending, dashes, × keeping the category); axe and the keyboard walk on both layouts; `converter.spec.ts` untouched (two boxes).
+
+## Built (2026-10-07)
+
+Built as planned, in `TableLayout.tsx` with the components in the gallery, and the build settled a few things the lab left open:
+
+- **The menu's arrows move without choosing.** The lab applied a category on every radio change, as the theme menu previews themes. In the converter a category takes the unit out and is a step to undo, so Enter or a click chooses and Escape closes unchanged (docs/LEARNINGS.md).
+- **Choosing the category the box is already in keeps its unit.** In the lab it cleared it.
+- **Backspace on an empty field takes the unit out**, as the chip's × does and as it does with two boxes.
+- **Matched letters are heavier in the matches**, as in every list of matches, and each match tells screen readers its category.
+- **The field points at a row only while the cursor is on it**; resting on the unit in the box, it points at nothing, so a screen reader stays on the field while typing.
+- **Ctrl/⌘+C copies a row only with the cursor on it**; otherwise it is the field's own copy.
+- **Escape's steps are undoable**, like every other change to the conversion; the table layout's Escape does not use the two-box chunks.
+- **The tiles go four across at a 512 px column**, the smallest stock container size above the widest case (Theorem's "Temperature" needs 456 px), not at a breakpoint.
+- **The server's page carries both layouts' empty state**, so a saved table layout shows its menu, box, and tiles before the island hydrates.
 
 ## Open, after Sean sees it in the product
 

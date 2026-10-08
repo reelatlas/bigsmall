@@ -1,12 +1,7 @@
-import {
-  getCategory,
-  matchSpan,
-  type Category,
-  type SearchResult,
-  type Unit,
-} from '@bigsmall/core';
+import { getCategory, type Category, type SearchResult, type Unit } from '@bigsmall/core';
 import { cx } from '../lib/recipes';
 import { ChevronRightIcon } from './icons';
+import { MatchedText } from './MatchedText';
 
 /**
  * What a row in the panel can be. The smart input builds this list from a core search response,
@@ -154,10 +149,10 @@ function RowBody({
     return (
       <>
         <span className="shrink-0 font-numeric font-semibold text-ink-muted">
-          <Marked text={item.unit.symbol} query={query} className="text-ink" />
+          <MatchedText text={item.unit.symbol} query={query} className="text-ink" />
         </span>
         <span className="flex-1 truncate text-right">
-          <Marked text={item.unit.plural} query={query} className="font-semibold" />
+          <MatchedText text={item.unit.plural} query={query} className="font-semibold" />
           {showCategory && (
             // The literal space keeps the accessible name "ounces Weight", not "ouncesWeight".
             <>
@@ -175,34 +170,11 @@ function RowBody({
     return (
       <>
         <span className="flex-1 font-medium">
-          <Marked text={item.category.name} query={query} className="font-bold" />
+          <MatchedText text={item.category.name} query={query} className="font-bold" />
         </span>
         <ChevronRightIcon className="text-ink-muted" />
       </>
     );
   }
   return null;
-}
-
-/** `text` with the part that matches `query` wrapped in a span, the way search matched it (core matchSpan). */
-function Marked({
-  text,
-  query,
-  className,
-}: {
-  text: string;
-  query: string | undefined;
-  className: string;
-}) {
-  const span = query ? matchSpan(text, query) : null;
-  if (!span) return text;
-  return (
-    <>
-      {text.slice(0, span.start)}
-      <span className={className} data-match>
-        {text.slice(span.start, span.end)}
-      </span>
-      {text.slice(span.end)}
-    </>
-  );
 }

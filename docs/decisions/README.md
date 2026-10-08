@@ -14,9 +14,10 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0006](0006-smart-input-combobox.md)    | Hand-built WAI-ARIA combobox; React Aria removed                            | accepted                                        |
 | [0007](0007-preact-compat.md)           | The island runs on Preact through preact/compat                             | accepted                                        |
 | [0008](0008-hosting-and-domains.md)     | Hosting on Vercel, with bigsmall.work as the main domain                    | accepted                                        |
-| [0009](0009-two-layouts.md)             | One converter, two layouts: the table by default, two boxes behind a switch | accepted; the headline superseded by 0010       |
+| [0009](0009-two-layouts.md)             | One converter, two layouts: the table by default, two boxes behind a switch | accepted; partly superseded by 0010, 0012       |
 | [0010](0010-table-without-headline.md)  | The table shows every unit alike; the second box's unit is kept, not shown  | accepted                                        |
 | [0011](0011-listed-order.md)            | Units listed the visitor's way: their own system first, smallest to largest | accepted                                        |
+| [0012](0012-table-as-unit-list.md)      | The table is the unit list: a category menu, and a cursor in the field      | accepted                                        |
 
 ## Template
 

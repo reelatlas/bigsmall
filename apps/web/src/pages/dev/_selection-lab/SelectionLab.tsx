@@ -29,7 +29,7 @@ import {
 import { Button } from '../../../components/Button';
 import { ChevronDownIcon, CopyIcon } from '../../../components/icons';
 import { UnitChip } from '../../../components/UnitChip';
-import { typingUnit } from '../../../features/converter/SmartInput';
+import { typingUnit } from '../../../features/converter/state';
 import { browserLocale, detectRegion } from '../../../lib/region';
 import {
   CARD,

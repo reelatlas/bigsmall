@@ -3,6 +3,8 @@ import { useId, useState } from 'react';
 import { Button } from '../../../components/Button';
 import { CopiedIcon } from '../../../components/icons';
 import { Calculator, SendButton } from '../../../components/Calculator';
+import { CategoryMenu } from '../../../components/CategoryMenu';
+import { CategoryTiles } from '../../../components/CategoryTiles';
 import { ConversionTable } from '../../../components/ConversionTable';
 import { LayoutSwitch } from '../../../components/LayoutSwitch';
 import { NumberText } from '../../../components/NumberText';
@@ -12,8 +14,15 @@ import {
   toSuggestionItem,
   type SuggestionItem,
 } from '../../../components/SuggestionPanel';
+import { UnitMatches } from '../../../components/UnitMatches';
 import { SmartInput } from '../../../features/converter/SmartInput';
-import { initialState, selectTable, type BoxView } from '../../../features/converter/state';
+import {
+  initialState,
+  selectTable,
+  type BoxView,
+  type ConverterState,
+  type TableView,
+} from '../../../features/converter/state';
 import type { ConverterEnv } from '../../../features/converter/useConverter';
 import type { Layout } from '../../../lib/layout';
 import { cx, FIELD_ROW, NUMBER_SIZES, SHELL, SHELL_BORDERED } from '../../../lib/recipes';
@@ -161,35 +170,92 @@ function OpenSample() {
   );
 }
 
+/** The table layout's view of a state, from the real selector. */
+function tableOf(state: Partial<ConverterState>): TableView {
+  return selectTable({ ...initialState, ...state }, { ...ENV, tier: 'basic' });
+}
+
 /**
- * The table layout's rows for 250 mL, from the real table view: milliliters marked as the unit in
- * the box, one copy confirmed. A second table shows a value with no answer. Their titles are for
- * screen readers; on the page the category label over the box names the table.
+ * The table layout's pieces in frozen states, from the real table view: the category menu before
+ * and after a category is chosen; the start's categories, the cursor on one; 250 mL in every unit
+ * of volume, milliliters marked as the unit in the box, the cursor on cups and one copy
+ * confirmed; Volume chosen with no unit, each value a dash; a value with no answer; and the
+ * matches for "250 p" from every category. The tables' titles are for screen readers; on the page
+ * the category menu over the box names them.
  */
-function TableSample() {
-  const table = selectTable(
-    { ...initialState, a: { text: '250', unit: 'milliliter' } },
-    { ...ENV, tier: 'basic' },
-  );
-  if (!table) return null;
+function TableSamples() {
+  const id = useId();
+  /** Each list's own item ids, as each table layout has one list at a time. */
+  const itemIds = (list: string) => (index: number) => `${id}-${list}-${index}`;
+  const start = tableOf({});
+  const values = tableOf({ a: { text: '250', unit: 'milliliter' }, category: 'volume' });
+  const dashes = tableOf({ a: { text: '', unit: null }, category: 'volume' });
+  const matches = tableOf({ a: { text: '250 p', unit: null } });
+  const cups = values.kind === 'units' ? values.rows.findIndex((row) => row.id === 'us-cup') : -1;
   return (
     <>
+      <div className="flex flex-wrap gap-3">
+        <CategoryMenu categories={start.categories} value={null} onChoose={noop} />
+        <CategoryMenu categories={start.categories} value="volume" onChoose={noop} />
+      </div>
+      {start.kind === 'start' && (
+        <CategoryTiles
+          id={`${id}-start`}
+          categories={start.categories}
+          cursor={2}
+          itemId={itemIds('start')}
+          onPick={noop}
+        />
+      )}
+      {values.kind === 'units' && (
+        <ConversionTable
+          id={`${id}-values`}
+          title="Volume"
+          rows={values.rows}
+          message={null}
+          cursor={cups}
+          itemId={itemIds('values')}
+          copied="liter"
+          onPick={noop}
+          onCopy={noop}
+        />
+      )}
+      {dashes.kind === 'units' && (
+        <ConversionTable
+          id={`${id}-dashes`}
+          title="Volume, no unit yet"
+          rows={dashes.rows}
+          message={null}
+          cursor={-1}
+          itemId={itemIds('dashes')}
+          copied={null}
+          onPick={noop}
+          onCopy={noop}
+        />
+      )}
       <ConversionTable
-        title="Volume"
-        rows={table.rows}
-        message={null}
-        copied="liter"
-        onUse={noop}
-        onCopy={noop}
-      />
-      <ConversionTable
+        id={`${id}-message`}
         title="Length"
         rows={[]}
         message="Too large to convert"
+        cursor={-1}
+        itemId={itemIds('message')}
         copied={null}
-        onUse={noop}
+        onPick={noop}
         onCopy={noop}
       />
+      {matches.kind === 'matches' && (
+        <UnitMatches
+          id={`${id}-matches`}
+          matches={matches.rows}
+          counts={matches.counts}
+          query={matches.query}
+          notFound=""
+          cursor={1}
+          itemId={itemIds('matches')}
+          onPick={noop}
+        />
+      )}
     </>
   );
 }
@@ -212,7 +278,7 @@ export function FieldSamples({ theme }: { theme: string }) {
       <ArithmeticSample label={`${theme} arithmetic sample`} />
       <OpenSample />
       <CalculatorSample />
-      <TableSample />
+      <TableSamples />
       <LayoutSwitchSample />
     </div>
   );

@@ -49,7 +49,10 @@ function detectEnv(): ConverterEnv {
 export interface ConverterController {
   state: ConverterState;
   view: ConverterView;
-  /** The table layout's view, once the source box holds a number and a unit; null otherwise, and in the two-box layout. */
+  /**
+   * What the table layout shows under its box; null with two boxes. Before hydration, when the
+   * layout is not known yet, it is the table layout's empty state, which the server renders too.
+   */
   table: TableView | null;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
@@ -72,9 +75,9 @@ export function useConverter(layout: Layout | null): ConverterController {
   const view = useMemo(() => selectView(state, env), [state, env]);
   const table = useMemo(
     () =>
-      layout === 'table'
-        ? selectTable(state, { ...env, tier: state.mode === 'basic' ? 'basic' : 'all' })
-        : null,
+      layout === 'boxes'
+        ? null
+        : selectTable(state, { ...env, tier: state.mode === 'basic' ? 'basic' : 'all' }),
     [layout, state, env],
   );
 

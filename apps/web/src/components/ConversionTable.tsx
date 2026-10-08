@@ -1,5 +1,5 @@
-import { useId, useRef, useState, type ButtonHTMLAttributes, type KeyboardEvent } from 'react';
-import { CARD, cx } from '../lib/recipes';
+import { useId, type ButtonHTMLAttributes } from 'react';
+import { CARD, CURSOR_ROW, cx, rowFill } from '../lib/recipes';
 import { Button } from './Button';
 import { CopiedIcon, CopyIcon } from './icons';
 
@@ -9,27 +9,37 @@ export interface ConversionRow {
   id: string;
   /** Singular or plural to agree with the value ("1 cup", "2.5 cups"). */
   name: string;
-  /** The value at six significant digits, or "Too large" or "Too small". */
+  /** The value at six significant digits, "Too large" or "Too small", or a dash. */
   text: string;
   symbol: string;
-  /** False while the text is a message: there is nothing to copy or move. */
-  hasValue: boolean;
-  /** The unit in the box: marked, and not moved again. */
+  /**
+   * What the text is: a value; a dash, while there is no number or no unit to convert from; or a
+   * message, in the danger color. Only a value has a copy button.
+   */
+  tone: 'value' | 'empty' | 'message';
+  /** The unit in the box: marked in the accent's soft fill. */
   inBox: boolean;
 }
 
 export interface ConversionTableProps {
+  /** The grid's id, which the field's combobox controls. */
+  id: string;
   /**
-   * Names the table for screen readers: the category, "Volume". On screen the category label
-   * over the box names it (docs/UX-SPEC.md §1).
+   * Names the table for screen readers: the category, "Volume". On screen the category menu over
+   * the box names it (docs/UX-SPEC.md §1).
    */
   title: string;
   rows: readonly ConversionRow[];
   /** In place of the rows when the value has no answer: "Too large to convert". */
   message: string | null;
+  /** The row the field's cursor is on, by index, or -1. */
+  cursor: number;
+  /** The id of a row's unit cell, which the field points at while the cursor is on it. */
+  itemId: (index: number) => string;
   /** The row whose copy button shows the check, by id. */
   copied: string | null;
-  onUse: (row: ConversionRow) => void;
+  /** A row was clicked or tapped, by index. */
+  onPick: (index: number) => void;
   onCopy: (row: ConversionRow) => void;
   /** More props for a row's copy button: the copy hook's pointer handlers. */
   copyProps?: (
@@ -45,54 +55,34 @@ export interface ConversionTableProps {
  */
 const ROWS = 'grid grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,max-content)_auto] gap-y-0.5';
 
+/** The value's look, by what it is: a value, a dash, or a message. */
+const TONE: Record<ConversionRow['tone'], string> = {
+  value: 'text-ink',
+  empty: 'text-ink-muted',
+  message: 'text-sm font-medium text-danger',
+};
+
 /**
- * The table layout's rows (docs/UX-SPEC.md §1): a value in every unit of its category. A row is a
- * button that moves its unit into the box; its copy button sits beside it, never inside. The rows
- * are one Tab stop with the arrow keys between them (a roving tabindex), and Ctrl/⌘+C copies the
- * focused row, so the copy buttons stay out of the Tab order, as in the boxes. Columns line up
- * across rows through a subgrid (ROWS).
+ * The table layout's units (docs/UX-SPEC.md §1): every unit of the category, with its value or a
+ * dash. The field keeps focus and its cursor moves through the rows (aria-activedescendant on a
+ * grid, ADR 0012), so the rows are no Tab stops; a click or tap on one is the field's to act on,
+ * and focus stays in the field. Each row's copy button sits in a cell of its own beside it, out
+ * of the Tab order as in the boxes. Columns line up across rows through a subgrid (ROWS).
  */
 export function ConversionTable({
+  id,
   title,
   rows,
   message,
+  cursor,
+  itemId,
   copied,
-  onUse,
+  onPick,
   onCopy,
   copyProps,
 }: ConversionTableProps) {
   const titleId = useId();
   const moveHintId = useId();
-  const [focusIndex, setFocusIndex] = useState(0);
-  const current = Math.min(focusIndex, Math.max(rows.length - 1, 0));
-  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
-
-  const focusRow = (index: number) => {
-    setFocusIndex(index);
-    buttons.current[index]?.focus();
-  };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const last = rows.length - 1;
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c') {
-      const row = rows[current];
-      if (row?.hasValue) onCopy(row);
-      return;
-    }
-    const next =
-      event.key === 'ArrowDown'
-        ? Math.min(current + 1, last)
-        : event.key === 'ArrowUp'
-          ? Math.max(current - 1, 0)
-          : event.key === 'Home'
-            ? 0
-            : event.key === 'End'
-              ? last
-              : null;
-    if (next === null) return;
-    event.preventDefault();
-    focusRow(next);
-  };
 
   return (
     <section aria-labelledby={titleId} className="mt-4">
@@ -106,38 +96,33 @@ export function ConversionTable({
         {message ? (
           <p className="px-2 py-2.5 font-medium text-danger">{message}</p>
         ) : (
-          <ul className={ROWS}>
+          <div id={id} role="grid" aria-labelledby={titleId} className={ROWS}>
             {rows.map((row, index) => (
-              <li
+              <div
                 key={row.id}
-                className="col-span-5 grid grid-cols-subgrid items-center"
+                role="row"
+                aria-selected={index === cursor}
                 data-row={row.id}
+                className="col-span-5 grid grid-cols-subgrid items-center"
               >
-                <button
-                  ref={(element) => {
-                    buttons.current[index] = element;
-                  }}
-                  type="button"
-                  tabIndex={index === current ? 0 : -1}
-                  aria-disabled={row.inBox || !row.hasValue || undefined}
-                  aria-describedby={row.inBox || !row.hasValue ? undefined : moveHintId}
-                  onFocus={() => setFocusIndex(index)}
-                  onKeyDown={onKeyDown}
-                  onClick={() => {
-                    if (!row.inBox && row.hasValue) onUse(row);
-                  }}
+                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field */}
+                <div
+                  id={itemId(index)}
+                  role="gridcell"
+                  tabIndex={-1}
+                  aria-disabled={row.tone === 'message' || undefined}
+                  aria-describedby={row.inBox || row.tone === 'message' ? undefined : moveHintId}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => onPick(index)}
                   className={cx(
-                    'col-span-4 grid min-h-11 grid-cols-subgrid items-center gap-x-2 rounded-nested px-2 text-left',
-                    row.inBox ? 'cursor-default bg-accent-soft' : 'hover:bg-surface-raised',
+                    CURSOR_ROW,
+                    'col-span-4 grid grid-cols-subgrid items-center gap-x-2',
+                    rowFill(row.inBox, index === cursor),
                   )}
                 >
-                  <span
-                    className={cx(
-                      'text-right font-numeric whitespace-nowrap',
-                      row.hasValue ? 'text-ink' : 'text-sm font-medium text-danger',
-                    )}
-                  >
+                  <span className={cx('text-right font-numeric whitespace-nowrap', TONE[row.tone])}>
                     {row.text}
+                    {row.tone === 'empty' && <span className="sr-only">no value</span>}
                   </span>
                   <span className="col-start-3 text-right font-numeric font-semibold whitespace-nowrap text-ink-muted">
                     {row.symbol}
@@ -146,25 +131,27 @@ export function ConversionTable({
                     {row.name}
                     {row.inBox && <span className="sr-only">, in the box</span>}
                   </span>
-                </button>
-                {row.hasValue ? (
-                  <Button
-                    variant="ghost"
-                    square
-                    nested
-                    tabIndex={-1}
-                    aria-label={`Copy ${row.name}`}
-                    onClick={() => onCopy(row)}
-                    {...copyProps?.(row)}
-                  >
-                    {copied === row.id ? <CopiedIcon /> : <CopyIcon />}
-                  </Button>
-                ) : (
-                  <span className="size-11" />
-                )}
-              </li>
+                </div>
+                <div role="gridcell">
+                  {row.tone === 'value' ? (
+                    <Button
+                      variant="ghost"
+                      square
+                      nested
+                      tabIndex={-1}
+                      aria-label={`Copy ${row.name}`}
+                      onClick={() => onCopy(row)}
+                      {...copyProps?.(row)}
+                    >
+                      {copied === row.id ? <CopiedIcon /> : <CopyIcon />}
+                    </Button>
+                  ) : (
+                    <span className="block size-11" />
+                  )}
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </section>

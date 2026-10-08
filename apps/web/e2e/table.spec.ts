@@ -754,17 +754,24 @@ test('Enter works out arithmetic and keeps the unit; with no unit, the next Ente
   await expectCursor(page, 'Length');
 });
 
-test('a long number steps down a size and stays on one line; its exponent marker is bold', async ({
+test('a long number steps down a size and fits, or scrolls at the smallest; its exponent marker is bold', async ({
   page,
 }) => {
+  // How many digits fit depends on the machine's font, so the test checks the rule, not a length:
+  // at every length, the number fits on one line, or it is at the smallest size and scrolls.
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto('/?a=kilometer&v=1');
   await ready(page);
   const fontSize = () => box(page).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  const fits = () => box(page).evaluate((el) => el.scrollWidth <= el.clientWidth);
   const short = await fontSize();
-  await box(page).fill('123456789012345678');
-  expect(await fontSize()).toBeLessThan(short);
-  expect(await box(page).evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+  await box(page).fill('1234567890123456789012345678901234567890');
+  const smallest = await fontSize();
+  expect(smallest).toBeLessThan(short);
+  for (let digits = 1; digits <= 24; digits += 1) {
+    await box(page).fill('123456789012345678901234'.slice(0, digits));
+    expect((await fits()) || (await fontSize()) === smallest, `${digits} digits`).toBe(true);
+  }
   await box(page).fill('1.5E21');
   await expect(page.locator('[data-marker]')).toHaveText('E');
 });

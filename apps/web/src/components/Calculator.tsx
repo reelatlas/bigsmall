@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useFitStep } from '../lib/fit-step';
-import { CARD, cx, FIELD_ROW, LABEL, NUMBER_SIZES } from '../lib/recipes';
+import { CARD, cx, FIELD_ROW, NUMBER_SIZES } from '../lib/recipes';
 import { Button, type ButtonVariant } from './Button';
 import { BackspaceIcon, CloseIcon, CopiedIcon } from './icons';
 
@@ -51,6 +51,9 @@ const TYPED: Readonly<Record<string, CalculatorKey>> = {
   ',': 'decimal',
   Backspace: 'backspace',
 };
+
+/** The title, which names the calculator's group: a label over what it names. */
+const TITLE = 'text-sm font-medium text-ink-muted';
 
 /** The display's text: one line, sized down like a long number in a field, its end kept in view. */
 const DISPLAY_TEXT = 'min-w-0 flex-1 overflow-hidden font-numeric whitespace-pre text-ink';
@@ -216,7 +219,7 @@ export function Calculator({
       className={cx(CARD, 'p-3 shadow-sm')}
     >
       <div className="mb-2 flex items-center justify-between">
-        <h2 id={titleId} className={cx('pl-1', LABEL)}>
+        <h2 id={titleId} className={cx('pl-1', TITLE)}>
           Calculator
         </h2>
         <Button

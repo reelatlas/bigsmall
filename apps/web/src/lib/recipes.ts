@@ -77,9 +77,6 @@ export const FIELD_ROW = 'flex h-15 items-center gap-2 pr-2 pl-4';
 
 // Text
 
-/** A label naming what is under it: the category over two boxes, the calculator's title. */
-export const LABEL = 'text-sm font-medium text-ink-muted';
-
 /**
  * A unit's symbol, wherever it shows (the chip, the lists, the table, the matches): semibold in
  * equal-width digits, muted beside its name, in ink when it stands alone (a collapsed chip).

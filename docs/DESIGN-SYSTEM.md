@@ -102,7 +102,7 @@ Prefer native elements when they are good enough (`<button>`, radios, `<dialog>`
 
 ### Recipes
 
-A class list more than one file builds from is a recipe in `src/lib/recipes.ts`, written once so a shared shape cannot drift between Astro and TSX: the card (`CARD`), where the calculator opens (`CALCULATOR_PLACE`), the fluid shells (`SHELL`, `SHELL_BORDERED`, `SHELL_GHOST`, `SHELL_PANEL`), the menus inside them (`MENU_TRIGGER`, `MENU_CHEVRON`, `MENU_OPTION`, shared by the theme menu and the category menu), a label's type (`LABEL`), a unit's symbol wherever it shows (`unitSymbol()`), the field row (`FIELD_ROW`), the rows a field's cursor moves through (`CURSOR_ROW`, and `rowFill()` for their fill), the type ladders (`NUMBER_SIZES`, `WORDMARK_SIZES`), and the wordmark's face and lines (`WORDMARK_FACE`, `PLAYING_LINE`, `ART_LINE`).
+A class list more than one file builds from is a recipe in `src/lib/recipes.ts`, written once so a shared shape cannot drift between Astro and TSX: the card (`CARD`), where the calculator opens (`CALCULATOR_PLACE`), the fluid shells (`SHELL`, `SHELL_BORDERED`, `SHELL_GHOST`, `SHELL_PANEL`), the menus inside them (`MENU_TRIGGER`, `MENU_CHEVRON`, `MENU_OPTION`, shared by the theme menu and the category menu), a unit's symbol wherever it shows (`unitSymbol()`), the field row (`FIELD_ROW`), the rows a field's cursor moves through (`CURSOR_ROW`, and `rowFill()` for their fill), the type ladders (`NUMBER_SIZES`, `WORDMARK_SIZES`), and the wordmark's face and lines (`WORDMARK_FACE`, `PLAYING_LINE`, `ART_LINE`).
 
 - A recipe whose look depends on a state is a small function returning class lists (`rowFill(selected, current)`, `unitSymbol(alone)`), so the states can never both apply and fight over one property.
 
@@ -195,7 +195,7 @@ The converter's box is `ValueField`, placed by `TableLayout`: it takes a shell's
 ### Calculator
 
 - A card: `CARD` with `p-3 shadow-sm`, in the `Calculator` component. The converter places it with `CALCULATOR_PLACE`, at most `max-w-sm` wide: between the box and the table, flush left 16 px under the box, and from `md` in a column of its own (`w-72`) right of them (see "A column beside a pair of rows").
-- **Header**: the title "Calculator" (`LABEL`, labelling the group) and a ghost close button.
+- **Header**: the title "Calculator" (`text-sm font-medium text-ink-muted`, labelling the group) and a ghost close button.
 - **Display**: a field's geometry, `rounded-lg border-2 border-edge bg-surface` around `FIELD_ROW`, so it is the same size as the box; the entry in `font-numeric` stepping down through `NUMBER_SIZES` (`src/lib/recipes.ts`) and keeping its end in view past the smallest; drawn by `NumberText`, so exponent markers and the running value look as they do in a box; a muted 0 when empty; at the row's right, why the entry has no value ("Too large"), in `text-sm font-medium text-danger`, like a table row's "Too large".
 - **Keys** are `Button`s at `min-h-12` with `font-numeric text-lg`, four to a row (`gap-2`): digits secondary; C, ⌫, E, and the decimal mark `tonal`; the five operators `soft`; = primary.
 - **Sending**: the `SendButton` under the keys, the row's width (`grid-flow-col auto-cols-fr`, so the gallery's two states share it); secondary, reading "Use" plus the box's unit symbol in semibold, with the copy check (`CopiedIcon`) while a send is confirmed, and `aria-disabled` while there is nothing to send.

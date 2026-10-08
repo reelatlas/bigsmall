@@ -3,6 +3,7 @@ import { useColumnsFit } from '../lib/fit-step';
 import { CARD, CURSOR_ROW, cx, NO_ANSWER, rowFill, unitSymbol } from '../lib/recipes';
 import { Button } from './Button';
 import { CopiedIcon, CopyIcon } from './icons';
+import { FormattedNumber } from './NumberText';
 
 /** One row as the table shows it; the converter maps its view onto these. */
 export interface ConversionRow {
@@ -83,7 +84,8 @@ const TONE: Record<ConversionRow['tone'], string> = {
  * The field keeps focus and its cursor moves through the rows (aria-activedescendant on a grid,
  * ADR 0012), so the rows are no Tab stops; a click or tap on one is the field's to act on, and
  * focus stays in the field. Each row's copy button sits in a cell of its own beside it, out of
- * the Tab order like the box's own. Columns line up across rows through a subgrid (ROWS).
+ * the Tab order like the box's own. Columns line up across rows through a subgrid (ROWS). A
+ * value in exponent form sets its marker heavier, as the box does (FormattedNumber).
  * Screen readers hear the symbol whole ("km²") and the name, shown or not, from copies of their
  * own; the columns they are drawn in are hidden from them.
  */
@@ -148,7 +150,7 @@ export function ConversionTable({
                         TONE[row.tone],
                       )}
                     >
-                      {row.text}
+                      {row.tone === 'value' ? <FormattedNumber text={row.text} /> : row.text}
                       {row.tone === 'empty' && <span className="sr-only">no value</span>}
                     </span>
                     <span

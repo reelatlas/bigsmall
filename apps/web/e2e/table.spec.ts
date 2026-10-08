@@ -856,7 +856,7 @@ test('Enter works out arithmetic and keeps the unit; with no unit, the next Ente
   await expectCursor(page, 'Length');
 });
 
-test('a long number steps down a size and fits, or scrolls at the smallest; its exponent marker is bold', async ({
+test('a long number steps down a size and fits, or scrolls at the smallest; its exponent marker is bold, in the box and in a row', async ({
   page,
 }) => {
   // How many digits fit depends on the machine's font, so the test checks the rule, not a length:
@@ -875,7 +875,12 @@ test('a long number steps down a size and fits, or scrolls at the smallest; its 
     expect((await fits()) || (await fontSize()) === smallest, `${digits} digits`).toBe(true);
   }
   await box(page).fill('1.5E21');
-  await expect(page.locator('[data-marker]')).toHaveText('E');
+  await expect(page.locator('[data-plane="box"] [data-marker]')).toHaveText('E');
+  // A row's value in exponent form sets its marker as the box does, and reads whole.
+  const marker = row(page, 'millimeter').locator('[data-marker]');
+  await expect(marker).toHaveText('E');
+  expect(await marker.evaluate((el) => getComputedStyle(el).fontWeight)).toBe('600');
+  await expect(unitCell(page, 'millimeter')).toHaveAccessibleName(/^1\.5E27 mm millimeters/);
 });
 
 test('the matches and the open menu pass axe, and matched letters are set heavier', async ({

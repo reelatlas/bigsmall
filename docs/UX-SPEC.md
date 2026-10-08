@@ -98,7 +98,7 @@ Nothing is chosen on a keystroke, and a unit is never chosen for you, on load or
 ## 7. Conversion and display
 
 - **The table converts** whenever the box holds a number and a unit: every row shows the value in its unit to 6 significant digits. A value moved into the box comes at 10 significant digits, trailing zeros trimmed, with the locale's grouping; magnitudes from 1e15 up, or below 1e-6, switch to exponent form (`1.23456789E23`).
-- **The exponent marker** in a value is semibold, so `1.5E21` reads as a number with an exponent. Only a marker inside the parsed number counts.
+- **The exponent marker** in a value is semibold, in the box and in the table's rows, so `1.5E21` reads as a number with an exponent. In the box, only a marker inside the parsed number counts.
 - **Running value.** While the box holds arithmetic and nothing else, its value follows it in the field in the muted color: `5 + 3 = 8`. The table converts from that value as it changes.
 - **Numbers fit.** A long number steps down through five type sizes until it fits on one line beside the chip, re-measured on every change and on resize, and steps back up when room returns. Past the smallest size it scrolls inside the field. Before it steps down at all, the chip gives up its name, if that makes the room (§5).
 - **Out of range.** When the typed number is beyond what a double holds (`1e400`), the table says "Too large to convert" in place of its rows; nonzero digits that round to zero say "Too small to convert", arithmetic that divides by zero "Can’t divide by zero", and a power with no real value "No real answer". A row whose own value overflows or rounds to zero says "Too large" or "Too small". Never a bare 0.

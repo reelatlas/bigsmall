@@ -22,12 +22,7 @@ export function NumberText({ text, parsed, running }: NumberTextProps) {
   const pieces: ReactNode[] = [];
   let from = 0;
   for (const at of marks) {
-    pieces.push(
-      text.slice(from, at),
-      <span key={at} className="font-semibold" data-marker>
-        {text[at]}
-      </span>,
-    );
+    pieces.push(text.slice(from, at), <Marker key={at}>{text[at] ?? ''}</Marker>);
     from = at + 1;
   }
   pieces.push(text.slice(from));
@@ -35,6 +30,31 @@ export function NumberText({ text, parsed, running }: NumberTextProps) {
     <>
       {pieces}
       {running !== null && <span className="text-ink-muted">{` = ${running}`}</span>}
+    </>
+  );
+}
+
+/** An exponent marker, heavier than the digits around it. */
+function Marker({ children }: { children: string }) {
+  return (
+    <span className="font-semibold" data-marker>
+      {children}
+    </span>
+  );
+}
+
+/**
+ * A number core formatted (formatNumber), such as a table row's value, drawn as a typed one is:
+ * its exponent marker heavier, "1.23457E23". Core writes an "E" only as that marker.
+ */
+export function FormattedNumber({ text }: { text: string }) {
+  const at = text.indexOf('E');
+  if (at < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, at)}
+      <Marker>E</Marker>
+      {text.slice(at + 1)}
     </>
   );
 }

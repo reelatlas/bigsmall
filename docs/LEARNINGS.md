@@ -488,6 +488,7 @@ Format:
 **What happened.** The table layout became the default, with two boxes a remembered choice. The island is server-rendered before anyone's choice is known, and it learns the choice only after hydrating, so a two-box visitor would have seen the table's one box first, then the second box appear.
 **Rule.** Treat a layout like the theme: the inline script applies the saved choice to `<html data-layout>` before paint, the server's markup carries both layouts' empty state, and custom variants (`layout-table:hidden`, `layout-boxes:hidden`) show the right one until the island takes over. A browser test blocks the island's code and checks both. Keep the island's first render identical to the server's (both states), and render one layout only once hydrated.
 **Promoted** to docs/DESIGN-SYSTEM.md, "Patterns".
+**Retired** with two boxes and the layout switch the same day (ADR 0013): no layout is saved now. The rule stands for any saved choice that changes an island's markup.
 
 ## 2026-10-07 — A count that stood in for room broke in a wider box
 
@@ -509,7 +510,7 @@ Format:
 ## 2026-10-07 — A half-typed number parses as a unit query
 
 **What happened.** The table layout opens its list once a unit is being typed. Keying that off the parser's `query` would have flashed the list open on the way to a number: `parse` reads `-` and `.` as queries before a digit follows, `1e` and `1e-` as the number 1 with the query `e` or `e-` before the exponent's digits, and `2(3` as 2 with the query `(3`.
-**Rule.** Behavior that should follow "a unit is being typed" checks the query for a character numbers and sums are not written with (a letter or a symbol), and treats a lone `e`, `E`, `e-`, or `e+` right after a number as an exponent on its way (`typingUnit` in `SmartInput.tsx`). A browser test types each of these and checks the list stays closed.
+**Rule.** Behavior that should follow "a unit is being typed" checks the query for a character numbers and sums are not written with (a letter or a symbol), and treats a lone `e`, `E`, `e-`, or `e+` right after a number as an exponent on its way (`typingUnit`, now in the converter's `state.ts`). A browser test types each of these and checks the list stays closed.
 
 ## 2026-10-07 — A layout test tuned to one machine's font failed on CI's
 
@@ -545,6 +546,7 @@ Format:
 
 **What happened.** The table layout keeps where its cursor is in component state, as an index. Undo, clear all, or a send from the calculator changes what the table shows from outside the component, and the index would then point at a different row of a different list, tinted for no reason.
 **Rule.** Tie a cursor to the view it was set in (here a key for the start, the matches, or one category's units) and treat it as resting whenever the view has changed. Code that moves the view on purpose and wants the cursor somewhere (choosing a category puts it on the first unit) sets the cursor with the view it is about to show.
+**Since** the same day choosing a category highlights no unit (Sean), so nothing sets a cursor for a view about to show; the cursor rests after every change of view.
 
 ## 2026-10-07 — Arrow keys through radios that apply would each be an undo step
 

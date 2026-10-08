@@ -207,7 +207,7 @@ The converter's box is `ValueField`, placed by `TableLayout`: it takes a shell's
 
 ### Copy
 
-- **Sentence case** for every label, button, heading, message, and theme name: "Clear all", "Neo-noir", "Copy first value". The only capitals inside a phrase are proper names.
+- **Sentence case** for every label, button, heading, message, and theme name: "Clear all", "Neo-noir", "Copy value". The only capitals inside a phrase are proper names.
 - **Units follow the standards, not the sentence-case rule.** Symbols are case-sensitive and never altered: mL, kB, °F, km/h. Unit names are lowercase, including ones named after people (kelvin, newton), except "Celsius" and "Fahrenheit", which the SI Brochure and NIST write capitalized. Chips and rows show the plural name ("milliliters") next to the symbol.
 - **Category names** are single capitalized words as labels: Length, Weight, Volume.
 - **Short and plain.** No exclamation marks, no jargon in user-facing text. Error and empty-state text says what to try next.

@@ -371,7 +371,7 @@ test('typing anywhere lands in the field, after what is there', async ({ page, i
   await page.keyboard.type('7');
   await expect(box(page)).toHaveValue('55467');
 
-  // With nothing focused on the page, too; Backspace takes the last character back.
+  // With nothing focused on the page, too. From the chip, Backspace takes the last character back.
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.keyboard.type('8');
   await expect(box(page)).toBeFocused();

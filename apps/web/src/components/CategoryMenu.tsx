@@ -144,8 +144,10 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           }}
           className={cx(MENU_TRIGGER, 'justify-between')}
         >
-          {/* The category's name, the word "Category" kept for screen readers, as "Theme" is. */}
-          <span>
+          {/* The category's name, the word "Category" kept for screen readers, as "Theme" is.
+              Before a choice the word shows, muted like the theme menu's label and a field's
+              placeholder. */}
+          <span className={cx(!chosenName && 'text-ink-muted')}>
             {chosenName ? (
               <>
                 <span className="sr-only">Category </span>

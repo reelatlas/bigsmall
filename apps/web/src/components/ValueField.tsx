@@ -111,7 +111,6 @@ export function ValueField({
           <input
             ref={inputRef}
             id={inputId}
-            data-field
             type="text"
             role="combobox"
             aria-expanded={popup.expanded}

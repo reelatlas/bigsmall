@@ -9,6 +9,7 @@ import {
   type FocusEvent,
   type KeyboardEvent,
   type ReactNode,
+  type RefObject,
 } from 'react';
 import { CategoryMenu } from '../../components/CategoryMenu';
 import { CategoryTiles } from '../../components/CategoryTiles';
@@ -45,6 +46,8 @@ function viewKeyOf(view: TableView): string {
 }
 
 export interface TableLayoutProps {
+  /** The field's input, which the host also focuses (clear all puts the caret back in it). */
+  inputRef: RefObject<HTMLInputElement>;
   /** The box, as the field shows it. */
   box: BoxView;
   table: TableView;
@@ -73,6 +76,7 @@ export interface TableLayoutProps {
  * in the field; Escape steps back one thing at a time, from browsing the table to an empty page.
  */
 export function TableLayout({
+  inputRef,
   box,
   table,
   env,
@@ -92,7 +96,6 @@ export function TableLayout({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
   const placeRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   /**
    * Where the cursor is, in the view it was set in, so a change from outside (undo, clear all, a
    * send from the calculator) brings it back to rest. A null position rests on the unit in the

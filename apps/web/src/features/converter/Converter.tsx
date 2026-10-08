@@ -53,6 +53,7 @@ export function Converter() {
   const hintId = useId();
   const calcMessageId = useId();
   const sectionRef = useRef<HTMLElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { copied, copy, markCopied, pointerProps } = useCopied<Confirmable>();
   const headerActions = useSlot(SLOTS.headerActions);
   const calculatorId = useId();
@@ -69,7 +70,7 @@ export function Converter() {
   /** Clear all (undoable like any other step), and the caret back in the box. */
   const clearAll = () => {
     dispatch({ type: 'clear' });
-    sectionRef.current?.querySelector<HTMLInputElement>('input[data-field]')?.focus();
+    inputRef.current?.focus();
   };
 
   // Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes anywhere inside the converter,
@@ -248,6 +249,7 @@ export function Converter() {
       </div>
 
       <TableLayout
+        inputRef={inputRef}
         box={box}
         table={table}
         env={env}

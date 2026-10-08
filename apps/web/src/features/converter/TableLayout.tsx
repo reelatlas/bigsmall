@@ -48,17 +48,21 @@ const TABLE_TOOLS_ROW =
  */
 const TABLE_TOOLS = 'flex shrink-0 items-center gap-1';
 const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
-/** 16 px under the box or the calculator; a container, so the categories go four across once it has the room. */
-const TABLE_ROWS_CELL = '@container mt-4 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';
 /**
- * Where the calculator opens (docs/DESIGN-SYSTEM.md, "Calculator"): 16 px under the box, at most
- * 384 px wide. From md, a column of its own: a subgrid of the first three rows, and the card in it
- * one too (`*:`), its three parts in the three rows. The card's top padding shrinks to 1 px there,
- * so its title row, 44 px and its 8 px margin, sits as high as the toolbar's icons and never makes
- * the first row taller.
+ * 8 px under the box, its popup, as the toolbar sits 8 px over it; a container, so the categories
+ * go four across once it has the room. Under an open calculator (below md) the calculator's own
+ * 16 px wins, the two margins collapsing.
+ */
+const TABLE_ROWS_CELL = '@container mt-2 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';
+/**
+ * Where the calculator opens (docs/DESIGN-SYSTEM.md, "Calculator"): 16 px from the box and from the
+ * table, a panel apart, at most 384 px wide. From md, a column of its own: a subgrid of the first
+ * three rows, and the card in it one too (`*:`), its three parts in the three rows. The card's top
+ * padding shrinks to 1 px there, so its title row, 44 px and its 8 px margin, sits as high as the
+ * toolbar's icons and never makes the first row taller.
  */
 const TABLE_CALCULATOR_CELL =
-  'mt-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-1 md:mt-0 md:grid md:w-72 md:grid-rows-subgrid md:*:row-span-3 md:*:grid md:*:grid-rows-subgrid md:*:pt-px';
+  'my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-1 md:my-0 md:grid md:w-72 md:grid-rows-subgrid md:*:row-span-3 md:*:grid md:*:grid-rows-subgrid md:*:pt-px';
 
 /**
  * Keys that start typing in the field when nothing on the page has focus: a letter, a digit, or

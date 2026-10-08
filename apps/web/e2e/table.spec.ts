@@ -584,11 +584,14 @@ test('the calculator takes a column from md, its top level with the toolbar and 
   await ready(page);
   const table = page.getByRole('region', { name: 'Temperature' });
   const calculator = page.getByRole('group', { name: 'Calculator' });
+  const field = page.locator('[data-plane="box"]');
   const gapUnderBox = async () => {
-    const field = (await box(page).boundingBox())!;
-    return (await table.boundingBox())!.y - (field.y + field.height);
+    const edge = (await field.boundingBox())!;
+    return Math.round((await table.boundingBox())!.y - (edge.y + edge.height));
   };
+  // The table sits 8 px under the box, its popup, as the toolbar sits 8 px over it.
   const closed = await gapUnderBox();
+  expect(closed).toBe(8);
 
   await page.getByRole('button', { name: 'Calculator', exact: true }).click();
   const wide = {
@@ -616,8 +619,10 @@ test('the calculator takes a column from md, its top level with the toolbar and 
     table: (await table.boundingBox())!,
     menu: (await menu(page).boundingBox())!,
   };
-  expect(narrow.calculator.y).toBeGreaterThan((await box(page).boundingBox())!.y);
-  expect(narrow.table.y).toBeGreaterThan(narrow.calculator.y + narrow.calculator.height);
+  // Between the box and the table, 16 px from each: a panel apart.
+  const boxEdge = (await field.boundingBox())!;
+  expect(Math.round(narrow.calculator.y - (boxEdge.y + boxEdge.height))).toBe(16);
+  expect(Math.round(narrow.table.y - (narrow.calculator.y + narrow.calculator.height))).toBe(16);
   // Flush left, under the menu's edge.
   expect(Math.abs(narrow.calculator.x - narrow.menu.x)).toBeLessThan(4);
 });

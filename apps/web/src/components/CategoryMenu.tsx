@@ -4,9 +4,8 @@ import {
   cx,
   MENU_CHEVRON,
   MENU_OPTION,
+  MENU_SHELL,
   MENU_TRIGGER,
-  SHELL,
-  SHELL_BORDERED,
   SHELL_PANEL,
 } from '../lib/recipes';
 import { ChevronDownIcon } from './icons';
@@ -30,9 +29,9 @@ export interface CategoryMenuProps {
 }
 
 /**
- * The converter's category menu (docs/UX-SPEC.md §1): a fluid shell like the theme menu, built
- * from the same recipes, its trigger and its choices one shape that grows over the page when
- * open. Its trigger shows the category's name and is as wide as the widest, so the toolbar keeps
+ * The converter's category menu (docs/UX-SPEC.md §1), built from the same recipes as the theme
+ * menu: at rest a ghost, the name and its chevron with no edge or fill; open, a card around the
+ * trigger and its choices, the same width (a local trial). Its trigger shows the category's name and is as wide as the widest, so the toolbar keeps
  * it on its line until there is truly no room; open, it keeps that width, as the theme menu does,
  * its trigger reading "Category" over the list and its counts bare numbers in the room the chevron
  * takes. The choices are native radios. The arrows move through them without choosing, since a
@@ -118,10 +117,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           its width as categories change and while open (the theme menu's sizer). The room after
           each label is the chevron's, and open, a choice's count's: the trigger's padding and a
           choice's, with its gutter, come to the same. */}
-      <span
-        aria-hidden="true"
-        className="invisible grid h-0 overflow-hidden border-2 border-transparent px-3 text-sm"
-      >
+      <span aria-hidden="true" className="invisible grid h-0 overflow-hidden px-3 text-sm">
         {[EMPTY_LABEL, ...categories.map((category) => category.name)].map((label) => (
           <span key={label} className="col-start-1 row-start-1 flex items-center gap-2">
             {label}
@@ -129,7 +125,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           </span>
         ))}
       </span>
-      <div className={cx('absolute inset-x-0 top-0 rounded-md', SHELL, SHELL_BORDERED)}>
+      <div className={MENU_SHELL}>
         <button
           ref={trigger}
           type="button"
@@ -140,7 +136,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
             setReached(value);
             setOpen((now) => !now);
           }}
-          className={cx(MENU_TRIGGER, 'justify-between')}
+          className={MENU_TRIGGER}
         >
           {/* The category's name, the word "Category" kept for screen readers, as "Theme" is.
               Before a choice, and while open, the word shows, muted like the theme menu's label

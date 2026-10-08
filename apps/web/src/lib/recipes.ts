@@ -63,12 +63,27 @@ export const SHELL_PANEL = 'hidden border-t border-line group-data-open:block';
 // Menus (docs/DESIGN-SYSTEM.md, "Fluid shells"): a trigger and a group of radios in one shell,
 // shared by the theme menu (ThemePicker.astro) and the category menu (CategoryMenu.tsx).
 
-/** A menu's trigger, the shell's top row: 44 px, its focus shown by the shell's accent edge. */
-export const MENU_TRIGGER =
-  'flex h-11 w-full items-center gap-2 px-3 text-sm text-ink transition-colors outline-none hover:bg-surface-raised';
+/**
+ * A ghost menu's shell (the theme and category menus, a trial): nothing at rest, so its trigger is
+ * all there is to see; open, a card around the trigger and its list, the same size. The card's
+ * accent edge is a 2 px outline drawn inside its edge: like a border, nothing inside can paint over
+ * it, and unlike one it takes no room, so nothing moves when it appears. Nothing clips at rest, so
+ * the trigger's focus ring shows whole.
+ */
+export const MENU_SHELL =
+  'absolute inset-x-0 top-0 rounded-md group-data-open:z-20 group-data-open:overflow-hidden group-data-open:bg-surface group-data-open:shadow-md group-data-open:outline-2 group-data-open:-outline-offset-2 group-data-open:outline-accent';
 
-/** The chevron after a trigger's value, turned over while the menu is open. */
-export const MENU_CHEVRON = 'text-ink-muted transition-transform group-data-open:rotate-180';
+/**
+ * A menu's trigger, as wide as the menu, which is as wide as its widest label: a ghost button, 44
+ * px, with a ghost button's corners, tint, and focus ring, covering the whole menu, 12 px from each
+ * edge to the label and the chevron, open or closed. Open, it is the card's top row.
+ */
+export const MENU_TRIGGER =
+  'my-0.5 flex h-11 w-full items-center gap-2 rounded-md px-3 text-sm text-ink transition-colors hover:bg-surface-raised group-data-open:rounded-b-none';
+
+/** The chevron at a trigger's end, turned over while the menu is open; it never moves. */
+export const MENU_CHEVRON =
+  'ml-auto shrink-0 text-ink-muted transition-transform group-data-open:rotate-180';
 
 /** A menu's choice: a label around its visually hidden radio, the checked one in the accent's soft fill. */
 export const MENU_OPTION =

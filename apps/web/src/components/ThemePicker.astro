@@ -1,12 +1,5 @@
 ---
-import {
-  MENU_CHEVRON,
-  MENU_OPTION,
-  MENU_TRIGGER,
-  SHELL,
-  SHELL_BORDERED,
-  SHELL_PANEL,
-} from '../lib/recipes';
+import { MENU_CHEVRON, MENU_OPTION, MENU_SHELL, MENU_TRIGGER, SHELL_PANEL } from '../lib/recipes';
 import { DEFAULT_LIGHT, THEMES } from '../lib/themes';
 import { ChevronDownIcon } from './icons';
 
@@ -14,48 +7,45 @@ const menuId = 'theme-menu';
 const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
 
 /*
- * The theme menu: a fluid shell (lib/recipes.ts) whose trigger and options are one shape, growing
- * over the page when open. No bundle: the inline script in layouts/Base.astro opens and closes it
+ * The theme menu: at rest a ghost, its label, name, and chevron with no edge or fill, as the icon
+ * buttons beside it are; open, a card around the trigger and its options, the same width
+ * (lib/recipes.ts, a local trial). No bundle: the inline script in layouts/Base.astro opens and closes it
  * (data-shell), applies and saves the chosen radio, and fills in the current name. The options are
- * native radios, so arrow keys, Space, and screen readers work without any script. The shell's
- * edge turns accent while anything inside has focus, which is the trigger's focus indicator. Option
- * rows use rounded-nested-md, the md corner minus the border and gutter, so the curves nest. Below
- * sm the word "Theme" is only for screen readers and the menu is as wide as its widest theme name,
- * with the name centered: the sizer below stacks every name in one grid cell, unseen, so the width
- * fits the theme's own font and stays put while the arrow keys preview themes. Open there, the
- * trigger reads "Theme" instead, muted, heading the list, whose fill marks the theme, as the
- * category menu does.
+ * native radios, so arrow keys, Space, and screen readers work without any script. The trigger
+ * covers the whole menu and never changes size; option rows use rounded-nested-md, the md corner
+ * minus the card's border and gutter, so the curves nest. The menu is as wide as its widest label,
+ * so nothing beside it moves while the arrow keys preview themes, and the card is the same width:
+ * the sizer below stacks every label in one grid cell, unseen, in the theme's own
+ * font, "Theme" and a name from sm, a name alone below it, where the word "Theme" is only for
+ * screen readers. Open there, the trigger reads "Theme" instead, muted, over the list, whose fill
+ * marks the theme, as the category menu does.
  */
 ---
 
-<div class="group relative h-12 sm:w-44" data-shell>
-  <span
-    aria-hidden="true"
-    class="invisible grid h-0 overflow-hidden border-2 border-transparent px-3 text-sm sm:hidden"
-  >
+<div class="group relative h-12" data-shell>
+  <span aria-hidden="true" class="invisible grid h-0 overflow-hidden px-3 text-sm">
     {THEMES.map((t) => (
-      <span class="col-start-1 row-start-1 flex items-center gap-1">
+      <span class="col-start-1 row-start-1 flex items-center gap-2">
+        <span class="max-sm:hidden">Theme</span>
         {t.name}
         <span class="size-4" />
       </span>
     ))}
   </span>
-  <div class:list={['absolute inset-x-0 top-0 rounded-md', SHELL, SHELL_BORDERED]}>
+  <div class={MENU_SHELL}>
     <button
       type="button"
       data-shell-toggle
       data-tool="theme"
       aria-expanded="false"
       aria-controls={menuId}
-      class:list={[MENU_TRIGGER, 'justify-center sm:justify-between']}
+      class={MENU_TRIGGER}
     >
       <span class="text-ink-muted max-sm:sr-only max-sm:group-data-open:not-sr-only">Theme</span>
-      <span class="flex items-center gap-1">
-        <span data-theme-name class="max-sm:group-data-open:hidden">
-          {defaultName}
-        </span>
-        <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />
+      <span data-theme-name class="max-sm:group-data-open:hidden">
+        {defaultName}
       </span>
+      <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />
     </button>
     <fieldset id={menuId} class:list={[SHELL_PANEL, 'p-1']}>
       <legend class="sr-only">Theme</legend>

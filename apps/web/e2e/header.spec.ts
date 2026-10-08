@@ -171,9 +171,13 @@ for (const width of [320, 375, 400, 414, 416, 430, 520, 640]) {
         const name = box('main > header h1');
         const menus = box('[data-header-menus]');
         const copyUrl = box('[aria-label="Copy URL"]');
-        const shown = document.querySelector('[data-theme-name]')!;
-        const trigger = shown.closest('button')!.getBoundingClientRect();
-        const content = shown.parentElement!.getBoundingClientRect();
+        const button = document.querySelector('[data-theme-name]')!.closest('button')!;
+        const trigger = button.getBoundingClientRect();
+        // The first words shown (the label from sm, the name below it) and the chevron at the end.
+        const first = [...button.querySelectorAll('span')]
+          .find((span) => getComputedStyle(span).position !== 'absolute')!
+          .getBoundingClientRect();
+        const chevron = button.querySelector('svg')!.getBoundingClientRect();
         return {
           overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
           ownLine: menus.top >= name.bottom,
@@ -181,8 +185,8 @@ for (const width of [320, 375, 400, 414, 416, 430, 520, 640]) {
           right: Math.round(header.right - menus.right),
           themeFirst: trigger.right <= copyUrl.left,
           rowGap: Math.round(menus.top - name.bottom),
-          padLeft: Math.round(content.left - trigger.left),
-          padRight: Math.round(trigger.right - content.right),
+          padLeft: Math.round(first.left - trigger.left),
+          padRight: Math.round(trigger.right - chevron.right),
         };
       });
       expect(m.overflow, theme.id).toBe(0);
@@ -191,8 +195,8 @@ for (const width of [320, 375, 400, 414, 416, 430, 520, 640]) {
       expect(ownLine ? m.left : m.right, theme.id).toBe(0);
       // A wrapped row of menus keeps 20 px of air under the name.
       if (ownLine) expect(m.rowGap, theme.id).toBe(20);
-      // The theme's name sits in the middle of its trigger, with no wide gap after it.
-      if (width < 640) expect(Math.abs(m.padLeft - m.padRight), theme.id).toBeLessThanOrEqual(10);
+      // The trigger's padding is the same at both ends, to its first words and after its chevron.
+      expect(m.padLeft, theme.id).toBe(m.padRight);
     }
   });
 }

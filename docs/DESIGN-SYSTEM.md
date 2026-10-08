@@ -54,10 +54,9 @@ The full list is the single source of truth in `apps/web/src/lib/themes.ts` (`TO
 
 Custom utilities, also in `global.css`:
 
-| Utility                   | Use                                                                                     |
-| ------------------------- | --------------------------------------------------------------------------------------- |
-| `focus-ring-inset`        | Draws the focus ring inside the element, for a control flush against an edge that clips |
-| `focus-ring-within-inset` | The same ring on a wrapper whose descendant has focus (the theme menu's radio labels)   |
+| Utility                   | Use                                                                                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `focus-ring-within-inset` | Draws the focus ring inside a wrapper whose descendant has focus, for a control flush against an edge that clips (the theme menu's radio labels) |
 
 Layout and spacing use Tailwind's default scale (`p-4`, `gap-2`, `max-w-2xl`). Those are not themed.
 
@@ -122,8 +121,8 @@ A class list more than one file builds from is a recipe in `src/lib/recipes.ts`,
 
 - **One ring.** The base layer gives every `:focus-visible` element a 2 px `--focus` outline offset by 2 px. Buttons, chips, and links rely on it and add nothing.
 - **Never pair `outline-none` with focus utilities.** In Tailwind v4, `outline-none` sets the outline style to none, and `focus-visible:outline-2` then draws nothing (docs/LEARNINGS.md).
-- **Inset where an edge clips.** `focus-ring-inset` on the shortcuts toggle while its shell is open; `focus-ring-within-inset` on the theme menu's option labels.
-- **Shell edges for fields and the theme menu.** The field's input and the theme trigger set `outline-none`; their shell's accent edge (`focus-within:border-accent`) is the indicator.
+- **Inset where an edge clips.** `focus-ring-within-inset` on the theme menu's option labels.
+- **Shell edges for fields, the menus, and the open shortcuts map.** The field's input and the theme trigger set `outline-none`; their shell's accent edge (`focus-within:border-accent`) is the indicator. The shortcuts toggle does the same while its map is open (`group-data-open:outline-none`): the open shell's accent edge says where focus is, so the icon draws no ring inside it; closed, it shows the ring like any button.
 - **The list is never focused.** Rows are virtually focused through `aria-activedescendant`; the listbox has `tabIndex={-1}` so Chrome does not make it a Tab stop.
 
 ### Motion

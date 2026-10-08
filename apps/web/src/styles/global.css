@@ -72,14 +72,9 @@
 
 /*
  * Focus (docs/DESIGN-SYSTEM.md, "Focus"). Every focusable element gets the ring from the base
- * layer below. These two move it inside the element, for controls flush against an edge that
- * clips: one for the focused element itself, one for a wrapper whose descendant has focus.
+ * layer below. This one draws it inside a wrapper whose descendant has focus, for controls flush
+ * against an edge that clips (the theme menu's radio labels).
  */
-@utility focus-ring-inset {
-  &:focus-visible {
-    outline-offset: -2px;
-  }
-}
 @utility focus-ring-within-inset {
   &:has(:focus-visible) {
     outline: 2px solid var(--focus);

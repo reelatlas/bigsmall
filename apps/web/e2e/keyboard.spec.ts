@@ -138,8 +138,18 @@ test('the shortcuts map shows while the keyboard is on its icon', async ({ page 
   await page.goto('/');
   await ready(page);
   const map = page.getByRole('group', { name: 'Keyboard shortcuts' });
+  const ring = () => shortcuts(page).evaluate((icon) => getComputedStyle(icon).outlineStyle);
   await page.keyboard.press('Tab');
   await expect(shortcuts(page)).toBeFocused();
+  await expect(map).toBeVisible();
+  // The open map's accent edge shows where focus is; the icon draws no ring inside it.
+  expect(await ring()).toBe('none');
+  await page.keyboard.press('Escape');
+  await expect(map).toBeHidden();
+  await expect(shortcuts(page)).toBeFocused();
+  expect(await ring()).not.toBe('none');
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowRight');
   await expect(map).toBeVisible();
   await page.keyboard.press('ArrowRight');
   await expect(map).toBeHidden();

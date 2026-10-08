@@ -11,7 +11,9 @@ const titleId = 'shortcuts-title';
 /*
  * The keyboard shortcuts map. At rest it is the same ghost icon button as undo, redo, and clear
  * all; open, its shell (lib/recipes.ts) takes the fluid-shell edge, surface, and shadow and grows
- * left and down from the icon over the page, the way the theme menu grows out of its trigger. A
+ * left and down from the icon over the page, the way the theme menu grows out of its trigger.
+ * While it is open, the shell's accent edge is the icon's focus indicator, as a field's is, so the
+ * icon draws no ring of its own. A
  * mouse resting on it opens it for a look, a click pins it open, and Escape, a click elsewhere,
  * or focus leaving closes it, so the content can be hovered, dismissed, and stays put until then
  * (WCAG 1.4.13). The inline script in layouts/Base.astro drives it, so it adds no bundle; Button
@@ -42,7 +44,7 @@ const titleId = 'shortcuts-title';
         aria-expanded="false"
         aria-controls={panelId}
         aria-label="Keyboard shortcuts"
-        className="group-data-open:focus-ring-inset"
+        className="group-data-open:outline-none"
       >
         <KeyboardIcon />
       </Button>

@@ -744,8 +744,8 @@ test('the hint has a line of its own; the toolbar under it starts with the categ
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     const wide = await geometry();
-    // 16 px under the hint, where the menu's edge starts right under it.
-    expect(Math.round(wide.toolbar.y - (wide.hint.y + wide.hint.height)), theme.id).toBe(16);
+    // 8 px under the hint, as the toolbar sits over the box.
+    expect(Math.round(wide.toolbar.y - (wide.hint.y + wide.hint.height)), theme.id).toBe(8);
     expect(Math.abs(middle(wide.menu) - middle(wide.last)), theme.id).toBeLessThan(4);
     expect(wide.menu.x + wide.menu.width, theme.id).toBeLessThan(wide.first.x);
     expect(Math.abs(wide.menu.x - wide.start.x), theme.id).toBeLessThanOrEqual(3);
@@ -762,7 +762,7 @@ test('the hint has a line of its own; the toolbar under it starts with the categ
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     const narrow = await geometry();
-    // 8 px under the hint, where the icons come first, their glyphs inset in their buttons.
+    // 8 px under the hint on a phone too.
     expect(Math.round(narrow.toolbar.y - (narrow.hint.y + narrow.hint.height)), theme.id).toBe(8);
     expect(Math.abs(narrow.first.x - narrow.start.x), theme.id).toBeLessThanOrEqual(1);
     expect(narrow.menu.y, theme.id).toBeGreaterThanOrEqual(narrow.last.y + narrow.last.height);

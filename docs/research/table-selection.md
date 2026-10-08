@@ -2,7 +2,7 @@
 
 Sean found the table layout's suggestion list covering the very table it lists, and the list repeating the table's units. Three prototypes were built in the selection lab (`/dev/selection-lab`, `apps/web/src/pages/dev/_selection-lab/SelectionLab.tsx`) on one shared model, the table as the unit list: A, a category menu; B, category tabs; C, no category control. Sean chose **A** and refined it over several rounds the same day. This document was the behavior to build into the converter's table layout, the decisions behind it, and the plan; it is now built (ADR 0012), and the current behavior lives in docs/UX-SPEC.md §1, §8, §9, and §12. The lab's `TableIsTheList` component, with `control="menu"`, was the working reference. The lab retired once A shipped (2026-10-07); it and its B and C variants are in git, in `apps/web/src/pages/dev/_selection-lab/` as of commit `f1321b0`.
 
-The two-box layout keeps today's suggestion list, its keys, and its chip, unchanged. Both layouts keep one shared conversion state.
+The two-box layout kept its suggestion list until two boxes retired the same day (ADR 0013).
 
 ## Behavior
 
@@ -77,4 +77,3 @@ Built as planned, in `TableLayout.tsx` with the components in the gallery, and t
 
 - An **all-clear** interaction, in the action bar or inline.
 - Whether a category chosen with no unit belongs in the URL.
-- Whether typing from anywhere should reach the first box in the two-box layout too.

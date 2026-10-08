@@ -5,19 +5,15 @@ import {
   type UnitPreference,
 } from '@bigsmall/core';
 import { useEffect, useMemo, useReducer, useState } from 'react';
-import type { Layout } from '../../lib/layout';
 import { browserLocale, detectRegion } from '../../lib/region';
 import { ANNOUNCE_MS, URL_WRITE_MS } from '../../lib/timing';
 import {
-  escapeTarget,
   initialHistory,
   reduceWithHistory,
+  selectBox,
   selectTable,
-  selectView,
-  type BoxId,
+  type BoxView,
   type ConverterState,
-  type ConverterView,
-  type EscapeTarget,
   type HistoryAction,
   type NumberEnv,
   type TableView,
@@ -48,37 +44,30 @@ function detectEnv(): ConverterEnv {
 
 export interface ConverterController {
   state: ConverterState;
-  view: ConverterView;
-  /**
-   * What the table layout shows under its box; null with two boxes. Before hydration, when the
-   * layout is not known yet, it is the table layout's empty state, which the server renders too.
-   */
-  table: TableView | null;
+  /** The box as the field shows it. */
+  box: BoxView;
+  /** What the table shows under the box: the start, the category's units, or the matches. */
+  table: TableView;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
   canUndo: boolean;
   canRedo: boolean;
-  /** Per box, what Escape takes back once its list is closed. */
-  escapeTargets: Record<BoxId, EscapeTarget>;
-  /** Debounced copy of the layout's announcement, so screen readers are not flooded while typing. */
+  /** Debounced copy of the table's announcement, so screen readers are not flooded while typing. */
   announcement: string | null;
 }
 
 /**
- * Owns the converter state and its history, derives the view (and the table, in that layout),
- * syncs the URL, and paces announcements. `layout` is null until the island hydrates.
+ * Owns the converter state and its history, derives the box and the table, syncs the URL, and
+ * paces announcements.
  */
-export function useConverter(layout: Layout | null): ConverterController {
+export function useConverter(): ConverterController {
   const [history, dispatch] = useReducer(reduceWithHistory, initialHistory);
   const state = history.present;
   const [env] = useState(detectEnv);
-  const view = useMemo(() => selectView(state, env), [state, env]);
+  const box = useMemo(() => selectBox(state, env), [state, env]);
   const table = useMemo(
-    () =>
-      layout === 'boxes'
-        ? null
-        : selectTable(state, { ...env, tier: state.mode === 'basic' ? 'basic' : 'all' }),
-    [layout, state, env],
+    () => selectTable(state, { ...env, tier: state.mode === 'basic' ? 'basic' : 'all' }),
+    [state, env],
   );
 
   // Restore the conversion from the URL once, after hydration (the server renders the empty state).
@@ -99,8 +88,8 @@ export function useConverter(layout: Layout | null): ConverterController {
     return () => window.clearTimeout(timer);
   }, [state, env.separators]);
 
-  // Two boxes say the pair's sentence; the table says how many units it shows the value in.
-  const spoken = layout === 'table' ? (table?.announcement ?? null) : view.announcement;
+  // The table says how many units it shows the value in, or how many match.
+  const spoken = table.announcement;
   const [announcement, setAnnouncement] = useState<string | null>(null);
   useEffect(() => {
     const timer = window.setTimeout(() => setAnnouncement(spoken), ANNOUNCE_MS);
@@ -109,13 +98,12 @@ export function useConverter(layout: Layout | null): ConverterController {
 
   return {
     state,
-    view,
+    box,
     table,
     env,
     dispatch,
     canUndo: history.past.length > 0,
     canRedo: history.future.length > 0,
-    escapeTargets: { a: escapeTarget(history, 'a'), b: escapeTarget(history, 'b') },
     announcement,
   };
 }

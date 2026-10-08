@@ -1,7 +1,7 @@
 # 0009 — One converter, two layouts: the table by default, two boxes behind a switch
 
 Date: 2026-10-07
-Status: accepted; the headline (the last sentence of decision 2) superseded by 0010; how the table lists and picks units superseded by 0012
+Status: superseded by 0013 (the headline by 0010, how the table lists and picks units by 0012)
 
 ## Context
 
@@ -51,3 +51,5 @@ Built the same day. Where the build settled what the decision left open:
 **Revised (2026-10-07).** After trying the build, Sean dropped the headline: ADR 0010. The category label stopped adapting to the layout (it sits over the box in both), and the calculator takes a column beside the table from `md` (docs/UX-SPEC.md §1).
 
 **Revised again (2026-10-07).** The box's suggestion list covered the table it listed, so the table became the list: a category menu over the box, the categories or a category's units (dashes until there is a number and a unit) or the matches in the table's place, and a cursor that keeps the caret in the field (ADR 0012). Tapping a row still moves its unit into the box.
+
+**Superseded (2026-10-07).** Two boxes and the switch retired: the table is the only layout (ADR 0013).

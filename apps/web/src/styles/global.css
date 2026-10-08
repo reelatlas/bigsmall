@@ -70,12 +70,6 @@
   --default-transition-timing-function: var(--motion-ease);
 }
 
-/* Thin, themed, arrow-less scrollbars for lists inside rounded shells. */
-@utility scroll-thin {
-  scrollbar-width: thin;
-  scrollbar-color: var(--line) transparent;
-}
-
 /*
  * Focus (docs/DESIGN-SYSTEM.md, "Focus"). Every focusable element gets the ring from the base
  * layer below. These two move it inside the element, for controls flush against an edge that
@@ -92,15 +86,6 @@
     outline-offset: -2px;
   }
 }
-
-/*
- * The converter's layout (ADR 0009), as the inline script in layouts/Base.astro applied it before
- * paint. Before the island hydrates, these pick which of the server-rendered empty states shows:
- * `layout-table:hidden` on what only two boxes have (the second box, swap), `layout-boxes:hidden`
- * on what only the table has. Once hydrated the island renders one layout and they agree with it.
- */
-@custom-variant layout-table (&:where(:root:not([data-layout='boxes']) *));
-@custom-variant layout-boxes (&:where(:root[data-layout='boxes'] *));
 
 @layer base {
   html {

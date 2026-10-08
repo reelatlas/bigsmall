@@ -1,66 +1,63 @@
 import { describe, expect, it } from 'vitest';
-import { initialState, reduce } from '../src/features/converter/state';
+import { initialState, reduce, type ConverterState } from '../src/features/converter/state';
 import { urlFor, paramsToState, stateToParams } from '../src/features/converter/url';
 
 const EN = { decimal: '.', group: ',' };
 const DE = { decimal: ',', group: '.' };
 
+/** The box holding `text`, with `unit` in it. */
+function holding(text: string, unit: string | null = null): ConverterState {
+  return reduce(initialState, { type: 'hydrate', state: { text, unit } });
+}
+
 describe('stateToParams', () => {
-  it('writes units, the typed value, and which side holds it', () => {
-    const s = [
-      { type: 'input', box: 'a', text: '5 ml', at: 0 } as const,
-      { type: 'lock', box: 'a', unit: 'milliliter' } as const,
-      { type: 'lock', box: 'b', unit: 'us-cup' } as const,
-    ].reduce(reduce, initialState);
-    expect(stateToParams(s, EN).toString()).toBe('a=milliliter&b=us-cup&v=5&s=a');
+  it('writes the unit and the typed value', () => {
+    expect(stateToParams(holding('5', 'milliliter'), EN).toString()).toBe('a=milliliter&v=5');
   });
 
   it('omits what is not set', () => {
     expect(stateToParams(initialState, EN).toString()).toBe('');
-    const onlyB = reduce(initialState, { type: 'lock', box: 'b', unit: 'kelvin' });
-    expect(stateToParams(onlyB, EN).toString()).toBe('b=kelvin');
+    expect(stateToParams(holding('', 'kelvin'), EN).toString()).toBe('a=kelvin');
+    expect(stateToParams(holding('250'), EN).toString()).toBe('v=250');
   });
 
   it('writes the value canonically, not as typed', () => {
-    const s = reduce(initialState, { type: 'input', box: 'b', text: '1,000.5 km', at: 0 });
-    expect(stateToParams(s, EN).toString()).toBe('v=1000.5&s=b');
+    expect(stateToParams(holding('1,000.5 km'), EN).toString()).toBe('v=1000.5');
   });
 
   it('reads the typed number with the user’s separators', () => {
-    const s = reduce(initialState, { type: 'input', box: 'a', text: '1.000', at: 0 });
-    expect(stateToParams(s, DE).toString()).toBe('v=1000&s=a');
-    expect(stateToParams(s, EN).toString()).toBe('v=1&s=a');
-    const decimal = reduce(initialState, { type: 'input', box: 'a', text: '2,5', at: 0 });
-    expect(stateToParams(decimal, DE).toString()).toBe('v=2.5&s=a');
+    expect(stateToParams(holding('1.000'), DE).toString()).toBe('v=1000');
+    expect(stateToParams(holding('1.000'), EN).toString()).toBe('v=1');
+    expect(stateToParams(holding('2,5'), DE).toString()).toBe('v=2.5');
   });
 });
 
 describe('paramsToState', () => {
   it('round-trips', () => {
-    const s = [
-      { type: 'input', box: 'b', text: '2', at: 0 } as const,
-      { type: 'lock', box: 'b', unit: 'foot' } as const,
-      { type: 'lock', box: 'a', unit: 'meter' } as const,
-    ].reduce(reduce, initialState);
-    const back = paramsToState(stateToParams(s, EN));
-    expect(back).toEqual({
-      a: { text: '', unit: 'meter' },
-      b: { text: '2', unit: 'foot' },
-      source: 'b',
+    expect(paramsToState(stateToParams(holding('2', 'foot'), EN))).toEqual({
+      text: '2',
+      unit: 'foot',
     });
   });
 
-  it('drops unknown units and a second unit from another category', () => {
-    expect(paramsToState(new URLSearchParams('a=cubit&b=meter'))).toEqual({
-      a: { text: '', unit: null },
-      b: { text: '', unit: 'meter' },
-      source: 'a',
+  it('opens a two-box link on the box that held the number', () => {
+    expect(paramsToState(new URLSearchParams('a=mile&b=kilometer&v=1&s=a'))).toEqual({
+      text: '1',
+      unit: 'mile',
     });
-    expect(paramsToState(new URLSearchParams('a=meter&b=kelvin&v=3&s=a'))).toEqual({
-      a: { text: '3', unit: 'meter' },
-      b: { text: '', unit: null },
-      source: 'a',
+    expect(paramsToState(new URLSearchParams('a=meter&b=foot&v=2&s=b'))).toEqual({
+      text: '2',
+      unit: 'foot',
     });
+    // The second box held the number with no unit of its own.
+    expect(paramsToState(new URLSearchParams('a=meter&v=2&s=b'))).toEqual({
+      text: '2',
+      unit: null,
+    });
+  });
+
+  it('drops an unknown unit', () => {
+    expect(paramsToState(new URLSearchParams('a=cubit&v=3'))).toEqual({ text: '3', unit: null });
   });
 
   it('returns null when nothing useful is present', () => {
@@ -68,11 +65,10 @@ describe('paramsToState', () => {
     expect(paramsToState(new URLSearchParams('x=1&a=nope'))).toBeNull();
   });
 
-  it('ignores a bad value but keeps the units', () => {
+  it('ignores a bad value but keeps the unit', () => {
     expect(paramsToState(new URLSearchParams('a=meter&v=abc'))).toEqual({
-      a: { text: '', unit: 'meter' },
-      b: { text: '', unit: null },
-      source: 'a',
+      text: '',
+      unit: 'meter',
     });
   });
 });
@@ -81,12 +77,9 @@ describe('urlFor', () => {
   const page = { origin: 'https://bigsmall.example', pathname: '/' };
 
   it('is the page address with the conversion, read from the state', () => {
-    const s = [
-      { type: 'input', box: 'a', text: '5', at: 0 } as const,
-      { type: 'lock', box: 'a', unit: 'milliliter' } as const,
-      { type: 'lock', box: 'b', unit: 'us-cup' } as const,
-    ].reduce(reduce, initialState);
-    expect(urlFor(s, EN, page)).toBe('https://bigsmall.example/?a=milliliter&b=us-cup&v=5&s=a');
+    expect(urlFor(holding('5', 'milliliter'), EN, page)).toBe(
+      'https://bigsmall.example/?a=milliliter&v=5',
+    );
   });
 
   it('is the bare page address when nothing is entered', () => {

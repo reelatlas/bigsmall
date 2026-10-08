@@ -1,5 +1,7 @@
 # Usability test 1 — the smart input
 
+**Needs rewriting before it runs:** the tasks below were written for the table with its suggestion list and for two boxes behind a switch. Since 2026-10-07 the converter is one box whose table is the unit list (ADR 0012, ADR 0013): rewrite the tasks for it, drop task 7 and its go/no-go line, and take the questions from docs/UX-SPEC.md §15.
+
 Milestone 2 exit gate (docs/PLAN.md §13). Five people, about 20 minutes each, one at a time. The goal is to learn whether the table layout is understood without explanation, whether people find the two-box layout behind the switch, and where the smart input surprises them. Nothing here measures speed. The behavior being tested is described in docs/UX-SPEC.md; its open questions are §15.
 
 Rewritten for the table layout on 2026-10-07 (ADR 0009). What the test should learn about it is listed in docs/research/findings-friends-1.md.

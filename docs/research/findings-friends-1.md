@@ -38,3 +38,5 @@ The test (docs/research/usability-test-1.md) no longer decides whether to build 
 - whether people find that tapping a row moves it into the box, and expect it to;
 - whether anyone looks for a second box, or finds the switch;
 - whether anyone opening a link that names two units, in the table, misses which unit was meant.
+
+On 2026-10-07, after using option A in the product, Sean retired two boxes and the switch: the table is the only layout (ADR 0013).

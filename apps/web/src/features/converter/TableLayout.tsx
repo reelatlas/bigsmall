@@ -44,7 +44,7 @@ function viewKeyOf(view: TableView): string {
 }
 
 export interface TableLayoutProps {
-  /** The source box, the one box this layout shows. */
+  /** The box, as the field shows it. */
   box: BoxView;
   table: TableView;
   env: ConverterEnv;
@@ -151,7 +151,7 @@ export function TableLayout({
     const text = key === 'Backspace' ? input.value.slice(0, -1) : input.value + key;
     caretToEnd.current = true;
     input.focus();
-    dispatch({ type: 'input', box: box.id, text, at: performance.now() });
+    dispatch({ type: 'input', text, at: performance.now() });
     setPosition(null);
   };
 
@@ -233,13 +233,13 @@ export function TableLayout({
    * keeps its unit, the cursor resting on it.
    */
   const choose = (category: CategoryId) => {
-    dispatch({ type: 'chooseCategory', box: box.id, category });
+    dispatch({ type: 'chooseCategory', category });
     setPosition(null);
   };
 
   /** A unit taken into the box, with its new text; the category follows, and the cursor rests on its row. */
   const take = (unitId: string, text: string) => {
-    dispatch({ type: 'use', box: box.id, unit: unitId, text });
+    dispatch({ type: 'use', unit: unitId, text });
     setPosition(null);
     caretToEnd.current = true;
   };
@@ -276,7 +276,6 @@ export function TableLayout({
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     dispatch({
       type: 'input',
-      box: box.id,
       text: event.currentTarget.value,
       at: performance.now(),
     });
@@ -327,24 +326,24 @@ export function TableLayout({
         const worked = evaluatedText(box.text, env);
         if (browsing) takeRow(at);
         else if (table.kind === 'matches') takeRow(0);
-        else if (worked !== null) dispatch({ type: 'replace', box: box.id, text: worked });
+        else if (worked !== null) dispatch({ type: 'replace', text: worked });
         else if (box.unit) setPosition(null);
         else if (rowCount > 0) setPosition(0);
         return;
       }
       case 'Escape':
         // One step at a time: back from browsing the table; the typed unit, back to the number;
-        // the number; the unit and the category, back to the start, the hidden second box with
-        // them, as clear all does; then it lets go, leaving just the page. Right after Enter the
-        // cursor only rests, so the first Escape already clears.
+        // the number; the unit and the category, back to the start, as clear all does; then it
+        // lets go, leaving just the page. Right after Enter the cursor only rests, so the first
+        // Escape already clears.
         event.preventDefault();
         if (browsing) {
           setPosition(null);
           inputRef.current?.scrollIntoView({ block: 'nearest' });
         } else if (table.kind === 'matches') {
-          dispatch({ type: 'replace', box: box.id, text: number });
+          dispatch({ type: 'replace', text: number });
         } else if (box.text !== '') {
-          dispatch({ type: 'replace', box: box.id, text: '' });
+          dispatch({ type: 'replace', text: '' });
         } else if (box.unit || table.kind === 'units') {
           dispatch({ type: 'clear' });
           setPosition(null);
@@ -354,7 +353,7 @@ export function TableLayout({
         // On an empty field, Backspace takes the unit out, as the chip's × does.
         if (box.unit && event.currentTarget.value === '') {
           event.preventDefault();
-          dispatch({ type: 'unlock', box: box.id });
+          dispatch({ type: 'unlock' });
           setPosition(null);
         }
         return;
@@ -415,14 +414,12 @@ export function TableLayout({
           <ValueField
             inputRef={inputRef}
             label="Value"
-            boxId={box.id}
             text={box.text}
             parsed={box.parsed}
             locale={env.locale}
             unit={box.unit}
             // What the field takes, never a value it might be mistaken for.
             placeholder={box.unit ? 'Number' : 'Number or unit'}
-            message={box.message}
             describedBy={describedBy}
             popup={{
               expanded: rowCount > 0,
@@ -437,7 +434,7 @@ export function TableLayout({
             // arrows reach the units; its × takes the unit out and keeps the category's table.
             onChipOpen={() => inputRef.current?.focus()}
             onChipRemove={() => {
-              dispatch({ type: 'unlock', box: box.id });
+              dispatch({ type: 'unlock' });
               setPosition(null);
               inputRef.current?.focus();
             }}

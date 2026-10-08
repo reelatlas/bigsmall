@@ -1,7 +1,7 @@
 # 0010 — The table shows every unit alike; the second box's unit is kept, not shown
 
 Date: 2026-10-07
-Status: accepted
+Status: superseded by 0013
 
 ## Context
 
@@ -27,3 +27,7 @@ Behavior: docs/UX-SPEC.md §1 and §11.
 - The table's announcement is always how many units it shows the value in ("250 milliliters in 9 units of volume").
 - The rows' keyboard, copy, and moving a unit in are unchanged; `selectTable` loses its headline, and the table component its larger first row.
 - ADR 0009's decision 2 stands except for its last sentence, which this replaces.
+
+## Outcome notes (2026-10-07)
+
+With two boxes retired (ADR 0013) there is no second box's unit to keep: a two-box link opens on the box that held the number, and the URL drops `b`.

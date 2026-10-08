@@ -83,20 +83,16 @@ describe('pressKey', () => {
 describe('placeNumber', () => {
   const SEP = EN.separators;
 
-  it('replaces the number a box holds and keeps unit text typed after it', () => {
-    expect(placeNumber('5', false, '36', SEP)).toBe('36');
-    expect(placeNumber('5 ft', false, '36', SEP)).toBe('36 ft');
-    expect(placeNumber('2+3 ft', false, '36', SEP)).toBe('36 ft');
+  it('replaces the number the box holds and keeps unit text typed after it', () => {
+    expect(placeNumber('5', '36', SEP)).toBe('36');
+    expect(placeNumber('5 ft', '36', SEP)).toBe('36 ft');
+    expect(placeNumber('2+3 ft', '36', SEP)).toBe('36 ft');
   });
 
   it('fills an empty box, or one holding only unit text', () => {
-    expect(placeNumber('', false, '36', SEP)).toBe('36');
-    expect(placeNumber('ft', false, '36', SEP)).toBe('36 ft');
-    expect(placeNumber(MINUS, false, '36', SEP)).toBe('36');
-  });
-
-  it('replaces a converted result outright', () => {
-    expect(placeNumber('1,056.688', true, '36', SEP)).toBe('36');
+    expect(placeNumber('', '36', SEP)).toBe('36');
+    expect(placeNumber('ft', '36', SEP)).toBe('36 ft');
+    expect(placeNumber(MINUS, '36', SEP)).toBe('36');
   });
 });
 

@@ -1,5 +1,5 @@
-import { formatNumber, getCategory, parse } from '@bigsmall/core';
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { formatNumber, parse } from '@bigsmall/core';
+import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
 import {
@@ -9,81 +9,45 @@ import {
   EraserIcon,
   LinkIcon,
   RedoIcon,
-  SwapIcon,
   UndoIcon,
 } from '../../components/icons';
 import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
-import { LayoutSwitch } from '../../components/LayoutSwitch';
 import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
-import { appliedLayout, applyLayout, type Layout } from '../../lib/layout';
 import { isApplePlatform } from '../../lib/platform';
-import { CALCULATOR_PLACE, cx, LABEL } from '../../lib/recipes';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
-import { SmartInput } from './SmartInput';
-import { nextBox, type BoxId, type BoxView } from './state';
 import { TableLayout } from './TableLayout';
 import { urlFor } from './url';
 import { useConverter } from './useConverter';
 
 /**
- * The buttons that confirm with a check: copying a box's value, a table row's, or the page's URL,
- * and sending the calculator's value to a box.
+ * The buttons that confirm with a check: copying the box's value, a row's, or the page's URL, and
+ * sending the calculator's value to the box.
  */
-type Confirmable = BoxId | 'url' | `use-${BoxId}` | `row-${string}`;
+type Confirmable = 'value' | 'url' | 'use' | `row-${string}`;
 
 /** What the status region says when a button confirms. */
-function confirmation(key: Confirmable, layout: Layout | null): string {
+function confirmation(key: Confirmable): string {
   if (key === 'url') return 'URL copied';
-  if (key === 'use-a' || key === 'use-b') {
-    if (layout === 'table') return 'Sent to the value';
-    return key === 'use-a' ? 'Sent to the first value' : 'Sent to the second value';
-  }
+  if (key === 'use') return 'Sent to the value';
   return 'Copied';
 }
 
-/** The hint over the toolbar, per layout (docs/UX-SPEC.md §1). */
-const HINTS: Record<Layout, string> = {
-  table:
-    'Type a number and a unit to see it in every unit of its kind. Pick one to convert from it.',
-  boxes: 'Type a number, unit, or both. Once each box has a unit, typing in one updates the other.',
-};
-
-/** What each empty box suggests before anything scopes it; the second shows a category can be typed too. */
-const EXAMPLES: Record<BoxId, string> = {
-  a: '5 ml, feet, °F…',
-  b: '2 kg, inches, speed…',
-};
-
-/** A box's text field, found by the mark SmartInput puts on it. */
-function boxInput(section: HTMLElement | null, id: BoxId): HTMLInputElement | null {
-  return section?.querySelector<HTMLInputElement>(`input[data-box="${id}"]`) ?? null;
-}
-
-/** Focus that waits for the render after a change (see the layout effect below). */
-type FocusRequest = { kind: 'enter'; box: BoxId } | { kind: 'box'; box: BoxId };
+/** The hint over the toolbar (docs/UX-SPEC.md §1). */
+const HINT = 'Type a number, unit, or both to compare all at once.';
 
 /**
- * The converter island, in either layout (ADR 0009, ADR 0012, docs/UX-SPEC.md §1): the hint and
- * the toolbar (calculator, swap with two boxes, undo, redo, clear all); then the table layout
- * (TableLayout: its category menu, its one box, and its table), or the category label and the two
- * linked boxes; the calculator when open, beside the table or under the boxes (§8); and the live
- * regions. It draws the Copy URL button and the layout switch into the header's slots (§7, §10).
- *
- * Until it hydrates the layout is unknown here, so the server's markup carries both layouts' empty
- * state and the layout-* variants (global.css) show the one the inline script applied. Classes
- * with those variants stay on afterwards: they agree with the page's data-layout, which the switch
- * keeps in step.
+ * The converter island (ADR 0012, ADR 0013, docs/UX-SPEC.md §1): the hint and the toolbar
+ * (calculator, undo, redo, clear all); the box and its table (TableLayout), with the calculator
+ * when open between them or beside them (§8); and the live regions. It draws the Copy URL button
+ * into the header's slot (§7).
  */
 export function Converter() {
   const hydrated = useIsHydrated();
-  const [chosenLayout, setChosenLayout] = useState<Layout | null>(null);
-  const layout: Layout | null = hydrated ? (chosenLayout ?? appliedLayout()) : null;
-  const { state, view, table, env, dispatch, canUndo, canRedo, escapeTargets, announcement } =
-    useConverter(layout);
+  const { state, box, table, env, dispatch, canUndo, canRedo, announcement } = useConverter();
   // Tooltips name the platform's keys; until hydration they read as on the server (Ctrl).
   const apple = hydrated && isApplePlatform();
   const hintId = useId();
@@ -91,7 +55,6 @@ export function Converter() {
   const sectionRef = useRef<HTMLElement>(null);
   const { copied, copy, markCopied, pointerProps } = useCopied<Confirmable>();
   const headerActions = useSlot(SLOTS.headerActions);
-  const layoutSlot = useSlot(SLOTS.layoutSwitch);
   const calculatorId = useId();
   const calculatorToggleId = useId();
   const [calculatorOpen, setCalculatorOpen] = useState(false);
@@ -101,42 +64,12 @@ export function Converter() {
   const entryValue = entryParsed.value;
   // Why the entry has no value to use or send, said in the display: "Too large".
   const calcMessage = entryMessage(entryParsed);
-  const categoryName = view.category ? getCategory(view.category)?.name : undefined;
-  // A category chosen with no unit is something to clear in the table layout, which shows it.
-  const isEmpty =
-    !state.a.text &&
-    !state.a.unit &&
-    !state.b.text &&
-    !state.b.unit &&
-    (layout === 'boxes' || !state.category);
+  const isEmpty = !state.text && !state.unit && !state.category;
 
-  const switchLayout = (next: Layout) => {
-    applyLayout(next);
-    setChosenLayout(next);
-  };
-
-  // Focus that waits for the render a change brings: Enter's hand-off to the other box, with two
-  // boxes (docs/UX-SPEC.md §5), so the other box opens on its new scope; and clear all's caret,
-  // whose box the table layout renders only once the clear lands. A layout effect, so focus moves
-  // before the next key; each request is a new object, handled once however the view changes.
-  const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(null);
-  const handledFocus = useRef<FocusRequest | null>(null);
-  useLayoutEffect(() => {
-    if (!focusRequest || handledFocus.current === focusRequest) return;
-    handledFocus.current = focusRequest;
-    const to =
-      focusRequest.kind === 'box'
-        ? focusRequest.box
-        : layout === 'boxes'
-          ? nextBox(view, focusRequest.box)
-          : null;
-    if (to) boxInput(sectionRef.current, to)?.focus();
-  }, [focusRequest, view, layout]);
-
-  /** Clear both boxes (undoable like any other step) and put the caret back in the first box. */
+  /** Clear all (undoable like any other step), and the caret back in the box. */
   const clearAll = () => {
     dispatch({ type: 'clear' });
-    setFocusRequest({ kind: 'box', box: 'a' });
+    sectionRef.current?.querySelector<HTMLInputElement>('input[data-field]')?.focus();
   };
 
   // Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes anywhere inside the converter,
@@ -164,7 +97,7 @@ export function Converter() {
     document.getElementById(calculatorToggleId)?.focus();
   };
 
-  /** Keys change only the calculator's own entry (calculator.ts); the boxes wait for a send. */
+  /** Keys change only the calculator's own entry (calculator.ts); the box waits for a send. */
   const press = (key: CalculatorKey) => {
     const next = pressKey(entry, key, env);
     if (!next) return;
@@ -175,95 +108,46 @@ export function Converter() {
     );
   };
 
-  /** Escape takes back the latest chunk of the entry, like Escape in a box; empty, it closes. */
+  /** Escape takes back the latest chunk of the entry; empty, it closes. */
   const escapeCalculator = () => {
     if (entry.text === '') closeCalculator();
-    else dispatch({ type: 'stepBack', box: 'calc' });
+    else dispatch({ type: 'stepBack' });
   };
 
   /**
-   * "Use in 1st", or "Use" into the table's box: the entry's value, its running value if = was
-   * not pressed, replaces the box's number or fills an empty box, keeping its unit. One undoable
-   * step that makes the box the source.
+   * "Use": the entry's value, its running value if = was not pressed, replaces the box's number
+   * or fills an empty box, keeping its unit. One undoable step.
    */
-  const send = (id: BoxId) => {
+  const send = () => {
     if (entryValue === undefined) return;
-    const shown = view[id];
-    const showsResult = !shown.isSource && view.result?.box === id;
     const number = formatNumber(entryValue, { locale: env.locale });
-    dispatch({
-      type: 'replace',
-      box: id,
-      text: placeNumber(shown.text, showsResult, number, env.separators),
-    });
-    markCopied(`use-${id}`);
+    dispatch({ type: 'replace', text: placeNumber(state.text, number, env.separators) });
+    markCopied('use');
   };
-
-  const sendButton = (id: BoxId, ordinal?: string) => (
-    <SendButton
-      key={id}
-      ordinal={ordinal}
-      symbol={view[id].unit?.symbol}
-      confirmed={copied === `use-${id}`}
-      unavailable={entryValue === undefined}
-      aria-describedby={calcMessage ? calcMessageId : undefined}
-      onClick={() => send(id)}
-      {...pointerProps(`use-${id}`)}
-    />
-  );
 
   /** Copies a table row's full-precision value, not the 6 digits it shows (docs/UX-SPEC.md §7). */
   const copyRow = (unitId: string) => {
-    const row = table?.kind === 'units' ? table.rows.find((each) => each.id === unitId) : undefined;
+    const row = table.kind === 'units' ? table.rows.find((each) => each.id === unitId) : undefined;
     if (row?.value != null) copy(String(row.value), `row-${unitId}`);
   };
 
-  /** Both boxes get a copy control whenever they hold a number, so the control never jumps sides. */
-  const copyButton = (box: BoxView, label: string) => {
-    const value = box.isSource
-      ? box.parsed.value
-      : view.result?.box === box.id
-        ? view.result.value
-        : undefined;
-    if (value === undefined) return undefined;
-    return (
-      <Button
-        variant="ghost"
-        square
-        nested
-        // Out of the Tab order so Tab goes box to box; focusing a result selects it for Ctrl+C.
-        tabIndex={-1}
-        aria-label={`Copy ${label}`}
-        onClick={() => copy(String(value), box.id)}
-        {...pointerProps(box.id)}
-      >
-        {/* A check in the success color confirms the copy (the status line announces it);
-            useCopied decides when it reverts. */}
-        {copied === box.id ? <CopiedIcon /> : <CopyIcon />}
-      </Button>
-    );
-  };
-
-  /** One of the two boxes. */
-  const renderBox = (box: BoxView, label: string, counterpart: BoxView) => (
-    <div className="min-w-0 flex-1">
-      <SmartInput
-        box={box}
-        label={label}
-        describedBy={hintId}
-        mode={state.mode}
-        env={env}
-        dispatch={dispatch}
-        escapeTarget={escapeTargets[box.id]}
-        examples={EXAMPLES[box.id]}
-        counterpart={counterpart.unit}
-        trailing={copyButton(box, label.toLowerCase())}
-        onEnter={() => setFocusRequest({ kind: 'enter', box: box.id })}
-      />
-    </div>
+  // The box's copy button, whenever it holds a number: out of the Tab order, since Ctrl/⌘+C
+  // copies from the field itself. A check in the success color confirms the copy (the status line
+  // announces it); useCopied decides when it reverts.
+  const value = box.parsed.value;
+  const copyButton = value !== undefined && (
+    <Button
+      variant="ghost"
+      square
+      nested
+      tabIndex={-1}
+      aria-label="Copy value"
+      onClick={() => copy(String(value), 'value')}
+      {...pointerProps('value')}
+    >
+      {copied === 'value' ? <CopiedIcon /> : <CopyIcon />}
+    </Button>
   );
-
-  const source = state.source;
 
   const calculator = calculatorOpen && (
     <Calculator
@@ -283,14 +167,14 @@ export function Converter() {
       onEscape={escapeCalculator}
       onClose={closeCalculator}
       footer={
-        layout === 'table' ? (
-          sendButton(source)
-        ) : (
-          <>
-            {sendButton('a', '1st')}
-            {sendButton('b', '2nd')}
-          </>
-        )
+        <SendButton
+          symbol={box.unit?.symbol}
+          confirmed={copied === 'use'}
+          unavailable={entryValue === undefined}
+          aria-describedby={calcMessage ? calcMessageId : undefined}
+          onClick={send}
+          {...pointerProps('use')}
+        />
       }
     />
   );
@@ -303,13 +187,12 @@ export function Converter() {
       data-hydrated={hydrated ? '' : undefined}
     >
       {/*
-        The hint has a line of its own, and the toolbar the next one, flush left over the boxes it
+        The hint has a line of its own, and the toolbar the next one, flush left over the box it
         acts on, so what to do and the tools to do it with read apart (docs/UX-SPEC.md §1).
       */}
       <div className="mb-2 flex flex-col gap-2">
         <p id={hintId} className="text-sm text-ink-muted">
-          {layout !== 'boxes' && <span className="layout-boxes:hidden">{HINTS.table}</span>}
-          {layout !== 'table' && <span className="layout-table:hidden">{HINTS.boxes}</span>}
+          {HINT}
         </p>
         <div className="-ml-3 flex shrink-0 items-center gap-1 self-start">
           <Button
@@ -325,22 +208,7 @@ export function Converter() {
           >
             <CalculatorIcon />
           </Button>
-          {/* Two boxes only: in the table a row does swap's job. Its arrows point the way the
-              boxes sit, across from sm and down below it. */}
-          {layout !== 'table' && (
-            <Button
-              variant="ghost"
-              square
-              className="layout-table:hidden"
-              aria-label="Swap sides"
-              title="Swap sides"
-              disabled={isEmpty}
-              onClick={() => dispatch({ type: 'swap' })}
-            >
-              <SwapIcon className="rotate-90 sm:rotate-0" />
-            </Button>
-          )}
-          {/* The calculator and swap act on the conversion; undo and redo step through its history. */}
+          {/* The calculator works out a number; undo and redo step through the history. */}
           <ToolbarDivider />
           <Button
             variant="ghost"
@@ -379,57 +247,26 @@ export function Converter() {
         </div>
       </div>
 
-      {/*
-        The table layout: its category menu, its one box, a column wide enough to read its rows
-        across, and its table (TableLayout).
-      */}
-      {layout !== 'boxes' && table && (
-        <div className="layout-boxes:hidden">
-          <TableLayout
-            box={view[source]}
-            table={table}
-            env={env}
-            dispatch={dispatch}
-            describedBy={hintId}
-            copyButton={copyButton(view[source], 'value')}
-            calculator={layout === 'table' && calculator}
-            calculatorId={calculatorId}
-            copiedRow={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
-            onCopyRow={copyRow}
-            copyRowProps={(row) => pointerProps(`row-${row.id}`)}
-          />
-        </div>
-      )}
+      <TableLayout
+        box={box}
+        table={table}
+        env={env}
+        dispatch={dispatch}
+        describedBy={hintId}
+        copyButton={copyButton}
+        calculator={calculator}
+        calculatorId={calculatorId}
+        copiedRow={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
+        onCopyRow={copyRow}
+        copyRowProps={(row) => pointerProps(`row-${row.id}`)}
+      />
 
-      {layout !== 'table' && (
-        <div className="layout-table:hidden">
-          {/*
-            The category label over the first box, left-aligned with the value, whichever box
-            drives. It keeps its line while empty, so nothing moves when it appears. Plain text,
-            not a live region: the announcement already names the units (docs/UX-SPEC.md §12).
-          */}
-          <p data-category-label className={cx('mb-1.5 min-h-5 px-4.5', LABEL)}>
-            {categoryName ?? ''}
-          </p>
-          {/* Side by side from sm and stacked below it, Tab going from one straight to the other. */}
-          <div className="flex flex-col gap-y-2 sm:flex-row sm:gap-x-4">
-            {renderBox(view.a, 'First value', view.b)}
-            {renderBox(view.b, 'Second value', view.a)}
-          </div>
-          {calculator && (
-            <div id={calculatorId} className={CALCULATOR_PLACE}>
-              {calculator}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* The two live regions (docs/UX-SPEC.md §12): the result, once it settles; and action feedback. */}
+      {/* The two live regions (docs/UX-SPEC.md §12): the table's sentence, once it settles; and action feedback. */}
       <p aria-live="polite" className="sr-only">
         {announcement ?? ''}
       </p>
       <p role="status" className="sr-only">
-        {copied ? confirmation(copied, layout) : ''}
+        {copied ? confirmation(copied) : ''}
       </p>
 
       {/* Drawn into the header so it copies from this state, not from the address bar. */}
@@ -447,9 +284,6 @@ export function Converter() {
           </Button>,
           headerActions,
         )}
-      {layoutSlot &&
-        layout &&
-        createPortal(<LayoutSwitch value={layout} onChange={switchLayout} />, layoutSlot)}
     </section>
   );
 }

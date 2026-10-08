@@ -121,11 +121,10 @@ test('shortcuts name ⌘ on Apple devices and Ctrl elsewhere', async ({ page, is
   await expect(undo).toHaveAttribute('title', 'Undo (⌘Z)');
 });
 
-// Under 544 px the header's menus take a line of their own, theme menu first and flush left with
-// the layout switch beside it; from 544 px every theme's name, art, and menus share one line, the
-// menus on the right and the switch left of the theme menu.
-for (const width of [320, 375, 414, 430, 520, 536, 552, 640]) {
-  const ownLine = width < 544;
+// Under 416 px the header's menus take a line of their own, theme menu first and flush left; from
+// 416 px every theme's name, art, and menus share one line, the menus on the right.
+for (const width of [320, 375, 400, 414, 416, 430, 520, 640]) {
+  const ownLine = width < 416;
   test(`at ${width} px the name keeps its art, and the menus ${ownLine ? 'wrap under it, theme first' : 'share its line'}`, async ({
     page,
   }) => {
@@ -141,7 +140,6 @@ for (const width of [320, 375, 414, 430, 520, 536, 552, 640]) {
         const name = box('main > header h1');
         const menus = box('[data-header-menus]');
         const copyUrl = box('[aria-label="Copy URL"]');
-        const layoutSwitch = box('#layout-switch fieldset');
         const shown = document.querySelector('[data-theme-name]')!;
         const trigger = shown.closest('button')!.getBoundingClientRect();
         const content = shown.parentElement!.getBoundingClientRect();
@@ -151,10 +149,6 @@ for (const width of [320, 375, 414, 430, 520, 536, 552, 640]) {
           left: Math.round(menus.left - header.left),
           right: Math.round(header.right - menus.right),
           themeFirst: trigger.right <= copyUrl.left,
-          switchBesideTheme:
-            menus.top >= name.bottom
-              ? layoutSwitch.left >= trigger.right && layoutSwitch.right <= copyUrl.left
-              : layoutSwitch.right <= trigger.left && layoutSwitch.left >= copyUrl.right,
           rowGap: Math.round(menus.top - name.bottom),
           padLeft: Math.round(content.left - trigger.left),
           padRight: Math.round(trigger.right - content.right),
@@ -163,7 +157,6 @@ for (const width of [320, 375, 414, 430, 520, 536, 552, 640]) {
       expect(m.overflow, theme.id).toBe(0);
       expect(m.ownLine, theme.id).toBe(ownLine);
       expect(m.themeFirst, theme.id).toBe(ownLine);
-      expect(m.switchBesideTheme, theme.id).toBe(true);
       expect(ownLine ? m.left : m.right, theme.id).toBe(0);
       // A wrapped row of menus keeps 20 px of air under the name.
       if (ownLine) expect(m.rowGap, theme.id).toBe(20);

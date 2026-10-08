@@ -44,7 +44,7 @@ export function evaluatedText(text: string, env: NumberEnv): string | null {
  */
 export function entryMessage(parsed: ParsedInput): string | null {
   const problem = parsed.outOfRange ?? parsed.invalid;
-  return problem ? NO_ANSWER_MESSAGES[problem].calculator : null;
+  return problem ? NO_ANSWER_MESSAGES[problem].short : null;
 }
 
 /** = and C make a whole new entry, a step of their own; every other key is typing, chunked. */
@@ -71,17 +71,10 @@ export function pressKey(
 }
 
 /**
- * A box's text with its number replaced by `number`, or `number` added when it has none. The box
- * keeps its unit, which is not in the text, and any unit text typed after the number; a box
- * showing a converted result simply takes the number.
+ * The box's text with its number replaced by `number`, or `number` added when it has none. The box
+ * keeps its unit, which is not in the text, and any unit text typed after the number.
  */
-export function placeNumber(
-  text: string,
-  showsResult: boolean,
-  number: string,
-  separators: Separators,
-): string {
-  if (showsResult) return number;
+export function placeNumber(text: string, number: string, separators: Separators): string {
   const parsed = parse(text, separators);
   if (parsed.valueText !== undefined) return parsed.query ? `${number} ${parsed.query}` : number;
   // A lone sign or "(" is arithmetic waiting for its first number, which the new number replaces.

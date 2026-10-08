@@ -1,69 +1,59 @@
 import { expect, test } from '@playwright/test';
 import { TYPING_CHUNK_MS } from '../src/lib/timing';
-import { boxes, chooseLayout, expectNoA11yViolations, MARGIN_MS, ready } from './support';
+import { box, expectNoA11yViolations, MARGIN_MS, ready } from './support';
 
-// The calculator with two boxes, its send buttons naming them; table.spec.ts covers "Use".
-test.beforeEach(async ({ page }) => {
-  await chooseLayout(page, 'boxes');
-});
-
-// The calculator scratch pad (docs/UX-SPEC.md §8, "The calculator").
+// The calculator scratch pad (docs/UX-SPEC.md §8, "The calculator"): its keys, its Tab cycle,
+// Escape, "Use" into the box, and one history with the box. Where it opens is in table.spec.ts.
 
 test('the calculator holds the keyboard, cycles Enter targets with Tab, and steps back with Escape', async ({
   page,
 }) => {
-  await page.goto('/?a=milliliter&b=liter&v=1&s=a');
+  await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  const { first, second } = boxes(page);
   const toggle = page.getByRole('button', { name: 'Calculator' });
   const calculator = page.getByRole('group', { name: 'Calculator' });
   const key = (name: string) => calculator.getByRole('button', { name, exact: true });
   const entry = calculator.locator('[data-entry]');
-  const useIn = (ordinal: string) =>
-    calculator.getByRole('button', { name: new RegExp(`^Use in ${ordinal}`) });
+  const use = calculator.getByRole('button', { name: /^Use/ });
   const close = calculator.getByRole('button', { name: 'Close calculator' });
 
   // Opening puts focus on =, so typing and Enter reach the calculator at once.
   await toggle.click();
   await expect(key('equals')).toBeFocused();
-  await expect(useIn('1st')).toHaveAttribute('aria-disabled', 'true');
+  await expect(use).toHaveAttribute('aria-disabled', 'true');
   await expectNoA11yViolations(page);
   await page.keyboard.type('12*3');
   await expect(entry).toHaveText('12×3 = 36');
-  await expect(first).toHaveValue('1');
+  await expect(box(page)).toHaveValue('1');
   await page.keyboard.press('Enter');
   await expect(entry).toHaveText('36');
 
-  // Tab cycles =, Use in 1st, Use in 2nd, Close; Enter presses whichever has focus.
+  // Tab cycles =, Use, Close; Enter presses whichever has focus.
   await page.keyboard.press('Tab');
-  await expect(useIn('1st')).toBeFocused();
-  await page.keyboard.press('Tab');
-  await expect(useIn('2nd')).toBeFocused();
+  await expect(use).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(close).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(key('equals')).toBeFocused();
   await page.keyboard.press('Shift+Tab');
   await page.keyboard.press('Shift+Tab');
-  await expect(useIn('2nd')).toBeFocused();
+  await expect(use).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(second).toHaveValue('36');
-  await expect(first).toHaveValue('36,000');
+  await expect(box(page)).toHaveValue('36');
+  await expect(page.locator('[data-row="liter"]')).toContainText('0.036');
   // After a send, focus is back on =, so Enter cannot send the same number again.
   await expect(key('equals')).toBeFocused();
-  await expect(
-    page.getByRole('status').filter({ hasText: 'Sent to the second value' }),
-  ).toHaveCount(1);
+  await expect(page.getByRole('status').filter({ hasText: 'Sent to the value' })).toHaveCount(1);
 
   // One history: undo takes back the send, then the =, and redo puts both back.
   await page.keyboard.press('Control+z');
-  await expect(second).toHaveValue('0.001');
+  await expect(box(page)).toHaveValue('1');
   await page.keyboard.press('Control+z');
   await expect(entry).toHaveText('12×3 = 36');
   await page.keyboard.press('Control+y');
   await page.keyboard.press('Control+y');
   await expect(entry).toHaveText('36');
-  await expect(second).toHaveValue('36');
+  await expect(box(page)).toHaveValue('36');
 
   // Escape takes back one burst of typing at a time, then closes once the display is empty.
   await page.keyboard.type('12345');
@@ -102,13 +92,13 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
 });
 
 test('the calculator says why its number has no value to use', async ({ page }) => {
-  await page.goto('/?a=milliliter&b=liter&v=1&s=a');
+  await page.goto('/?a=milliliter&v=1');
   await ready(page);
   await page.getByRole('button', { name: 'Calculator' }).click();
   const calculator = page.getByRole('group', { name: 'Calculator' });
   const message = calculator.locator('[data-calculator-message]');
   const equals = calculator.getByRole('button', { name: 'equals', exact: true });
-  const useIn = calculator.getByRole('button', { name: /^Use in 1st/ });
+  const useIn = calculator.getByRole('button', { name: /^Use/ });
 
   // A large exponent: the display says so, and nothing can be sent until it is back in range.
   await page.keyboard.type('9^999');

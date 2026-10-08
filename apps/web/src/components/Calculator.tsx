@@ -77,7 +77,7 @@ export interface CalculatorProps {
   onClose: () => void;
   /** Move focus onto = when it mounts, which is what opening does. False for gallery samples. */
   focusOnOpen?: boolean;
-  /** Under the keys: the buttons that send the value to a box, sharing the row's width. */
+  /** Under the keys: the button that sends the value to the box, the row's width. */
   footer?: ReactNode;
 }
 
@@ -272,8 +272,6 @@ export interface SendButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'children' | 'className' | 'disabled'
 > {
-  /** "1st" or "2nd" with two boxes ("Use in 1st"); without one it reads "Use", for the table's one box. */
-  ordinal?: string | undefined;
   /** The box's unit symbol, once it has one. */
   symbol?: string | undefined;
   /** Shows the check that confirms a send, the one copy uses. */
@@ -282,8 +280,8 @@ export interface SendButtonProps extends Omit<
   unavailable: boolean;
 }
 
-/** "Use in 1st": puts the calculator's value into a box. Named by what it shows. */
-export function SendButton({ ordinal, symbol, confirmed, unavailable, ...props }: SendButtonProps) {
+/** "Use": puts the calculator's value into the box. Named by what it shows, "Use mL". */
+export function SendButton({ symbol, confirmed, unavailable, ...props }: SendButtonProps) {
   return (
     <Button
       variant="secondary"
@@ -293,7 +291,7 @@ export function SendButton({ ordinal, symbol, confirmed, unavailable, ...props }
       {...props}
     >
       {confirmed && <CopiedIcon />}
-      <span>{ordinal ? `Use in ${ordinal}` : 'Use'}</span>
+      <span>Use</span>
       {symbol && <span className="font-semibold">{symbol}</span>}
     </Button>
   );

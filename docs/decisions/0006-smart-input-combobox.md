@@ -34,3 +34,7 @@ After milestone 2's first build the converter page measured 91.4 KB of gzipped J
 - **The Back row is an option.** Inside a category the list's first row is "← Back", a `role="option"` like the others, so `aria-activedescendant` and the arrow keys reach it and Enter on it goes up a level.
 - **Commits.** Only Enter and a pick commit a unit. Tab and leaving the box never commit, so moving between boxes never changes what was typed (owner decision; docs/UX-SPEC.md §5).
 - **The theme menu is native radios** in a header shell, per decision 2, not a second listbox.
+
+## Outcome notes (2026-10-07)
+
+The smart input this decision built retired with two boxes (ADR 0013). Its hand-built combobox lives on in the table's box, whose popup is the table's place, a grid or a listbox (ADR 0012).

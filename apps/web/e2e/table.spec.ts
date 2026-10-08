@@ -1,21 +1,18 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
-import { ANNOUNCE_MS } from '../src/lib/timing';
-import { applyTheme, chooseLayout, MARGIN_MS, ready } from './support';
+import { ANNOUNCE_MS, COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
+import { applyTheme, box, expectNoA11yViolations, MARGIN_MS, ready } from './support';
 
-// The table layout, the default (ADR 0009, ADR 0012, docs/UX-SPEC.md §1, §8, §9): one box, a
-// category menu over it, and in the table's place the categories to start from, the category's
-// units with their values, or the units a typed query matches. The caret stays in the field while
-// a cursor moves through the table. The layout switch and the two-box layout's flows are covered
-// here and in converter.spec.ts. Visitors are in the US: their own units come first (ADR 0011).
+// The converter (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §5, §7–§9, §11): one box, a category menu
+// over it, and in the table's place the categories to start from, the category's units with their
+// values, or the units a typed query matches. The caret stays in the field while a cursor moves
+// through the table. The calculator's own flows are in calculator.spec.ts. Visitors are in the
+// US: their own units come first (ADR 0011).
 
-const box = (page: Page) => page.getByRole('combobox', { name: 'Value', exact: true });
 const menu = (page: Page) => page.getByRole('button', { name: /^(Choose a category|Category)/ });
 const row = (page: Page, unitId: string) => page.locator(`[data-row="${unitId}"]`);
 /** A row's unit cell: what a click takes and the cursor lands on. */
 const unitCell = (page: Page, unitId: string) => row(page, unitId).getByRole('gridcell').first();
-const rowOrder = (page: Page) =>
-  page.locator('[data-row]').evaluateAll((rows) => rows.map((each) => each.dataset['row']));
 const tiles = (page: Page) => page.getByRole('listbox', { name: 'Categories' });
 const matches = (page: Page) => page.getByRole('listbox', { name: 'Matching units' });
 const VOLUME_UNITS = 9;
@@ -40,8 +37,8 @@ test('the start lists the categories; a number alone keeps them; Enter goes into
 }) => {
   await page.goto('/');
   await ready(page);
-  await expect(page.getByRole('combobox', { name: 'Second value' })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Swap sides' })).toHaveCount(0);
+  // One box, and no layout to switch to.
+  await expect(page.getByRole('combobox')).toHaveCount(1);
   await expect(menu(page)).toHaveText(/Choose a category/);
   await expect(box(page)).toHaveAttribute('placeholder', 'Number or unit');
   await expect(tiles(page).getByRole('option')).toHaveCount(8);
@@ -189,7 +186,7 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   isMobile,
 }) => {
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
-  await page.goto('/?a=milliliter&v=250&s=a');
+  await page.goto('/?a=milliliter&v=250');
   await ready(page);
   await menu(page).click();
   const radios = page.getByRole('group', { name: 'Category' }).getByRole('radio');
@@ -232,7 +229,7 @@ test('keyboard: the arrows loop through the menu, the field, and every row, from
 }) => {
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/?a=us-cup&v=250&s=a');
+  await page.goto('/?a=us-cup&v=250');
   await ready(page);
   await box(page).click();
   // Resting on cups, the arrows go on from its row.
@@ -274,7 +271,7 @@ test('Escape steps back: off the table, the typed unit, the number, the unit and
   isMobile,
 }) => {
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
-  await page.goto('/?a=milliliter&v=250&s=a');
+  await page.goto('/?a=milliliter&v=250');
   await ready(page);
   await box(page).click();
   await box(page).press('ArrowDown');
@@ -309,7 +306,7 @@ test('Escape steps back: off the table, the typed unit, the number, the unit and
 
 test('typing anywhere lands in the field, after what is there', async ({ page, isMobile }) => {
   test.skip(isMobile, 'typing from anywhere needs a keyboard');
-  await page.goto('/?a=milliliter&v=554&s=a');
+  await page.goto('/?a=milliliter&v=554');
   await ready(page);
   await menu(page).focus();
   await page.keyboard.type('6');
@@ -333,7 +330,7 @@ test('typing anywhere lands in the field, after what is there', async ({ page, i
 test('× takes the unit out and keeps the category; so does Backspace on an empty field', async ({
   page,
 }) => {
-  await page.goto('/?a=milliliter&v=250&s=a');
+  await page.goto('/?a=milliliter&v=250');
   await ready(page);
   await page.getByRole('button', { name: 'Remove milliliters' }).click();
   await expect(box(page)).toBeFocused();
@@ -342,7 +339,7 @@ test('× takes the unit out and keeps the category; so does Backspace on an empt
   await expect(page.locator('[data-row]')).toHaveCount(VOLUME_UNITS);
   await expect(row(page, 'liter')).toContainText('—');
 
-  await page.goto('/?a=milliliter&s=a');
+  await page.goto('/?a=milliliter');
   await ready(page);
   await box(page).click();
   await box(page).press('Backspace');
@@ -354,7 +351,7 @@ test('a row reads the value on the left, then symbol and name on the right, each
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/?a=milliliter&v=250&s=a');
+  await page.goto('/?a=milliliter&v=250');
   await ready(page);
   await expect(unitCell(page, 'liter')).toHaveAccessibleName(/^0\.25 L liters/);
   const cells = await page
@@ -378,7 +375,7 @@ test('a row reads the value on the left, then symbol and name on the right, each
 });
 
 test('a row moves into the box with its value; undo takes it back', async ({ page }) => {
-  await page.goto('/?a=milliliter&b=us-cup&v=250&s=a');
+  await page.goto('/?a=milliliter&v=250');
   await ready(page);
 
   await unitCell(page, 'liter').click();
@@ -387,38 +384,32 @@ test('a row moves into the box with its value; undo takes it back', async ({ pag
   await expect(unitCell(page, 'liter')).toContainText('in the box');
   await expect(row(page, 'milliliter')).toContainText('250');
   await expect(row(page, 'us-cup')).toContainText('1.05669');
-  await expect(page).toHaveURL(/a=liter&b=us-cup&v=0.25&s=a/);
+  await expect(page).toHaveURL(/\?a=liter&v=0\.25$/);
 
   await page.keyboard.press('Control+z');
   await expect(box(page)).toHaveValue('250');
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
 });
 
-test('the second box’s unit is a row like any other, kept for a switch back to two boxes', async ({
-  page,
-}) => {
-  await page.goto('/?a=milliliter&v=250&s=a');
-  await ready(page);
-  const alone = await rowOrder(page);
-
+test('a link from two boxes opens on the box that held the number', async ({ page }) => {
   await page.goto('/?a=milliliter&b=us-cup&v=250&s=a');
   await ready(page);
-  await expect(page.locator('[data-row]')).toHaveCount(alone.length);
-  expect(await rowOrder(page)).toEqual(alone);
-
-  // Moving it into the box gives the second box the box's old unit, as swap does.
-  await unitCell(page, 'us-cup').click();
-  await expect(box(page)).toHaveValue('1.056688209');
-  await page.getByTitle('Two boxes').click();
-  await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
+  await expect(box(page)).toHaveValue('250');
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
-  await expect(page.getByRole('combobox', { name: 'Second value' })).not.toHaveValue('');
+  // The link is rewritten in today's form, the second box's unit gone.
+  await expect(page).toHaveURL(/\?a=milliliter&v=250$/);
+
+  await page.goto('/?a=milliliter&b=us-cup&v=2&s=b');
+  await ready(page);
+  await expect(box(page)).toHaveValue('2');
+  await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
+  await expect(row(page, 'us-pint')).toContainText('1');
 });
 
 test('a value with no answer says so once; a row too large for a double says so', async ({
   page,
 }) => {
-  await page.goto('/?a=kilometer&v=1&s=a');
+  await page.goto('/?a=kilometer&v=1');
   await ready(page);
   await box(page).fill('1e400');
   await expect(page.getByRole('region', { name: 'Length' })).toContainText('Too large to convert');
@@ -432,8 +423,7 @@ test('a value with no answer says so once; a row too large for a double says so'
 });
 
 test('the live region says how many units the value is shown in', async ({ page }) => {
-  // The same with a second box's unit kept from two boxes: the table names none in particular.
-  await page.goto('/?a=milliliter&b=us-cup&v=250&s=a');
+  await page.goto('/?a=milliliter&v=250');
   await ready(page);
   await expect(page.locator('[aria-live="polite"]')).toHaveText(
     `250 milliliters in ${VOLUME_UNITS} units of volume`,
@@ -441,23 +431,12 @@ test('the live region says how many units the value is shown in', async ({ page 
   );
 });
 
-test('the calculator sends its number into the one box with "Use"', async ({ page }) => {
-  await page.goto('/?a=milliliter&v=250&s=a');
-  await ready(page);
-  await page.getByRole('button', { name: 'Calculator' }).click();
-  await page.keyboard.type('12*3');
-  await page.getByRole('button', { name: /^Use mL$/ }).click();
-  await expect(box(page)).toHaveValue('36');
-  await expect(page.getByRole('status')).toHaveText('Sent to the value');
-  await expect(row(page, 'liter')).toContainText('0.036');
-});
-
 test('the calculator takes a column beside the box and table from md, and sits between them below it', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   // Three units, so the calculator is far taller than the box and the table together.
-  await page.goto('/?a=celsius&v=20&s=a');
+  await page.goto('/?a=celsius&v=20');
   await ready(page);
   const table = page.getByRole('region', { name: 'Temperature' });
   const calculator = page.getByRole('group', { name: 'Calculator' });
@@ -494,96 +473,53 @@ test('the calculator takes a column beside the box and table from md, and sits b
   expect(Math.abs(narrow.calculator.x - narrow.menu.x)).toBeLessThan(4);
 });
 
-test('the chip gives up its name before the number shrinks, sooner in one of two boxes', async ({
+test('the chip gives up its name before the number shrinks, sooner in a narrower box', async ({
   page,
 }) => {
   // Numbers are set in the system's font, so how many digits fit differs by machine: the test
   // types every length from 1 to 20 digits and checks the rule, not a count.
-  await page.setViewportSize({ width: 1280, height: 720 });
-  await page.goto('/?a=milliliter&v=1&s=a');
+  await page.goto('/?a=milliliter&v=1');
   await ready(page);
   const name = page
     .getByRole('button', { name: 'Change unit: milliliters' })
     .getByText('milliliters', { exact: true });
-  const fontSize = (field: Locator) =>
-    field.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-  const sweep = async (field: Locator) => {
-    await field.fill('1');
-    const largest = await fontSize(field);
+  const fontSize = () => box(page).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  const sweep = async (width: number) => {
+    await page.setViewportSize({ width, height: 720 });
+    await box(page).fill('1');
+    const largest = await fontSize();
     const seen: { digits: number; named: boolean; full: boolean }[] = [];
     for (let digits = 1; digits <= 20; digits += 1) {
-      await field.fill('12345678901234567890'.slice(0, digits));
-      seen.push({
-        digits,
-        named: await name.isVisible(),
-        full: (await fontSize(field)) === largest,
-      });
+      await box(page).fill('12345678901234567890'.slice(0, digits));
+      seen.push({ digits, named: await name.isVisible(), full: (await fontSize()) === largest });
     }
     return seen;
   };
   const firstUnnamed = (seen: Awaited<ReturnType<typeof sweep>>) =>
     seen.find((step) => !step.named)?.digits ?? Infinity;
 
-  const table = await sweep(box(page));
-  await page.getByTitle('Two boxes').click();
-  const two = await sweep(page.getByRole('combobox', { name: 'First value' }));
-
-  for (const step of [...table, ...two]) {
+  const wide = await sweep(1280);
+  const narrow = await sweep(375);
+  for (const step of [...wide, ...narrow]) {
     expect(step.named && !step.full, `${step.digits} digits: name kept, number shrunk`).toBe(false);
   }
-  // The wide box keeps the name past the six characters it once gave up at.
-  expect(table.some((step) => step.digits > 6 && step.named)).toBe(true);
-  // One of two boxes gives it up sooner, and the number then keeps its size for a while.
-  expect(firstUnnamed(two)).toBeLessThan(firstUnnamed(table));
-  expect(two.some((step) => !step.named && step.full)).toBe(true);
+  // The wide box keeps the name past the six characters a count once gave up at.
+  expect(wide.some((step) => step.digits > 6 && step.named)).toBe(true);
+  // A phone's box gives it up sooner, and the number then keeps its size for a while.
+  expect(firstUnnamed(narrow)).toBeLessThan(firstUnnamed(wide));
+  expect(narrow.some((step) => !step.named && step.full)).toBe(true);
 });
 
-test('the switch changes layout, keeps the conversion, and remembers the choice', async ({
+test('before the island hydrates, the server’s page shows the start, so nothing jumps', async ({
   page,
 }) => {
-  await page.goto('/?a=milliliter&b=us-cup&v=250&s=a');
-  await ready(page);
-  // The radios are drawn as icons; a pointer clicks their labels, named by their titles.
-  await expect(page.getByRole('radio', { name: 'Table' })).toBeChecked();
-
-  await page.getByTitle('Two boxes').click();
-  await expect(page.locator('html')).toHaveAttribute('data-layout', 'boxes');
-  await expect(page.getByRole('combobox', { name: 'Second value' })).toHaveValue('1.056688209');
-  await expect(page.getByRole('button', { name: 'Swap sides' })).toBeVisible();
-  await expect(page.locator('[data-row]')).toHaveCount(0);
-
-  await page.reload();
-  await ready(page);
-  await expect(page.getByRole('radio', { name: 'Two boxes' })).toBeChecked();
-  await expect(page.getByRole('combobox', { name: 'Second value' })).toBeVisible();
-
-  await page.getByTitle('Table').click();
-  await expect(row(page, 'us-cup')).toContainText('1.05669');
-  await expect(page.getByRole('combobox', { name: 'Second value' })).toHaveCount(0);
-});
-
-test('a saved layout shows before the island hydrates, so neither flashes the other', async ({
-  page,
-}) => {
-  // Without the island's code the page stays as the server rendered it, both layouts' empty
-  // state, styled by the layout the inline script applied.
+  // Without the island's code the page stays as the server rendered it.
   await page.route('**/features/converter/Converter.tsx**', (route) => route.abort());
-  const second = page.getByRole('combobox', { name: 'Second value' });
-
   await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('data-layout', 'table');
   await expect(box(page)).toBeVisible();
+  await expect(box(page)).toHaveAttribute('placeholder', 'Number or unit');
   await expect(menu(page)).toBeVisible();
   await expect(tiles(page)).toBeVisible();
-  await expect(second).toBeHidden();
-
-  await chooseLayout(page, 'boxes');
-  await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('data-layout', 'boxes');
-  await expect(second).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Swap sides' })).toBeVisible();
-  await expect(box(page)).toBeHidden();
-  await expect(menu(page)).toBeHidden();
 });
 
 test('the categories go four across once the column has the room, and fit in every theme', async ({
@@ -621,7 +557,7 @@ test('at 320 px the rows and the categories fit without scrolling sideways', asy
     page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
-  await page.goto('/?a=kilometer-per-hour&b=mile-per-hour&v=100&s=a');
+  await page.goto('/?a=kilometer-per-hour&v=100');
   await ready(page);
   await expect(row(page, 'mile-per-hour')).toBeVisible();
   expect(await overflow()).toBe(0);
@@ -629,4 +565,184 @@ test('at 320 px the rows and the categories fit without scrolling sideways', asy
   await ready(page);
   await expect(tiles(page)).toBeVisible();
   expect(await overflow()).toBe(0);
+});
+
+test('the hint has a line of its own, and the toolbar sits under it, over the menu and the box', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  const words = 'Type a number, unit, or both to compare all at once.';
+  const hint = (await page.getByText(words).boundingBox())!;
+  const toolbar = (await page.getByRole('button', { name: 'Undo' }).boundingBox())!;
+  expect(hint.y + hint.height).toBeLessThanOrEqual(toolbar.y);
+  expect(toolbar.y + toolbar.height).toBeLessThanOrEqual((await menu(page).boundingBox())!.y);
+  await expect(box(page)).toHaveAccessibleDescription(words);
+});
+
+test('the box and a row copy their full values, and the copy confirms with a check', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/?a=mile&v=2');
+  await ready(page);
+  const copyValue = page.getByRole('button', { name: 'Copy value' });
+  const copyRow = row(page, 'kilometer').getByRole('button', { name: /^Copy/ });
+  const checks = page.locator('[data-copied]');
+
+  await copyRow.click();
+  await expect(copyRow.locator('[data-copied]')).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
+  // The full value, not the six digits the row shows.
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('3.218688');
+
+  // The check moves to whichever button copied last.
+  await copyValue.click();
+  await expect(copyValue.locator('[data-copied]')).toBeVisible();
+  await expect(checks).toHaveCount(1);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');
+
+  // It stays while the mouse rests on the button and reverts once the mouse leaves.
+  await page.waitForTimeout(COPIED_MS + MARGIN_MS);
+  await expect(checks).toHaveCount(1);
+  await page.mouse.move(0, 0);
+  await expect(checks).toHaveCount(0);
+});
+
+test('Copy URL copies the current conversion and confirms with a check', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/?a=mile&v=2');
+  await ready(page);
+  const copyUrl = page.getByRole('button', { name: 'Copy URL' });
+
+  // Typed just before the click, so the address bar may not have caught up; the copied URL has.
+  await box(page).fill('3');
+  await copyUrl.click();
+  await expect(copyUrl.locator('[data-copied]')).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'URL copied' })).toHaveCount(1);
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(new URL(copied).search).toBe('?a=mile&v=3');
+});
+
+test('clear all empties the box, its unit, and its category; undo brings them back', async ({
+  page,
+}) => {
+  await page.goto('/?a=mile&v=1');
+  await ready(page);
+  const clear = page.getByRole('button', { name: 'Clear all' });
+
+  await clear.click();
+  await expect(box(page)).toHaveValue('');
+  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(menu(page)).toHaveText(/Choose a category/);
+  await expect(tiles(page)).toBeVisible();
+  await expect(box(page)).toBeFocused();
+  await expect(clear).toBeDisabled();
+  await expect(page).toHaveURL(/\/$/);
+
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(page.getByRole('button', { name: 'Remove miles' })).toBeVisible();
+  await expect(box(page)).toHaveValue('1');
+  await expect(row(page, 'kilometer')).toContainText('1.60934');
+
+  // A category alone is something to clear too.
+  await page.goto('/');
+  await ready(page);
+  await tiles(page).getByRole('option', { name: 'Time' }).click();
+  await clear.click();
+  await expect(tiles(page)).toBeVisible();
+});
+
+test('undo takes typing back a burst at a time; Ctrl+Y and Ctrl+Shift+Z both redo', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  await box(page).pressSequentially('25');
+  await page.waitForTimeout(TYPING_CHUNK_MS + MARGIN_MS);
+  await box(page).pressSequentially('0');
+  await expect(box(page)).toHaveValue('250');
+
+  await box(page).press('Control+z');
+  await expect(box(page)).toHaveValue('25');
+  await box(page).press('Control+z');
+  await expect(box(page)).toHaveValue('');
+  await box(page).press('Control+y');
+  await expect(box(page)).toHaveValue('25');
+  await box(page).press('Control+Shift+z');
+  await expect(box(page)).toHaveValue('250');
+});
+
+test('Enter works out arithmetic and keeps the unit; with no unit, the next Enter goes into the table', async ({
+  page,
+}) => {
+  await page.goto('/?a=milliliter&v=1');
+  await ready(page);
+  await box(page).fill('2 × 3');
+  await expect(row(page, 'liter')).toContainText('0.006');
+  await box(page).press('Enter');
+  await expect(box(page)).toHaveValue('6');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await box(page).fill('5/0');
+  await expect(page.getByRole('region', { name: 'Volume' })).toContainText('Can’t divide by zero');
+
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('6*3');
+  await box(page).press('Enter');
+  await expect(box(page)).toHaveValue('18');
+  await expectCursor(page, null);
+  await box(page).press('Enter');
+  await expectCursor(page, 'Length');
+});
+
+test('a long number steps down a size and stays on one line; its exponent marker is bold', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto('/?a=kilometer&v=1');
+  await ready(page);
+  const fontSize = () => box(page).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  const short = await fontSize();
+  await box(page).fill('123456789012345678');
+  expect(await fontSize()).toBeLessThan(short);
+  expect(await box(page).evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+  await box(page).fill('1.5E21');
+  await expect(page.locator('[data-marker]')).toHaveText('E');
+});
+
+test('the matches and the open menu pass axe, and matched letters are set heavier', async ({
+  page,
+}) => {
+  await page.goto('/?a=milliliter&v=250');
+  await ready(page);
+  await box(page).fill('250 me');
+  await expect(matches(page)).toBeVisible();
+  const weight = await matches(page)
+    .locator('[data-match]')
+    .first()
+    .evaluate((el) => Number(getComputedStyle(el).fontWeight));
+  expect(weight).toBeGreaterThanOrEqual(600);
+  await expectNoA11yViolations(page);
+  await menu(page).click();
+  await expect(page.getByRole('group', { name: 'Category' })).toBeVisible();
+  await expectNoA11yViolations(page);
+});
+
+test.describe('in a German locale', () => {
+  test.use({ locale: 'de-DE' });
+
+  test('numbers read and write the German way, and the URL keeps the number meant', async ({
+    page,
+  }) => {
+    await page.goto('/?a=kilometer');
+    await ready(page);
+    await box(page).fill('1.000');
+    await expect(row(page, 'meter')).toContainText('1.000.000');
+    await expect(page).toHaveURL(/v=1000$/);
+  });
 });

@@ -1,6 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Locator, type Page } from '@playwright/test';
-import { LAYOUT_STORAGE_KEY, type Layout } from '../src/lib/layout';
+import { expect, type Page } from '@playwright/test';
 import type { ThemeMeta } from '../src/lib/themes';
 
 /** How long past a delay a test waits for its effect, so a slow machine still sees it land. */
@@ -15,23 +14,6 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'
  */
 export async function ready(page: Page) {
   await page.locator('section[data-hydrated]').waitFor();
-}
-
-/**
- * Saves a layout before the page loads, as the switch would have (ADR 0009): the table is the
- * default, so tests of the two-box flows call this with 'boxes' first.
- */
-export async function chooseLayout(page: Page, layout: Layout) {
-  await page.addInitScript(
-    ([key, value]) => {
-      try {
-        localStorage.setItem(key!, value!);
-      } catch {
-        // Storage blocked: the page falls back to the default layout.
-      }
-    },
-    [LAYOUT_STORAGE_KEY, layout],
-  );
 }
 
 /** Theme tokens transition; axe must see the settled colors, not a frame in between. */
@@ -69,24 +51,5 @@ export async function applyTheme(page: Page, theme: Pick<ThemeMeta, 'id' | 'name
   }, theme);
 }
 
-/** The converter's two boxes and the parts of their lists that tests reach for. */
-export function boxes(page: Page) {
-  return {
-    first: page.getByRole('combobox', { name: 'First value' }),
-    second: page.getByRole('combobox', { name: 'Second value' }),
-    back: page.getByRole('option', { name: 'Back to categories' }),
-    /** The category label over the two boxes (the table layout has its category menu there). */
-    label: page.locator('[data-category-label]'),
-    /** The category an open list is inside, shown on its Back row. */
-    scope: page.locator('[data-scope-name]'),
-  };
-}
-
-/** Press ArrowDown until `option` is the highlighted row, so tests do not hard-code list order. */
-export async function arrowTo(field: Locator, option: Locator) {
-  for (let step = 0; step < 25; step += 1) {
-    if ((await option.getAttribute('aria-selected')) === 'true') return;
-    await field.press('ArrowDown');
-  }
-  await expect(option).toHaveAttribute('aria-selected', 'true');
-}
+/** The converter's box, the field named "Value" (exactly, so no other name containing it matches). */
+export const box = (page: Page) => page.getByRole('combobox', { name: 'Value', exact: true });

@@ -7,8 +7,6 @@ import { useIsHydrated } from './hydrated';
 export const SLOTS = {
   /** In the header between the shortcuts map and the theme menu: the converter's Copy URL button. */
   headerActions: 'header-actions',
-  /** In the header beside the theme menu: the converter's layout switch (docs/UX-SPEC.md §10). */
-  layoutSwitch: 'layout-switch',
 } as const;
 
 /**

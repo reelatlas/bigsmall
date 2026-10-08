@@ -1,13 +1,15 @@
 import { getUnit, parse, type Separators } from '@bigsmall/core';
-import type { BoxId, ConverterState, Restorable } from './state';
+import type { ConverterState, Restorable } from './state';
 
 /**
  * The conversion in the URL, so links and bookmarks reproduce it (docs/UX-SPEC.md §11):
- *   ?a=milliliter&b=us-cup&v=5&s=a
- * a, b: unit ids · v: the typed number in canonical form · s: which box holds v.
+ *   ?a=milliliter&v=5
+ * a: the box's unit id · v: the typed number in canonical form. Links from the two-box converter
+ * (ADR 0013) may also carry b, the second box's unit, and s, which box held v; they open on the
+ * box that held the number.
  */
 
-const PARAM = { a: 'a', b: 'b', value: 'v', source: 's' } as const;
+const PARAM = { unit: 'a', value: 'v', secondUnit: 'b', source: 's' } as const;
 
 /**
  * The state as URL parameters. The typed text is read with the user's separators, so "1.000" in
@@ -16,13 +18,9 @@ const PARAM = { a: 'a', b: 'b', value: 'v', source: 's' } as const;
  */
 export function stateToParams(state: ConverterState, separators: Separators): URLSearchParams {
   const params = new URLSearchParams();
-  if (state.a.unit) params.set(PARAM.a, state.a.unit);
-  if (state.b.unit) params.set(PARAM.b, state.b.unit);
-  const value = parse(state[state.source].text, separators).value;
-  if (value !== undefined) {
-    params.set(PARAM.value, String(value));
-    params.set(PARAM.source, state.source);
-  }
+  if (state.unit) params.set(PARAM.unit, state.unit);
+  const value = parse(state.text, separators).value;
+  if (value !== undefined) params.set(PARAM.value, String(value));
   return params;
 }
 
@@ -40,24 +38,15 @@ export function urlFor(
   return `${page.origin}${page.pathname}${query ? `?${query}` : ''}`;
 }
 
-/** Reads a URL back into state. Unknown units are dropped; a second unit from another category is dropped too. */
+/** Reads a URL back into state. An unknown unit is dropped. */
 export function paramsToState(params: URLSearchParams): Restorable | null {
-  const unitA = validUnit(params.get(PARAM.a));
-  let unitB = validUnit(params.get(PARAM.b));
-  if (unitA && unitB && getUnit(unitA)?.category !== getUnit(unitB)?.category) unitB = null;
-
+  // A two-box link whose number was in the second box opens on that box's unit.
+  const fromSecond = params.get(PARAM.source) === 'b';
+  const unit = validUnit(params.get(fromSecond ? PARAM.secondUnit : PARAM.unit));
   const rawValue = params.get(PARAM.value);
   const value = rawValue === null ? undefined : parse(rawValue).value;
-  const source: BoxId = params.get(PARAM.source) === 'b' ? 'b' : 'a';
-
-  if (!unitA && !unitB && value === undefined) return null;
-
-  const text = value === undefined ? '' : String(value);
-  return {
-    a: { text: source === 'a' ? text : '', unit: unitA },
-    b: { text: source === 'b' ? text : '', unit: unitB },
-    source,
-  };
+  if (!unit && value === undefined) return null;
+  return { text: value === undefined ? '' : String(value), unit };
 }
 
 function validUnit(id: string | null): string | null {

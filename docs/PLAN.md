@@ -12,11 +12,10 @@ Positioning in one line: _type anything into either box and get the answer._
 
 ### v1 (launch)
 
-- **Two layouts.** The table, the default: one smart input, and the value in every unit of its category below it. Behind a switch, the two linked boxes below. One state and URL serve both (ADR 0009).
-- **Two linked smart inputs.** Each accepts a number, a unit, or both (`5 ml`, `ml`, `5`). Typing in one updates the other instantly. Either box can be the source.
-- **Smart search.** Empty box shows categories. Typing a unit narrows to matching units across categories. Typing a category word (`fluids`, `temp`) narrows to that category. Once one box has a unit, the other is scoped to the same category.
+- **One box and its table.** One smart input, and the value in every unit of its category in a table under it, which is also where units are picked (ADR 0012). Two linked boxes behind a switch were built and retired the same day (ADR 0009, ADR 0013).
+- **Smart search.** Typing a unit lists matching units across every category, grouped by category, the current category first. Typing a category word (`fluids`, `temp`) offers that category.
 - **Manual selection.** Everything reachable by tapping, with no typing required.
-- **Calculator.** A scratch pad behind an icon button, for anyone who would rather tap than type or wants to work a number out first; its number goes into either box only when sent (docs/UX-SPEC.md §8).
+- **Calculator.** A scratch pad behind an icon button, for anyone who would rather tap than type or wants to work a number out first; its number goes into the box only when sent (docs/UX-SPEC.md §8).
 - **Basic and advanced modes.** Basic shows the common units of the common categories. Advanced reveals everything. Searching for an advanced unit escalates automatically.
 - **Themes.** Two neutral defaults (light, dark) plus distinctive aesthetic themes. Theme choice persists.
 - **Shareable URLs.** The current conversion is in the URL, so links and bookmarks work; a Copy URL button in the header copies it.
@@ -56,12 +55,12 @@ Time zones and calendar math, clothing and shoe sizes, decibels, number-base con
 
 Full behavior lives in `docs/UX-SPEC.md`. The short version:
 
-1. Both boxes start empty; focusing one lists the categories.
-2. The user types a number, a unit, or both into either box. The parser splits the text into an optional number and an optional unit query.
-3. Suggestions update on every keystroke with the best match highlighted, but nothing commits on a keystroke: Enter or a pick puts the unit into a chip, and Tab or clicking away leaves the text as typed. Ambiguous matches (`oz`, later `ton`, `cup`, `gal`) name their category so the choice is visible.
-4. When one box has a unit, the other box's list is scoped to that category, most common units first.
-5. Once both boxes have a unit, the result appears live in the box that is not the source. Typing a number into either box makes it the source.
-6. Swap flips the pair; undo, redo, and clear all sit above the boxes. A calculator beside them works a number out and sends it to either box.
+1. The box starts empty, the categories under it to start from.
+2. The user types a number, a unit, or both. The parser splits the text into an optional number and an optional unit query.
+3. Typing a unit lists the matches under the box, across every category; nothing is chosen on a keystroke: Enter or a click takes a unit into a chip.
+4. Choosing a category instead lists its units, with none chosen; picking one means the typed number in that unit.
+5. With a number and a unit, every row of the table shows the value in its unit; tapping a row moves it into the box.
+6. Undo, redo, and clear all sit above the box. A calculator beside it works a number out and sends it to the box.
 
 The smart input is the whole product. It is the first thing to build and the first thing to test with people.
 
@@ -198,7 +197,7 @@ Rule of thumb: if a future session would have to rediscover it, write it down.
 | --- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | M0  | **Setup**              | Tooling installed, repo on GitHub, workspace scaffolded, CI runs lint + typecheck + tests, docs skeleton in place. **Done 2026-10-06.**                                                                                                                                      |
 | M1  | **Core engine**        | Eight primary categories with basic-tier units, parser, search, formatter; golden and round-trip tests green; zero UI. **Done 2026-10-06.**                                                                                                                                  |
-| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending, to run on the table layout (ADR 0009, ADR 0012).**                                     |
+| M2  | **Smart input spike**  | Two linked boxes with the `daylight` theme, mobile-first, URL state; usability test with five people; bundle measured against budget. **Code done 2026-10-06; usability test pending, to run on the one-box converter (ADR 0012, ADR 0013).**                                |
 | M3  | **Complete converter** | Basic/advanced modes, persistence, remaining basic-tier categories, advanced categories loaded on demand. Shipped early: swap (M2); the calculator (a scratch pad with + − × ÷ ^ whose number can be sent to either box), arithmetic in the boxes, and Copy URL (2026-10-06) |
 | M4  | **Themes**             | `midnight`, `sakura`, `neo-noir`, `hardhat`, `theorem` designed and polished: fonts and decoration (per-theme art shipped early, 2026-10-06). The picker, the contrast test, the gallery, and the bundle budget already exist                                                |
 | M5  | **Launch**             | SEO pair pages, analytics, PWA manifest and offline, domain, Lighthouse gates passing. Shipped early: the domain, and the MVP live on `bigsmall.work` for friends' feedback, tagged `v0.1.0` (2026-10-07; docs/DEPLOYMENT.md)                                                |

@@ -25,35 +25,6 @@ function Icon({ children, ...props }: IconProps) {
   );
 }
 
-export function SwapIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <path d="M4 7h13M13 3l4 4-4 4" />
-      <path d="M20 17H7M11 13l-4 4 4 4" />
-    </Icon>
-  );
-}
-
-/** The table layout: one value over rows of units. */
-export function TableIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <rect x="3" y="4" width="18" height="16" rx="2" />
-      <path d="M3 9.5h18M3 14.5h18" />
-    </Icon>
-  );
-}
-
-/** The two-box layout: two values side by side. */
-export function TwoBoxesIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <rect x="2.5" y="7" width="8" height="10" rx="2" />
-      <rect x="13.5" y="7" width="8" height="10" rx="2" />
-    </Icon>
-  );
-}
-
 export function CloseIcon(props: IconProps) {
   return (
     <Icon {...props}>
@@ -67,14 +38,6 @@ export function CopyIcon(props: IconProps) {
     <Icon {...props}>
       <rect x="9" y="9" width="11" height="11" rx="2" />
       <path d="M5 15V5a2 2 0 0 1 2-2h10" />
-    </Icon>
-  );
-}
-
-export function ChevronRightIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <path d="M9 6l6 6-6 6" />
     </Icon>
   );
 }

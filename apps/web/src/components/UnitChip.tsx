@@ -27,9 +27,9 @@ const BODY = 'inline-flex items-baseline gap-2 self-center px-3';
 const HOVER = 'transition-colors hover:bg-surface/40';
 
 /**
- * The locked unit inside a field: its symbol, then its name, plus a remove control. The body opens
- * the unit list with two boxes and puts the caret in the field in the table layout, whose table is
- * the list (`onOpen`). Collapsed, the symbol stands alone in the ink color.
+ * The unit in the field: its symbol, then its name, plus a remove control. The body puts the caret
+ * in the field (`onOpen`), whose table is the unit list. Collapsed, the symbol stands alone in the
+ * ink color.
  */
 export function UnitChip({ unit, compact, nameRef, onOpen, onRemove }: UnitChipProps) {
   // Both buttons stay out of the Tab order: the field's own keys change and remove the unit

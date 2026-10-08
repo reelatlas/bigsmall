@@ -22,17 +22,28 @@ import { noMatchMessage, type BoxView, type HistoryAction, type TableView } from
 import type { ConverterEnv } from './useConverter';
 
 /**
- * The converter from md (docs/UX-SPEC.md §1): the box and its table in the first column, and
- * the calculator in a column of its own on their right, spanning both rows; the second row takes
- * any height the calculator adds, so the table always sits right under the box. Below md the
- * calculator opens between the box and the table, flush left.
+ * The converter from md (docs/UX-SPEC.md §1): the toolbar, the box, and its table in the first
+ * column, and the calculator in a column of its own on their right, level with the box and
+ * spanning its rows; the last row takes any height the calculator adds, so the table always sits
+ * right under the box. Below md the calculator opens between the box and the table, flush left.
  */
-const TABLE_GRID = 'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_1fr] md:gap-x-4';
-const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-1';
+const TABLE_GRID =
+  'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_1fr] md:gap-x-4';
+/**
+ * The toolbar row, as wide as the box: the tools at its left, the category menu at its right end,
+ * its right edge on the box's. Where the row has no room for both, the menu wraps onto a line of
+ * its own, flush left (justify-between puts a line's one item at its start), with no breakpoint:
+ * the browser's own fit decides, in every theme.
+ */
+const TABLE_TOOLS_ROW =
+  'mb-2 flex max-w-xl flex-wrap items-center justify-between gap-x-4 gap-y-2 md:col-start-1 md:row-start-1';
+/** The tools: their first glyph lined up with the hint and the box. */
+const TABLE_TOOLS = '-ml-3 flex shrink-0 items-center gap-1';
+const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
 /** 16 px under the box or the calculator; a container, so the categories go four across once it has the room. */
-const TABLE_ROWS_CELL = '@container mt-4 max-w-xl md:col-start-1 md:row-start-2';
+const TABLE_ROWS_CELL = '@container mt-4 max-w-xl md:col-start-1 md:row-start-3';
 const TABLE_CALCULATOR_CELL =
-  'md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:w-72 md:self-start';
+  'md:col-start-2 md:row-span-2 md:row-start-2 md:mt-0 md:w-72 md:self-start';
 
 /**
  * Keys that start typing in the field when nothing on the page has focus: a letter, a digit, or
@@ -46,6 +57,8 @@ function viewKeyOf(view: TableView): string {
 }
 
 export interface TableLayoutProps {
+  /** The toolbar's buttons (the calculator, undo, redo, clear all), at the left of its row. */
+  tools: ReactNode;
   /** The field's input, which the host also focuses (clear all puts the caret back in it). */
   inputRef: RefObject<HTMLInputElement>;
   /** The box, as the field shows it. */
@@ -67,8 +80,8 @@ export interface TableLayoutProps {
 }
 
 /**
- * The box and what it lists (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §8, §9): the category
- * menu, the field, and in the table's place the categories to start from, the category's units
+ * The box and what it lists (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §8, §9): the toolbar row
+ * with the category menu at its end, the field, and in the table's place the categories to start from, the category's units
  * with their values, or the units a typed query matches. The table is the unit list: the caret
  * stays in the field while a cursor the field points at (aria-activedescendant) moves through
  * whatever the table's place shows, the arrows going round from the menu through the field and
@@ -76,6 +89,7 @@ export interface TableLayoutProps {
  * in the field; Escape steps back one thing at a time, from browsing the table to an empty page.
  */
 export function TableLayout({
+  tools,
   inputRef,
   box,
   table,
@@ -410,27 +424,32 @@ export function TableLayout({
       />
     );
 
-  // The cursor shows only while focus is in the layout: leaving it, the cursor rests again.
+  // The cursor shows only while focus is in the box or its table: moving to the toolbar, the
+  // calculator, or off the page, the cursor rests again.
   return (
     <div
       ref={rootRef}
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPosition(null);
+        const next = event.relatedTarget as Node | null;
+        if (![fieldRef, placeRef].some((part) => part.current?.contains(next))) setPosition(null);
       }}
     >
-      <div ref={menuRef} className="mb-2">
-        <CategoryMenu
-          categories={table.categories}
-          value={chosen}
-          counts={table.kind === 'matches' ? table.counts : undefined}
-          triggerRef={triggerRef}
-          onChoose={(category) => {
-            choose(category);
-            inputRef.current?.focus();
-          }}
-        />
-      </div>
       <div className={TABLE_GRID}>
+        <div className={TABLE_TOOLS_ROW}>
+          <div className={TABLE_TOOLS}>{tools}</div>
+          <div ref={menuRef}>
+            <CategoryMenu
+              categories={table.categories}
+              value={chosen}
+              counts={table.kind === 'matches' ? table.counts : undefined}
+              triggerRef={triggerRef}
+              onChoose={(category) => {
+                choose(category);
+                inputRef.current?.focus();
+              }}
+            />
+          </div>
+        </div>
         <div ref={fieldRef} className={TABLE_BOX_CELL}>
           <ValueField
             inputRef={inputRef}

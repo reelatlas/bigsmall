@@ -45,9 +45,10 @@ function confirmation(key: Confirmable): string {
 const HINT = 'Type a number, unit, or both to compare all at once.';
 
 /**
- * The converter island (ADR 0012, ADR 0013, docs/UX-SPEC.md §1): the hint and the toolbar
- * (calculator, undo, redo, clear all); the box and its table (TableLayout), with the calculator
- * when open between them or beside them (§8); and the live regions. It draws the Copy URL button
+ * The converter island (ADR 0012, ADR 0013, docs/UX-SPEC.md §1): the hint; the toolbar's
+ * buttons (calculator, undo, redo, clear all), which TableLayout sets in a row with the category
+ * menu; the box and its table, with the calculator when open between them or beside them (§8);
+ * and the live regions. It draws the Copy URL button
  * into the header's slot (§7).
  */
 export function Converter() {
@@ -230,73 +231,73 @@ export function Converter() {
       data-hydrated={hydrated ? '' : undefined}
     >
       {/*
-        The hint has a line of its own, and the toolbar the next one, flush left over the box it
-        acts on, so what to do and the tools to do it with read apart (docs/UX-SPEC.md §1).
+        The hint has a line of its own, and the toolbar the next one, over the box it acts on, so
+        what to do and the tools to do it with read apart (docs/UX-SPEC.md §1).
       */}
-      <div className="mb-2 flex flex-col gap-2">
-        <p id={hintId} className="text-sm text-ink-muted">
-          {HINT}
-        </p>
-        <div className="-ml-3 flex shrink-0 items-center gap-1 self-start">
-          <Button
-            variant="ghost"
-            square
-            id={calculatorToggleId}
-            aria-label="Calculator"
-            aria-keyshortcuts="Alt+C"
-            title={apple ? 'Calculator (⌥C)' : 'Calculator (Alt+C)'}
-            aria-expanded={calculatorOpen}
-            aria-controls={calculatorOpen ? calculatorId : undefined}
-            onClick={() => {
-              // Closed with the icon, focus stays on it, wherever the calculator was opened from.
-              const icon = calculatorToggle();
-              if (calculatorOpen) closeCalculator(icon);
-              else openCalculator(icon);
-            }}
-            on={calculatorOpen}
-          >
-            <CalculatorIcon />
-          </Button>
-          {/* The calculator works out a number; undo and redo step through the history. */}
-          <ToolbarDivider />
-          <Button
-            variant="ghost"
-            square
-            aria-label="Undo"
-            aria-keyshortcuts="Control+Z Meta+Z"
-            title={apple ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)'}
-            disabled={!canUndo}
-            onClick={() => dispatch({ type: 'undo' })}
-          >
-            <UndoIcon />
-          </Button>
-          <Button
-            variant="ghost"
-            square
-            aria-label="Redo"
-            aria-keyshortcuts="Control+Y Control+Shift+Z Meta+Shift+Z Meta+Y"
-            title={apple ? 'Redo (⇧⌘Z)' : 'Redo (Ctrl+Y)'}
-            disabled={!canRedo}
-            onClick={() => dispatch({ type: 'redo' })}
-          >
-            <RedoIcon />
-          </Button>
-          {/* Clearing is a different kind of step from undo and redo, so a divider sets it apart. */}
-          <ToolbarDivider />
-          <Button
-            variant="ghost"
-            square
-            aria-label="Clear all"
-            title="Clear all"
-            disabled={isEmpty}
-            onClick={clearAll}
-          >
-            <EraserIcon />
-          </Button>
-        </div>
-      </div>
+      <p id={hintId} className="mb-2 text-sm text-ink-muted">
+        {HINT}
+      </p>
 
       <TableLayout
+        tools={
+          <>
+            <Button
+              variant="ghost"
+              square
+              id={calculatorToggleId}
+              aria-label="Calculator"
+              aria-keyshortcuts="Alt+C"
+              title={apple ? 'Calculator (⌥C)' : 'Calculator (Alt+C)'}
+              aria-expanded={calculatorOpen}
+              aria-controls={calculatorOpen ? calculatorId : undefined}
+              onClick={() => {
+                // Closed with the icon, focus stays on it, wherever the calculator was opened from.
+                const icon = calculatorToggle();
+                if (calculatorOpen) closeCalculator(icon);
+                else openCalculator(icon);
+              }}
+              on={calculatorOpen}
+            >
+              <CalculatorIcon />
+            </Button>
+            {/* The calculator works out a number; undo and redo step through the history. */}
+            <ToolbarDivider />
+            <Button
+              variant="ghost"
+              square
+              aria-label="Undo"
+              aria-keyshortcuts="Control+Z Meta+Z"
+              title={apple ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)'}
+              disabled={!canUndo}
+              onClick={() => dispatch({ type: 'undo' })}
+            >
+              <UndoIcon />
+            </Button>
+            <Button
+              variant="ghost"
+              square
+              aria-label="Redo"
+              aria-keyshortcuts="Control+Y Control+Shift+Z Meta+Shift+Z Meta+Y"
+              title={apple ? 'Redo (⇧⌘Z)' : 'Redo (Ctrl+Y)'}
+              disabled={!canRedo}
+              onClick={() => dispatch({ type: 'redo' })}
+            >
+              <RedoIcon />
+            </Button>
+            {/* Clearing is a different kind of step from undo and redo, so a divider sets it apart. */}
+            <ToolbarDivider />
+            <Button
+              variant="ghost"
+              square
+              aria-label="Clear all"
+              title="Clear all"
+              disabled={isEmpty}
+              onClick={clearAll}
+            >
+              <EraserIcon />
+            </Button>
+          </>
+        }
         inputRef={inputRef}
         box={box}
         table={table}

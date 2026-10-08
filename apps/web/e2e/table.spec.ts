@@ -340,7 +340,7 @@ test('with nothing focused, Escape clears the box a step at a time, as in the bo
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
 });
 
-test('the cursor shows only while focus is in the converter', async ({ page, isMobile }) => {
+test('the cursor shows only while focus is in the box or its table', async ({ page, isMobile }) => {
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
   await page.goto('/?a=milliliter&v=250');
   await ready(page);
@@ -629,16 +629,36 @@ test('at 320 px the rows and the categories fit without scrolling sideways', asy
   expect(await overflow()).toBe(0);
 });
 
-test('the hint has a line of its own, and the toolbar sits under it, over the menu and the box', async ({
+test('the hint has a line of its own; the toolbar under it ends in the category menu, or wraps it on a phone', async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
   await ready(page);
   const words = 'Type a number, unit, or both to compare all at once.';
-  const hint = (await page.getByText(words).boundingBox())!;
-  const toolbar = (await page.getByRole('button', { name: 'Undo' }).boundingBox())!;
-  expect(hint.y + hint.height).toBeLessThanOrEqual(toolbar.y);
-  expect(toolbar.y + toolbar.height).toBeLessThanOrEqual((await menu(page).boundingBox())!.y);
+  const geometry = async () => ({
+    hint: (await page.getByText(words).boundingBox())!,
+    undo: (await page.getByRole('button', { name: 'Undo' }).boundingBox())!,
+    menu: (await menu(page).boundingBox())!,
+    field: (await box(page).boundingBox())!,
+    start: (await tiles(page).boundingBox())!,
+  });
+  // Wide: the menu at the toolbar's right end, its edge on the column's, over the box.
+  const wide = await geometry();
+  expect(wide.hint.y + wide.hint.height).toBeLessThanOrEqual(wide.undo.y);
+  const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
+  expect(Math.abs(middle(wide.menu) - middle(wide.undo))).toBeLessThan(4);
+  expect(
+    Math.abs(wide.menu.x + wide.menu.width - (wide.start.x + wide.start.width)),
+  ).toBeLessThanOrEqual(3);
+  expect(wide.menu.y + wide.menu.height).toBeLessThanOrEqual(wide.field.y);
+
+  // A phone has no room for both: the menu takes the next line, flush left, still over the box.
+  await page.setViewportSize({ width: 375, height: 800 });
+  const narrow = await geometry();
+  expect(narrow.menu.y).toBeGreaterThanOrEqual(narrow.undo.y + narrow.undo.height);
+  expect(Math.abs(narrow.menu.x - narrow.start.x)).toBeLessThanOrEqual(3);
+  expect(narrow.menu.y + narrow.menu.height).toBeLessThanOrEqual(narrow.field.y);
   await expect(box(page)).toHaveAccessibleDescription(words);
 });
 

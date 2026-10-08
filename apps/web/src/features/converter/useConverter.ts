@@ -4,7 +4,7 @@ import {
   regionDefaults,
   type UnitPreference,
 } from '@bigsmall/core';
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useReducer, useState, type RefObject } from 'react';
 import { browserLocale, detectRegion } from '../../lib/region';
 import { ANNOUNCE_MS, URL_WRITE_MS } from '../../lib/timing';
 import {
@@ -58,9 +58,9 @@ export interface ConverterController {
 
 /**
  * Owns the converter state and its history, derives the box and the table, syncs the URL, and
- * paces announcements.
+ * paces announcements. `input` is the box's input, whose text typed before hydration is kept.
  */
-export function useConverter(): ConverterController {
+export function useConverter(input: RefObject<HTMLInputElement>): ConverterController {
   const [history, dispatch] = useReducer(reduceWithHistory, initialHistory);
   const state = history.present;
   const [env] = useState(detectEnv);
@@ -70,11 +70,16 @@ export function useConverter(): ConverterController {
     [state, env],
   );
 
-  // Restore the conversion from the URL once, after hydration (the server renders the empty state).
-  useEffect(() => {
-    const hydrated = paramsToState(new URLSearchParams(window.location.search));
-    if (hydrated) dispatch({ type: 'hydrate', state: hydrated });
-  }, []);
+  // Restore the conversion from the URL once, at hydration (the server renders the empty state).
+  // Text typed into the box before then, in the server's field, is kept: it replaces the URL's
+  // number, the URL's unit staying. In a layout effect, before any render can reset the field.
+  useLayoutEffect(() => {
+    const restored = paramsToState(new URLSearchParams(window.location.search), env.separators);
+    const typed = input.current?.value ?? '';
+    if (typed) dispatch({ type: 'hydrate', state: { text: typed, unit: restored?.unit ?? null } });
+    else if (restored) dispatch({ type: 'hydrate', state: restored });
+    // Both are fixed for the island's life, so this runs once, as the page loads.
+  }, [env.separators, input]);
 
   // Keep the URL in step with the state, without flooding history.
   useEffect(() => {

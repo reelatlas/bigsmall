@@ -21,13 +21,14 @@ describe('stateToParams', () => {
     expect(stateToParams(holding('250'), EN).toString()).toBe('v=250');
   });
 
-  it('writes the value canonically, not as typed', () => {
+  it('writes the number canonically: a period decimal, no grouping', () => {
     expect(stateToParams(holding('1,000.5 km'), EN).toString()).toBe('v=1000.5');
   });
 
   it('reads the typed number with the user’s separators', () => {
     expect(stateToParams(holding('1.000'), DE).toString()).toBe('v=1000');
-    expect(stateToParams(holding('1.000'), EN).toString()).toBe('v=1');
+    // In English "1.000" is one, written as typed, its zeros kept.
+    expect(stateToParams(holding('1.000'), EN).toString()).toBe('v=1.000');
     expect(stateToParams(holding('2,5'), DE).toString()).toBe('v=2.5');
   });
 });
@@ -38,6 +39,23 @@ describe('paramsToState', () => {
       text: '2',
       unit: 'foot',
     });
+  });
+
+  it('keeps every digit typed, which a double would round', () => {
+    const params = stateToParams(holding('123456789012345678', 'meter'), EN);
+    expect(params.toString()).toBe('a=meter&v=123456789012345678');
+    expect(paramsToState(params)).toEqual({ text: '123456789012345678', unit: 'meter' });
+  });
+
+  it('writes arithmetic as its value', () => {
+    expect(stateToParams(holding('5 + 3', 'meter'), EN).toString()).toBe('a=meter&v=8');
+  });
+
+  it("reads the number back in the visitor's own decimal mark", () => {
+    const params = stateToParams(holding('1.234,567', 'meter'), DE);
+    expect(params.toString()).toBe('a=meter&v=1234.567');
+    expect(paramsToState(params, DE)).toEqual({ text: '1234,567', unit: 'meter' });
+    expect(paramsToState(params, EN)).toEqual({ text: '1234.567', unit: 'meter' });
   });
 
   it('opens a two-box link on the box that held the number', () => {

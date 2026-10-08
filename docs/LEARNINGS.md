@@ -589,3 +589,8 @@ Format:
 
 **What happened.** A new fitting hook's `useCallback` read `grid.current` and listed `[grid, columns]`. The React Compiler's lint (`react-hooks/preserve-manual-memoization`) failed `pnpm check`: it inferred `grid.current` as the dependency, which is not `grid`. The other fitting hooks hand the ref itself to their measuring function and were never flagged.
 **Rule.** In a memoized callback, pass the ref to the function that reads it (`fitColumns(grid, columns)`) rather than reading `.current` in the callback, so what the compiler infers matches the dependencies listed.
+
+## 2026-10-08 — Text typed into a server-rendered field survives hydration, until the next render
+
+**What happened.** Keys typed into the converter's box before its island loaded went into the server's plain field and were then lost. Preact's hydration leaves the field's value alone, but the island's state starts empty, so the first render after it (the URL's restore, or any key) set the field back to that empty text.
+**Rule.** An island whose field may hold text before it loads reads the field in a layout effect at hydration and adopts it into its state, before anything renders again. Keys typed with nothing focused can be kept the same way: an inline script moves focus into the field on the first one, so the field receives the key.

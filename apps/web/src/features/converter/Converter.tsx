@@ -48,13 +48,14 @@ const HINT = 'Type a number, unit, or both to compare all at once.';
  */
 export function Converter() {
   const hydrated = useIsHydrated();
-  const { state, box, table, env, dispatch, canUndo, canRedo, announcement } = useConverter();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { state, box, table, env, dispatch, canUndo, canRedo, announcement } =
+    useConverter(inputRef);
   // Tooltips name the platform's keys; until hydration they read as on the server (Ctrl).
   const apple = hydrated && isApplePlatform();
   const hintId = useId();
   const calcMessageId = useId();
   const sectionRef = useRef<HTMLElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const { copied, copy, markCopied, pointerProps } = useCopied<Confirmable>();
   const headerActions = useSlot(SLOTS.headerActions);
   const calculatorId = useId();

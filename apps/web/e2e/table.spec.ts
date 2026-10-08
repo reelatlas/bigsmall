@@ -676,6 +676,30 @@ test('before the island hydrates, the server’s page shows the start, so nothin
   await expect(tiles(page)).toBeVisible();
 });
 
+test('keys typed before the island loads are kept, the link’s unit staying', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'typing from anywhere needs a keyboard');
+  // Hold the island's code until the keys are in, so they land in the server's page.
+  let release = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route(/Converter[\w.-]*\.(tsx|js)/, async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.goto('/?a=milliliter', { waitUntil: 'domcontentloaded' });
+  // With nothing focused, the first key moves focus into the box, and the keys land there.
+  await page.keyboard.type('25');
+  await expect(box(page)).toBeFocused();
+  await expect(box(page)).toHaveValue('25');
+  release();
+  await ready(page);
+  await expect(box(page)).toHaveValue('25');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  await expect(row(page, 'liter')).toContainText('0.025');
+});
+
 test('the categories go four across once the column has the room, and fit in every theme', async ({
   page,
 }) => {
@@ -948,5 +972,9 @@ test.describe('in a German locale', () => {
     await box(page).fill('1.000');
     await expect(row(page, 'meter')).toContainText('1.000.000');
     await expect(page).toHaveURL(/v=1000$/);
+    // A link's number opens in the visitor's own decimal mark, every digit kept.
+    await page.goto('/?a=kilometer&v=1234.567890123456789');
+    await ready(page);
+    await expect(box(page)).toHaveValue('1234,567890123456789');
   });
 });

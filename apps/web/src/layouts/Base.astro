@@ -4,6 +4,7 @@ import { PLANE_EVENT } from '../lib/planes';
 import { APPLE_PLATFORM } from '../lib/platform';
 import { SITE } from '../lib/site';
 import { PEEK_CLOSE_MS, PEEK_OPEN_MS } from '../lib/timing';
+import { STARTS_TYPING } from '../lib/typing';
 import { DEFAULT_DARK, DEFAULT_LIGHT, THEMES, THEME_STORAGE_KEY } from '../lib/themes';
 
 interface Props {
@@ -55,6 +56,8 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         peekOpen: PEEK_OPEN_MS,
         peekClose: PEEK_CLOSE_MS,
         planeEvent: PLANE_EVENT,
+        startsTyping: STARTS_TYPING.source,
+        startsTypingFlags: STARTS_TYPING.flags,
       }}
     >
       // Runs inline before first paint: applies the saved theme (no flash) and drives the header
@@ -208,6 +211,19 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
           if (focusWasInside) toggleOf(shell)?.focus();
           event.preventDefault();
         }
+      });
+
+      // Typing from anywhere, before the converter's code has loaded (docs/UX-SPEC.md §8): a letter
+      // or a digit typed with nothing focused moves focus into the box, so the key lands in its
+      // field, which the island keeps as it loads. Once loaded, the island does this itself.
+      const startsTypingKey = new RegExp(startsTyping, startsTypingFlags);
+      document.addEventListener('keydown', (event) => {
+        if (document.querySelector('[data-hydrated]')) return;
+        const active = document.activeElement;
+        if (active && active !== document.body && active !== document.documentElement) return;
+        if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+        if (startsTypingKey.test(event.key))
+          document.querySelector('[data-plane="box"] input')?.focus();
       });
 
       // Toolbars and planes (docs/UX-SPEC.md §8, ADR 0014). A [role=toolbar] is one Tab stop: ←

@@ -18,6 +18,7 @@ import { UnitMatches } from '../../components/UnitMatches';
 import { ValueField } from '../../components/ValueField';
 import { pressedByTouch } from '../../lib/modality';
 import { stepPlane } from '../../lib/planes';
+import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
 import { noMatchMessage, type BoxView, type HistoryAction, type TableView } from './state';
 import type { ConverterEnv } from './useConverter';
@@ -63,12 +64,6 @@ const TABLE_ROWS_CELL = '@container mt-2 max-w-xl md:col-start-1 md:row-span-2 m
  */
 const TABLE_CALCULATOR_CELL =
   'my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-1 md:my-0 md:grid md:w-72 md:grid-rows-subgrid md:*:row-span-3 md:*:grid md:*:grid-rows-subgrid md:*:pt-px';
-
-/**
- * Keys that start typing in the field when nothing on the page has focus: a letter, a digit, or
- * what a number can start with. Not Space, which scrolls the page.
- */
-const STARTS_TYPING = /^[\p{L}\p{N}.,-]$/u;
 
 /**
  * Keys that type into the field from a control beside it (a toolbar's, the chip, a copy button):

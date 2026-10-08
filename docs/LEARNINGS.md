@@ -521,6 +521,7 @@ Format:
 
 **What happened.** The selection lab, a new `/dev` page, rendered in the dev server with some of its Tailwind classes missing: `opacity-0` and `appearance-none` had no rules, so a native menu meant to be unseen showed through, arrow and all. Two causes stacked. The island was `client:only`, and in dev Astro inlines the CSS of the server's module graph, where a client-only island never appears. And the dev server had been running since before the file existed, so Tailwind had not scanned it. A production build scans every source and was never affected.
 **Rule.** Render islands with `client:load`, as the other labs do, so their classes reach the page's CSS. When a new file's classes are still missing in a long-running dev server, saving `src/styles/global.css`, with no change, makes Tailwind rescan; restarting the server does too.
+**Came back (2026-10-08).** New layout classes in an existing island (`grid-rows-subgrid`, `md:*:row-span-3`) were missing from the long-running dev server's page CSS, and the open calculator's keys spilled past its card in the owner's tab while a fresh headless load looked right. Re-saving `src/styles/global.css` unchanged made Tailwind rescan. **Promoted** to CLAUDE.md, "Commands".
 
 ## 2026-10-07 — A menu that closes on blur shuts before a pick lands
 

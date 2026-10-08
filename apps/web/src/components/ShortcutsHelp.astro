@@ -13,10 +13,9 @@ const titleId = 'shortcuts-title';
  * all; open, its shell (lib/recipes.ts) takes the fluid-shell edge, surface, and shadow and grows
  * left and down from the icon over the page, the way the theme menu grows out of its trigger.
  * While it is open, the shell's accent edge is the icon's focus indicator, as a field's is, so the
- * icon draws no ring of its own. A
- * mouse resting on it opens it for a look, a click pins it open, and Escape, a click elsewhere,
- * or focus leaving closes it, so the content can be hovered, dismissed, and stays put until then
- * (WCAG 1.4.13). The inline script in layouts/Base.astro drives it, so it adds no bundle; Button
+ * icon draws no ring of its own. A mouse resting on it, or the keyboard reaching it, opens it for
+ * a look, a click pins it open, and Escape, a click elsewhere, or focus leaving closes it, so the
+ * content can be hovered, dismissed, and stays put until then (WCAG 1.4.13). The inline script in layouts/Base.astro drives it, so it adds no bundle; Button
  * and the icon are TSX components rendered to static HTML. Hidden on touch-first devices, which
  * have no keyboard to use, and below the sm breakpoint, where a panel growing left from beside the
  * theme menu would run off the screen. The list itself lives in src/lib/shortcuts.ts.

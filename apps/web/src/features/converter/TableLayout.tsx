@@ -106,10 +106,10 @@ export interface TableLayoutProps {
  * led by the category menu, the field, and in the table's place the categories to start from,
  * the category's units with their values, or the units a typed query matches. The table is the
  * unit list: the caret stays in the field while a cursor the field points at
- * (aria-activedescendant) moves through whatever the table's place shows, the arrows going round
- * from the menu through the field and every row and back. Typing anywhere in the layout, or with
- * nothing focused on the page, lands in the field; Escape steps back one thing at a time, from
- * browsing the table to an empty page.
+ * (aria-activedescendant) moves through whatever the table's place shows, the arrows going on past
+ * the field and the last row to the page's other planes (ADR 0014). Typing anywhere in the layout,
+ * or with nothing focused on the page, lands in the field; Escape steps back one thing at a time,
+ * from browsing the table to an empty page.
  */
 export function TableLayout({
   tools,
@@ -373,8 +373,8 @@ export function TableLayout({
         return;
       }
       case 'ArrowDown':
-        // The loop: the menu, the field, every row, and round to the menu again, each step from
-        // where the cursor is, the unit in the box while it rests there.
+        // From the field down every row, each step from where the cursor is (the unit in the box
+        // while it rests there), and past the last row on to the next plane, the header's toolbar.
         event.preventDefault();
         if (at < 0 && rowCount > 0) setPosition(0);
         else if (at >= 0 && at + step < rowCount) setPosition(at + step);

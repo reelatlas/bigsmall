@@ -41,10 +41,9 @@ const HINT = 'Type a number, unit, or both to compare all at once.';
 
 /**
  * The converter island (ADR 0012, ADR 0013, docs/UX-SPEC.md §1): the hint; the toolbar's
- * buttons (calculator, undo, redo, clear all), which TableLayout sets in a row with the category
+ * buttons (calculator, undo, redo, clear all), which TableLayout sets in a row after the category
  * menu; the box and its table, with the calculator when open between them or beside them (§8);
- * and the live regions. It draws the Copy URL button
- * into the header's slot (§7).
+ * and the live regions. It draws the Copy URL button into the header's slot (§7).
  */
 export function Converter() {
   const hydrated = useIsHydrated();

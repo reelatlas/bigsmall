@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useFitStep } from '../lib/fit-step';
-import { CARD, cx, FIELD_ROW, NUMBER_SIZES } from '../lib/recipes';
+import { CARD, cx, FIELD_ROW, NO_ANSWER, NUMBER_SIZES } from '../lib/recipes';
 import { nextInDirection, type Box, type Direction } from '../lib/spatial';
 import { Button, type ButtonVariant } from './Button';
 import { BackspaceIcon, CloseIcon, CopiedIcon } from './icons';
@@ -307,11 +307,7 @@ export function Calculator({
             {display || <span className="text-ink-muted">0</span>}
           </div>
           {message && (
-            <span
-              id={messageId}
-              className="shrink-0 text-sm font-medium text-danger"
-              data-calculator-message
-            >
+            <span id={messageId} className={cx('shrink-0', NO_ANSWER)} data-calculator-message>
               {message}
             </span>
           )}

@@ -79,6 +79,12 @@ export function unitSymbol(alone = false): string {
   return cx('font-numeric font-semibold', alone ? 'text-ink' : 'text-ink-muted');
 }
 
+/**
+ * Why a value has no answer, said short in its place ("Too large"): a table row's, and the
+ * calculator display's at its right.
+ */
+export const NO_ANSWER = 'text-sm font-medium text-danger';
+
 // Lists a field's cursor moves through (docs/DESIGN-SYSTEM.md, "Lists"): the table, the matches,
 // and the start's categories, whose rows the arrows reach while the caret stays in the field.
 

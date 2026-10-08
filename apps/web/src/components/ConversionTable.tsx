@@ -1,5 +1,5 @@
 import { useId, type ButtonHTMLAttributes } from 'react';
-import { CARD, CURSOR_ROW, cx, rowFill, unitSymbol } from '../lib/recipes';
+import { CARD, CURSOR_ROW, cx, NO_ANSWER, rowFill, unitSymbol } from '../lib/recipes';
 import { Button } from './Button';
 import { CopiedIcon, CopyIcon } from './icons';
 
@@ -69,7 +69,7 @@ function splitExponent(symbol: string): [base: string, exponent: string] {
 const TONE: Record<ConversionRow['tone'], string> = {
   value: 'text-ink',
   empty: 'text-ink-muted',
-  message: 'text-sm font-medium text-danger',
+  message: NO_ANSWER,
 };
 
 /**

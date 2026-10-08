@@ -39,3 +39,7 @@ Behavior: docs/UX-SPEC.md §1, §8, §9, §12.
 - Typing from anywhere with nothing focused is a single-key shortcut by WCAG 2.1.4's reading. It only types into the field and never acts, and no other single-key shortcut exists; if one is ever added, revisit this.
 - The server's page carries both layouts' empty state, the table layout's being the menu, the box, and the start's categories.
 - Still open, for after Sean uses it (docs/UX-SPEC.md §14): an all-clear control, a chosen category in the URL, and typing from anywhere reaching the first of two boxes.
+
+## Outcome notes (2026-10-07)
+
+- The selection lab retired once A shipped; it is in git as of commit `f1321b0` (`apps/web/src/pages/dev/_selection-lab/`).

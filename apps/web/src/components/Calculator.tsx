@@ -120,6 +120,10 @@ export interface CalculatorProps {
  * other keys stay out of the Tab order, and a click on one returns the keyboard to the calculator
  * without moving focus off the key Enter would press. Clicking elsewhere on the page leaves it
  * open. What a key does is the caller's (features/converter/calculator.ts).
+ *
+ * The card is three parts, one after another: the title row, the display, and the keys with the
+ * footer. A host that makes the card a subgrid lines them up with rows of its own (TableLayout
+ * from md: the display level with the box).
  */
 export function Calculator({
   display,
@@ -297,7 +301,7 @@ export function Calculator({
         </Button>
       </div>
       {/* The display has a field's size and edge, so it reads as where the typing goes. */}
-      <div className="mb-3 rounded-lg border-2 border-edge bg-surface">
+      <div className="rounded-lg border-2 border-edge bg-surface">
         <div className={FIELD_ROW}>
           <div ref={displayRef} className={cx(DISPLAY_TEXT, size)} data-entry>
             {display || <span className="text-ink-muted">0</span>}
@@ -313,24 +317,31 @@ export function Calculator({
           )}
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-2">
-        {keys.map((def) => (
-          <Button
-            key={def.key}
-            variant={def.variant}
-            aria-label={def.name}
-            aria-describedby={def.key === 'equals' && message ? messageId : undefined}
-            tabIndex={def.key === 'equals' ? undefined : -1}
-            data-calculator-stop={def.key === 'equals' ? 'equals' : undefined}
-            onClick={() => onPress(def.key)}
-            className="min-h-12 font-numeric text-lg"
-          >
-            {def.face}
-          </Button>
-        ))}
+      {/*
+        The keys and the footer, one part, 12 px under the display. The gaps are the title row's
+        bottom margin and this top margin, never the display's own, so in a host's rows (subgrid)
+        the display stays exactly as tall as its row.
+      */}
+      <div className="mt-3">
+        <div className="grid grid-cols-4 gap-2">
+          {keys.map((def) => (
+            <Button
+              key={def.key}
+              variant={def.variant}
+              aria-label={def.name}
+              aria-describedby={def.key === 'equals' && message ? messageId : undefined}
+              tabIndex={def.key === 'equals' ? undefined : -1}
+              data-calculator-stop={def.key === 'equals' ? 'equals' : undefined}
+              onClick={() => onPress(def.key)}
+              className="min-h-12 font-numeric text-lg"
+            >
+              {def.face}
+            </Button>
+          ))}
+        </div>
+        {/* One column per send button, shared equally: two split the row, one fills it. */}
+        {footer && <div className="mt-2 grid auto-cols-fr grid-flow-col gap-2">{footer}</div>}
       </div>
-      {/* One column per send button, shared equally: two split the row, one fills it. */}
-      {footer && <div className="mt-2 grid auto-cols-fr grid-flow-col gap-2">{footer}</div>}
     </div>
   );
 }

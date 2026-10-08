@@ -24,12 +24,14 @@ import type { ConverterEnv } from './useConverter';
 
 /**
  * The converter from md (docs/UX-SPEC.md §1): the toolbar, the box, and its table in the first
- * column, and the calculator in a column of its own on their right, level with the box and
- * spanning its rows; the last row takes any height the calculator adds, so the table always sits
- * right under the box. Below md the calculator opens between the box and the table, flush left.
+ * column, and the calculator in a column of its own on their right. Its card is a subgrid of the
+ * first three rows, so its title row sits level with the toolbar, its display level with the box,
+ * and its keys in the third row, which the table shares with the last; the last row, 1fr, takes
+ * the rest of a long table, so the card hugs its keys and the table always sits right under the
+ * box. Below md the calculator opens between the box and the table, flush left.
  */
 const TABLE_GRID =
-  'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_1fr] md:gap-x-4';
+  'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_auto_1fr] md:gap-x-4';
 /**
  * The toolbar row, as wide as the box: the tools at its left, the category menu at its right end,
  * its right edge on the box's. Where the row has no room for both, the menu wraps onto a line of
@@ -42,9 +44,15 @@ const TABLE_TOOLS_ROW =
 const TABLE_TOOLS = '-ml-3 flex shrink-0 items-center gap-1';
 const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
 /** 16 px under the box or the calculator; a container, so the categories go four across once it has the room. */
-const TABLE_ROWS_CELL = '@container mt-4 max-w-xl md:col-start-1 md:row-start-3';
+const TABLE_ROWS_CELL = '@container mt-4 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';
+/**
+ * The calculator's column from md: a subgrid of the first three rows, and the card in it one too
+ * (`*:`), its three parts in the three rows. The card's top padding shrinks to 1 px there, so its
+ * title row, 44 px and its 8 px margin, sits as high as the toolbar's icons and never makes the
+ * first row taller.
+ */
 const TABLE_CALCULATOR_CELL =
-  'md:col-start-2 md:row-span-2 md:row-start-2 md:mt-0 md:w-72 md:self-start';
+  'md:col-start-2 md:row-span-3 md:row-start-1 md:mt-0 md:grid md:w-72 md:grid-rows-subgrid md:*:row-span-3 md:*:grid md:*:grid-rows-subgrid md:*:pt-px';
 
 /**
  * Keys that start typing in the field when nothing on the page has focus: a letter, a digit, or

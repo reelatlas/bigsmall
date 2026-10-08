@@ -572,3 +572,8 @@ Format:
 
 **What happened.** The table's cursor rested again when focus left `TableLayout`'s root, which then held only the menu, the box, and the table. When the toolbar moved into the same root, clicking the calculator icon no longer left it, and the cursor stayed lit while focus was on the toolbar. A browser test caught it.
 **Rule.** Write a focus rule against the parts it is about (the box and its table: `fieldRef`, `placeRef`), not against whichever wrapper holds them today.
+
+## 2026-10-08 — Line a column's parts up with the rows beside it: subgrid, and a row for the long side
+
+**What happened.** Sean asked for the calculator's top to sit level with the toolbar and its display level with the box. Matching them with padding would have tuned the card to the toolbar's height, and broken as soon as the toolbar wrapped. Made a subgrid of the converter's rows, the card's parts sit in those rows by construction. Two things had to hold: the card's padding and border land on its first and last parts as margin, so its title row had to fit the toolbar's row (1 px of top padding there); and a margin on the display would have made the box's row taller, so the gaps went on the title row and the keys instead. A table spanning the same third row would also have stretched the card to the table's length, so the table spans that row and a last `1fr` row, which takes the rest.
+**Rule.** To line parts of one column up with another column's rows, make it a subgrid of those rows rather than matching numbers. Keep margins off the parts whose rows must not grow, fit the edge parts' padding inside the edge rows, and give a long neighbor a `1fr` row of its own after the shared ones, so the subgrid hugs its content.

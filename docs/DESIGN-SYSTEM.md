@@ -115,7 +115,7 @@ A class list more than one file builds from is a recipe in `src/lib/recipes.ts`,
 
 - **2 px is a control's edge.** Fields, the theme menu, and secondary buttons share `border-2` in `--edge`, so no control looks lighter-edged than its neighbor. A border is the one edge children cannot paint over; an inset ring is drawn under them, which is how row highlights once ate into it.
 - **1 px is a divider or a keycap.** The line under a menu's trigger, between the matches' groups, the toolbar divider (`border-l`), and keycaps use `border`.
-- **Open is accent.** A shell's edge is `border-edge` at rest and `border-accent` while open or while something inside has focus.
+- **Open is accent.** A shell's edge is `border-edge` at rest and `border-accent` while open or while something inside has focus. The calculator's card does the same while focus is inside it: its 1 px border and a 1 px ring turn accent, 2 px like a focused box, so nothing moves.
 - **A control's edge identifies it.** `--edge` passes 3:1 against the page and the surface in every theme, so a field's resting edge meets WCAG 1.4.11 by itself, and the theme test enforces it. `--line` stays subtle because a divider only groups. Each theme's `--edge` is its `--line` moved toward `--ink` to the first step past 3:1. Introduced 2026-10-06 as a trial the owner may roll back (findings-0, sixth pass).
 
 ### Focus
@@ -194,7 +194,7 @@ The converter's box is `ValueField`, placed by `TableLayout`: it takes a shell's
 
 ### Calculator
 
-- A card: `CARD` with `p-3 shadow-sm`, in the `Calculator` component. The converter places it with `CALCULATOR_PLACE`, at most `max-w-sm` wide: between the box and the table, flush left 16 px under the box, and from `md` in a column of its own (`w-72`) right of them (see "A column beside a pair of rows").
+- A card: `CARD` with `p-3 shadow-sm`, in the `Calculator` component; while focus is inside it, where the keys go, its edge turns accent (`ACTIVE`: the border and `ring-1` in `--accent`, easing like a shell's edge), as a focused box's does. Introduced 2026-10-08 as a trial in its own commit. The converter places it with `CALCULATOR_PLACE`, at most `max-w-sm` wide: between the box and the table, flush left 16 px under the box, and from `md` in a column of its own (`w-72`) right of them (see "A column beside a pair of rows").
 - **Header**: the title "Calculator" (`text-sm font-medium text-ink-muted`, labelling the group) and a ghost close button.
 - **Display**: a field's geometry, `rounded-lg border-2 border-edge bg-surface` around `FIELD_ROW`, so it is the same size as the box; the entry in `font-numeric` stepping down through `NUMBER_SIZES` (`src/lib/recipes.ts`) and keeping its end in view past the smallest; drawn by `NumberText`, so exponent markers and the running value look as they do in a box; a muted 0 when empty; at the row's right, why the entry has no value ("Too large"), in `text-sm font-medium text-danger`, like a table row's "Too large".
 - **Keys** are `Button`s at `min-h-12` with `font-numeric text-lg`, four to a row (`gap-2`): digits secondary; C, ⌫, E, and the decimal mark `tonal`; the five operators `soft`; = primary.

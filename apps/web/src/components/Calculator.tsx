@@ -70,6 +70,13 @@ function boxOf(element: HTMLElement): Box & { element: HTMLElement } {
 /** The title, which names the calculator's group: a label over what it names. */
 const TITLE = 'text-sm font-medium text-ink-muted';
 
+/**
+ * The card while focus is inside it, where the keys go: its edge turns accent, 2 px like a
+ * focused box (its 1 px border and a 1 px ring, so nothing moves), easing as the shells' edges do.
+ */
+const ACTIVE =
+  'transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-1 focus-within:ring-accent';
+
 /** The display's text: one line, sized down like a long number in a field, its end kept in view. */
 const DISPLAY_TEXT = 'min-w-0 flex-1 overflow-hidden font-numeric whitespace-pre text-ink';
 
@@ -268,7 +275,7 @@ export function Calculator({
       ref={groupRef}
       role="group"
       aria-labelledby={titleId}
-      className={cx(CARD, 'p-3 shadow-sm')}
+      className={cx(CARD, 'p-3 shadow-sm', ACTIVE)}
     >
       <div className="mb-2 flex items-center justify-between">
         <h2 id={titleId} className={cx('pl-1', TITLE)}>

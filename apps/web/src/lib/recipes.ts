@@ -64,7 +64,7 @@ export const SHELL_PANEL = 'hidden border-t border-line group-data-open:block';
 // shared by the theme menu (ThemePicker.astro) and the category menu (CategoryMenu.tsx).
 
 /**
- * A ghost menu's shell (the theme and category menus, a trial): nothing at rest, so its trigger is
+ * A ghost menu's shell (the theme and category menus): nothing at rest, so its trigger is
  * all there is to see; open, a card around the trigger and its list, the same size. The card's
  * accent edge is a 2 px outline drawn inside its edge: like a border, nothing inside can paint over
  * it, and unlike one it takes no room, so nothing moves when it appears. Nothing clips at rest, so

@@ -9,7 +9,7 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
 /*
  * The theme menu: at rest a ghost, its label, name, and chevron with no edge or fill, as the icon
  * buttons beside it are; open, a card around the trigger and its options, the same width
- * (lib/recipes.ts, a local trial). No bundle: the inline script in layouts/Base.astro opens and closes it
+ * (lib/recipes.ts). No bundle: the inline script in layouts/Base.astro opens and closes it
  * (data-shell), applies and saves the chosen radio, and fills in the current name. The options are
  * native radios, so arrow keys, Space, and screen readers work without any script. The trigger
  * covers the whole menu and never changes size; option rows use rounded-nested-md, the md corner

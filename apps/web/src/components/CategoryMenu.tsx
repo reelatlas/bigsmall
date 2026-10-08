@@ -31,9 +31,9 @@ export interface CategoryMenuProps {
 /**
  * The converter's category menu (docs/UX-SPEC.md §1), built from the same recipes as the theme
  * menu: at rest a ghost, the name and its chevron with no edge or fill; open, a card around the
- * trigger and its choices, the same width (a local trial). Its trigger shows the category's name and is as wide as the widest, so the toolbar keeps
- * it on its line until there is truly no room; open, it keeps that width, as the theme menu does,
- * its trigger reading "Category" over the list and its counts bare numbers in the room the chevron
+ * trigger and its choices, the same size. Its trigger shows the category's name, and the menu is as
+ * wide as the widest, so the toolbar keeps it on its line until there is truly no room; open, its
+ * trigger reads "Category" over the list, and its counts are bare numbers in the room the chevron
  * takes. The choices are native radios. The arrows move through them without choosing, since a
  * new category takes the unit out of the box and each choice is a step to undo; Enter, a click, or
  * a tap chooses, and Escape, a click outside, or focus leaving closes it unchanged. While a unit is

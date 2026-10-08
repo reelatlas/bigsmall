@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { PLANE_EVENT } from '../lib/planes';
 import { APPLE_PLATFORM } from '../lib/platform';
 import { SITE } from '../lib/site';
 import { PEEK_CLOSE_MS, PEEK_OPEN_MS } from '../lib/timing';
@@ -53,11 +54,13 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         applePlatformFlags: APPLE_PLATFORM.flags,
         peekOpen: PEEK_OPEN_MS,
         peekClose: PEEK_CLOSE_MS,
+        planeEvent: PLANE_EVENT,
       }}
     >
       // Runs inline before first paint: applies the saved theme (no flash) and drives the header
-      // menus (theme, keyboard shortcuts) by delegation, so they never wait for a JS bundle. Values
-      // come from src/lib/themes.ts via define:vars, so there is one source of truth.
+      // menus (theme, keyboard shortcuts) and the page's toolbars and planes by delegation, so
+      // they never wait for a JS bundle. Values come from src/lib via define:vars, so there is one
+      // source of truth.
       const apply = (id) => {
         document.documentElement.dataset.theme = id;
         for (const option of document.querySelectorAll('[data-theme-option]')) {
@@ -203,6 +206,95 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
           if (focusWasInside) toggleOf(shell)?.focus();
           event.preventDefault();
         }
+      });
+
+      // Toolbars and planes (docs/UX-SPEC.md §8, ADR 0014). A [role=toolbar] is one Tab stop: ←
+      // and → (Home, End) move along its [data-tool] controls in the order they show, round from
+      // end to end, and the control last reached stays its stop (a roving tabindex; before that,
+      // its [data-default-tool], or its first). ↑ and ↓ move between the page's [data-plane]s, top
+      // to bottom and round, landing on a toolbar's stop or a plane's first control; the
+      // converter's box, a plane of its own, hands its ↑ and ↓ over once its rows run out (a
+      // planeEvent from src/lib/planes.ts). Escape on a tool goes back to the box. Only a tool
+      // itself answers, so a menu open inside a toolbar keeps its own keys.
+      const shown = (element) => element.getClientRects().length > 0;
+      const toolsOf = (bar) =>
+        [...bar.querySelectorAll('[data-tool]')].filter(shown).sort((a, b) => {
+          const [ra, rb] = [a.getBoundingClientRect(), b.getBoundingClientRect()];
+          const sameLine = Math.abs(ra.top - rb.top) < Math.min(ra.height, rb.height) / 2;
+          return sameLine ? ra.left - rb.left : ra.top - rb.top;
+        });
+      const stopOf = (bar) => {
+        const tools = toolsOf(bar);
+        return (
+          tools.find((tool) => tool.getAttribute('tabindex') === '0') ??
+          tools.find((tool) => tool.dataset.tool === bar.dataset.defaultTool) ??
+          tools[0]
+        );
+      };
+      const makeStop = (bar, stop) => {
+        for (const tool of bar.querySelectorAll('[data-tool]')) {
+          tool.setAttribute('tabindex', tool === stop ? '0' : '-1');
+        }
+      };
+      // Each toolbar keeps exactly one stop, also once an island has drawn a tool into it (Copy URL).
+      const settleToolbars = () => {
+        for (const bar of document.querySelectorAll('[role="toolbar"]')) {
+          const stop = stopOf(bar);
+          if (stop) makeStop(bar, stop);
+        }
+      };
+      document.addEventListener('DOMContentLoaded', settleToolbars);
+      const planeEntry = (plane) =>
+        plane.matches('[role="toolbar"]') ? stopOf(plane) : plane.querySelector('input, button');
+      const movePlane = (from, step) => {
+        const planes = [...document.querySelectorAll('[data-plane]')].filter(shown);
+        const at = planes.findIndex((plane) => plane.contains(from));
+        if (planes.length < 2 || at < 0) return;
+        planeEntry(planes[(at + step + planes.length) % planes.length])?.focus();
+      };
+      document.addEventListener(planeEvent, (event) => movePlane(event.target, event.detail));
+      document.addEventListener('focusin', (event) => {
+        const tool = event.target instanceof Element ? event.target.closest('[data-tool]') : null;
+        const bar = tool === event.target ? tool.closest('[role="toolbar"]') : null;
+        if (!bar) return;
+        makeStop(bar, tool);
+        // Reached with the keyboard, the shortcuts icon shows its map, as a resting mouse does;
+        // moving on closes it, as focus leaving any shell does.
+        const shell = tool.closest('[data-shell-hover]');
+        if (shell && tool.matches(':focus-visible') && !shell.hasAttribute('data-open')) {
+          closeAll(shell);
+          setOpen(shell, true, false);
+        }
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Tab') settleToolbars();
+        if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+        const tool = event.target instanceof Element ? event.target.closest('[data-tool]') : null;
+        const bar = tool === event.target ? tool.closest('[role="toolbar"]') : null;
+        if (!bar) return;
+        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+          event.preventDefault();
+          movePlane(bar, event.key === 'ArrowDown' ? 1 : -1);
+          return;
+        }
+        if (event.key === 'Escape') {
+          const box = document.querySelector('[data-plane="box"]');
+          if (!box) return;
+          event.preventDefault();
+          planeEntry(box)?.focus();
+          return;
+        }
+        const tools = toolsOf(bar);
+        const at = tools.indexOf(tool);
+        const next = {
+          ArrowRight: tools[(at + 1) % tools.length],
+          ArrowLeft: tools[(at - 1 + tools.length) % tools.length],
+          Home: tools[0],
+          End: tools[tools.length - 1],
+        }[event.key];
+        if (!next) return;
+        event.preventDefault();
+        next.focus();
       });
     </script>
   </head>

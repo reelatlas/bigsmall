@@ -19,6 +19,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0011](0011-listed-order.md)            | Units listed the visitor's way: their own system first, smallest to largest | accepted                                        |
 | [0012](0012-table-as-unit-list.md)      | The table is the unit list: a category menu, and a cursor in the field      | accepted                                        |
 | [0013](0013-one-layout.md)              | One layout: the table; two boxes and the layout switch retire               | accepted                                        |
+| [0014](0014-planes.md)                  | The arrow keys move between the page's planes: two toolbars and the box     | accepted                                        |
 
 ## Template
 

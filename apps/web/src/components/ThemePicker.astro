@@ -42,6 +42,7 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
     <button
       type="button"
       data-shell-toggle
+      data-tool="theme"
       aria-expanded="false"
       aria-controls={menuId}
       class:list={[MENU_TRIGGER, 'justify-center sm:justify-between']}

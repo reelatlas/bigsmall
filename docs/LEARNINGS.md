@@ -562,3 +562,13 @@ Format:
 
 **What happened.** The category menu took its value from the table's view, and the matches' view carried no category, so while a unit was typed the menu fell back on the box's unit. With a unit in the box that named the same category; with a category chosen and no unit, the menu read "Choose a category" while the table still ranked that category's matches first. The second tidy pass found it by trying both states.
 **Rule.** Every view a control reads carries the state the control names (the units and the matches both carry the category the converter is in; the start, by definition, has none), so no consumer rebuilds it from a stand-in that agrees only some of the time. A control's test covers each state that reaches it: here, with and without a unit in the box.
+
+## 2026-10-08 — An inline script can keep an attribute on an island's element
+
+**What happened.** The page's toolbars keep their roving tabindex from the inline script in `Base.astro`, on buttons the converter island renders too. Preact's hydration diffs only event handlers against the server's markup, and later renders touch only the props they name, so the tabindex the script sets survives both.
+**Rule.** An inline script may own an attribute on an island's element only while the island never passes that attribute as a prop; a prop's value would come back on the next render. An element the island draws after hydration (Copy URL, in the header's slot) starts without it, so the script settles every toolbar again whenever it acts (on Tab, and on focus).
+
+## 2026-10-08 — A focus rule written against a wrapper breaks when the wrapper gains parts
+
+**What happened.** The table's cursor rested again when focus left `TableLayout`'s root, which then held only the menu, the box, and the table. When the toolbar moved into the same root, clicking the calculator icon no longer left it, and the cursor stayed lit while focus was on the toolbar. A browser test caught it.
+**Rule.** Write a focus rule against the parts it is about (the box and its table: `fieldRef`, `placeRef`), not against whichever wrapper holds them today.

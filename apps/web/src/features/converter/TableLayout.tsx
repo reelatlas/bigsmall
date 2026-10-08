@@ -16,6 +16,7 @@ import { CategoryTiles } from '../../components/CategoryTiles';
 import { ConversionTable, type ConversionTableProps } from '../../components/ConversionTable';
 import { UnitMatches } from '../../components/UnitMatches';
 import { ValueField } from '../../components/ValueField';
+import { stepPlane } from '../../lib/planes';
 import { CALCULATOR_PLACE, cx } from '../../lib/recipes';
 import { evaluatedText } from './calculator';
 import { noMatchMessage, type BoxView, type HistoryAction, type TableView } from './state';
@@ -106,8 +107,7 @@ export function TableLayout({
   const listId = useId();
   const itemId = (index: number) => `${listId}-item-${index}`;
   const rootRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
   const placeRef = useRef<HTMLDivElement>(null);
   /**
@@ -153,10 +153,12 @@ export function TableLayout({
     return Math.max(count, 1);
   };
 
-  /** Focus onto the menu's trigger, the stop above the field in the arrows' loop. */
-  const focusMenu = () => {
-    triggerRef.current?.focus();
-    setPosition(null);
+  /**
+   * Past the field or the last row, ↑ and ↓ go on to the plane above or below, the toolbar or
+   * the header (ADR 0014); the cursor rests again as focus leaves.
+   */
+  const leaveBox = (step: 1 | -1) => {
+    if (inputRef.current) stepPlane(inputRef.current, step);
   };
 
   /**
@@ -187,11 +189,10 @@ export function TableLayout({
     setPosition(null);
   };
 
-  // Keys pressed on the layout's other parts: the menu, the chip, a copy button. Native
-  // listeners: the wrapper is not itself interactive. The calculator keeps its own keys.
-  // - Escape brings the caret back to the field; on the menu's trigger, the ladder's last step,
-  //   it lets go of focus, leaving just the page.
-  // - On the trigger the arrows go on round the loop: up to the last row, down to the field.
+  // Keys pressed on the layout's other parts: the toolbar, the chip, a copy button. Native
+  // listeners: the wrapper is not itself interactive. The calculator keeps its own keys, and the
+  // toolbar's arrows and Escape are the page's toolbar controller's (layouts/Base.astro).
+  // - Escape on the chip or a copy button brings the caret back to the field.
   // - A letter, a digit, or Backspace lands in the field, as typing in a combobox's list does
   //   (WAI-ARIA). Space keeps its own job on a button or a radio.
   // Bound in a layout effect, so a key pressed straight after another finds the latest state.
@@ -202,22 +203,13 @@ export function TableLayout({
       const input = inputRef.current;
       const target = event.target as Node;
       if (!input || target === input || event.defaultPrevented || event.isComposing) return;
-      const own = [menuRef, fieldRef, placeRef].some((part) => part.current?.contains(target));
+      const own = [toolsRef, fieldRef, placeRef].some((part) => part.current?.contains(target));
       if (!own) return;
-      const onTrigger = target === triggerRef.current;
       if (event.key === 'Escape') {
-        event.preventDefault();
-        if (onTrigger) triggerRef.current?.blur();
-        else {
-          input.focus();
-          setPosition(null);
-        }
-        return;
-      }
-      if (onTrigger && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+        if ((target as Element).closest('[data-tool]')) return;
         event.preventDefault();
         input.focus();
-        setPosition(event.key === 'ArrowUp' ? rowCount - 1 : null);
+        setPosition(null);
         return;
       }
       if (event.ctrlKey || event.metaKey || event.altKey) return;
@@ -348,12 +340,12 @@ export function TableLayout({
         event.preventDefault();
         if (at < 0 && rowCount > 0) setPosition(0);
         else if (at >= 0 && at + step < rowCount) setPosition(at + step);
-        else focusMenu();
+        else leaveBox(1);
         return;
       case 'ArrowUp':
         event.preventDefault();
         if (at >= 0) setPosition(at - step >= 0 ? at - step : -1);
-        else focusMenu();
+        else leaveBox(-1);
         return;
       case 'Enter': {
         // On a row, take it. In the field: a typed unit takes its best match; arithmetic becomes
@@ -435,22 +427,28 @@ export function TableLayout({
       }}
     >
       <div className={TABLE_GRID}>
-        <div className={TABLE_TOOLS_ROW}>
+        {/* The converter's toolbar, the page's second plane (ADR 0014): first reached at the menu. */}
+        <div
+          ref={toolsRef}
+          role="toolbar"
+          aria-label="Tools"
+          className={TABLE_TOOLS_ROW}
+          data-plane="tools"
+          data-default-tool="category"
+        >
           <div className={TABLE_TOOLS}>{tools}</div>
-          <div ref={menuRef}>
-            <CategoryMenu
-              categories={table.categories}
-              value={chosen}
-              counts={table.kind === 'matches' ? table.counts : undefined}
-              triggerRef={triggerRef}
-              onChoose={(category) => {
-                choose(category);
-                inputRef.current?.focus();
-              }}
-            />
-          </div>
+          <CategoryMenu
+            categories={table.categories}
+            value={chosen}
+            counts={table.kind === 'matches' ? table.counts : undefined}
+            tool="category"
+            onChoose={(category) => {
+              choose(category);
+              inputRef.current?.focus();
+            }}
+          />
         </div>
-        <div ref={fieldRef} className={TABLE_BOX_CELL}>
+        <div ref={fieldRef} className={TABLE_BOX_CELL} data-plane="box">
           <ValueField
             inputRef={inputRef}
             label="Value"

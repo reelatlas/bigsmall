@@ -245,6 +245,7 @@ export function Converter() {
               variant="ghost"
               square
               id={calculatorToggleId}
+              data-tool="calculator"
               aria-label="Calculator"
               aria-keyshortcuts="Alt+C"
               title={apple ? 'Calculator (⌥C)' : 'Calculator (Alt+C)'}
@@ -265,22 +266,24 @@ export function Converter() {
             <Button
               variant="ghost"
               square
+              data-tool="undo"
               aria-label="Undo"
               aria-keyshortcuts="Control+Z Meta+Z"
               title={apple ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)'}
-              disabled={!canUndo}
-              onClick={() => dispatch({ type: 'undo' })}
+              aria-disabled={!canUndo || undefined}
+              onClick={() => canUndo && dispatch({ type: 'undo' })}
             >
               <UndoIcon />
             </Button>
             <Button
               variant="ghost"
               square
+              data-tool="redo"
               aria-label="Redo"
               aria-keyshortcuts="Control+Y Control+Shift+Z Meta+Shift+Z Meta+Y"
               title={apple ? 'Redo (⇧⌘Z)' : 'Redo (Ctrl+Y)'}
-              disabled={!canRedo}
-              onClick={() => dispatch({ type: 'redo' })}
+              aria-disabled={!canRedo || undefined}
+              onClick={() => canRedo && dispatch({ type: 'redo' })}
             >
               <RedoIcon />
             </Button>
@@ -289,10 +292,11 @@ export function Converter() {
             <Button
               variant="ghost"
               square
+              data-tool="clear"
               aria-label="Clear all"
               title="Clear all"
-              disabled={isEmpty}
-              onClick={clearAll}
+              aria-disabled={isEmpty || undefined}
+              onClick={() => !isEmpty && clearAll()}
             >
               <EraserIcon />
             </Button>
@@ -326,6 +330,7 @@ export function Converter() {
           <Button
             variant="ghost"
             square
+            data-tool="copy-url"
             aria-label="Copy URL"
             title="Copy URL"
             onClick={() => copy(urlFor(state, env.separators, window.location), 'url')}

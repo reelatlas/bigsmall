@@ -1,5 +1,5 @@
 import type { Category, CategoryId } from '@bigsmall/core';
-import { useId, useLayoutEffect, useRef, useState, type FocusEvent, type RefObject } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type FocusEvent } from 'react';
 import {
   cx,
   MENU_CHEVRON,
@@ -19,8 +19,8 @@ export interface CategoryMenuProps {
   counts?: Partial<Record<CategoryId, number>> | undefined;
   /** A choice was made, with Enter or a click: the menu has closed. */
   onChoose: (id: CategoryId) => void;
-  /** The trigger, for a host whose keys move focus onto it (TableLayout's arrow loop). */
-  triggerRef?: RefObject<HTMLButtonElement>;
+  /** Its name as a control of the toolbar it sits in (`data-tool`, ADR 0014), if it is in one. */
+  tool?: string;
 }
 
 /**
@@ -31,21 +31,14 @@ export interface CategoryMenuProps {
  * chooses, and Escape, a click outside, or focus leaving closes it unchanged. While a unit is
  * typed, each choice says how many of its units match.
  */
-export function CategoryMenu({
-  categories,
-  value,
-  counts,
-  onChoose,
-  triggerRef,
-}: CategoryMenuProps) {
+export function CategoryMenu({ categories, value, counts, onChoose, tool }: CategoryMenuProps) {
   const menuId = useId();
   const groupName = useId();
   const [open, setOpen] = useState(false);
   /** The choice the arrows have reached while open: the chosen category until they move. */
   const [reached, setReached] = useState<CategoryId | null>(value);
   const rootRef = useRef<HTMLDivElement>(null);
-  const ownTriggerRef = useRef<HTMLButtonElement>(null);
-  const trigger = triggerRef ?? ownTriggerRef;
+  const trigger = useRef<HTMLButtonElement>(null);
   const chosenName = categories.find((category) => category.id === value)?.name;
 
   const choose = (id: CategoryId) => {
@@ -113,6 +106,7 @@ export function CategoryMenu({
         <button
           ref={trigger}
           type="button"
+          data-tool={tool}
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => {

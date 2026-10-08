@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { ANNOUNCE_MS, COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
-import { applyTheme, box, expectNoA11yViolations, MARGIN_MS, ready } from './support';
+import { applyTheme, box, expectNoA11yViolations, MARGIN_MS, menu, ready } from './support';
 
 // The converter (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §5, §7–§9, §11): one box, a category menu
 // over it, and in the table's place the categories to start from, the category's units with their
@@ -9,7 +9,6 @@ import { applyTheme, box, expectNoA11yViolations, MARGIN_MS, ready } from './sup
 // through the table. The calculator's own flows are in calculator.spec.ts. Visitors are in the
 // US: their own units come first (ADR 0011).
 
-const menu = (page: Page) => page.getByRole('button', { name: /^(Choose a category|Category)/ });
 const row = (page: Page, unitId: string) => page.locator(`[data-row="${unitId}"]`);
 /** A row's unit cell: what a click takes and the cursor lands on. */
 const unitCell = (page: Page, unitId: string) => row(page, unitId).getByRole('gridcell').first();
@@ -230,7 +229,7 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   await expect(page.getByRole('button', { name: 'Remove Fahrenheit' })).toBeVisible();
 });
 
-test('keyboard: the arrows loop through the menu, the field, and every row, from the unit in the box', async ({
+test('keyboard: the arrows go through every row from the unit in the box, then on round the page', async ({
   page,
   context,
   isMobile,
@@ -251,24 +250,21 @@ test('keyboard: the arrows loop through the menu, the field, and every row, from
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(Number(await page.evaluate(() => navigator.clipboard.readText()))).toBeCloseTo(2000, 9);
 
-  // Past the last row the loop reaches the menu; up from it is the last row, down the field.
-  for (
-    let step = 0;
-    step < VOLUME_UNITS && !(await menu(page).evaluate((el) => el === document.activeElement));
-    step += 1
-  ) {
-    await page.keyboard.press('ArrowDown');
-  }
-  await expect(menu(page)).toBeFocused();
-  await page.keyboard.press('ArrowUp');
-  await expect(box(page)).toBeFocused();
+  // Down to the last row, liters; Enter takes it, its value to the box's 10 digits, and the cursor rests on it.
+  for (let step = 0; step < 6; step += 1) await box(page).press('ArrowDown');
   await expectCursor(page, 'liters');
-  // Enter takes it, its value to the box's 10 digits; the cursor rests on it.
+  expect(await cursor(page)).not.toContain('milliliters');
   await box(page).press('Enter');
   await expect(box(page)).toHaveValue(/^59\.147059/);
   await expect(page.getByRole('button', { name: 'Remove liters' })).toBeVisible();
   await expectCursor(page, null);
-  await menu(page).focus();
+
+  // Past the last row the loop goes on round the page (ADR 0014): the header's toolbar, the
+  // converter's, first reached at the menu, and the box again, the cursor resting.
+  await box(page).press('ArrowDown');
+  await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(menu(page)).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(box(page)).toBeFocused();
   await expectCursor(page, null);

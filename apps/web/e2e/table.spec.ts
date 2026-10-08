@@ -199,6 +199,8 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   const radios = page.getByRole('group', { name: 'Category' }).getByRole('radio');
   await expect(radios).toHaveCount(8);
   await expect(page.getByRole('radio', { name: 'Volume' })).toBeFocused();
+  // Open, the trigger heads the list with the word "Category"; the list's fill marks the choice.
+  await expect(menu(page)).toHaveText('Category');
   // Moving through the choices changes nothing until one is chosen.
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('radio', { name: 'Temperature' })).toBeChecked();

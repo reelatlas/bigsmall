@@ -58,6 +58,29 @@ test('arrow keys preview themes in the open menu; Enter keeps the choice and clo
   await expect(toggle).toBeFocused();
 });
 
+test('open, the theme menu reads "Theme" where its button shows the name alone', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const toggle = themeToggle(page);
+  const name = page.locator('[data-theme-name]');
+
+  // From sm the button shows "Theme" and the name, open or closed.
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await toggle.click();
+  await expect(name).toBeVisible();
+  await page.keyboard.press('Escape');
+
+  // Below sm it shows the name alone; open, it reads "Theme", the list's fill marking the theme.
+  await page.setViewportSize({ width: 375, height: 800 });
+  const word = toggle.getByText('Theme', { exact: true });
+  await toggle.click();
+  await expect(name).toBeHidden();
+  expect((await word.boundingBox())!.width).toBeGreaterThan(10);
+  await page.keyboard.press('Escape');
+  await expect(name).toBeVisible();
+});
+
 test('the shortcuts map opens on hover, stays when clicked, and closes on Escape', async ({
   page,
   isMobile,

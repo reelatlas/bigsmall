@@ -151,10 +151,11 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           className={cx(MENU_TRIGGER, 'justify-between')}
         >
           {/* The category's name, the word "Category" kept for screen readers, as "Theme" is.
-              Before a choice the word shows, muted like the theme menu's label and a field's
-              placeholder. */}
-          <span className={cx(!chosenName && 'text-ink-muted')}>
-            {chosenName ? (
+              Before a choice, and while open, the word shows, muted like the theme menu's label
+              and a field's placeholder: open, the list's fill marks the choice, so the name would
+              only repeat it, and the word heads the list as the shortcuts map's title does. */}
+          <span className={cx((open || !chosenName) && 'text-ink-muted')}>
+            {chosenName && !open ? (
               <>
                 <span className="sr-only">Category </span>
                 {chosenName}

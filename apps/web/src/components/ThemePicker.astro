@@ -22,7 +22,9 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
  * rows use rounded-nested-md, the md corner minus the border and gutter, so the curves nest. Below
  * sm the word "Theme" is only for screen readers and the menu is as wide as its widest theme name,
  * with the name centered: the sizer below stacks every name in one grid cell, unseen, so the width
- * fits the theme's own font and stays put while the arrow keys preview themes.
+ * fits the theme's own font and stays put while the arrow keys preview themes. Open there, the
+ * trigger reads "Theme" instead, muted, heading the list, whose fill marks the theme, as the
+ * category menu does.
  */
 ---
 
@@ -47,9 +49,11 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
       aria-controls={menuId}
       class:list={[MENU_TRIGGER, 'justify-center sm:justify-between']}
     >
-      <span class="text-ink-muted max-sm:sr-only">Theme</span>
+      <span class="text-ink-muted max-sm:sr-only max-sm:group-data-open:not-sr-only">Theme</span>
       <span class="flex items-center gap-1">
-        <span data-theme-name>{defaultName}</span>
+        <span data-theme-name class="max-sm:group-data-open:hidden">
+          {defaultName}
+        </span>
         <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />
       </span>
     </button>

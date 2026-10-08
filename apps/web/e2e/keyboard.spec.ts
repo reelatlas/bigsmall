@@ -97,6 +97,21 @@ test('the arrows move between the header, the toolbar, and the box, round from e
   await expect(menu(page)).toBeFocused();
 });
 
+test('with nothing focused, ↑ or ↓ goes into the box, and the next press moves on from there', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  await page.keyboard.press('ArrowDown');
+  await expect(box(page)).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await expect(menu(page)).toBeFocused();
+
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('ArrowUp');
+  await expect(box(page)).toBeFocused();
+});
+
 test('Escape on a toolbar control goes back to the box; with the map open, it closes the map first', async ({
   page,
 }) => {

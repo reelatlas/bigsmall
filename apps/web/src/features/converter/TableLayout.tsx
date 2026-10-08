@@ -222,9 +222,10 @@ export function TableLayout({
   });
 
   // With nothing on the page focused, the page has one job: a letter or a digit starts typing in
-  // the field, and Escape takes the ladder's clearing steps, as it would in the field. Typing
-  // only types, never acts; neither works with focus in another control or with Ctrl, ⌘, or Alt
-  // held (WCAG 2.1.4; ADR 0012). An Escape that closed a header menu has done its job already.
+  // the field, ↑ or ↓ goes into it, the next press moving on from there (ADR 0014), and Escape
+  // takes the ladder's clearing steps, as it would in the field. Typing only types, never acts;
+  // none of it works with focus in another control or with Ctrl, ⌘, or Alt held (WCAG 2.1.4;
+  // ADR 0012). An Escape that closed a header menu has done its job already.
   useLayoutEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.defaultPrevented || event.isComposing) return;
@@ -233,6 +234,12 @@ export function TableLayout({
       if (active && active !== document.body && active !== document.documentElement) return;
       if (event.key === 'Escape') {
         if (clearStep()) event.preventDefault();
+        return;
+      }
+      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        inputRef.current?.focus();
+        setPosition(null);
         return;
       }
       if (!STARTS_TYPING.test(event.key)) return;

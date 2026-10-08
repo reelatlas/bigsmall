@@ -95,7 +95,8 @@ function tableOf(state: Partial<ConverterState>): TableView {
  * The table's pieces in frozen states, from the real table view: the category menu before and
  * after a category is chosen; the start's categories, the cursor on one; 250 mL in every unit of
  * volume, milliliters marked as the unit in the box, the cursor on cups and one copy confirmed;
- * Volume chosen with no unit, each value a dash; a value with no answer; and the matches for
+ * Area chosen with no unit, each value a dash, the symbols lined up on their last letter with
+ * their exponents hanging after it; a value with no answer; and the matches for
  * "250 p" from every category. The tables' titles are for screen readers; on the page the
  * category menu over the box names them.
  */
@@ -105,7 +106,7 @@ function TableSamples() {
   const itemIds = (list: string) => (index: number) => `${id}-${list}-${index}`;
   const start = tableOf({});
   const values = tableOf({ text: '250', unit: 'milliliter', category: 'volume' });
-  const dashes = tableOf({ category: 'volume' });
+  const dashes = tableOf({ category: 'area' });
   const matches = tableOf({ text: '250 p' });
   const cups = values.kind === 'units' ? values.rows.findIndex((row) => row.id === 'us-cup') : -1;
   return (
@@ -139,7 +140,7 @@ function TableSamples() {
       {dashes.kind === 'units' && (
         <ConversionTable
           id={`${id}-dashes`}
-          title="Volume, no unit yet"
+          title="Area, no unit yet"
           rows={dashes.rows}
           message={null}
           cursor={-1}

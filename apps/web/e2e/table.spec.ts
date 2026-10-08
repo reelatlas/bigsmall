@@ -38,7 +38,7 @@ test('the start lists the categories; a number alone keeps them; Enter goes into
   await ready(page);
   // One box, and no layout to switch to.
   await expect(page.getByRole('combobox')).toHaveCount(1);
-  await expect(menu(page)).toHaveText(/Choose a category/);
+  await expect(menu(page)).toHaveText(/^Category$/);
   await expect(box(page)).toHaveAttribute('placeholder', 'Number or unit');
   await expect(tiles(page).getByRole('option')).toHaveCount(8);
 
@@ -297,7 +297,7 @@ test('Escape steps back: off the table, the typed unit, the number, the unit and
 
   await box(page).press('Escape');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
-  await expect(menu(page)).toHaveText(/Choose a category/);
+  await expect(menu(page)).toHaveText(/^Category$/);
   await expect(tiles(page)).toBeVisible();
 
   await box(page).press('Escape');
@@ -743,7 +743,7 @@ test('clear all empties the box, its unit, and its category; undo brings them ba
   await clear.click();
   await expect(box(page)).toHaveValue('');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
-  await expect(menu(page)).toHaveText(/Choose a category/);
+  await expect(menu(page)).toHaveText(/^Category$/);
   await expect(tiles(page)).toBeVisible();
   await expect(box(page)).toBeFocused();
   await expect(clear).toBeDisabled();

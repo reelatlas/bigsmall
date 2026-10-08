@@ -11,6 +11,9 @@ import {
 } from '../lib/recipes';
 import { ChevronDownIcon } from './icons';
 
+/** The trigger before a category is chosen: the control's own name, as a select shows its field's. */
+const EMPTY_LABEL = 'Category';
+
 export interface CategoryMenuProps {
   categories: readonly Category[];
   /** The category chosen, or null before one is. */
@@ -26,7 +29,9 @@ export interface CategoryMenuProps {
 /**
  * The converter's category menu (docs/UX-SPEC.md §1): a fluid shell like the theme menu, built
  * from the same recipes, its trigger and its choices one shape that grows over the page when
- * open. The choices are native radios. The arrows move through them without choosing, since a
+ * open. Its trigger shows the category's name and is as wide as the widest, so the toolbar keeps
+ * it on its line until there is truly no room; open, it widens to fit the counts, toward the side
+ * of the page with the room. The choices are native radios. The arrows move through them without choosing, since a
  * new category takes the unit out of the box and each choice is a step to undo; Enter or a click
  * chooses, and Escape, a click outside, or focus leaving closes it unchanged. While a unit is
  * typed, each choice says how many of its units match.
@@ -40,6 +45,8 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   const rootRef = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const chosenName = categories.find((category) => category.id === value)?.name;
+  /** Which edge the open menu keeps, so it grows toward the side of the page with the room. */
+  const [side, setSide] = useState<'left' | 'right'>('right');
 
   const choose = (id: CategoryId) => {
     setOpen(false);
@@ -96,13 +103,33 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   return (
     <div
       ref={rootRef}
-      className="group relative h-12 w-56"
+      className="group relative h-12"
       data-open={open || undefined}
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
       }}
     >
-      <div className={cx('absolute inset-x-0 top-0 rounded-md', SHELL, SHELL_BORDERED)}>
+      {/* Unseen, every label stacked in one cell: the menu is as wide as the widest, so it keeps
+          its width as categories change (the theme menu's sizer). */}
+      <span
+        aria-hidden="true"
+        className="invisible grid h-0 overflow-hidden border-2 border-transparent px-3 text-sm"
+      >
+        {[EMPTY_LABEL, ...categories.map((category) => category.name)].map((label) => (
+          <span key={label} className="col-start-1 row-start-1 flex items-center gap-2">
+            {label}
+            <span className="size-4" />
+          </span>
+        ))}
+      </span>
+      <div
+        className={cx(
+          'absolute top-0 min-w-full rounded-md group-data-open:w-56',
+          side === 'right' ? 'right-0' : 'left-0',
+          SHELL,
+          SHELL_BORDERED,
+        )}
+      >
         <button
           ref={trigger}
           type="button"
@@ -110,25 +137,25 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => {
+            const box = rootRef.current?.getBoundingClientRect();
+            if (!open && box) setSide(box.left + box.width / 2 > innerWidth / 2 ? 'right' : 'left');
             setReached(value);
             setOpen((now) => !now);
           }}
           className={cx(MENU_TRIGGER, 'justify-between')}
         >
-          {chosenName ? (
-            <>
-              <span className="text-ink-muted">Category</span>
-              <span className="flex items-center gap-1">
+          {/* The category's name, the word "Category" kept for screen readers, as "Theme" is. */}
+          <span>
+            {chosenName ? (
+              <>
+                <span className="sr-only">Category </span>
                 {chosenName}
-                <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />
-              </span>
-            </>
-          ) : (
-            <>
-              <span>Choose a category</span>
-              <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />
-            </>
-          )}
+              </>
+            ) : (
+              EMPTY_LABEL
+            )}
+          </span>
+          <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />
         </button>
         <fieldset id={menuId} className={cx(SHELL_PANEL, 'p-1')}>
           <legend className="sr-only">Category</legend>

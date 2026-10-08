@@ -55,5 +55,4 @@ export async function applyTheme(page: Page, theme: Pick<ThemeMeta, 'id' | 'name
 export const box = (page: Page) => page.getByRole('combobox', { name: 'Value', exact: true });
 
 /** The converter's category menu trigger, before a category is chosen or after. */
-export const menu = (page: Page) =>
-  page.getByRole('button', { name: /^(Choose a category|Category)/ });
+export const menu = (page: Page) => page.getByRole('button', { name: /^Category/ });

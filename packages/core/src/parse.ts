@@ -24,6 +24,12 @@ export interface ParsedInput {
   expression?: true;
   /** Where the exponent markers ("e" or "E") sit within `valueText`, so the UI can set them apart. */
   exponentMarks?: number[];
+  /**
+   * The number exactly as typed, when the text is one number rather than arithmetic: its digits in
+   * canonical form, a period decimal, no grouping, and an E exponent ("1,000.50" is "1000.50"), so
+   * a URL can keep digits a double would round ("123456789012345678").
+   */
+  canonical?: string;
 }
 
 // Characters that are easy to get wrong as escapes, so they are named once.
@@ -107,6 +113,12 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
   else if (evaluation.value === 0 && (evaluation.underflow || roundedToZero)) {
     result.outOfRange = 'small';
   } else result.value = evaluation.value;
+
+  const [only] = numbers;
+  if (result.value !== undefined && !result.expression && only && numbers.length === 1) {
+    const signs = scanned.tokens.filter((token) => token.kind === 'sign' && token.negative);
+    result.canonical = `${signs.length % 2 === 1 ? '-' : ''}${canonicalNumber(only.text, separators)}`;
+  }
 
   const rest = trimmed.slice(scanned.end).trim();
   if (rest) result.query = rest;
@@ -309,6 +321,11 @@ function evaluate(scanned: readonly Token[]): Evaluation {
 
 /** The number the text spells, which may be Infinity or a zero that underflowed; parse() judges the range. */
 function toNumber(text: string, separators: Separators): number {
+  return Number(canonicalNumber(text, separators));
+}
+
+/** A typed number's digits in canonical form: a period decimal, no grouping, an E exponent. */
+function canonicalNumber(text: string, separators: Separators): string {
   let body = text.replace(TRAILING_MARK, '').split(UNICODE_MINUS).join('-');
   let exponent = '';
   const expIndex = body.search(EXPONENT_MARK);
@@ -325,8 +342,7 @@ function toNumber(text: string, separators: Separators): number {
   const fractionPart =
     decimalIndex >= 0 ? body.slice(decimalIndex + 1).replace(ANY_SEPARATOR, '') : '';
 
-  const canonical = `${integerPart || '0'}${fractionPart ? `.${fractionPart}` : ''}${exponent ? `e${exponent}` : ''}`;
-  return Number(canonical);
+  return `${integerPart || '0'}${fractionPart ? `.${fractionPart}` : ''}${exponent ? `E${exponent}` : ''}`;
 }
 
 /**

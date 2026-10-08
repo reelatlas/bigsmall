@@ -105,6 +105,19 @@ describe('parse', () => {
     expect(parse('1.7e308').value).toBe(1.7e308);
     expect(parse('5e-324').value).toBe(5e-324);
   });
+
+  it('gives one number exactly as typed, in canonical form, digits a double would round included', () => {
+    expect(parse('123456789012345678').canonical).toBe('123456789012345678');
+    expect(parse('1,000.50 km', EN).canonical).toBe('1000.50');
+    expect(parse('1.000,5', DE).canonical).toBe('1000.5');
+    expect(parse(`${MINUS}40 f`).canonical).toBe('-40');
+    expect(parse('.5').canonical).toBe('0.5');
+    expect(parse('1.5e21').canonical).toBe('1.5E21');
+    // Arithmetic, and no number, have none: a URL keeps their value instead.
+    expect(parse('5 + 3').canonical).toBeUndefined();
+    expect(parse('ml').canonical).toBeUndefined();
+    expect(parse('1e400').canonical).toBeUndefined();
+  });
 });
 
 describe('localeSeparators', () => {

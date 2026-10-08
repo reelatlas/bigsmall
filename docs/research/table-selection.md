@@ -64,6 +64,7 @@ Built as planned, in `TableLayout.tsx` with the components in the gallery, and t
 
 - **The menu's arrows move without choosing.** The lab applied a category on every radio change, as the theme menu previews themes. In the converter a category takes the unit out and is a step to undo, so Enter or a click chooses and Escape closes unchanged (docs/LEARNINGS.md).
 - **Choosing the category the box is already in keeps its unit.** In the lab it cleared it.
+- **Nothing is highlighted after a category is chosen** (Sean, after trying the build): the lab put the cursor on the first unit, which read as a choice made for him and let Enter take teaspoons unasked. The caret waits in the field; ↓ or Enter moves into the units, as with the start's tiles.
 - **Backspace on an empty field takes the unit out**, as the chip's × does and as it does with two boxes.
 - **Matched letters are heavier in the matches**, as in every list of matches, and each match tells screen readers its category.
 - **The field points at a row only while the cursor is on it**; resting on the unit in the box, it points at nothing, so a screen reader stays on the field while typing.

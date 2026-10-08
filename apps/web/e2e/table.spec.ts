@@ -52,11 +52,13 @@ test('the start lists the categories; a number alone keeps them; Enter goes into
     await expect(tiles(page), text).toBeVisible();
   }
   await box(page).fill('250');
-  // A click on a tile lists its units, none chosen: a dash for each value until one is picked.
+  // A click on a tile lists its units, none chosen and none highlighted: a dash for each value
+  // until one is picked.
   await tiles(page).getByRole('option', { name: 'Volume' }).click();
   await expect(box(page)).toBeFocused();
   await expect(menu(page)).toHaveText(/Category\s*Volume/);
   await expect(page.locator('[data-row]')).toHaveCount(VOLUME_UNITS);
+  await expect(page.locator('[role="row"][aria-selected="true"]')).toHaveCount(0);
   await expect(row(page, 'us-cup')).toContainText('—');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
   await expect(box(page)).toHaveValue('250');
@@ -98,6 +100,10 @@ test('keyboard: the start’s categories are a grid the arrows move through', as
   await box(page).press('ArrowRight');
   await box(page).press('ArrowRight');
   await box(page).press('Enter');
+  // Nothing is highlighted for you: the caret waits in the field until ↓ moves into the units.
+  await expectCursor(page, null);
+  await expect(page.locator('[data-row]')).toHaveCount(VOLUME_UNITS);
+  await box(page).press('ArrowDown');
   await expectCursor(page, 'teaspoons');
   await box(page).press('ArrowDown');
   await box(page).press('ArrowDown');
@@ -206,11 +212,14 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   await expect(box(page)).toBeFocused();
   await expect(box(page)).toHaveValue('250');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  // No unit is highlighted for you; Enter goes into the units, and Enter again takes one.
+  await expectCursor(page, null);
+  await box(page).press('Enter');
   await expectCursor(page, 'Fahrenheit');
-
-  // Choosing the category the box is in keeps its unit.
   await box(page).press('Enter');
   await expect(page.getByRole('button', { name: 'Remove Fahrenheit' })).toBeVisible();
+
+  // Choosing the category the box is in keeps its unit.
   await menu(page).click();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove Fahrenheit' })).toBeVisible();

@@ -39,7 +39,7 @@ const TABLE_CALCULATOR_CELL =
 const STARTS_TYPING = /^[\p{L}\p{N}.,-]$/u;
 
 /** Which list the table's place shows, for a cursor to belong to: the start, the matches, or one category's units. */
-function viewKeyOf(view: Pick<TableView, 'kind'> & { category?: CategoryId }): string {
+function viewKeyOf(view: TableView): string {
   return view.kind === 'units' ? `units:${view.category}` : view.kind;
 }
 
@@ -104,7 +104,7 @@ export function TableLayout({
     position: null,
   });
   const position = cursor.view === viewKey ? cursor.position : null;
-  const setPosition = (next: number | null, view = viewKey) => setCursor({ view, position: next });
+  const setPosition = (next: number | null) => setCursor({ view: viewKey, position: next });
   /** Set when typing elsewhere lands in the field: the caret goes after the text it added. */
   const caretToEnd = useRef(false);
 
@@ -228,13 +228,13 @@ export function TableLayout({
   }, [browsing, at, listId]);
 
   /**
-   * A category chosen: the box keeps its number, and a new category's first unit waits for Enter
-   * to take it, none chosen for you; the box's own category keeps its unit, the cursor resting on it.
+   * A category chosen: the box keeps its number and its units list with none chosen and none
+   * highlighted, the caret waiting in the field for ↓, Enter, or a click; the box's own category
+   * keeps its unit, the cursor resting on it.
    */
   const choose = (category: CategoryId) => {
-    const keepsUnit = box.unit?.category === category;
     dispatch({ type: 'chooseCategory', box: box.id, category });
-    setPosition(keepsUnit ? null : 0, viewKeyOf({ kind: 'units', category }));
+    setPosition(null);
   };
 
   /** A unit taken into the box, with its new text; the category follows, and the cursor rests on its row. */

@@ -265,3 +265,11 @@ The first run of `/tidy`, over everything since the launch tag (`v0.1.0`): the t
 | Comments still described the category label in both layouts and the chip always opening a list              | Corrected, with the design system's chip row                                                                          |
 | `CLAUDE.md`'s status had grown into one long changelog                                                      | Five lines of where things stand, each pointing to its doc                                                            |
 | The selection lab still holds its own copies of what the product now has                                    | Brought to Sean: keep it for comparing B and C, or retire it (git and docs/research/table-selection.md keep the rest) |
+
+## Sixteenth pass: one layout, after option A
+
+Sean's notes on the first tidy pass and on option A in the product (2026-10-07).
+
+| Observation                                                                                                           | What changed                                                                                                                                                     |
+| --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Choosing a category already highlights the first unit, as if hovered and chosen; should the caret just go to the box? | Yes, as a combobox should: nothing is highlighted after a category is chosen, the caret waits in the box, and ↓ or Enter moves into the units, as with the tiles |

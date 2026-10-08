@@ -166,6 +166,32 @@ test('a typed unit lists matches from every category, grouped, without values', 
   await expect(page.getByRole('region', { name: 'Volume' })).toBeVisible();
 });
 
+test('the category menu keeps its width open, its counts fitting beside the names, in every theme', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('250 p');
+  const shell = page.locator('[data-tool="category"]').locator('xpath=..');
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const closed = (await shell.boundingBox())!.width;
+    await menu(page).click();
+    expect((await shell.boundingBox())!.width, theme.id).toBe(closed);
+    const overflowing = await shell
+      .locator('label')
+      .evaluateAll((labels) =>
+        labels
+          .filter((label) => label.scrollWidth > label.clientWidth)
+          .map((label) => label.textContent),
+      );
+    expect(overflowing, theme.id).toEqual([]);
+    // A bare number on screen; screen readers hear "4 matches".
+    await expect(page.getByRole('radio', { name: /^Volume 4 matches$/ })).toBeAttached();
+    await page.keyboard.press('Escape');
+  }
+});
+
 test('a typed category name opens the category with no unit chosen, and the menu keeps naming it', async ({
   page,
 }) => {

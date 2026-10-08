@@ -33,11 +33,11 @@ export interface CategoryMenuProps {
  * The converter's category menu (docs/UX-SPEC.md §1): a fluid shell like the theme menu, built
  * from the same recipes, its trigger and its choices one shape that grows over the page when
  * open. Its trigger shows the category's name and is as wide as the widest, so the toolbar keeps
- * it on its line until there is truly no room; open, it widens to fit the counts, toward the side
- * of the page with the room. The choices are native radios. The arrows move through them without
- * choosing, since a new category takes the unit out of the box and each choice is a step to undo;
- * Enter or a click chooses, and Escape, a click outside, or focus leaving closes it unchanged.
- * While a unit is typed, each choice says how many of its units match.
+ * it on its line until there is truly no room; open, it keeps that width, as the theme menu does,
+ * its counts bare numbers in the room the chevron takes. The choices are native radios. The arrows
+ * move through them without choosing, since a new category takes the unit out of the box and each
+ * choice is a step to undo; Enter or a click chooses, and Escape, a click outside, or focus leaving
+ * closes it unchanged. While a unit is typed, each choice says how many of its units match.
  */
 export function CategoryMenu({ categories, value, counts, onChoose, tool }: CategoryMenuProps) {
   const menuId = useId();
@@ -48,8 +48,6 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   const rootRef = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const chosenName = categories.find((category) => category.id === value)?.name;
-  /** Which edge the open menu keeps, so it grows toward the side of the page with the room. */
-  const [side, setSide] = useState<'left' | 'right'>('left');
 
   const choose = (id: CategoryId) => {
     setOpen(false);
@@ -116,7 +114,9 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
       }}
     >
       {/* Unseen, every label stacked in one cell: the menu is as wide as the widest, so it keeps
-          its width as categories change (the theme menu's sizer). */}
+          its width as categories change and while open (the theme menu's sizer). The room after
+          each label is the chevron's, and open, a choice's count's: the trigger's padding and a
+          choice's, with its gutter, come to the same. */}
       <span
         aria-hidden="true"
         className="invisible grid h-0 overflow-hidden border-2 border-transparent px-3 text-sm"
@@ -128,14 +128,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           </span>
         ))}
       </span>
-      <div
-        className={cx(
-          'absolute top-0 min-w-full rounded-md group-data-open:w-56',
-          side === 'right' ? 'right-0' : 'left-0',
-          SHELL,
-          SHELL_BORDERED,
-        )}
-      >
+      <div className={cx('absolute inset-x-0 top-0 rounded-md', SHELL, SHELL_BORDERED)}>
         <button
           ref={trigger}
           type="button"
@@ -143,8 +136,6 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => {
-            const box = rootRef.current?.getBoundingClientRect();
-            if (!open && box) setSide(box.left + box.width / 2 > innerWidth / 2 ? 'right' : 'left');
             setReached(value);
             setOpen((now) => !now);
           }}
@@ -192,9 +183,12 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
                   className="sr-only"
                 />
                 {category.name}
+                {/* A bare number, as the matches' group headers show it ("Weight 2"); the word
+                    stays for screen readers. */}
                 {count !== undefined && count > 0 && (
                   <span className="font-numeric text-xs text-ink-muted">
-                    {count} {count === 1 ? 'match' : 'matches'}
+                    {count}
+                    <span className="sr-only"> {count === 1 ? 'match' : 'matches'}</span>
                   </span>
                 )}
               </label>

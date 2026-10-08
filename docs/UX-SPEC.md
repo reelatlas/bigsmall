@@ -164,16 +164,16 @@ The theme menu and the shortcuts map are fluid shells driven by the inline scrip
 - **Theme menu.** A trigger showing the current theme; the options are native radios, so arrow keys and Space work. Picking a theme applies it at once, saves it, closes the menu, and returns focus to the trigger. The arrow keys apply and save each theme they reach and leave the menu open, so themes can be compared; Enter or Escape closes it on the theme reached. Without a saved choice the theme follows the system's light or dark preference.
 - **Shortcuts map.** A keyboard icon, borderless like the other icon buttons. A mouse resting on it opens the map after 120 ms and it closes 200 ms after the mouse leaves, and reaching it with the keyboard opens it until focus moves on, the open map's accent edge then showing where focus is, with no ring on the icon; a click pins it open, and a second click, Escape, or a click outside closes it (WCAG 1.4.13: the map can be hovered, dismissed, and stays until then). Open, it grows left and down from the icon. It lists, from `src/lib/shortcuts.ts`:
 
-  | Action                    | Keys                   |
-  | ------------------------- | ---------------------- |
-  | Type from anywhere        | 0–9 or a–z             |
-  | Pick a unit or value      | Enter                  |
-  | Step back or clear        | Esc                    |
-  | Move up and down the page | ↑ ↓                    |
-  | Move across a toolbar     | ← →                    |
-  | Open the calculator       | Alt C                  |
-  | Undo                      | Ctrl Z                 |
-  | Redo                      | Ctrl Y or Ctrl Shift Z |
+  | Action                | Keys                   |
+  | --------------------- | ---------------------- |
+  | Type from anywhere    | 0–9 or a–z             |
+  | Pick a unit or value  | Enter                  |
+  | Step back or clear    | Esc                    |
+  | Move up and down page | ↑ ↓                    |
+  | Move across a toolbar | ← →                    |
+  | Open calculator       | Alt C                  |
+  | Undo                  | Ctrl Z                 |
+  | Redo                  | Ctrl Y or Ctrl Shift Z |
 
   Keys pressed together sit side by side; alternatives are joined by "or". Tab, Home and End in a toolbar, Backspace on an empty box, and Ctrl C, which everyone knows, work but are left out to keep the map short. Letters are in lowercase, as most unit symbols are written. It is hidden on touch-first devices and below the `sm` breakpoint.
 

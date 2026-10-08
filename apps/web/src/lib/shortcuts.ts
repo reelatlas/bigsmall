@@ -23,9 +23,9 @@ export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Pick a unit or value', keys: [['Enter']] },
   { action: 'Step back or clear', keys: [['Esc']] },
   // Each pair of arrows shares one group so they sit side by side with nothing between them.
-  { action: 'Move up and down the page', keys: [['↑', '↓']] },
+  { action: 'Move up and down page', keys: [['↑', '↓']] },
   { action: 'Move across a toolbar', keys: [['←', '→']] },
-  { action: 'Open the calculator', keys: [['Alt', 'C']] },
+  { action: 'Open calculator', keys: [['Alt', 'C']] },
   { action: 'Undo', keys: [['Mod', 'Z']] },
   {
     action: 'Redo',

@@ -30,7 +30,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 ## Type and fonts
 
 - Sizes from the scale, numbers in `font-numeric` (tabular digits), faces only through `font-display`, `font-body`, `font-numeric`.
-- Text that must fit steps down a ladder in `recipes.ts` through `useFitStep`, `useFieldFit`, or `fitPhrase`: never a third way, never clipped, never a size in between.
+- Text that must fit steps down a ladder in `recipes.ts` through `useFitStep`, `useFieldFit`, or `fitPhrase`: never a third way, never clipped, never a size in between. A column that may not fit gives way whole through `useColumnsFit`.
 
 ## Layout
 

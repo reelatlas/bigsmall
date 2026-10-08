@@ -31,8 +31,9 @@ function largestFit(text: FitText): number {
 }
 
 /**
- * Runs `fit` before paint after every render, and again whenever `observed` resizes, so text
- * shrinks as it grows and takes the room back when its box widens.
+ * Runs `fit` before paint after every render, and again whenever `observed` resizes or the theme
+ * changes, so text shrinks as it grows, takes the room back when its box widens, and fits each
+ * theme's fonts, which change what fits without resizing anything.
  */
 function useRefit(fit: () => void, observed: RefObject<HTMLElement | null>) {
   useLayoutEffect(fit);
@@ -40,9 +41,14 @@ function useRefit(fit: () => void, observed: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const element = observed.current;
     if (!element || typeof ResizeObserver === 'undefined') return;
-    const observer = new ResizeObserver(fit);
-    observer.observe(element);
-    return () => observer.disconnect();
+    const resizes = new ResizeObserver(fit);
+    resizes.observe(element);
+    const themes = new MutationObserver(fit);
+    themes.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => {
+      resizes.disconnect();
+      themes.disconnect();
+    };
   }, [observed, fit]);
 }
 
@@ -112,4 +118,61 @@ export function useFieldFit(
 
   useRefit(refit, row);
   return fit;
+}
+
+/**
+ * Shows every column that may give way, then hides them in the order named until each cell still
+ * shown fits its width on one line. Leaves the cells as chosen and returns the columns hidden, or
+ * null while the grid is not drawn.
+ */
+function fitColumns(
+  grid: RefObject<HTMLElement | null>,
+  columns: readonly string[],
+): string[] | null {
+  const element = grid.current;
+  if (!element) return null;
+  const cells = (column: string) => [
+    ...element.querySelectorAll<HTMLElement>(`[data-column="${column}"]`),
+  ];
+  for (const column of columns) for (const cell of cells(column)) cell.hidden = false;
+  const hidden: string[] = [];
+  for (const column of columns) {
+    const fits = columns.every(
+      (each) =>
+        hidden.includes(each) || cells(each).every((cell) => cell.scrollWidth <= cell.clientWidth),
+    );
+    if (fits) break;
+    for (const cell of cells(column)) cell.hidden = true;
+    hidden.push(column);
+  }
+  return hidden;
+}
+
+/**
+ * Fits a grid's columns that give way (docs/DESIGN-SYSTEM.md, "Columns that give way"): columns
+ * that may hide, named in the order they give way, each cell marked `data-column` with its
+ * column's name and kept to one line, clipped. A column shows while each of its cells fits whole;
+ * otherwise it hides in every row at once, never one cell, so the rows keep reading alike. The
+ * measurement hides and shows the cells itself, as useFieldFit does the chip's name, and the grid
+ * renders them with the same `hidden`; `grid` is the element whose resizes refit it, one whose
+ * size the fit never changes. `columns` must keep its identity between renders (a constant).
+ */
+export function useColumnsFit(
+  grid: RefObject<HTMLElement | null>,
+  columns: readonly string[],
+): readonly string[] {
+  const [hidden, setHidden] = useState<readonly string[]>([]);
+
+  const refit = useCallback(() => {
+    const next = fitColumns(grid, columns);
+    if (!next) return;
+    setHidden((current) =>
+      current.length === next.length && current.every((column, at) => column === next[at])
+        ? current
+        : next,
+    );
+  }, [grid, columns]);
+
+  useRefit(refit, grid);
+  return hidden;
 }

@@ -449,6 +449,47 @@ test('a row reads the value on the left, then symbol and name on the right, each
   await expect(unitCell(page, 'square-kilometer')).toHaveAccessibleName(/^1 km² square kilometer/);
 });
 
+test('where a name would not fit on one line, the names give way in every row, and come back with the room', async ({
+  page,
+}) => {
+  // Each name as drawn: shown and whole, or hidden in every row, never clipped. The rule, not a
+  // width, is checked, since each theme's fonts move where it switches.
+  const names = () =>
+    page.locator('[data-column="name"]').evaluateAll((cells) => {
+      const shown = cells.filter((cell) => !(cell as HTMLElement).hidden);
+      return {
+        rows: cells.length,
+        shown: shown.length,
+        clipped: shown.filter((cell) => cell.scrollWidth > cell.clientWidth).length,
+      };
+    });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/?a=kilometer-per-hour&v=100');
+  await ready(page);
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    expect(await names(), theme.id).toEqual({ rows: 5, shown: 5, clipped: 0 });
+  }
+
+  // At 320 px "kilometers per hour" has no room beside its value: the names give way, the symbols
+  // standing alone, and screen readers still hear each row's name.
+  await page.setViewportSize({ width: 320, height: 800 });
+  await applyTheme(page, THEMES[0]!);
+  await expect.poll(names).toEqual({ rows: 5, shown: 0, clipped: 0 });
+  await expect(unitCell(page, 'mile-per-hour')).toHaveAccessibleName(
+    /^62\.1371 mph miles per hour/,
+  );
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const narrow = await names();
+    expect([0, narrow.rows], theme.id).toContain(narrow.shown);
+    expect(narrow.clipped, theme.id).toBe(0);
+  }
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect.poll(names).toEqual({ rows: 5, shown: 5, clipped: 0 });
+});
+
 test('a row moves into the box with its value; undo takes it back', async ({ page }) => {
   await page.goto('/?a=milliliter&v=250');
   await ready(page);

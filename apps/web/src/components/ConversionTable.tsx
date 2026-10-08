@@ -1,4 +1,5 @@
-import { useId, type ButtonHTMLAttributes } from 'react';
+import { useId, useRef, type ButtonHTMLAttributes } from 'react';
+import { useColumnsFit } from '../lib/fit-step';
 import { CARD, CURSOR_ROW, cx, NO_ANSWER, rowFill, unitSymbol } from '../lib/recipes';
 import { Button } from './Button';
 import { CopiedIcon, CopyIcon } from './icons';
@@ -52,10 +53,15 @@ export interface ConversionTableProps {
  * values line up at their last digit; past a column that takes the spare width, on the right, the
  * symbol right-aligned in its column, an exponent hanging after it in a narrow column of its own
  * (so "ha" ends where the "m" of "m²" does), and the name left-aligned in its own; then the copy
- * button. On a narrow screen the name shrinks first, wrapping and hyphenating. The unit's cell has
- * no column gap, since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2).
+ * button. The names keep to one line: where one would not fit beside its value (a long value on a
+ * phone), the names give way in every row (GIVE_WAY), the symbols standing alone. The unit's cell
+ * has no column gap, since the symbol and its exponent touch: its parts space themselves (pr-2,
+ * pl-2).
  */
 const ROWS = 'grid grid-cols-[auto_minmax(0,1fr)_auto_auto_minmax(0,max-content)_auto] gap-y-0.5';
+
+/** The columns that give way when a row has no room for them, in that order (useColumnsFit). */
+const GIVE_WAY = ['name'] as const;
 
 /** A symbol's trailing exponent, set in a column of its own: "km²" is "km" and "²". */
 const EXPONENT = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+$/u;
@@ -78,7 +84,8 @@ const TONE: Record<ConversionRow['tone'], string> = {
  * ADR 0012), so the rows are no Tab stops; a click or tap on one is the field's to act on, and
  * focus stays in the field. Each row's copy button sits in a cell of its own beside it, out of
  * the Tab order like the box's own. Columns line up across rows through a subgrid (ROWS).
- * Screen readers hear the symbol whole ("km²"); the two columns it is drawn in are hidden from them.
+ * Screen readers hear the symbol whole ("km²") and the name, shown or not, from copies of their
+ * own; the columns they are drawn in are hidden from them.
  */
 export function ConversionTable({
   id,
@@ -94,6 +101,8 @@ export function ConversionTable({
 }: ConversionTableProps) {
   const titleId = useId();
   const moveHintId = useId();
+  const gridRef = useRef<HTMLDivElement>(null);
+  const namesHidden = useColumnsFit(gridRef, GIVE_WAY).includes('name');
 
   return (
     <section aria-labelledby={titleId}>
@@ -107,7 +116,7 @@ export function ConversionTable({
         {message ? (
           <p className="px-2 py-2.5 font-medium text-danger">{message}</p>
         ) : (
-          <div id={id} role="grid" aria-labelledby={titleId} className={ROWS}>
+          <div ref={gridRef} id={id} role="grid" aria-labelledby={titleId} className={ROWS}>
             {rows.map((row, index) => {
               const [base, exponent] = splitExponent(row.symbol);
               return (
@@ -153,9 +162,18 @@ export function ConversionTable({
                       {exponent}
                     </span>
                     <span className="sr-only">{row.symbol}</span>
-                    <span className="min-w-0 pl-2 break-words hyphens-auto text-ink" data-name>
+                    <span
+                      aria-hidden="true"
+                      hidden={namesHidden}
+                      className="min-w-0 overflow-hidden pl-2 whitespace-nowrap text-ink"
+                      data-name
+                      data-column="name"
+                    >
                       {row.name}
-                      {row.inBox && <span className="sr-only">, in the box</span>}
+                    </span>
+                    <span className="sr-only">
+                      {row.name}
+                      {row.inBox && ', in the box'}
                     </span>
                   </div>
                   <div role="gridcell">

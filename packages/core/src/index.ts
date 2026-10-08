@@ -24,6 +24,8 @@ export type {
   SearchResponse,
   Suggestion,
 } from './search';
+export { unitListGroup } from './order';
+export type { ListGroup } from './order';
 export { matchSpan } from './highlight';
 export type { TextSpan } from './highlight';
 export { formatNumber } from './format';

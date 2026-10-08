@@ -27,6 +27,20 @@ function listGroup(unit: Unit, preference: UnitPreference): number {
 }
 
 /**
+ * A unit's group in the listed order, as a long table's headings may name it (docs/PLAN.md §2,
+ * "Section names in a long table"): an everyday unit of the visitor's own system, of the other
+ * main one, or of neither, or a specialist unit of any system.
+ */
+export type ListGroup = 'own' | 'other' | 'neither' | 'specialist';
+
+const LIST_GROUPS: readonly ListGroup[] = ['own', 'other', 'neither', 'specialist'];
+
+/** The group `orderUnits` lists the unit in for a visitor of this preference. */
+export function unitListGroup(unit: Unit, preference: UnitPreference = 'metric'): ListGroup {
+  return LIST_GROUPS[listGroup(unit, preference)] ?? 'neither';
+}
+
+/**
  * The order a category's units are listed in with nothing typed (docs/UX-SPEC.md §3, ADR 0011,
  * ADR 0016): the everyday units of the visitor's own system first, then of the other main system,
  * then of neither, then the specialist units of every system, each group smallest to largest;

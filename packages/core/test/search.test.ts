@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveExact, search, suggest } from '../src/index';
+import { getUnit, resolveExact, search, suggest, unitListGroup } from '../src/index';
 import type { SearchResponse } from '../src/index';
 
 /** Unit ids and #category ids in result order. */
@@ -171,6 +171,17 @@ describe('search: idle lists', () => {
       'cubic-yard',
       'cubic-meter',
     ]);
+  });
+
+  it('names the group each unit is listed in, for the visitor', () => {
+    const group = (id: string, system: 'us' | 'imperial' | 'metric') =>
+      unitListGroup(getUnit(id)!, system);
+    expect(group('inch', 'us')).toBe('own');
+    expect(group('meter', 'us')).toBe('other');
+    expect(group('imperial-pint', 'us')).toBe('neither');
+    expect(group('imperial-pint', 'imperial')).toBe('own');
+    expect(group('knot', 'metric')).toBe('neither');
+    expect(group('nanometer', 'metric')).toBe('specialist');
   });
 
   it('orders the newer categories by the same rule', () => {

@@ -1,5 +1,5 @@
 import type { Separators } from './locale';
-import { compactKey } from './normalize';
+import { compactKey, compactKeyWithDegree } from './normalize';
 import { orderUnits } from './order';
 import { parse, type ParsedInput } from './parse';
 import type { UnitPreference } from './region';
@@ -100,7 +100,12 @@ const unitKeys: readonly UnitKey[] = units.flatMap((unit, index) => {
     { field: 'plural', raw: unit.plural },
     ...unit.aliases.map((raw) => ({ field: 'alias' as const, raw })),
   ];
-  return keys.map((k) => ({ unit, index, field: k.field, raw: k.raw, compact: compactKey(k.raw) }));
+  return keys.flatMap((k) => {
+    const key = { unit, index, field: k.field, raw: k.raw, compact: compactKey(k.raw) };
+    // "°C" is also found by a typed "°", which starts it.
+    const withDegree = compactKeyWithDegree(k.raw);
+    return withDegree ? [key, { ...key, compact: withDegree }] : [key];
+  });
 });
 
 const categoryKeys: readonly CategoryKey[] = categories.flatMap((category, index) => {
@@ -172,9 +177,20 @@ function categoryOf(result: SearchResult): CategoryId {
   return result.kind === 'unit' ? result.unit.category : result.category.id;
 }
 
+/** 0 for an everyday unit or a category, 1 for a specialist unit. */
+function tierRank(result: SearchResult): number {
+  return result.kind === 'unit' && result.unit.tier !== 'basic' ? 1 : 0;
+}
+
 function compareRanked(a: Ranked, b: Ranked, options: SearchOptions): number {
   const ra = a.result;
   const rb = b.result;
+  // Among exact matches an everyday unit comes first, whichever key it matched: "c" is Celsius's
+  // alias and the speed of light's symbol, and Celsius leads.
+  if (ra.matchClass <= 2 && rb.matchClass <= 2) {
+    const tier = tierRank(ra) - tierRank(rb);
+    if (tier !== 0) return tier;
+  }
   if (ra.matchClass !== rb.matchClass) return ra.matchClass - rb.matchClass;
   if (ra.kind !== rb.kind) return ra.kind === 'category' ? -1 : 1;
   if (options.prefer) {
@@ -183,11 +199,12 @@ function compareRanked(a: Ranked, b: Ranked, options: SearchOptions): number {
     if (preferred !== 0) return preferred;
   }
   if (ra.kind === 'unit' && rb.kind === 'unit') {
+    // Everyday before specialist, then the visitor's own family, as the table lists them (order.ts).
+    const tier = tierRank(ra) - tierRank(rb);
+    if (tier !== 0) return tier;
     const preference = options.system;
     const sys = systemRank(ra.unit.system, preference) - systemRank(rb.unit.system, preference);
     if (sys !== 0) return sys;
-    const tier = (ra.unit.tier === 'basic' ? 0 : 1) - (rb.unit.tier === 'basic' ? 0 : 1);
-    if (tier !== 0) return tier;
   }
   return a.index - b.index;
 }
@@ -284,12 +301,15 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
 /**
  * The single unit a query names exactly, or null when it names none or more than one.
  * "ml" → milliliter. "oz" → null (weight ounce and fluid ounce both match) unless the category is locked.
- * Advanced units count: typing an exact name is explicit intent.
+ * Advanced units count: typing an exact name is explicit intent. Where an everyday unit and a
+ * specialist one both match exactly, the everyday one is meant: "c" is Celsius, not the speed of light.
  */
 export function resolveExact(text: string, options: SearchOptions = {}): Unit | null {
   const { results } = search(text, { ...options, tier: 'all', limit: 100 });
   const exact = results.filter((r): r is UnitMatch => r.kind === 'unit' && r.matchClass <= 2);
-  return exact.length === 1 ? exact[0]!.unit : null;
+  const everyday = exact.filter((r) => r.unit.tier === 'basic');
+  const named = everyday.length > 0 ? everyday : exact;
+  return named.length === 1 ? named[0]!.unit : null;
 }
 
 export interface Suggestion {

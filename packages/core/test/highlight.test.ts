@@ -32,6 +32,8 @@ describe('matchSpan', () => {
     expect(marked('°F', 'f')).toBe('°F');
     expect(marked('°F', '°f')).toBe('°F');
     expect(marked('°', '°')).toBe('°');
+    expect(marked('°C', '°')).toBe('°');
+    expect(marked('°C', '°c')).toBe('°C');
     expect(marked('degrees Fahrenheit', 'fahr')).toBe('Fahr');
   });
 

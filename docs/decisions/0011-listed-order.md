@@ -1,7 +1,7 @@
 # 0011 — Units listed the visitor's way: their own system first, smallest to largest
 
 Date: 2026-10-07
-Status: accepted
+Status: accepted; amended by 0016
 
 ## Context
 
@@ -28,3 +28,7 @@ The rule lives in core (`orderUnits`, `src/order.ts`); the suggestion list, the 
 - A US visitor sees inches, feet, yards, and miles first; a metric visitor millimeters through kilometers. The order depends on the region and the category, never on the value, so rows stay where the eye left them.
 - The catalog's order now only breaks ties and orders categories with no size, so new units are still written most common first.
 - A sort the visitor chooses (docs/PLAN.md §2) will replace this default, not sit beside it.
+
+## Outcome (2026-10-08)
+
+Amended by ADR 0016: the rule orders the everyday units, and the specialist units every category gained come after them all, in a group of their own, smallest to largest.

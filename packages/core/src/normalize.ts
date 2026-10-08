@@ -22,11 +22,13 @@ const WHITESPACE = /\s+/g;
  * - whitespace collapsed to single spaces and trimmed
  */
 export function normalizeKey(input: string): string {
-  return input
-    .replace(DEGREE_LOOKALIKES, '°')
-    .replace(DEGREE_BEFORE_LETTER, '')
-    .normalize('NFKD')
-    .replace(DEGREE_BEFORE_LETTER, '')
+  return fold(input, true);
+}
+
+function fold(input: string, dropDegreeBeforeLetter: boolean): string {
+  const dropDegree = (text: string) =>
+    dropDegreeBeforeLetter ? text.replace(DEGREE_BEFORE_LETTER, '') : text;
+  return dropDegree(dropDegree(input.replace(DEGREE_LOOKALIKES, '°')).normalize('NFKD'))
     .replace(COMBINING_MARKS, '')
     .toLowerCase()
     .replace(/μ/g, 'u')
@@ -41,8 +43,19 @@ export function compactKey(input: string): string {
 }
 
 /**
+ * A key's compact form with its degree sign kept ("°C" → "°c"), or null when it has none before
+ * a letter. Search indexes it beside the compact form, so a typed "°" finds every scale whose
+ * symbol starts with one, while "C" still finds Celsius.
+ */
+export function compactKeyWithDegree(input: string): string | null {
+  const kept = fold(input, false).replace(/ /g, '');
+  return kept === compactKey(input) ? null : kept;
+}
+
+/**
  * True when the character at `at` is a degree sign that folds away because a letter follows it
- * ("°F"), the one rule of normalizeKey that looks past a single character (highlight.ts).
+ * ("°F"), the one rule of normalizeKey that looks past a single character: highlighting pulls it
+ * into a match that starts at the letter (highlight.ts).
  */
 export function degreeBeforeLetter(text: string, at: number): boolean {
   return /^[°º˚]\s*\p{L}/u.test(text.slice(at));

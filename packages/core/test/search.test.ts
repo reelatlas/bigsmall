@@ -57,6 +57,10 @@ describe('search: idle lists', () => {
       'us-gallon',
       'milliliter',
       'liter',
+      // The UK's own measures are everyday too, of neither main system for a US visitor.
+      'imperial-fluid-ounce',
+      'imperial-pint',
+      'imperial-gallon',
     ]);
     // The hectare is metric, so it sits among the metric units by size.
     expect(ids(search('', { category: 'area', system: 'metric' }))).toEqual([
@@ -79,7 +83,8 @@ describe('search: idle lists', () => {
       'mile-per-hour',
       'knot',
     ]);
-    // The stone is British: with UK visitors' own units, after metric for US visitors.
+    // The stone is British and the short ton American: each with its own visitors' units, and
+    // after metric for the other's.
     expect(ids(search('', { category: 'mass', system: 'imperial' }))).toEqual([
       'ounce',
       'pound',
@@ -88,10 +93,12 @@ describe('search: idle lists', () => {
       'gram',
       'kilogram',
       'tonne',
+      'short-ton',
     ]);
     expect(ids(search('', { category: 'mass', system: 'us' }))).toEqual([
       'ounce',
       'pound',
+      'short-ton',
       'milligram',
       'gram',
       'kilogram',
@@ -124,37 +131,33 @@ describe('search: idle lists', () => {
     expect(ids(search('', { category: 'length' }))[0]).toBe('millimeter');
   });
 
-  it('lists specialist units among the everyday ones by the same rule', () => {
+  it('lists the specialist units after every everyday one, smallest to largest', () => {
     expect(ids(search('', { category: 'length', system: 'us', tier: 'all' }))).toEqual([
-      'mil',
       'inch',
       'foot',
       'yard',
-      'fathom',
-      'furlong',
       'mile',
-      'nanometer',
-      'micrometer',
       'millimeter',
       'centimeter',
       'meter',
       'kilometer',
+      'nanometer',
+      'micrometer',
+      'mil',
+      'fathom',
+      'furlong',
       'nautical-mile',
       'astronomical-unit',
       'light-year',
       'parsec',
     ]);
-    // A UK visitor's own imperial measures first; the US ones belong to neither main system.
+    // A UK visitor's own measures first; the US ones are everyday units of neither main system.
     expect(ids(search('', { category: 'volume', system: 'imperial', tier: 'all' }))).toEqual([
-      'cubic-inch',
       'imperial-fluid-ounce',
       'imperial-pint',
       'imperial-gallon',
-      'cubic-foot',
-      'cubic-yard',
       'milliliter',
       'liter',
-      'cubic-meter',
       'us-teaspoon',
       'us-tablespoon',
       'us-fluid-ounce',
@@ -162,31 +165,35 @@ describe('search: idle lists', () => {
       'us-pint',
       'us-quart',
       'us-gallon',
+      'cubic-inch',
+      'cubic-foot',
       'oil-barrel',
+      'cubic-yard',
+      'cubic-meter',
     ]);
   });
 
-  it('orders the newer categories by the same rule: own system, the other, then neither', () => {
+  it('orders the newer categories by the same rule', () => {
     expect(ids(search('', { category: 'pressure', system: 'us', tier: 'all' }))).toEqual([
       'inch-of-mercury',
       'pound-per-square-inch',
       'pascal',
-      'hectopascal',
       'millimeter-of-mercury',
       'kilopascal',
       'bar',
-      'megapascal',
       'atmosphere',
+      'hectopascal',
+      'megapascal',
     ]);
     expect(ids(search('', { category: 'power', system: 'metric', tier: 'all' }))).toEqual([
       'watt',
-      'metric-horsepower',
       'kilowatt',
       'megawatt',
-      'gigawatt',
-      'btu-per-hour',
       'horsepower',
+      'btu-per-hour',
+      'metric-horsepower',
       'ton-of-refrigeration',
+      'gigawatt',
     ]);
     // A reciprocal has no size to order by: the catalog's order, the visitor's own unit first.
     expect(ids(search('', { category: 'fuel-economy', system: 'us', tier: 'all' }))).toEqual([
@@ -202,13 +209,13 @@ describe('search: idle lists', () => {
     expect(ids(search('', { category: 'fuel-economy', system: 'metric' }))[0]).toBe(
       'liter-per-100-kilometers',
     );
-    // Angles have no customary system: SI and the units it accepts, then the others.
+    // Angles have no customary system: degrees and radians, the gradian, then the specialist ones.
     expect(ids(search('', { category: 'angle', system: 'us', tier: 'all' }))).toEqual([
-      'arcsecond',
-      'arcminute',
       'degree',
       'radian',
       'gradian',
+      'arcsecond',
+      'arcminute',
       'revolution',
     ]);
   });
@@ -324,7 +331,10 @@ describe('search: categories and scope', () => {
 
   it('a locked category scopes results to its units and hides categories', () => {
     expect(ids(search('m', { category: 'time' }))).toEqual(['millisecond', 'minute', 'month']);
-    expect(ids(search('oz', { category: 'volume' }))).toEqual(['us-fluid-ounce']);
+    expect(ids(search('oz', { category: 'volume' }))).toEqual([
+      'us-fluid-ounce',
+      'imperial-fluid-ounce',
+    ]);
     expect(ids(search('fluids', { category: 'length' }))).toEqual([]);
   });
 
@@ -343,14 +353,16 @@ describe('search: categories and scope', () => {
     // Units only: "p" also starts Pressure and Power, "f" Fuel economy, and categories lead their class.
     const unitIds = (response: SearchResponse) => ids(response).filter((id) => !id.startsWith('#'));
     expect(unitIds(search('p', { system: 'us' })).slice(0, 2)).toEqual(['pound', 'us-pint']);
-    expect(unitIds(search('p', { system: 'us', prefer: 'volume' })).slice(0, 2)).toEqual([
+    expect(unitIds(search('p', { system: 'us', prefer: 'volume' })).slice(0, 3)).toEqual([
       'us-pint',
+      'imperial-pint',
       'pound',
     ]);
     // A stronger match still comes first: °F is an exact symbol, fl oz only a prefix.
-    expect(unitIds(search('f', { system: 'us', prefer: 'volume' })).slice(0, 3)).toEqual([
+    expect(unitIds(search('f', { system: 'us', prefer: 'volume' })).slice(0, 4)).toEqual([
       'fahrenheit',
       'us-fluid-ounce',
+      'imperial-fluid-ounce',
       'foot',
     ]);
     // Categories still lead their class.
@@ -403,11 +415,29 @@ describe('resolveExact', () => {
     ]);
   });
 
-  it('leaves "ton" to the visitor’s ton, offering every one', () => {
+  it('leaves "ton" to the visitor’s everyday ton, offering every one', () => {
     expect(resolveExact('ton')).toBeNull();
     expect(ids(search('ton', { system: 'us', tier: 'all' }))[0]).toBe('short-ton');
-    expect(ids(search('ton', { system: 'imperial', tier: 'all' }))[0]).toBe('long-ton');
+    // The long ton is a specialist unit; the UK weighs in tonnes.
+    expect(ids(search('ton', { system: 'imperial', tier: 'all' }))[0]).toBe('tonne');
+    expect(ids(search('ton', { system: 'imperial', tier: 'all' }))).toContain('long-ton');
     expect(ids(search('ton', { system: 'metric', tier: 'all' }))[0]).toBe('tonne');
+  });
+
+  it('puts an everyday unit before a specialist one among exact matches', () => {
+    expect(resolveExact('c')?.id).toBe('celsius');
+    expect(ids(search('c', { tier: 'all' })).slice(0, 2)).toEqual(['celsius', 'speed-of-light']);
+    expect(resolveExact('speed of light')?.id).toBe('speed-of-light');
+  });
+
+  it('offers every scale whose symbol starts with a typed degree sign, the degree first', () => {
+    expect(ids(search('°', { tier: 'all' }))).toEqual([
+      'degree',
+      'celsius',
+      'fahrenheit',
+      'rankine',
+    ]);
+    expect(ids(search('F', { tier: 'all' }))[0]).toBe('fahrenheit');
   });
 
   it('reads a degree sign on its own as the angle, and before a letter as the scale', () => {

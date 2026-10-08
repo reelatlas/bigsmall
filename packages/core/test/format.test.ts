@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compactKey, formatNumber, normalizeKey } from '../src/index';
+import { compactKey, compactKeyWithDegree, formatNumber, normalizeKey } from '../src/index';
 
 describe('formatNumber', () => {
   it('shows up to ten significant digits and trims trailing zeros', () => {
@@ -63,6 +63,13 @@ describe('normalizeKey and compactKey', () => {
     expect(normalizeKey('°')).toBe('°');
     expect(normalizeKey('º')).toBe('°');
     expect(normalizeKey('˚')).toBe('°');
+  });
+
+  it('keeps the degree sign of a scale’s symbol on request, for a typed "°" to find', () => {
+    expect(compactKeyWithDegree('°C')).toBe('°c');
+    expect(compactKeyWithDegree('℉')).toBe('°f');
+    expect(compactKeyWithDegree('°')).toBeNull();
+    expect(compactKeyWithDegree('deg c')).toBeNull();
   });
 
   it('maps superscripts and micro signs to ASCII', () => {

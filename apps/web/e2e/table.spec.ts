@@ -102,8 +102,8 @@ test('keyboard: the start’s categories are a grid the arrows move through', as
   await expect(page.locator('[data-row]')).toHaveCount(VOLUME_UNITS);
   await box(page).press('ArrowDown');
   await expectCursor(page, 'teaspoons');
-  // Tablespoons, cubic inches, fluid ounces, then cups.
-  for (let step = 0; step < 4; step += 1) await box(page).press('ArrowDown');
+  // Tablespoons, fluid ounces, then cups.
+  for (let step = 0; step < 3; step += 1) await box(page).press('ArrowDown');
   await expectCursor(page, 'cups');
   await box(page).press('Enter');
   await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
@@ -279,13 +279,13 @@ test('keyboard: the arrows go through every row from the unit in the box, then o
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(Number(await page.evaluate(() => navigator.clipboard.readText()))).toBeCloseTo(2000, 9);
 
-  // Down to the last row, imperial gallons (fluid ounces are the fourth); Enter takes it, its
-  // value to the box's 10 digits, and the cursor rests on it.
-  for (let step = 4; step < VOLUME_UNITS; step += 1) await box(page).press('ArrowDown');
-  await expectCursor(page, 'imperial gallons');
+  // Down to the last row, the largest specialist unit, cubic meters (fluid ounces are the
+  // third); Enter takes it, its value to the box's 10 digits, and the cursor rests on it.
+  for (let step = 3; step < VOLUME_UNITS; step += 1) await box(page).press('ArrowDown');
+  await expectCursor(page, 'cubic meters');
   await box(page).press('Enter');
-  await expect(box(page)).toHaveValue(/^13\.01053413/);
-  await expect(page.getByRole('button', { name: 'Remove imperial gallons' })).toBeVisible();
+  await expect(box(page)).toHaveValue(/^0\.059147059/);
+  await expect(page.getByRole('button', { name: 'Remove cubic meters' })).toBeVisible();
   await expectCursor(page, null);
 
   // Past the last row the loop goes on round the page (ADR 0014): the header's toolbar, the
@@ -492,19 +492,20 @@ test('where a name would not fit on one line, the names give way in every row, a
         clipped: shown.filter((cell) => cell.scrollWidth > cell.clientWidth).length,
       };
     });
+  const rows = unitsIn('speed').length;
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/?a=kilometer-per-hour&v=100');
   await ready(page);
   for (const theme of THEMES) {
     await applyTheme(page, theme);
-    expect(await names(), theme.id).toEqual({ rows: 5, shown: 5, clipped: 0 });
+    expect(await names(), theme.id).toEqual({ rows, shown: rows, clipped: 0 });
   }
 
   // At 320 px "kilometers per hour" has no room beside its value: the names give way, the symbols
   // standing alone, and screen readers still hear each row's name.
   await page.setViewportSize({ width: 320, height: 800 });
   await applyTheme(page, THEMES[0]!);
-  await expect.poll(names).toEqual({ rows: 5, shown: 0, clipped: 0 });
+  await expect.poll(names).toEqual({ rows, shown: 0, clipped: 0 });
   await expect(unitCell(page, 'mile-per-hour')).toHaveAccessibleName(
     /^62\.1371 mph miles per hour/,
   );
@@ -516,7 +517,7 @@ test('where a name would not fit on one line, the names give way in every row, a
   }
 
   await page.setViewportSize({ width: 1280, height: 900 });
-  await expect.poll(names).toEqual({ rows: 5, shown: 5, clipped: 0 });
+  await expect.poll(names).toEqual({ rows, shown: rows, clipped: 0 });
 });
 
 test('a row moves into the box with its value; undo takes it back', async ({ page }) => {

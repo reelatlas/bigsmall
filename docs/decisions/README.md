@@ -16,7 +16,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0008](0008-hosting-and-domains.md)     | Hosting on Vercel, with bigsmall.work as the main domain                          | accepted                                        |
 | [0009](0009-two-layouts.md)             | One converter, two layouts: the table by default, two boxes behind a switch       | superseded by 0013                              |
 | [0010](0010-table-without-headline.md)  | The table shows every unit alike; the second box's unit is kept, not shown        | superseded by 0013                              |
-| [0011](0011-listed-order.md)            | Units listed the visitor's way: their own system first, smallest to largest       | accepted                                        |
+| [0011](0011-listed-order.md)            | Units listed the visitor's way: their own system first, smallest to largest       | accepted; amended by 0016                       |
 | [0012](0012-table-as-unit-list.md)      | The table is the unit list: a category menu, and a cursor in the field            | accepted                                        |
 | [0013](0013-one-layout.md)              | One layout: the table; two boxes and the layout switch retire                     | accepted                                        |
 | [0014](0014-planes.md)                  | The arrow keys move between the page's planes: two toolbars and the box           | accepted                                        |

@@ -12,7 +12,7 @@ export { DEFAULT_SEPARATORS, localeSeparators } from './locale';
 export type { Separators } from './locale';
 export { parse } from './parse';
 export type { ParsedInput } from './parse';
-export { normalizeKey, compactKey } from './normalize';
+export { normalizeKey, compactKey, compactKeyWithDegree } from './normalize';
 export { search, resolveExact, suggest } from './search';
 export type {
   MatchClass,

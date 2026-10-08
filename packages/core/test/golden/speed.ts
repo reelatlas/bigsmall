@@ -89,4 +89,18 @@ export const speed: GoldenRow[] = [
     source: `${SP811}: kilometer per hour = 2.777778E-01 m/s`,
     tolerance: PUBLISHED_7_DIGITS,
   },
+  {
+    value: 1,
+    from: 'speed-of-light',
+    to: 'meter-per-second',
+    expected: 299792458,
+    source: 'BIPM SI Brochure, 9th ed. (2019), §2.2: c = 299 792 458 m/s (exact)',
+  },
+  {
+    value: 1,
+    from: 'speed-of-light',
+    to: 'kilometer-per-hour',
+    expected: 1079252848.8,
+    source: 'Derived: 299 792 458 m/s × 3.6',
+  },
 ];

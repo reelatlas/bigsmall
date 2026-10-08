@@ -13,6 +13,8 @@ const SI = 'BIPM SI Brochure, 9th ed. (2019), §2.3.4 (metre per second); Table 
 const MPH = 'NIST SP 811 (2008) Appendix B.8: 1 mi/h = 0.44704 m/s exactly';
 const KNOT = 'NIST SP 811 (2008) Appendix B.8: 1 nautical mile = 1852 m; 1 kn = 1852 m/h';
 const FPS = 'International Yard and Pound Agreement (1959): 1 ft = 0.3048 m exactly';
+const LIGHT =
+  'BIPM SI Brochure, 9th ed. (2019), §2.2: the speed of light in vacuum c = 299 792 458 m/s, a defining constant (exact)';
 
 export const speedUnits: readonly Unit[] = [
   {
@@ -94,5 +96,20 @@ export const speedUnits: readonly Unit[] = [
     factor: 0.3048,
     exact: true,
     source: FPS,
+  },
+  {
+    kind: 'linear',
+    id: 'speed-of-light',
+    category: 'speed',
+    name: 'speed of light',
+    plural: 'speed of light',
+    symbol: 'c',
+    aliases: ['light speed', 'lightspeed', 'speed of light in vacuum'],
+    system: 'other',
+    tier: 'advanced',
+    factor: 299792458,
+    exact: true,
+    source: LIGHT,
+    note: 'Light in a vacuum: 299,792,458 m/s by definition.',
   },
 ];

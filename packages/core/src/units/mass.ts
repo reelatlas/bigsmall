@@ -193,7 +193,7 @@ export const massUnits: readonly Unit[] = [
     symbol: 'ton (US)',
     aliases: ['US ton', 'US tons', 'ton US', 'tons US', 'sh tn'],
     system: 'us',
-    tier: 'advanced',
+    tier: 'basic',
     factor: 2000 * 0.45359237,
     exact: true,
     source: TONS,

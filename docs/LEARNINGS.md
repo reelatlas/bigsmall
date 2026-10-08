@@ -537,6 +537,7 @@ Format:
 
 **What happened.** The table layout's tests found its box with `getByRole('combobox', { name: 'Value' })`. Before hydration the page carries both layouts, and in the two-box layout the locator matched "First value" and "Second value" too: Playwright matches an accessible name as a case-insensitive substring unless told otherwise.
 **Rule.** When one name is contained in another on the same page ("Value" in "First value"), pass `exact: true`, or scope the locator to a container.
+**Came back (2026-10-08).** Four selectors for the calculator icon, "Calculator", also matched its own close button, "Close calculator", and worked only because the calculator was closed whenever they ran. The third tidy pass made them exact. **Promoted** to docs/TESTING.md, "End to end".
 
 ## 2026-10-07 — A radio group with nothing checked focuses the first without checking it
 

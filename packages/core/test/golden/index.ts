@@ -2,6 +2,7 @@ import { angle } from './angle';
 import { area } from './area';
 import { data } from './data';
 import { energy } from './energy';
+import { fuelEconomy } from './fuel-economy';
 import { length } from './length';
 import { mass } from './mass';
 import { power } from './power';
@@ -22,6 +23,7 @@ export const golden: Record<string, GoldenRow[]> = {
   speed,
   time,
   data,
+  'fuel-economy': fuelEconomy,
   energy,
   pressure,
   power,

@@ -13,6 +13,7 @@ export type CategoryId =
   | 'speed'
   | 'time'
   | 'data'
+  | 'fuel-economy'
   | 'energy'
   | 'pressure'
   | 'power'

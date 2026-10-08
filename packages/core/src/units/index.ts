@@ -3,6 +3,7 @@ import { angle, angleUnits } from './angle';
 import { area, areaUnits } from './area';
 import { data, dataUnits } from './data';
 import { energy, energyUnits } from './energy';
+import { fuelEconomy, fuelEconomyUnits } from './fuel-economy';
 import { length, lengthUnits } from './length';
 import { mass, massUnits } from './mass';
 import { power, powerUnits } from './power';
@@ -22,6 +23,7 @@ export const categories: readonly Category[] = [
   speed,
   time,
   data,
+  fuelEconomy,
   energy,
   pressure,
   power,
@@ -38,6 +40,7 @@ export const units: readonly Unit[] = [
   ...speedUnits,
   ...timeUnits,
   ...dataUnits,
+  ...fuelEconomyUnits,
   ...energyUnits,
   ...pressureUnits,
   ...powerUnits,

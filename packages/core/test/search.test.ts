@@ -18,6 +18,7 @@ describe('search: idle lists', () => {
       '#speed',
       '#time',
       '#data',
+      '#fuel-economy',
       '#energy',
       '#pressure',
       '#power',
@@ -145,6 +146,20 @@ describe('search: idle lists', () => {
       'horsepower',
       'ton-of-refrigeration',
     ]);
+    // A reciprocal has no size to order by: the catalog's order, the visitor's own unit first.
+    expect(ids(search('', { category: 'fuel-economy', system: 'us', tier: 'all' }))).toEqual([
+      'mile-per-us-gallon',
+      'liter-per-100-kilometers',
+      'kilometer-per-liter',
+      'mile-per-imperial-gallon',
+      'us-gallon-per-100-miles',
+    ]);
+    expect(ids(search('', { category: 'fuel-economy', system: 'imperial' }))[0]).toBe(
+      'mile-per-imperial-gallon',
+    );
+    expect(ids(search('', { category: 'fuel-economy', system: 'metric' }))[0]).toBe(
+      'liter-per-100-kilometers',
+    );
     // Angles have no customary system: SI and the units it accepts, then the others.
     expect(ids(search('', { category: 'angle', system: 'us', tier: 'all' }))).toEqual([
       'arcsecond',
@@ -283,7 +298,7 @@ describe('search: categories and scope', () => {
   });
 
   it('ranks a preferred category first among equal matches, hiding none', () => {
-    // Units only: "p" also starts Pressure and Power, and categories lead their class.
+    // Units only: "p" also starts Pressure and Power, "f" Fuel economy, and categories lead their class.
     const unitIds = (response: SearchResponse) => ids(response).filter((id) => !id.startsWith('#'));
     expect(unitIds(search('p', { system: 'us' })).slice(0, 2)).toEqual(['pound', 'us-pint']);
     expect(unitIds(search('p', { system: 'us', prefer: 'volume' })).slice(0, 2)).toEqual([
@@ -291,7 +306,7 @@ describe('search: categories and scope', () => {
       'pound',
     ]);
     // A stronger match still comes first: °F is an exact symbol, fl oz only a prefix.
-    expect(ids(search('f', { system: 'us', prefer: 'volume' })).slice(0, 3)).toEqual([
+    expect(unitIds(search('f', { system: 'us', prefer: 'volume' })).slice(0, 3)).toEqual([
       'fahrenheit',
       'us-fluid-ounce',
       'foot',
@@ -332,6 +347,18 @@ describe('resolveExact', () => {
     expect(resolveExact('cc')?.id).toBe('milliliter');
     expect(resolveExact('mbar')?.id).toBe('hectopascal');
     expect(resolveExact('food calories')?.id).toBe('kilocalorie');
+  });
+
+  it('leaves "mpg" to the visitor’s gallon, offering both', () => {
+    expect(resolveExact('mpg')).toBeNull();
+    expect(ids(search('mpg', { system: 'us' })).slice(0, 2)).toEqual([
+      'mile-per-us-gallon',
+      'mile-per-imperial-gallon',
+    ]);
+    expect(ids(search('mpg', { system: 'imperial' })).slice(0, 2)).toEqual([
+      'mile-per-imperial-gallon',
+      'mile-per-us-gallon',
+    ]);
   });
 
   it('reads a degree sign on its own as the angle, and before a letter as the scale', () => {

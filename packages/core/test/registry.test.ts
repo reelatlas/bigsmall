@@ -13,6 +13,7 @@ describe('registry integrity', () => {
       'speed',
       'time',
       'data',
+      'fuel-economy',
       'energy',
       'pressure',
       'power',

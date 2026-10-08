@@ -213,7 +213,7 @@ The converter's box is `ValueField`, placed by `TableLayout`: it takes a shell's
 
 - **Sentence case** for every label, button, heading, message, and theme name: "Clear all", "Neo-noir", "Copy value". The only capitals inside a phrase are proper names.
 - **Units follow the standards, not the sentence-case rule.** Symbols are case-sensitive and never altered: mL, kB, °F, km/h. Unit names are lowercase, including ones named after people (kelvin, newton), except "Celsius" and "Fahrenheit", which the SI Brochure and NIST write capitalized. Chips and rows show the plural name ("milliliters") next to the symbol.
-- **Category names** are single capitalized words as labels: Length, Weight, Volume.
+- **Category names** are single capitalized words as labels: Length, Weight, Volume; a name of two words capitalizes the first alone (Fuel economy).
 - **Short and plain.** No exclamation marks, no jargon in user-facing text. Error and empty-state text says what to try next.
 - **Digit groups never break.** Where text may wrap, digits are grouped with U+202F, the narrow no-break space (the wordmark's lists write `_` for it), and a unit test rejects a plain space between two digits.
 

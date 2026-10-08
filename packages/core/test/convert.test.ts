@@ -100,6 +100,14 @@ describe('functional units (reciprocal)', () => {
   it('20 km/L = 5 L/100km', () => expectClose(convert(20, kmPerL, lPer100km), 5));
 });
 
+describe('fuel economy at 0', () => {
+  it('has no value in the reciprocal units, and 0 in the others', () => {
+    expect(convert(0, 'liter-per-100-kilometers', 'kilometer-per-liter')).toBe(Infinity);
+    expect(convert(0, 'mile-per-us-gallon', 'liter-per-100-kilometers')).toBe(Infinity);
+    expect(convert(0, 'liter-per-100-kilometers', 'us-gallon-per-100-miles')).toBe(0);
+  });
+});
+
 describe('errors', () => {
   it('rejects unknown units', () => {
     expect(() => convert(1, 'cubit', 'meter')).toThrowError(ConversionError);

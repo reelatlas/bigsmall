@@ -150,10 +150,10 @@ export function selectBox(state: ConverterState, options: NumberEnv): BoxView {
 }
 
 /**
- * Why a conversion has no answer to show: beyond what a double holds, rounded to zero, or
- * arithmetic with no answer (a division by zero, a power with no real value).
+ * Why a conversion has no answer to show: beyond what a double holds, rounded to zero, arithmetic
+ * with no answer (a division by zero, a power with no real value), or 0 in a reciprocal unit.
  */
-export type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real';
+export type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real' | 'zero';
 
 /**
  * What the converter says when there is no answer to show (docs/UX-SPEC.md §1, §8): in full in
@@ -164,6 +164,7 @@ export const NO_ANSWER_MESSAGES: Record<NoAnswer, { long: string; short: string 
   small: { long: 'Too small to convert', short: 'Too small' },
   'divide-by-zero': { long: 'Can’t divide by zero', short: 'Can’t divide by zero' },
   'not-real': { long: 'No real answer', short: 'No real answer' },
+  zero: { long: 'Undefined for 0', short: 'Undefined for 0' },
 };
 
 /** What the matches say when a typed unit matches nothing (docs/UX-SPEC.md §1). */
@@ -327,14 +328,17 @@ function valueRow(target: Unit, from: Unit, value: number, locale: string | unde
     converted === undefined ? '' : formatNumber(converted, { precision: TABLE_PRECISION, locale });
   const tooSmall = converted === 0 && value !== 0;
   const shown = text && !tooSmall ? (converted ?? null) : null;
+  // 0 in a reciprocal unit has no value in the others: 0 mpg is no distance at all, so no L/100 km.
+  const problem: NoAnswer | null =
+    shown !== null ? null : tooSmall ? 'small' : value === 0 ? 'zero' : 'large';
   return {
     unit: target,
     id: target.id,
     name: unitName(target, shown ?? Number.NaN),
     symbol: target.symbol,
     value: shown,
-    text: !text ? NO_ANSWER_MESSAGES.large.short : tooSmall ? NO_ANSWER_MESSAGES.small.short : text,
-    tone: shown === null ? 'message' : 'value',
+    text: problem ? NO_ANSWER_MESSAGES[problem].short : text,
+    tone: problem ? 'message' : 'value',
     inBox: target.id === from.id,
   };
 }

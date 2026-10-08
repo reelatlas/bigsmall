@@ -6,7 +6,7 @@ Draft v0.2, 2026-10-06. Taxonomy, tiers, special-logic units, and verification s
 
 Milestone 1 (2026-10-06): all eight primary categories ship their basic tier, 54 units, every one cited and covered by a golden test row. Base units: meter, kilogram, liter, kelvin, square meter, meter per second, second, byte.
 
-2026-10-08: Energy, Pressure, Power, and Angle join, 35 units with their specialist ones, every one cited and covered by a golden row (base units: joule, pascal, watt, radian). With the modes dropped, the table lists every unit, specialist ones included, and the tier only ranks matches (ADR 0016). Next: Fuel economy, then the specialist units of the first eight categories.
+2026-10-08: Energy, Pressure, Power, and Angle join, 35 units with their specialist ones, every one cited and covered by a golden row (base units: joule, pascal, watt, radian). Fuel economy follows the same day, 5 units (base: kilometer per liter), its reciprocal units saying "Undefined for 0" where they have no value. With the modes dropped, the table lists every unit, specialist ones included, and the tier only ranks matches (ADR 0016). Next: the specialist units of the first eight categories.
 
 Alias decisions so far (each one changes the ranking, and so which row Enter takes; see docs/UX-SPEC.md §4 and §5):
 
@@ -48,9 +48,9 @@ Two tiers at two levels:
 
 ### Group: everyday (basic categories)
 
-The categories that ship are marked ★: the first eight since milestone 1, and Energy, Pressure, Power, and Angle since 2026-10-08.
+The categories that ship are marked ★: the first eight since milestone 1, and Fuel economy, Energy, Pressure, Power, and Angle since 2026-10-08.
 
-The ★ rows ship with exactly these basic units. For Energy, Pressure, Power, and Angle the advanced column is what shipped, with what was left out after "not:"; for the others it is the plan.
+The ★ rows ship with exactly these basic units. For the five that shipped on 2026-10-08 the advanced column is what shipped, with what was left out after "not:"; for the others it is the plan.
 
 | Category      | ★   | Basic units                                              | Advanced units (examples)                                                                                              |
 | ------------- | --- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -62,7 +62,7 @@ The ★ rows ship with exactly these basic units. For Energy, Pressure, Power, a
 | Speed         | ★   | m/s, km/h, mph, knot, ft/s                               | km/s, cm/s, in/s, Mach (standard sea level), speed of light; pace (min/km, min/mi) as a reciprocal unit                |
 | Time          | ★   | ms, s, min, h, day, week, month, year                    | µs, ns, fortnight, decade, century, millennium, sidereal day/year, shake                                               |
 | Data          | ★   | bit, B, kB, MB, GB, TB                                   | KiB, MiB, GiB, TiB, PB, kbit/Mbit/Gbit, nibble                                                                         |
-| Fuel economy  |     | mpg (US), mpg (UK), L/100 km, km/L                       | mi/L, gal/100 mi                                                                                                       |
+| Fuel economy  | ★   | mpg (US), mpg (UK), L/100 km, km/L                       | gal/100 mi (US); not: mi/L                                                                                             |
 | Energy        | ★   | J, kJ, cal, kcal, Wh, kWh, BTU                           | MJ, GJ, ft·lbf, therm (US), eV; not: erg, hp·h, ton of TNT                                                             |
 | Pressure      | ★   | Pa, kPa, bar, psi, atm, mmHg, inHg                       | hPa (millibar its alias), MPa; not: kgf/cm², ksi, torr, inH₂O                                                          |
 | Power         | ★   | W, kW, MW, hp (mechanical)                               | metric hp (PS), BTU/h, ton of refrigeration, GW; not: ft·lbf/s                                                         |
@@ -119,6 +119,7 @@ Currency (live rates), Clothing and shoe sizes (lookup tables), Sound (logarithm
 | Mach                       | Depends on conditions                                                                  | Standard sea level 340.29 m/s; state it                                                                                                                                                                   |
 | mmHg, inHg                 | A mercury column depends on its density and on gravity                                 | Conventional: 13 595.1 kg/m³ under gₙ = 9.80665 m/s², as NIST SP 811 lists them                                                                                                                           |
 | BTU, therm                 | Several definitions (International Table, thermochemical, 59 °F; the EC and US therms) | The International Table BTU; the US therm, the unit of US gas bills                                                                                                                                       |
+| mpg                        | A US and an imperial gallon                                                            | Two units, `mpg (US)` and `mpg (UK)`; no alias claims `mpg`, so typing it offers both, the visitor's own first                                                                                            |
 | Millibar                   | The same size as the hectopascal                                                       | An alias of the hectopascal, not a second row                                                                                                                                                             |
 | Degree sign                | `°` alone is an angle; before C or F it belongs to the scale                           | Folded away only before a letter (`normalize.ts`), so `45°` finds the degree and `°F` Fahrenheit                                                                                                          |
 

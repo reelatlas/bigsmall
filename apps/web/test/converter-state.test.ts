@@ -181,6 +181,15 @@ describe('selectTable', () => {
     expect(mm.value).toBeNull();
   });
 
+  it('says a reciprocal unit is undefined for 0, the others reading 0', () => {
+    const rows = table({ type: 'use', unit: 'mile-per-us-gallon', text: '0' }).rows;
+    const per100km = rows.find((row) => row.id === 'liter-per-100-kilometers')!;
+    expect(per100km.text).toBe('Undefined for 0');
+    expect(per100km.tone).toBe('message');
+    expect(per100km.value).toBeNull();
+    expect(rows.find((row) => row.id === 'kilometer-per-liter')?.text).toBe('0');
+  });
+
   it('announces how many units the value is shown in', () => {
     const t = table(ml());
     expect(t.announcement).toBe(`250 milliliters in ${t.rows.length} units of volume`);

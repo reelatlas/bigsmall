@@ -84,12 +84,12 @@ export function ValueField({
 
   // The row is measured, not counted: in any box, wide or narrow, the chip keeps its name while
   // the value fits beside it at full size, then the value steps down.
-  const fitTexts = useMemo<readonly FitText[]>(
-    () => [{ ref: textLayerRef, base: TEXT_LAYER, steps: NUMBER_SIZES }],
+  const fitText = useMemo<FitText>(
+    () => ({ ref: textLayerRef, base: TEXT_LAYER, steps: NUMBER_SIZES }),
     [],
   );
-  const fit = useFieldFit(rowRef, chipNameRef, fitTexts);
-  const sizeClass = NUMBER_SIZES[fit.steps[0] ?? 0];
+  const fit = useFieldFit(rowRef, chipNameRef, fitText);
+  const sizeClass = NUMBER_SIZES[fit.step];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
   const syncScroll = () => {

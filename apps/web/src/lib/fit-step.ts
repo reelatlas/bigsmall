@@ -4,8 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useState, type RefObject } fro
  * Text that steps down a type ladder to fit (docs/DESIGN-SYSTEM.md, "Type that steps to fit"):
  * its element, its full class list without the size step, and the ladder (class lists, largest
  * first, such as NUMBER_SIZES in lib/recipes.ts). The element must clip (`overflow-hidden`) and
- * keep its content on one line (`whitespace-pre` or `whitespace-nowrap`), except that a final step
- * may wrap as a last resort, which then always fits.
+ * keep its content on one line (`whitespace-pre` or `whitespace-nowrap`).
  */
 export interface FitText {
   ref: RefObject<HTMLElement | null>;
@@ -69,52 +68,47 @@ export function useFitStep(
   return step;
 }
 
-/** How a field's row fits: whether the chip shows its symbol alone, and each text's step. */
+/** How a field's row fits: whether the chip shows its symbol alone, and the text's step. */
 export interface FieldFit {
   compact: boolean;
-  steps: readonly number[];
-}
-
-function sameFit(a: FieldFit, b: FieldFit): boolean {
-  return a.compact === b.compact && a.steps.every((step, i) => step === b.steps[i]);
+  step: number;
 }
 
 /**
- * Measures a field's row: with the chip's name shown, does every text fit at its largest size?
- * If not, the name is hidden and each text takes the largest step that fits without it. Leaves
- * the name and the texts as chosen.
+ * Measures a field's row: with the chip's name shown, does the text fit at its largest size? If
+ * not, the name is hidden and the text takes the largest step that fits without it. Leaves the
+ * name and the text as chosen.
  */
-function fitField(nameRef: RefObject<HTMLElement | null>, texts: readonly FitText[]): FieldFit {
+function fitField(nameRef: RefObject<HTMLElement | null>, text: FitText): FieldFit {
   const name = nameRef.current;
   if (name) name.hidden = false;
-  const whole = texts.every((text) => !text.ref.current || fitsAt(text.ref.current, text, 0));
-  if (whole) return { compact: false, steps: texts.map(() => 0) };
+  const element = text.ref.current;
+  if (!element || fitsAt(element, text, 0)) return { compact: false, step: 0 };
   if (name) name.hidden = true;
-  return { compact: name !== null, steps: texts.map(largestFit) };
+  return { compact: name !== null, step: largestFit(text) };
 }
 
 /**
- * Fits a field's row (docs/DESIGN-SYSTEM.md, "Fields"): the chip's name gives way before any of
- * the field's text steps down, so the name stays while the row has room for it and the text at
- * its largest size, in a field of any width. `texts` are the field's text layers, each on its
- * ladder, over the same room; `name` is the chip's name, which the measurement hides and shows
- * itself as useFitStep writes classes (the chip renders it with the same `hidden`); `row` is the
- * element whose resizes refit the field, one whose size the fit never changes.
+ * Fits a field's row (docs/DESIGN-SYSTEM.md, "Fields"): the chip's name gives way before the
+ * field's text steps down, so the name stays while the row has room for it and the text at its
+ * largest size, in a field of any width. `text` is the field's text layer on its ladder; `name`
+ * is the chip's name, which the measurement hides and shows itself as useFitStep writes classes
+ * (the chip renders it with the same `hidden`); `row` is the element whose resizes refit the
+ * field, one whose size the fit never changes.
  */
 export function useFieldFit(
   row: RefObject<HTMLElement | null>,
   name: RefObject<HTMLElement | null>,
-  texts: readonly FitText[],
+  text: FitText,
 ): FieldFit {
-  const [fit, setFit] = useState<FieldFit>(() => ({
-    compact: false,
-    steps: texts.map(() => 0),
-  }));
+  const [fit, setFit] = useState<FieldFit>({ compact: false, step: 0 });
 
   const refit = useCallback(() => {
-    const next = fitField(name, texts);
-    setFit((current) => (sameFit(current, next) ? current : next));
-  }, [name, texts]);
+    const next = fitField(name, text);
+    setFit((current) =>
+      current.compact === next.compact && current.step === next.step ? current : next,
+    );
+  }, [name, text]);
 
   useRefit(refit, row);
   return fit;

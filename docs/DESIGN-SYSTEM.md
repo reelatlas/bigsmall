@@ -253,7 +253,7 @@ A visual or motion behavior with more than a couple of settings gets a lab page 
 
 `/dev/wordmark-lab` is the first. It plays the header's wordmark with live settings (timing, pointer response, the mix of phrase kinds, the art's chances, the type steps), can play it without hovering, hold a phrase, show any phrase, or simulate pointer speed, and lists every phrase set in a box the name's size in the page theme. The sheet marks a phrase too long at every step, and a browser test fails if any theme has one.
 
-A design question with a few answers gets a prototype lab instead, each answer built from the real engine and components with simple state of its own, side by side for the owner to try: `/dev/table-controls-lab` (filtering the table and naming its sections, docs/research/table-controls.md). A prototype lab retires once its answer ships, as the selection lab did (docs/research/table-selection.md).
+A design question with a few answers gets a prototype lab instead, each answer built from the real engine and components with simple state of its own, side by side for the owner to try: `/dev/table-controls-lab` (filtering the table and naming its sections, docs/research/table-controls.md) and `/dev/organization-lab` (the same question, two tables side by side, docs/research/organization-lab.md). A prototype lab retires once its answer ships, as the selection lab did (docs/research/table-selection.md).
 
 ## Brand assets
 

@@ -1,0 +1,24 @@
+---
+import DevPage from '../../layouts/DevPage.astro';
+import { OrganizationLab } from './_organization-lab/OrganizationLab';
+
+/*
+ * Prototypes for how the table's units are grouped (Sean, 2026-10-09;
+ * docs/research/organization-lab.md). Built from the real engine and table view. The table
+ * controls lab, beside this one, tries ways to hide the groups the table already has.
+ */
+---
+
+<DevPage
+  title="organization lab"
+  description="Prototypes for how the table's units are grouped and filtered."
+  wide
+>
+  <Fragment slot="intro">
+    Organization lab. The two tables sit side by side (one over the other on a phone) and share
+    their sections. Pick Jobs or By system once, then give each table its own filter. Presets and
+    Check list open together. Length, volume, energy, and data show the differences most clearly.
+    The unit in the box stays on screen.
+  </Fragment>
+  <OrganizationLab client:load />
+</DevPage>

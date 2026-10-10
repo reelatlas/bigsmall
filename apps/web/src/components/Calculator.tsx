@@ -351,7 +351,11 @@ export interface SendButtonProps extends Omit<
   unavailable: boolean;
 }
 
-/** "Use": puts the calculator's value into the box. Named by what it shows, "Use mL". */
+/**
+ * "Use": puts the calculator's value into the box. Named by what it shows, "Use mL". A send done
+ * shows the copy check after the label, drawing itself in, as a labelled button's confirmation does
+ * (docs/DESIGN-SYSTEM.md, "Motion"; Sean, 2026-10-10).
+ */
 export function SendButton({ symbol, confirmed, unavailable, ...props }: SendButtonProps) {
   return (
     <Button
@@ -361,9 +365,9 @@ export function SendButton({ symbol, confirmed, unavailable, ...props }: SendBut
       aria-disabled={unavailable || undefined}
       {...props}
     >
-      {confirmed && <CopiedIcon />}
       <span>Use</span>
       {symbol && <span className="font-semibold">{symbol}</span>}
+      {confirmed && <CopiedIcon className="check-draw text-success" />}
     </Button>
   );
 }

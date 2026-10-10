@@ -604,3 +604,8 @@ Format:
 
 **What happened.** Adding categories and units broke browser tests that had the counts written in: eight tiles, nine volume rows, five speed rows, the start's two rows of tiles, and walks that pressed ↓ a set number of times to reach the last row. Each was right when written and wrong the moment the catalog grew.
 **Rule.** A test that counts what the registry holds imports it from `@bigsmall/core` (`categories.length`, `unitsIn('volume').length`) and derives the rest from it (rows of tiles, steps to the last row). It still names the units it checks by id, so a reordering fails loudly where it should.
+
+## 2026-10-10 — Dim text with the muted ink, never with opacity
+
+**What happened.** The settings lab dimmed hidden units' rows with `opacity-60`. Axe failed them on color contrast in every theme: fading the ink and the muted ink over the surface drops both below 4.5:1.
+**Rule.** A row or label that reads as set aside takes `text-ink-muted`, which every theme already holds to body-text contrast (docs/DESIGN-SYSTEM.md, colors), never an opacity on readable text. Opacity is for a control that is disabled and says so, where WCAG asks no contrast.

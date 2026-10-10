@@ -1,91 +1,94 @@
 import {
   categories,
-  formatNumber,
+  getCategory,
   localeSeparators,
+  parse,
+  unitsIn,
   type CategoryId,
+  type Unit,
   type UnitPreference,
 } from '@bigsmall/core';
-import { useMemo, useRef, useState, useId } from 'react';
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FocusEvent,
+  type ReactNode,
+} from 'react';
 import { Button } from '../../../components/Button';
 import { CategoryMenu } from '../../../components/CategoryMenu';
-import { ChevronDownIcon, CopyIcon } from '../../../components/icons';
-import { initialState, selectTable, type TableRow } from '../../../features/converter/state';
+import {
+  CalculatorIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  EraserIcon,
+  RedoIcon,
+  UndoIcon,
+} from '../../../components/icons';
+import { ToolbarDivider } from '../../../components/ToolbarDivider';
+import {
+  initialState,
+  selectTable,
+  type MatchesView,
+  type TableRow,
+} from '../../../features/converter/state';
 import { useColumnsFit } from '../../../lib/fit-step';
-import { cx, CURSOR_ROW, LIST_CARD, PANEL_TITLE, rowFill } from '../../../lib/recipes';
+import {
+  CARD,
+  cx,
+  CURSOR_ROW,
+  LIST_CARD,
+  PANEL_TITLE,
+  rowFill,
+  unitSymbol,
+} from '../../../lib/recipes';
 import { browserLocale } from '../../../lib/region';
+import { DENOMINATORS, displayChanged, displayValue, FRESH_DISPLAY, type Display } from './display';
+import { BoxField, CHECKBOX, GIVE_WAY, RowCells, ROWS, toggleSet } from './parts';
+import { FIXED_LABEL, fixedKeyOf, sectionsOf, SHOW_KEYS, type FixedKey } from './sections';
 import {
-  BoxField,
-  CHECKBOX,
-  CHOICE,
-  GIVE_WAY,
-  RowCells,
-  ROWS,
-  sectionSymbols,
-  toggleSet,
-} from './parts';
-import {
-  FAMILY_LABEL,
-  familyChips,
-  familyHint,
-  sectionsFor,
-  showsInFamilies,
-  showsInPreset,
-  type Family,
-  type Preset,
-  type Section,
-} from './sections';
-import {
-  freshView,
-  isViewOption,
-  VIEW_OPTIONS,
-  viewForCategory,
-  ViewMock,
-  type ViewOption,
-  type ViewState,
-} from './view-options';
+  exceptionsIn,
+  FRESH_RULE,
+  groupState,
+  presetKeys,
+  presetOf,
+  shows,
+  SHOW_PRESETS,
+  withChoice,
+  withoutExceptions,
+  withSystem,
+  withSystems,
+  type GroupState,
+  type ShowPreset,
+  type ViewRule,
+} from './view-rule';
 
-/** How the rows are named. Both tables share this, so a filter is the only difference between them. */
-type Cut = 'fixed' | 'jobs' | 'earned';
-/** The earlier filters, built first (2026-10-09). */
-type EarlierFilter = 'fold' | 'presets' | 'families' | 'checks' | 'menu' | 'find';
-/** How a table chooses which of those rows stay on screen: E to I, or an earlier filter. */
-type FilterId = ViewOption | EarlierFilter;
+/**
+ * The settings lab (docs/research/organization-lab.md, 2026-10-10): Sean's model in the context of
+ * the action bar. A Settings button shapes what shows (the units, in every category) and how it
+ * looks (names, copy buttons, decimals or fractions, rounding); the table heads its sections by
+ * system and keeps what is hidden in a Hidden section at its foot; search leaves hidden units out
+ * and says when one matches. Two ways to choose single units, side by side: in the table, or in
+ * Settings. Built from the real engine, table view, menu, chip, and toolbar parts, with state of
+ * its own: no undo, no URL, no arrow keys.
+ */
 
-const CUTS: ReadonlyArray<{ id: Cut; name: string }> = [
-  { id: 'fixed', name: 'Fixed system names' },
-  { id: 'jobs', name: 'Jobs' },
-  { id: 'earned', name: 'By system' },
-];
+type Variant = 'separate' | 'together';
 
-const FILTERS: ReadonlyArray<{ id: EarlierFilter; name: string; hint: string }> = [
-  { id: 'fold', name: 'Fold', hint: 'The section name hides that group.' },
+const VARIANTS: ReadonlyArray<{ id: Variant; name: string; hint: string }> = [
   {
-    id: 'presets',
-    name: 'Presets',
-    hint: 'Mine, Everyday, or All. One choice for the whole table.',
-  },
-  { id: 'families', name: 'Families', hint: 'Metric, US, UK, and More, each on or off.' },
-  {
-    id: 'checks',
-    name: 'Check list',
-    hint: 'Edit turns on a checkbox per unit, and one per section. Done hides what is unchecked.',
+    id: 'separate',
+    name: '1. Separate',
+    hint: 'Settings set every category. Single units are chosen in the table: Edit at its foot puts a checkbox on every row and a three-state one on every heading.',
   },
   {
-    id: 'menu',
-    name: 'Show menu',
-    hint: 'One button opens a checkbox per section. The table stays clear until you open it.',
+    id: 'together',
+    name: '2. Together',
+    hint: 'Settings show this category under each system: its checkbox reads all, some, or none of them here and sets the system everywhere, and it opens to the units, chosen here alone.',
   },
-  { id: 'find', name: 'Find', hint: 'Type to leave only the units whose name or symbol matches.' },
-];
-
-const PRESETS: ReadonlyArray<{ id: Preset; name: string; hint: string }> = [
-  {
-    id: 'mine',
-    name: 'Mine',
-    hint: 'Everyday units of your system. A category with no region shows every everyday unit.',
-  },
-  { id: 'everyday', name: 'Everyday', hint: 'Every everyday unit, of every system.' },
-  { id: 'all', name: 'All', hint: 'Every unit.' },
 ];
 
 const REGIONS: ReadonlyArray<{ id: UnitPreference; name: string }> = [
@@ -94,9 +97,9 @@ const REGIONS: ReadonlyArray<{ id: UnitPreference; name: string }> = [
   { id: 'metric', name: 'Metric' },
 ];
 
-/** A sample for each category, so switching shows values at once. Same numbers as the table controls lab. */
+/** A sample for each category, so switching shows values at once. */
 const SAMPLES: Partial<Record<CategoryId, { unit: string; text: string }>> = {
-  length: { unit: 'foot', text: '6' },
+  length: { unit: 'foot', text: '6.3' },
   mass: { unit: 'pound', text: '150' },
   volume: { unit: 'us-cup', text: '2' },
   temperature: { unit: 'fahrenheit', text: '72' },
@@ -111,622 +114,889 @@ const SAMPLES: Partial<Record<CategoryId, { unit: string; text: string }>> = {
   angle: { unit: 'degree', text: '45' },
 };
 
-const ALL_FAMILIES: ReadonlySet<Family> = new Set(['metric', 'us', 'uk', 'customary', 'more']);
-
-interface FilterState {
-  /** Options E to I: their switches and single units, kept across categories. */
-  view: ViewState;
-  preset: Preset;
-  families: ReadonlySet<Family>;
-  folds: ReadonlySet<string>;
-  hiddenUnits: ReadonlySet<string>;
-  hiddenSections: ReadonlySet<string>;
+interface Ui {
+  rule: ViewRule;
+  display: Display;
+  settingsOpen: boolean;
+  /** The table is the checklist (variant 1). */
   editing: boolean;
-  menuOpen: boolean;
-  query: string;
+  hiddenOpen: boolean;
+  /** The hidden units a typed query matches, shown. */
+  revealMatches: boolean;
+  /** Systems opened to their units in Settings (variant 2). */
+  expanded: ReadonlySet<FixedKey>;
 }
 
-function freshFilter(): FilterState {
+function freshUi(): Ui {
   return {
-    view: freshView(),
-    preset: 'all',
-    families: new Set(ALL_FAMILIES),
-    folds: new Set(),
-    hiddenUnits: new Set(),
-    hiddenSections: new Set(),
+    rule: FRESH_RULE,
+    display: FRESH_DISPLAY,
+    settingsOpen: false,
     editing: false,
-    menuOpen: false,
-    query: '',
+    hiddenOpen: false,
+    revealMatches: false,
+    expanded: new Set(),
   };
 }
 
-function filterMeta(id: EarlierFilter): { id: EarlierFilter; name: string; hint: string } {
-  return FILTERS.find((filter) => filter.id === id) ?? FILTERS[0]!;
+/** A new category keeps every setting and exception; what was open closes. */
+function closed(ui: Ui): Ui {
+  return { ...ui, settingsOpen: false, editing: false, revealMatches: false, expanded: new Set() };
 }
 
-function matchesQuery(row: TableRow, query: string): boolean {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return true;
-  return [row.name, row.symbol, row.unit.name, row.unit.plural].some((text) =>
-    text.toLowerCase().includes(needle),
+type UpdateUi = (update: (ui: Ui) => Ui) => void;
+
+const OPTION_LINE =
+  'flex min-h-11 cursor-pointer items-center gap-2 rounded-nested-md px-2 text-sm text-ink hover:bg-surface-raised';
+const PILL =
+  'flex min-h-11 cursor-pointer items-center rounded-md border-2 border-edge px-3 text-sm text-ink focus-ring-within-inset has-checked:border-transparent has-checked:bg-accent-soft has-disabled:cursor-not-allowed has-disabled:opacity-50';
+const SUBHEAD = cx(PANEL_TITLE, 'text-xs');
+
+function SlidersIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+      <circle cx="16" cy="7" r="2" />
+      <circle cx="10" cy="17" r="2" />
+    </svg>
   );
 }
 
-/** A section with no name of its own is still choosable in the show menu, by its first symbols. */
-function menuName(section: Section<TableRow>): string {
-  if (section.label) return section.label;
-  const symbols = section.rows.slice(0, 3).map((row) => row.symbol);
-  const extra = section.rows.length - symbols.length;
-  return extra > 0 ? `${symbols.join(', ')} +${extra}` : symbols.join(', ');
-}
-
-function rowKept(
-  row: TableRow,
-  filter: EarlierFilter,
-  state: FilterState,
-  folded: boolean,
-  sectionKey: string,
-  preference: UnitPreference,
-): boolean {
-  if (filter === 'fold') return folded;
-  if (filter === 'presets') return !showsInPreset(row.unit, state.preset, preference);
-  if (filter === 'families') return !showsInFamilies(row.unit, state.families);
-  if (filter === 'checks') return state.hiddenUnits.has(row.id);
-  if (filter === 'menu') return state.hiddenSections.has(sectionKey);
-  return !matchesQuery(row, state.query);
-}
-
-function Mock({
-  filter,
-  cut,
-  rows,
-  category,
-  preference,
-  text,
-  unit,
-  state,
-  onText,
-  onTake,
-  onRemove,
-  onState,
-}: {
-  filter: EarlierFilter;
-  cut: Cut;
-  rows: readonly TableRow[];
-  category: CategoryId;
-  preference: UnitPreference;
-  text: string;
-  unit: string | null;
-  state: FilterState;
-  onText: (text: string) => void;
-  onTake: (row: TableRow) => void;
-  onRemove: () => void;
-  onState: (update: (current: FilterState) => FilterState) => void;
-}) {
-  const id = useId();
-  const gridRef = useRef<HTMLDivElement>(null);
-  const namesHidden = useColumnsFit(gridRef, GIVE_WAY).includes('name');
-  const meta = filterMeta(filter);
-  const chips = familyChips(category);
-  const sections = sectionsFor(rows, cut, preference).map((section) => {
-    const foldKey = `${category}:${section.key}`;
-    const folded = filter === 'fold' && section.label !== null && state.folds.has(foldKey);
-    const sectionOff = filter === 'menu' && state.hiddenSections.has(section.key);
-    const visible = section.rows.filter((row) => {
-      if (row.inBox) return true;
-      if (folded || sectionOff) return false;
-      if (filter === 'presets') return showsInPreset(row.unit, state.preset, preference);
-      if (filter === 'families') return showsInFamilies(row.unit, state.families);
-      if (filter === 'checks') return state.editing || !state.hiddenUnits.has(row.id);
-      if (filter === 'find') return matchesQuery(row, state.query);
-      return true;
-    });
-    const listed = section.rows.filter((row) => !row.inBox);
-    const sectionOn = listed.every((row) => !state.hiddenUnits.has(row.id));
-    return { ...section, foldKey, folded, visible, sectionOn };
+/** A checkbox for a group: checked for all its units, a dash for some, clear for none. */
+function TriCheckbox({ state, onChange }: { state: GroupState; onChange: () => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  useLayoutEffect(() => {
+    if (ref.current) ref.current.indeterminate = state === 'some';
   });
-  const drawn = sections.filter((section) => section.folded || section.visible.length > 0);
-  const visibleCount = drawn.reduce((count, section) => count + section.visible.length, 0);
-  const kept = sections.some((section) =>
-    section.rows.some(
-      (row) => row.inBox && rowKept(row, filter, state, section.folded, section.key, preference),
-    ),
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={state === 'all'}
+      onChange={onChange}
+      className={CHECKBOX}
+    />
   );
-  const hiddenChecked = filter === 'checks' && !state.editing ? state.hiddenUnits.size : 0;
+}
 
-  const setUnits = (ids: readonly string[], hide: boolean) => {
-    onState((current) => {
-      const next = new Set(current.hiddenUnits);
-      for (const unitId of ids) {
-        if (hide) next.add(unitId);
-        else next.delete(unitId);
-      }
-      return { ...current, hiddenUnits: next };
-    });
-  };
+/** One choice of a few, as pills. */
+function Pills<T extends string>({
+  legend,
+  options,
+  value,
+  disabled = false,
+  onChange,
+}: {
+  legend: string;
+  options: ReadonlyArray<{ value: T; label: string }>;
+  value: T | null;
+  disabled?: boolean;
+  onChange: (value: T) => void;
+}) {
+  const name = useId();
+  return (
+    <fieldset disabled={disabled} className="grid gap-1">
+      <legend className={cx(SUBHEAD, 'pb-1')}>{legend}</legend>
+      <div className="flex flex-wrap gap-1">
+        {options.map((option) => (
+          <label key={option.value} className={PILL}>
+            <input
+              type="radio"
+              name={name}
+              checked={value === option.value}
+              onChange={() => onChange(option.value)}
+              className="sr-only"
+            />
+            {option.label}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+const PLACES: ReadonlyArray<{ value: string; label: string; places: Display['places'] }> = [
+  { value: '1', label: '0.1', places: 1 },
+  { value: '2', label: '0.01', places: 2 },
+  { value: '3', label: '0.001', places: 3 },
+  { value: 'none', label: 'No limit', places: null },
+];
+
+/**
+ * Settings: what shows, in every category, then how it looks. Variant 1 lists the systems as
+ * switches for every category; variant 2 shows this category under each one.
+ */
+function SettingsPanel({
+  variant,
+  id,
+  ui,
+  preference,
+  category,
+  boxUnit,
+  onUi,
+}: {
+  variant: Variant;
+  id: string;
+  ui: Ui;
+  preference: UnitPreference;
+  category: CategoryId;
+  boxUnit: string | null;
+  onUi: UpdateUi;
+}) {
+  const { rule, display } = ui;
+  const name = getCategory(category)?.name ?? '';
+  const here = unitsIn(category);
+  const isShown = (unit: Unit) => unit.id === boxUnit || shows(unit, rule, preference);
+  const exceptions = exceptionsIn(rule, here);
+  const setRule = (next: (rule: ViewRule) => ViewRule) =>
+    onUi((now) => ({ ...now, rule: next(now.rule) }));
+  const setDisplay = (patch: Partial<Display>) =>
+    onUi((now) => ({ ...now, display: { ...now.display, ...patch } }));
 
   return (
-    <div className="min-w-0">
-      <p className="min-h-12 text-sm text-ink-muted">{meta.hint}</p>
-      <BoxField text={text} unit={unit} onText={onText} onRemove={onRemove} />
-      <div className={cx(LIST_CARD, 'mt-2 p-2')}>
-        {filter === 'presets' && (
-          <div className="grid gap-2 pb-2">
-            <div role="group" aria-label="How much to show" className="flex flex-wrap gap-1">
-              {PRESETS.map((each) => (
-                <Button
-                  key={each.id}
-                  variant="secondary"
-                  nested
-                  on={state.preset === each.id}
-                  aria-pressed={state.preset === each.id}
-                  onClick={() => onState((current) => ({ ...current, preset: each.id }))}
-                  className="text-sm"
-                >
-                  {each.name}
-                </Button>
+    <div
+      id={id}
+      role="dialog"
+      aria-label="Settings"
+      onPointerDown={(event) => event.preventDefault()}
+      className={cx(
+        CARD,
+        'absolute top-full right-0 z-20 mt-1 grid max-h-120 w-80 gap-4 overflow-y-auto p-3 shadow-md',
+      )}
+    >
+      <section className="grid gap-2" aria-label="Units">
+        <div>
+          <h3 className={PANEL_TITLE}>Units</h3>
+          <p className="text-xs text-ink-muted">
+            What the table and search show, in every category.
+          </p>
+        </div>
+        <Pills<ShowPreset>
+          legend="Show"
+          options={SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name }))}
+          value={presetOf(rule.shown, preference)}
+          onChange={(preset) =>
+            setRule((now) => withSystems(now, presetKeys(preset, preference), preference))
+          }
+        />
+        <fieldset className="grid">
+          <legend className={cx(SUBHEAD, 'pb-1')}>
+            {variant === 'separate' ? 'Systems' : `Systems, and the units in ${name}`}
+          </legend>
+          {SHOW_KEYS.map((key) => {
+            const units = here.filter((unit) => fixedKeyOf(unit, preference) === key);
+            if (variant === 'separate' || units.length === 0) {
+              return (
+                <label key={key} className={OPTION_LINE}>
+                  <input
+                    type="checkbox"
+                    checked={rule.shown.has(key)}
+                    onChange={() =>
+                      setRule((now) => withSystem(now, key, !now.shown.has(key), preference))
+                    }
+                    className={CHECKBOX}
+                  />
+                  {FIXED_LABEL[key]}
+                  {variant === 'together' && (
+                    <span className="ml-auto text-xs text-ink-muted">none in {name}</span>
+                  )}
+                </label>
+              );
+            }
+            const state = groupState(units, isShown);
+            const open = ui.expanded.has(key);
+            return (
+              <div key={key}>
+                <div className="flex items-center">
+                  <label className={cx(OPTION_LINE, 'min-w-0 flex-1')}>
+                    <TriCheckbox
+                      state={state}
+                      onChange={() =>
+                        setRule((now) => withSystem(now, key, state !== 'all', preference))
+                      }
+                    />
+                    {FIXED_LABEL[key]}
+                    <span className="ml-auto font-numeric text-xs text-ink-muted">
+                      {units.filter(isShown).length} of {units.length}
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-label={`${FIXED_LABEL[key]} units in ${name}`}
+                    onClick={() =>
+                      onUi((now) => ({ ...now, expanded: toggleSet(now.expanded, key) }))
+                    }
+                    className="grid size-11 shrink-0 place-items-center rounded-nested-md text-ink-muted hover:bg-surface-raised"
+                  >
+                    <ChevronDownIcon
+                      width="16"
+                      height="16"
+                      className={cx('transition-transform', !open && '-rotate-90')}
+                    />
+                  </button>
+                </div>
+                {open &&
+                  units.map((unit) => (
+                    <label key={unit.id} className={cx(OPTION_LINE, 'pl-8')}>
+                      <input
+                        type="checkbox"
+                        checked={isShown(unit)}
+                        disabled={unit.id === boxUnit}
+                        onChange={() =>
+                          setRule((now) => withChoice(now, [unit], !isShown(unit), preference))
+                        }
+                        className={CHECKBOX}
+                      />
+                      <span className={unitSymbol()}>{unit.symbol}</span>
+                      <span className="truncate">{unit.plural}</span>
+                      {unit.id === boxUnit && (
+                        <span className="ml-auto text-xs text-ink-muted">in the box</span>
+                      )}
+                    </label>
+                  ))}
+              </div>
+            );
+          })}
+        </fieldset>
+        <p className="text-xs text-ink-muted">
+          {variant === 'separate'
+            ? 'A system switch sets every category and clears the units chosen against it.'
+            : 'A system’s checkbox sets it in every category and clears the units chosen against it; a unit’s sets that unit alone.'}
+        </p>
+        {exceptions > 0 && (
+          <p className="flex items-center justify-between gap-2 text-xs text-ink-muted">
+            <span>
+              <span className="font-numeric">{exceptions}</span>{' '}
+              {exceptions === 1 ? 'unit' : 'units'} chosen on {exceptions === 1 ? 'its' : 'their'}{' '}
+              own in {name}
+            </span>
+            <Button
+              variant="ghost"
+              nested
+              onClick={() => setRule((now) => withoutExceptions(now, here))}
+              className="text-sm"
+            >
+              Reset {name}
+            </Button>
+          </p>
+        )}
+      </section>
+
+      <section className="grid gap-3 border-t border-line pt-3" aria-label="Display">
+        <h3 className={PANEL_TITLE}>Display</h3>
+        <Pills
+          legend="Unit names"
+          options={[
+            { value: 'both', label: 'Symbol and name' },
+            { value: 'symbol', label: 'Symbol only' },
+          ]}
+          value={display.names}
+          onChange={(names) => setDisplay({ names })}
+        />
+        <label className={OPTION_LINE}>
+          <input
+            type="checkbox"
+            checked={display.copy}
+            onChange={() => setDisplay({ copy: !display.copy })}
+            className={CHECKBOX}
+          />
+          Copy buttons
+        </label>
+        <Pills
+          legend="Format"
+          options={[
+            { value: 'decimal', label: 'Decimals' },
+            { value: 'fraction', label: 'Fractions' },
+          ]}
+          value={display.format}
+          onChange={(format) => setDisplay({ format })}
+        />
+        {display.format === 'decimal' ? (
+          <Pills
+            legend="Round to"
+            options={PLACES}
+            value={PLACES.find((each) => each.places === display.places)?.value ?? null}
+            onChange={(value) =>
+              setDisplay({ places: PLACES.find((each) => each.value === value)?.places ?? null })
+            }
+          />
+        ) : (
+          <fieldset className="grid gap-1">
+            <legend className={cx(SUBHEAD, 'pb-1')}>Fractions in</legend>
+            <div className="flex flex-wrap gap-1">
+              {DENOMINATORS.map((of) => (
+                <label key={of} className={PILL}>
+                  <input
+                    type="checkbox"
+                    checked={display.denominators.has(of)}
+                    onChange={() =>
+                      setDisplay({ denominators: toggleSet(display.denominators, of) })
+                    }
+                    className="sr-only"
+                  />
+                  1/{of}
+                </label>
               ))}
             </div>
-            <p className="px-2 text-xs text-ink-muted">
-              {PRESETS.find((each) => each.id === state.preset)?.hint}
-            </p>
-          </div>
+          </fieldset>
         )}
-        {filter === 'families' && chips.length > 0 && (
-          <div className="grid gap-2 pb-2">
-            <div role="group" aria-label="Families to show" className="flex flex-wrap gap-1">
-              {chips.map((family) => {
-                const on = state.families.has(family);
-                return (
-                  <Button
-                    key={family}
-                    variant="secondary"
-                    nested
-                    on={on}
-                    aria-pressed={on}
-                    onClick={() =>
-                      onState((current) => ({
-                        ...current,
-                        families: toggleSet(current.families, family),
-                      }))
-                    }
-                    className="text-sm"
-                  >
-                    {FAMILY_LABEL[family]}
-                  </Button>
-                );
-              })}
-            </div>
-            <p className="px-2 text-xs text-ink-muted">{familyHint(category)}</p>
-          </div>
-        )}
-        {filter === 'checks' && (
-          <div className="flex items-center justify-end pb-1">
-            <Button
-              variant="ghost"
-              nested
-              onClick={() => onState((current) => ({ ...current, editing: !current.editing }))}
-              className="text-sm"
-            >
-              {state.editing ? 'Done' : 'Edit'}
-            </Button>
-          </div>
-        )}
-        {filter === 'menu' && (
-          <div className="pb-2">
-            <div className="flex items-center justify-between gap-2">
-              <Button
-                variant="secondary"
-                nested
-                on={state.menuOpen}
-                aria-expanded={state.menuOpen}
-                onClick={() => onState((current) => ({ ...current, menuOpen: !current.menuOpen }))}
-                className="text-sm"
-              >
-                Show
-              </Button>
-              {state.menuOpen && (
-                <Button
-                  variant="ghost"
-                  nested
-                  onClick={() => onState((current) => ({ ...current, hiddenSections: new Set() }))}
-                  className="text-sm"
-                >
-                  Show all
-                </Button>
-              )}
-            </div>
-            {state.menuOpen && (
-              <div role="group" aria-label="Sections to show" className="flex flex-wrap gap-x-4">
-                {sections.map((section) => (
-                  <label key={section.key} className={CHOICE}>
-                    <input
-                      type="checkbox"
-                      checked={!state.hiddenSections.has(section.key)}
-                      onChange={() =>
-                        onState((current) => ({
-                          ...current,
-                          hiddenSections: toggleSet(current.hiddenSections, section.key),
-                        }))
-                      }
-                      className={CHECKBOX}
-                    />
-                    {menuName(section)}
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-        {filter === 'find' && (
-          <div className="pb-2">
-            <label htmlFor={`${id}-find`} className="sr-only">
-              Find a unit
-            </label>
-            <input
-              id={`${id}-find`}
-              type="search"
-              value={state.query}
-              placeholder="Find a unit"
-              onChange={(event) =>
-                onState((current) => ({ ...current, query: event.currentTarget.value }))
-              }
-              className="min-h-11 w-full rounded-md border-2 border-edge bg-surface px-3 text-ink"
-            />
-          </div>
-        )}
-        {drawn.length === 0 ? (
-          <p className="px-2 py-6 text-sm text-ink-muted">
-            {filter === 'find'
-              ? 'Nothing matches.'
-              : filter === 'presets'
-                ? 'Nothing shown. Choose All to bring the units back.'
-                : 'Nothing shown. Turn a section back on.'}
-          </p>
-        ) : (
-          <div ref={gridRef} className={ROWS}>
-            {drawn.map((section, at) => {
-              const symbols = sectionSymbols(section, cut !== 'fixed');
-              const edge = at === 0 ? 'pt-1' : 'mt-1 border-t border-line pt-2';
-              const checking = filter === 'checks' && state.editing;
-              return (
-                <div
-                  key={section.key}
-                  role="group"
-                  aria-label={section.label ?? 'Units'}
-                  className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
-                >
-                  {section.label && filter === 'fold' ? (
-                    <h3 className={cx('col-span-6', edge)}>
-                      <button
-                        type="button"
-                        aria-expanded={!section.folded}
-                        onClick={() =>
-                          onState((current) => ({
-                            ...current,
-                            folds: toggleSet(current.folds, section.foldKey),
-                          }))
-                        }
-                        className={cx(
-                          PANEL_TITLE,
-                          'flex min-h-11 w-full items-center gap-2 rounded-nested px-2 text-left hover:bg-surface-raised',
-                        )}
-                      >
-                        <ChevronDownIcon
-                          width="16"
-                          height="16"
-                          className={cx(
-                            'shrink-0 transition-transform',
-                            section.folded && '-rotate-90',
-                          )}
-                        />
-                        {section.label}
-                        {section.folded && (
-                          <span className="font-numeric font-normal">{section.rows.length}</span>
-                        )}
-                      </button>
-                    </h3>
-                  ) : section.label ? (
-                    <h3 className={cx('col-span-6', edge)}>
-                      {checking ? (
-                        <label
-                          className={cx(
-                            PANEL_TITLE,
-                            'flex min-h-11 items-center gap-2 rounded-nested px-2',
-                          )}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={section.sectionOn}
-                            onChange={() =>
-                              setUnits(
-                                section.rows.filter((row) => !row.inBox).map((row) => row.id),
-                                section.sectionOn,
-                              )
-                            }
-                            className={CHECKBOX}
-                          />
-                          {section.label}
-                        </label>
-                      ) : (
-                        <span className={cx('block px-2 pb-1', PANEL_TITLE)}>{section.label}</span>
-                      )}
-                    </h3>
-                  ) : (
-                    at > 0 && (
-                      <div aria-hidden="true" className="col-span-6 mt-1 border-t border-line" />
-                    )
-                  )}
-                  {section.visible.map((row) => {
-                    const symbol = symbols.get(row.id) ?? row.symbol;
-                    const unchecked = state.hiddenUnits.has(row.id);
-                    if (checking) {
-                      return (
-                        <label
-                          key={row.id}
-                          className={cx(
-                            CURSOR_ROW,
-                            'col-span-6 grid grid-cols-subgrid items-center',
-                            rowFill(row.inBox, false),
-                            unchecked && 'opacity-50',
-                          )}
-                        >
-                          <RowCells row={row} symbol={symbol} namesHidden={namesHidden} />
-                          <span className="grid size-11 place-items-center">
-                            <input
-                              type="checkbox"
-                              checked={!unchecked || row.inBox}
-                              disabled={row.inBox}
-                              onChange={() => setUnits([row.id], !unchecked)}
-                              className={CHECKBOX}
-                            />
-                          </span>
-                        </label>
-                      );
-                    }
-                    return (
-                      <div key={row.id} className="col-span-6 grid grid-cols-subgrid items-center">
-                        <button
-                          type="button"
-                          onClick={() => onTake(row)}
-                          className={cx(
-                            CURSOR_ROW,
-                            'col-span-5 grid grid-cols-subgrid items-center',
-                            rowFill(row.inBox, false),
-                          )}
-                        >
-                          <RowCells row={row} symbol={symbol} namesHidden={namesHidden} />
-                        </button>
-                        {row.tone === 'value' ? (
-                          <Button
-                            variant="ghost"
-                            square
-                            nested
-                            aria-label={`Copy ${row.name}`}
-                            onClick={() => void navigator.clipboard?.writeText(String(row.value))}
-                          >
-                            <CopyIcon />
-                          </Button>
-                        ) : (
-                          <span className="block size-11" />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
-        )}
-        <p className="flex items-center justify-between gap-2 border-t border-line px-2 pt-2 text-sm text-ink-muted">
-          <span>
-            <span className="font-numeric">{visibleCount}</span> of{' '}
-            <span className="font-numeric">{rows.length}</span>
-            {kept && ' · the unit in the box stays'}
-          </span>
-          {hiddenChecked > 0 && (
-            <Button
-              variant="ghost"
-              nested
-              onClick={() => onState((current) => ({ ...current, editing: true }))}
-              className="text-sm"
-            >
-              <span className="font-numeric">{hiddenChecked}</span> hidden
-            </Button>
-          )}
-        </p>
+        <Pills
+          legend="Rounding"
+          options={[
+            { value: 'nearest', label: 'Nearest' },
+            { value: 'up', label: 'Up' },
+            { value: 'down', label: 'Down' },
+          ]}
+          value={display.rounding}
+          disabled={display.format === 'decimal' && display.places === null}
+          onChange={(rounding) => setDisplay({ rounding })}
+        />
+      </section>
+      <div className="border-t border-line pt-2">
+        <Button
+          variant="ghost"
+          onClick={() => onUi((now) => ({ ...now, rule: FRESH_RULE, display: FRESH_DISPLAY }))}
+          className="text-sm"
+        >
+          Reset all settings
+        </Button>
       </div>
     </div>
   );
 }
 
-function InlineRadios<T extends string>({
-  label,
-  name,
-  options,
-  value,
-  onChange,
+/** The table: sections headed by system, hidden units kept at its foot, values as Display writes them. */
+function ResultsTable({
+  variant,
+  ui,
+  rows,
+  preference,
+  locale,
+  onUi,
+  onTake,
 }: {
-  label: string;
-  name: string;
-  options: ReadonlyArray<{ id: T; name: string }>;
-  value: T;
-  onChange: (value: T) => void;
+  variant: Variant;
+  ui: Ui;
+  rows: readonly TableRow[];
+  preference: UnitPreference;
+  locale: string | undefined;
+  onUi: UpdateUi;
+  onTake: (row: TableRow) => void;
 }) {
-  return (
-    <div role="group" aria-label={label} className="flex flex-wrap items-center gap-x-4">
-      <span className={PANEL_TITLE}>{label}</span>
-      {options.map((option) => (
-        <label key={option.id} className={CHOICE}>
+  const gridRef = useRef<HTMLDivElement>(null);
+  const namesHidden = useColumnsFit(gridRef, GIVE_WAY).includes('name');
+  const withName = ui.display.names === 'both';
+  const isShown = (row: TableRow) => row.inBox || shows(row.unit, ui.rule, preference);
+  const editing = variant === 'separate' && ui.editing;
+  const hidden = rows.filter((row) => !isShown(row));
+  const shownValue = (row: TableRow) =>
+    row.tone === 'value' ? displayValue(row.value, ui.display, locale) : null;
+  const choose = (chosen: readonly TableRow[], show: boolean) =>
+    onUi((now) => ({
+      ...now,
+      rule: withChoice(
+        now.rule,
+        chosen.filter((row) => !row.inBox).map((row) => row.unit),
+        show,
+        preference,
+      ),
+    }));
+
+  /** A row that is a checkbox: in Edit, or in the Hidden section. */
+  const checkRow = (row: TableRow) => {
+    const on = isShown(row);
+    return (
+      <label
+        key={row.id}
+        className={cx(
+          CURSOR_ROW,
+          'col-span-6 grid grid-cols-subgrid items-center',
+          rowFill(row.inBox, false),
+        )}
+      >
+        <RowCells
+          row={row}
+          shown={shownValue(row)}
+          namesHidden={namesHidden}
+          withName={withName}
+          muted={!on}
+        />
+        <span className="grid size-11 place-items-center">
           <input
-            type="radio"
-            name={name}
-            checked={value === option.id}
-            onChange={() => onChange(option.id)}
+            type="checkbox"
+            checked={on}
+            disabled={row.inBox}
+            onChange={() => choose([row], !on)}
             className={CHECKBOX}
           />
-          {option.name}
+        </span>
+      </label>
+    );
+  };
+
+  const headedCheck = (label: string, group: readonly TableRow[], edge: string) => {
+    const state = groupState(group, isShown);
+    return (
+      <h4 className={cx('col-span-6', edge)}>
+        <label className={cx(PANEL_TITLE, 'flex min-h-11 items-center gap-2 px-2')}>
+          <TriCheckbox state={state} onChange={() => choose(group, state !== 'all')} />
+          {label}
         </label>
-      ))}
+      </h4>
+    );
+  };
+
+  return (
+    <div className={cx(LIST_CARD, 'p-2')}>
+      {editing && (
+        <div className="flex items-center justify-between gap-2 pb-1 pl-2">
+          <span className={PANEL_TITLE}>Choose the units to show</span>
+          <Button
+            variant="ghost"
+            nested
+            onClick={() => onUi((now) => ({ ...now, editing: false }))}
+            className="text-sm"
+          >
+            Done
+          </Button>
+        </div>
+      )}
+      <div ref={gridRef} className={ROWS}>
+        {sectionsOf(rows, preference).map((section, at) => {
+          const listed = editing ? section.rows : section.rows.filter(isShown);
+          if (listed.length === 0) return null;
+          const edge = at === 0 ? 'pt-1' : 'mt-1 border-t border-line pt-2';
+          return (
+            <div
+              key={section.key}
+              role="group"
+              aria-label={section.label}
+              className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
+            >
+              {editing ? (
+                headedCheck(section.label, section.rows, edge)
+              ) : (
+                <h4 className={cx('col-span-6 px-2 pb-1', PANEL_TITLE, edge)}>{section.label}</h4>
+              )}
+              {listed.map((row) => {
+                if (editing) return checkRow(row);
+                return (
+                  <div key={row.id} className="col-span-6 grid grid-cols-subgrid items-center">
+                    <button
+                      type="button"
+                      onClick={() => onTake(row)}
+                      className={cx(
+                        CURSOR_ROW,
+                        'col-span-5 grid grid-cols-subgrid items-center',
+                        rowFill(row.inBox, false),
+                      )}
+                    >
+                      <RowCells
+                        row={row}
+                        shown={shownValue(row)}
+                        namesHidden={namesHidden}
+                        withName={withName}
+                      />
+                    </button>
+                    {ui.display.copy &&
+                      (row.tone === 'value' ? (
+                        <Button
+                          variant="ghost"
+                          square
+                          nested
+                          aria-label={`Copy ${row.name}`}
+                          onClick={() => void navigator.clipboard?.writeText(String(row.value))}
+                        >
+                          <CopyIcon />
+                        </Button>
+                      ) : (
+                        <span className="block size-11" />
+                      ))}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+        {!editing && (hidden.length > 0 || variant === 'separate') && (
+          <div className="col-span-6 mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1">
+            {hidden.length > 0 ? (
+              <button
+                type="button"
+                aria-expanded={ui.hiddenOpen}
+                onClick={() => onUi((now) => ({ ...now, hiddenOpen: !now.hiddenOpen }))}
+                className={cx(
+                  PANEL_TITLE,
+                  'flex min-h-11 items-center gap-2 rounded-nested px-2 hover:bg-surface-raised',
+                )}
+              >
+                <ChevronDownIcon
+                  width="16"
+                  height="16"
+                  className={cx('transition-transform', !ui.hiddenOpen && '-rotate-90')}
+                />
+                Hidden
+                <span className="font-numeric font-normal">{hidden.length}</span>
+              </button>
+            ) : (
+              <span className="px-2 text-sm text-ink-muted">Every unit shown</span>
+            )}
+            {variant === 'separate' && (
+              <Button
+                variant="ghost"
+                nested
+                onClick={() => onUi((now) => ({ ...now, editing: true }))}
+                className="text-sm"
+              >
+                Edit
+              </Button>
+            )}
+          </div>
+        )}
+        {!editing &&
+          ui.hiddenOpen &&
+          sectionsOf(hidden, preference).map((section) => (
+            <div
+              key={section.key}
+              role="group"
+              aria-label={`Hidden, ${section.label}`}
+              className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
+            >
+              {headedCheck(section.label, section.rows, 'pt-1')}
+              {section.rows.map((row) => checkRow(row))}
+            </div>
+          ))}
+      </div>
     </div>
   );
 }
 
-/**
- * Sections shared by two tables, and a filter of its own on each (docs/research/organization-lab.md).
- * Built from the real engine and table view, with the names giving way, and its own state.
- */
+/** While a unit is typed: the matches that show; a line, and a way in, for those that are hidden. */
+function MatchesList({
+  view,
+  ui,
+  preference,
+  onUi,
+  onTake,
+}: {
+  view: MatchesView;
+  ui: Ui;
+  preference: UnitPreference;
+  onUi: UpdateUi;
+  onTake: (unit: Unit) => void;
+}) {
+  const units = view.rows.flatMap((row) => (row.kind === 'unit' ? [row] : []));
+  const visible = (row: (typeof units)[number]) =>
+    row.inBox || shows(row.unit, ui.rule, preference);
+  const shown = units.filter(visible);
+  const hidden = units.filter((row) => !visible(row));
+  const groups = new Map<string, typeof shown>();
+  for (const row of shown) {
+    groups.set(row.category.name, [...(groups.get(row.category.name) ?? []), row]);
+  }
+  const line = (row: (typeof units)[number], hint?: string): ReactNode => (
+    <button
+      key={row.unit.id}
+      type="button"
+      onClick={() => onTake(row.unit)}
+      className={cx(
+        CURSOR_ROW,
+        'flex w-full items-center gap-2 text-left',
+        rowFill(row.inBox, false),
+      )}
+    >
+      <span className={unitSymbol()}>{row.unit.symbol}</span>
+      <span className="truncate text-ink">{row.unit.plural}</span>
+      {hint && <span className="ml-auto text-xs text-ink-muted">{hint}</span>}
+    </button>
+  );
+  return (
+    <div className={cx(LIST_CARD, 'grid gap-1 p-2')}>
+      {[...groups].map(([name, rows]) => (
+        <div key={name} role="group" aria-label={name}>
+          <p className={cx(PANEL_TITLE, 'px-2 pt-1 pb-1')}>{name}</p>
+          {rows.map((row) => line(row))}
+        </div>
+      ))}
+      {shown.length === 0 && hidden.length === 0 && (
+        <p className="px-2 py-2 text-sm text-ink-muted">No unit matches.</p>
+      )}
+      {hidden.length > 0 && (
+        <div
+          className={cx(
+            'flex min-h-11 items-center justify-between gap-2',
+            shown.length > 0 && 'border-t border-line pt-1',
+          )}
+        >
+          <span className="px-2 text-sm text-ink-muted">
+            {shown.length === 0 ? (
+              'Only hidden units match'
+            ) : (
+              <>
+                <span className="font-numeric">{hidden.length}</span> hidden{' '}
+                {hidden.length === 1 ? 'unit also matches' : 'units also match'}
+              </>
+            )}
+          </span>
+          <Button
+            variant="ghost"
+            nested
+            aria-expanded={ui.revealMatches}
+            onClick={() => onUi((now) => ({ ...now, revealMatches: !now.revealMatches }))}
+            className="text-sm"
+          >
+            {ui.revealMatches ? 'Hide them' : 'Show them'}
+          </Button>
+        </div>
+      )}
+      {hidden.length > 0 && ui.revealMatches && (
+        <div role="group" aria-label="Hidden matches">
+          <p className={cx(PANEL_TITLE, 'px-2 pt-1 pb-1')}>Hidden</p>
+          {hidden.map((row) =>
+            line(row, `${row.category.name} · ${FIXED_LABEL[fixedKeyOf(row.unit, preference)]}`),
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** One converter: its action bar, the box, and the table or the matches. */
+function Converter({
+  variant,
+  preference,
+  locale,
+  category,
+  text,
+  unit,
+  ui,
+  onCategory,
+  onText,
+  onUnit,
+  onUi,
+}: {
+  variant: Variant;
+  preference: UnitPreference;
+  locale: string | undefined;
+  category: CategoryId;
+  text: string;
+  unit: string | null;
+  ui: Ui;
+  onCategory: (category: CategoryId) => void;
+  onText: (text: string) => void;
+  onUnit: (unit: string | null) => void;
+  onUi: UpdateUi;
+}) {
+  const id = useId();
+  const meta = VARIANTS.find((each) => each.id === variant) ?? VARIANTS[0]!;
+  const separators = useMemo(() => localeSeparators(locale), [locale]);
+  const view = useMemo(
+    () =>
+      selectTable(
+        { ...initialState, text, unit, category },
+        { locale, separators, system: preference },
+      ),
+    [text, unit, category, locale, separators, preference],
+  );
+  const changed =
+    ui.rule.overrides.size > 0 ||
+    ui.rule.shown.size !== SHOW_KEYS.length ||
+    displayChanged(ui.display);
+  const close = () => onUi((now) => ({ ...now, settingsOpen: false }));
+
+  useEffect(() => {
+    if (!ui.settingsOpen) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') close();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  });
+
+  const take = (chosen: Unit, number: string) => {
+    onUnit(chosen.id);
+    onText(number);
+  };
+
+  return (
+    <div className="min-w-0">
+      <h2 className="font-display text-lg font-semibold">{meta.name}</h2>
+      <p className="min-h-16 text-sm text-ink-muted">{meta.hint}</p>
+      <div
+        role="toolbar"
+        aria-label={`Tools, ${meta.name}`}
+        className="relative mt-2 mb-2 flex flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2"
+      >
+        <CategoryMenu categories={categories} value={category} onChoose={onCategory} />
+        <div className="flex shrink-0 items-center gap-1">
+          <div
+            className="contents"
+            onBlur={(event: FocusEvent<HTMLDivElement>) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) close();
+            }}
+          >
+            <Button
+              variant="ghost"
+              square
+              on={ui.settingsOpen}
+              aria-expanded={ui.settingsOpen}
+              aria-controls={`${id}-settings`}
+              aria-label={changed ? 'Settings, changed' : 'Settings'}
+              title="Settings"
+              onClick={() => onUi((now) => ({ ...now, settingsOpen: !now.settingsOpen }))}
+              className="relative"
+            >
+              <SlidersIcon />
+              {changed && (
+                <span
+                  aria-hidden="true"
+                  className="absolute top-2 right-2 size-2 rounded-full bg-accent"
+                />
+              )}
+            </Button>
+            {ui.settingsOpen && (
+              <SettingsPanel
+                variant={variant}
+                id={`${id}-settings`}
+                ui={ui}
+                preference={preference}
+                category={category}
+                boxUnit={unit}
+                onUi={onUi}
+              />
+            )}
+          </div>
+          <ToolbarDivider />
+          <Button variant="ghost" square aria-label="Calculator" aria-disabled title="Calculator">
+            <CalculatorIcon />
+          </Button>
+          <ToolbarDivider />
+          <Button variant="ghost" square aria-label="Undo" aria-disabled title="Undo">
+            <UndoIcon />
+          </Button>
+          <Button variant="ghost" square aria-label="Redo" aria-disabled title="Redo">
+            <RedoIcon />
+          </Button>
+          <ToolbarDivider />
+          <Button
+            variant="ghost"
+            square
+            aria-label="Clear all"
+            title="Clear all"
+            onClick={() => {
+              onText('');
+              onUnit(null);
+            }}
+          >
+            <EraserIcon />
+          </Button>
+        </div>
+      </div>
+      <BoxField text={text} unit={unit} onText={onText} onRemove={() => onUnit(null)} />
+      <div className="mt-2">
+        {view.kind === 'matches' ? (
+          <MatchesList
+            view={view}
+            ui={ui}
+            preference={preference}
+            onUi={onUi}
+            onTake={(chosen) => take(chosen, parse(text, separators).valueText ?? '')}
+          />
+        ) : view.kind === 'units' ? (
+          <ResultsTable
+            variant={variant}
+            ui={ui}
+            rows={view.rows}
+            preference={preference}
+            locale={locale}
+            onUi={onUi}
+            onTake={(row) => {
+              if (row.inBox || row.tone === 'message' || row.value === null) return;
+              take(row.unit, String(Number(row.value.toPrecision(10))));
+            }}
+          />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function OrganizationLab() {
   const id = useId();
-  const [cut, setCut] = useState<Cut>('fixed');
-  const [filters, setFilters] = useState<[FilterId, FilterId]>(['edit', 'tree']);
   const [system, setSystem] = useState<UnitPreference>('us');
   const [category, setCategory] = useState<CategoryId>('volume');
   const [unit, setUnit] = useState<string | null>(SAMPLES.volume?.unit ?? null);
   const [text, setText] = useState(SAMPLES.volume?.text ?? '');
-  const [columns, setColumns] = useState<[FilterState, FilterState]>([
-    freshFilter(),
-    freshFilter(),
-  ]);
-
+  const [uis, setUis] = useState<[Ui, Ui]>([freshUi(), freshUi()]);
   const locale = browserLocale();
-  const categoryName = categories.find((each) => each.id === category)?.name ?? '';
-  const rows = useMemo(() => {
-    const env = { locale, separators: localeSeparators(locale), system };
-    const state = { ...initialState, text, unit, category };
-    const shown = selectTable(state, env);
-    const view = shown.kind === 'units' ? shown : selectTable({ ...state, text: '' }, env);
-    return view.kind === 'units' ? view.rows : [];
-  }, [locale, system, text, unit, category]);
 
   const choose = (next: CategoryId) => {
     setCategory(next);
     setUnit(SAMPLES[next]?.unit ?? null);
     setText(SAMPLES[next]?.text ?? '');
-    // The View's switches and single units are settings for every category, so they stay.
-    const reset = (column: FilterState): FilterState => ({
-      ...column,
-      view: viewForCategory(column.view),
-      folds: new Set<string>(),
-      hiddenUnits: new Set<string>(),
-      hiddenSections: new Set<string>(),
-      query: '',
-      editing: false,
-      menuOpen: false,
-    });
-    setColumns((current) => [reset(current[0]), reset(current[1])]);
-  };
-  const take = (row: TableRow) => {
-    if (row.inBox || row.tone === 'message') return;
-    setText(row.value === null ? text : formatNumber(row.value, { precision: 10, locale }));
-    setUnit(row.id);
+    setUis((current) => [closed(current[0]), closed(current[1])]);
   };
   const startOver = () => {
-    setColumns([freshFilter(), freshFilter()]);
+    setUis([freshUi(), freshUi()]);
     setUnit(SAMPLES[category]?.unit ?? null);
     setText(SAMPLES[category]?.text ?? '');
   };
-  const setColumn = (index: 0 | 1, update: (current: FilterState) => FilterState) => {
-    setColumns((current) => {
-      const next: [FilterState, FilterState] = [current[0], current[1]];
-      next[index] = update(current[index]);
-      return next;
-    });
-  };
 
   return (
-    <div className="mt-6 grid gap-4">
+    <div className="mt-6 grid gap-6">
       <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
-        <InlineRadios
-          label="Sections"
-          name={`${id}-cut`}
-          options={CUTS}
-          value={cut}
-          onChange={setCut}
-        />
-        <InlineRadios
-          label="Region"
-          name={`${id}-region`}
-          options={REGIONS}
-          value={system}
-          onChange={setSystem}
-        />
+        <div role="group" aria-label="Region" className="flex flex-wrap items-center gap-x-4">
+          <span className={PANEL_TITLE}>Region</span>
+          {REGIONS.map((region) => (
+            <label key={region.id} className="flex min-h-11 items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name={`${id}-region`}
+                checked={system === region.id}
+                onChange={() => setSystem(region.id)}
+                className={CHECKBOX}
+              />
+              {region.name}
+            </label>
+          ))}
+        </div>
         <Button variant="secondary" onClick={startOver}>
           Start over
         </Button>
       </div>
-      <CategoryMenu categories={categories} value={category} onChoose={choose} />
-      <div className="grid items-start gap-8 md:grid-cols-2 md:gap-4">
-        {([0, 1] as const).map((index) => (
-          <div key={index} className="grid min-w-0 gap-2">
-            <div
-              role="group"
-              aria-label={index === 0 ? 'Left filter' : 'Right filter'}
-              className="grid gap-2"
-            >
-              {(
-                [
-                  ['One rule, five ways', VIEW_OPTIONS],
-                  ['Earlier', FILTERS],
-                ] as const
-              ).map(([title, options]) => (
-                <div key={title} className="flex flex-wrap items-center gap-1">
-                  <span className={cx(PANEL_TITLE, 'w-full')}>{title}</span>
-                  {options.map((each) => (
-                    <Button
-                      key={each.id}
-                      variant="secondary"
-                      on={filters[index] === each.id}
-                      aria-pressed={filters[index] === each.id}
-                      onClick={() =>
-                        setFilters((current) => {
-                          const next: [FilterId, FilterId] = [current[0], current[1]];
-                          next[index] = each.id;
-                          return next;
-                        })
-                      }
-                      className="text-sm"
-                    >
-                      {each.name}
-                    </Button>
-                  ))}
-                </div>
-              ))}
-            </div>
-            {isViewOption(filters[index]) ? (
-              <ViewMock
-                option={filters[index] as ViewOption}
-                cut={cut}
-                rows={rows}
-                categoryName={categoryName}
-                preference={system}
-                text={text}
-                unit={unit}
-                view={columns[index].view}
-                onText={setText}
-                onTake={take}
-                onRemove={() => setUnit(null)}
-                onView={(update) =>
-                  setColumn(index, (current) => ({ ...current, view: update(current.view) }))
-                }
-              />
-            ) : (
-              <Mock
-                filter={filters[index] as EarlierFilter}
-                cut={cut}
-                rows={rows}
-                category={category}
-                preference={system}
-                text={text}
-                unit={unit}
-                state={columns[index]}
-                onText={setText}
-                onTake={take}
-                onRemove={() => setUnit(null)}
-                onState={(update) => setColumn(index, update)}
-              />
-            )}
-          </div>
+      <div className="grid items-start gap-10 md:grid-cols-2 md:gap-6">
+        {VARIANTS.map((variant, index) => (
+          <Converter
+            key={variant.id}
+            variant={variant.id}
+            preference={system}
+            locale={locale}
+            category={category}
+            text={text}
+            unit={unit}
+            ui={uis[index]!}
+            onCategory={choose}
+            onText={setText}
+            onUnit={setUnit}
+            onUi={(update) =>
+              setUis((current) => {
+                const next: [Ui, Ui] = [current[0], current[1]];
+                next[index] = update(current[index]!);
+                return next;
+              })
+            }
+          />
         ))}
       </div>
     </div>

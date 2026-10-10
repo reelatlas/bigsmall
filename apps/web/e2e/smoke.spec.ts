@@ -5,13 +5,7 @@ import { applyTheme, box, expectNoA11yViolations, pickTheme, ready, settled } fr
 // Checks that span the site: every page and every theme pass axe, every Tab stop shows focus,
 // and reduced motion stills every theme. Each feature's flows have a file of their own.
 
-for (const path of [
-  '/',
-  '/dev/gallery',
-  '/dev/wordmark-lab',
-  '/dev/table-controls-lab',
-  '/dev/organization-lab',
-]) {
+for (const path of ['/', '/dev/gallery', '/dev/wordmark-lab', '/dev/organization-lab']) {
   test(`${path} renders with no WCAG violations`, async ({ page }) => {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

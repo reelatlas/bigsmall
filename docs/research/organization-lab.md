@@ -1,89 +1,53 @@
-# Organization lab: other ways to cut the table's groups (2026-10-09)
+# Settings lab: what shows and how it looks (2026-10-10)
 
-The table controls lab (`/dev/table-controls-lab`, docs/research/table-controls.md) tries ways to hide the groups the listed order already makes. This lab, `/dev/organization-lab`, separates the two jobs. The sections are chosen once, for both tables. Each table then has its own filter. The two tables sit side by side from a tablet’s width, one over the other on a phone. Nothing here is chosen or built in the converter.
+Sean's model, in the context of the action bar (2026-10-10): one Settings button shapes the results, and the table holds what is specific to them. `/dev/organization-lab` (the settings lab, `apps/web/src/pages/dev/_organization-lab/`) builds it in two converters side by side, which differ only in where single units are chosen. Each has the real action bar (the category menu, then Settings, the calculator, undo and redo, and clear all), the box, and the table or the matches. The category, the number, and the region are shared; each converter keeps its own settings. Nothing is built in the converter yet.
 
-It is built from the real engine and table view, with the table's columns and its names giving way, and it holds its own state: no undo, no URL, no arrow keys. It can switch the visitor's region (US, UK, metric). Presets and Check list open together, on Jobs. Length, volume, energy, and data show the differences most clearly; temperature, time, and speed show what a short category does.
+The earlier prototypes, the table controls lab (A to D) and this lab's first two rounds (jobs, by system, six filters, and options E to I), are retired; they are in git before this round. What they settled is below.
 
-The unit in the box always stays, in every idea. A heading that names the region drops "(US)" and "(UK)" from a symbol when the two would not then read alike.
+## Settled along the way
 
-## Sean's direction (2026-10-10)
+- **Sections by system, under fixed names**: Metric, US (customary), UK (imperial), Other, Specialist, the same in every category, every section headed, the visitor's own first (Sean, 2026-10-10). Only headings take the parentheses; units keep their names and symbols ("imperial gallon" is the standard name, and "gal (UK)" tells the gallons apart when names drop on a phone). A category with no regional system (time, data, angle) heads its everyday units Everyday.
+- **Other has no switch** while it holds two units, the knot and the atmosphere, which always show (Sean, 2026-10-10).
+- **One setting for every category**: a system switch means the same thing everywhere.
+- **Jobs (Cooking, Cubic, Trade) were set aside**: written per category, named differently in each, and in the way of one filter for every category.
 
-After both labs, Claude's evaluation (by system over jobs; one menu in the toolbar over controls in each table; filters shape browsing, never search) and Sean's answers:
+## The model
 
-- **Sections by system, with fixed names**: Metric, US (customary), UK (imperial), Other, Specialist, the same five in every category, the visitor's own first. Only section headings take the parentheses; unit names and symbols stay as they are ("imperial gallon" is the standard name, and "gal (UK)" tells the two gallons apart when names drop on a phone).
-- **Headings always show**, in every table with more than one section, a section of one included.
-- **One filter for every category**: hiding Metric hides it everywhere.
-- **Search finds every unit**, hidden or not; a hidden unit in the matches carries a "hidden" note, and the unit in the box always shows its row.
+### Settings, in the action bar
 
-These are in the lab as **Fixed system names**, the default sections, and **E. Show menu**, with four ways to choose single units beside it (below).
+A sliders button at the start of the tools opens one panel, anchored to the action bar's right edge, with two parts. A dot on the button says something differs from a fresh visit.
 
-## One rule, five ways (E to I, 2026-10-10)
+**Units**, what the table and search show, in every category:
 
-Sean asked for single units too, a custom subset like the check list, with a section's checkbox three-state: checked when all its units show, a dash when some do, clear when none do. Other keeps its heading and loses its switch while it holds two units (the knot and the atmosphere), which always show.
+- Show: All units, Everyday, or Your region (presets; none is lit when the switches are a custom set).
+- Systems: Metric, US (customary), UK (imperial), Specialist.
 
-**The rule**, the same in all five: the system switches (Metric, US (customary), UK (imperial), Specialist) set what shows in every category; a unit chosen on its own overrides its switch either way, hidden from a system that shows or shown from one that hides, and stays chosen when the category changes; a section's checkbox reads its units in this category and sets them all; the unit in the box always shows; a line under the table counts what is hidden, with Show all (every switch on, this category's single choices cleared). Turning a switch drops the single choices it now agrees with.
+**Display**, how results look:
 
-| Option                  | Where single units are chosen                                                                                                                                                                                                                                                             |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **E. Show menu**        | Nowhere: systems only.                                                                                                                                                                                                                                                                    |
-| **F. Edit the table**   | The Show menu's last item, Choose single units…, turns the table into the checklist: a checkbox in every row where the copy button was, a three-state one on every heading, Done at the top. Hidden rows stay in view, dimmed, while editing; the line under the table offers Edit again. |
-| **G. Tree in the menu** | Under the switches in the Show menu, "In Volume": a three-state checkbox per section with "2 of 3", and a chevron that opens it to its units. The menu is wider, to hold a unit's row, and scrolls inside.                                                                                |
-| **H. View menu**        | One View menu: the presets and switches, a row "Units in Volume ›" that opens a page of the units (three-state sections, every unit listed, "‹ View" back), and Display.                                                                                                                  |
-| **I. View panel**       | A sliders button in the toolbar opens a panel over the table with every part in view: Show, Display, and "Units in Volume" as a tree.                                                                                                                                                     |
+- Unit names: Symbol and name, or Symbol only.
+- Copy buttons, on or off (a copy still copies the full value).
+- Format: Decimals, rounded to 0.1, 0.01, 0.001, or No limit (today's six significant digits); or Fractions, in the sizes chosen (1/2, 1/3, 1/4, 1/8, 1/16, 1/32, 1/64, several at once), written as mixed numbers in lowest terms, "≈" where they round.
+- Rounding: Nearest, Up, or Down (off with No limit).
+- A value too small for the places or the sizes chosen, which would read 0, keeps its significant digits; one past a million keeps decimals.
 
-Each table keeps its settings when its option changes, so one choice can be seen in each of the five; Start over clears them.
+### What shows: one rule
 
-**Other settings, and where they go.** Sean's next settings (abbreviations alone or with names, copy buttons, fractions or decimals, rounding, and more) are a different kind: they change how rows look, everywhere, where Show changes which rows there are. H and I put them in one View, in a Display section beside Show, with names and copy buttons working and fractions and rounding marked for later. Single units are the one setting that belongs to a category, which is why each option gives them a place of their own, named for the category ("Units in Volume"), and never mixes them with the switches.
+The system switches set every category. A unit chosen on its own is an exception, shown or hidden against its switch, and stays when the category changes. Turning a switch sets that system everywhere and clears its exceptions, so the last thing done wins at the scope it was done; a preset clears the exceptions of the systems it changes. Settings counts a category's exceptions ("2 units chosen on their own in Volume") with Reset Volume. The unit in the box always shows.
 
-## Sections
+### Choosing single units: the two converters
 
-Chosen once, above the tables, so the two filters are the thing being compared.
+- **1. Separate.** Settings lists the systems as plain switches for every category. The table's foot has Edit, which puts a checkbox on every row and a three-state one on every heading (all, some as a dash, none); Done ends it.
+- **2. Together.** Settings shows this category under each system: the system's checkbox reads all, some, or none of its units here, and sets the system everywhere, clearing its exceptions; a chevron opens it to its units, each chosen here alone. A system with no units in the category is a plain switch, "none in Length".
 
-|                        | What a section is                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Fixed system names** | Metric, US (customary), UK (imperial), Other, and Specialist, the same five everywhere, each section headed even when it holds one unit. The shared inch, foot, and pound sit with US (customary), or with UK (imperial) for a UK visitor; every specialist unit is Specialist. A category with no regional system (time, data, angle) heads its everyday units Everyday. Units keep their own names and symbols. |
-| **Jobs**               | A name for the job, written per category below. Your own everyday jobs lead, then other everyday jobs, then jobs that are specialist throughout. A specialist unit stays in its job, so it can sit above a later job. A category with no jobs listed gets no everyday heading, and its specialist units sit under More units.                                                                                     |
-| **By system**          | The listed-order groups (ADR 0011, ADR 0016): your everyday units, the other main system's, those of neither, then specialist. A run of one unit keeps its rows and gets no name. A category with no regional system (time, data, angle) leaves its everyday units unnamed. The specialist run is called More units.                                                                                              |
+### Hidden units
 
-## Filters
+- **In the table**: a Hidden line at the foot counts them ("Hidden 5"); open, it lists them under their section names, values dimmed, a checkbox on each and a three-state one on each heading, so one or a section comes back with a tap.
+- **In search**: hidden units leave the matches. When one matches, a line says so ("2 hidden units also match", or "Only hidden units match"), and Show them lists them under Hidden with their category and section ("Volume · Specialist"). Taking one puts it in the box, where it shows. Nothing typed ever meets a bare "No unit matches" while a hidden unit matches.
 
-Each table picks one. They do not share what is hidden.
+## Questions this round puts to Sean
 
-|                  | How you choose what stays                                                                                                                                                                                                                                                                                                                                   |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **E. Show menu** | A menu in the toolbar built like the category menu, reading what it shows ("Show All units"). Open: All units, Everyday, or Your units, then a checkbox per fixed system. One setting for every category, kept when the category changes; a line under the table counts what is hidden, with Show all. A category with no regions keeps its everyday units. |
-| **Fold**         | The section name hides that group. A run with no name stays.                                                                                                                                                                                                                                                                                                |
-| **Presets**      | Mine, Everyday, or All. Mine is the everyday units of your system. A category with no such units (data, time) treats Mine as every everyday unit.                                                                                                                                                                                                           |
-| **Families**     | Metric, US, UK, and More, each on or off. More is every specialist unit. Inches and the other shared units are one switch, US and UK, where the category has no US-only or UK-only unit. Where it has both, those shared units stay while either switch is on. A category with no regions offers More alone.                                                |
-| **Check list**   | Edit turns the copy buttons into checkboxes, and puts one on each section name. Done hides whatever is unchecked, and leaves a count that opens Edit again.                                                                                                                                                                                                 |
-| **Show menu**    | One Show button opens a checkbox per section, and Show all. The table stays clear until the menu is open.                                                                                                                                                                                                                                                   |
-| **Find**         | A field leaves only the units whose name or symbol matches.                                                                                                                                                                                                                                                                                                 |
-
-## Jobs
-
-Catalog order. The lab reorders these so the visitor's own everyday jobs lead.
-
-| Category     | Jobs                                                                                                                                                                    |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Length       | US customary (in, ft, yd, mi); Metric (mm, cm, m, km); Very small (nm, µm, mil); Nautical (fathom, nautical mile); Survey (furlong); Astronomy (au, light-year, parsec) |
-| Volume       | Cooking (tsp through gal); Metric (mL, L, m³); Cubic (in³, ft³, yd³); UK (fl oz, pt, gal); Trade (oil barrel)                                                           |
-| Mass         | US customary (oz, lb); Metric (mg, g, kg); UK (stone); Precious and small (µg, carat, grain, troy oz); Tons (tonne, short ton, long ton)                                |
-| Energy       | Electricity (Wh, kWh); Food (cal, kcal); Heat (BTU, therm); SI (J through GJ); Other (ft·lbf, eV)                                                                       |
-| Data         | Decimal (B through PB); Binary (KiB through PiB); Bits (bit through Gbit)                                                                                               |
-| Area         | Metric; US customary (in² through mi², with yd²); Land (acre, hectare)                                                                                                  |
-| Pressure     | SI (Pa, hPa, kPa, MPa, bar); US customary (psi, inHg); Atmosphere (atm, mmHg)                                                                                           |
-| Power        | SI (W through GW); Horsepower (hp, metric hp); Heat (BTU/h, ton of refrigeration)                                                                                       |
-| Fuel economy | Per volume (mpg US, mpg UK, km/L); Per distance (L/100 km, gal/100 mi)                                                                                                  |
-
-Time, temperature, speed, and angle have no jobs. Their specialist units, when they have any, sit under More units.
-
-Survey is one unit, and so is UK stone, and so is the oil barrel. The job still has a name. By system leaves a run of one unnamed.
-
-## What to notice
-
-- **Volume.** By system keeps the spoons and the gallons in one US customary run, and the cubic measures with the oil barrel. Jobs splits cooking, cubic, UK, and trade.
-- **Energy, US.** By system’s first run is BTU alone, so it gets no name, and the therm sits in More units. Jobs opens on Heat, with the therm beside BTU. Mine is BTU alone, and the kilocalorie stays only because it is the unit in the box.
-- **Data.** By system has no everyday heading. Jobs names Decimal, Bits, and Binary. Bits come before the binary prefixes because the bit is everyday and the binary prefixes are all specialist.
-- **Length.** Folding Metric, or turning off US and UK, is the case of someone working in inches. US and UK are one Families switch, because the inch is shared.
-- **Time and temperature.** Families does not offer a Metric switch for minutes. By system, on temperature for a US visitor, names Celsius and kelvin Metric and leaves Fahrenheit unnamed, because it is a run of one.
-- **A specialist unit in an everyday job.** The tonne pulls both other tons up with it. The petabyte stays in Decimal. Hiding specialist units is the More switch, or Everyday, or folding that job.
+1. **Where single units are chosen**: in the table (1) or in Settings (2)?
+2. **One button or several**: one Settings button for everything (the lab), or one or two of the most used surfaced on their own (decimals or fractions, say) once we know which?
+3. **Fractions for metric units**: "≈ 1,920 1/4 mm" reads oddly; fractions for customary units only, metric staying decimal, or every unit alike?
+4. **Rounding up and down** below zero: toward larger values (up is toward +∞), or away from zero?
+5. **Where Settings sits**: at the start of the tools (the lab), beside the category menu, or at the end?

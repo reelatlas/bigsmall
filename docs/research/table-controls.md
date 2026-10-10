@@ -1,5 +1,7 @@
 # Table controls: filtering the table and naming its sections (lab, 2026-10-08)
 
+**Retired 2026-10-10.** Superseded by the settings lab (docs/research/organization-lab.md), where Sean's model, one Settings button in the action bar and the table's sections and Hidden section, took over; the lab is in git before its removal. What it showed (folding, chips, a panel, editing the list) fed that model.
+
 Sean asked for a way to filter the table's units and for section names in a long table, designed together with the everyday-or-every-unit toggle (docs/PLAN.md §2). Four ways to filter and four ways to mark sections are prototyped in the table controls lab (`/dev/table-controls-lab`, `apps/web/src/pages/dev/_table-controls-lab/TableControlsLab.tsx`), in any pairing. Nothing is chosen or built in the converter yet.
 
 The lab is built from the real engine, table view (`selectTable`), category menu, and chip, with the table's columns and its names giving way as in the converter, but it holds its own simple state: no undo, no URL, no arrow keys. It can switch the visitor's region (US, UK, metric) and the width (a phone's column, 360 px, or the converter's wide one, 576 px).

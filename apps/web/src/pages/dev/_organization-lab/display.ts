@@ -81,7 +81,16 @@ export function fractionsOf(chosen: ReadonlySet<Size>): Fraction[] {
   return [...found.values()].sort((a, b) => a.n / a.d - b.n / b.d);
 }
 
-const MINUS = '−';
+/**
+ * The locale's minus sign, as the table's own text writes it (Intl's), so a negative value reads
+ * the same in every format and with no limit (Sean, 2026-10-10: −40 and -40 had both shown).
+ */
+function minusSign(locale?: string): string {
+  return (
+    new Intl.NumberFormat(locale).formatToParts(-1).find((part) => part.type === 'minusSign')
+      ?.value ?? '-'
+  );
+}
 const NOISE = 1e-9;
 
 /**
@@ -120,7 +129,12 @@ export function displayValue(
     : fractionValue(value, display, locale);
 }
 
-/** A value to the places chosen; null with no limit, or where the places would read 0. */
+/**
+ * A value to the places chosen; null with no limit, or for a value smaller than the last place
+ * (under 0.01 with two), which keeps its significant digits whatever the rounding (Sean,
+ * 2026-10-10: rounding up had written 0.000619 as 0.01 while nearest kept its digits, so the
+ * table changed shape with the rounding).
+ */
 export function decimalValue(
   value: number | null,
   display: Display,
@@ -129,18 +143,21 @@ export function decimalValue(
   if (value === null || !Number.isFinite(value)) return null;
   if (display.places === null) return null;
   const scale = 10 ** display.places;
+  if (value !== 0 && Math.abs(value) < 1 / scale) return null;
   const result = rounded(value * scale, display.rounding) / scale;
   if (result === 0 && value !== 0) return null;
   if (Math.abs(result) >= 1e15) return null;
   const text = new Intl.NumberFormat(locale, { maximumFractionDigits: display.places }).format(
-    Math.abs(result),
+    result,
   );
-  return { text: (result < 0 ? MINUS : '') + text, approx: false };
+  return { text, approx: false };
 }
 
 /**
  * A value in the fraction sizes chosen, as a mixed number, and whether it rounds; null with no
- * size chosen, where it would read 0, or past a million. A tie goes up, as Math.round's does.
+ * size chosen, past a million, or for a value smaller than the smallest size chosen (under 1/8
+ * with eighths), which keeps its digits whatever the rounding, as decimals do. A tie goes up, as
+ * Math.round's does.
  */
 export function fractionValue(
   value: number | null,
@@ -149,6 +166,7 @@ export function fractionValue(
 ): Written | null {
   if (value === null || !Number.isFinite(value)) return null;
   if (Math.abs(value) >= 1e6 || display.fractions.size === 0) return null;
+  if (value !== 0 && Math.abs(value) < 1 / Math.max(...display.fractions) - NOISE) return null;
   // The nearest, the next up, or the next down of whole + a fraction chosen, a hair of float noise
   // allowed either way, so 2.4999999999999996 is still 2 1/2.
   const base = Math.floor(value);
@@ -175,7 +193,7 @@ export function fractionValue(
   const wholeText = whole ? new Intl.NumberFormat(locale).format(whole) : '';
   const text = [wholeText, fraction].filter(Boolean).join(' ');
   return {
-    text: (count < 0 ? MINUS : '') + text,
+    text: (count < 0 ? minusSign(locale) : '') + text,
     approx: Math.abs(value - count / pick.d) > NOISE,
   };
 }

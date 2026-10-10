@@ -134,6 +134,7 @@ A class list more than one file builds from is a recipe in `src/lib/recipes.ts`,
 
 - Components write `transition-colors` (or `transition-[border-color,box-shadow]`, `transition-transform`) and nothing else: the bridge makes every transition default to `--motion-fast` and `--motion-ease`.
 - Buttons, chips, and shell edges fade; list rows and theme options change instantly, so keyboard movement never lags.
+- **A check that draws itself in** (`check-draw`, `global.css`) confirms an action done in a button with a label, such as Settings' resets (Sean, 2026-10-10): `CheckIcon` in the success color after the label, its stroke drawn over `--motion-slow`. It rests fully drawn and animates from hidden, so reduced motion, which stops every animation, shows it whole. An icon-only button confirms by swapping its icon for `CopiedIcon` instead ("Icon buttons and the toolbar").
 - Reduced motion zeroes the motion tokens with an unlayered rule placed after the theme imports (a layered rule loses to the themes' unlayered token blocks), and a blanket `!important` rule stops any other transition or animation. A browser test checks the tokens read `0ms` in every theme.
 
 ### Corners

@@ -639,3 +639,8 @@ Format:
 
 **What happened.** Wrapping the lab's converter in a `max-w-xl` div made the wrapper the page grid's item instead of the converter, whose root carried `min-w-0`. The wrapper took its content's natural width, about 515 px, and the page scrolled sideways on a phone.
 **Rule.** Whatever is a grid or flex item directly takes `min-w-0` when its content can be wider than the track (a table with columns that give way); moving that item into a wrapper moves the `min-w-0` with it.
+
+## 2026-10-10 — An animation that reveals rests revealed
+
+**What happened.** A check meant to draw itself in would have started hidden (a stroke offset its full length) and animated to drawn. This site's reduced-motion rule stops every animation outright (`animation: none !important`), so under it the check would have stayed hidden, the confirmation lost.
+**Rule.** Animate from the hidden state to the resting one (`@keyframes … { from { … } }`, the rule's own style the finished look), never the other way, so stopping the animation leaves what it was revealing. `check-draw` in `global.css` does so.

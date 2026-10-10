@@ -185,16 +185,27 @@ describe('settings lab: display', () => {
   });
 
   it('rounds up toward larger values and down toward smaller, below zero too', () => {
-    expect(text(-2.15, { places: 1, rounding: 'up' })).toBe('−2.1');
-    expect(text(-2.15, { places: 1, rounding: 'down' })).toBe('−2.2');
+    // The locale's minus sign, as the table's own text writes it (en-US: the hyphen-minus).
+    expect(text(-2.15, { places: 1, rounding: 'up' })).toBe('-2.1');
+    expect(text(-2.15, { places: 1, rounding: 'down' })).toBe('-2.2');
     const quarters = { format: 'fraction', fractions: sizes(2, 4) } as const;
-    expect(text(-6.3, { ...quarters, rounding: 'up' })).toBe('−6 1/4');
-    expect(text(-6.3, { ...quarters, rounding: 'down' })).toBe('−6 1/2');
+    expect(text(-6.3, { ...quarters, rounding: 'up' })).toBe('-6 1/4');
+    expect(text(-6.3, { ...quarters, rounding: 'down' })).toBe('-6 1/2');
   });
 
-  it('keeps the table’s own text with no limit, or where the places would read 0', () => {
+  it('keeps the table’s own text with no limit, or for a value smaller than the last place', () => {
     expect(text(0.473176, { places: null })).toBeNull();
     expect(text(0.000473, { places: 2 })).toBeNull();
+    // Whatever the rounding: up no longer writes 0.000473 as 0.01 while nearest keeps its digits.
+    for (const rounding of ['nearest', 'up', 'down'] as const) {
+      expect(text(0.000473, { places: 2, rounding })).toBeNull();
+      expect(text(-0.006, { places: 2, rounding })).toBeNull();
+      expect(text(0.0625, { format: 'fraction', fractions: sizes(2, 4, 8), rounding })).toBeNull();
+    }
+    expect(text(0.01, { places: 2, rounding: 'down' })).toBe('0.01');
+    expect(text(0.125, { format: 'fraction', fractions: sizes(2, 4, 8), rounding: 'down' })).toBe(
+      '1/8',
+    );
   });
 
   it('writes every fraction of each size chosen, in lowest terms, marked when not exact', () => {
@@ -212,7 +223,7 @@ describe('settings lab: display', () => {
     // The rare ones of a fine size are written too: 5/64 is not rounded to a "common" neighbour.
     expect(fraction(0.078125, sizes(64))).toEqual({ text: '5/64', approx: false });
     expect(fraction(0.75, FRESH_DISPLAY.fractions)?.text).toBe('3/4');
-    expect(fraction(-1.5, FRESH_DISPLAY.fractions)?.text).toBe('−1 1/2');
+    expect(fraction(-1.5, FRESH_DISPLAY.fractions)?.text).toBe('-1 1/2');
     expect(fraction(0.9999, sizes(2, 4))?.text).toBe('1');
     // Float noise: a value that should be 2 1/2 is still 2 1/2 rounded down.
     expect(fraction(2.4999999999999996, sizes(2, 4, 8), 'down')?.text).toBe('2 1/2');
@@ -236,8 +247,8 @@ describe('settings lab: display', () => {
     expect(listed(sizes(2, 4, 8, 16)).slice(0, 4)).toEqual(['1/16', '1/8', '3/16', '1/4']);
     const quarters = { format: 'fraction', fractions: sizes(4) } as const;
     expect(text(2.5, quarters)).toBe('2 2/4');
-    expect(text(-1.5, quarters)).toBe('−1 2/4');
-    expect(text(-1.75, quarters)).toBe('−1 3/4');
+    expect(text(-1.5, quarters)).toBe('-1 2/4');
+    expect(text(-1.75, quarters)).toBe('-1 3/4');
   });
 
   it('writes Both as the fraction, its decimal beside it', () => {

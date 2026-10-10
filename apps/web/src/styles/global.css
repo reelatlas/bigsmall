@@ -82,6 +82,24 @@
   }
 }
 
+/*
+ * A check that draws itself in, for a confirmation such as a reset done (docs/DESIGN-SYSTEM.md,
+ * "Motion"). It rests fully drawn and animates from hidden, so reduced motion, which stops every
+ * animation, shows it whole. 24 covers the check's path (about 20 units long).
+ */
+@utility check-draw {
+  & path {
+    stroke-dasharray: 24;
+    animation: check-draw var(--motion-slow) var(--motion-ease) both;
+  }
+}
+
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 24;
+  }
+}
+
 @layer base {
   html {
     background: var(--canvas);

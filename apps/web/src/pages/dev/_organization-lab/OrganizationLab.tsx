@@ -11,6 +11,7 @@ import { Button } from '../../../components/Button';
 import { CategoryMenu } from '../../../components/CategoryMenu';
 import {
   CalculatorIcon,
+  CheckIcon,
   ChevronDownIcon,
   CopyIcon,
   EraserIcon,
@@ -26,6 +27,7 @@ import {
   type MatchesView,
   type TableRow,
 } from '../../../features/converter/state';
+import { useCopied } from '../../../lib/copied';
 import { useColumnsFit } from '../../../lib/fit-step';
 import {
   CARD,
@@ -196,6 +198,8 @@ function Choices<T extends string | number>({
   );
 }
 
+const ROUNDINGS: readonly Display['rounding'][] = ['nearest', 'up', 'down'];
+
 const PLACES: ReadonlyArray<{ value: string; label: string; places: Display['places'] }> = [
   { value: '1', label: '0.1', places: 1 },
   { value: '2', label: '0.01', places: 2 },
@@ -286,6 +290,11 @@ function SettingsPanel({
   const { rule, display } = ui;
   const hiddenCount = hiddenByHand(rule);
   const settingsChanged = switchesChanged(rule) || displayChanged(display);
+  // A reset done shows a check after its label that draws itself in, in the success color, at
+  // full strength while it shows; then the button settles to its off look (Sean, 2026-10-10).
+  // useCopied times it as it does a copy's check, and the status line says it.
+  const { copied: done, markCopied, pointerProps } = useCopied<'reset' | 'unhide'>();
+  const doneCheck = <CheckIcon width="16" height="16" className="check-draw text-success" />;
   const setRule = (next: (rule: ViewRule) => ViewRule) =>
     onUi((now) => ({ ...now, rule: next(now.rule) }));
   const setDisplay = (patch: Partial<Display>) =>
@@ -400,7 +409,7 @@ function SettingsPanel({
         <div className="flex items-center justify-between gap-2">
           <Button
             variant="ghost"
-            aria-disabled={!settingsChanged}
+            aria-disabled={!settingsChanged && done !== 'reset'}
             onClick={() => {
               if (!settingsChanged) return;
               onUi((now) => ({
@@ -408,25 +417,35 @@ function SettingsPanel({
                 rule: withSystems(now.rule, FRESH_RULE.shown),
                 display: FRESH_DISPLAY,
               }));
+              markCopied('reset');
             }}
+            {...pointerProps('reset')}
             className="text-sm"
           >
             Reset settings
+            {done === 'reset' && doneCheck}
           </Button>
           <Button
             variant="ghost"
-            aria-disabled={hiddenCount === 0}
+            aria-disabled={hiddenCount === 0 && done !== 'unhide'}
             onClick={() => {
-              if (hiddenCount > 0) setRule(withoutHidden);
+              if (hiddenCount === 0) return;
+              setRule(withoutHidden);
+              markCopied('unhide');
             }}
+            {...pointerProps('unhide')}
             className="text-sm"
           >
             Unhide units
             {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
+            {done === 'unhide' && doneCheck}
           </Button>
         </div>
         <p className="px-2 text-xs text-ink-muted">
           Reset settings keeps the units you hid; Unhide shows them again, in every category.
+        </p>
+        <p role="status" className="sr-only">
+          {done === 'reset' ? 'Settings reset' : done === 'unhide' ? 'Units unhidden' : ''}
         </p>
       </div>
     </div>
@@ -464,14 +483,27 @@ function ResultsTable({
   const hidden = rows.filter((row) => !isShown(row));
 
   /** The value as Display writes it first (a fraction with Both), and Both's decimal after it. */
-  const firstOf = (row: TableRow) =>
-    writtenValue(row, row.tone === 'value' ? displayValue(row.value, display, locale) : null);
-  const withDecimal = (row: TableRow) =>
-    display.format === 'both' &&
+  const firstOf = (row: TableRow, under: Display = display) =>
+    writtenValue(row, row.tone === 'value' ? displayValue(row.value, under, locale) : null);
+  const withDecimal = (row: TableRow, under: Display) =>
+    under.format === 'both' &&
     row.tone === 'value' &&
-    displayValue(row.value, display, locale) !== null;
-  const decimalOf = (row: TableRow): ReactNode =>
-    withDecimal(row) ? writtenValue(row, decimalValue(row.value, display, locale)) : null;
+    displayValue(row.value, under, locale) !== null;
+  const decimalOf = (row: TableRow, under: Display = display): ReactNode =>
+    withDecimal(row, under) ? writtenValue(row, decimalValue(row.value, under, locale)) : null;
+  /*
+   * The sizer measures each value under every rounding, so choosing Up, Down, or Nearest never
+   * moves the columns (Sean, 2026-10-10); a change of format or places, which rewrites the values,
+   * may.
+   */
+  const everyRounding =
+    (cell: (row: TableRow, under?: Display) => ReactNode) =>
+    (row: TableRow): ReactNode =>
+      ROUNDINGS.map((rounding) => (
+        <span key={rounding} className="block">
+          {cell(row, { ...display, rounding })}
+        </span>
+      ));
   const cells = (row: TableRow, muted = false, check?: ReactNode) => (
     <RowCells
       row={row}
@@ -609,8 +641,8 @@ function ResultsTable({
         })}
         <ColumnSizer
           rows={rows}
-          value={firstOf}
-          decimal={display.format === 'both' ? decimalOf : null}
+          value={everyRounding(firstOf)}
+          decimal={display.format === 'both' ? everyRounding(decimalOf) : null}
           namesHidden={namesHidden}
           decimalHidden={decimalHidden}
           withName={withName}

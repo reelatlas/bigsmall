@@ -48,9 +48,10 @@ A sliders button at the start of the tools opens one panel, anchored to the acti
 - Format: Decimals, Fractions, or Both.
 - Round to: for decimals 0.1, 0.01, 0.001, or No limit (today's six significant digits); for fractions the sizes chosen, each on or off, in two strips, each smallest to largest (1/8, 1/4, 1/3, 1/2, the everyday ones, on top; then 1/64, 1/32, 1/16), with a line under them that says what they write ("Shows 1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8"); with none chosen, values keep their decimals. With Both, the two read Round decimals to and Round fractions to, decimals first as Format lists them. Fractions are written as mixed numbers, "≈" where they round, a tie going up.
 - Rounding: Nearest, Up, or Down (off with No limit).
-- A value too small for the places or the step, which would read 0, keeps its significant digits; one past a million keeps decimals.
+- A value smaller than the last place or the smallest size chosen (under 0.01 with two places, under 1/8 with eighths) keeps its significant digits whatever the rounding (Sean, 2026-10-10: rounding up had written 0.000619 as 0.01 while nearest kept its digits, so the table changed shape with the rounding); one past a million keeps decimals. Negative values take the locale's minus sign in every format, as the table's own text does.
+- Rounding never moves the columns: the sizer measures each value under nearest, up, and down. A change of format, places, or fraction sizes rewrites the values, and the columns fit the new ones.
 
-**Resets**: Reset settings (the switches and Display; the units hidden in a table stay) and Unhide units, with their count (every unit hidden on its own; the settings stay). Each is off while it has nothing to do, and neither closes the panel, so what it changed is there to see (Sean, 2026-10-10).
+**Resets**: Reset settings (the switches and Display; the units hidden in a table stay) and Unhide units, with their count (every unit hidden on its own; the settings stay). Each is off while it has nothing to do, and neither closes the panel, so what it changed is there to see (Sean, 2026-10-10). A reset done shows a check after its label that draws itself in, in the success color, at full strength for the copy check's time (two seconds, longer while the pointer rests on it), then the button settles to its off look; the status line says "Settings reset" or "Units unhidden".
 
 The panel closes on Escape, a press outside it, or focus moving outside it, never on focus merely lost (a reset turning itself off, the fraction steps leaving with Reset settings).
 
@@ -75,3 +76,4 @@ The table's foot has Edit, which puts a checkbox on every row and a three-state 
 4. **One button or several**: one Settings button for everything (the lab), or one or two of the most used surfaced on their own once we know which?
 5. **Both's order in the table**: Settings now lists decimals first; the table writes the fraction first and its decimal after, in the muted ink, as charts of fractions do. Keep, or the decimal first there too?
 6. **The decimal places' order**: the fraction sizes run smallest to largest; the places run 0.1, 0.01, 0.001. Flip them to match (0.001, 0.01, 0.1, No limit)?
+7. **Trailing zeros**: rounded to 0.01, a value reads 0.1, not 0.10 (and 96, not 96.00), as the table does today. Pad them so the decimal points line up, or keep them off?

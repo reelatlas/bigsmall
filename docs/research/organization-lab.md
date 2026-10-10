@@ -36,13 +36,15 @@ A sliders button at the start of the tools opens one panel, anchored to the acti
 **Display**, how results look:
 
 - Unit names: Symbol only, or Symbol and name.
-- Copy buttons, a switch (a copy still copies the full value).
+- Copy buttons, a switch leading its label, as a checkbox does (a copy still copies the full value).
 - Format: Decimals or Fractions.
 - Round to: for decimals 0.1, 0.01, 0.001, or No limit (today's six significant digits); for fractions one step of six, in three groups, coarse to fine: Coarse (1/2, 1/4), Medium (1/8), Fine (1/16, 1/32, 1/64), with a line under them that says what the step writes ("Shows 1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8"). Fractions are written as mixed numbers in lowest terms, "≈" where they round.
 - Rounding: Nearest, Up, or Down (off with No limit).
 - A value too small for the places or the step, which would read 0, keeps its significant digits; one past a million keeps decimals.
 
-**Resets**: Reset settings (the switches and Display; the units hidden in a table stay) and Unhide units, with their count (every unit hidden on its own; the settings stay). Each is off while it has nothing to do.
+**Resets**: Reset settings (the switches and Display; the units hidden in a table stay) and Unhide units, with their count (every unit hidden on its own; the settings stay). Each is off while it has nothing to do, and neither closes the panel, so what it changed is there to see (Sean, 2026-10-10).
+
+The panel closes on Escape, a press outside it, or focus moving outside it, never on focus merely lost (a reset turning itself off, the fraction steps leaving with Reset settings).
 
 ### What shows: two layers
 

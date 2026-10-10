@@ -6,16 +6,7 @@ import {
   type Unit,
   type UnitPreference,
 } from '@bigsmall/core';
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FocusEvent,
-  type ReactNode,
-} from 'react';
+import { useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Button } from '../../../components/Button';
 import { CategoryMenu } from '../../../components/CategoryMenu';
 import {
@@ -305,6 +296,7 @@ function SettingsPanel({
 }) {
   const { rule, display } = ui;
   const hiddenCount = hiddenByHand(rule);
+  const settingsChanged = switchesChanged(rule) || displayChanged(display);
   const setRule = (next: (rule: ViewRule) => ViewRule) =>
     onUi((now) => ({ ...now, rule: next(now.rule) }));
   const setDisplay = (patch: Partial<Display>) =>
@@ -417,25 +409,29 @@ function SettingsPanel({
        * the units hidden in a table, which leave the settings.
        */}
       <div className="grid gap-1 border-t border-line pt-2">
+        {/* Off with aria-disabled, which keeps focus where it was, so the panel stays open. */}
         <div className="flex items-center justify-between gap-2">
           <Button
             variant="ghost"
-            disabled={!switchesChanged(rule) && !displayChanged(display)}
-            onClick={() =>
+            aria-disabled={!settingsChanged}
+            onClick={() => {
+              if (!settingsChanged) return;
               onUi((now) => ({
                 ...now,
                 rule: withSystems(now.rule, FRESH_RULE.shown),
                 display: FRESH_DISPLAY,
-              }))
-            }
+              }));
+            }}
             className="text-sm"
           >
             Reset settings
           </Button>
           <Button
             variant="ghost"
-            disabled={hiddenCount === 0}
-            onClick={() => setRule(withoutHidden)}
+            aria-disabled={hiddenCount === 0}
+            onClick={() => {
+              if (hiddenCount > 0) setRule(withoutHidden);
+            }}
             className="text-sm"
           >
             Unhide units
@@ -796,13 +792,34 @@ function Converter({
   );
   const close = () => onUi((now) => ({ ...now, settingsOpen: false }));
 
-  useEffect(() => {
+  /*
+   * Settings closes on Escape, a press outside it, or focus moving outside it; never on focus
+   * merely lost, as when a reset turns itself off or Reset settings takes the fraction steps away
+   * (Sean, 2026-10-10: a reset that closed the panel left no way to see that it worked).
+   */
+  const settingsRef = useRef<HTMLDivElement>(null);
+  // A layout effect, so the listeners are there before the next press (CLAUDE.md, rule 5).
+  useLayoutEffect(() => {
     if (!ui.settingsOpen) return undefined;
+    const outside = (target: EventTarget | null) =>
+      target instanceof Node && !settingsRef.current?.contains(target);
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') close();
     };
+    const onPress = (event: PointerEvent) => {
+      if (outside(event.target)) close();
+    };
+    const onFocus = (event: FocusEvent) => {
+      if (outside(event.target)) close();
+    };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPress);
+    document.addEventListener('focusin', onFocus);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPress);
+      document.removeEventListener('focusin', onFocus);
+    };
   });
 
   /**
@@ -830,12 +847,7 @@ function Converter({
       >
         <CategoryMenu categories={categories} value={category} onChoose={onCategory} />
         <div className="flex shrink-0 items-center gap-1">
-          <div
-            className="contents"
-            onBlur={(event: FocusEvent<HTMLDivElement>) => {
-              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) close();
-            }}
-          >
+          <div ref={settingsRef} className="contents">
             <Button
               variant="ghost"
               square

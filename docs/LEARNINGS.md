@@ -624,3 +624,8 @@ Format:
 
 **What happened.** A row's checkbox, handed to the cells component as a prop so it could lead the value's cell, failed `jsx-a11y/label-has-associated-control`: the rule reads the label's children as written, and the input was not among them.
 **Rule.** When the control sits inside a label but is rendered by a child component, tie them with `htmlFor` and the control's `id` (from `useId`, plus a row key), which the rule and every browser accept.
+
+## 2026-10-10 — A panel that closes on blur closes when its focused control disables or leaves
+
+**What happened.** The settings lab's panel closed when focus left it (`onBlur`, no related target inside). A reset turned itself off once it had nothing left to do, and Reset settings from Fractions removed the fraction steps; either way the focused control lost focus to the page, the blur came with no related target, and the panel closed in the middle of the very action whose result it should have shown.
+**Rule.** A popover closes on Escape, a press outside it (`pointerdown` on the document), and focus moving to something outside it (`focusin` on the document), attached in a layout effect so they are there before the next press; never on a bare blur. A control that turns itself off while focused takes `aria-disabled` (the Button's documented way to stay a stop) and does nothing when pressed, rather than `disabled`, which drops focus.

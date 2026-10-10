@@ -126,8 +126,9 @@ export function BoxField({
 
 /**
  * A trial switch (the next round's proposal 3): one setting that takes effect at once. The whole
- * row is the control, so its tap is the row's; the track is drawn from the control edge, and the
- * accent once on. It moves to components/ and the gallery if Sean keeps it.
+ * row is the control, so its tap is the row's; the track leads and its label follows, as a
+ * checkbox's does (Sean, 2026-10-10), drawn from the control edge, and the accent once on. It moves
+ * to components/ and the gallery if Sean keeps it.
  */
 export function Switch({
   label,
@@ -144,9 +145,8 @@ export function Switch({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-nested-md px-2 text-sm text-ink hover:bg-surface-raised"
+      className="flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-nested-md px-2 text-left text-sm text-ink hover:bg-surface-raised"
     >
-      {label}
       <span
         aria-hidden="true"
         className={cx(
@@ -161,6 +161,7 @@ export function Switch({
           )}
         />
       </span>
+      {label}
     </button>
   );
 }

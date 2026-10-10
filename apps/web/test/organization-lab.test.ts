@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest';
 import {
   displayChanged,
   displayValue,
+  fractionsOf,
   FRESH_DISPLAY,
-  stepFractions,
+  heldBy,
   type Display,
+  type Size,
 } from '../src/pages/dev/_organization-lab/display';
 import { fixedKeyOf, sectionsOf } from '../src/pages/dev/_organization-lab/sections';
 import {
@@ -146,6 +148,8 @@ describe('settings lab: display', () => {
   const as = (patch: Partial<Display>) => ({ ...FRESH_DISPLAY, ...patch });
   const text = (value: number, patch: Partial<Display>) =>
     displayValue(value, as(patch), 'en-US')?.text ?? null;
+  const sizes = (...each: Size[]) => new Set<Size>(each);
+  const listed = (chosen: ReadonlySet<Size>) => fractionsOf(chosen).map((f) => `${f.n}/${f.d}`);
 
   it('starts with symbols, no copy buttons, and two places, rounded to the nearest', () => {
     expect(FRESH_DISPLAY).toMatchObject({
@@ -157,7 +161,7 @@ describe('settings lab: display', () => {
     });
     expect(text(0.473176, {})).toBe('0.47');
     // Fractions, once chosen, start in eighths.
-    expect(stepFractions(FRESH_DISPLAY.step)).toEqual([
+    expect(listed(FRESH_DISPLAY.fractions)).toEqual([
       '1/8',
       '1/4',
       '3/8',
@@ -167,7 +171,8 @@ describe('settings lab: display', () => {
       '7/8',
     ]);
     expect(displayChanged(FRESH_DISPLAY)).toBe(false);
-    expect(displayChanged(as({ step: 16 }))).toBe(true);
+    expect(displayChanged(as({ fractions: sizes(8, 4, 2) }))).toBe(false);
+    expect(displayChanged(as({ fractions: sizes(16) }))).toBe(true);
   });
 
   it('writes decimals to a place, rounded to the nearest, up, or down', () => {
@@ -182,8 +187,9 @@ describe('settings lab: display', () => {
   it('rounds up toward larger values and down toward smaller, below zero too', () => {
     expect(text(-2.15, { places: 1, rounding: 'up' })).toBe('−2.1');
     expect(text(-2.15, { places: 1, rounding: 'down' })).toBe('−2.2');
-    expect(text(-6.3, { format: 'fraction', step: 4, rounding: 'up' })).toBe('−6 1/4');
-    expect(text(-6.3, { format: 'fraction', step: 4, rounding: 'down' })).toBe('−6 1/2');
+    const quarters = { format: 'fraction', fractions: sizes(4) } as const;
+    expect(text(-6.3, { ...quarters, rounding: 'up' })).toBe('−6 1/4');
+    expect(text(-6.3, { ...quarters, rounding: 'down' })).toBe('−6 1/2');
   });
 
   it('keeps the table’s own text with no limit, or where the places would read 0', () => {
@@ -191,26 +197,46 @@ describe('settings lab: display', () => {
     expect(text(0.000473, { places: 2 })).toBeNull();
   });
 
-  it('writes fractions to the step chosen, in lowest terms, marked when not exact', () => {
-    expect(displayValue(6.3, as({ format: 'fraction', step: 16 }), 'en-US')).toEqual({
-      text: '6 5/16',
-      approx: true,
-    });
-    expect(text(6.3, { format: 'fraction', step: 4 })).toBe('6 1/4');
-    expect(text(6.3, { format: 'fraction', step: 4, rounding: 'up' })).toBe('6 1/2');
-    expect(text(6.3, { format: 'fraction', step: 8, rounding: 'down' })).toBe('6 1/4');
-    expect(displayValue(2.5, as({ format: 'fraction', step: 64 }), 'en-US')).toEqual({
-      text: '2 1/2',
-      approx: false,
-    });
-    expect(text(0.75, { format: 'fraction' })).toBe('3/4');
-    expect(text(-1.5, { format: 'fraction' })).toBe('−1 1/2');
-    expect(text(0.9999, { format: 'fraction', step: 4 })).toBe('1');
-    expect(stepFractions(4)).toEqual(['1/4', '1/2', '3/4']);
+  it('writes every fraction of each size chosen, in lowest terms, marked when not exact', () => {
+    const fraction = (value: number, chosen: ReadonlySet<Size>, rounding?: Display['rounding']) =>
+      displayValue(
+        value,
+        as({ format: 'fraction', fractions: chosen, ...(rounding ? { rounding } : {}) }),
+        'en-US',
+      );
+    expect(fraction(6.3, sizes(16))).toEqual({ text: '6 5/16', approx: true });
+    expect(fraction(6.3, sizes(4))?.text).toBe('6 1/4');
+    expect(fraction(6.3, sizes(4), 'up')?.text).toBe('6 1/2');
+    expect(fraction(6.3, sizes(8), 'down')?.text).toBe('6 1/4');
+    expect(fraction(2.5, sizes(64))).toEqual({ text: '2 1/2', approx: false });
+    // The rare ones of a fine size are written too: 5/64 is not rounded to a "common" neighbour.
+    expect(fraction(0.078125, sizes(64))).toEqual({ text: '5/64', approx: false });
+    expect(fraction(0.75, FRESH_DISPLAY.fractions)?.text).toBe('3/4');
+    expect(fraction(-1.5, FRESH_DISPLAY.fractions)?.text).toBe('−1 1/2');
+    expect(fraction(0.9999, sizes(4))?.text).toBe('1');
+    // Float noise: a value that should be 2 1/2 is still 2 1/2 rounded down.
+    expect(fraction(2.4999999999999996, sizes(8), 'down')?.text).toBe('2 1/2');
   });
 
-  it('keeps the table’s own text where a fraction would read 0 or the value is too large', () => {
-    expect(text(0.001, { format: 'fraction', step: 16 })).toBeNull();
+  it('mixes thirds with the halves and their kin, for cups', () => {
+    expect(listed(sizes(3, 4))).toEqual(['1/4', '1/3', '1/2', '2/3', '3/4']);
+    const cups = { format: 'fraction', fractions: sizes(3, 4) } as const;
+    expect(displayValue(0.34, as(cups), 'en-US')).toEqual({ text: '1/3', approx: true });
+    expect(text(1.7, cups)).toBe('1 2/3');
+    expect(text(0.3, { ...cups, rounding: 'down' })).toBe('1/4');
+    expect(text(0.3, { ...cups, rounding: 'up' })).toBe('1/3');
+  });
+
+  it('counts a size as chosen when a finer one holds it; thirds stand alone', () => {
+    expect(heldBy(4, sizes(16))).toBe(16);
+    expect(heldBy(8, sizes(8))).toBeNull();
+    expect(heldBy(2, sizes(3))).toBeNull();
+    expect(heldBy(3, sizes(64))).toBeNull();
+  });
+
+  it('keeps the table’s own text where a fraction would read 0, the value is too large, or no size is chosen', () => {
+    expect(text(0.001, { format: 'fraction', fractions: sizes(16) })).toBeNull();
     expect(text(2_000_000, { format: 'fraction' })).toBeNull();
+    expect(text(0.5, { format: 'fraction', fractions: sizes() })).toBeNull();
   });
 });

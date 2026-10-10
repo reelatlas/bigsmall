@@ -38,12 +38,13 @@ import { browserLocale } from '../../../lib/region';
 import {
   displayChanged,
   displayValue,
-  FRACTION_GROUPS,
+  fractionsOf,
   FRESH_DISPLAY,
-  STEP_NAME,
-  stepFractions,
+  heldBy,
+  SIZE_NAME,
+  SIZES,
   type Display,
-  type FractionStep,
+  type Size,
 } from './display';
 import {
   BoxField,
@@ -53,6 +54,7 @@ import {
   RowCells,
   ROWS,
   Switch,
+  ToggleRow,
   type Look,
 } from './parts';
 import { FIXED_LABEL, fixedKeyOf, sectionsOf, SHOW_KEYS } from './sections';
@@ -198,6 +200,7 @@ function Choices<T extends string | number>({
   options,
   value,
   disabled = false,
+  hideLegend = false,
   onChange,
 }: {
   look: Look;
@@ -205,12 +208,14 @@ function Choices<T extends string | number>({
   options: ReadonlyArray<{ value: T; label: ReactNode }>;
   value: T | null;
   disabled?: boolean;
+  /** The legend for screen readers alone, where the choices say what they are (Sean, 2026-10-10). */
+  hideLegend?: boolean;
   onChange: (value: T) => void;
 }) {
   const name = useId();
   return (
     <fieldset disabled={disabled} className="grid">
-      <legend className={SUBHEAD}>{legend}</legend>
+      <legend className={hideLegend ? 'sr-only' : SUBHEAD}>{legend}</legend>
       <ChoiceRow look={look} name={name} options={options} value={value} onChange={onChange} />
     </fieldset>
   );
@@ -223,59 +228,73 @@ const PLACES: ReadonlyArray<{ value: string; label: string; places: Display['pla
   { value: 'none', label: 'No limit', places: null },
 ];
 
-/** What a step writes, in full up to eighths, the ends of the list past them. */
-function stepPreview(step: FractionStep): string {
-  const all = stepFractions(step);
-  return all.length <= 7 ? all.join(', ') : `${all.slice(0, 3).join(', ')} … ${all.at(-1)}`;
+/** What the sizes chosen write, in full up to nine, the ends of the list past them. */
+function sizesPreview(chosen: ReadonlySet<Size>): string {
+  const all = fractionsOf(chosen).map((f) => `${f.n}/${f.d}`);
+  if (all.length <= 9) return all.join(', ');
+  return `${all.slice(0, 3).join(', ')} … ${all.at(-1)}, ${all.length} in all`;
 }
 
+/** The two rows of sizes: halves to eighths, then the finer ones. */
+const SIZE_ROWS: ReadonlyArray<readonly Size[]> = [SIZES.slice(0, 4), SIZES.slice(4)];
+
 /**
- * Fractions to a step: one choice of the six, in three groups, coarse to fine, each named; a line
- * under them says what the step chosen writes.
+ * Fractions in the sizes chosen, several at once (Sean, 2026-10-10): each writes its whole grid,
+ * and a finer one holds the coarser it contains, which then show chosen and locked. Thirds stand
+ * alone. A line under them says what the sizes write.
  */
-function FractionSteps({
+function FractionSizes({
   look,
-  step,
+  chosen,
   onChange,
 }: {
   look: Look;
-  step: FractionStep;
-  onChange: (step: FractionStep) => void;
+  chosen: ReadonlySet<Size>;
+  onChange: (chosen: ReadonlySet<Size>) => void;
 }) {
-  const name = useId();
+  const toggle = (size: Size) => {
+    const next = new Set(chosen);
+    if (next.has(size)) next.delete(size);
+    else next.add(size);
+    onChange(next);
+  };
   return (
     <fieldset className="grid">
       <legend className={SUBHEAD}>Round to</legend>
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3">
-        {FRACTION_GROUPS.map((group) => (
-          <div
-            key={group.name}
-            role="group"
-            aria-labelledby={`${name}-${group.name}`}
-            className="col-span-2 grid grid-cols-subgrid items-center"
-          >
-            <span id={`${name}-${group.name}`} className="text-xs text-ink-muted">
-              {group.name}
-            </span>
-            <ChoiceRow<FractionStep>
-              look={look}
-              name={name}
-              options={group.steps.map((each) => ({
-                value: each,
-                label: (
-                  <>
-                    <span className="font-numeric">1/{each}</span>
-                    <span className="sr-only">, {STEP_NAME[each]}</span>
-                  </>
-                ),
-              }))}
-              value={step}
-              onChange={onChange}
-            />
-          </div>
-        ))}
-      </div>
-      <p className="pt-1 font-numeric text-xs text-ink-muted">Shows {stepPreview(step)}</p>
+      {SIZE_ROWS.map((sizes) => (
+        <ToggleRow<Size>
+          key={sizes.join()}
+          look={look}
+          options={sizes.map((size) => {
+            const holder = heldBy(size, chosen);
+            return {
+              value: size,
+              checked: holder !== null || chosen.has(size),
+              locked: holder !== null,
+              ...(holder ? { title: `In 1/${holder} already` } : {}),
+              label: (
+                <>
+                  <span className="font-numeric">1/{size}</span>
+                  <span className="sr-only">
+                    , {SIZE_NAME[size]}
+                    {holder && `, in ${SIZE_NAME[holder]} already`}
+                  </span>
+                </>
+              ),
+            };
+          })}
+          onToggle={toggle}
+        />
+      ))}
+      <p className="pt-1 text-xs text-ink-muted">
+        {chosen.size > 0 ? (
+          <>
+            Shows <span className="font-numeric">{sizesPreview(chosen)}</span>
+          </>
+        ) : (
+          'Choose a size to write fractions; until then values keep their decimals.'
+        )}
+      </p>
     </fieldset>
   );
 }
@@ -317,18 +336,20 @@ function SettingsPanel({
         <div>
           <h3 className={PANEL_TITLE}>Units</h3>
           <p className="text-xs text-ink-muted">
-            What the table and search show, in every category.
+            What search and the table show in every category. Units you hide or show in a table stay
+            as you set them.
           </p>
         </div>
         <Choices<ShowPreset>
           look={look}
           legend="Show"
+          hideLegend
           options={SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name }))}
           value={presetOf(rule.shown, preference)}
           onChange={(preset) => setRule((now) => withSystems(now, presetKeys(preset, preference)))}
         />
         <fieldset className="grid">
-          <legend className={cx(SUBHEAD, 'pb-1')}>Systems</legend>
+          <legend className="sr-only">Systems</legend>
           {SHOW_KEYS.map((key) => (
             <label key={key} className={OPTION_LINE}>
               <input
@@ -341,10 +362,6 @@ function SettingsPanel({
             </label>
           ))}
         </fieldset>
-        <p className="text-xs text-ink-muted">
-          A system switch sets every category. Units you hide or show in a table stay as you set
-          them.
-        </p>
       </section>
 
       <section className="grid gap-2 border-t border-line pt-3" aria-label="Display">
@@ -352,6 +369,7 @@ function SettingsPanel({
         <Choices<Display['names']>
           look={look}
           legend="Unit names"
+          hideLegend
           options={[
             { value: 'symbol', label: 'Symbol only' },
             { value: 'both', label: 'Symbol and name' },
@@ -385,10 +403,10 @@ function SettingsPanel({
             }
           />
         ) : (
-          <FractionSteps
+          <FractionSizes
             look={look}
-            step={display.step}
-            onChange={(step) => setDisplay({ step })}
+            chosen={display.fractions}
+            onChange={(fractions) => setDisplay({ fractions })}
           />
         )}
         <Choices<Display['rounding']>
@@ -446,6 +464,17 @@ function SettingsPanel({
   );
 }
 
+/** A grid of the converter's columns, the names giving way when its own rows have no room. */
+function OwnGrid({ children }: { children: (namesHidden: boolean) => ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const namesHidden = useColumnsFit(ref, GIVE_WAY).includes('name');
+  return (
+    <div ref={ref} className={ROWS}>
+      {children(namesHidden)}
+    </div>
+  );
+}
+
 /** The table: sections headed by system, hidden units kept at its foot, values as Display writes them. */
 function ResultsTable({
   ui,
@@ -463,8 +492,6 @@ function ResultsTable({
   onTake: (row: TableRow) => void;
 }) {
   const id = useId();
-  const gridRef = useRef<HTMLDivElement>(null);
-  const namesHidden = useColumnsFit(gridRef, GIVE_WAY).includes('name');
   const withName = ui.display.names === 'both';
   const { copy } = ui.display;
   const isShown = (row: TableRow) => row.inBox || shows(row.unit, ui.rule, preference);
@@ -484,7 +511,7 @@ function ResultsTable({
     }));
 
   /** A row that is a checkbox: in Edit, or in the Hidden section. */
-  const checkRow = (row: TableRow) => {
+  const checkRow = (row: TableRow, namesHidden: boolean) => {
     const on = isShown(row);
     return (
       <label
@@ -545,115 +572,125 @@ function ResultsTable({
           </Button>
         </div>
       )}
-      <div ref={gridRef} className={ROWS}>
-        {sectionsOf(rows, preference).map((section, at) => {
-          const listed = editing ? section.rows : section.rows.filter(isShown);
-          if (listed.length === 0) return null;
-          const edge = at === 0 ? 'pt-1' : 'mt-1 border-t border-line pt-2';
-          return (
-            <div
-              key={section.key}
-              role="group"
-              aria-label={section.label}
-              className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
-            >
-              {editing ? (
-                headedCheck(section.label, section.rows, edge)
-              ) : (
-                <h4 className={cx('col-span-6 px-2 pb-1', PANEL_TITLE, edge)}>{section.label}</h4>
-              )}
-              {listed.map((row) => {
-                if (editing) return checkRow(row);
-                return (
-                  <div key={row.id} className="col-span-6 grid grid-cols-subgrid items-center">
-                    {/* Without copy buttons the row runs to the card's edge: no column is kept for them. */}
-                    <button
-                      type="button"
-                      onClick={() => onTake(row)}
-                      className={cx(
-                        CURSOR_ROW,
-                        'grid grid-cols-subgrid items-center',
-                        copy ? 'col-span-5' : 'col-span-6',
-                        rowFill(row.inBox, false),
-                      )}
-                    >
-                      <RowCells
-                        row={row}
-                        shown={shownValue(row)}
-                        namesHidden={namesHidden}
-                        withName={withName}
-                      />
-                    </button>
-                    {copy &&
-                      (row.tone === 'value' ? (
-                        <Button
-                          variant="ghost"
-                          square
-                          nested
-                          aria-label={`Copy ${row.name}`}
-                          onClick={() => void navigator.clipboard?.writeText(String(row.value))}
-                        >
-                          <CopyIcon />
-                        </Button>
-                      ) : (
-                        <span className="block size-11" />
-                      ))}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
-        {!editing && (
-          <div className="col-span-6 mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1">
-            {hidden.length > 0 ? (
-              <button
-                type="button"
-                aria-expanded={ui.hiddenOpen}
-                onClick={() => onUi((now) => ({ ...now, hiddenOpen: !now.hiddenOpen }))}
-                className={cx(
-                  PANEL_TITLE,
-                  'flex min-h-11 items-center gap-2 rounded-nested px-2 hover:bg-surface-raised',
-                )}
+      <OwnGrid>
+        {(namesHidden) =>
+          sectionsOf(rows, preference).map((section, at) => {
+            const listed = editing ? section.rows : section.rows.filter(isShown);
+            if (listed.length === 0) return null;
+            const edge = at === 0 ? 'pt-1' : 'mt-1 border-t border-line pt-2';
+            return (
+              <div
+                key={section.key}
+                role="group"
+                aria-label={section.label}
+                className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
               >
-                <ChevronDownIcon
-                  width="16"
-                  height="16"
-                  className={cx('transition-transform', !ui.hiddenOpen && '-rotate-90')}
-                />
-                {/* The word and its count on one baseline, as the matches' headers; the icon centred. */}
-                <span className="flex items-baseline gap-1.5">
-                  Hidden
-                  <span className="font-numeric font-normal">{hidden.length}</span>
-                </span>
-              </button>
-            ) : (
-              <span className="px-2 text-sm text-ink-muted">Every unit shown</span>
-            )}
-            <Button
-              variant="ghost"
-              nested
-              onClick={() => onUi((now) => ({ ...now, editing: true }))}
-              className="text-sm"
+                {editing ? (
+                  headedCheck(section.label, section.rows, edge)
+                ) : (
+                  <h4 className={cx('col-span-6 px-2 pb-1', PANEL_TITLE, edge)}>{section.label}</h4>
+                )}
+                {listed.map((row) => {
+                  if (editing) return checkRow(row, namesHidden);
+                  return (
+                    <div key={row.id} className="col-span-6 grid grid-cols-subgrid items-center">
+                      {/* Without copy buttons the row runs to the card's edge: no column is kept for them. */}
+                      <button
+                        type="button"
+                        onClick={() => onTake(row)}
+                        className={cx(
+                          CURSOR_ROW,
+                          'grid grid-cols-subgrid items-center',
+                          copy ? 'col-span-5' : 'col-span-6',
+                          rowFill(row.inBox, false),
+                        )}
+                      >
+                        <RowCells
+                          row={row}
+                          shown={shownValue(row)}
+                          namesHidden={namesHidden}
+                          withName={withName}
+                        />
+                      </button>
+                      {copy &&
+                        (row.tone === 'value' ? (
+                          <Button
+                            variant="ghost"
+                            square
+                            nested
+                            aria-label={`Copy ${row.name}`}
+                            onClick={() => void navigator.clipboard?.writeText(String(row.value))}
+                          >
+                            <CopyIcon />
+                          </Button>
+                        ) : (
+                          <span className="block size-11" />
+                        ))}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })
+        }
+      </OwnGrid>
+      {!editing && (
+        <div className="mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1">
+          {hidden.length > 0 ? (
+            <button
+              type="button"
+              aria-expanded={ui.hiddenOpen}
+              onClick={() => onUi((now) => ({ ...now, hiddenOpen: !now.hiddenOpen }))}
+              className={cx(
+                PANEL_TITLE,
+                'flex min-h-11 items-center gap-2 rounded-nested px-2 hover:bg-surface-raised',
+              )}
             >
-              Edit
-            </Button>
-          </div>
-        )}
-        {!editing &&
-          ui.hiddenOpen &&
-          sectionsOf(hidden, preference).map((section) => (
-            <div
-              key={section.key}
-              role="group"
-              aria-label={`Hidden, ${section.label}`}
-              className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
-            >
-              {headedCheck(section.label, section.rows, 'pt-1')}
-              {section.rows.map((row) => checkRow(row))}
-            </div>
-          ))}
-      </div>
+              <ChevronDownIcon
+                width="16"
+                height="16"
+                className={cx('transition-transform', !ui.hiddenOpen && '-rotate-90')}
+              />
+              {/* The word and its count on one baseline, as the matches' headers; the icon centred. */}
+              <span className="flex items-baseline gap-1.5">
+                Hidden
+                <span className="font-numeric font-normal">{hidden.length}</span>
+              </span>
+            </button>
+          ) : (
+            <span className="px-2 text-sm text-ink-muted">Every unit shown</span>
+          )}
+          <Button
+            variant="ghost"
+            nested
+            onClick={() => onUi((now) => ({ ...now, editing: true }))}
+            className="text-sm"
+          >
+            Edit
+          </Button>
+        </div>
+      )}
+      {/*
+       * The Hidden list sizes its columns to its own rows, so opening it never moves the table's
+       * (Sean, 2026-10-10: a checkbox and a long hidden value had widened the shared value column).
+       */}
+      {!editing && ui.hiddenOpen && hidden.length > 0 && (
+        <OwnGrid>
+          {(namesHidden) =>
+            sectionsOf(hidden, preference).map((section) => (
+              <div
+                key={section.key}
+                role="group"
+                aria-label={`Hidden, ${section.label}`}
+                className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
+              >
+                {headedCheck(section.label, section.rows, 'pt-1')}
+                {section.rows.map((row) => checkRow(row, namesHidden))}
+              </div>
+            ))
+          }
+        </OwnGrid>
+      )}
     </div>
   );
 }

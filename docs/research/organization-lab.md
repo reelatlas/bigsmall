@@ -13,14 +13,17 @@ The earlier prototypes, the table controls lab (A to D), this lab's first two ro
 - **Separate** (Sean, 2026-10-10): Settings applies to every category; the table applies to this one (Edit, the Hidden section).
 - **Display reaches search**: with Symbol only, the matches show symbols alone, the name kept for screen readers; everything the converter surfaces follows Display.
 - **A fresh visit** (Sean, 2026-10-10): every system but Specialist (the Everyday preset), Symbol only (listed first), no copy buttons, decimals to 0.01, rounded to the nearest; fractions, once chosen, start in eighths (1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8).
-- **No copy column without copy buttons**: the rows run to the card's edge. The checkboxes of Edit and the Hidden section lead a row, on the left under their heading's, so no column at the right edge is kept for them either and the other rows never move when Hidden opens.
+- **No copy column without copy buttons**: the rows run to the card's edge. The checkboxes of Edit and the Hidden section lead a row, on the left under their heading's, so no column at the right edge is kept for them either.
+- **Opening Hidden never moves the table** (Sean, 2026-10-10): the Hidden list sizes its columns to its own rows, so its checkboxes and long values never widen the table's value column.
 - **Done closes Hidden**: whoever just chose what to hide should not have to fold it again.
 - **No dot on Settings**: a dot for "changed" would sit there for good once anything is set. The two resets say what can be undone instead.
 - **Two layers, two resets** (Sean, 2026-10-10): the system switches are one layer, for every category; a unit hidden or shown on its own in a table is another, which the switches, the presets, and Reset settings leave. Reset settings puts the switches and Display back as a fresh visit has them; Unhide units brings back every unit hidden on its own, in every category, and leaves the settings.
 - **Taking a hidden unit unhides it** (Sean, 2026-10-10): one taken from the hidden matches into the box leaves Hidden, as if checked there, so clearing the box never hides it again.
 - **Rounding below zero**: up is toward larger values and down toward smaller, as ceiling and floor are (IEEE 754, and the reading Sean expected): −2.15 rounds up to −2.1 and down to −2.2. Spreadsheets' ROUNDUP, which rounds away from zero, is the exception, not the rule.
 - **Fractions apply to every unit** when chosen, metric included.
-- **Fractions as one step, in generic groups** (Sean, 2026-10-10): trades are a rule of thumb (a framer may work to 1/16, a woodworker to 1/32), not a standard, so the groups are named by fineness. The steps nest, a sixteenth holding every eighth, quarter, and half, so one step is chosen, never several.
+- **Fractions in the sizes chosen** (Sean, 2026-10-10): 1/2, 1/3, 1/4, 1/8, 1/16, 1/32, 1/64, several at once. Each writes its whole grid: whoever reads sixteenths needs the rare ones too, a mismeasurement included. A finer size holds the coarser it contains (sixteenths hold every eighth, quarter, and half), which then show chosen and locked; thirds stand alone and mix with the others (1/4, 1/3, 1/2, 2/3, 3/4 for cups). Trades were set aside as a rule of thumb, not a standard, and so were named groups once several sizes could be chosen.
+- **No "most common" 32nds and 64ths** (proposed 2026-10-10, for Sean to confirm): a reference chart lists every 64th, where dropping the rarely used ones trims rows. The table lists none: each row writes one value, rounded to the sizes chosen, so a "common" set would hide nothing and only round some values further than asked (0.078 in would read ≈ 1/16 under 64ths, never 5/64), with no standard behind which 64ths are common. The hardware sizes behind them (screw pilot holes, tap drills) are a lookup, the nearest standard drill to a size, which a later feature could answer with cited sizes.
+- **Fractions in lowest terms** (4/64 is written 1/16): drill bits, tapes, and charts mark them so. Unreduced would only help someone counting the ticks of a rule graduated in 64ths; a later option if it is ever asked for.
 
 ## The model
 
@@ -28,17 +31,17 @@ The earlier prototypes, the table controls lab (A to D), this lab's first two ro
 
 A sliders button at the start of the tools opens one panel, anchored to the action bar's right edge, with two parts and two resets.
 
-**Units**, what the table and search show, in every category:
+**Units**, under one line (Sean, 2026-10-10: one sentence for the section, no labels over its two groups; the groups keep names for screen readers): "What search and the table show in every category. Units you hide or show in a table stay as you set them."
 
-- Show: All units, Everyday, or Your region (presets; none is lit when the switches are a custom set).
-- Systems: Metric, US (customary), UK (imperial), Specialist, a checkbox each.
+- All units, Everyday, or Your region (presets; none is lit when the switches are a custom set).
+- Metric, US (customary), UK (imperial), Specialist, a checkbox each.
 
 **Display**, how results look:
 
-- Unit names: Symbol only, or Symbol and name.
+- Symbol only, or Symbol and name (no label: the choices say it).
 - Copy buttons, a switch leading its label, as a checkbox does (a copy still copies the full value).
 - Format: Decimals or Fractions.
-- Round to: for decimals 0.1, 0.01, 0.001, or No limit (today's six significant digits); for fractions one step of six, in three groups, coarse to fine: Coarse (1/2, 1/4), Medium (1/8), Fine (1/16, 1/32, 1/64), with a line under them that says what the step writes ("Shows 1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8"). Fractions are written as mixed numbers in lowest terms, "≈" where they round.
+- Round to: for decimals 0.1, 0.01, 0.001, or No limit (today's six significant digits); for fractions the sizes chosen, in two rows (1/2, 1/3, 1/4, 1/8, then 1/16, 1/32, 1/64), with a line under them that says what they write ("Shows 1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8"); with none chosen, values keep their decimals. Fractions are written as mixed numbers in lowest terms, "≈" where they round, a tie going up.
 - Rounding: Nearest, Up, or Down (off with No limit).
 - A value too small for the places or the step, which would read 0, keeps its significant digits; one past a million keeps decimals.
 
@@ -63,6 +66,7 @@ The table's foot has Edit, which puts a checkbox on every row and a three-state 
 
 1. **Compact pills or a segmented control** for Settings' choices (1 and 2 in the lab)? Both draw a 32 px shape with less padding, the text kept at the 14 px size, and both keep a 44 px tap. Whichever is kept becomes a recipe for every setting list.
 2. **The switch's look** for Copy buttons (the trial in the lab): kept, it moves to `components/` and the gallery.
-3. **The fraction groups' names**: Coarse, Medium, Fine (the lab), or another set, such as Rough, Standard, Precise? And thirds, which do not nest with the others (1/3 cup): left out (the lab), or a choice of their own?
-4. **Where Settings sits**: at the start of the tools (the lab), beside the category menu, or at the end? Sean is still thinking (2026-10-10).
-5. **One button or several**: one Settings button for everything (the lab), or one or two of the most used surfaced on their own once we know which?
+3. **No "most common" 32nds and 64ths** (above, under settled): agreed, or try a common set anyway?
+4. **Decimals and fractions together** (Sean, 2026-10-10, asked): a third Format choice, Both, writing the fraction with its decimal after it in the muted ink ("6 5/16 · 6.30"), the decimal a column that gives way on a narrow screen as the names do. Recommended; not built yet.
+5. **Where Settings sits**: at the start of the tools (the lab), beside the category menu, or at the end? Sean is still thinking (2026-10-10).
+6. **One button or several**: one Settings button for everything (the lab), or one or two of the most used surfaced on their own once we know which?

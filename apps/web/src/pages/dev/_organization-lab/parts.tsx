@@ -220,3 +220,40 @@ export function ChoiceRow<T extends string | number>({
     </div>
   );
 }
+
+/**
+ * Several of a few, in either look. A choice held by another (sixteenths hold eighths) shows
+ * chosen and locked, in the muted ink, and says what holds it.
+ */
+export function ToggleRow<T extends string | number>({
+  look,
+  options,
+  onToggle,
+}: {
+  look: Look;
+  options: ReadonlyArray<{
+    value: T;
+    label: ReactNode;
+    checked: boolean;
+    locked?: boolean;
+    title?: string;
+  }>;
+  onToggle: (value: T) => void;
+}) {
+  return (
+    <div className={ROW[look]}>
+      {options.map((option) => (
+        <label key={option.value} className={TARGET} title={option.title}>
+          <input
+            type="checkbox"
+            checked={option.checked}
+            disabled={option.locked}
+            onChange={() => onToggle(option.value)}
+            className="peer sr-only"
+          />
+          <span className={DRAWN[look]}>{option.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}

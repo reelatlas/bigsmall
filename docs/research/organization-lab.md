@@ -15,7 +15,25 @@ After both labs, Claude's evaluation (by system over jobs; one menu in the toolb
 - **One filter for every category**: hiding Metric hides it everywhere.
 - **Search finds every unit**, hidden or not; a hidden unit in the matches carries a "hidden" note, and the unit in the box always shows its row.
 
-These are in the lab as **Fixed system names** (the default sections) and **E. Show menu** (the left table's default filter), beside Fold on the right.
+These are in the lab as **Fixed system names**, the default sections, and **E. Show menu**, with four ways to choose single units beside it (below).
+
+## One rule, five ways (E to I, 2026-10-10)
+
+Sean asked for single units too, a custom subset like the check list, with a section's checkbox three-state: checked when all its units show, a dash when some do, clear when none do. Other keeps its heading and loses its switch while it holds two units (the knot and the atmosphere), which always show.
+
+**The rule**, the same in all five: the system switches (Metric, US (customary), UK (imperial), Specialist) set what shows in every category; a unit chosen on its own overrides its switch either way, hidden from a system that shows or shown from one that hides, and stays chosen when the category changes; a section's checkbox reads its units in this category and sets them all; the unit in the box always shows; a line under the table counts what is hidden, with Show all (every switch on, this category's single choices cleared). Turning a switch drops the single choices it now agrees with.
+
+| Option                  | Where single units are chosen                                                                                                                                                                                                                                                             |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **E. Show menu**        | Nowhere: systems only.                                                                                                                                                                                                                                                                    |
+| **F. Edit the table**   | The Show menu's last item, Choose single units…, turns the table into the checklist: a checkbox in every row where the copy button was, a three-state one on every heading, Done at the top. Hidden rows stay in view, dimmed, while editing; the line under the table offers Edit again. |
+| **G. Tree in the menu** | Under the switches in the Show menu, "In Volume": a three-state checkbox per section with "2 of 3", and a chevron that opens it to its units. The menu is wider, to hold a unit's row, and scrolls inside.                                                                                |
+| **H. View menu**        | One View menu: the presets and switches, a row "Units in Volume ›" that opens a page of the units (three-state sections, every unit listed, "‹ View" back), and Display.                                                                                                                  |
+| **I. View panel**       | A sliders button in the toolbar opens a panel over the table with every part in view: Show, Display, and "Units in Volume" as a tree.                                                                                                                                                     |
+
+Each table keeps its settings when its option changes, so one choice can be seen in each of the five; Start over clears them.
+
+**Other settings, and where they go.** Sean's next settings (abbreviations alone or with names, copy buttons, fractions or decimals, rounding, and more) are a different kind: they change how rows look, everywhere, where Show changes which rows there are. H and I put them in one View, in a Display section beside Show, with names and copy buttons working and fractions and rounding marked for later. Single units are the one setting that belongs to a category, which is why each option gives them a place of their own, named for the category ("Units in Volume"), and never mixes them with the switches.
 
 ## Sections
 

@@ -362,8 +362,11 @@ export const FIXED_LABEL: Record<FixedKey, string> = {
   specialist: 'Specialist',
 };
 
-/** The Show menu's switches, in its order: one setting for every category. */
-export const SHOW_KEYS: readonly FixedKey[] = ['metric', 'us', 'uk', 'other', 'specialist'];
+/**
+ * The Show menu's switches, in its order: one setting for every category. Other has none while it
+ * holds two units, the knot and the atmosphere, which always show (Sean, 2026-10-10).
+ */
+export const SHOW_KEYS: readonly FixedKey[] = ['metric', 'us', 'uk', 'specialist'];
 
 /** The visitor's own fixed section. */
 export function ownKey(preference: UnitPreference): FixedKey {

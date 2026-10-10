@@ -1,62 +1,55 @@
 import {
   categories,
   formatNumber,
-  getUnit,
   localeSeparators,
   type CategoryId,
   type UnitPreference,
 } from '@bigsmall/core';
-import { useId, useMemo, useRef, useState, type FocusEvent } from 'react';
+import { useMemo, useRef, useState, useId } from 'react';
 import { Button } from '../../../components/Button';
 import { CategoryMenu } from '../../../components/CategoryMenu';
 import { ChevronDownIcon, CopyIcon } from '../../../components/icons';
-import { FormattedNumber } from '../../../components/NumberText';
-import { UnitChip } from '../../../components/UnitChip';
 import { initialState, selectTable, type TableRow } from '../../../features/converter/state';
 import { useColumnsFit } from '../../../lib/fit-step';
-import {
-  cx,
-  CURSOR_ROW,
-  FIELD_ROW,
-  LIST_CARD,
-  MENU_CHEVRON,
-  MENU_OPTION,
-  MENU_ROOT,
-  MENU_SHELL,
-  MENU_SIZER,
-  MENU_SIZER_LABEL,
-  MENU_TRIGGER,
-  NO_ANSWER,
-  PANEL_TITLE,
-  rowFill,
-  SHELL_PANEL,
-  unitSymbol,
-} from '../../../lib/recipes';
+import { cx, CURSOR_ROW, LIST_CARD, PANEL_TITLE, rowFill } from '../../../lib/recipes';
 import { browserLocale } from '../../../lib/region';
+import {
+  BoxField,
+  CHECKBOX,
+  CHOICE,
+  GIVE_WAY,
+  RowCells,
+  ROWS,
+  sectionSymbols,
+  toggleSet,
+} from './parts';
 import {
   FAMILY_LABEL,
   familyChips,
   familyHint,
-  FIXED_LABEL,
-  fixedKeyOf,
-  ownKey,
   sectionsFor,
-  SHOW_KEYS,
   showsInFamilies,
   showsInPreset,
   type Family,
-  type FixedKey,
   type Preset,
   type Section,
 } from './sections';
-
-const CHOICE = 'flex min-h-11 items-center gap-2 text-sm';
-const CHECKBOX = 'size-4 accent-accent';
+import {
+  freshView,
+  isViewOption,
+  VIEW_OPTIONS,
+  viewForCategory,
+  ViewMock,
+  type ViewOption,
+  type ViewState,
+} from './view-options';
 
 /** How the rows are named. Both tables share this, so a filter is the only difference between them. */
 type Cut = 'fixed' | 'jobs' | 'earned';
-/** How a table chooses which of those rows stay on screen. */
-type FilterId = 'show' | 'fold' | 'presets' | 'families' | 'checks' | 'menu' | 'find';
+/** The earlier filters, built first (2026-10-09). */
+type EarlierFilter = 'fold' | 'presets' | 'families' | 'checks' | 'menu' | 'find';
+/** How a table chooses which of those rows stay on screen: E to I, or an earlier filter. */
+type FilterId = ViewOption | EarlierFilter;
 
 const CUTS: ReadonlyArray<{ id: Cut; name: string }> = [
   { id: 'fixed', name: 'Fixed system names' },
@@ -64,12 +57,7 @@ const CUTS: ReadonlyArray<{ id: Cut; name: string }> = [
   { id: 'earned', name: 'By system' },
 ];
 
-const FILTERS: ReadonlyArray<{ id: FilterId; name: string; hint: string }> = [
-  {
-    id: 'show',
-    name: 'E. Show menu',
-    hint: 'A menu in the toolbar, like the category menu: All units, Everyday, or Your units, and a switch per system. One setting for every category.',
-  },
+const FILTERS: ReadonlyArray<{ id: EarlierFilter; name: string; hint: string }> = [
   { id: 'fold', name: 'Fold', hint: 'The section name hides that group.' },
   {
     id: 'presets',
@@ -123,23 +111,11 @@ const SAMPLES: Partial<Record<CategoryId, { unit: string; text: string }>> = {
   angle: { unit: 'degree', text: '45' },
 };
 
-const ROWS = 'grid grid-cols-[auto_minmax(0,1fr)_auto_auto_minmax(0,max-content)_auto] gap-y-0.5';
-const GIVE_WAY = ['name'] as const;
-const EXPONENT = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+$/u;
-const REGION_MARK = / \((?:US|UK)\)$/;
-
-const TONE: Record<TableRow['tone'], string> = {
-  value: 'text-ink',
-  empty: 'text-ink-muted',
-  message: NO_ANSWER,
-};
-
 const ALL_FAMILIES: ReadonlySet<Family> = new Set(['metric', 'us', 'uk', 'customary', 'more']);
 
 interface FilterState {
-  /** The Show menu's switches: kept across categories, as one setting for all of them. */
-  shown: ReadonlySet<FixedKey>;
-  showOpen: boolean;
+  /** Options E to I: their switches and single units, kept across categories. */
+  view: ViewState;
   preset: Preset;
   families: ReadonlySet<Family>;
   folds: ReadonlySet<string>;
@@ -152,8 +128,7 @@ interface FilterState {
 
 function freshFilter(): FilterState {
   return {
-    shown: new Set(SHOW_KEYS),
-    showOpen: false,
+    view: freshView(),
     preset: 'all',
     families: new Set(ALL_FAMILIES),
     folds: new Set(),
@@ -165,28 +140,8 @@ function freshFilter(): FilterState {
   };
 }
 
-function filterMeta(id: FilterId): { id: FilterId; name: string; hint: string } {
+function filterMeta(id: EarlierFilter): { id: EarlierFilter; name: string; hint: string } {
   return FILTERS.find((filter) => filter.id === id) ?? FILTERS[0]!;
-}
-
-function toggleSet<T extends string>(set: ReadonlySet<T>, key: T): ReadonlySet<T> {
-  const next = new Set(set);
-  if (next.has(key)) next.delete(key);
-  else next.add(key);
-  return next;
-}
-
-/**
- * The symbols a section shows. A heading that names the region can drop "(US)" and "(UK)"; the
- * fixed names leave every unit as it is (Sean, 2026-10-10).
- */
-function sectionSymbols(section: Section<TableRow>, shorten: boolean): Map<string, string> {
-  const namesRegion = shorten && section.label !== null && /US|UK|Imperial/i.test(section.label);
-  const short = section.rows.map((row) => row.symbol.replace(REGION_MARK, ''));
-  const unique = new Set(short).size === short.length;
-  return new Map(
-    section.rows.map((row, at) => [row.id, namesRegion && unique ? short[at]! : row.symbol]),
-  );
 }
 
 function matchesQuery(row: TableRow, query: string): boolean {
@@ -207,179 +162,18 @@ function menuName(section: Section<TableRow>): string {
 
 function rowKept(
   row: TableRow,
-  filter: FilterId,
+  filter: EarlierFilter,
   state: FilterState,
   folded: boolean,
   sectionKey: string,
   preference: UnitPreference,
 ): boolean {
-  if (filter === 'show') return !showsInMenu(row, state.shown, preference);
   if (filter === 'fold') return folded;
   if (filter === 'presets') return !showsInPreset(row.unit, state.preset, preference);
   if (filter === 'families') return !showsInFamilies(row.unit, state.families);
   if (filter === 'checks') return state.hiddenUnits.has(row.id);
   if (filter === 'menu') return state.hiddenSections.has(sectionKey);
   return !matchesQuery(row, state.query);
-}
-
-type ShowPreset = 'all' | 'everyday' | 'yours';
-
-const SHOW_PRESETS: ReadonlyArray<{ id: ShowPreset; name: string }> = [
-  { id: 'all', name: 'All units' },
-  { id: 'everyday', name: 'Everyday' },
-  { id: 'yours', name: 'Your units' },
-];
-
-function presetKeys(preset: ShowPreset, preference: UnitPreference): ReadonlySet<FixedKey> {
-  if (preset === 'all') return new Set(SHOW_KEYS);
-  if (preset === 'everyday') return new Set(SHOW_KEYS.filter((key) => key !== 'specialist'));
-  return new Set([ownKey(preference)]);
-}
-
-/** The preset the switches match, or null for a custom choice. */
-function presetOf(shown: ReadonlySet<FixedKey>, preference: UnitPreference): ShowPreset | null {
-  const same = (keys: ReadonlySet<FixedKey>) =>
-    keys.size === shown.size && [...keys].every((key) => shown.has(key));
-  return SHOW_PRESETS.find((preset) => same(presetKeys(preset.id, preference)))?.id ?? null;
-}
-
-/** A row stays unless its system is switched off; a category with no regions keeps its everyday units. */
-function showsInMenu(
-  row: TableRow,
-  shown: ReadonlySet<FixedKey>,
-  preference: UnitPreference,
-): boolean {
-  const key = fixedKeyOf(row.unit, preference);
-  return key === 'everyday' || shown.has(key);
-}
-
-/**
- * The Show menu (option E): built from the category menu's recipes, a ghost at rest reading what it
- * shows, "Show All units"; open, the presets, then a switch per system. Its sizer holds every
- * label, so it never changes width. A press on a choice keeps focus where it is, so the menu's
- * blur does not close it before the choice lands.
- */
-function ShowMenu({
-  shown,
-  preference,
-  open,
-  onOpen,
-  onShown,
-}: {
-  shown: ReadonlySet<FixedKey>;
-  preference: UnitPreference;
-  open: boolean;
-  onOpen: (open: boolean) => void;
-  onShown: (shown: ReadonlySet<FixedKey>) => void;
-}) {
-  const id = useId();
-  const preset = presetOf(shown, preference);
-  const current = SHOW_PRESETS.find((each) => each.id === preset)?.name ?? 'Custom';
-  const sizes = [
-    ...[...SHOW_PRESETS.map((each) => each.name), 'Custom'].map((name) => `Show ${name}`),
-    ...SHOW_KEYS.map((key) => FIXED_LABEL[key]),
-  ];
-  return (
-    <div
-      className={MENU_ROOT}
-      data-open={open || undefined}
-      onBlur={(event: FocusEvent<HTMLDivElement>) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) onOpen(false);
-      }}
-    >
-      <span aria-hidden="true" className={MENU_SIZER}>
-        {sizes.map((label) => (
-          <span key={label} className={MENU_SIZER_LABEL}>
-            <span className="size-4" />
-            {label}
-            <span className="size-4" />
-          </span>
-        ))}
-      </span>
-      <div className={MENU_SHELL}>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={`${id}-panel`}
-          onClick={() => onOpen(!open)}
-          className={MENU_TRIGGER}
-        >
-          <span className="text-ink-muted">Show</span>
-          {current}
-          <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />
-        </button>
-        <div id={`${id}-panel`} className={cx(SHELL_PANEL, 'p-1')}>
-          <fieldset>
-            <legend className="sr-only">Show</legend>
-            {SHOW_PRESETS.map((each) => (
-              <label
-                key={each.id}
-                onPointerDown={(event) => event.preventDefault()}
-                className={MENU_OPTION}
-              >
-                <input
-                  type="radio"
-                  name={`${id}-preset`}
-                  checked={preset === each.id}
-                  onChange={() => onShown(presetKeys(each.id, preference))}
-                  className="sr-only"
-                />
-                {each.name}
-              </label>
-            ))}
-          </fieldset>
-          <fieldset className="mt-1 border-t border-line pt-1">
-            <legend className="sr-only">Systems</legend>
-            {SHOW_KEYS.map((key) => (
-              <label
-                key={key}
-                onPointerDown={(event) => event.preventDefault()}
-                className={cx(MENU_OPTION, 'gap-2')}
-              >
-                <input
-                  type="checkbox"
-                  checked={shown.has(key)}
-                  onChange={() => onShown(toggleSet(shown, key))}
-                  className={CHECKBOX}
-                />
-                {FIXED_LABEL[key]}
-              </label>
-            ))}
-          </fieldset>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RowCells({
-  row,
-  symbol,
-  namesHidden,
-}: {
-  row: TableRow;
-  symbol: string;
-  namesHidden: boolean;
-}) {
-  const exponent = EXPONENT.exec(symbol)?.[0] ?? '';
-  return (
-    <>
-      <span className={cx('pr-2 text-right font-numeric whitespace-nowrap', TONE[row.tone])}>
-        {row.tone === 'value' ? <FormattedNumber text={row.text} /> : row.text}
-      </span>
-      <span className={cx('col-start-3 pl-2 text-right whitespace-nowrap', unitSymbol())}>
-        {symbol.slice(0, symbol.length - exponent.length)}
-      </span>
-      <span className={cx('whitespace-nowrap', unitSymbol())}>{exponent}</span>
-      <span
-        hidden={namesHidden}
-        className="min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap text-ink"
-        data-column="name"
-      >
-        {row.name}
-      </span>
-    </>
-  );
 }
 
 function Mock({
@@ -396,7 +190,7 @@ function Mock({
   onRemove,
   onState,
 }: {
-  filter: FilterId;
+  filter: EarlierFilter;
   cut: Cut;
   rows: readonly TableRow[];
   category: CategoryId;
@@ -412,7 +206,6 @@ function Mock({
   const id = useId();
   const gridRef = useRef<HTMLDivElement>(null);
   const namesHidden = useColumnsFit(gridRef, GIVE_WAY).includes('name');
-  const chipUnit = unit ? getUnit(unit) : undefined;
   const meta = filterMeta(filter);
   const chips = familyChips(category);
   const sections = sectionsFor(rows, cut, preference).map((section) => {
@@ -422,7 +215,6 @@ function Mock({
     const visible = section.rows.filter((row) => {
       if (row.inBox) return true;
       if (folded || sectionOff) return false;
-      if (filter === 'show') return showsInMenu(row, state.shown, preference);
       if (filter === 'presets') return showsInPreset(row.unit, state.preset, preference);
       if (filter === 'families') return showsInFamilies(row.unit, state.families);
       if (filter === 'checks') return state.editing || !state.hiddenUnits.has(row.id);
@@ -456,33 +248,7 @@ function Mock({
   return (
     <div className="min-w-0">
       <p className="min-h-12 text-sm text-ink-muted">{meta.hint}</p>
-      {filter === 'show' && (
-        <div className="mt-2 flex">
-          <ShowMenu
-            shown={state.shown}
-            preference={preference}
-            open={state.showOpen}
-            onOpen={(open) => onState((current) => ({ ...current, showOpen: open }))}
-            onShown={(shown) => onState((current) => ({ ...current, shown }))}
-          />
-        </div>
-      )}
-      <div className={cx(LIST_CARD, FIELD_ROW, 'mt-2')}>
-        <label htmlFor={`${id}-number`} className="sr-only">
-          Number
-        </label>
-        <input
-          id={`${id}-number`}
-          inputMode="decimal"
-          autoComplete="off"
-          value={text}
-          onChange={(event) => onText(event.currentTarget.value)}
-          className="min-w-0 flex-1 bg-transparent font-numeric text-3xl text-ink"
-        />
-        {chipUnit && (
-          <UnitChip unit={chipUnit} compact={false} onOpen={() => undefined} onRemove={onRemove} />
-        )}
-      </div>
+      <BoxField text={text} unit={unit} onText={onText} onRemove={onRemove} />
       <div className={cx(LIST_CARD, 'mt-2 p-2')}>
         {filter === 'presets' && (
           <div className="grid gap-2 pb-2">
@@ -753,34 +519,11 @@ function Mock({
           </div>
         )}
         <p className="flex items-center justify-between gap-2 border-t border-line px-2 pt-2 text-sm text-ink-muted">
-          {filter === 'show' ? (
-            <span>
-              {visibleCount < rows.length ? (
-                <>
-                  <span className="font-numeric">{rows.length - visibleCount}</span> hidden
-                </>
-              ) : (
-                'Every unit shown'
-              )}
-              {kept && ' · the unit in the box stays'}
-            </span>
-          ) : (
-            <span>
-              <span className="font-numeric">{visibleCount}</span> of{' '}
-              <span className="font-numeric">{rows.length}</span>
-              {kept && ' · the unit in the box stays'}
-            </span>
-          )}
-          {filter === 'show' && visibleCount < rows.length && (
-            <Button
-              variant="ghost"
-              nested
-              onClick={() => onState((current) => ({ ...current, shown: new Set(SHOW_KEYS) }))}
-              className="text-sm"
-            >
-              Show all
-            </Button>
-          )}
+          <span>
+            <span className="font-numeric">{visibleCount}</span> of{' '}
+            <span className="font-numeric">{rows.length}</span>
+            {kept && ' · the unit in the box stays'}
+          </span>
           {hiddenChecked > 0 && (
             <Button
               variant="ghost"
@@ -836,7 +579,7 @@ function InlineRadios<T extends string>({
 export function OrganizationLab() {
   const id = useId();
   const [cut, setCut] = useState<Cut>('fixed');
-  const [filters, setFilters] = useState<[FilterId, FilterId]>(['show', 'fold']);
+  const [filters, setFilters] = useState<[FilterId, FilterId]>(['edit', 'tree']);
   const [system, setSystem] = useState<UnitPreference>('us');
   const [category, setCategory] = useState<CategoryId>('volume');
   const [unit, setUnit] = useState<string | null>(SAMPLES.volume?.unit ?? null);
@@ -847,6 +590,7 @@ export function OrganizationLab() {
   ]);
 
   const locale = browserLocale();
+  const categoryName = categories.find((each) => each.id === category)?.name ?? '';
   const rows = useMemo(() => {
     const env = { locale, separators: localeSeparators(locale), system };
     const state = { ...initialState, text, unit, category };
@@ -859,16 +603,16 @@ export function OrganizationLab() {
     setCategory(next);
     setUnit(SAMPLES[next]?.unit ?? null);
     setText(SAMPLES[next]?.text ?? '');
-    // The Show menu's switches are one setting for every category, so they stay.
+    // The View's switches and single units are settings for every category, so they stay.
     const reset = (column: FilterState): FilterState => ({
       ...column,
+      view: viewForCategory(column.view),
       folds: new Set<string>(),
       hiddenUnits: new Set<string>(),
       hiddenSections: new Set<string>(),
       query: '',
       editing: false,
       menuOpen: false,
-      showOpen: false,
     });
     setColumns((current) => [reset(current[0]), reset(current[1])]);
   };
@@ -915,42 +659,73 @@ export function OrganizationLab() {
       <div className="grid items-start gap-8 md:grid-cols-2 md:gap-4">
         {([0, 1] as const).map((index) => (
           <div key={index} className="grid min-w-0 gap-2">
-            <div role="group" aria-label={index === 0 ? 'Left filter' : 'Right filter'}>
-              <div className="flex flex-wrap gap-1">
-                {FILTERS.map((each) => (
-                  <Button
-                    key={each.id}
-                    variant="secondary"
-                    on={filters[index] === each.id}
-                    aria-pressed={filters[index] === each.id}
-                    onClick={() =>
-                      setFilters((current) => {
-                        const next: [FilterId, FilterId] = [current[0], current[1]];
-                        next[index] = each.id;
-                        return next;
-                      })
-                    }
-                    className="text-sm"
-                  >
-                    {each.name}
-                  </Button>
-                ))}
-              </div>
+            <div
+              role="group"
+              aria-label={index === 0 ? 'Left filter' : 'Right filter'}
+              className="grid gap-2"
+            >
+              {(
+                [
+                  ['One rule, five ways', VIEW_OPTIONS],
+                  ['Earlier', FILTERS],
+                ] as const
+              ).map(([title, options]) => (
+                <div key={title} className="flex flex-wrap items-center gap-1">
+                  <span className={cx(PANEL_TITLE, 'w-full')}>{title}</span>
+                  {options.map((each) => (
+                    <Button
+                      key={each.id}
+                      variant="secondary"
+                      on={filters[index] === each.id}
+                      aria-pressed={filters[index] === each.id}
+                      onClick={() =>
+                        setFilters((current) => {
+                          const next: [FilterId, FilterId] = [current[0], current[1]];
+                          next[index] = each.id;
+                          return next;
+                        })
+                      }
+                      className="text-sm"
+                    >
+                      {each.name}
+                    </Button>
+                  ))}
+                </div>
+              ))}
             </div>
-            <Mock
-              filter={filters[index]}
-              cut={cut}
-              rows={rows}
-              category={category}
-              preference={system}
-              text={text}
-              unit={unit}
-              state={columns[index]}
-              onText={setText}
-              onTake={take}
-              onRemove={() => setUnit(null)}
-              onState={(update) => setColumn(index, update)}
-            />
+            {isViewOption(filters[index]) ? (
+              <ViewMock
+                option={filters[index] as ViewOption}
+                cut={cut}
+                rows={rows}
+                categoryName={categoryName}
+                preference={system}
+                text={text}
+                unit={unit}
+                view={columns[index].view}
+                onText={setText}
+                onTake={take}
+                onRemove={() => setUnit(null)}
+                onView={(update) =>
+                  setColumn(index, (current) => ({ ...current, view: update(current.view) }))
+                }
+              />
+            ) : (
+              <Mock
+                filter={filters[index] as EarlierFilter}
+                cut={cut}
+                rows={rows}
+                category={category}
+                preference={system}
+                text={text}
+                unit={unit}
+                state={columns[index]}
+                onText={setText}
+                onTake={take}
+                onRemove={() => setUnit(null)}
+                onState={(update) => setColumn(index, update)}
+              />
+            )}
           </div>
         ))}
       </div>

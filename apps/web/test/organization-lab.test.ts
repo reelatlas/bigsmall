@@ -8,6 +8,14 @@ import {
   showsInFamilies,
   showsInPreset,
 } from '../src/pages/dev/_organization-lab/sections';
+import {
+  groupState,
+  unitShown,
+  withChoice,
+  withSystems,
+  type ViewRule,
+} from '../src/pages/dev/_organization-lab/view-rule';
+import type { TableRow } from '../src/features/converter/state';
 
 function rows(category: CategoryId) {
   return unitsIn(category).map((unit) => ({ id: unit.id, unit }));
@@ -124,5 +132,65 @@ describe('organization lab groupings', () => {
     expect(fixedKeyOf(inch, 'us')).toBe('us');
     expect(fixedKeyOf(inch, 'metric')).toBe('us');
     expect(fixedKeyOf(inch, 'imperial')).toBe('uk');
+  });
+
+  describe('the rule options E to I share', () => {
+    const row = (id: string, inBox = false): TableRow => {
+      const unit = unitsIn('length').find((each) => each.id === id)!;
+      return {
+        unit,
+        id,
+        name: unit.plural,
+        symbol: unit.symbol,
+        value: null,
+        text: '—',
+        tone: 'empty',
+        inBox,
+      };
+    };
+    const everyday: ViewRule = { shown: new Set(['metric', 'us', 'uk']), overrides: new Map() };
+
+    it('lets a switch hide a system, a single choice show one back, and the box keep its unit', () => {
+      expect(unitShown(row('nanometer'), everyday, 'us')).toBe(false);
+      const shownBack = withChoice(everyday, [row('nanometer')], true, 'us');
+      expect(unitShown(row('nanometer'), shownBack, 'us')).toBe(true);
+      expect(unitShown(row('parsec', true), everyday, 'us')).toBe(true);
+    });
+
+    it('records a choice only where it differs from the switch', () => {
+      const hidden = withChoice(everyday, [row('inch')], false, 'us');
+      expect(hidden.overrides.get('inch')).toBe(false);
+      expect(withChoice(hidden, [row('inch')], true, 'us').overrides.has('inch')).toBe(false);
+    });
+
+    it('reads a section as all, some, or none of its units', () => {
+      const us = ['inch', 'foot', 'yard', 'mile'].map((id) => row(id));
+      const one = withChoice(everyday, [row('inch')], false, 'us');
+      expect(groupState(us, (each) => unitShown(each, everyday, 'us'))).toBe('all');
+      expect(groupState(us, (each) => unitShown(each, one, 'us'))).toBe('some');
+      const none = withChoice(everyday, us, false, 'us');
+      expect(groupState(us, (each) => unitShown(each, none, 'us'))).toBe('none');
+    });
+
+    it('drops the single choices a switch now agrees with', () => {
+      const shownBack = withChoice(everyday, [row('nanometer')], true, 'us');
+      const all = withSystems(shownBack, new Set(['metric', 'us', 'uk', 'specialist']), 'us');
+      expect(all.overrides.size).toBe(0);
+    });
+
+    it('always shows Other, which has no switch', () => {
+      const knot = unitsIn('speed').find((unit) => unit.id === 'knot')!;
+      const knotRow: TableRow = {
+        unit: knot,
+        id: 'knot',
+        name: 'knots',
+        symbol: 'kn',
+        value: null,
+        text: '—',
+        tone: 'empty',
+        inBox: false,
+      };
+      expect(unitShown(knotRow, { shown: new Set(), overrides: new Map() }, 'us')).toBe(true);
+    });
   });
 });

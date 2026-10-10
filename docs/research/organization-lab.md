@@ -66,7 +66,7 @@ The table's foot has Edit, which puts a checkbox on every row and a three-state 
 
 ### Hidden units
 
-- **In the table**: a Hidden line at the foot counts them ("Hidden 5"); open, it lists them under their section names, values dimmed, a checkbox on each and a three-state one on each heading, so one or a section comes back with a tap.
+- **In the table**: a Hidden line at the foot counts them ("Hidden 5"); open, it lists them under their section names, a checkbox, the symbol, and the name where names show, set in under a three-state checkbox on each heading, so one or a section comes back with a tap. It shows no values: it is for bringing units back, and needs none of the table's columns.
 - **In search**: hidden units leave the matches. When one matches, a line says so ("2 hidden units also match", or "Only hidden units match"), and Show them lists them under Hidden with their category and section ("Volume · Specialist"). Taking one puts it in the box and unhides it. Nothing typed ever meets a bare "No unit matches" while a hidden unit matches.
 
 ## Questions this round puts to Sean

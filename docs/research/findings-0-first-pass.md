@@ -563,3 +563,15 @@ Sean's answers on the settings lab (2026-10-10).
 | In Edit, sections and units look alike                                                           | Each unit's checkbox is set in under its section's, as a tree's child is, in Edit and the Hidden list      |
 | With Both, the decimal first in the table, as Settings lists it                                  | The decimal, then its fraction in the muted ink; the fraction gives way on a narrow screen after the names |
 | Keep the places from 0.1 to 0.001, and run the fraction sizes the same way, the least fine first | 1/2, 1/3, 1/4, 1/8, then 1/16, 1/32, 1/64                                                                  |
+
+## Sixth tidy pass
+
+Since the fifth tidy (2026-10-08): the settings lab, `SegmentedControl` and `Switch`, `check-draw`, and the calculator's send check.
+
+| Found                                                                                | What changed                                                               |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| A menu's choice, the settings switch, and the lab's checkbox rows built the same row | One recipe, `OPTION_ROW`; `MENU_OPTION` builds on it, its output unchanged |
+| DevPage's `wide` column had no page left that used it                                | Gone                                                                       |
+| Three exports of the lab used only in their own files                                | No longer exported                                                         |
+| The research doc said the Hidden list dims values; it lists units without them       | Corrected                                                                  |
+| The gallery paragraph did not name the settings' controls                            | It does                                                                    |

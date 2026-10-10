@@ -23,7 +23,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 
 - Markup repeated in two places is a component in `src/components/`, or a prop or variant of one that exists. Extend before adding; never fork.
 - A component defined inside a page, a lab, or a feature file that the product uses moves to `src/components/`. Search: `^function [A-Z]` and `^export function [A-Z]` outside `src/components/`. Lab-only tools under `src/pages/dev/_<lab>/` stay there.
-- Every component in `src/components/` has an inventory row in `DESIGN-SYSTEM.md` and a gallery sample (`src/pages/dev/gallery.astro`, `src/pages/dev/_gallery/FieldSamples.tsx`) in the states that ship.
+- Every component in `src/components/` has an inventory row in `DESIGN-SYSTEM.md` and a gallery sample (`src/pages/dev/gallery.astro` and its islands in `src/pages/dev/_gallery/`) in the states that ship.
 - Component rules (`DESIGN-SYSTEM.md`, "Component rules"): tokens only, keyboard-operable with visible focus, a name, 44 px targets, 320 px and 400 % zoom, reduced motion, what it branches on as a prop, ARIA written on the element, a labelled container with a role.
 - A prop, option, or variant that no caller uses anymore is dead code (below).
 

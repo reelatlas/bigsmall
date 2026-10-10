@@ -5,21 +5,22 @@ import { OrganizationLab } from './_organization-lab/OrganizationLab';
 /*
  * The settings lab (Sean, 2026-10-10; docs/research/organization-lab.md): the Settings button in
  * the action bar, what shows and how it looks, the table's sections and its Hidden section, and
- * search with hidden units, in two converters side by side that choose single units two ways.
+ * search with hidden units, with single units chosen in the table. Two looks for Settings' choices
+ * side by side: compact pills and a segmented control.
  */
 ---
 
 <DevPage
   title="settings lab"
-  description="The Settings button, the table's sections, and hidden units, two ways side by side."
+  description="The Settings button, the table's sections, and hidden units, with two looks for its choices."
   wide
 >
   <Fragment slot="intro">
     Settings lab. Each converter has the real action bar with a Settings button at the start of its
-    tools: what shows, in every category, and how results look. Hidden units wait in a Hidden
-    section at the table's foot, under their section names. Type a unit's name in the box to see how
-    search treats hidden ones. The two choose single units differently; the category, the number,
-    and the region are shared.
+    tools: what shows, in every category, and how results look. Edit at the table's foot chooses
+    single units; hidden ones wait in a Hidden section under their section names. Type a unit's name
+    in the box to see how search treats hidden ones. The two differ only in how Settings draws its
+    choices; the category, the number, and the region are shared.
   </Fragment>
   <OrganizationLab client:load />
 </DevPage>

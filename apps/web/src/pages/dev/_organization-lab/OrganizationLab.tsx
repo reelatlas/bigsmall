@@ -1,9 +1,7 @@
 import {
   categories,
-  getCategory,
   localeSeparators,
   parse,
-  unitsIn,
   type CategoryId,
   type Unit,
   type UnitPreference,
@@ -46,19 +44,38 @@ import {
   unitSymbol,
 } from '../../../lib/recipes';
 import { browserLocale } from '../../../lib/region';
-import { DENOMINATORS, displayChanged, displayValue, FRESH_DISPLAY, type Display } from './display';
-import { BoxField, CHECKBOX, GIVE_WAY, RowCells, ROWS, toggleSet } from './parts';
-import { FIXED_LABEL, fixedKeyOf, sectionsOf, SHOW_KEYS, type FixedKey } from './sections';
 import {
-  exceptionsIn,
+  displayChanged,
+  displayValue,
+  FRACTION_GROUPS,
+  FRESH_DISPLAY,
+  STEP_NAME,
+  stepFractions,
+  type Display,
+  type FractionStep,
+} from './display';
+import {
+  BoxField,
+  CHECKBOX,
+  ChoiceRow,
+  GIVE_WAY,
+  RowCells,
+  ROWS,
+  Switch,
+  type Look,
+} from './parts';
+import { FIXED_LABEL, fixedKeyOf, sectionsOf, SHOW_KEYS } from './sections';
+import {
   FRESH_RULE,
   groupState,
+  hiddenByHand,
   presetKeys,
   presetOf,
   shows,
   SHOW_PRESETS,
+  switchesChanged,
   withChoice,
-  withoutExceptions,
+  withoutHidden,
   withSystem,
   withSystems,
   type GroupState,
@@ -68,26 +85,25 @@ import {
 
 /**
  * The settings lab (docs/research/organization-lab.md, 2026-10-10): Sean's model in the context of
- * the action bar. A Settings button shapes what shows (the units, in every category) and how it
- * looks (names, copy buttons, decimals or fractions, rounding); the table heads its sections by
- * system and keeps what is hidden in a Hidden section at its foot; search leaves hidden units out
- * and says when one matches. Two ways to choose single units, side by side: in the table, or in
- * Settings. Built from the real engine, table view, menu, chip, and toolbar parts, with state of
- * its own: no undo, no URL, no arrow keys.
+ * the action bar, with single units chosen in the table (Separate, Sean's direction). A Settings
+ * button shapes what shows (the units, in every category) and how it looks (names, copy buttons,
+ * decimals or fractions, rounding); the table heads its sections by system and keeps what is hidden
+ * in a Hidden section at its foot; search leaves hidden units out and says when one matches. Two
+ * looks for Settings' choices, side by side: compact pills, and a segmented control. Built from the
+ * real engine, table view, menu, chip, and toolbar parts, with state of its own: no undo, no URL,
+ * no arrow keys.
  */
 
-type Variant = 'separate' | 'together';
-
-const VARIANTS: ReadonlyArray<{ id: Variant; name: string; hint: string }> = [
+const LOOKS: ReadonlyArray<{ id: Look; name: string; hint: string }> = [
   {
-    id: 'separate',
-    name: '1. Separate',
-    hint: 'Settings set every category. Single units are chosen in the table: Edit at its foot puts a checkbox on every row and a three-state one on every heading.',
+    id: 'pills',
+    name: '1. Compact pills',
+    hint: 'Each choice its own pill, drawn 32 px tall with less padding than today’s 44 px; each still takes a 44 px tap.',
   },
   {
-    id: 'together',
-    name: '2. Together',
-    hint: 'Settings show this category under each system: its checkbox reads all, some, or none of them here and sets the system everywhere, and it opens to the units, chosen here alone.',
+    id: 'segmented',
+    name: '2. Segmented control',
+    hint: 'A setting’s choices joined in one strip, a line between each, at the same size; the same 44 px tap.',
   },
 ];
 
@@ -118,13 +134,11 @@ interface Ui {
   rule: ViewRule;
   display: Display;
   settingsOpen: boolean;
-  /** The table is the checklist (variant 1). */
+  /** The table is the checklist. */
   editing: boolean;
   hiddenOpen: boolean;
   /** The hidden units a typed query matches, shown. */
   revealMatches: boolean;
-  /** Systems opened to their units in Settings (variant 2). */
-  expanded: ReadonlySet<FixedKey>;
 }
 
 function freshUi(): Ui {
@@ -135,21 +149,18 @@ function freshUi(): Ui {
     editing: false,
     hiddenOpen: false,
     revealMatches: false,
-    expanded: new Set(),
   };
 }
 
 /** A new category keeps every setting and exception; what was open closes. */
 function closed(ui: Ui): Ui {
-  return { ...ui, settingsOpen: false, editing: false, revealMatches: false, expanded: new Set() };
+  return { ...ui, settingsOpen: false, editing: false, revealMatches: false };
 }
 
 type UpdateUi = (update: (ui: Ui) => Ui) => void;
 
 const OPTION_LINE =
   'flex min-h-11 cursor-pointer items-center gap-2 rounded-nested-md px-2 text-sm text-ink hover:bg-surface-raised';
-const PILL =
-  'flex min-h-11 cursor-pointer items-center rounded-md border-2 border-edge px-3 text-sm text-ink focus-ring-within-inset has-checked:border-transparent has-checked:bg-accent-soft has-disabled:cursor-not-allowed has-disabled:opacity-50';
 const SUBHEAD = cx(PANEL_TITLE, 'text-xs');
 
 function SlidersIcon() {
@@ -189,38 +200,27 @@ function TriCheckbox({ state, onChange }: { state: GroupState; onChange: () => v
   );
 }
 
-/** One choice of a few, as pills. */
-function Pills<T extends string>({
+/** One choice of a few, under its legend, in the converter's look. */
+function Choices<T extends string | number>({
+  look,
   legend,
   options,
   value,
   disabled = false,
   onChange,
 }: {
+  look: Look;
   legend: string;
-  options: ReadonlyArray<{ value: T; label: string }>;
+  options: ReadonlyArray<{ value: T; label: ReactNode }>;
   value: T | null;
   disabled?: boolean;
   onChange: (value: T) => void;
 }) {
   const name = useId();
   return (
-    <fieldset disabled={disabled} className="grid gap-1">
-      <legend className={cx(SUBHEAD, 'pb-1')}>{legend}</legend>
-      <div className="flex flex-wrap gap-1">
-        {options.map((option) => (
-          <label key={option.value} className={PILL}>
-            <input
-              type="radio"
-              name={name}
-              checked={value === option.value}
-              onChange={() => onChange(option.value)}
-              className="sr-only"
-            />
-            {option.label}
-          </label>
-        ))}
-      </div>
+    <fieldset disabled={disabled} className="grid">
+      <legend className={SUBHEAD}>{legend}</legend>
+      <ChoiceRow look={look} name={name} options={options} value={value} onChange={onChange} />
     </fieldset>
   );
 }
@@ -232,32 +232,79 @@ const PLACES: ReadonlyArray<{ value: string; label: string; places: Display['pla
   { value: 'none', label: 'No limit', places: null },
 ];
 
+/** What a step writes, in full up to eighths, the ends of the list past them. */
+function stepPreview(step: FractionStep): string {
+  const all = stepFractions(step);
+  return all.length <= 7 ? all.join(', ') : `${all.slice(0, 3).join(', ')} … ${all.at(-1)}`;
+}
+
 /**
- * Settings: what shows, in every category, then how it looks. Variant 1 lists the systems as
- * switches for every category; variant 2 shows this category under each one.
+ * Fractions to a step: one choice of the six, in three groups, coarse to fine, each named; a line
+ * under them says what the step chosen writes.
  */
+function FractionSteps({
+  look,
+  step,
+  onChange,
+}: {
+  look: Look;
+  step: FractionStep;
+  onChange: (step: FractionStep) => void;
+}) {
+  const name = useId();
+  return (
+    <fieldset className="grid">
+      <legend className={SUBHEAD}>Round to</legend>
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3">
+        {FRACTION_GROUPS.map((group) => (
+          <div
+            key={group.name}
+            role="group"
+            aria-labelledby={`${name}-${group.name}`}
+            className="col-span-2 grid grid-cols-subgrid items-center"
+          >
+            <span id={`${name}-${group.name}`} className="text-xs text-ink-muted">
+              {group.name}
+            </span>
+            <ChoiceRow<FractionStep>
+              look={look}
+              name={name}
+              options={group.steps.map((each) => ({
+                value: each,
+                label: (
+                  <>
+                    <span className="font-numeric">1/{each}</span>
+                    <span className="sr-only">, {STEP_NAME[each]}</span>
+                  </>
+                ),
+              }))}
+              value={step}
+              onChange={onChange}
+            />
+          </div>
+        ))}
+      </div>
+      <p className="pt-1 font-numeric text-xs text-ink-muted">Shows {stepPreview(step)}</p>
+    </fieldset>
+  );
+}
+
+/** Settings: what shows, in every category, then how it looks. */
 function SettingsPanel({
-  variant,
+  look,
   id,
   ui,
   preference,
-  category,
-  boxUnit,
   onUi,
 }: {
-  variant: Variant;
+  look: Look;
   id: string;
   ui: Ui;
   preference: UnitPreference;
-  category: CategoryId;
-  boxUnit: string | null;
   onUi: UpdateUi;
 }) {
   const { rule, display } = ui;
-  const name = getCategory(category)?.name ?? '';
-  const here = unitsIn(category);
-  const isShown = (unit: Unit) => unit.id === boxUnit || shows(unit, rule, preference);
-  const exceptions = exceptionsIn(rule, here);
+  const hiddenCount = hiddenByHand(rule);
   const setRule = (next: (rule: ViewRule) => ViewRule) =>
     onUi((now) => ({ ...now, rule: next(now.rule) }));
   const setDisplay = (patch: Partial<Display>) =>
@@ -271,7 +318,7 @@ function SettingsPanel({
       onPointerDown={(event) => event.preventDefault()}
       className={cx(
         CARD,
-        'absolute top-full right-0 z-20 mt-1 grid max-h-120 w-80 gap-4 overflow-y-auto p-3 shadow-md',
+        'absolute top-full right-0 z-20 mt-1 grid max-h-120 w-80 gap-3 overflow-y-auto p-3 shadow-md',
       )}
     >
       <section className="grid gap-2" aria-label="Units">
@@ -281,139 +328,52 @@ function SettingsPanel({
             What the table and search show, in every category.
           </p>
         </div>
-        <Pills<ShowPreset>
+        <Choices<ShowPreset>
+          look={look}
           legend="Show"
           options={SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name }))}
           value={presetOf(rule.shown, preference)}
-          onChange={(preset) =>
-            setRule((now) => withSystems(now, presetKeys(preset, preference), preference))
-          }
+          onChange={(preset) => setRule((now) => withSystems(now, presetKeys(preset, preference)))}
         />
         <fieldset className="grid">
-          <legend className={cx(SUBHEAD, 'pb-1')}>
-            {variant === 'separate' ? 'Systems' : `Systems, and the units in ${name}`}
-          </legend>
-          {SHOW_KEYS.map((key) => {
-            const units = here.filter((unit) => fixedKeyOf(unit, preference) === key);
-            if (variant === 'separate' || units.length === 0) {
-              return (
-                <label key={key} className={OPTION_LINE}>
-                  <input
-                    type="checkbox"
-                    checked={rule.shown.has(key)}
-                    onChange={() =>
-                      setRule((now) => withSystem(now, key, !now.shown.has(key), preference))
-                    }
-                    className={CHECKBOX}
-                  />
-                  {FIXED_LABEL[key]}
-                  {variant === 'together' && (
-                    <span className="ml-auto text-xs text-ink-muted">none in {name}</span>
-                  )}
-                </label>
-              );
-            }
-            const state = groupState(units, isShown);
-            const open = ui.expanded.has(key);
-            return (
-              <div key={key}>
-                <div className="flex items-center">
-                  <label className={cx(OPTION_LINE, 'min-w-0 flex-1')}>
-                    <TriCheckbox
-                      state={state}
-                      onChange={() =>
-                        setRule((now) => withSystem(now, key, state !== 'all', preference))
-                      }
-                    />
-                    {FIXED_LABEL[key]}
-                    <span className="ml-auto font-numeric text-xs text-ink-muted">
-                      {units.filter(isShown).length} of {units.length}
-                    </span>
-                  </label>
-                  <button
-                    type="button"
-                    aria-expanded={open}
-                    aria-label={`${FIXED_LABEL[key]} units in ${name}`}
-                    onClick={() =>
-                      onUi((now) => ({ ...now, expanded: toggleSet(now.expanded, key) }))
-                    }
-                    className="grid size-11 shrink-0 place-items-center rounded-nested-md text-ink-muted hover:bg-surface-raised"
-                  >
-                    <ChevronDownIcon
-                      width="16"
-                      height="16"
-                      className={cx('transition-transform', !open && '-rotate-90')}
-                    />
-                  </button>
-                </div>
-                {open &&
-                  units.map((unit) => (
-                    <label key={unit.id} className={cx(OPTION_LINE, 'pl-8')}>
-                      <input
-                        type="checkbox"
-                        checked={isShown(unit)}
-                        disabled={unit.id === boxUnit}
-                        onChange={() =>
-                          setRule((now) => withChoice(now, [unit], !isShown(unit), preference))
-                        }
-                        className={CHECKBOX}
-                      />
-                      <span className={unitSymbol()}>{unit.symbol}</span>
-                      <span className="truncate">{unit.plural}</span>
-                      {unit.id === boxUnit && (
-                        <span className="ml-auto text-xs text-ink-muted">in the box</span>
-                      )}
-                    </label>
-                  ))}
-              </div>
-            );
-          })}
+          <legend className={cx(SUBHEAD, 'pb-1')}>Systems</legend>
+          {SHOW_KEYS.map((key) => (
+            <label key={key} className={OPTION_LINE}>
+              <input
+                type="checkbox"
+                checked={rule.shown.has(key)}
+                onChange={() => setRule((now) => withSystem(now, key, !now.shown.has(key)))}
+                className={CHECKBOX}
+              />
+              {FIXED_LABEL[key]}
+            </label>
+          ))}
         </fieldset>
         <p className="text-xs text-ink-muted">
-          {variant === 'separate'
-            ? 'A system switch sets every category and clears the units chosen against it.'
-            : 'A system’s checkbox sets it in every category and clears the units chosen against it; a unit’s sets that unit alone.'}
+          A system switch sets every category. Units you hide or show in a table stay as you set
+          them.
         </p>
-        {exceptions > 0 && (
-          <p className="flex items-center justify-between gap-2 text-xs text-ink-muted">
-            <span>
-              <span className="font-numeric">{exceptions}</span>{' '}
-              {exceptions === 1 ? 'unit' : 'units'} chosen on {exceptions === 1 ? 'its' : 'their'}{' '}
-              own in {name}
-            </span>
-            <Button
-              variant="ghost"
-              nested
-              onClick={() => setRule((now) => withoutExceptions(now, here))}
-              className="text-sm"
-            >
-              Reset {name}
-            </Button>
-          </p>
-        )}
       </section>
 
-      <section className="grid gap-3 border-t border-line pt-3" aria-label="Display">
+      <section className="grid gap-2 border-t border-line pt-3" aria-label="Display">
         <h3 className={PANEL_TITLE}>Display</h3>
-        <Pills
+        <Choices<Display['names']>
+          look={look}
           legend="Unit names"
           options={[
-            { value: 'both', label: 'Symbol and name' },
             { value: 'symbol', label: 'Symbol only' },
+            { value: 'both', label: 'Symbol and name' },
           ]}
           value={display.names}
           onChange={(names) => setDisplay({ names })}
         />
-        <label className={OPTION_LINE}>
-          <input
-            type="checkbox"
-            checked={display.copy}
-            onChange={() => setDisplay({ copy: !display.copy })}
-            className={CHECKBOX}
-          />
-          Copy buttons
-        </label>
-        <Pills
+        <Switch
+          label="Copy buttons"
+          checked={display.copy}
+          onChange={(copy) => setDisplay({ copy })}
+        />
+        <Choices<Display['format']>
+          look={look}
           legend="Format"
           options={[
             { value: 'decimal', label: 'Decimals' },
@@ -423,7 +383,8 @@ function SettingsPanel({
           onChange={(format) => setDisplay({ format })}
         />
         {display.format === 'decimal' ? (
-          <Pills
+          <Choices
+            look={look}
             legend="Round to"
             options={PLACES}
             value={PLACES.find((each) => each.places === display.places)?.value ?? null}
@@ -432,26 +393,14 @@ function SettingsPanel({
             }
           />
         ) : (
-          <fieldset className="grid gap-1">
-            <legend className={cx(SUBHEAD, 'pb-1')}>Fractions in</legend>
-            <div className="flex flex-wrap gap-1">
-              {DENOMINATORS.map((of) => (
-                <label key={of} className={PILL}>
-                  <input
-                    type="checkbox"
-                    checked={display.denominators.has(of)}
-                    onChange={() =>
-                      setDisplay({ denominators: toggleSet(display.denominators, of) })
-                    }
-                    className="sr-only"
-                  />
-                  1/{of}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <FractionSteps
+            look={look}
+            step={display.step}
+            onChange={(step) => setDisplay({ step })}
+          />
         )}
-        <Pills
+        <Choices<Display['rounding']>
+          look={look}
           legend="Rounding"
           options={[
             { value: 'nearest', label: 'Nearest' },
@@ -463,14 +412,39 @@ function SettingsPanel({
           onChange={(rounding) => setDisplay({ rounding })}
         />
       </section>
-      <div className="border-t border-line pt-2">
-        <Button
-          variant="ghost"
-          onClick={() => onUi((now) => ({ ...now, rule: FRESH_RULE, display: FRESH_DISPLAY }))}
-          className="text-sm"
-        >
-          Reset all settings
-        </Button>
+      {/*
+       * Two resets (Sean, 2026-10-10): the settings, which leave the units hidden in a table, and
+       * the units hidden in a table, which leave the settings.
+       */}
+      <div className="grid gap-1 border-t border-line pt-2">
+        <div className="flex items-center justify-between gap-2">
+          <Button
+            variant="ghost"
+            disabled={!switchesChanged(rule) && !displayChanged(display)}
+            onClick={() =>
+              onUi((now) => ({
+                ...now,
+                rule: withSystems(now.rule, FRESH_RULE.shown),
+                display: FRESH_DISPLAY,
+              }))
+            }
+            className="text-sm"
+          >
+            Reset settings
+          </Button>
+          <Button
+            variant="ghost"
+            disabled={hiddenCount === 0}
+            onClick={() => setRule(withoutHidden)}
+            className="text-sm"
+          >
+            Unhide units
+            {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
+          </Button>
+        </div>
+        <p className="px-2 text-xs text-ink-muted">
+          Reset settings keeps the units you hid; Unhide shows them again, in every category.
+        </p>
       </div>
     </div>
   );
@@ -478,7 +452,6 @@ function SettingsPanel({
 
 /** The table: sections headed by system, hidden units kept at its foot, values as Display writes them. */
 function ResultsTable({
-  variant,
   ui,
   rows,
   preference,
@@ -486,7 +459,6 @@ function ResultsTable({
   onUi,
   onTake,
 }: {
-  variant: Variant;
   ui: Ui;
   rows: readonly TableRow[];
   preference: UnitPreference;
@@ -494,11 +466,13 @@ function ResultsTable({
   onUi: UpdateUi;
   onTake: (row: TableRow) => void;
 }) {
+  const id = useId();
   const gridRef = useRef<HTMLDivElement>(null);
   const namesHidden = useColumnsFit(gridRef, GIVE_WAY).includes('name');
   const withName = ui.display.names === 'both';
+  const { copy } = ui.display;
   const isShown = (row: TableRow) => row.inBox || shows(row.unit, ui.rule, preference);
-  const editing = variant === 'separate' && ui.editing;
+  const { editing } = ui;
   const hidden = rows.filter((row) => !isShown(row));
   const shownValue = (row: TableRow) =>
     row.tone === 'value' ? displayValue(row.value, ui.display, locale) : null;
@@ -519,6 +493,7 @@ function ResultsTable({
     return (
       <label
         key={row.id}
+        htmlFor={`${id}-${row.id}`}
         className={cx(
           CURSOR_ROW,
           'col-span-6 grid grid-cols-subgrid items-center',
@@ -531,16 +506,17 @@ function ResultsTable({
           namesHidden={namesHidden}
           withName={withName}
           muted={!on}
+          check={
+            <input
+              id={`${id}-${row.id}`}
+              type="checkbox"
+              checked={on}
+              disabled={row.inBox}
+              onChange={() => choose([row], !on)}
+              className={CHECKBOX}
+            />
+          }
         />
-        <span className="grid size-11 place-items-center">
-          <input
-            type="checkbox"
-            checked={on}
-            disabled={row.inBox}
-            onChange={() => choose([row], !on)}
-            className={CHECKBOX}
-          />
-        </span>
       </label>
     );
   };
@@ -562,10 +538,11 @@ function ResultsTable({
       {editing && (
         <div className="flex items-center justify-between gap-2 pb-1 pl-2">
           <span className={PANEL_TITLE}>Choose the units to show</span>
+          {/* Done closes Hidden too: whoever just chose what to hide should not have to fold it. */}
           <Button
             variant="ghost"
             nested
-            onClick={() => onUi((now) => ({ ...now, editing: false }))}
+            onClick={() => onUi((now) => ({ ...now, editing: false, hiddenOpen: false }))}
             className="text-sm"
           >
             Done
@@ -593,12 +570,14 @@ function ResultsTable({
                 if (editing) return checkRow(row);
                 return (
                   <div key={row.id} className="col-span-6 grid grid-cols-subgrid items-center">
+                    {/* Without copy buttons the row runs to the card's edge: no column is kept for them. */}
                     <button
                       type="button"
                       onClick={() => onTake(row)}
                       className={cx(
                         CURSOR_ROW,
-                        'col-span-5 grid grid-cols-subgrid items-center',
+                        'grid grid-cols-subgrid items-center',
+                        copy ? 'col-span-5' : 'col-span-6',
                         rowFill(row.inBox, false),
                       )}
                     >
@@ -609,7 +588,7 @@ function ResultsTable({
                         withName={withName}
                       />
                     </button>
-                    {ui.display.copy &&
+                    {copy &&
                       (row.tone === 'value' ? (
                         <Button
                           variant="ghost"
@@ -629,7 +608,7 @@ function ResultsTable({
             </div>
           );
         })}
-        {!editing && (hidden.length > 0 || variant === 'separate') && (
+        {!editing && (
           <div className="col-span-6 mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1">
             {hidden.length > 0 ? (
               <button
@@ -646,22 +625,23 @@ function ResultsTable({
                   height="16"
                   className={cx('transition-transform', !ui.hiddenOpen && '-rotate-90')}
                 />
-                Hidden
-                <span className="font-numeric font-normal">{hidden.length}</span>
+                {/* The word and its count on one baseline, as the matches' headers; the icon centred. */}
+                <span className="flex items-baseline gap-1.5">
+                  Hidden
+                  <span className="font-numeric font-normal">{hidden.length}</span>
+                </span>
               </button>
             ) : (
               <span className="px-2 text-sm text-ink-muted">Every unit shown</span>
             )}
-            {variant === 'separate' && (
-              <Button
-                variant="ghost"
-                nested
-                onClick={() => onUi((now) => ({ ...now, editing: true }))}
-                className="text-sm"
-              >
-                Edit
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              nested
+              onClick={() => onUi((now) => ({ ...now, editing: true }))}
+              className="text-sm"
+            >
+              Edit
+            </Button>
           </div>
         )}
         {!editing &&
@@ -682,7 +662,11 @@ function ResultsTable({
   );
 }
 
-/** While a unit is typed: the matches that show; a line, and a way in, for those that are hidden. */
+/**
+ * While a unit is typed: the matches that show, written as Display writes the table (symbols
+ * alone with Symbol only, the name kept for screen readers); a line, and a way in, for those that
+ * are hidden.
+ */
 function MatchesList({
   view,
   ui,
@@ -701,6 +685,7 @@ function MatchesList({
     row.inBox || shows(row.unit, ui.rule, preference);
   const shown = units.filter(visible);
   const hidden = units.filter((row) => !visible(row));
+  const withName = ui.display.names === 'both';
   const groups = new Map<string, typeof shown>();
   for (const row of shown) {
     groups.set(row.category.name, [...(groups.get(row.category.name) ?? []), row]);
@@ -717,7 +702,7 @@ function MatchesList({
       )}
     >
       <span className={unitSymbol()}>{row.unit.symbol}</span>
-      <span className="truncate text-ink">{row.unit.plural}</span>
+      <span className={withName ? 'truncate text-ink' : 'sr-only'}>{row.unit.plural}</span>
       {hint && <span className="ml-auto text-xs text-ink-muted">{hint}</span>}
     </button>
   );
@@ -774,7 +759,7 @@ function MatchesList({
 
 /** One converter: its action bar, the box, and the table or the matches. */
 function Converter({
-  variant,
+  look,
   preference,
   locale,
   category,
@@ -786,7 +771,7 @@ function Converter({
   onUnit,
   onUi,
 }: {
-  variant: Variant;
+  look: Look;
   preference: UnitPreference;
   locale: string | undefined;
   category: CategoryId;
@@ -799,7 +784,7 @@ function Converter({
   onUi: UpdateUi;
 }) {
   const id = useId();
-  const meta = VARIANTS.find((each) => each.id === variant) ?? VARIANTS[0]!;
+  const meta = LOOKS.find((each) => each.id === look) ?? LOOKS[0]!;
   const separators = useMemo(() => localeSeparators(locale), [locale]);
   const view = useMemo(
     () =>
@@ -809,10 +794,6 @@ function Converter({
       ),
     [text, unit, category, locale, separators, preference],
   );
-  const changed =
-    ui.rule.overrides.size > 0 ||
-    ui.rule.shown.size !== SHOW_KEYS.length ||
-    displayChanged(ui.display);
   const close = () => onUi((now) => ({ ...now, settingsOpen: false }));
 
   useEffect(() => {
@@ -824,15 +805,24 @@ function Converter({
     return () => document.removeEventListener('keydown', onKey);
   });
 
+  /**
+   * A unit taken into the box is shown from then on (Sean, 2026-10-10): one taken from the hidden
+   * matches leaves Hidden, as if checked there, so clearing the box never hides it again.
+   */
   const take = (chosen: Unit, number: string) => {
     onUnit(chosen.id);
     onText(number);
+    onUi((now) => ({
+      ...now,
+      rule: withChoice(now.rule, [chosen], true, preference),
+      revealMatches: false,
+    }));
   };
 
   return (
     <div className="min-w-0">
       <h2 className="font-display text-lg font-semibold">{meta.name}</h2>
-      <p className="min-h-16 text-sm text-ink-muted">{meta.hint}</p>
+      <p className="min-h-10 text-sm text-ink-muted">{meta.hint}</p>
       <div
         role="toolbar"
         aria-label={`Tools, ${meta.name}`}
@@ -852,27 +842,18 @@ function Converter({
               on={ui.settingsOpen}
               aria-expanded={ui.settingsOpen}
               aria-controls={`${id}-settings`}
-              aria-label={changed ? 'Settings, changed' : 'Settings'}
+              aria-label="Settings"
               title="Settings"
               onClick={() => onUi((now) => ({ ...now, settingsOpen: !now.settingsOpen }))}
-              className="relative"
             >
               <SlidersIcon />
-              {changed && (
-                <span
-                  aria-hidden="true"
-                  className="absolute top-2 right-2 size-2 rounded-full bg-accent"
-                />
-              )}
             </Button>
             {ui.settingsOpen && (
               <SettingsPanel
-                variant={variant}
+                look={look}
                 id={`${id}-settings`}
                 ui={ui}
                 preference={preference}
-                category={category}
-                boxUnit={unit}
                 onUi={onUi}
               />
             )}
@@ -915,7 +896,6 @@ function Converter({
           />
         ) : view.kind === 'units' ? (
           <ResultsTable
-            variant={variant}
             ui={ui}
             rows={view.rows}
             preference={preference}
@@ -976,10 +956,10 @@ export function OrganizationLab() {
         </Button>
       </div>
       <div className="grid items-start gap-10 md:grid-cols-2 md:gap-6">
-        {VARIANTS.map((variant, index) => (
+        {LOOKS.map((look, index) => (
           <Converter
-            key={variant.id}
-            variant={variant.id}
+            key={look.id}
+            look={look.id}
             preference={system}
             locale={locale}
             category={category}

@@ -1,5 +1,5 @@
 import { getUnit } from '@bigsmall/core';
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 import { FormattedNumber } from '../../../components/NumberText';
 import { UnitChip } from '../../../components/UnitChip';
 import type { TableRow } from '../../../features/converter/state';
@@ -22,17 +22,12 @@ const TONE: Record<TableRow['tone'], string> = {
   message: NO_ANSWER,
 };
 
-export function toggleSet<T>(set: ReadonlySet<T>, key: T): ReadonlySet<T> {
-  const next = new Set(set);
-  if (next.has(key)) next.delete(key);
-  else next.add(key);
-  return next;
-}
-
 /**
  * A row's value, symbol, exponent, and name, in the converter's columns. `shown` is the value as
  * the display writes it (decimals to a place, a fraction), with "≈" where a fraction rounds.
- * Without names (symbols only) the name's column stays, empty, and nothing in it gives way.
+ * Without names (symbols only) the name's column stays, empty, and nothing in it gives way. A
+ * checkbox (Edit, the Hidden section) leads the value's cell, on the left under its heading's, so
+ * no column at the right edge is kept for it and the other rows never move (Sean, 2026-10-10).
  */
 export function RowCells({
   row,
@@ -40,6 +35,7 @@ export function RowCells({
   namesHidden,
   withName,
   muted = false,
+  check,
 }: {
   row: TableRow;
   shown: { text: string; approx: boolean } | null;
@@ -47,26 +43,30 @@ export function RowCells({
   withName: boolean;
   /** A hidden unit's row: its value and name in the muted ink, which keeps the contrast fading would lose. */
   muted?: boolean;
+  check?: ReactNode;
 }) {
   const exponent = EXPONENT.exec(row.symbol)?.[0] ?? '';
+  const value = shown ? (
+    <>
+      {shown.approx && <span className="text-ink-muted">≈ </span>}
+      {shown.text}
+    </>
+  ) : row.tone === 'value' ? (
+    <FormattedNumber text={row.text} />
+  ) : (
+    row.text
+  );
   return (
     <>
       <span
         className={cx(
-          'pr-2 text-right font-numeric whitespace-nowrap',
+          'pr-2 font-numeric whitespace-nowrap',
+          check ? 'flex items-center gap-3' : 'text-right',
           muted ? 'text-ink-muted' : TONE[row.tone],
         )}
       >
-        {shown ? (
-          <>
-            {shown.approx && <span className="text-ink-muted">≈ </span>}
-            {shown.text}
-          </>
-        ) : row.tone === 'value' ? (
-          <FormattedNumber text={row.text} />
-        ) : (
-          row.text
-        )}
+        {check}
+        {check ? <span className="ml-auto">{value}</span> : value}
       </span>
       <span className={cx('col-start-3 pl-2 text-right whitespace-nowrap', unitSymbol())}>
         {row.symbol.slice(0, row.symbol.length - exponent.length)}
@@ -120,6 +120,102 @@ export function BoxField({
       {chipUnit && (
         <UnitChip unit={chipUnit} compact={false} onOpen={() => undefined} onRemove={onRemove} />
       )}
+    </div>
+  );
+}
+
+/**
+ * A trial switch (the next round's proposal 3): one setting that takes effect at once. The whole
+ * row is the control, so its tap is the row's; the track is drawn from the control edge, and the
+ * accent once on. It moves to components/ and the gallery if Sean keeps it.
+ */
+export function Switch({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-nested-md px-2 text-sm text-ink hover:bg-surface-raised"
+    >
+      {label}
+      <span
+        aria-hidden="true"
+        className={cx(
+          'flex h-6 w-10 shrink-0 items-center rounded-full border-2 p-0.5 transition-colors',
+          checked ? 'border-accent bg-accent' : 'border-edge bg-surface',
+        )}
+      >
+        <span
+          className={cx(
+            'size-4 rounded-full transition-transform',
+            checked ? 'translate-x-4 bg-on-accent' : 'bg-ink-muted',
+          )}
+        />
+      </span>
+    </button>
+  );
+}
+
+/** The two looks for a setting's choices, side by side in the lab (the next round's proposal 4). */
+export type Look = 'pills' | 'segmented';
+
+/**
+ * Each choice's tap is 44 px however small its drawn shape (CLAUDE.md, accessibility): the label
+ * is the target, and the shape inside it is drawn 32 px tall with less padding than the converter's
+ * controls, the text kept at text-sm.
+ */
+const TARGET =
+  'group flex min-h-11 min-w-11 cursor-pointer items-center has-disabled:cursor-not-allowed';
+const SHAPE =
+  'flex h-8 w-full items-center justify-center px-2.5 text-sm whitespace-nowrap text-ink peer-checked:bg-accent-soft peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-focus peer-disabled:text-ink-muted';
+const DRAWN: Record<Look, string> = {
+  /** A compact pill each, apart. */
+  pills: cx(SHAPE, 'rounded-md border-2 border-edge peer-checked:border-transparent'),
+  /** One strip: an edge around all, a line between each, at the controls' one weight. */
+  segmented: cx(
+    SHAPE,
+    'border-y-2 border-r-2 border-edge group-first:rounded-l-md group-first:border-l-2 group-last:rounded-r-md',
+  ),
+};
+const ROW: Record<Look, string> = { pills: 'flex flex-wrap gap-x-1', segmented: 'flex w-fit' };
+
+/** One choice of a few, in either look; `name` ties rows of one choice together. */
+export function ChoiceRow<T extends string | number>({
+  look,
+  name,
+  options,
+  value,
+  onChange,
+}: {
+  look: Look;
+  name: string;
+  options: ReadonlyArray<{ value: T; label: ReactNode }>;
+  value: T | null;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className={ROW[look]}>
+      {options.map((option) => (
+        <label key={option.value} className={TARGET}>
+          <input
+            type="radio"
+            name={name}
+            checked={value === option.value}
+            onChange={() => onChange(option.value)}
+            className="peer sr-only"
+          />
+          <span className={DRAWN[look]}>{option.label}</span>
+        </label>
+      ))}
     </div>
   );
 }

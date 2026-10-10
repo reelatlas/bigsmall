@@ -1,11 +1,12 @@
-import { getUnit, type Unit, type UnitPreference } from '@bigsmall/core';
+import type { Unit, UnitPreference } from '@bigsmall/core';
 import { fixedKeyOf, ownKey, SHOW_KEYS, type FixedKey } from './sections';
 
 /**
- * Which units show (docs/research/organization-lab.md, 2026-10-10). The system switches set every
- * category; a unit chosen on its own is an exception, shown or hidden against its switch; turning a
- * switch sets that system everywhere and clears its exceptions, so the last thing done wins at the
- * scope it was done. The unit in the box always shows, whatever this says (the caller's to apply).
+ * Which units show (docs/research/organization-lab.md, 2026-10-10). Two layers. The system
+ * switches set every category. A unit chosen on its own in a table is an exception, shown or
+ * hidden against its switch, and is a layer of its own (Sean, 2026-10-10): the switches, the
+ * presets, and Reset settings leave it, and only Unhide (every unit hidden on its own) or the
+ * table clears it. The unit in the box always shows, whatever this says (the caller's to apply).
  */
 export interface ViewRule {
   /** The system switches: one setting for every category. */
@@ -14,7 +15,17 @@ export interface ViewRule {
   overrides: ReadonlyMap<string, boolean>;
 }
 
-export const FRESH_RULE: ViewRule = { shown: new Set(SHOW_KEYS), overrides: new Map() };
+/** A fresh visit's: every system but Specialist, the Everyday preset (Sean, 2026-10-10). */
+export const FRESH_RULE: ViewRule = {
+  shown: new Set(SHOW_KEYS.filter((key) => key !== 'specialist')),
+  overrides: new Map(),
+};
+
+/** Whether the switches differ from a fresh visit's; units chosen on their own are not counted. */
+export function switchesChanged(rule: ViewRule): boolean {
+  const fresh = FRESH_RULE.shown;
+  return rule.shown.size !== fresh.size || [...fresh].some((key) => !rule.shown.has(key));
+}
 
 export type ShowPreset = 'all' | 'everyday' | 'region';
 
@@ -79,51 +90,25 @@ export function withChoice(
   return { ...rule, overrides };
 }
 
-/** One system switched on or off, in every category, its exceptions everywhere cleared. */
-export function withSystem(
-  rule: ViewRule,
-  key: FixedKey,
-  on: boolean,
-  preference: UnitPreference,
-): ViewRule {
+/** One system switched on or off, in every category; units chosen on their own stay. */
+export function withSystem(rule: ViewRule, key: FixedKey, on: boolean): ViewRule {
   const shown = new Set(rule.shown);
   if (on) shown.add(key);
   else shown.delete(key);
-  return clearedFor(rule, shown, new Set([key]), preference);
+  return { ...rule, shown };
 }
 
-/** A whole set of switches (a preset): each system that changes clears its exceptions. */
-export function withSystems(
-  rule: ViewRule,
-  shown: ReadonlySet<FixedKey>,
-  preference: UnitPreference,
-): ViewRule {
-  const changed = new Set(SHOW_KEYS.filter((key) => rule.shown.has(key) !== shown.has(key)));
-  return clearedFor(rule, shown, changed, preference);
+/** A whole set of switches (a preset, or Reset settings); units chosen on their own stay. */
+export function withSystems(rule: ViewRule, shown: ReadonlySet<FixedKey>): ViewRule {
+  return { ...rule, shown };
 }
 
-function clearedFor(
-  rule: ViewRule,
-  shown: ReadonlySet<FixedKey>,
-  keys: ReadonlySet<FixedKey>,
-  preference: UnitPreference,
-): ViewRule {
-  const overrides = new Map(rule.overrides);
-  for (const id of overrides.keys()) {
-    const unit = getUnit(id);
-    if (!unit || keys.has(fixedKeyOf(unit, preference))) overrides.delete(id);
-  }
-  return { shown, overrides };
+/** The units hidden on their own, in every category. */
+export function hiddenByHand(rule: ViewRule): number {
+  return [...rule.overrides.values()].filter((show) => !show).length;
 }
 
-/** How many of these units are exceptions. */
-export function exceptionsIn(rule: ViewRule, units: readonly Unit[]): number {
-  return units.filter((unit) => rule.overrides.has(unit.id)).length;
-}
-
-/** These units back to their switches. */
-export function withoutExceptions(rule: ViewRule, units: readonly Unit[]): ViewRule {
-  const overrides = new Map(rule.overrides);
-  for (const unit of units) overrides.delete(unit.id);
-  return { ...rule, overrides };
+/** Unhide: every unit hidden on its own back to its switch; those shown on their own stay. */
+export function withoutHidden(rule: ViewRule): ViewRule {
+  return { ...rule, overrides: new Map([...rule.overrides].filter(([, show]) => show)) };
 }

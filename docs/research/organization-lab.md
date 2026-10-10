@@ -1,8 +1,8 @@
 # Settings lab: what shows and how it looks (2026-10-10)
 
-Sean's model, in the context of the action bar (2026-10-10): one Settings button shapes the results, and the table holds what is specific to them. `/dev/organization-lab` (the settings lab, `apps/web/src/pages/dev/_organization-lab/`) builds it in two converters side by side, which differ only in where single units are chosen. Each has the real action bar (the category menu, then Settings, the calculator, undo and redo, and clear all), the box, and the table or the matches. The category, the number, and the region are shared; each converter keeps its own settings. Nothing is built in the converter yet.
+Sean's model, in the context of the action bar (2026-10-10): one Settings button shapes the results, and the table holds what is specific to them. `/dev/organization-lab` (the settings lab, `apps/web/src/pages/dev/_organization-lab/`) builds it with single units chosen in the table (Separate, Sean's direction), in two converters side by side that differ only in how Settings draws its choices: compact pills, or a segmented control. Each has the real action bar (the category menu, then Settings, the calculator, undo and redo, and clear all), the box, and the table or the matches. The category, the number, and the region are shared; each converter keeps its own settings. Nothing is built in the converter yet.
 
-The earlier prototypes, the table controls lab (A to D) and this lab's first two rounds (jobs, by system, six filters, and options E to I), are retired; they are in git before this round. What they settled is below.
+The earlier prototypes, the table controls lab (A to D), this lab's first two rounds (jobs, by system, six filters, and options E to I), and variant 2, Together (single units chosen in Settings, under each system), are retired; they are in git. What they settled is below.
 
 ## Settled along the way
 
@@ -10,59 +10,57 @@ The earlier prototypes, the table controls lab (A to D) and this lab's first two
 - **Other has no switch** while it holds two units, the knot and the atmosphere, which always show (Sean, 2026-10-10).
 - **One setting for every category**: a system switch means the same thing everywhere.
 - **Jobs (Cooking, Cubic, Trade) were set aside**: written per category, named differently in each, and in the way of one filter for every category.
+- **Separate** (Sean, 2026-10-10): Settings applies to every category; the table applies to this one (Edit, the Hidden section).
+- **Display reaches search**: with Symbol only, the matches show symbols alone, the name kept for screen readers; everything the converter surfaces follows Display.
+- **A fresh visit** (Sean, 2026-10-10): every system but Specialist (the Everyday preset), Symbol only (listed first), no copy buttons, decimals to 0.01, rounded to the nearest; fractions, once chosen, start in eighths (1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8).
+- **No copy column without copy buttons**: the rows run to the card's edge. The checkboxes of Edit and the Hidden section lead a row, on the left under their heading's, so no column at the right edge is kept for them either and the other rows never move when Hidden opens.
+- **Done closes Hidden**: whoever just chose what to hide should not have to fold it again.
+- **No dot on Settings**: a dot for "changed" would sit there for good once anything is set. The two resets say what can be undone instead.
+- **Two layers, two resets** (Sean, 2026-10-10): the system switches are one layer, for every category; a unit hidden or shown on its own in a table is another, which the switches, the presets, and Reset settings leave. Reset settings puts the switches and Display back as a fresh visit has them; Unhide units brings back every unit hidden on its own, in every category, and leaves the settings.
+- **Taking a hidden unit unhides it** (Sean, 2026-10-10): one taken from the hidden matches into the box leaves Hidden, as if checked there, so clearing the box never hides it again.
+- **Rounding below zero**: up is toward larger values and down toward smaller, as ceiling and floor are (IEEE 754, and the reading Sean expected): −2.15 rounds up to −2.1 and down to −2.2. Spreadsheets' ROUNDUP, which rounds away from zero, is the exception, not the rule.
+- **Fractions apply to every unit** when chosen, metric included.
+- **Fractions as one step, in generic groups** (Sean, 2026-10-10): trades are a rule of thumb (a framer may work to 1/16, a woodworker to 1/32), not a standard, so the groups are named by fineness. The steps nest, a sixteenth holding every eighth, quarter, and half, so one step is chosen, never several.
 
 ## The model
 
 ### Settings, in the action bar
 
-A sliders button at the start of the tools opens one panel, anchored to the action bar's right edge, with two parts. A dot on the button says something differs from a fresh visit.
+A sliders button at the start of the tools opens one panel, anchored to the action bar's right edge, with two parts and two resets.
 
 **Units**, what the table and search show, in every category:
 
 - Show: All units, Everyday, or Your region (presets; none is lit when the switches are a custom set).
-- Systems: Metric, US (customary), UK (imperial), Specialist.
+- Systems: Metric, US (customary), UK (imperial), Specialist, a checkbox each.
 
 **Display**, how results look:
 
-- Unit names: Symbol and name, or Symbol only.
-- Copy buttons, on or off (a copy still copies the full value).
-- Format: Decimals, rounded to 0.1, 0.01, 0.001, or No limit (today's six significant digits); or Fractions, in the sizes chosen (1/2, 1/3, 1/4, 1/8, 1/16, 1/32, 1/64, several at once), written as mixed numbers in lowest terms, "≈" where they round.
+- Unit names: Symbol only, or Symbol and name.
+- Copy buttons, a switch (a copy still copies the full value).
+- Format: Decimals or Fractions.
+- Round to: for decimals 0.1, 0.01, 0.001, or No limit (today's six significant digits); for fractions one step of six, in three groups, coarse to fine: Coarse (1/2, 1/4), Medium (1/8), Fine (1/16, 1/32, 1/64), with a line under them that says what the step writes ("Shows 1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8"). Fractions are written as mixed numbers in lowest terms, "≈" where they round.
 - Rounding: Nearest, Up, or Down (off with No limit).
-- A value too small for the places or the sizes chosen, which would read 0, keeps its significant digits; one past a million keeps decimals.
+- A value too small for the places or the step, which would read 0, keeps its significant digits; one past a million keeps decimals.
 
-### What shows: one rule
+**Resets**: Reset settings (the switches and Display; the units hidden in a table stay) and Unhide units, with their count (every unit hidden on its own; the settings stay). Each is off while it has nothing to do.
 
-The system switches set every category. A unit chosen on its own is an exception, shown or hidden against its switch, and stays when the category changes. Turning a switch sets that system everywhere and clears its exceptions, so the last thing done wins at the scope it was done; a preset clears the exceptions of the systems it changes. Settings counts a category's exceptions ("2 units chosen on their own in Volume") with Reset Volume. The unit in the box always shows.
+### What shows: two layers
 
-### Choosing single units: the two converters
+The system switches set every category. A unit chosen on its own in a table is an exception, shown or hidden against its switch, recorded only where it differs from the switch when chosen, and kept when the category or the switches change. The unit in the box always shows.
 
-- **1. Separate.** Settings lists the systems as plain switches for every category. The table's foot has Edit, which puts a checkbox on every row and a three-state one on every heading (all, some as a dash, none); Done ends it.
-- **2. Together.** Settings shows this category under each system: the system's checkbox reads all, some, or none of its units here, and sets the system everywhere, clearing its exceptions; a chevron opens it to its units, each chosen here alone. A system with no units in the category is a plain switch, "none in Length".
+### Choosing single units: in the table
+
+The table's foot has Edit, which puts a checkbox on every row and a three-state one on every heading (all, some as a dash, none); Done ends it.
 
 ### Hidden units
 
 - **In the table**: a Hidden line at the foot counts them ("Hidden 5"); open, it lists them under their section names, values dimmed, a checkbox on each and a three-state one on each heading, so one or a section comes back with a tap.
-- **In search**: hidden units leave the matches. When one matches, a line says so ("2 hidden units also match", or "Only hidden units match"), and Show them lists them under Hidden with their category and section ("Volume · Specialist"). Taking one puts it in the box, where it shows. Nothing typed ever meets a bare "No unit matches" while a hidden unit matches.
+- **In search**: hidden units leave the matches. When one matches, a line says so ("2 hidden units also match", or "Only hidden units match"), and Show them lists them under Hidden with their category and section ("Volume · Specialist"). Taking one puts it in the box and unhides it. Nothing typed ever meets a bare "No unit matches" while a hidden unit matches.
 
 ## Questions this round puts to Sean
 
-1. **Where single units are chosen**: in the table (1) or in Settings (2)?
-2. **One button or several**: one Settings button for everything (the lab), or one or two of the most used surfaced on their own (decimals or fractions, say) once we know which?
-3. **Fractions for metric units**: "≈ 1,920 1/4 mm" reads oddly; fractions for customary units only, metric staying decimal, or every unit alike?
-4. **Rounding up and down** below zero: toward larger values (up is toward +∞), or away from zero?
-5. **Where Settings sits**: at the start of the tools (the lab), beside the category menu, or at the end?
-
-## Next round (Sean, 2026-10-10, saved before a compaction)
-
-Decided, and to build in the lab next:
-
-1. **Separate is the direction.** Settings applies to every category; the table applies to this one (Edit, the Hidden section). Variant 2, Together, goes from the lab.
-2. **Symbol only reaches search too.** With Unit names set to Symbol only, the matches list shows symbols alone, as the table does; everything the converter surfaces follows Display.
-
-Asked, with the approach proposed, for Sean to confirm when the work resumes:
-
-3. **Copy buttons: a switch, not a checkbox.** The standard reading: a switch is one setting that takes effect at once (on or off); a checkbox is one choice in a list, or a choice that waits for a Save. So single on/off display settings (copy buttons, and later ones like it) take a switch, while the systems and other lists keep checkboxes. There is no switch component yet: a new `Switch` in `components/`, from existing tokens (the accent and its soft fill, the control edge), in the gallery, with `role="switch"` and `aria-checked`; its look comes to Sean before it ships.
-4. **Compact pills in Settings.** Sean finds the 44 px pills large and crowded in the panel. Proposal: a compact pill whose drawn shape is about 32 px tall, with less padding (`px-2.5`) and the text kept at `text-sm` for legibility, while each keeps a 44 px touch area through an unseen margin of its row, so the 44 px target rule (`CLAUDE.md`, accessibility) still holds. The alternative is a joined segmented control (one edge, dividers between the choices), which reads more compact still. Either becomes a recipe for every setting list, never a one-off.
-5. **Fractions grouped by trade, as a ladder.** Sean found the trade fractions worth offering in full (64ths and 32nds for machining, 16ths for fine woodworking and sheet metal, 8ths for construction and hardware, quarters and halves for rough framing) and asks for a clear hierarchy. Because they nest (a sixteenth grid holds every eighth, quarter, and half), the clearest control is one choice of the finest step, each step labelled with its use: Halves and quarters, rough framing; Eighths, construction and hardware; Sixteenths, fine woodworking and sheet metal; Thirty-seconds and sixty-fourths, machining. A value is then written in that step, reduced to lowest terms (3/8, 5/16). Thirds do not nest with them; they would be their own choice (cooking), or left out. The pasted list is standard arithmetic, not another site's wording, and is not copied as text.
-
-Still open from this round: fractions for metric units (customary only, or every unit), where the Settings button sits, and which way rounding goes below zero.
+1. **Compact pills or a segmented control** for Settings' choices (1 and 2 in the lab)? Both draw a 32 px shape with less padding, the text kept at the 14 px size, and both keep a 44 px tap. Whichever is kept becomes a recipe for every setting list.
+2. **The switch's look** for Copy buttons (the trial in the lab): kept, it moves to `components/` and the gallery.
+3. **The fraction groups' names**: Coarse, Medium, Fine (the lab), or another set, such as Rough, Standard, Precise? And thirds, which do not nest with the others (1/3 cup): left out (the lab), or a choice of their own?
+4. **Where Settings sits**: at the start of the tools (the lab), beside the category menu, or at the end? Sean is still thinking (2026-10-10).
+5. **One button or several**: one Settings button for everything (the lab), or one or two of the most used surfaced on their own once we know which?

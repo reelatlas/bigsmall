@@ -1,8 +1,10 @@
 import { getUnit, unitsIn, type CategoryId, type UnitPreference } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import {
+  displayChanged,
   displayValue,
   FRESH_DISPLAY,
+  stepFractions,
   type Display,
 } from '../src/pages/dev/_organization-lab/display';
 import { fixedKeyOf, sectionsOf } from '../src/pages/dev/_organization-lab/sections';
@@ -10,8 +12,12 @@ import {
   FRESH_RULE,
   groupState,
   presetKeys,
+  hiddenByHand,
+  presetOf,
   shows,
+  switchesChanged,
   withChoice,
+  withoutHidden,
   withSystem,
   withSystems,
 } from '../src/pages/dev/_organization-lab/view-rule';
@@ -58,7 +64,7 @@ describe('settings lab: sections', () => {
 });
 
 describe('settings lab: what shows', () => {
-  const everyday = withSystems(FRESH_RULE, presetKeys('everyday', 'us'), 'us');
+  const everyday = withSystems(FRESH_RULE, presetKeys('everyday', 'us'));
 
   it('lets a switch hide a system, and a unit chosen on its own show back', () => {
     expect(shows(unit('nanometer'), everyday, 'us')).toBe(false);
@@ -73,27 +79,53 @@ describe('settings lab: what shows', () => {
     expect(withChoice(hidden, [unit('inch')], true, 'us').overrides.has('inch')).toBe(false);
   });
 
-  it('sets a system everywhere and clears its exceptions, the last thing done winning', () => {
-    // The US box reads "some" with the inch hidden; its checkbox shows the whole system again.
+  it('keeps units chosen on their own through the switches and the presets', () => {
+    // The inch hidden in a table stays hidden when US is switched off and on again.
     const noInch = withChoice(everyday, [unit('inch')], false, 'us');
-    const us = withSystem(noInch, 'us', true, 'us');
-    expect(shows(unit('inch'), us, 'us')).toBe(true);
-    // Turning Specialist on and off clears the nanometer shown on its own.
+    const again = withSystem(withSystem(noInch, 'us', false), 'us', true);
+    expect(shows(unit('inch'), again, 'us')).toBe(false);
+    // The nanometer shown on its own stays when Specialist is switched on and off.
     const back = withChoice(everyday, [unit('nanometer')], true, 'us');
-    const off = withSystem(withSystem(back, 'specialist', true, 'us'), 'specialist', false, 'us');
-    expect(shows(unit('nanometer'), off, 'us')).toBe(false);
+    const off = withSystem(withSystem(back, 'specialist', true), 'specialist', false);
+    expect(shows(unit('nanometer'), off, 'us')).toBe(true);
+    const all = withSystems(noInch, presetKeys('all', 'us'));
+    expect(all.overrides.get('inch')).toBe(false);
   });
 
-  it('lets a preset clear the exceptions of the systems it changes and keep the rest', () => {
+  it('resets the switches apart from the units hidden on their own, and unhides those apart', () => {
     const chosen = withChoice(
-      withChoice(everyday, [unit('inch')], false, 'us'),
+      withChoice(withSystem(everyday, 'specialist', true), [unit('inch')], false, 'us'),
+      [unit('parsec')],
+      false,
+      'us',
+    );
+    expect(switchesChanged(chosen)).toBe(true);
+    expect(hiddenByHand(chosen)).toBe(2);
+    // Reset settings: the switches as fresh, the inch still hidden.
+    const reset = withSystems(chosen, FRESH_RULE.shown);
+    expect(switchesChanged(reset)).toBe(false);
+    expect(shows(unit('inch'), reset, 'us')).toBe(false);
+    // Unhide: the inch back, the switches untouched, a unit shown on its own kept.
+    const shown = withChoice(
+      withSystem(chosen, 'specialist', false),
       [unit('nanometer')],
       true,
       'us',
     );
-    const all = withSystems(chosen, presetKeys('all', 'us'), 'us');
-    expect(all.overrides.has('nanometer')).toBe(false);
-    expect(all.overrides.get('inch')).toBe(false);
+    const unhidden = withoutHidden(shown);
+    expect(hiddenByHand(unhidden)).toBe(0);
+    expect(shows(unit('inch'), unhidden, 'us')).toBe(true);
+    expect(shows(unit('nanometer'), unhidden, 'us')).toBe(true);
+    expect(unhidden.shown.has('specialist')).toBe(false);
+  });
+
+  it('starts with every system but Specialist, the Everyday preset', () => {
+    expect(presetOf(FRESH_RULE.shown, 'us')).toBe('everyday');
+    expect(shows(unit('parsec'), FRESH_RULE, 'us')).toBe(false);
+    expect(switchesChanged(FRESH_RULE)).toBe(false);
+    expect(switchesChanged(withSystem(FRESH_RULE, 'specialist', true))).toBe(true);
+    // A unit hidden on its own is not a change of the switches.
+    expect(switchesChanged(withChoice(FRESH_RULE, [unit('inch')], false, 'us'))).toBe(false);
   });
 
   it('always shows Other, which has no switch', () => {
@@ -115,41 +147,70 @@ describe('settings lab: display', () => {
   const text = (value: number, patch: Partial<Display>) =>
     displayValue(value, as(patch), 'en-US')?.text ?? null;
 
+  it('starts with symbols, no copy buttons, and two places, rounded to the nearest', () => {
+    expect(FRESH_DISPLAY).toMatchObject({
+      names: 'symbol',
+      copy: false,
+      format: 'decimal',
+      places: 2,
+      rounding: 'nearest',
+    });
+    expect(text(0.473176, {})).toBe('0.47');
+    // Fractions, once chosen, start in eighths.
+    expect(stepFractions(FRESH_DISPLAY.step)).toEqual([
+      '1/8',
+      '1/4',
+      '3/8',
+      '1/2',
+      '5/8',
+      '3/4',
+      '7/8',
+    ]);
+    expect(displayChanged(FRESH_DISPLAY)).toBe(false);
+    expect(displayChanged(as({ step: 16 }))).toBe(true);
+  });
+
   it('writes decimals to a place, rounded to the nearest, up, or down', () => {
     expect(text(0.473176, { places: 2 })).toBe('0.47');
     expect(text(0.473176, { places: 2, rounding: 'up' })).toBe('0.48');
     expect(text(0.479, { places: 2, rounding: 'down' })).toBe('0.47');
     expect(text(1234.5678, { places: 1 })).toBe('1,234.6');
+    // Float noise never rounds a value down a step: 0.29 × 100 is 28.999… in binary.
+    expect(text(0.29, { places: 2, rounding: 'down' })).toBe('0.29');
+  });
+
+  it('rounds up toward larger values and down toward smaller, below zero too', () => {
+    expect(text(-2.15, { places: 1, rounding: 'up' })).toBe('−2.1');
+    expect(text(-2.15, { places: 1, rounding: 'down' })).toBe('−2.2');
+    expect(text(-6.3, { format: 'fraction', step: 4, rounding: 'up' })).toBe('−6 1/4');
+    expect(text(-6.3, { format: 'fraction', step: 4, rounding: 'down' })).toBe('−6 1/2');
   });
 
   it('keeps the table’s own text with no limit, or where the places would read 0', () => {
-    expect(text(0.473176, {})).toBeNull();
+    expect(text(0.473176, { places: null })).toBeNull();
     expect(text(0.000473, { places: 2 })).toBeNull();
   });
 
-  it('writes fractions in the sizes chosen, the nearest of them, marked when not exact', () => {
-    const sixteenths = new Set([2, 4, 8, 16]);
-    expect(
-      displayValue(6.3, as({ format: 'fraction', denominators: sixteenths }), 'en-US'),
-    ).toEqual({ text: '6 5/16', approx: true });
-    expect(text(6.3, { format: 'fraction', denominators: new Set([4]) })).toBe('6 1/4');
-    expect(text(6.3, { format: 'fraction', denominators: new Set([4]), rounding: 'up' })).toBe(
-      '6 1/2',
-    );
-    expect(text(6.3, { format: 'fraction', denominators: new Set([8]), rounding: 'down' })).toBe(
-      '6 1/4',
-    );
-    expect(displayValue(2.5, as({ format: 'fraction' }), 'en-US')).toEqual({
+  it('writes fractions to the step chosen, in lowest terms, marked when not exact', () => {
+    expect(displayValue(6.3, as({ format: 'fraction', step: 16 }), 'en-US')).toEqual({
+      text: '6 5/16',
+      approx: true,
+    });
+    expect(text(6.3, { format: 'fraction', step: 4 })).toBe('6 1/4');
+    expect(text(6.3, { format: 'fraction', step: 4, rounding: 'up' })).toBe('6 1/2');
+    expect(text(6.3, { format: 'fraction', step: 8, rounding: 'down' })).toBe('6 1/4');
+    expect(displayValue(2.5, as({ format: 'fraction', step: 64 }), 'en-US')).toEqual({
       text: '2 1/2',
       approx: false,
     });
     expect(text(0.75, { format: 'fraction' })).toBe('3/4');
     expect(text(-1.5, { format: 'fraction' })).toBe('−1 1/2');
-    expect(text(0.9999, { format: 'fraction', denominators: new Set([4]) })).toBe('1');
+    expect(text(0.9999, { format: 'fraction', step: 4 })).toBe('1');
+    expect(stepFractions(4)).toEqual(['1/4', '1/2', '3/4']);
   });
 
   it('keeps the table’s own text where a fraction would read 0 or the value is too large', () => {
-    expect(text(0.001, { format: 'fraction', denominators: new Set([16]) })).toBeNull();
+    expect(text(0.001, { format: 'fraction', step: 16 })).toBeNull();
     expect(text(2_000_000, { format: 'fraction' })).toBeNull();
   });
 });

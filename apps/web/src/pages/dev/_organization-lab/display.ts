@@ -1,46 +1,74 @@
 /**
  * How results look, the settings lab's Display (docs/research/organization-lab.md, 2026-10-10):
- * names, copy buttons, and how a value is written, as decimals to a place or as fractions of the
- * sizes chosen, rounded to the nearest, up, or down. A copy button still copies the full value.
- * The lab's own; the converter would take the number formats into core's formatter.
+ * names, copy buttons, and how a value is written, as decimals to a place or as fractions to a
+ * step, rounded to the nearest, up, or down. A copy button still copies the full value. The lab's
+ * own; the converter would take the number formats into core's formatter.
  */
 export interface Display {
-  names: 'both' | 'symbol';
+  names: 'symbol' | 'both';
   copy: boolean;
   format: 'decimal' | 'fraction';
   /** Decimal places, or null for no limit: the table's six significant digits, as today. */
   places: 1 | 2 | 3 | null;
-  /** The fraction sizes a value may be written in: 2 for halves, 16 for sixteenths. */
-  denominators: ReadonlySet<number>;
+  /** The finest fraction a value is written to: 8 for eighths, which hold every quarter and half. */
+  step: FractionStep;
   rounding: 'nearest' | 'up' | 'down';
 }
 
-export const DENOMINATORS = [2, 3, 4, 8, 16, 32, 64] as const;
+export type FractionStep = 2 | 4 | 8 | 16 | 32 | 64;
 
+/**
+ * The steps in three groups, coarse to fine (Sean, 2026-10-10: generic names, not trades). They
+ * nest, a sixteenth holding every eighth, quarter, and half, so one step is chosen, never several.
+ */
+export const FRACTION_GROUPS: ReadonlyArray<{ name: string; steps: readonly FractionStep[] }> = [
+  { name: 'Coarse', steps: [2, 4] },
+  { name: 'Medium', steps: [8] },
+  { name: 'Fine', steps: [16, 32, 64] },
+];
+
+export const STEP_NAME: Record<FractionStep, string> = {
+  2: 'halves',
+  4: 'quarters',
+  8: 'eighths',
+  16: 'sixteenths',
+  32: 'thirty-seconds',
+  64: 'sixty-fourths',
+};
+
+/** A fresh visit's (Sean, 2026-10-10): symbols, no copy buttons, two places, eighths in waiting. */
 export const FRESH_DISPLAY: Display = {
-  names: 'both',
-  copy: true,
+  names: 'symbol',
+  copy: false,
   format: 'decimal',
-  places: null,
-  denominators: new Set([2, 4, 8, 16]),
+  places: 2,
+  step: 8,
   rounding: 'nearest',
 };
 
-/** Whether any display setting differs from a fresh visit's. */
+/** Whether any display setting differs from a fresh visit's: what Reset settings would change. */
 export function displayChanged(display: Display): boolean {
   const fresh = FRESH_DISPLAY;
-  return (
-    display.names !== fresh.names ||
-    display.copy !== fresh.copy ||
-    display.format !== fresh.format ||
-    display.places !== fresh.places ||
-    display.rounding !== fresh.rounding
-  );
+  return (Object.keys(fresh) as (keyof Display)[]).some((key) => display[key] !== fresh[key]);
+}
+
+/** The fractions a step writes below 1, in lowest terms: 1/4, 1/2, 3/4 for quarters. */
+export function stepFractions(step: FractionStep): string[] {
+  return Array.from({ length: step - 1 }, (_, index) => {
+    const common = gcd(index + 1, step);
+    return `${(index + 1) / common}/${step / common}`;
+  });
 }
 
 const MINUS = '−';
 
-function rounded(value: number, rounding: Display['rounding']): number {
+/**
+ * Up is toward larger values and down toward smaller, below zero too (Sean, 2026-10-10): −2.15
+ * rounds up to −2.1 and down to −2.2, as ceiling and floor do (IEEE 754). The scaled value is
+ * snapped first, so float noise (0.29 × 100 = 28.999…) never rounds a value down a step.
+ */
+function rounded(scaled: number, rounding: Display['rounding']): number {
+  const value = Number(scaled.toPrecision(12));
   if (rounding === 'up') return Math.ceil(value);
   if (rounding === 'down') return Math.floor(value);
   return Math.round(value);
@@ -52,7 +80,7 @@ function gcd(a: number, b: number): number {
 
 /**
  * A value as the display writes it, and whether that is not exact (a fraction that rounds); null
- * to keep the table's own text: no limit, a value too small for the places or the sizes (it would
+ * to keep the table's own text: no limit, a value too small for the places or the step (it would
  * read 0), or too large to write as a fraction.
  */
 export function displayValue(
@@ -72,21 +100,16 @@ export function displayValue(
     );
     return { text: (result < 0 ? MINUS : '') + text, approx: false };
   }
-  if (Math.abs(value) >= 1e6 || display.denominators.size === 0) return null;
-  const size = Math.abs(value);
-  let best: { count: number; of: number; error: number } | null = null;
-  for (const of of [...display.denominators].sort((a, b) => a - b)) {
-    const count = rounded(size * of, display.rounding);
-    const error = Math.abs(size - count / of);
-    if (!best || error < best.error - 1e-12) best = { count, of, error };
-  }
-  if (!best) return null;
-  const whole = Math.floor(best.count / best.of);
-  const part = best.count % best.of;
-  if (whole === 0 && part === 0) return value === 0 ? { text: '0', approx: false } : null;
-  const common = gcd(part, best.of);
-  const fraction = part ? `${part / common}/${best.of / common}` : '';
+  if (Math.abs(value) >= 1e6) return null;
+  const { step } = display;
+  const count = rounded(value * step, display.rounding);
+  if (count === 0) return value === 0 ? { text: '0', approx: false } : null;
+  const size = Math.abs(count);
+  const whole = Math.floor(size / step);
+  const part = size % step;
+  const common = gcd(part, step);
+  const fraction = part ? `${part / common}/${step / common}` : '';
   const wholeText = whole ? new Intl.NumberFormat(locale).format(whole) : '';
   const text = [wholeText, fraction].filter(Boolean).join(' ');
-  return { text: (value < 0 ? MINUS : '') + text, approx: best.error > 1e-9 };
+  return { text: (count < 0 ? MINUS : '') + text, approx: Math.abs(value - count / step) > 1e-9 };
 }

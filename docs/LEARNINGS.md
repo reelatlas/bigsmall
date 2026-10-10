@@ -609,3 +609,18 @@ Format:
 
 **What happened.** The settings lab dimmed hidden units' rows with `opacity-60`. Axe failed them on color contrast in every theme: fading the ink and the muted ink over the surface drops both below 4.5:1.
 **Rule.** A row or label that reads as set aside takes `text-ink-muted`, which every theme already holds to body-text contrast (docs/DESIGN-SYSTEM.md, colors), never an opacity on readable text. Opacity is for a control that is disabled and says so, where WCAG asks no contrast.
+
+## 2026-10-10 — A word and a number in another font share a baseline, not a centre
+
+**What happened.** The settings lab's Hidden button laid its chevron, the word, and the count out with `items-center`. The count is set in the numeric font, whose line box is not the body font's, so centring the two boxes left the digit sitting visibly higher than the word.
+**Rule.** Text beside text aligns on the baseline: wrap the word and its count in one `flex items-baseline` (or keep them in one inline run), and centre only the icon against that group. The real matches list's category headers already do it this way.
+
+## 2026-10-10 — Snap a scaled value before rounding it up or down
+
+**What happened.** Rounding 0.29 down to two places gave 0.28: 0.29 × 100 is 28.999999999999996 in binary, and `Math.floor` took it at its word. Converted values carry the same noise (a result that should be 2.5 can arrive as 2.4999999999999996), so an eighth could round down a step too.
+**Rule.** Before `Math.ceil` or `Math.floor` on a scaled value, snap it to 12 significant digits (`Number(x.toPrecision(12))`), which keeps every digit a converter shows and drops the float noise. Rounding to the nearest is unaffected, but goes through the same snap so the three agree.
+
+## 2026-10-10 — The label lint cannot see a control passed through a prop
+
+**What happened.** A row's checkbox, handed to the cells component as a prop so it could lead the value's cell, failed `jsx-a11y/label-has-associated-control`: the rule reads the label's children as written, and the input was not among them.
+**Rule.** When the control sits inside a label but is rendered by a child component, tie them with `htmlFor` and the control's `id` (from `useId`, plus a row key), which the rule and every browser accept.

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { cx } from '../lib/recipes';
+import { cx, OPTION_ROW } from '../lib/recipes';
 
 export interface SwitchProps {
   /** What it turns on, after the switch. */
@@ -21,7 +21,7 @@ export function Switch({ label, checked, onChange }: SwitchProps) {
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-nested-md px-2 text-left text-sm text-ink hover:bg-surface-raised"
+      className={cx(OPTION_ROW, 'w-full gap-2 text-left')}
     >
       <span
         aria-hidden="true"

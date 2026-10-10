@@ -34,6 +34,7 @@ import {
   cx,
   CURSOR_ROW,
   LIST_CARD,
+  OPTION_ROW,
   PANEL_TITLE,
   rowFill,
   unitSymbol,
@@ -132,8 +133,7 @@ function closed(ui: Ui): Ui {
 
 type UpdateUi = (update: (ui: Ui) => Ui) => void;
 
-const OPTION_LINE =
-  'flex min-h-11 cursor-pointer items-center gap-2 rounded-nested-md px-2 text-sm text-ink hover:bg-surface-raised';
+const OPTION_LINE = cx(OPTION_ROW, 'gap-2');
 const SUBHEAD = cx(PANEL_TITLE, 'text-xs');
 
 function SlidersIcon() {

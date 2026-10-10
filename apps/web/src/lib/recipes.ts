@@ -97,9 +97,15 @@ export const MENU_TRIGGER =
 export const MENU_CHEVRON =
   'ml-auto shrink-0 text-ink-muted transition-transform group-data-open:rotate-180';
 
+/**
+ * A row in a list of choices: 44 px tall, in the nested corner, the raised surface under the
+ * pointer. A menu's choice, a setting's switch, a setting's checkbox.
+ */
+export const OPTION_ROW =
+  'flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink hover:bg-surface-raised';
+
 /** A menu's choice: a label around its visually hidden radio, the checked one in the accent's soft fill. */
-export const MENU_OPTION =
-  'flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink focus-ring-within-inset hover:bg-surface-raised has-checked:bg-accent-soft';
+export const MENU_OPTION = cx(OPTION_ROW, 'focus-ring-within-inset has-checked:bg-accent-soft');
 
 // Fields (docs/DESIGN-SYSTEM.md, "Fields")
 

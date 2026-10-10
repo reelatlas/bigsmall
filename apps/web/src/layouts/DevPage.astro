@@ -8,11 +8,9 @@ interface Props {
   description: string;
   /** The wordmark waits for the page to play it (the wordmark lab). */
   manual?: boolean;
-  /** A wider column, for a page that sets two things side by side. */
-  wide?: boolean;
 }
 
-const { title, description, manual = false, wide = false } = Astro.props;
+const { title, description, manual = false } = Astro.props;
 
 /*
  * A development page under /dev: the site's header, a line saying what the page is for, then its
@@ -22,7 +20,7 @@ const { title, description, manual = false, wide = false } = Astro.props;
 ---
 
 <Base title={`bigsmall · ${title}`} description={description} noindex>
-  <main class:list={['mx-auto px-4 py-10', wide ? 'max-w-7xl' : 'max-w-5xl']}>
+  <main class="mx-auto max-w-5xl px-4 py-10">
     <PageHeader manual={manual} />
     <p class="mt-2 max-w-prose text-sm text-ink-muted">
       <slot name="intro" />

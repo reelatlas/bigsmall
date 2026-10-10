@@ -32,7 +32,7 @@ export const SHOW_KEYS: readonly FixedKey[] = ['metric', 'us', 'uk', 'specialist
 const REGIONAL: ReadonlySet<UnitSystem> = new Set(['us', 'imperial', 'uk']);
 
 /** A category whose units belong to US customary, imperial, or UK measure, so a region names them. */
-export function categoryIsRegional(category: CategoryId): boolean {
+function categoryIsRegional(category: CategoryId): boolean {
   return unitsIn(category).some((unit) => REGIONAL.has(unit.system));
 }
 

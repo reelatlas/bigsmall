@@ -52,11 +52,7 @@ export function presetOf(
 }
 
 /** What the switches alone show: Other, and a category's everyday units where it has no regions, always. */
-export function bySystem(
-  unit: Unit,
-  shown: ReadonlySet<FixedKey>,
-  preference: UnitPreference,
-): boolean {
+function bySystem(unit: Unit, shown: ReadonlySet<FixedKey>, preference: UnitPreference): boolean {
   const key = fixedKeyOf(unit, preference);
   return key === 'standard' || key === 'other' || shown.has(key);
 }

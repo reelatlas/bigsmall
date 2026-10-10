@@ -135,11 +135,7 @@ export function displayValue(
  * 2026-10-10: rounding up had written 0.000619 as 0.01 while nearest kept its digits, so the
  * table changed shape with the rounding).
  */
-export function decimalValue(
-  value: number | null,
-  display: Display,
-  locale?: string,
-): Written | null {
+function decimalValue(value: number | null, display: Display, locale?: string): Written | null {
   if (value === null || !Number.isFinite(value)) return null;
   if (display.places === null) return null;
   const scale = 10 ** display.places;

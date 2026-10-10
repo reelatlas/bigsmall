@@ -40,12 +40,13 @@ import {
 } from '../../../lib/recipes';
 import { browserLocale } from '../../../lib/region';
 import {
-  decimalValue,
   displayChanged,
   displayValue,
   fractionsOf,
+  fractionValue,
   FRESH_DISPLAY,
   SIZE_NAME,
+  SIZES,
   type Display,
   type Size,
 } from './display';
@@ -215,13 +216,11 @@ function sizesPreview(chosen: ReadonlySet<Size>): string {
 }
 
 /**
- * The two strips of sizes, each smallest to largest (Sean, 2026-10-10): eighths to halves, the
- * everyday ones, on top; then sixty-fourths to sixteenths.
+ * The two strips of sizes, from the least fine to the finest as the places run (Sean,
+ * 2026-10-10: people break a measure down that way): halves to eighths, then sixteenths to
+ * sixty-fourths.
  */
-const SIZE_ROWS: ReadonlyArray<readonly Size[]> = [
-  [8, 4, 3, 2],
-  [64, 32, 16],
-];
+const SIZE_ROWS: ReadonlyArray<readonly Size[]> = [SIZES.slice(0, 4), SIZES.slice(4)];
 
 /**
  * Fractions in the sizes chosen, each on or off by itself (Sean, 2026-10-10): what is chosen is
@@ -476,21 +475,20 @@ function ResultsTable({
   const gridRef = useRef<HTMLDivElement>(null);
   const fitted = useColumnsFit(gridRef, GIVE_WAY);
   const namesHidden = fitted.includes('name');
-  const decimalHidden = fitted.includes('decimal');
+  const secondHidden = fitted.includes('second');
   const { display, editing } = ui;
   const withName = display.names === 'both';
   const isShown = (row: TableRow) => row.inBox || shows(row.unit, ui.rule, preference);
   const hidden = rows.filter((row) => !isShown(row));
 
-  /** The value as Display writes it first (a fraction with Both), and Both's decimal after it. */
+  /** The value as Display writes it first (the decimal with Both), and Both's fraction after it. */
   const firstOf = (row: TableRow, under: Display = display) =>
     writtenValue(row, row.tone === 'value' ? displayValue(row.value, under, locale) : null);
-  const withDecimal = (row: TableRow, under: Display) =>
-    under.format === 'both' &&
-    row.tone === 'value' &&
-    displayValue(row.value, under, locale) !== null;
-  const decimalOf = (row: TableRow, under: Display = display): ReactNode =>
-    withDecimal(row, under) ? writtenValue(row, decimalValue(row.value, under, locale)) : null;
+  const secondOf = (row: TableRow, under: Display = display): ReactNode => {
+    if (under.format !== 'both' || row.tone !== 'value') return null;
+    const fraction = fractionValue(row.value, under, locale);
+    return fraction ? writtenValue(row, fraction) : null;
+  };
   /*
    * The sizer measures each value under every rounding, so choosing Up, Down, or Nearest never
    * moves the columns (Sean, 2026-10-10); a change of format or places, which rewrites the values,
@@ -508,9 +506,9 @@ function ResultsTable({
     <RowCells
       row={row}
       value={firstOf(row)}
-      decimal={display.format === 'both' ? decimalOf(row) : null}
+      second={display.format === 'both' ? secondOf(row) : null}
       namesHidden={namesHidden}
-      decimalHidden={decimalHidden}
+      secondHidden={secondHidden}
       withName={withName}
       muted={muted}
       check={check}
@@ -642,9 +640,9 @@ function ResultsTable({
         <ColumnSizer
           rows={rows}
           value={everyRounding(firstOf)}
-          decimal={display.format === 'both' ? everyRounding(decimalOf) : null}
+          second={display.format === 'both' ? everyRounding(secondOf) : null}
           namesHidden={namesHidden}
-          decimalHidden={decimalHidden}
+          secondHidden={secondHidden}
           withName={withName}
         />
       </div>
@@ -697,7 +695,7 @@ function ResultsTable({
               <label
                 key={row.id}
                 htmlFor={`${id}-${row.id}`}
-                className={cx(CURSOR_ROW, 'flex items-center gap-2 hover:bg-surface-raised')}
+                className={cx(CURSOR_ROW, 'flex items-center gap-2 pl-8 hover:bg-surface-raised')}
               >
                 {checkbox(row, false)}
                 <span className={unitSymbol()}>{row.symbol}</span>

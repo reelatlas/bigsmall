@@ -7,7 +7,7 @@
 export interface Display {
   names: 'symbol' | 'both';
   copy: boolean;
-  /** Both writes the fraction, then its decimal (Sean, 2026-10-10). */
+  /** Both writes the decimal, then its fraction, as Format and Settings list them (Sean, 2026-10-10). */
   format: 'decimal' | 'fraction' | 'both';
   /** Decimal places, or null for no limit: the table's six significant digits, as today. */
   places: 1 | 2 | 3 | null;
@@ -18,7 +18,7 @@ export interface Display {
 
 export type Size = 2 | 3 | 4 | 8 | 16 | 32 | 64;
 
-/** The sizes offered (Sean, 2026-10-10: thirds among them, for cups). */
+/** The sizes offered, largest first as the places run (Sean, 2026-10-10: thirds among them, for cups). */
 export const SIZES: readonly Size[] = [2, 3, 4, 8, 16, 32, 64];
 
 export const SIZE_NAME: Record<Size, string> = {
@@ -116,17 +116,17 @@ export interface Written {
 }
 
 /**
- * A value as the display writes it first: its decimal, or its fraction (alone, or ahead of its
- * decimal with Both). Null keeps the table's own text.
+ * A value as the display writes it first: its fraction with Fractions, else its decimal (alone,
+ * or ahead of its fraction with Both). Null keeps the table's own text.
  */
 export function displayValue(
   value: number | null,
   display: Display,
   locale?: string,
 ): Written | null {
-  return display.format === 'decimal'
-    ? decimalValue(value, display, locale)
-    : fractionValue(value, display, locale);
+  return display.format === 'fraction'
+    ? fractionValue(value, display, locale)
+    : decimalValue(value, display, locale);
 }
 
 /**

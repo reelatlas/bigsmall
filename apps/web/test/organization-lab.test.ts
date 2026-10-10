@@ -1,10 +1,10 @@
 import { getUnit, unitsIn, type CategoryId, type UnitPreference } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import {
-  decimalValue,
   displayChanged,
   displayValue,
   fractionsOf,
+  fractionValue,
   FRESH_DISPLAY,
   type Display,
   type Size,
@@ -251,10 +251,10 @@ describe('settings lab: display', () => {
     expect(text(-1.75, quarters)).toBe('-1 3/4');
   });
 
-  it('writes Both as the fraction, its decimal beside it', () => {
+  it('writes Both as the decimal, its fraction beside it, as Settings lists them', () => {
     const both = as({ format: 'both', fractions: sizes(2, 4, 8, 16), places: 2 });
-    expect(displayValue(6.3, both, 'en-US')).toEqual({ text: '6 5/16', approx: true });
-    expect(decimalValue(6.3, both, 'en-US')?.text).toBe('6.3');
+    expect(displayValue(6.3, both, 'en-US')?.text).toBe('6.3');
+    expect(fractionValue(6.3, both, 'en-US')).toEqual({ text: '6 5/16', approx: true });
   });
 
   it('keeps the table’s own text where a fraction would read 0, the value is too large, or no size is chosen', () => {

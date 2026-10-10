@@ -15,7 +15,7 @@ export interface ViewRule {
   overrides: ReadonlyMap<string, boolean>;
 }
 
-/** A fresh visit's: every system but Specialist, the Everyday preset (Sean, 2026-10-10). */
+/** A fresh visit's: every system but Specialist, the Standard preset (Sean, 2026-10-10). */
 export const FRESH_RULE: ViewRule = {
   shown: new Set(SHOW_KEYS.filter((key) => key !== 'specialist')),
   overrides: new Map(),
@@ -27,17 +27,17 @@ export function switchesChanged(rule: ViewRule): boolean {
   return rule.shown.size !== fresh.size || [...fresh].some((key) => !rule.shown.has(key));
 }
 
-export type ShowPreset = 'all' | 'everyday' | 'region';
+export type ShowPreset = 'all' | 'standard' | 'region';
 
 export const SHOW_PRESETS: ReadonlyArray<{ id: ShowPreset; name: string }> = [
   { id: 'all', name: 'All units' },
-  { id: 'everyday', name: 'Everyday' },
+  { id: 'standard', name: 'Standard' },
   { id: 'region', name: 'Your region' },
 ];
 
 export function presetKeys(preset: ShowPreset, preference: UnitPreference): ReadonlySet<FixedKey> {
   if (preset === 'all') return new Set(SHOW_KEYS);
-  if (preset === 'everyday') return new Set(SHOW_KEYS.filter((key) => key !== 'specialist'));
+  if (preset === 'standard') return new Set(SHOW_KEYS.filter((key) => key !== 'specialist'));
   return new Set([ownKey(preference)]);
 }
 
@@ -58,7 +58,7 @@ export function bySystem(
   preference: UnitPreference,
 ): boolean {
   const key = fixedKeyOf(unit, preference);
-  return key === 'everyday' || key === 'other' || shown.has(key);
+  return key === 'standard' || key === 'other' || shown.has(key);
 }
 
 /** Whether a unit shows: its exception, if it has one, else its switch. */

@@ -13,6 +13,7 @@ import {
 } from '../../components/icons';
 import { Keycap } from '../../components/Keycap';
 import { FieldSamples } from './_gallery/FieldSamples';
+import { SettingSamples } from './_gallery/SettingSamples';
 import DevPage from '../../layouts/DevPage.astro';
 import { THEMES, TOKEN_CONTRACT } from '../../lib/themes';
 
@@ -67,6 +68,10 @@ const swatches = TOKEN_CONTRACT.colors;
 
         <div class="mt-4">
           <FieldSamples client:idle theme={t.name} />
+        </div>
+
+        <div class="mt-4">
+          <SettingSamples client:idle theme={t.name} />
         </div>
 
         <div role="group" class="mt-4 flex flex-wrap items-center gap-1" aria-label="Icon buttons">

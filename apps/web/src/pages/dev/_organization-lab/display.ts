@@ -1,16 +1,17 @@
 /**
  * How results look, the settings lab's Display (docs/research/organization-lab.md, 2026-10-10):
- * names, copy buttons, and how a value is written, as decimals to a place or as fractions in the
- * sizes chosen, rounded to the nearest, up, or down. A copy button still copies the full value.
+ * names, copy buttons, and how a value is written, as decimals to a place, as fractions in the
+ * sizes chosen, or both side by side, rounded to the nearest, up, or down. A copy button still copies the full value.
  * The lab's own; the converter would take the number formats into core's formatter.
  */
 export interface Display {
   names: 'symbol' | 'both';
   copy: boolean;
-  format: 'decimal' | 'fraction';
+  /** Both writes the fraction, then its decimal (Sean, 2026-10-10). */
+  format: 'decimal' | 'fraction' | 'both';
   /** Decimal places, or null for no limit: the table's six significant digits, as today. */
   places: 1 | 2 | 3 | null;
-  /** The fraction sizes chosen: 8 for eighths, 3 for thirds. Each writes its whole grid. */
+  /** The fraction sizes chosen, each on or off by itself: 8 for eighths, 3 for thirds. */
   fractions: ReadonlySet<Size>;
   rounding: 'nearest' | 'up' | 'down';
 }
@@ -29,14 +30,6 @@ export const SIZE_NAME: Record<Size, string> = {
   32: 'thirty-seconds',
   64: 'sixty-fourths',
 };
-
-/**
- * The finer size chosen that holds this one, or null: sixteenths hold every eighth, quarter, and
- * half, so with 1/16 chosen those are in already. Thirds hold and are held by none.
- */
-export function heldBy(size: Size, chosen: ReadonlySet<Size>): Size | null {
-  return SIZES.find((other) => other !== size && other % size === 0 && chosen.has(other)) ?? null;
-}
 
 /** A fresh visit's (Sean, 2026-10-10): symbols, no copy buttons, two places, eighths in waiting. */
 export const FRESH_DISPLAY: Display = {
@@ -71,15 +64,18 @@ interface Fraction {
 }
 
 /**
- * Every fraction below 1 the sizes chosen write, in lowest terms, smallest first: every one of
- * each grid (Sean, 2026-10-10: whoever reads sixteenths needs the rare ones too).
+ * Every fraction below 1 the sizes chosen write, smallest first: every one of each size (Sean,
+ * 2026-10-10: whoever reads sixteenths needs the rare ones too), each written in the smallest
+ * size chosen that writes it exactly. With 1/4 alone a half is 2/4; with 1/2 as well, 1/2. So
+ * every size is on or off by itself, and what shows is what was chosen.
  */
 export function fractionsOf(chosen: ReadonlySet<Size>): Fraction[] {
   const found = new Map<string, Fraction>();
-  for (const d of chosen) {
+  for (const d of [...chosen].sort((a, b) => a - b)) {
     for (let n = 1; n < d; n += 1) {
       const common = gcd(n, d);
-      found.set(`${n / common}/${d / common}`, { n: n / common, d: d / common });
+      const key = `${n / common}/${d / common}`;
+      if (!found.has(key)) found.set(key, { n, d });
     }
   }
   return [...found.values()].sort((a, b) => a.n / a.d - b.n / b.d);
@@ -104,29 +100,54 @@ function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
 
+export interface Written {
+  text: string;
+  /** Not exact: a fraction that rounds. */
+  approx: boolean;
+}
+
 /**
- * A value as the display writes it, and whether that is not exact (a fraction that rounds); null
- * to keep the table's own text: no limit, no fraction size chosen, a value too small for the places
- * or the sizes (it would read 0), or too large to write as a fraction. A tie goes up, as
- * Math.round's does.
+ * A value as the display writes it first: its decimal, or its fraction (alone, or ahead of its
+ * decimal with Both). Null keeps the table's own text.
  */
 export function displayValue(
   value: number | null,
   display: Display,
   locale?: string,
-): { text: string; approx: boolean } | null {
+): Written | null {
+  return display.format === 'decimal'
+    ? decimalValue(value, display, locale)
+    : fractionValue(value, display, locale);
+}
+
+/** A value to the places chosen; null with no limit, or where the places would read 0. */
+export function decimalValue(
+  value: number | null,
+  display: Display,
+  locale?: string,
+): Written | null {
   if (value === null || !Number.isFinite(value)) return null;
-  if (display.format === 'decimal') {
-    if (display.places === null) return null;
-    const scale = 10 ** display.places;
-    const result = rounded(value * scale, display.rounding) / scale;
-    if (result === 0 && value !== 0) return null;
-    if (Math.abs(result) >= 1e15) return null;
-    const text = new Intl.NumberFormat(locale, { maximumFractionDigits: display.places }).format(
-      Math.abs(result),
-    );
-    return { text: (result < 0 ? MINUS : '') + text, approx: false };
-  }
+  if (display.places === null) return null;
+  const scale = 10 ** display.places;
+  const result = rounded(value * scale, display.rounding) / scale;
+  if (result === 0 && value !== 0) return null;
+  if (Math.abs(result) >= 1e15) return null;
+  const text = new Intl.NumberFormat(locale, { maximumFractionDigits: display.places }).format(
+    Math.abs(result),
+  );
+  return { text: (result < 0 ? MINUS : '') + text, approx: false };
+}
+
+/**
+ * A value in the fraction sizes chosen, as a mixed number, and whether it rounds; null with no
+ * size chosen, where it would read 0, or past a million. A tie goes up, as Math.round's does.
+ */
+export function fractionValue(
+  value: number | null,
+  display: Display,
+  locale?: string,
+): Written | null {
+  if (value === null || !Number.isFinite(value)) return null;
   if (Math.abs(value) >= 1e6 || display.fractions.size === 0) return null;
   // The nearest, the next up, or the next down of whole + a fraction chosen, a hair of float noise
   // allowed either way, so 2.4999999999999996 is still 2 1/2.
@@ -145,11 +166,12 @@ export function displayValue(
   if (!pick) return null;
   const count = base * pick.d + pick.n;
   if (count === 0) return value === 0 ? { text: '0', approx: false } : null;
+  // Written in the fraction's own size, never reduced past it: a below-zero part (d − n) has the
+  // same lowest terms as n/d, so the same smallest size chosen writes it.
   const size = Math.abs(count);
   const whole = Math.floor(size / pick.d);
   const part = size % pick.d;
-  const common = gcd(part, pick.d);
-  const fraction = part ? `${part / common}/${pick.d / common}` : '';
+  const fraction = part ? `${part}/${pick.d}` : '';
   const wholeText = whole ? new Intl.NumberFormat(locale).format(whole) : '';
   const text = [wholeText, fraction].filter(Boolean).join(' ');
   return {

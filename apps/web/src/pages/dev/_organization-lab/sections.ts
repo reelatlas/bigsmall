@@ -9,17 +9,17 @@ import {
 /**
  * The table's sections for the settings lab (docs/research/organization-lab.md): by system, under
  * fixed names, the same five everywhere (Sean, 2026-10-10), so a switch means the same thing in
- * every category. `everyday` is a category with no regional system's everyday units (time, data,
+ * every category. `standard` is a category with no regional system's everyday units (time, data,
  * angle), which a system switch never hides.
  */
-export type FixedKey = 'metric' | 'us' | 'uk' | 'other' | 'everyday' | 'specialist';
+export type FixedKey = 'metric' | 'us' | 'uk' | 'other' | 'standard' | 'specialist';
 
 export const FIXED_LABEL: Record<FixedKey, string> = {
   metric: 'Metric',
   us: 'US (customary)',
   uk: 'UK (imperial)',
   other: 'Other',
-  everyday: 'Everyday',
+  standard: 'Standard',
   specialist: 'Specialist',
 };
 
@@ -49,7 +49,7 @@ export function ownKey(preference: UnitPreference): FixedKey {
  */
 export function fixedKeyOf(unit: Unit, preference: UnitPreference): FixedKey {
   if (unit.tier !== 'basic') return 'specialist';
-  if (!categoryIsRegional(unit.category)) return 'everyday';
+  if (!categoryIsRegional(unit.category)) return 'standard';
   if (unit.system === 'si' || unit.system === 'metric') return 'metric';
   if (unit.system === 'us') return 'us';
   if (unit.system === 'uk') return 'uk';
@@ -74,7 +74,7 @@ export function sectionsOf<T extends { unit: Unit }>(
 ): Section<T>[] {
   const own = ownKey(preference);
   const rank = (key: FixedKey) =>
-    key === own || key === 'everyday' ? 0 : key === 'specialist' ? 3 : key === 'other' ? 2 : 1;
+    key === own || key === 'standard' ? 0 : key === 'specialist' ? 3 : key === 'other' ? 2 : 1;
   const sections = new Map<FixedKey, Section<T>>();
   for (const row of rows) {
     const key = fixedKeyOf(row.unit, preference);

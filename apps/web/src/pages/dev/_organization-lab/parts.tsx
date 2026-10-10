@@ -4,15 +4,20 @@ import { FormattedNumber } from '../../../components/NumberText';
 import { UnitChip } from '../../../components/UnitChip';
 import type { TableRow } from '../../../features/converter/state';
 import { cx, FIELD_ROW, LIST_CARD, NO_ANSWER, unitSymbol } from '../../../lib/recipes';
+import type { Written } from './display';
 
 // What the settings lab's tables draw, in the converter's columns.
 
 export const CHECKBOX = 'size-4 accent-accent';
 
-/** The converter's table columns: value, spare width, symbol, its exponent, name, and a last cell. */
+/**
+ * The table's columns: the value, its decimal beside it (Both), spare width, the symbol, its
+ * exponent, the name, and a last cell (copy buttons). Seven, so a row spans all with col-span-7.
+ */
 export const ROWS =
-  'grid grid-cols-[auto_minmax(0,1fr)_auto_auto_minmax(0,max-content)_auto] gap-y-0.5';
-export const GIVE_WAY = ['name'] as const;
+  'grid grid-cols-[auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)_auto] gap-y-0.5';
+/** What gives way on a narrow screen, in order: the names, then Both's decimal. */
+export const GIVE_WAY = ['name', 'decimal'] as const;
 
 const EXPONENT = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+$/u;
 
@@ -22,45 +27,62 @@ const TONE: Record<TableRow['tone'], string> = {
   message: NO_ANSWER,
 };
 
+const VALUE_CELL = 'pr-2 font-numeric whitespace-nowrap';
+const DECIMAL_CELL = 'min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric whitespace-nowrap';
+const SYMBOL_CELL = cx('col-start-4 pl-2 text-right whitespace-nowrap', unitSymbol());
+const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
+
+/** A value as written, "≈" ahead of one that rounds; the table's own text where nothing is. */
+export function writtenValue(row: TableRow, written: Written | null): ReactNode {
+  if (written) {
+    return (
+      <>
+        {written.approx && <span className="text-ink-muted">≈ </span>}
+        {written.text}
+      </>
+    );
+  }
+  return row.tone === 'value' ? <FormattedNumber text={row.text} /> : row.text;
+}
+
+function splitSymbol(symbol: string): [string, string] {
+  const exponent = EXPONENT.exec(symbol)?.[0] ?? '';
+  return [symbol.slice(0, symbol.length - exponent.length), exponent];
+}
+
 /**
- * A row's value, symbol, exponent, and name, in the converter's columns. `shown` is the value as
- * the display writes it (decimals to a place, a fraction), with "≈" where a fraction rounds.
+ * A row's value, its decimal (Both), symbol, exponent, and name, in the converter's columns.
  * Without names (symbols only) the name's column stays, empty, and nothing in it gives way. A
- * checkbox (Edit, the Hidden section) leads the value's cell, on the left under its heading's, so
- * no column at the right edge is kept for it and the other rows never move (Sean, 2026-10-10).
+ * checkbox (Edit) leads the value's cell, on the left under its heading's, so no column at the
+ * right edge is kept for it (Sean, 2026-10-10).
  */
 export function RowCells({
   row,
-  shown,
+  value,
+  decimal = null,
   namesHidden,
+  decimalHidden,
   withName,
   muted = false,
   check,
 }: {
   row: TableRow;
-  shown: { text: string; approx: boolean } | null;
+  value: ReactNode;
+  /** Both's decimal, in the muted ink after the fraction; null where it has none. */
+  decimal?: ReactNode;
   namesHidden: boolean;
+  decimalHidden: boolean;
   withName: boolean;
   /** A hidden unit's row: its value and name in the muted ink, which keeps the contrast fading would lose. */
   muted?: boolean;
   check?: ReactNode;
 }) {
-  const exponent = EXPONENT.exec(row.symbol)?.[0] ?? '';
-  const value = shown ? (
-    <>
-      {shown.approx && <span className="text-ink-muted">≈ </span>}
-      {shown.text}
-    </>
-  ) : row.tone === 'value' ? (
-    <FormattedNumber text={row.text} />
-  ) : (
-    row.text
-  );
+  const [symbol, exponent] = splitSymbol(row.symbol);
   return (
     <>
       <span
         className={cx(
-          'pr-2 font-numeric whitespace-nowrap',
+          VALUE_CELL,
           check ? 'flex items-center gap-3' : 'text-right',
           muted ? 'text-ink-muted' : TONE[row.tone],
         )}
@@ -68,17 +90,21 @@ export function RowCells({
         {check}
         {check ? <span className="ml-auto">{value}</span> : value}
       </span>
-      <span className={cx('col-start-3 pl-2 text-right whitespace-nowrap', unitSymbol())}>
-        {row.symbol.slice(0, row.symbol.length - exponent.length)}
-      </span>
+      {decimal !== null && (
+        <span
+          hidden={decimalHidden}
+          className={cx(DECIMAL_CELL, 'text-ink-muted')}
+          data-column="decimal"
+        >
+          {decimal}
+        </span>
+      )}
+      <span className={SYMBOL_CELL}>{symbol}</span>
       <span className={cx('whitespace-nowrap', unitSymbol())}>{exponent}</span>
       {withName ? (
         <span
           hidden={namesHidden}
-          className={cx(
-            'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap',
-            muted ? 'text-ink-muted' : 'text-ink',
-          )}
+          className={cx(NAME_CELL, muted ? 'text-ink-muted' : 'text-ink')}
           data-column="name"
         >
           {row.name}
@@ -87,6 +113,62 @@ export function RowCells({
         <span />
       )}
     </>
+  );
+}
+
+/**
+ * A row no one sees, as tall as nothing, holding every one of the category's values, decimals,
+ * symbols, and names, shown or hidden: each column is then as wide as the widest it could ever
+ * hold, so a preset, a switch, or a unit hidden never moves the rest (Sean, 2026-10-10). The
+ * menus' sizer does the same for their widest label (`MENU_SIZER`). It gives way with the
+ * columns it measures, and takes a row's side padding, which a subgrid adds to its edge columns.
+ */
+export function ColumnSizer({
+  rows,
+  value,
+  decimal,
+  namesHidden,
+  decimalHidden,
+  withName,
+}: {
+  rows: readonly TableRow[];
+  value: (row: TableRow) => ReactNode;
+  decimal: ((row: TableRow) => ReactNode) | null;
+  namesHidden: boolean;
+  decimalHidden: boolean;
+  withName: boolean;
+}) {
+  const stack = (cell: (row: TableRow) => ReactNode) =>
+    rows.map((row) => (
+      <span key={row.id} className="block">
+        {cell(row)}
+      </span>
+    ));
+  return (
+    <div
+      aria-hidden="true"
+      className="invisible col-span-7 grid h-0 grid-cols-subgrid overflow-hidden px-2"
+    >
+      <span className={cx(VALUE_CELL, 'col-start-1')}>{stack(value)}</span>
+      {decimal && (
+        <span
+          hidden={decimalHidden}
+          className={cx(DECIMAL_CELL, 'col-start-2')}
+          data-column="decimal"
+        >
+          {stack(decimal)}
+        </span>
+      )}
+      <span className={SYMBOL_CELL}>{stack((row) => splitSymbol(row.symbol)[0])}</span>
+      <span className={cx('col-start-5 whitespace-nowrap', unitSymbol())}>
+        {stack((row) => splitSymbol(row.symbol)[1])}
+      </span>
+      {withName && (
+        <span hidden={namesHidden} className={cx(NAME_CELL, 'col-start-6')} data-column="name">
+          {stack((row) => row.name)}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -120,140 +202,6 @@ export function BoxField({
       {chipUnit && (
         <UnitChip unit={chipUnit} compact={false} onOpen={() => undefined} onRemove={onRemove} />
       )}
-    </div>
-  );
-}
-
-/**
- * A trial switch (the next round's proposal 3): one setting that takes effect at once. The whole
- * row is the control, so its tap is the row's; the track leads and its label follows, as a
- * checkbox's does (Sean, 2026-10-10), drawn from the control edge, and the accent once on. It moves
- * to components/ and the gallery if Sean keeps it.
- */
-export function Switch({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className="flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-nested-md px-2 text-left text-sm text-ink hover:bg-surface-raised"
-    >
-      <span
-        aria-hidden="true"
-        className={cx(
-          'flex h-6 w-10 shrink-0 items-center rounded-full border-2 p-0.5 transition-colors',
-          checked ? 'border-accent bg-accent' : 'border-edge bg-surface',
-        )}
-      >
-        <span
-          className={cx(
-            'size-4 rounded-full transition-transform',
-            checked ? 'translate-x-4 bg-on-accent' : 'bg-ink-muted',
-          )}
-        />
-      </span>
-      {label}
-    </button>
-  );
-}
-
-/** The two looks for a setting's choices, side by side in the lab (the next round's proposal 4). */
-export type Look = 'pills' | 'segmented';
-
-/**
- * Each choice's tap is 44 px however small its drawn shape (CLAUDE.md, accessibility): the label
- * is the target, and the shape inside it is drawn 32 px tall with less padding than the converter's
- * controls, the text kept at text-sm.
- */
-const TARGET =
-  'group flex min-h-11 min-w-11 cursor-pointer items-center has-disabled:cursor-not-allowed';
-const SHAPE =
-  'flex h-8 w-full items-center justify-center px-2.5 text-sm whitespace-nowrap text-ink peer-checked:bg-accent-soft peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-focus peer-disabled:text-ink-muted';
-const DRAWN: Record<Look, string> = {
-  /** A compact pill each, apart. */
-  pills: cx(SHAPE, 'rounded-md border-2 border-edge peer-checked:border-transparent'),
-  /** One strip: an edge around all, a line between each, at the controls' one weight. */
-  segmented: cx(
-    SHAPE,
-    'border-y-2 border-r-2 border-edge group-first:rounded-l-md group-first:border-l-2 group-last:rounded-r-md',
-  ),
-};
-const ROW: Record<Look, string> = { pills: 'flex flex-wrap gap-x-1', segmented: 'flex w-fit' };
-
-/** One choice of a few, in either look; `name` ties rows of one choice together. */
-export function ChoiceRow<T extends string | number>({
-  look,
-  name,
-  options,
-  value,
-  onChange,
-}: {
-  look: Look;
-  name: string;
-  options: ReadonlyArray<{ value: T; label: ReactNode }>;
-  value: T | null;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div className={ROW[look]}>
-      {options.map((option) => (
-        <label key={option.value} className={TARGET}>
-          <input
-            type="radio"
-            name={name}
-            checked={value === option.value}
-            onChange={() => onChange(option.value)}
-            className="peer sr-only"
-          />
-          <span className={DRAWN[look]}>{option.label}</span>
-        </label>
-      ))}
-    </div>
-  );
-}
-
-/**
- * Several of a few, in either look. A choice held by another (sixteenths hold eighths) shows
- * chosen and locked, in the muted ink, and says what holds it.
- */
-export function ToggleRow<T extends string | number>({
-  look,
-  options,
-  onToggle,
-}: {
-  look: Look;
-  options: ReadonlyArray<{
-    value: T;
-    label: ReactNode;
-    checked: boolean;
-    locked?: boolean;
-    title?: string;
-  }>;
-  onToggle: (value: T) => void;
-}) {
-  return (
-    <div className={ROW[look]}>
-      {options.map((option) => (
-        <label key={option.value} className={TARGET} title={option.title}>
-          <input
-            type="checkbox"
-            checked={option.checked}
-            disabled={option.locked}
-            onChange={() => onToggle(option.value)}
-            className="peer sr-only"
-          />
-          <span className={DRAWN[look]}>{option.label}</span>
-        </label>
-      ))}
     </div>
   );
 }

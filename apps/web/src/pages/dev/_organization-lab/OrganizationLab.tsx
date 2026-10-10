@@ -17,6 +17,8 @@ import {
   RedoIcon,
   UndoIcon,
 } from '../../../components/icons';
+import { SegmentedControl, SegmentedToggles } from '../../../components/SegmentedControl';
+import { Switch } from '../../../components/Switch';
 import { ToolbarDivider } from '../../../components/ToolbarDivider';
 import {
   initialState,
@@ -36,27 +38,17 @@ import {
 } from '../../../lib/recipes';
 import { browserLocale } from '../../../lib/region';
 import {
+  decimalValue,
   displayChanged,
   displayValue,
   fractionsOf,
   FRESH_DISPLAY,
-  heldBy,
   SIZE_NAME,
   SIZES,
   type Display,
   type Size,
 } from './display';
-import {
-  BoxField,
-  CHECKBOX,
-  ChoiceRow,
-  GIVE_WAY,
-  RowCells,
-  ROWS,
-  Switch,
-  ToggleRow,
-  type Look,
-} from './parts';
+import { BoxField, CHECKBOX, ColumnSizer, GIVE_WAY, RowCells, ROWS, writtenValue } from './parts';
 import { FIXED_LABEL, fixedKeyOf, sectionsOf, SHOW_KEYS } from './sections';
 import {
   FRESH_RULE,
@@ -78,27 +70,13 @@ import {
 
 /**
  * The settings lab (docs/research/organization-lab.md, 2026-10-10): Sean's model in the context of
- * the action bar, with single units chosen in the table (Separate, Sean's direction). A Settings
- * button shapes what shows (the units, in every category) and how it looks (names, copy buttons,
- * decimals or fractions, rounding); the table heads its sections by system and keeps what is hidden
- * in a Hidden section at its foot; search leaves hidden units out and says when one matches. Two
- * looks for Settings' choices, side by side: compact pills, and a segmented control. Built from the
- * real engine, table view, menu, chip, and toolbar parts, with state of its own: no undo, no URL,
- * no arrow keys.
+ * the action bar, with single units chosen in the table (Separate) and Settings' choices drawn as
+ * segmented controls (both Sean's choices). A Settings button shapes what shows (the units, in
+ * every category) and how it looks (names, copy buttons, decimals, fractions, or both, and
+ * rounding); the table heads its sections by system and keeps what is hidden in a Hidden list at
+ * its foot; search leaves hidden units out and says when one matches. Built from the real engine,
+ * table view, menu, chip, and toolbar parts, with state of its own: no undo, no URL, no arrow keys.
  */
-
-const LOOKS: ReadonlyArray<{ id: Look; name: string; hint: string }> = [
-  {
-    id: 'pills',
-    name: '1. Compact pills',
-    hint: 'Each choice its own pill, drawn 32 px tall with less padding than today’s 44 px; each still takes a 44 px tap.',
-  },
-  {
-    id: 'segmented',
-    name: '2. Segmented control',
-    hint: 'A setting’s choices joined in one strip, a line between each, at the same size; the same 44 px tap.',
-  },
-];
 
 const REGIONS: ReadonlyArray<{ id: UnitPreference; name: string }> = [
   { id: 'us', name: 'US' },
@@ -193,9 +171,8 @@ function TriCheckbox({ state, onChange }: { state: GroupState; onChange: () => v
   );
 }
 
-/** One choice of a few, under its legend, in the converter's look. */
+/** One choice of a few, a segmented control under its legend. */
 function Choices<T extends string | number>({
-  look,
   legend,
   options,
   value,
@@ -203,7 +180,6 @@ function Choices<T extends string | number>({
   hideLegend = false,
   onChange,
 }: {
-  look: Look;
   legend: string;
   options: ReadonlyArray<{ value: T; label: ReactNode }>;
   value: T | null;
@@ -216,7 +192,7 @@ function Choices<T extends string | number>({
   return (
     <fieldset disabled={disabled} className="grid">
       <legend className={hideLegend ? 'sr-only' : SUBHEAD}>{legend}</legend>
-      <ChoiceRow look={look} name={name} options={options} value={value} onChange={onChange} />
+      <SegmentedControl name={name} options={options} value={value} onChange={onChange} />
     </fieldset>
   );
 }
@@ -235,20 +211,20 @@ function sizesPreview(chosen: ReadonlySet<Size>): string {
   return `${all.slice(0, 3).join(', ')} … ${all.at(-1)}, ${all.length} in all`;
 }
 
-/** The two rows of sizes: halves to eighths, then the finer ones. */
+/** The two strips of sizes: halves to eighths, then the finer ones. */
 const SIZE_ROWS: ReadonlyArray<readonly Size[]> = [SIZES.slice(0, 4), SIZES.slice(4)];
 
 /**
- * Fractions in the sizes chosen, several at once (Sean, 2026-10-10): each writes its whole grid,
- * and a finer one holds the coarser it contains, which then show chosen and locked. Thirds stand
- * alone. A line under them says what the sizes write.
+ * Fractions in the sizes chosen, each on or off by itself (Sean, 2026-10-10): what is chosen is
+ * what shows, a fraction written in the smallest size chosen that writes it (1/4 alone writes a
+ * half as 2/4; with 1/2 as well, 1/2). The line under them says what they write.
  */
 function FractionSizes({
-  look,
+  legend,
   chosen,
   onChange,
 }: {
-  look: Look;
+  legend: string;
   chosen: ReadonlySet<Size>;
   onChange: (chosen: ReadonlySet<Size>) => void;
 }) {
@@ -260,29 +236,20 @@ function FractionSizes({
   };
   return (
     <fieldset className="grid">
-      <legend className={SUBHEAD}>Round to</legend>
+      <legend className={SUBHEAD}>{legend}</legend>
       {SIZE_ROWS.map((sizes) => (
-        <ToggleRow<Size>
+        <SegmentedToggles<Size>
           key={sizes.join()}
-          look={look}
-          options={sizes.map((size) => {
-            const holder = heldBy(size, chosen);
-            return {
-              value: size,
-              checked: holder !== null || chosen.has(size),
-              locked: holder !== null,
-              ...(holder ? { title: `In 1/${holder} already` } : {}),
-              label: (
-                <>
-                  <span className="font-numeric">1/{size}</span>
-                  <span className="sr-only">
-                    , {SIZE_NAME[size]}
-                    {holder && `, in ${SIZE_NAME[holder]} already`}
-                  </span>
-                </>
-              ),
-            };
-          })}
+          options={sizes.map((size) => ({
+            value: size,
+            label: (
+              <>
+                <span className="font-numeric">1/{size}</span>
+                <span className="sr-only">, {SIZE_NAME[size]}</span>
+              </>
+            ),
+          }))}
+          checked={(size) => chosen.has(size)}
           onToggle={toggle}
         />
       ))}
@@ -301,13 +268,11 @@ function FractionSizes({
 
 /** Settings: what shows, in every category, then how it looks. */
 function SettingsPanel({
-  look,
   id,
   ui,
   preference,
   onUi,
 }: {
-  look: Look;
   id: string;
   ui: Ui;
   preference: UnitPreference;
@@ -320,6 +285,7 @@ function SettingsPanel({
     onUi((now) => ({ ...now, rule: next(now.rule) }));
   const setDisplay = (patch: Partial<Display>) =>
     onUi((now) => ({ ...now, display: { ...now.display, ...patch } }));
+  const both = display.format === 'both';
 
   return (
     <div
@@ -329,7 +295,7 @@ function SettingsPanel({
       onPointerDown={(event) => event.preventDefault()}
       className={cx(
         CARD,
-        'absolute top-full right-0 z-20 mt-1 grid max-h-120 w-80 gap-3 overflow-y-auto p-3 shadow-md',
+        'absolute top-full left-0 z-20 mt-1 grid max-h-120 w-80 gap-3 overflow-y-auto p-3 shadow-md',
       )}
     >
       <section className="grid gap-2" aria-label="Units">
@@ -341,7 +307,6 @@ function SettingsPanel({
           </p>
         </div>
         <Choices<ShowPreset>
-          look={look}
           legend="Show"
           hideLegend
           options={SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name }))}
@@ -367,7 +332,6 @@ function SettingsPanel({
       <section className="grid gap-2 border-t border-line pt-3" aria-label="Display">
         <h3 className={PANEL_TITLE}>Display</h3>
         <Choices<Display['names']>
-          look={look}
           legend="Unit names"
           hideLegend
           options={[
@@ -383,34 +347,33 @@ function SettingsPanel({
           onChange={(copy) => setDisplay({ copy })}
         />
         <Choices<Display['format']>
-          look={look}
           legend="Format"
           options={[
             { value: 'decimal', label: 'Decimals' },
             { value: 'fraction', label: 'Fractions' },
+            { value: 'both', label: 'Both' },
           ]}
           value={display.format}
           onChange={(format) => setDisplay({ format })}
         />
-        {display.format === 'decimal' ? (
+        {display.format !== 'decimal' && (
+          <FractionSizes
+            legend={both ? 'Round fractions to' : 'Round to'}
+            chosen={display.fractions}
+            onChange={(fractions) => setDisplay({ fractions })}
+          />
+        )}
+        {display.format !== 'fraction' && (
           <Choices
-            look={look}
-            legend="Round to"
+            legend={both ? 'Round decimals to' : 'Round to'}
             options={PLACES}
             value={PLACES.find((each) => each.places === display.places)?.value ?? null}
             onChange={(value) =>
               setDisplay({ places: PLACES.find((each) => each.value === value)?.places ?? null })
             }
           />
-        ) : (
-          <FractionSizes
-            look={look}
-            chosen={display.fractions}
-            onChange={(fractions) => setDisplay({ fractions })}
-          />
         )}
         <Choices<Display['rounding']>
-          look={look}
           legend="Rounding"
           options={[
             { value: 'nearest', label: 'Nearest' },
@@ -464,18 +427,11 @@ function SettingsPanel({
   );
 }
 
-/** A grid of the converter's columns, the names giving way when its own rows have no room. */
-function OwnGrid({ children }: { children: (namesHidden: boolean) => ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const namesHidden = useColumnsFit(ref, GIVE_WAY).includes('name');
-  return (
-    <div ref={ref} className={ROWS}>
-      {children(namesHidden)}
-    </div>
-  );
-}
-
-/** The table: sections headed by system, hidden units kept at its foot, values as Display writes them. */
+/**
+ * The table: sections headed by system, values as Display writes them, the hidden units listed at
+ * its foot. A sizer holds every column at the widest it could hold, so nothing moves as presets,
+ * switches, Hidden, or units hidden change what shows (Sean, 2026-10-10).
+ */
 function ResultsTable({
   ui,
   rows,
@@ -492,13 +448,37 @@ function ResultsTable({
   onTake: (row: TableRow) => void;
 }) {
   const id = useId();
-  const withName = ui.display.names === 'both';
-  const { copy } = ui.display;
+  const gridRef = useRef<HTMLDivElement>(null);
+  const fitted = useColumnsFit(gridRef, GIVE_WAY);
+  const namesHidden = fitted.includes('name');
+  const decimalHidden = fitted.includes('decimal');
+  const { display, editing } = ui;
+  const withName = display.names === 'both';
   const isShown = (row: TableRow) => row.inBox || shows(row.unit, ui.rule, preference);
-  const { editing } = ui;
   const hidden = rows.filter((row) => !isShown(row));
-  const shownValue = (row: TableRow) =>
-    row.tone === 'value' ? displayValue(row.value, ui.display, locale) : null;
+
+  /** The value as Display writes it first (a fraction with Both), and Both's decimal after it. */
+  const firstOf = (row: TableRow) =>
+    writtenValue(row, row.tone === 'value' ? displayValue(row.value, display, locale) : null);
+  const withDecimal = (row: TableRow) =>
+    display.format === 'both' &&
+    row.tone === 'value' &&
+    displayValue(row.value, display, locale) !== null;
+  const decimalOf = (row: TableRow): ReactNode =>
+    withDecimal(row) ? writtenValue(row, decimalValue(row.value, display, locale)) : null;
+  const cells = (row: TableRow, muted = false, check?: ReactNode) => (
+    <RowCells
+      row={row}
+      value={firstOf(row)}
+      decimal={display.format === 'both' ? decimalOf(row) : null}
+      namesHidden={namesHidden}
+      decimalHidden={decimalHidden}
+      withName={withName}
+      muted={muted}
+      check={check}
+    />
+  );
+
   const choose = (chosen: readonly TableRow[], show: boolean) =>
     onUi((now) => ({
       ...now,
@@ -510,8 +490,19 @@ function ResultsTable({
       ),
     }));
 
-  /** A row that is a checkbox: in Edit, or in the Hidden section. */
-  const checkRow = (row: TableRow, namesHidden: boolean) => {
+  const checkbox = (row: TableRow, on: boolean) => (
+    <input
+      id={`${id}-${row.id}`}
+      type="checkbox"
+      checked={on}
+      disabled={row.inBox}
+      onChange={() => choose([row], !on)}
+      className={CHECKBOX}
+    />
+  );
+
+  /** A row that is a checkbox, in Edit. */
+  const checkRow = (row: TableRow) => {
     const on = isShown(row);
     return (
       <label
@@ -519,27 +510,11 @@ function ResultsTable({
         htmlFor={`${id}-${row.id}`}
         className={cx(
           CURSOR_ROW,
-          'col-span-6 grid grid-cols-subgrid items-center',
+          'col-span-7 grid grid-cols-subgrid items-center',
           rowFill(row.inBox, false),
         )}
       >
-        <RowCells
-          row={row}
-          shown={shownValue(row)}
-          namesHidden={namesHidden}
-          withName={withName}
-          muted={!on}
-          check={
-            <input
-              id={`${id}-${row.id}`}
-              type="checkbox"
-              checked={on}
-              disabled={row.inBox}
-              onChange={() => choose([row], !on)}
-              className={CHECKBOX}
-            />
-          }
-        />
+        {cells(row, !on, checkbox(row, on))}
       </label>
     );
   };
@@ -547,7 +522,7 @@ function ResultsTable({
   const headedCheck = (label: string, group: readonly TableRow[], edge: string) => {
     const state = groupState(group, isShown);
     return (
-      <h4 className={cx('col-span-6', edge)}>
+      <h4 className={edge}>
         <label className={cx(PANEL_TITLE, 'flex min-h-11 items-center gap-2 px-2')}>
           <TriCheckbox state={state} onChange={() => choose(group, state !== 'all')} />
           {label}
@@ -572,68 +547,69 @@ function ResultsTable({
           </Button>
         </div>
       )}
-      <OwnGrid>
-        {(namesHidden) =>
-          sectionsOf(rows, preference).map((section, at) => {
-            const listed = editing ? section.rows : section.rows.filter(isShown);
-            if (listed.length === 0) return null;
-            const edge = at === 0 ? 'pt-1' : 'mt-1 border-t border-line pt-2';
-            return (
-              <div
-                key={section.key}
-                role="group"
-                aria-label={section.label}
-                className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
-              >
-                {editing ? (
-                  headedCheck(section.label, section.rows, edge)
-                ) : (
-                  <h4 className={cx('col-span-6 px-2 pb-1', PANEL_TITLE, edge)}>{section.label}</h4>
-                )}
-                {listed.map((row) => {
-                  if (editing) return checkRow(row, namesHidden);
-                  return (
-                    <div key={row.id} className="col-span-6 grid grid-cols-subgrid items-center">
-                      {/* Without copy buttons the row runs to the card's edge: no column is kept for them. */}
-                      <button
-                        type="button"
-                        onClick={() => onTake(row)}
-                        className={cx(
-                          CURSOR_ROW,
-                          'grid grid-cols-subgrid items-center',
-                          copy ? 'col-span-5' : 'col-span-6',
-                          rowFill(row.inBox, false),
-                        )}
-                      >
-                        <RowCells
-                          row={row}
-                          shown={shownValue(row)}
-                          namesHidden={namesHidden}
-                          withName={withName}
-                        />
-                      </button>
-                      {copy &&
-                        (row.tone === 'value' ? (
-                          <Button
-                            variant="ghost"
-                            square
-                            nested
-                            aria-label={`Copy ${row.name}`}
-                            onClick={() => void navigator.clipboard?.writeText(String(row.value))}
-                          >
-                            <CopyIcon />
-                          </Button>
-                        ) : (
-                          <span className="block size-11" />
-                        ))}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })
-        }
-      </OwnGrid>
+      <div ref={gridRef} className={ROWS}>
+        {sectionsOf(rows, preference).map((section, at) => {
+          const listed = editing ? section.rows : section.rows.filter(isShown);
+          if (listed.length === 0) return null;
+          const edge = at === 0 ? 'pt-1' : 'mt-1 border-t border-line pt-2';
+          return (
+            <div
+              key={section.key}
+              role="group"
+              aria-label={section.label}
+              className="col-span-7 grid grid-cols-subgrid gap-y-0.5"
+            >
+              {editing ? (
+                <div className="col-span-7">{headedCheck(section.label, section.rows, edge)}</div>
+              ) : (
+                <h4 className={cx('col-span-7 px-2 pb-1', PANEL_TITLE, edge)}>{section.label}</h4>
+              )}
+              {listed.map((row) => {
+                if (editing) return checkRow(row);
+                return (
+                  <div key={row.id} className="col-span-7 grid grid-cols-subgrid items-center">
+                    {/* Without copy buttons the row runs to the card's edge: no column is kept for them. */}
+                    <button
+                      type="button"
+                      onClick={() => onTake(row)}
+                      className={cx(
+                        CURSOR_ROW,
+                        'grid grid-cols-subgrid items-center',
+                        display.copy ? 'col-span-6' : 'col-span-7',
+                        rowFill(row.inBox, false),
+                      )}
+                    >
+                      {cells(row)}
+                    </button>
+                    {display.copy &&
+                      (row.tone === 'value' ? (
+                        <Button
+                          variant="ghost"
+                          square
+                          nested
+                          aria-label={`Copy ${row.name}`}
+                          onClick={() => void navigator.clipboard?.writeText(String(row.value))}
+                        >
+                          <CopyIcon />
+                        </Button>
+                      ) : (
+                        <span className="block size-11" />
+                      ))}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+        <ColumnSizer
+          rows={rows}
+          value={firstOf}
+          decimal={display.format === 'both' ? decimalOf : null}
+          namesHidden={namesHidden}
+          decimalHidden={decimalHidden}
+          withName={withName}
+        />
+      </div>
       {!editing && (
         <div className="mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1">
           {hidden.length > 0 ? (
@@ -671,26 +647,27 @@ function ResultsTable({
         </div>
       )}
       {/*
-       * The Hidden list sizes its columns to its own rows, so opening it never moves the table's
-       * (Sean, 2026-10-10: a checkbox and a long hidden value had widened the shared value column).
+       * The Hidden list names its units, without values (Sean, 2026-10-10): it is for bringing
+       * them back, and needs none of the table's columns, so opening it moves nothing.
        */}
-      {!editing && ui.hiddenOpen && hidden.length > 0 && (
-        <OwnGrid>
-          {(namesHidden) =>
-            sectionsOf(hidden, preference).map((section) => (
-              <div
-                key={section.key}
-                role="group"
-                aria-label={`Hidden, ${section.label}`}
-                className="col-span-6 grid grid-cols-subgrid gap-y-0.5"
+      {!editing &&
+        ui.hiddenOpen &&
+        sectionsOf(hidden, preference).map((section) => (
+          <div key={section.key} role="group" aria-label={`Hidden, ${section.label}`}>
+            {headedCheck(section.label, section.rows, 'pt-1')}
+            {section.rows.map((row) => (
+              <label
+                key={row.id}
+                htmlFor={`${id}-${row.id}`}
+                className={cx(CURSOR_ROW, 'flex items-center gap-2 hover:bg-surface-raised')}
               >
-                {headedCheck(section.label, section.rows, 'pt-1')}
-                {section.rows.map((row) => checkRow(row, namesHidden))}
-              </div>
-            ))
-          }
-        </OwnGrid>
-      )}
+                {checkbox(row, false)}
+                <span className={unitSymbol()}>{row.symbol}</span>
+                <span className={withName ? 'truncate text-ink' : 'sr-only'}>{row.name}</span>
+              </label>
+            ))}
+          </div>
+        ))}
     </div>
   );
 }
@@ -790,9 +767,8 @@ function MatchesList({
   );
 }
 
-/** One converter: its action bar, the box, and the table or the matches. */
+/** The converter: its action bar, the box, and the table or the matches. */
 function Converter({
-  look,
   preference,
   locale,
   category,
@@ -804,7 +780,6 @@ function Converter({
   onUnit,
   onUi,
 }: {
-  look: Look;
   preference: UnitPreference;
   locale: string | undefined;
   category: CategoryId;
@@ -817,7 +792,6 @@ function Converter({
   onUi: UpdateUi;
 }) {
   const id = useId();
-  const meta = LOOKS.find((each) => each.id === look) ?? LOOKS[0]!;
   const separators = useMemo(() => localeSeparators(locale), [locale]);
   const view = useMemo(
     () =>
@@ -831,7 +805,7 @@ function Converter({
 
   /*
    * Settings closes on Escape, a press outside it, or focus moving outside it; never on focus
-   * merely lost, as when a reset turns itself off or Reset settings takes the fraction steps away
+   * merely lost, as when a reset turns itself off or Reset settings takes the fraction sizes away
    * (Sean, 2026-10-10: a reset that closed the panel left no way to see that it worked).
    */
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -875,15 +849,22 @@ function Converter({
 
   return (
     <div className="min-w-0">
-      <h2 className="font-display text-lg font-semibold">{meta.name}</h2>
-      <p className="min-h-10 text-sm text-ink-muted">{meta.hint}</p>
+      {/*
+       * The action bar (Sean, 2026-10-10): the category menu, the calculator, and Settings lead,
+       * with no dividers between them; undo, redo, and clear all keep the right end. Where the two
+       * do not fit on one line, the leading group wraps to the line over the box, as the
+       * converter's toolbar does, and the others stay at the right.
+       */}
       <div
         role="toolbar"
-        aria-label={`Tools, ${meta.name}`}
-        className="relative mt-2 mb-2 flex flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2"
+        aria-label="Tools"
+        className="relative mb-2 flex flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2"
       >
-        <CategoryMenu categories={categories} value={category} onChoose={onCategory} />
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex items-center gap-1">
+          <CategoryMenu categories={categories} value={category} onChoose={onCategory} />
+          <Button variant="ghost" square aria-label="Calculator" aria-disabled title="Calculator">
+            <CalculatorIcon />
+          </Button>
           <div ref={settingsRef} className="contents">
             <Button
               variant="ghost"
@@ -898,20 +879,11 @@ function Converter({
               <SlidersIcon />
             </Button>
             {ui.settingsOpen && (
-              <SettingsPanel
-                look={look}
-                id={`${id}-settings`}
-                ui={ui}
-                preference={preference}
-                onUi={onUi}
-              />
+              <SettingsPanel id={`${id}-settings`} ui={ui} preference={preference} onUi={onUi} />
             )}
           </div>
-          <ToolbarDivider />
-          <Button variant="ghost" square aria-label="Calculator" aria-disabled title="Calculator">
-            <CalculatorIcon />
-          </Button>
-          <ToolbarDivider />
+        </div>
+        <div className="ml-auto flex shrink-0 items-center gap-1">
           <Button variant="ghost" square aria-label="Undo" aria-disabled title="Undo">
             <UndoIcon />
           </Button>
@@ -967,17 +939,17 @@ export function OrganizationLab() {
   const [category, setCategory] = useState<CategoryId>('volume');
   const [unit, setUnit] = useState<string | null>(SAMPLES.volume?.unit ?? null);
   const [text, setText] = useState(SAMPLES.volume?.text ?? '');
-  const [uis, setUis] = useState<[Ui, Ui]>([freshUi(), freshUi()]);
+  const [ui, setUi] = useState<Ui>(freshUi);
   const locale = browserLocale();
 
   const choose = (next: CategoryId) => {
     setCategory(next);
     setUnit(SAMPLES[next]?.unit ?? null);
     setText(SAMPLES[next]?.text ?? '');
-    setUis((current) => [closed(current[0]), closed(current[1])]);
+    setUi(closed);
   };
   const startOver = () => {
-    setUis([freshUi(), freshUi()]);
+    setUi(freshUi());
     setUnit(SAMPLES[category]?.unit ?? null);
     setText(SAMPLES[category]?.text ?? '');
   };
@@ -1004,29 +976,19 @@ export function OrganizationLab() {
           Start over
         </Button>
       </div>
-      <div className="grid items-start gap-10 md:grid-cols-2 md:gap-6">
-        {LOOKS.map((look, index) => (
-          <Converter
-            key={look.id}
-            look={look.id}
-            preference={system}
-            locale={locale}
-            category={category}
-            text={text}
-            unit={unit}
-            ui={uis[index]!}
-            onCategory={choose}
-            onText={setText}
-            onUnit={setUnit}
-            onUi={(update) =>
-              setUis((current) => {
-                const next: [Ui, Ui] = [current[0], current[1]];
-                next[index] = update(current[index]!);
-                return next;
-              })
-            }
-          />
-        ))}
+      <div className="max-w-xl min-w-0">
+        <Converter
+          preference={system}
+          locale={locale}
+          category={category}
+          text={text}
+          unit={unit}
+          ui={ui}
+          onCategory={choose}
+          onText={setText}
+          onUnit={setUnit}
+          onUi={setUi}
+        />
       </div>
     </div>
   );

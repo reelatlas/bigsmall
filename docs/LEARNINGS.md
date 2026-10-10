@@ -629,3 +629,13 @@ Format:
 
 **What happened.** The settings lab's panel closed when focus left it (`onBlur`, no related target inside). A reset turned itself off once it had nothing left to do, and Reset settings from Fractions removed the fraction steps; either way the focused control lost focus to the page, the blur came with no related target, and the panel closed in the middle of the very action whose result it should have shown.
 **Rule.** A popover closes on Escape, a press outside it (`pointerdown` on the document), and focus moving to something outside it (`focusin` on the document), attached in a layout effect so they are there before the next press; never on a bare blur. A control that turns itself off while focused takes `aria-disabled` (the Button's documented way to stay a stop) and does nothing when pressed, rather than `disabled`, which drops focus.
+
+## 2026-10-10 — A subgrid's padding counts toward its parent's edge columns
+
+**What happened.** The settings lab sized its table's columns with a sizer row (every value, shown or hidden, in one invisible subgrid row) so a preset would never move them. The values still moved 8 px when a long one showed: each row is a subgrid with `px-2`, and a subgrid's padding is added to the parent's first and last tracks, so a shown row asked for 8 px more than the unpadded sizer had measured.
+**Rule.** A sizer row in a subgrid table takes the same side padding (and border) as the rows it stands for, so it measures what they would.
+
+## 2026-10-10 — A wrapper made a grid item needs `min-w-0` again
+
+**What happened.** Wrapping the lab's converter in a `max-w-xl` div made the wrapper the page grid's item instead of the converter, whose root carried `min-w-0`. The wrapper took its content's natural width, about 515 px, and the page scrolled sideways on a phone.
+**Rule.** Whatever is a grid or flex item directly takes `min-w-0` when its content can be wider than the track (a table with columns that give way); moving that item into a wrapper moves the `min-w-0` with it.

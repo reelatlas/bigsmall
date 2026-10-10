@@ -11,14 +11,14 @@ The earlier prototypes, the table controls lab (A to D), this lab's first two ro
 - **One setting for every category**: a system switch means the same thing everywhere.
 - **Jobs (Cooking, Cubic, Trade) were set aside**: written per category, named differently in each, and in the way of one filter for every category.
 - **Separate** (Sean, 2026-10-10): Settings applies to every category; the table applies to this one (Edit, the Hidden section).
-- **Display reaches search**: with Symbol only, the matches show symbols alone, the name kept for screen readers; everything the converter surfaces follows Display.
+- **Display reaches search and the box**: with Symbol only, the matches show symbols alone and the box's chip its symbol alone, the names kept for screen readers; with copy buttons on, the box has its copy button too, off, none (Sean, 2026-10-10). Everything the converter surfaces follows Display.
 - **A fresh visit** (Sean, 2026-10-10): every system but Specialist (the Everyday preset), Symbol only (listed first), no copy buttons, decimals to 0.01, rounded to the nearest; fractions, once chosen, start in eighths (1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8).
 - **No copy column without copy buttons**: the rows run to the card's edge. The checkboxes of Edit and the Hidden section lead a row, on the left under their heading's, so no column at the right edge is kept for them either.
 - **Nothing moves as what shows changes** (Sean, 2026-10-10): every column of the table is as wide as the widest it could hold across all of the category's units, shown or hidden (a sizer row no one sees, as the menus have), so a preset, a switch, a unit hidden, or Hidden opening never shifts the values, symbols, or names. Only Edit, a mode of its own, adds its checkboxes.
 - **The Hidden list names its units, without values**: it is for bringing them back, a checkbox, the symbol, and the name where names show, under their section names, and needs none of the table's columns.
 - **Standard, not Everyday** (Sean, 2026-10-10): the presets read All units, Standard, Your region, and a category with no regional system heads its units Standard, so Standard and Specialist read as the pair they are.
 - **Segmented controls and the switch** (Sean, 2026-10-10): Settings' choices are segmented controls, the copy buttons a switch; both are components now (`SegmentedControl`, `Switch`; docs/DESIGN-SYSTEM.md, "Settings").
-- **The action bar** (Sean, 2026-10-10): the category menu, the calculator, and Settings lead, no dividers between them; undo, redo, and clear all keep the right end. On a phone the leading three wrap to the line over the box. The panel opens under Settings, from the left.
+- **The action bar** (Sean, 2026-10-10): the category menu, the calculator, and Settings lead, no dividers between them; undo, redo, and clear all keep the right end. On a phone the leading three wrap to the line over the box. The panel opens under Settings, from the left, and on a phone spans the action bar, so it never runs past a 320 px screen.
 - **Both**: a third Format choice writes the fraction and its decimal after it in the muted ink, each rounded its own way (Round fractions to, Round decimals to); on a narrow screen the names give way first, then the decimal.
 - **Done closes Hidden**: whoever just chose what to hide should not have to fold it again.
 - **No dot on Settings**: a dot for "changed" would sit there for good once anything is set. The two resets say what can be undone instead.
@@ -46,7 +46,7 @@ A sliders button at the start of the tools opens one panel, anchored to the acti
 - Symbol only, or Symbol and name (no label: the choices say it).
 - Copy buttons, a switch leading its label, as a checkbox does (a copy still copies the full value).
 - Format: Decimals, Fractions, or Both.
-- Round to: for decimals 0.1, 0.01, 0.001, or No limit (today's six significant digits); for fractions the sizes chosen, each on or off, in two strips (1/2, 1/3, 1/4, 1/8, then 1/16, 1/32, 1/64), with a line under them that says what they write ("Shows 1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8"); with none chosen, values keep their decimals. With Both, the two read Round fractions to and Round decimals to. Fractions are written as mixed numbers, "≈" where they round, a tie going up.
+- Round to: for decimals 0.1, 0.01, 0.001, or No limit (today's six significant digits); for fractions the sizes chosen, each on or off, in two strips, each smallest to largest (1/8, 1/4, 1/3, 1/2, the everyday ones, on top; then 1/64, 1/32, 1/16), with a line under them that says what they write ("Shows 1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8"); with none chosen, values keep their decimals. With Both, the two read Round decimals to and Round fractions to, decimals first as Format lists them. Fractions are written as mixed numbers, "≈" where they round, a tie going up.
 - Rounding: Nearest, Up, or Down (off with No limit).
 - A value too small for the places or the step, which would read 0, keeps its significant digits; one past a million keeps decimals.
 
@@ -73,3 +73,5 @@ The table's foot has Edit, which puts a checkbox on every row and a three-state 
 2. **No "most common" 32nds and 64ths** (settled above as proposed): agreed, or try a common set anyway?
 3. **Edit's checkboxes** widen the value column while Edit is on, a mode of its own; keep, or hold the column for them too?
 4. **One button or several**: one Settings button for everything (the lab), or one or two of the most used surfaced on their own once we know which?
+5. **Both's order in the table**: Settings now lists decimals first; the table writes the fraction first and its decimal after, in the muted ink, as charts of fractions do. Keep, or the decimal first there too?
+6. **The decimal places' order**: the fraction sizes run smallest to largest; the places run 0.1, 0.01, 0.001. Flip them to match (0.001, 0.01, 0.1, No limit)?

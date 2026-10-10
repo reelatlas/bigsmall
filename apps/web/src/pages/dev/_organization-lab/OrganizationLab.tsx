@@ -44,7 +44,6 @@ import {
   fractionsOf,
   FRESH_DISPLAY,
   SIZE_NAME,
-  SIZES,
   type Display,
   type Size,
 } from './display';
@@ -211,8 +210,14 @@ function sizesPreview(chosen: ReadonlySet<Size>): string {
   return `${all.slice(0, 3).join(', ')} … ${all.at(-1)}, ${all.length} in all`;
 }
 
-/** The two strips of sizes: halves to eighths, then the finer ones. */
-const SIZE_ROWS: ReadonlyArray<readonly Size[]> = [SIZES.slice(0, 4), SIZES.slice(4)];
+/**
+ * The two strips of sizes, each smallest to largest (Sean, 2026-10-10): eighths to halves, the
+ * everyday ones, on top; then sixty-fourths to sixteenths.
+ */
+const SIZE_ROWS: ReadonlyArray<readonly Size[]> = [
+  [8, 4, 3, 2],
+  [64, 32, 16],
+];
 
 /**
  * Fractions in the sizes chosen, each on or off by itself (Sean, 2026-10-10): what is chosen is
@@ -295,7 +300,7 @@ function SettingsPanel({
       onPointerDown={(event) => event.preventDefault()}
       className={cx(
         CARD,
-        'absolute top-full left-0 z-20 mt-1 grid max-h-120 w-80 gap-3 overflow-y-auto p-3 shadow-md',
+        'absolute inset-x-0 top-full z-20 mt-1 grid max-h-120 gap-3 overflow-y-auto p-3 shadow-md sm:right-auto sm:w-80',
       )}
     >
       <section className="grid gap-2" aria-label="Units">
@@ -356,13 +361,7 @@ function SettingsPanel({
           value={display.format}
           onChange={(format) => setDisplay({ format })}
         />
-        {display.format !== 'decimal' && (
-          <FractionSizes
-            legend={both ? 'Round fractions to' : 'Round to'}
-            chosen={display.fractions}
-            onChange={(fractions) => setDisplay({ fractions })}
-          />
-        )}
+        {/* Decimals first, then fractions, as Format lists them (Sean, 2026-10-10). */}
         {display.format !== 'fraction' && (
           <Choices
             legend={both ? 'Round decimals to' : 'Round to'}
@@ -371,6 +370,13 @@ function SettingsPanel({
             onChange={(value) =>
               setDisplay({ places: PLACES.find((each) => each.value === value)?.places ?? null })
             }
+          />
+        )}
+        {display.format !== 'decimal' && (
+          <FractionSizes
+            legend={both ? 'Round fractions to' : 'Round to'}
+            chosen={display.fractions}
+            onChange={(fractions) => setDisplay({ fractions })}
           />
         )}
         <Choices<Display['rounding']>
@@ -905,7 +911,14 @@ function Converter({
           </Button>
         </div>
       </div>
-      <BoxField text={text} unit={unit} onText={onText} onRemove={() => onUnit(null)} />
+      <BoxField
+        text={text}
+        unit={unit}
+        symbolOnly={ui.display.names === 'symbol'}
+        value={ui.display.copy ? parse(text, separators).value : undefined}
+        onText={onText}
+        onRemove={() => onUnit(null)}
+      />
       <div className="mt-2">
         {view.kind === 'matches' ? (
           <MatchesList

@@ -1,5 +1,7 @@
 import { getUnit } from '@bigsmall/core';
 import { useId, type ReactNode } from 'react';
+import { Button } from '../../../components/Button';
+import { CopyIcon } from '../../../components/icons';
 import { FormattedNumber } from '../../../components/NumberText';
 import { UnitChip } from '../../../components/UnitChip';
 import type { TableRow } from '../../../features/converter/state';
@@ -172,15 +174,25 @@ export function ColumnSizer({
   );
 }
 
-/** The box: its number or a unit being typed, and the chip of the unit in it. */
+/**
+ * The box: its number or a unit being typed, and the chip of the unit in it. Display reaches it
+ * as it reaches the table (Sean, 2026-10-10): with Symbol only the chip shows the symbol alone,
+ * the name kept in its labels, and with copy buttons on, a copy button ends it whenever it holds a
+ * number, out of the Tab order as the converter's is (Ctrl/⌘+C copies from the field).
+ */
 export function BoxField({
   text,
   unit,
+  symbolOnly,
+  value,
   onText,
   onRemove,
 }: {
   text: string;
   unit: string | null;
+  symbolOnly: boolean;
+  /** The number to copy, or undefined for no copy button. */
+  value: number | undefined;
   onText: (text: string) => void;
   onRemove: () => void;
 }) {
@@ -200,7 +212,24 @@ export function BoxField({
         className="min-w-0 flex-1 bg-transparent font-numeric text-3xl text-ink placeholder:text-ink-muted"
       />
       {chipUnit && (
-        <UnitChip unit={chipUnit} compact={false} onOpen={() => undefined} onRemove={onRemove} />
+        <UnitChip
+          unit={chipUnit}
+          compact={symbolOnly}
+          onOpen={() => undefined}
+          onRemove={onRemove}
+        />
+      )}
+      {value !== undefined && (
+        <Button
+          variant="ghost"
+          square
+          nested
+          tabIndex={-1}
+          aria-label="Copy value"
+          onClick={() => void navigator.clipboard?.writeText(String(value))}
+        >
+          <CopyIcon />
+        </Button>
       )}
     </div>
   );

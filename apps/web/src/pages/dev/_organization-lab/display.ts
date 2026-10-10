@@ -18,7 +18,7 @@ export interface Display {
 
 export type Size = 2 | 3 | 4 | 8 | 16 | 32 | 64;
 
-/** The sizes, largest first (Sean, 2026-10-10: thirds among them, for cups). */
+/** The sizes offered (Sean, 2026-10-10: thirds among them, for cups). */
 export const SIZES: readonly Size[] = [2, 3, 4, 8, 16, 32, 64];
 
 export const SIZE_NAME: Record<Size, string> = {

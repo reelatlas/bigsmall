@@ -20,7 +20,14 @@ import { pressedByTouch } from '../../lib/modality';
 import { stepPlane } from '../../lib/planes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
-import { noMatchMessage, type BoxView, type HistoryAction, type TableView } from './state';
+import { sectionsOf, shows, withChoice, type Settings } from './settings';
+import {
+  noMatchMessage,
+  type BoxView,
+  type HistoryAction,
+  type TableRow,
+  type TableView,
+} from './state';
 import type { ConverterEnv } from './useConverter';
 
 /**
@@ -34,20 +41,26 @@ import type { ConverterEnv } from './useConverter';
 const TABLE_GRID =
   'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_auto_1fr] md:gap-x-4';
 /**
- * The toolbar row, as wide as the box: the category menu at its left, its edge on the box's, and
- * the tools at its right end. Where the row has no room for both, the tools keep the line and the
- * menu wraps under them, both flush left, with no breakpoint: the menu comes first in the markup,
- * `flex-wrap-reverse` stacks a wrapped row's first line at the bottom, and justify-between puts a
- * line's one item at its start. The browser's own fit decides, in every theme.
+ * The toolbar's cell, as wide as the box, and what Settings' panel opens under: the panel sits
+ * beside the toolbar, not in it, so its own controls keep their keys.
  */
-const TABLE_TOOLS_ROW =
-  'mb-2 flex max-w-xl flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2 md:col-start-1 md:row-start-1';
+const TABLE_TOOLS_CELL = 'relative max-w-xl md:col-start-1 md:row-start-1';
 /**
- * The tools: their outer edges on the box's (the last button's at the row's right end, the first's
- * when they wrap, flush left), so a filled one (switched on, hovered) lines up with the box and the
- * table, its glyph inside the column as their text is.
+ * The toolbar row (Sean, 2026-10-10): the category menu, the calculator, and Settings at its left,
+ * the menu's edge on the box's, with no dividers between them; undo, redo, and clear all at its
+ * right end. Where the row has no room for both, the right end keeps the top line and the leading
+ * three wrap under it, over the box, with no breakpoint: they come first in the markup,
+ * `flex-wrap-reverse` stacks a wrapped row's first line at the bottom, and the right end's
+ * `ml-auto` keeps it right. The browser's own fit decides, in every theme.
  */
-const TABLE_TOOLS = 'flex shrink-0 items-center gap-1';
+const TABLE_TOOLS_ROW = 'mb-2 flex flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2';
+const TABLE_LEADING = 'flex items-center gap-1';
+/**
+ * The right end's tools: their outer edges on the box's (the last button's at the row's right
+ * end), so a filled one (switched on, hovered) lines up with the box and the table, its glyph
+ * inside the column as their text is.
+ */
+const TABLE_TOOLS = 'ml-auto flex shrink-0 items-center gap-1';
 const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
 /**
  * 8 px under the box, its popup, as the toolbar sits 8 px over it; a container, so the categories
@@ -79,8 +92,15 @@ function viewKeyOf(view: TableView): string {
 }
 
 export interface TableLayoutProps {
-  /** The toolbar's buttons (the calculator, undo, redo, clear all), at the right end of its row. */
+  /** The tools after the category menu: the calculator and Settings. */
+  leadingTools: ReactNode;
+  /** The toolbar's right end: undo, redo, and clear all. */
   tools: ReactNode;
+  /** Settings' panel while it is open, under the toolbar. */
+  panel: ReactNode;
+  /** What shows and how it looks (settings.ts). */
+  settings: Settings;
+  onSettings: (update: (settings: Settings) => Settings) => void;
   /** The field's input, which the host also focuses (clear all puts the caret back in it). */
   inputRef: RefObject<HTMLInputElement>;
   /** The box, as the field shows it. */
@@ -98,7 +118,7 @@ export interface TableLayoutProps {
   /** The row whose copy button shows the check, by unit id. */
   copiedRow: string | null;
   onCopyRow: (unitId: string) => void;
-  copyRowProps: NonNullable<ConversionTableProps['copyProps']>;
+  copyRowProps: NonNullable<ConversionTableProps<TableRow>['copyProps']>;
 }
 
 /**
@@ -112,7 +132,11 @@ export interface TableLayoutProps {
  * from browsing the table to an empty page.
  */
 export function TableLayout({
+  leadingTools,
   tools,
+  panel,
+  settings,
+  onSettings,
   inputRef,
   box,
   table,
@@ -152,15 +176,23 @@ export function TableLayout({
    * Enter, labelled Done, puts the keyboard away once it has done its job (ADR 0015).
    */
   const tappedIn = useRef(false);
+  /** Edit, in the category it was started in: a new category ends it. */
+  const [editingIn, setEditingIn] = useState<string | null>(null);
+  const editing = table.kind === 'units' && editingIn === table.category;
+  const [hiddenOpen, setHiddenOpen] = useState(false);
+  /** The hidden matches shown, for the query they were shown for: a new query hides them again. */
+  const [revealedFor, setRevealedFor] = useState<string | null>(null);
+  const revealed = table.kind === 'matches' && revealedFor === table.query;
+  const { rule, display } = settings;
 
   const number = box.parsed.valueText ?? '';
   const rowCount =
     table.kind === 'units'
-      ? table.message
+      ? table.message || editing
         ? 0
         : table.rows.length
       : table.kind === 'matches'
-        ? table.rows.length
+        ? table.rows.length + (revealed ? table.hidden.length : 0)
         : table.categories.length;
   const rest = table.kind === 'units' && box.unit ? table.rows.findIndex((row) => row.inBox) : -1;
   const at = position === null ? rest : Math.min(position, rowCount - 1);
@@ -308,10 +340,22 @@ export function TableLayout({
    * highlighted, the caret waiting in the field for ↓, Enter, or a click; the box's own category
    * keeps its unit, the cursor resting on it.
    */
-  const choose = (category: CategoryId) => {
+  const chooseCategory = (category: CategoryId) => {
     dispatch({ type: 'chooseCategory', category });
     setPosition(null);
   };
+
+  /** Units shown or hidden on their own, from Edit, the Hidden list, or a hidden unit taken. */
+  const choose = (rows: readonly Pick<TableRow, 'unit'>[], show: boolean) =>
+    onSettings((now) => ({
+      ...now,
+      rule: withChoice(
+        now.rule,
+        rows.map((row) => row.unit),
+        show,
+        env.system,
+      ),
+    }));
 
   /** A unit taken into the box, with its new text; the category follows, and the cursor rests on its row. */
   const take = (unitId: string, text: string) => {
@@ -329,11 +373,18 @@ export function TableLayout({
   const takeRow = (index: number) => {
     if (table.kind === 'start') {
       const category = table.categories[index];
-      if (category) choose(category.id);
+      if (category) chooseCategory(category.id);
     } else if (table.kind === 'matches') {
       const match = table.rows[index];
+      // A hidden unit taken from search leaves Hidden, as if checked there, so clearing the box
+      // never hides it again (Sean, 2026-10-10).
+      const hiddenMatch = revealed ? table.hidden[index - table.rows.length] : undefined;
       if (match?.kind === 'unit') take(match.unit.id, number);
-      else if (match) choose(match.category.id);
+      else if (match) chooseCategory(match.category.id);
+      else if (hiddenMatch) {
+        choose([hiddenMatch], true);
+        take(hiddenMatch.unit.id, number);
+      }
     } else {
       const row = table.rows[index];
       if (!row || row.tone === 'message') return;
@@ -455,19 +506,36 @@ export function TableLayout({
         cursor={browsing ? at : -1}
         itemId={itemId}
         onPick={pick}
+        hidden={table.hidden}
+        revealed={revealed}
+        onReveal={(show) => setRevealedFor(show ? table.query : null)}
+        symbolOnly={display.names === 'symbol'}
       />
     ) : (
-      <ConversionTable
+      <ConversionTable<TableRow>
         id={listId}
         title={table.categories.find((category) => category.id === table.category)?.name ?? ''}
-        rows={table.rows}
+        sections={table.sections}
+        hidden={table.hidden}
+        every={sectionsOf(table.all, env.system)}
         message={table.message}
+        display={display}
+        locale={env.locale}
         cursor={browsing ? at : -1}
         itemId={itemId}
         copied={copiedRow}
         onPick={pick}
         onCopy={(row) => onCopyRow(row.id)}
         copyProps={copyRowProps}
+        editing={editing}
+        hiddenOpen={hiddenOpen}
+        isShown={(row) => row.inBox || shows(row.unit, rule, env.system)}
+        onChoose={choose}
+        onEditing={(on) => {
+          setEditingIn(on ? table.category : null);
+          setPosition(null);
+        }}
+        onHiddenOpen={setHiddenOpen}
       />
     );
 
@@ -482,27 +550,33 @@ export function TableLayout({
       }}
     >
       <div className={TABLE_GRID}>
-        {/* The converter's toolbar, the page's second plane (ADR 0014): first reached at the menu. */}
-        <div
-          ref={toolsRef}
-          role="toolbar"
-          aria-label="Tools"
-          className={TABLE_TOOLS_ROW}
-          data-plane="tools"
-          data-default-tool="category"
-        >
-          <CategoryMenu
-            categories={table.categories}
-            value={chosen}
-            counts={table.kind === 'matches' ? table.counts : undefined}
-            tool="category"
-            onChoose={(category) => {
-              choose(category);
-              // After a tap focus stays with the menu, so no keyboard comes up (ADR 0015).
-              if (!pressedByTouch()) inputRef.current?.focus();
-            }}
-          />
-          <div className={TABLE_TOOLS}>{tools}</div>
+        <div className={TABLE_TOOLS_CELL}>
+          {/* The converter's toolbar, the page's second plane (ADR 0014): first reached at the menu. */}
+          <div
+            ref={toolsRef}
+            role="toolbar"
+            aria-label="Tools"
+            className={TABLE_TOOLS_ROW}
+            data-plane="tools"
+            data-default-tool="category"
+          >
+            <div className={TABLE_LEADING}>
+              <CategoryMenu
+                categories={table.categories}
+                value={chosen}
+                counts={table.kind === 'matches' ? table.counts : undefined}
+                tool="category"
+                onChoose={(category) => {
+                  chooseCategory(category);
+                  // After a tap focus stays with the menu, so no keyboard comes up (ADR 0015).
+                  if (!pressedByTouch()) inputRef.current?.focus();
+                }}
+              />
+              {leadingTools}
+            </div>
+            <div className={TABLE_TOOLS}>{tools}</div>
+          </div>
+          {panel}
         </div>
         <div
           ref={fieldRef}
@@ -529,6 +603,7 @@ export function TableLayout({
               kind: table.kind === 'units' ? 'grid' : 'listbox',
             }}
             trailing={copyButton}
+            symbolOnly={display.names === 'symbol'}
             onChange={onChange}
             onKeyDown={onKeyDown}
             // The chip is a readout here, and part of the box: clicking or tapping it puts the

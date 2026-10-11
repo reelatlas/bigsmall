@@ -18,6 +18,7 @@ import {
   type NumberEnv,
   type TableView,
 } from './state';
+import { FRESH_SETTINGS, type Settings } from './settings';
 import { paramsToState, stateToParams } from './url';
 
 /** How this visitor writes numbers (NumberEnv), and which unit family their region expects. */
@@ -54,6 +55,12 @@ export interface ConverterController {
   canRedo: boolean;
   /** Debounced copy of the table's announcement, so screen readers are not flooded while typing. */
   announcement: string | null;
+  /**
+   * What shows and how it looks (ADR 0017): a fresh visit's on every visit, kept apart from the
+   * conversion's history, so undo steps through what was typed and converted.
+   */
+  settings: Settings;
+  updateSettings: (update: (settings: Settings) => Settings) => void;
 }
 
 /**
@@ -64,8 +71,12 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
   const [history, dispatch] = useReducer(reduceWithHistory, initialHistory);
   const state = history.present;
   const [env] = useState(detectEnv);
+  const [settings, setSettings] = useState<Settings>(FRESH_SETTINGS);
   const box = useMemo(() => selectBox(state, env), [state, env]);
-  const table = useMemo(() => selectTable(state, env), [state, env]);
+  const table = useMemo(
+    () => selectTable(state, { ...env, rule: settings.rule }),
+    [state, env, settings.rule],
+  );
 
   // Restore the conversion from the URL once, at hydration (the server renders the empty state).
   // Text typed into the box before then, in the server's field, is kept: it replaces the URL's
@@ -107,5 +118,7 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
     canUndo: history.past.length > 0,
     canRedo: history.future.length > 0,
     announcement,
+    settings,
+    updateSettings: setSettings,
   };
 }

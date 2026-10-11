@@ -13,8 +13,17 @@ import {
   initialState,
   selectTable,
   type ConverterState,
+  type TableRow,
   type TableView,
 } from '../../../features/converter/state';
+import {
+  FRESH_DISPLAY,
+  FRESH_RULE,
+  sectionsOf,
+  shows,
+  type Display,
+  type ViewRule,
+} from '../../../features/converter/settings';
 import type { ConverterEnv } from '../../../features/converter/useConverter';
 
 // Gallery-only: the real components in frozen states, so every theme is checked against what
@@ -86,19 +95,73 @@ function CalculatorSample() {
   );
 }
 
-/** The table's view of a state, from the real selector. */
-function tableOf(state: Partial<ConverterState>): TableView {
-  return selectTable({ ...initialState, ...state }, ENV);
+/** The table's view of a state, from the real selector; every unit shows without a rule. */
+function tableOf(state: Partial<ConverterState>, rule?: ViewRule): TableView {
+  return selectTable({ ...initialState, ...state }, rule ? { ...ENV, rule } : ENV);
+}
+
+/** Names and copy buttons on, the way the table showed before Settings. */
+const NAMED: Display = { ...FRESH_DISPLAY, names: 'both', copy: true, places: null };
+
+/** A table in a frozen state: nothing it does changes anything. */
+function TableSample({
+  view,
+  title,
+  display = FRESH_DISPLAY,
+  rule,
+  cursor = -1,
+  copied = null,
+  editing = false,
+  hiddenOpen = false,
+  itemId,
+}: {
+  view: TableView;
+  title: string;
+  display?: Display;
+  rule?: ViewRule;
+  cursor?: number;
+  copied?: string | null;
+  editing?: boolean;
+  hiddenOpen?: boolean;
+  itemId: (index: number) => string;
+}) {
+  const id = useId();
+  if (view.kind !== 'units') return null;
+  return (
+    <ConversionTable<TableRow>
+      id={id}
+      title={title}
+      sections={view.sections}
+      hidden={view.hidden}
+      every={sectionsOf(view.all, ENV.system)}
+      message={view.message}
+      display={display}
+      locale={ENV.locale}
+      cursor={cursor}
+      itemId={itemId}
+      copied={copied}
+      onPick={noop}
+      onCopy={noop}
+      editing={editing}
+      hiddenOpen={hiddenOpen}
+      isShown={(row) => !rule || row.inBox || shows(row.unit, rule, ENV.system)}
+      onChoose={noop}
+      onEditing={noop}
+      onHiddenOpen={noop}
+    />
+  );
 }
 
 /**
  * The table's pieces in frozen states, from the real table view: the category menu before and
  * after a category is chosen; the start's categories, the cursor on one; 250 mL in every unit of
- * volume, milliliters marked as the unit in the box, the cursor on cups and one copy confirmed;
- * Area chosen with no unit, each value a dash, the symbols lined up on their last letter with
- * their exponents hanging after it; a million square kilometers in a phone's width, the names
- * given way in every row and the exponent markers bold; a value with no answer; and the matches for
- * "250 p" from every category. The tables' titles are for screen readers; on the page the
+ * volume in its sections, names and copy buttons on, milliliters marked as the unit in the box,
+ * the cursor on cups and one copy confirmed; Area chosen with no unit, as a fresh visit shows it,
+ * each value a dash, the symbols lined up on their last letter with their exponents hanging after
+ * it; a million square kilometers in a phone's width, the names given way in every row and the
+ * exponent markers bold; 6.3 feet as decimals with their fractions (Both); a fresh visit's volume
+ * with its Hidden list open, and in Edit; a value with no answer; and the matches for "250 p" from
+ * every category, the hidden ones shown. The tables' titles are for screen readers; on the page the
  * category menu over the box names them.
  */
 function TableSamples() {
@@ -109,7 +172,10 @@ function TableSamples() {
   const values = tableOf({ text: '250', unit: 'milliliter', category: 'volume' });
   const dashes = tableOf({ category: 'area' });
   const narrow = tableOf({ text: '1000000', unit: 'square-kilometer', category: 'area' });
-  const matches = tableOf({ text: '250 p' });
+  const matches = tableOf({ text: '250 p' }, FRESH_RULE);
+  const feet = tableOf({ text: '6.3', unit: 'foot', category: 'length' });
+  const fresh = tableOf({ text: '2', unit: 'us-cup', category: 'volume' }, FRESH_RULE);
+  const tooLarge = tableOf({ text: '1e400', unit: 'meter', category: 'length' });
   const cups = values.kind === 'units' ? values.rows.findIndex((row) => row.id === 'us-cup') : -1;
   return (
     <>
@@ -126,58 +192,44 @@ function TableSamples() {
           onPick={noop}
         />
       )}
-      {values.kind === 'units' && (
-        <ConversionTable
-          id={`${id}-values`}
-          title="Volume"
-          rows={values.rows}
-          message={null}
-          cursor={cups}
-          itemId={itemIds('values')}
-          copied="liter"
-          onPick={noop}
-          onCopy={noop}
-        />
-      )}
-      {dashes.kind === 'units' && (
-        <ConversionTable
-          id={`${id}-dashes`}
-          title="Area, no unit yet"
-          rows={dashes.rows}
-          message={null}
-          cursor={-1}
-          itemId={itemIds('dashes')}
-          copied={null}
-          onPick={noop}
-          onCopy={noop}
-        />
-      )}
-      {narrow.kind === 'units' && (
-        <div className="max-w-80">
-          <ConversionTable
-            id={`${id}-narrow`}
-            title="Area, on a phone"
-            rows={narrow.rows}
-            message={null}
-            cursor={-1}
-            itemId={itemIds('narrow')}
-            copied={null}
-            onPick={noop}
-            onCopy={noop}
-          />
-        </div>
-      )}
-      <ConversionTable
-        id={`${id}-message`}
-        title="Length"
-        rows={[]}
-        message="Too large to convert"
-        cursor={-1}
-        itemId={itemIds('message')}
-        copied={null}
-        onPick={noop}
-        onCopy={noop}
+      <TableSample
+        view={values}
+        title="Volume"
+        display={NAMED}
+        cursor={cups}
+        copied="liter"
+        itemId={itemIds('values')}
       />
+      <TableSample view={dashes} title="Area, no unit yet" itemId={itemIds('dashes')} />
+      <div className="max-w-80">
+        <TableSample
+          view={narrow}
+          title="Area, on a phone"
+          display={NAMED}
+          itemId={itemIds('narrow')}
+        />
+      </div>
+      <TableSample
+        view={feet}
+        title="Length, decimals and fractions"
+        display={{ ...FRESH_DISPLAY, names: 'both', format: 'both' }}
+        itemId={itemIds('both')}
+      />
+      <TableSample
+        view={fresh}
+        title="Volume, its hidden units"
+        rule={FRESH_RULE}
+        hiddenOpen
+        itemId={itemIds('hidden')}
+      />
+      <TableSample
+        view={fresh}
+        title="Volume, in Edit"
+        rule={FRESH_RULE}
+        editing
+        itemId={itemIds('edit')}
+      />
+      <TableSample view={tooLarge} title="Length" itemId={itemIds('message')} />
       {matches.kind === 'matches' && (
         <UnitMatches
           id={`${id}-matches`}
@@ -188,6 +240,10 @@ function TableSamples() {
           cursor={1}
           itemId={itemIds('matches')}
           onPick={noop}
+          hidden={matches.hidden}
+          revealed
+          onReveal={noop}
+          symbolOnly={false}
         />
       )}
     </>

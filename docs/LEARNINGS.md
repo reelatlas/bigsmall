@@ -644,3 +644,18 @@ Format:
 
 **What happened.** A check meant to draw itself in would have started hidden (a stroke offset its full length) and animated to drawn. This site's reduced-motion rule stops every animation outright (`animation: none !important`), so under it the check would have stayed hidden, the confirmation lost.
 **Rule.** Animate from the hidden state to the resting one (`@keyframes … { from { … } }`, the rule's own style the finished look), never the other way, so stopping the animation leaves what it was revealing. `check-draw` in `global.css` does so.
+
+## 2026-10-11 — A listbox holds options and groups, never a button
+
+**What happened.** The matches offered hidden units with a line and a Show them button inside the listbox, between the groups. A listbox may hold only options and groups of options; a focusable control inside one breaks the combobox pattern and axe's required-children rule.
+**Rule.** A control that acts on a list sits outside it, in the card beside the listbox (the matches' line under it); what it adds to the list goes in as options (the revealed hidden units, a group named Hidden), so the field's cursor reaches them as it reaches the rest.
+
+## 2026-10-11 — A popover's Escape on a toolbar control needs the capture phase
+
+**What happened.** Escape on the Settings icon was meant to close its panel and keep focus there. The page's toolbar controller (layouts/Base.astro), registered first, answered Escape on any tool by moving focus to the box, and the panel then closed only because focus had left it.
+**Rule.** A popover opened from a toolbar control listens for Escape in the capture phase on the document and marks it handled (`preventDefault`); the toolbar controller skips handled keys, so the open popover closes first, as an open header menu does, and the next Escape goes back to the box.
+
+## 2026-10-11 — Waiting on animations: a cancelled one has settled
+
+**What happened.** The browser tests' `settled` helper waited on every animation's `finished` promise before running axe. A transition cancelled on the way (a list redrawn under it) rejects that promise with an AbortError, which failed a test with nothing wrong on the page.
+**Rule.** Wait on `animation.finished.catch(() => undefined)`: a cancelled animation is as settled as a finished one.

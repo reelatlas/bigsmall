@@ -13,6 +13,15 @@ import {
   type UnitPreference,
 } from '@bigsmall/core';
 import { TYPING_CHUNK_MS } from '../../lib/timing';
+import {
+  SECTION_LABEL,
+  sectionOf,
+  sectionsOf,
+  shows,
+  SYSTEM_KEYS,
+  type Section,
+  type ViewRule,
+} from './settings';
 
 /**
  * The converter's state and the pure reducer over it (docs/UX-SPEC.md §1, §7, §9): one box, the
@@ -223,11 +232,19 @@ export interface StartView extends TableViewBase {
   kind: 'start';
 }
 
-/** A category's units in the listed order: with values once the box has a number and a unit, a dash for each until then. */
+/**
+ * A category's units: with values once the box has a number and a unit, a dash for each until
+ * then. Those the settings show are in their sections (docs/UX-SPEC.md §3), and `rows` is them in
+ * that order, the order the cursor moves in; those they hide wait in `hidden`, in theirs.
+ */
 export interface UnitsView extends TableViewBase {
   kind: 'units';
   category: CategoryId;
   rows: TableRow[];
+  sections: Section<TableRow>[];
+  hidden: Section<TableRow>[];
+  /** Every row, shown or hidden: what the table's columns are sized to, so nothing moves. */
+  all: TableRow[];
   /** In place of the rows when the box's value has no answer: "Too large to convert". */
   message: string | null;
 }
@@ -246,6 +263,15 @@ export interface MatchesView extends TableViewBase {
   rows: MatchRow[];
   /** How many units match, per category with any match; one that matched by name alone counts 0. */
   counts: Partial<Record<CategoryId, number>>;
+  /** The units that match but the settings hide, with their section's name, offered apart. */
+  hidden: HiddenMatch[];
+}
+
+/** A hidden unit that matches, with the name of the section it would show in. */
+export interface HiddenMatch {
+  unit: Unit;
+  category: Category;
+  section: string;
 }
 
 export type TableView = StartView | UnitsView | MatchesView;
@@ -253,7 +279,12 @@ export type TableView = StartView | UnitsView | MatchesView;
 export interface TableOptions extends NumberEnv {
   /** The visitor's unit family, listed first. */
   system: UnitPreference;
+  /** Which units show (settings.ts); without one, every unit does. */
+  rule?: ViewRule;
 }
+
+/** Every system switched on and no unit chosen on its own: every unit shows. */
+const SHOW_ALL: ViewRule = { shown: new Set(SYSTEM_KEYS), overrides: new Map() };
 
 /** Every unit and category, specialist ones too: the table has no basic and advanced modes (docs/UX-SPEC.md §3). */
 const EVERY_TIER = 'all';
@@ -290,6 +321,21 @@ function selectUnits(
   }).results.flatMap((result) => (result.kind === 'unit' ? [result.unit] : []));
   const kind = getCategory(category)?.name.toLowerCase() ?? '';
   const base = { ...shared, kind: 'units', category } as const;
+  const rule = options.rule ?? SHOW_ALL;
+  /** The rows as the settings arrange them: the shown ones in their sections, the hidden apart. */
+  const arranged = (all: TableRow[]) => {
+    const isShown = (row: TableRow) => row.inBox || shows(row.unit, rule, options.system);
+    const sections = sectionsOf(all.filter(isShown), options.system);
+    return {
+      rows: sections.flatMap((section) => section.rows),
+      sections,
+      hidden: sectionsOf(
+        all.filter((row) => !isShown(row)),
+        options.system,
+      ),
+      all,
+    };
+  };
 
   const problem = parsed.outOfRange ?? parsed.invalid;
   if (unit && problem) {
@@ -297,6 +343,9 @@ function selectUnits(
     return {
       ...base,
       rows: [],
+      sections: [],
+      hidden: [],
+      all: [],
       message: NO_ANSWER_MESSAGES[problem].long,
       announcement:
         problem === 'large' || problem === 'small'
@@ -307,18 +356,23 @@ function selectUnits(
 
   if (!unit || parsed.value === undefined) {
     // Nothing to convert yet: every unit, a dash for its value, so the table stays in place.
-    const rows = listed.map((target) => emptyRow(target, unit));
-    return { ...base, rows, message: null, announcement: `${rows.length} units of ${kind}` };
+    const view = arranged(listed.map((target) => emptyRow(target, unit)));
+    return {
+      ...base,
+      ...view,
+      message: null,
+      announcement: `${view.rows.length} units of ${kind}`,
+    };
   }
 
   const value = parsed.value;
-  const rows = listed.map((target) => valueRow(target, unit, value, options.locale));
+  const view = arranged(listed.map((target) => valueRow(target, unit, value, options.locale)));
   const from = spokenAmount(parsed, unit, options.locale);
   return {
     ...base,
-    rows,
+    ...view,
     message: null,
-    announcement: `${from} in ${rows.length} units of ${kind}`,
+    announcement: `${from} in ${view.rows.length} units of ${kind}`,
   };
 }
 
@@ -374,11 +428,20 @@ function selectMatches(
     prefer: current,
     limit: MATCH_LIMIT,
   });
+  const rule = options.rule ?? SHOW_ALL;
+  const hidden: HiddenMatch[] = [];
   const ranked = results.flatMap((result): MatchRow[] => {
     if (result.kind === 'category') return [{ kind: 'category', category: result.category }];
     const category = getCategory(result.unit.category);
+    if (!category) return [];
     const inBox = result.unit.id === unit?.id;
-    return category ? [{ kind: 'unit', unit: result.unit, category, inBox }] : [];
+    // A hidden unit leaves the matches and is offered apart, under its section's name.
+    if (!inBox && !shows(result.unit, rule, options.system)) {
+      const section = SECTION_LABEL[sectionOf(result.unit, options.system)];
+      hidden.push({ unit: result.unit, category, section });
+      return [];
+    }
+    return [{ kind: 'unit', unit: result.unit, category, inBox }];
   });
   const order: CategoryId[] = [];
   for (const row of ranked) if (!order.includes(row.category.id)) order.push(row.category.id);
@@ -391,10 +454,21 @@ function selectMatches(
     counts[row.category.id] = (counts[row.category.id] ?? 0) + (row.kind === 'unit' ? 1 : 0);
   }
   const announcement =
-    rows.length === 0
-      ? 'No unit matches'
-      : `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`;
-  return { ...base, kind: 'matches', category: current, query, rows, counts, announcement };
+    rows.length > 0
+      ? `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`
+      : hidden.length > 0
+        ? 'Only hidden units match'
+        : 'No unit matches';
+  return {
+    ...base,
+    kind: 'matches',
+    category: current,
+    query,
+    rows,
+    counts,
+    hidden,
+    announcement,
+  };
 }
 
 /**

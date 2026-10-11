@@ -1,12 +1,21 @@
 import type { Category, CategoryId, Unit } from '@bigsmall/core';
 import { useId } from 'react';
 import { CURSOR_ROW, cx, LIST_CARD, rowFill, unitSymbol } from '../lib/recipes';
+import { Button } from './Button';
 import { MatchedText } from './MatchedText';
 
 /** A match as the list shows it: a unit, or a category whose name matched, to open. */
 export type UnitMatch =
   | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean }
   | { kind: 'category'; category: Category };
+
+/** A unit that matches but the settings hide: offered apart, with its category and section. */
+export interface HiddenUnitMatch {
+  unit: Unit;
+  category: Category;
+  /** The section it would show in: "Specialist". */
+  section: string;
+}
 
 export interface UnitMatchesProps {
   /** The listbox's id, which the field's combobox controls. */
@@ -23,8 +32,15 @@ export interface UnitMatchesProps {
   cursor: number;
   /** The id of a match, which the field points at while the cursor is on it. */
   itemId: (index: number) => string;
-  /** A match was clicked or tapped, by index. */
+  /** A match was clicked or tapped, by index; the hidden ones, once shown, count on after the rest. */
   onPick: (index: number) => void;
+  /** The hidden units that match (docs/UX-SPEC.md §3). */
+  hidden: readonly HiddenUnitMatch[];
+  /** Whether they are shown, under Hidden after the rest. */
+  revealed: boolean;
+  onReveal: (revealed: boolean) => void;
+  /** Symbol only: the names leave the screen, kept for screen readers (docs/UX-SPEC.md §7). */
+  symbolOnly: boolean;
 }
 
 /** The columns of a match: the symbol, then the name, both left-aligned so they read down easily. */
@@ -45,6 +61,10 @@ export function UnitMatches({
   cursor,
   itemId,
   onPick,
+  hidden,
+  revealed,
+  onReveal,
+  symbolOnly,
 }: UnitMatchesProps) {
   const groupId = useId();
   const groups: { category: Category; first: number; items: UnitMatch[] }[] = [];
@@ -54,11 +74,25 @@ export function UnitMatches({
     else groups.push({ category: match.category, first: index, items: [match] });
   });
 
+  const hiddenHeaderId = `${groupId}-hidden`;
+  /** A unit's symbol and name, as every match writes them; the name for screen readers alone with Symbol only. */
+  const unitText = (unit: Unit) => (
+    <>
+      <span className={cx('whitespace-nowrap', unitSymbol())}>
+        <MatchedText text={unit.symbol} query={query} className="text-ink" />
+      </span>
+      <span className={symbolOnly ? 'sr-only' : 'min-w-0 text-ink'}>
+        <MatchedText text={unit.plural} query={query} className="font-semibold" />
+      </span>
+    </>
+  );
+
   return (
     <div className={cx(LIST_CARD, 'p-2')}>
-      {matches.length === 0 ? (
+      {matches.length === 0 && hidden.length === 0 && (
         <p className="px-2 py-2.5 text-sm text-ink-muted">{notFound}</p>
-      ) : (
+      )}
+      {(matches.length > 0 || (revealed && hidden.length > 0)) && (
         <div id={id} role="listbox" aria-label="Matching units" className={ROWS}>
           {groups.map((group, groupIndex) => {
             const headerId = `${groupId}-${group.category.id}`;
@@ -105,21 +139,10 @@ export function UnitMatches({
                     >
                       {match.kind === 'unit' ? (
                         <>
-                          <span className={cx('whitespace-nowrap', unitSymbol())}>
-                            <MatchedText
-                              text={match.unit.symbol}
-                              query={query}
-                              className="text-ink"
-                            />
-                          </span>
-                          <span className="min-w-0 text-ink">
-                            <MatchedText
-                              text={match.unit.plural}
-                              query={query}
-                              className="font-semibold"
-                            />
-                            <span className="sr-only">, {match.category.name}</span>
-                            {match.inBox && <span className="sr-only">, in the box</span>}
+                          {unitText(match.unit)}
+                          <span className="sr-only">
+                            , {match.category.name}
+                            {match.inBox && ', in the box'}
                           </span>
                         </>
                       ) : (
@@ -138,6 +161,93 @@ export function UnitMatches({
               </div>
             );
           })}
+          {hidden.length > 0 && revealed && (
+            <div
+              role="group"
+              aria-labelledby={hiddenHeaderId}
+              className="col-span-2 grid grid-cols-subgrid gap-y-0.5"
+            >
+              <div
+                id={hiddenHeaderId}
+                className="col-span-2 px-2 pt-1 pb-1 text-xs font-medium text-ink-muted"
+              >
+                Hidden
+              </div>
+              {hidden.map((match, offset) => {
+                const index = matches.length + offset;
+                return (
+                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field
+                  <div
+                    key={match.unit.id}
+                    id={itemId(index)}
+                    role="option"
+                    tabIndex={-1}
+                    aria-selected={index === cursor}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => onPick(index)}
+                    className={cx(
+                      CURSOR_ROW,
+                      'col-span-2 grid grid-cols-subgrid items-center',
+                      rowFill(false, index === cursor),
+                    )}
+                  >
+                    <span className={cx('whitespace-nowrap', unitSymbol())}>
+                      <MatchedText text={match.unit.symbol} query={query} className="text-ink" />
+                    </span>
+                    <span className="flex min-w-0 items-baseline gap-2">
+                      <span className={symbolOnly ? 'sr-only' : 'min-w-0 truncate text-ink'}>
+                        <MatchedText
+                          text={match.unit.plural}
+                          query={query}
+                          className="font-semibold"
+                        />
+                      </span>
+                      <span className="sr-only">, hidden, {match.category.name}</span>
+                      <span
+                        aria-hidden="true"
+                        className="ml-auto text-xs whitespace-nowrap text-ink-muted"
+                      >
+                        {match.category.name} · {match.section}
+                      </span>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+      {/*
+       * Hidden units that match leave the list; a line says so and offers them, so nothing
+       * typed meets a bare "No unit matches" while a hidden unit matches (docs/UX-SPEC.md §3).
+       */}
+      {hidden.length > 0 && (
+        <div
+          className={cx(
+            'flex min-h-11 items-center justify-between gap-2',
+            matches.length > 0 && 'mt-1.5 border-t border-line pt-1',
+          )}
+        >
+          <span className="px-2 text-sm text-ink-muted">
+            {matches.length === 0 ? (
+              'Only hidden units match'
+            ) : (
+              <>
+                <span className="font-numeric">{hidden.length}</span> hidden{' '}
+                {hidden.length === 1 ? 'unit also matches' : 'units also match'}
+              </>
+            )}
+          </span>
+          <Button
+            variant="ghost"
+            nested
+            aria-expanded={revealed}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => onReveal(!revealed)}
+            className="text-sm"
+          >
+            {revealed ? 'Hide them' : 'Show them'}
+          </Button>
         </div>
       )}
     </div>

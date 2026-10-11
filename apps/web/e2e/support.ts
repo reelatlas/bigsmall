@@ -16,9 +16,15 @@ export async function ready(page: Page) {
   await page.locator('section[data-hydrated]').waitFor();
 }
 
-/** Theme tokens transition; axe must see the settled colors, not a frame in between. */
+/**
+ * Theme tokens transition; axe must see the settled colors, not a frame in between. A transition
+ * cancelled on the way (a list redrawn under it) has settled too: its promise rejects, so it is
+ * waited on without failing.
+ */
 export async function settled(page: Page) {
-  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+  await page.evaluate(() =>
+    Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined))),
+  );
 }
 
 /** Runs axe on the page as it is and fails on any violation. */
@@ -56,3 +62,40 @@ export const box = (page: Page) => page.getByRole('combobox', { name: 'Value', e
 
 /** The converter's category menu trigger, before a category is chosen or after. */
 export const menu = (page: Page) => page.getByRole('button', { name: /^Category/ });
+
+/** The converter's Settings button, in its toolbar (not the dev toolbar's). */
+export const settingsButton = (page: Page) =>
+  page
+    .getByRole('toolbar', { name: 'Tools' })
+    .getByRole('button', { name: 'Settings', exact: true });
+
+/**
+ * Opens Settings, picks each choice by its label ("All units", "Symbol and name", "No limit"),
+ * turns a switch over by its name ("Copy buttons"), or presses a button ("Unhide units"), then
+ * closes it with Escape.
+ */
+export async function setSettings(page: Page, ...choices: string[]) {
+  await settingsButton(page).click();
+  const panel = page.getByRole('dialog', { name: 'Settings' });
+  for (const choice of choices) {
+    const toggle = panel.getByRole('switch', { name: choice });
+    const button = panel.getByRole('button', { name: new RegExp(`^${choice}`) });
+    if (await toggle.count()) await toggle.click();
+    else if (await button.count()) await button.click();
+    else
+      await panel
+        .locator('label')
+        .filter({ hasText: new RegExp(`^${choice}$`) })
+        .click();
+  }
+  await page.keyboard.press('Escape');
+  await expect(panel).toHaveCount(0);
+}
+
+/**
+ * The table as it was before Settings (ADR 0017): every unit, names, copy buttons, and six
+ * significant digits, for tests whose subject is something else.
+ */
+export async function showEverything(page: Page) {
+  await setSettings(page, 'All units', 'Symbol and name', 'Copy buttons', 'No limit');
+}

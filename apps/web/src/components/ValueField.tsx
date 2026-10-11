@@ -39,6 +39,8 @@ export interface ValueFieldProps {
   };
   /** Rendered at the end of the field: the copy button. */
   trailing?: ReactNode;
+  /** Symbol only (docs/UX-SPEC.md §7): the chip shows its symbol alone, as when it lacks the room. */
+  symbolOnly?: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
   /** The chip's body was clicked or tapped. */
@@ -72,6 +74,7 @@ export function ValueField({
   describedBy,
   popup,
   trailing,
+  symbolOnly = false,
   onChange,
   onKeyDown,
   onChipOpen,
@@ -80,6 +83,8 @@ export function ValueField({
   const rowRef = useRef<HTMLDivElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
   const chipNameRef = useRef<HTMLSpanElement>(null);
+  /** No name to measure: with Symbol only the chip never shows one, so the number has its room. */
+  const noName = useRef<HTMLSpanElement>(null);
   const inputId = `${useId()}-input`;
 
   // The row is measured, not counted: in any box, wide or narrow, the chip keeps its name while
@@ -88,7 +93,7 @@ export function ValueField({
     () => ({ ref: textLayerRef, base: TEXT_LAYER, steps: NUMBER_SIZES }),
     [],
   );
-  const fit = useFieldFit(rowRef, chipNameRef, fitText);
+  const fit = useFieldFit(rowRef, symbolOnly ? noName : chipNameRef, fitText);
   const sizeClass = NUMBER_SIZES[fit.step];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
@@ -143,7 +148,7 @@ export function ValueField({
           // readers still reach both buttons.
           <UnitChip
             unit={unit}
-            compact={fit.compact}
+            compact={symbolOnly || fit.compact}
             nameRef={chipNameRef}
             onOpen={onChipOpen}
             onRemove={onChipRemove}

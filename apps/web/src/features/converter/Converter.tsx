@@ -9,6 +9,7 @@ import {
   EraserIcon,
   LinkIcon,
   RedoIcon,
+  SlidersIcon,
   UndoIcon,
 } from '../../components/icons';
 import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
@@ -20,6 +21,7 @@ import { pressedByTouch } from '../../lib/modality';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
+import { SettingsPanel } from './SettingsPanel';
 import { TableLayout } from './TableLayout';
 import { urlFor } from './url';
 import { useConverter } from './useConverter';
@@ -41,16 +43,30 @@ function confirmation(key: Confirmable): string {
 const HINT = 'Type a number, unit, or both to compare all at once.';
 
 /**
- * The converter island (ADR 0012, ADR 0013, docs/UX-SPEC.md §1): the hint; the toolbar's
- * buttons (calculator, undo, redo, clear all), which TableLayout sets in a row after the category
- * menu; the box and its table, with the calculator when open between them or beside them (§8);
- * and the live regions. It draws the Copy URL button into the header's slot (§7).
+ * The converter island (ADR 0012, ADR 0013, ADR 0017, docs/UX-SPEC.md §1): the hint; the
+ * toolbar's buttons, the calculator and Settings after the category menu and undo, redo, and
+ * clear all at its right end, which TableLayout sets in a row; Settings' panel; the box and its
+ * table, with the calculator when open between them or beside them (§8); and the live regions. It
+ * draws the Copy URL button into the header's slot (§7).
  */
 export function Converter() {
   const hydrated = useIsHydrated();
   const inputRef = useRef<HTMLInputElement>(null);
-  const { state, box, table, env, dispatch, canUndo, canRedo, announcement } =
-    useConverter(inputRef);
+  const {
+    state,
+    box,
+    table,
+    env,
+    dispatch,
+    canUndo,
+    canRedo,
+    announcement,
+    settings,
+    updateSettings,
+  } = useConverter(inputRef);
+  const settingsId = useId();
+  const settingsToggleId = useId();
+  const [settingsOpen, setSettingsOpen] = useState(false);
   // Tooltips name the platform's keys; until hydration they read as on the server (Ctrl).
   const apple = hydrated && isApplePlatform();
   const hintId = useId();
@@ -136,6 +152,41 @@ export function Converter() {
     return () => document.removeEventListener('keydown', onKeyDown);
   });
 
+  /*
+   * Settings closes on Escape, which brings focus back to its button, a press outside it and its
+   * button, or focus moving outside them; never on focus merely lost, as when a reset turns itself
+   * off or Reset settings takes the fraction sizes away (docs/LEARNINGS.md, "A panel that closes
+   * on blur"). In a layout effect, so the listeners are there before the next press. Escape is
+   * heard in the capture phase and marked handled, so on the Settings button it closes the panel
+   * first, before the toolbar's Escape goes back to the box, as an open menu's does.
+   */
+  useLayoutEffect(() => {
+    if (!settingsOpen) return undefined;
+    const inside = (target: EventTarget | null) =>
+      target instanceof Node &&
+      [settingsId, settingsToggleId].some((id) => document.getElementById(id)?.contains(target));
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || !inside(event.target)) return;
+      event.preventDefault();
+      setSettingsOpen(false);
+      document.getElementById(settingsToggleId)?.focus();
+    };
+    const onPress = (event: PointerEvent) => {
+      if (!inside(event.target)) setSettingsOpen(false);
+    };
+    const onFocus = (event: FocusEvent) => {
+      if (!inside(event.target)) setSettingsOpen(false);
+    };
+    document.addEventListener('keydown', onKey, true);
+    document.addEventListener('pointerdown', onPress);
+    document.addEventListener('focusin', onFocus);
+    return () => {
+      document.removeEventListener('keydown', onKey, true);
+      document.removeEventListener('pointerdown', onPress);
+      document.removeEventListener('focusin', onFocus);
+    };
+  }, [settingsOpen, settingsId, settingsToggleId]);
+
   /** Keys change only the calculator's own entry (calculator.ts); the box waits for a send. */
   const press = (key: CalculatorKey) => {
     const next = pressKey(entry, key, env);
@@ -170,11 +221,11 @@ export function Converter() {
     if (row?.value != null) copy(String(row.value), `row-${unitId}`);
   };
 
-  // The box's copy button, whenever it holds a number: out of the Tab order, since Ctrl/⌘+C
-  // copies from the field itself. A check in the success color confirms the copy (the status line
-  // announces it); useCopied decides when it reverts.
+  // The box's copy button, with copy buttons on and whenever it holds a number: out of the Tab
+  // order, since Ctrl/⌘+C copies from the field itself. A check in the success color confirms the
+  // copy (the status line announces it); useCopied decides when it reverts.
   const value = box.parsed.value;
-  const copyButton = value !== undefined && (
+  const copyButton = settings.display.copy && value !== undefined && (
     <Button
       variant="ghost"
       square
@@ -237,7 +288,7 @@ export function Converter() {
       </p>
 
       <TableLayout
-        tools={
+        leadingTools={
           <>
             <Button
               variant="ghost"
@@ -259,8 +310,24 @@ export function Converter() {
             >
               <CalculatorIcon />
             </Button>
-            {/* The calculator works out a number; undo and redo step through the history. */}
-            <ToolbarDivider />
+            <Button
+              variant="ghost"
+              square
+              id={settingsToggleId}
+              data-tool="settings"
+              aria-label="Settings"
+              title="Settings"
+              aria-expanded={settingsOpen}
+              aria-controls={settingsOpen ? settingsId : undefined}
+              on={settingsOpen}
+              onClick={() => setSettingsOpen((open) => !open)}
+            >
+              <SlidersIcon />
+            </Button>
+          </>
+        }
+        tools={
+          <>
             <Button
               variant="ghost"
               square
@@ -300,6 +367,18 @@ export function Converter() {
             </Button>
           </>
         }
+        panel={
+          settingsOpen && (
+            <SettingsPanel
+              id={settingsId}
+              settings={settings}
+              preference={env.system}
+              onSettings={updateSettings}
+            />
+          )
+        }
+        settings={settings}
+        onSettings={updateSettings}
         inputRef={inputRef}
         box={box}
         table={table}

@@ -40,7 +40,8 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
   await expect(use).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(box(page)).toHaveValue('36');
-  await expect(page.locator('[data-row="liter"]')).toContainText('0.036');
+  // Two places, as a fresh visit writes values.
+  await expect(page.locator('[data-row="liter"]')).toContainText('0.04');
   // After a send, focus is back on =, so Enter cannot send the same number again.
   await expect(key('equals')).toBeFocused();
   await expect(page.getByRole('status').filter({ hasText: 'Sent to the value' })).toHaveCount(1);

@@ -1,7 +1,7 @@
 # 0016 — Every unit in the table: specialist units listed with the everyday ones, no modes
 
 Date: 2026-10-08
-Status: accepted
+Status: accepted; amended by 0017 (the specialist units wait under Hidden on a fresh visit, one tap away)
 
 ## Context
 

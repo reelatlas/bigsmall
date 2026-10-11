@@ -45,7 +45,8 @@ test('pages tell search engines and link previews what they are; dev pages stay 
 test('a conversion loads from the URL', async ({ page }) => {
   await page.goto('/?a=mile&v=1');
   await expect(box(page)).toHaveValue('1');
-  await expect(page.locator('[data-row="kilometer"]')).toContainText('1.60934');
+  // Two places, as a fresh visit writes values.
+  await expect(page.locator('[data-row="kilometer"]')).toContainText('1.61');
 });
 
 test('every theme passes axe on the converter', async ({ page }) => {

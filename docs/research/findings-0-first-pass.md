@@ -575,3 +575,11 @@ Since the fifth tidy (2026-10-08): the settings lab, `SegmentedControl` and `Swi
 | Three exports of the lab used only in their own files                                | No longer exported                                                         |
 | The research doc said the Hidden list dims values; it lists units without them       | Corrected                                                                  |
 | The gallery paragraph did not name the settings' controls                            | It does                                                                    |
+
+## Thirty-second pass: Settings in the converter
+
+Sean asked for everything settled in the lab on the main page (2026-10-11).
+
+| Observation                                      | What changed                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Merge everything from the lab into the main page | Built into the converter (ADR 0017): the toolbar's new order with Settings, its panel, sections by system, the two layers, the Hidden list and Edit, search leaving hidden units out, Display (names, copy buttons, decimals, fractions, both, rounding) written by core, columns that hold still, and a fresh visit's settings; ADR 0016 amended (specialist units under Hidden by default) |

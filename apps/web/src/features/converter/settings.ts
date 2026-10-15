@@ -61,7 +61,7 @@ function categoryIsRegional(category: CategoryId): boolean {
 }
 
 /** The visitor's own section. */
-export function ownSection(preference: UnitPreference): SectionKey {
+function ownSection(preference: UnitPreference): SectionKey {
   if (preference === 'us') return 'us';
   if (preference === 'imperial') return 'uk';
   return 'metric';

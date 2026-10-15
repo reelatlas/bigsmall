@@ -252,9 +252,10 @@ type List = 'shown' | 'hidden';
  * which lists the shown units as Hidden lists its own, a checkbox, the symbol, and the name, with
  * no values, the hidden units staying in Hidden below, so a checkbox moves a unit between the two
  * (Sean, 2026-10-15). The table's controls (its foot, Edit, Hidden) take the arrows as a panel
- * does, Edit Escape too, and after a unit moves focus stays where it was, on the line that took
- * its place. The field keeps focus and its cursor moves
- * through the shown rows (aria-activedescendant on a grid, ADR 0012), so the rows are no Tab
+ * does, out of Edit carrying on from the box's rows (ADR 0014); Escape ends Edit, then folds an
+ * open Hidden; and after a unit moves focus stays where it was, on the line that took its place.
+ * The field keeps focus and its cursor moves through the shown rows (aria-activedescendant on a
+ * grid, ADR 0012), so the rows are no Tab
  * stops; a click or tap on one is the field's to act on, and focus stays in the field. With copy
  * buttons on, each row's sits in a cell of its own beside it, out of the Tab order like the box's
  * own. Columns line up across rows through a subgrid (ROWS), each as wide as the widest it could

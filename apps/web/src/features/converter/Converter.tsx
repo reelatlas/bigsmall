@@ -6,8 +6,8 @@ import {
   CalculatorIcon,
   CopiedIcon,
   EraserIcon,
-  FilterIcon,
   LinkIcon,
+  ListArrowIcon,
   RedoIcon,
   RulerIcon,
   UndoIcon,
@@ -317,7 +317,7 @@ export function Converter() {
               on={side === 'units'}
               onClick={() => toggleSettings('units')}
             >
-              <FilterIcon />
+              <ListArrowIcon />
             </Button>
             <Button
               variant="ghost"

@@ -139,11 +139,13 @@ export function CalculatorIcon(props: IconProps) {
   );
 }
 
-export function FilterIcon(props: IconProps) {
+export function ListArrowIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      {/* Three lines, each shorter: fewer shown, Settings' Units (Sean, 2026-10-15). */}
-      <path d="M4 6h16M7 12h10M10 18h4" />
+      {/* A list with an arrow up and down beside it: what shows, and in what order, Settings'
+          Units (Sean, 2026-10-15, from the icon lab; narrowing lines before). */}
+      <path d="M6 4v16M3.5 6.5L6 4l2.5 2.5M3.5 17.5L6 20l2.5-2.5" />
+      <path d="M12 6h9M12 12h9M12 18h9" />
     </Icon>
   );
 }

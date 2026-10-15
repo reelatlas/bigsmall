@@ -20,6 +20,7 @@ import {
   shows,
   SYSTEM_KEYS,
   type Section,
+  type SectionKey,
   type ViewRule,
 } from './settings';
 
@@ -281,6 +282,8 @@ export interface TableOptions extends NumberEnv {
   system: UnitPreference;
   /** Which units show (settings.ts); without one, every unit does. */
   rule?: ViewRule;
+  /** The sections' order (settings.ts); without one, a fresh visit's. */
+  order?: readonly SectionKey[];
 }
 
 /** Every system switched on and no unit chosen on its own: every unit shows. */
@@ -325,13 +328,14 @@ function selectUnits(
   /** The rows as the settings arrange them: the shown ones in their sections, the hidden apart. */
   const arranged = (all: TableRow[]) => {
     const isShown = (row: TableRow) => row.inBox || shows(row.unit, rule, options.system);
-    const sections = sectionsOf(all.filter(isShown), options.system);
+    const sections = sectionsOf(all.filter(isShown), options.system, options.order);
     return {
       rows: sections.flatMap((section) => section.rows),
       sections,
       hidden: sectionsOf(
         all.filter((row) => !isShown(row)),
         options.system,
+        options.order,
       ),
       all,
     };

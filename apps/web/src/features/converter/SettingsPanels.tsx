@@ -15,27 +15,24 @@ import {
 import { Switch } from '../../components/Switch';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
-import { TriCheckbox } from '../../components/TriCheckbox';
-import { cx, OPTION_ROW, PANEL_TITLE } from '../../lib/recipes';
+import { cx, PANEL_TITLE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
   customReady,
   hiddenByHand,
-  SECTION_LABEL,
   SHOW_PRESETS,
+  orderChanged,
   shownChoice,
-  SYSTEM_KEYS,
-  systemState,
   withCustomPicked,
   withoutHidden,
   withPresetPicked,
-  withSystem,
   type Display,
   type Settings,
   type ShowChoice,
   type ViewRule,
 } from './settings';
+import { SystemRows } from './SystemRows';
 
 const SUBHEAD = cx(PANEL_TITLE, 'text-xs');
 
@@ -189,16 +186,17 @@ function Reset({
  * Units (docs/UX-SPEC.md §1, §3; ADR 0017; Filter until Sean renamed it, 2026-10-15): what search
  * and the table show, in every category. The presets first, and Custom, the visitor's own set,
  * which lights the moment anything departs from every preset; picking a preset keeps that set
- * aside, and picking Custom brings it back. Then a switch per system, a dash while some of its
- * units are chosen on their own; then Show units you hid, which clears what Edit and the Hidden
- * list hid, the switches staying.
+ * aside, and picking Custom brings it back. Then the systems, in the order the table's sections
+ * follow, each a checkbox (a dash while some of its units are chosen on their own) and a handle to
+ * reorder it by (SystemRows); then Show units you hid, which clears what Edit and the Hidden list
+ * hid, the switches staying, and Reset order.
  */
 export function UnitsPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
   const { rule } = settings;
   const hiddenCount = hiddenByHand(rule);
   const setRule = (next: (rule: ViewRule) => ViewRule) =>
     onSettings((now) => ({ ...now, rule: next(now.rule) }));
-  const { copied: done, markCopied, pointerProps } = useCopied<'unhide'>();
+  const { copied: done, markCopied, pointerProps } = useCopied<'unhide' | 'order'>();
   return (
     <SidePanel title="Units" onClose={onClose}>
       <Choices<ShowChoice>
@@ -223,27 +221,10 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
           )
         }
       />
-      <div className="grid gap-1">
-        <fieldset className="grid">
-          <legend className="sr-only">Systems</legend>
-          {SYSTEM_KEYS.map((key) => {
-            // A dash while some of the system's units are chosen on their own; a press on a dash
-            // or a clear box shows them all, on a checked one hides them all.
-            const state = systemState(rule, key, preference);
-            return (
-              <label key={key} className={cx(OPTION_ROW, 'gap-2')}>
-                <TriCheckbox
-                  state={state}
-                  onChange={() =>
-                    setRule((now) => withSystem(now, key, state !== 'all', preference))
-                  }
-                />
-                {SECTION_LABEL[key]}
-              </label>
-            );
-          })}
-        </fieldset>
-      </div>
+      <fieldset className="grid">
+        <legend className="sr-only">Systems, in the table's order</legend>
+        <SystemRows settings={settings} preference={preference} onSettings={onSettings} />
+      </fieldset>
       <div className="flex flex-wrap items-center justify-between gap-x-2 border-t border-line pt-2">
         <Reset
           off={hiddenCount === 0}
@@ -257,8 +238,19 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
           Show units you hid
           {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
         </Reset>
+        <Reset
+          off={!orderChanged(settings, preference)}
+          done={done === 'order'}
+          onReset={() => {
+            onSettings((now) => ({ ...now, order: null }));
+            markCopied('order');
+          }}
+          pointer={pointerProps('order')}
+        >
+          Reset order
+        </Reset>
         <p role="status" className="sr-only">
-          {done === 'unhide' ? 'Units shown' : ''}
+          {done === 'unhide' ? 'Units shown' : done === 'order' ? 'Order reset' : ''}
         </p>
       </div>
     </SidePanel>

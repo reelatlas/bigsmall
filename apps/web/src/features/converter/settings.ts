@@ -88,17 +88,31 @@ export interface Section<T> {
 }
 
 /**
- * Rows in their sections, every section headed, even a section of one: the visitor's own first,
- * then the other systems in the listed order, then Other, then Specialty. Rows keep the listed
- * order within their section.
+ * The order of the table's sections, by their systems' switches, on a fresh visit: the visitor's
+ * own first, then the others as SYSTEM_KEYS lists them, Specialty last (ADR 0011). Units' rows
+ * reorder it, in every category (Sean, 2026-10-15).
+ */
+export function defaultOrder(preference: UnitPreference): readonly SectionKey[] {
+  const own = ownSection(preference);
+  return [own, ...SYSTEM_KEYS.filter((key) => key !== own)];
+}
+
+/**
+ * Rows in their sections, every section headed, even a section of one, in `order`: Standard first
+ * (it is a category's only everyday section), then the systems as ordered, Other after the last
+ * of Metric, US, and UK. Rows keep the listed order within their section.
  */
 export function sectionsOf<T extends { unit: Unit }>(
   rows: readonly T[],
   preference: UnitPreference,
+  order: readonly SectionKey[] = defaultOrder(preference),
 ): Section<T>[] {
-  const own = ownSection(preference);
-  const rank = (key: SectionKey) =>
-    key === own || key === 'standard' ? 0 : key === 'specialist' ? 3 : key === 'other' ? 2 : 1;
+  const at = (key: SectionKey) => order.indexOf(key);
+  const rank = (key: SectionKey) => {
+    if (key === 'standard') return -1;
+    if (key === 'other') return Math.max(at('metric'), at('us'), at('uk')) + 0.5;
+    return at(key);
+  };
   const sections = new Map<SectionKey, Section<T>>();
   for (const row of rows) {
     const key = sectionOf(row.unit, preference);
@@ -309,9 +323,39 @@ export interface Settings {
    * the switches and the units chosen on their own. Null until there is one.
    */
   kept: ViewRule | null;
+  /** The sections' order as the visitor set it in Units, or null for a fresh visit's (defaultOrder). */
+  order: readonly SectionKey[] | null;
 }
 
-export const FRESH_SETTINGS: Settings = { rule: FRESH_RULE, display: FRESH_DISPLAY, kept: null };
+export const FRESH_SETTINGS: Settings = {
+  rule: FRESH_RULE,
+  display: FRESH_DISPLAY,
+  kept: null,
+  order: null,
+};
+
+/** The sections' order in force. */
+export function orderOf(settings: Settings, preference: UnitPreference): readonly SectionKey[] {
+  return settings.order ?? defaultOrder(preference);
+}
+
+/** A system moved to place `to` (0 is first) in the order, in every category. */
+export function withOrder(
+  settings: Settings,
+  key: SectionKey,
+  to: number,
+  preference: UnitPreference,
+): Settings {
+  const order = orderOf(settings, preference).filter((each) => each !== key);
+  order.splice(Math.min(Math.max(to, 0), order.length), 0, key);
+  return { ...settings, order };
+}
+
+/** Whether the order differs from a fresh visit's, for Units' Reset order. */
+export function orderChanged(settings: Settings, preference: UnitPreference): boolean {
+  const fresh = defaultOrder(preference);
+  return orderOf(settings, preference).some((key, at) => key !== fresh[at]);
+}
 
 /**
  * A preset picked in Units: exactly its set; a custom set that was showing is kept aside, not lost,

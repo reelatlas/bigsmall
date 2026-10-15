@@ -135,6 +135,15 @@ export function FilterIcon(props: IconProps) {
   );
 }
 
+export function GripIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      {/* Six dots in two columns: a handle to drag a row by. */}
+      <path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01" strokeWidth="3" />
+    </Icon>
+  );
+}
+
 export function RulerIcon(props: IconProps) {
   return (
     <Icon {...props}>

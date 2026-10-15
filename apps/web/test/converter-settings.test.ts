@@ -6,8 +6,11 @@ import {
   FRESH_RULE,
   groupState,
   customReady,
+  defaultOrder,
   FRESH_SETTINGS,
   hiddenByHand,
+  orderChanged,
+  orderOf,
   presetKeys,
   presetOf,
   presetRule,
@@ -18,6 +21,7 @@ import {
   systemState,
   withChoice,
   withCustomPicked,
+  withOrder,
   withoutHidden,
   withPresetPicked,
   withSystem,
@@ -107,6 +111,25 @@ describe('settings: what shows', () => {
     expect(shownChoice(nanometer, 'us')).toBe('custom');
     expect(shownChoice(FRESH_RULE, 'us')).toBe('standard');
     expect(shownChoice(withSystem(FRESH_RULE, 'uk', false, 'us'), 'us')).toBe('custom');
+  });
+
+  it("orders the sections as set: the visitor's own first on a fresh visit, Standard first, Other after the regional systems", () => {
+    expect(defaultOrder('us')).toEqual(['us', 'metric', 'uk', 'specialist']);
+    expect(defaultOrder('metric')).toEqual(['metric', 'us', 'uk', 'specialist']);
+    const moved = withOrder(FRESH_SETTINGS, 'specialist', 0, 'us');
+    expect(orderOf(moved, 'us')).toEqual(['specialist', 'us', 'metric', 'uk']);
+    expect(orderChanged(moved, 'us')).toBe(true);
+    expect(orderChanged(withOrder(moved, 'specialist', 9, 'us'), 'us')).toBe(false);
+    for (const category of ['speed', 'pressure', 'time'] as const) {
+      const rows = unitsIn(category).map((each) => ({ unit: each }));
+      const present = new Set(rows.map((row) => sectionOf(row.unit, 'us')));
+      const order = ['uk', 'specialist', 'metric', 'us'] as const;
+      expect(sectionsOf(rows, 'us', order).map((section) => section.key)).toEqual(
+        ['standard', 'uk', 'specialist', 'metric', 'us', 'other'].filter((key) =>
+          present.has(key as never),
+        ),
+      );
+    }
   });
 
   it('keeps a custom set aside when a preset is picked, and Custom brings it back', () => {

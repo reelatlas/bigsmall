@@ -288,7 +288,7 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   await expect(row(page, 'nanometer')).toBeVisible();
   await settingsButton(page, 'Units').click();
   const units = settingsPanel(page, 'Units');
-  const specialty = units.getByLabel('Specialty');
+  const specialty = units.getByRole('checkbox', { name: 'Specialty' });
   await expect
     .poll(() => specialty.evaluate((input) => (input as HTMLInputElement).indeterminate))
     .toBe(true);
@@ -334,6 +334,80 @@ test("Custom lights for a set of the visitor's own; a preset keeps it aside, and
   await expect(custom).toBeChecked();
   await expect(row(page, 'us-teaspoon')).toHaveCount(0);
   await expectNoA11yViolations(page);
+});
+
+test("the systems reorder in Units, by a handle's Move menu or a drag, and the table's sections follow; Reset order brings a fresh visit's back", async ({
+  page,
+}) => {
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await settingsButton(page, 'Units').click();
+  const units = settingsPanel(page, 'Units');
+  const sections = () =>
+    table(page)
+      .locator('[data-section]')
+      .evaluateAll((all) => all.map((each) => each.getAttribute('data-section')));
+  await expect.poll(sections).toEqual(['us', 'metric', 'uk']);
+  // A press on a handle, with no drag, opens Move up and Move down.
+  await units.getByRole('button', { name: 'Move Metric' }).click();
+  await units.getByRole('button', { name: 'Move up' }).click();
+  await expect.poll(sections).toEqual(['metric', 'us', 'uk']);
+  await expect(units.getByRole('status').filter({ hasText: 'Metric, 1 of 4' })).toHaveCount(1);
+  await expect(units.getByRole('button', { name: 'Move up' })).toHaveAttribute(
+    'aria-disabled',
+    'true',
+  );
+  await expectNoA11yViolations(page);
+  // Dragged by its handle, UK goes first, the pointer's place deciding.
+  const handle = (await units.getByRole('button', { name: 'Move UK (imperial)' }).boundingBox())!;
+  const top = (await units.locator('[data-system="metric"]').boundingBox())!;
+  await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(handle.x + handle.width / 2, top.y + 4, { steps: 10 });
+  await page.mouse.up();
+  await expect.poll(sections).toEqual(['uk', 'metric', 'us']);
+  // The drag's own click opens no menu.
+  await expect(units.getByRole('group', { name: /^Move/ })).toHaveCount(0);
+  await units.getByRole('button', { name: 'Reset order' }).click();
+  await expect.poll(sections).toEqual(['us', 'metric', 'uk']);
+  // Its check stays while the pointer rests on it; moved away, it dims, nothing left to reset.
+  await page.mouse.move(0, 0);
+  await expect(units.getByRole('button', { name: 'Reset order' })).toHaveAttribute(
+    'aria-disabled',
+    'true',
+  );
+});
+
+test("Alt and an arrow move a system's row; Escape closes its Move menu, the panel staying open", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await settingsButton(page, 'Units').click();
+  const units = settingsPanel(page, 'Units');
+  const sections = () =>
+    table(page)
+      .locator('[data-section]')
+      .evaluateAll((all) => all.map((each) => each.getAttribute('data-section')));
+  const uk = units.getByRole('checkbox', { name: 'UK (imperial)' });
+  await uk.focus();
+  await page.keyboard.press('Alt+ArrowUp');
+  await expect.poll(sections).toEqual(['us', 'uk', 'metric']);
+  await expect(uk).toBeFocused();
+  await expect(units.getByRole('status').filter({ hasText: 'UK (imperial), 2 of 4' })).toHaveCount(
+    1,
+  );
+  // → reaches the row's handle; Enter opens its menu, Escape closes it.
+  await page.keyboard.press('ArrowRight');
+  const handle = units.getByRole('button', { name: 'Move UK (imperial)' });
+  await expect(handle).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(units.getByRole('button', { name: 'Move up' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(handle).toBeFocused();
+  await expect(units).toBeVisible();
 });
 
 test('search leaves hidden units out and offers them; taking one unhides it', async ({ page }) => {
@@ -427,16 +501,17 @@ test('Units and Display follow the calculator in the toolbar; a panel keeps its 
       .locator('label', { hasText: new RegExp(`^${label.replace(/[()]/g, '\\$&')}$`) })
       .locator('input');
   await expect(choice('Standard')).toBeFocused();
-  // ← and → move a strip's choice; ↑ and ↓ move between rows, never out of the panel.
+  // ← and → move a strip's choice; ↑ and ↓ move between rows, never out of the panel. The systems
+  // come in the table's order, the visitor's own first.
   await page.keyboard.press('ArrowRight');
   await expect(choice('Your region')).toBeChecked();
   await page.keyboard.press('ArrowDown');
-  await expect(choice('Metric')).toBeFocused();
-  await page.keyboard.press('ArrowDown');
   await expect(choice('US (customary)')).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(choice('Metric')).toBeFocused();
   // Enter works a checkbox as Space does.
   await page.keyboard.press('Enter');
-  await expect(choice('US (customary)')).not.toBeChecked();
+  await expect(choice('Metric')).toBeChecked();
   for (let step = 0; step < 6; step += 1) await page.keyboard.press('ArrowUp');
   await expect(filter.getByRole('button', { name: 'Close units' })).toBeFocused();
   // A digit lands in the box, after what is there; the panel stays open.

@@ -18,7 +18,7 @@ import {
   type NumberEnv,
   type TableView,
 } from './state';
-import { FRESH_SETTINGS, type Settings } from './settings';
+import { defaultOrder, FRESH_SETTINGS, type Settings } from './settings';
 import { paramsToState, stateToParams } from './url';
 
 /** How this visitor writes numbers (NumberEnv), and which unit family their region expects. */
@@ -73,9 +73,15 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
   const [env] = useState(detectEnv);
   const [settings, setSettings] = useState<Settings>(FRESH_SETTINGS);
   const box = useMemo(() => selectBox(state, env), [state, env]);
+  const order = settings.order;
   const table = useMemo(
-    () => selectTable(state, { ...env, rule: settings.rule }),
-    [state, env, settings.rule],
+    () =>
+      selectTable(state, {
+        ...env,
+        rule: settings.rule,
+        order: order ?? defaultOrder(env.system),
+      }),
+    [state, env, settings.rule, order],
   );
 
   // Restore the conversion from the URL once, at hydration (the server renders the empty state).

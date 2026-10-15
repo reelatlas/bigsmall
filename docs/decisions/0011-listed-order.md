@@ -1,7 +1,7 @@
 # 0011 — Units listed the visitor's way: their own system first, smallest to largest
 
 Date: 2026-10-07
-Status: accepted; amended by 0016, and by 0017 (the order is grouped into sections by system)
+Status: accepted; amended by 0016, and by 0017 (the order is grouped into sections by system, and since 2026-10-15 the visitor can reorder the systems; the visitor's own first is a fresh visit's order)
 
 ## Context
 

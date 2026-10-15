@@ -21,7 +21,7 @@ import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
-import { sectionsOf, shows, withChoice, type Settings } from './settings';
+import { orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
 import {
   noMatchMessage,
   type BoxView,
@@ -565,7 +565,7 @@ export function TableLayout({
         title={table.categories.find((category) => category.id === table.category)?.name ?? ''}
         sections={table.sections}
         hidden={table.hidden}
-        every={sectionsOf(table.all, env.system)}
+        every={sectionsOf(table.all, env.system, orderOf(settings, env.system))}
         message={table.message}
         display={display}
         locale={env.locale}

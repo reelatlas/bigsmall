@@ -27,9 +27,9 @@ function listGroup(unit: Unit, preference: UnitPreference): number {
 }
 
 /**
- * A unit's group in the listed order, as a long table's headings may name it (docs/PLAN.md §2,
- * "Section names in a long table"): an everyday unit of the visitor's own system, of the other
- * main one, or of neither, or a specialist unit of any system.
+ * A unit's group in the listed order: an everyday unit of the visitor's own system, of the other
+ * main one, or of neither, or a specialist unit of any system. The table's headings are the web's
+ * (`sectionOf` in apps/web's settings.ts).
  */
 export type ListGroup = 'own' | 'other' | 'neither' | 'specialist';
 

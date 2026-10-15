@@ -9,10 +9,10 @@ import type { ReactNode } from 'react';
  * names it (a visually hidden one where the choices say what they are). A strip is marked
  * `data-strip`, so a side panel's arrows take it as one row (SidePanel). Each seam is drawn once:
  * every segment has its whole edge and overlaps the one before by the edge's width, its own left
- * edge clear over its neighbour's line (its fill kept inside its edge), so no seam is two lines that
- * a scaled screen rounds apart. With focus a segment's own edge turns the focus color and it is
- * lifted over its neighbours: the highlight is the edge, the same width at rest and with focus, on
- * all four sides alike wherever the segment is (Sean, 2026-10-15).
+ * edge clear over its neighbour's line (its fill kept inside its edge), so no seam is two lines
+ * that a scaled screen rounds apart. With focus a segment's own edge turns the focus color and it
+ * is lifted over its neighbours: the highlight is the edge, the same width at rest and with focus,
+ * on all four sides alike wherever the segment is (Sean, 2026-10-15).
  */
 
 const TARGET =

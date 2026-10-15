@@ -13,9 +13,10 @@
 @import './themes/theorem.css';
 
 /*
- * Bridge semantic tokens into Tailwind utilities (bg-canvas, text-ink, font-display, rounded-md ...).
- * `inline` keeps the var() reference in the generated CSS so [data-theme] swaps apply at runtime.
- * Components use only these utilities or the semantic variables; never raw colors (CLAUDE.md rule 3).
+ * Bridge semantic tokens into Tailwind utilities (bg-canvas, text-ink, font-display,
+ * rounded-md ...). `inline` keeps the var() reference in the generated CSS so [data-theme] swaps
+ * apply at runtime. Components use only these utilities or the semantic variables; never raw
+ * colors (CLAUDE.md rule 3).
  * The full table is in docs/DESIGN-SYSTEM.md, "Tailwind bridge".
  */
 @theme inline {

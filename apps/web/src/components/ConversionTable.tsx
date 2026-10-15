@@ -126,10 +126,10 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * the decimal point (96 beside 473.18); with Both, its fraction beside it; past a column that takes
  * the spare width, on the right, the symbol right-aligned in its column, an exponent hanging after
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
- * left-aligned in its own; the active row's copy button laid over its end. The names keep to one line:
- * where one would not fit beside its value (a long value on a phone), the names give way in every
- * row (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
- * columns, the symbol and the name centred beside both lines. The unit's cell has no column gap,
+ * left-aligned in its own; the active row's copy button laid over its end. The names keep to one
+ * line: where one would not fit beside its value (a long value on a phone), the names give way in
+ * every row (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the
+ * value's columns, the symbol and the name centred beside both lines. The unit's cell has no column gap,
  * since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2). Seven
  * columns, so a row spans col-span-7.
  */
@@ -298,15 +298,15 @@ type List = 'shown' | 'hidden';
  * does, out of Edit carrying on from the box's rows (ADR 0014); Escape ends Edit, then folds an
  * open Hidden; and after a unit moves focus stays where it was, on the line that took its place.
  * The field keeps focus and its cursor moves through the shown rows (aria-activedescendant on a
- * grid, ADR 0012), so the rows are no Tab
- * stops; a click or tap on one is the field's to act on, and focus stays in the field. One copy
- * button shows at a time, laid over the active row's end in a cell of its own: the row under the
- * mouse, else the row the cursor is on, else the box's unit's (the row a tap took in), out of the
- * Tab order since Ctrl/⌘+C copies the cursor's row; the others stay for screen readers, unseen and
- * out of the pointer's way. Columns line up across rows through a subgrid (ROWS), each as wide as the widest it could
- * hold across every row and every rounding (a sizer row no one sees), so a setting that changes
- * what shows never moves the rest. Screen readers hear the symbol whole ("km²") and the name,
- * shown or not, from copies of their own; the columns they are drawn in are hidden from them.
+ * grid, ADR 0012), so the rows are no Tab stops; a click or tap on one is the field's to act on,
+ * and focus stays in the field. One copy button shows at a time, laid over the active row's end in
+ * a cell of its own: the row under the mouse, else the row the cursor is on, else the box's unit's
+ * (the row a tap took in), out of the Tab order since Ctrl/⌘+C copies the cursor's row; the others
+ * stay for screen readers, unseen and out of the pointer's way. Columns line up across rows
+ * through a subgrid (ROWS), each as wide as the widest it could hold across every row and every
+ * rounding (a sizer row no one sees), so a setting that changes what shows never moves the rest.
+ * Screen readers hear the symbol whole ("km²") and the name, shown or not, from copies of their
+ * own; the columns they are drawn in are hidden from them.
  */
 export function ConversionTable<T extends ConversionRow>({
   id,
@@ -686,13 +686,7 @@ export function ConversionTable<T extends ConversionRow>({
     const spot = `section:${section.key}`;
     return (
       <h3 className={edge} {...marker}>
-        <label
-          className={cx(
-            PANEL_TITLE,
-            'flex min-h-11 cursor-pointer items-center gap-2 rounded-nested px-2',
-            CHOICE_FILL,
-          )}
-        >
+        <label className={cx(PANEL_TITLE, CURSOR_ROW, 'flex items-center gap-2', CHOICE_FILL)}>
           <TriCheckbox
             state={state}
             data-spot={spot}

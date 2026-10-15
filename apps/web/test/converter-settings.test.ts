@@ -4,7 +4,6 @@ import {
   displayChanged,
   FRESH_DISPLAY,
   FRESH_RULE,
-  groupState,
   byHand,
   defaultOrder,
   FRESH_SETTINGS,
@@ -224,13 +223,6 @@ describe('settings: what shows', () => {
     expect(settingsFrom(null)).toBeNull();
     expect(settingsFrom({ v: 2 })).toBeNull();
     expect(settingsFrom({ v: 4, rule: { shown: [], overrides: [] } })).toBeNull();
-  });
-
-  it('reads a group as all, some, or none of its units', () => {
-    const us = ['inch', 'foot', 'yard', 'mile'].map(unit);
-    const one = withChoice(FRESH_RULE, [unit('inch')], false, 'us');
-    expect(groupState(us, (each) => shows(each, FRESH_RULE, 'us'))).toBe('all');
-    expect(groupState(us, (each) => shows(each, one, 'us'))).toBe('some');
   });
 });
 

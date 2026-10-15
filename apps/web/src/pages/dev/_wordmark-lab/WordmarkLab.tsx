@@ -15,11 +15,12 @@ import { CheckIcon, CopyIcon } from '../../../components/icons';
 import {
   ART_LINE,
   CARD,
+  CHECKBOX,
   cx,
   PLAYING_LINE,
+  type WordmarkSize,
   WORDMARK_FACE,
   WORDMARK_SIZES,
-  type WordmarkSize,
 } from '../../../lib/recipes';
 import {
   play,
@@ -57,7 +58,6 @@ const FIELD = 'grid gap-1 text-sm';
 const INPUT = 'min-h-11 min-w-0 rounded-md border-2 border-edge bg-surface px-3 text-ink';
 const SELECT = cx(INPUT, 'w-full');
 const CHECK = 'flex min-h-11 items-center gap-2 text-sm';
-const CHECKBOX = 'size-4 accent-accent';
 type TimingKey = keyof Timing;
 
 const defaults = (): WordmarkSettings => ({

@@ -32,7 +32,7 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
 // Native <button>: accessible by default, no runtime. Tokens only: every color, radius, and
 // duration here resolves to a theme variable. Keyboard focus shows the base focus ring.
 // `disabled` drops a button out of the Tab order; `aria-disabled` looks the same but keeps it a
-// stop, for a set of stops that should not change shape (the calculator's send buttons), and
+// stop, for a set of stops that should not change shape (the calculator's Use), and
 // its click handler must then do nothing.
 const BASE =
   'inline-flex min-h-11 items-center justify-center gap-2 font-medium transition-[background-color,color,opacity] ' +

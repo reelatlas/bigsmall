@@ -1,16 +1,14 @@
 import { useLayoutEffect, useRef, type InputHTMLAttributes } from 'react';
-import { CHECKBOX, cx } from '../lib/recipes';
+import { CHECKBOX } from '../lib/recipes';
 
 /** All of a group on, some of it, or none. */
 export type TriState = 'all' | 'some' | 'none';
 
-// className is a plain string, as in React: Preact's own typing also allows a signal there.
 export interface TriCheckboxProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'type' | 'checked' | 'defaultChecked' | 'className'
 > {
   state: TriState;
-  className?: string | undefined;
 }
 
 /**
@@ -20,19 +18,13 @@ export interface TriCheckboxProps extends Omit<
  * Settings' systems and the table's sections, is that a dash or a clear box turns the whole group
  * on and a checked one turns it off. The box itself is the native one, in the accent.
  */
-export function TriCheckbox({ state, className, ...props }: TriCheckboxProps) {
+export function TriCheckbox({ state, ...props }: TriCheckboxProps) {
   const ref = useRef<HTMLInputElement>(null);
   // In a layout effect, so the dash is drawn with the render that asked for it.
   useLayoutEffect(() => {
     if (ref.current) ref.current.indeterminate = state === 'some';
   });
   return (
-    <input
-      ref={ref}
-      type="checkbox"
-      checked={state === 'all'}
-      className={cx(CHECKBOX, className)}
-      {...props}
-    />
+    <input ref={ref} type="checkbox" checked={state === 'all'} className={CHECKBOX} {...props} />
   );
 }

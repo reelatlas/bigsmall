@@ -20,8 +20,9 @@ export type CategoryId =
   | 'angle';
 
 /**
- * Everyday (basic) or specialist (advanced). Specialist units are listed after every everyday one,
- * and rank after them among equal matches; a later filter may show the everyday ones alone (ADR 0016).
+ * Everyday (basic) or specialist (advanced). Specialist units are listed after every everyday
+ * one, and rank after them among equal matches; the web's Specialty switch shows or hides them
+ * (ADR 0016, ADR 0017).
  */
 export type Tier = 'basic' | 'advanced';
 

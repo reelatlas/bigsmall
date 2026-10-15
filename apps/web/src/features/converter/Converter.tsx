@@ -292,7 +292,6 @@ export function Converter() {
     sidePanel = (
       <DisplayPanel
         settings={settings}
-        preference={env.system}
         onSettings={updateSettings}
         onClose={() => closeSettings('display')}
       />
@@ -432,7 +431,8 @@ export function Converter() {
         })}
       />
 
-      {/* The two live regions (docs/UX-SPEC.md §12): the table's sentence, once it settles; and action feedback. */}
+      {/* The page's two live regions (docs/UX-SPEC.md §12): the table's sentence, once it settles,
+          and action feedback; the side panels' resets and moves have status lines of their own. */}
       <p aria-live="polite" className="sr-only">
         {announcement ?? ''}
       </p>

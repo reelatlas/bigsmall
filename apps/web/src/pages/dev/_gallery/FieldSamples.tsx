@@ -141,7 +141,7 @@ function TableSample({
  * The table's pieces in frozen states, from the real table view: the category menu before and
  * after a category is chosen; the start's categories, the cursor on one; 250 mL in every unit of
  * volume in its sections, names on, milliliters marked as the unit in the box, the cursor on
- * cups, its copy button laid over its end and confirmed; Area chosen with no unit, as a fresh visit shows it,
+ * cups, its copy button laid over its end and confirmed; Area chosen with no unit, symbols alone,
  * each value a dash, the symbols lined up on their last letter with their exponents hanging after
  * it; a million square kilometers in a phone's width, the names given way in every row and the
  * exponent markers bold; 6.3 feet as decimals with their fractions (Both); a fresh visit's volume

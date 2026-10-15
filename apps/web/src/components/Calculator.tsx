@@ -1,13 +1,13 @@
 import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useFitStep } from '../lib/fit-step';
 import {
-  CARD,
   cx,
   FIELD_ROW,
   NO_ANSWER,
   NUMBER_SIZES,
-  PANEL_ACTIVE,
-  PANEL_TITLE,
+  PANEL_CARD,
+  PANEL_HEAD,
+  PANEL_HEADING,
 } from '../lib/recipes';
 import { nextInDirection, type Box, type Direction } from '../lib/spatial';
 import { Button, type ButtonVariant } from './Button';
@@ -78,7 +78,7 @@ function boxOf(element: HTMLElement): Box & { element: HTMLElement } {
 /** The display's text: one line, sized down like a long number in a field, its end kept in view. */
 const DISPLAY_TEXT = 'min-w-0 flex-1 overflow-hidden font-numeric whitespace-pre text-ink';
 
-/** Marks what Tab moves between: close, =, and each send button. Enter presses the one focused. */
+/** Marks what Tab moves between: close, =, and Use. Enter presses the one focused. */
 const STOP = 'data-calculator-stop';
 
 /** The = key of the calculator inside `container`, where opening puts focus. */
@@ -91,7 +91,7 @@ export interface CalculatorProps {
   display: ReactNode;
   /**
    * Why the entry has no value ("Too large"), shown at the right of the display in the danger
-   * color and joined to the description of = (and of the caller's send buttons, by `messageId`).
+   * color and joined to the description of = (and of the caller's send button, by `messageId`).
    */
   message?: string | null;
   /** The message's id, for the caller's buttons to name it in `aria-describedby`. */
@@ -113,7 +113,7 @@ export interface CalculatorProps {
  * A calculator with its own display. While it is open it holds the keyboard: focus moves in,
  * every typed key presses its key (digits, ". ,", "+ - * / ^", "e", "=", Backspace) and brings
  * focus back to =, the arrow keys move focus between its buttons by where they sit, Tab and
- * Shift+Tab cycle through close, =, and each send button, and Enter presses whichever has focus,
+ * Shift+Tab cycle through close, =, and Use, and Enter presses whichever has focus,
  * so focus always shows what Enter will do. Escape is the caller's (step back, then close). The
  * other keys stay out of the Tab order, and a click on one returns the keyboard to the calculator
  * without moving focus off the key Enter would press. Clicking elsewhere on the page leaves it
@@ -277,14 +277,9 @@ export function Calculator({
   }, [onPress, onEscape]);
 
   return (
-    <div
-      ref={groupRef}
-      role="group"
-      aria-labelledby={titleId}
-      className={cx(CARD, 'p-3 shadow-sm', PANEL_ACTIVE)}
-    >
-      <div className="mb-2 flex items-center justify-between">
-        <h2 id={titleId} className={cx('pl-1', PANEL_TITLE)}>
+    <div ref={groupRef} role="group" aria-labelledby={titleId} className={PANEL_CARD}>
+      <div className={PANEL_HEAD}>
+        <h2 id={titleId} className={PANEL_HEADING}>
           Calculator
         </h2>
         <Button

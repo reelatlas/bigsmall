@@ -36,7 +36,7 @@ export interface CategoryMatch {
 export type SearchResult = UnitMatch | CategoryMatch;
 
 export interface SearchOptions {
-  /** Restrict unit results to one category (the other box has a unit). */
+  /** Restrict unit results to one category (the box already holds a unit of it). */
   category?: CategoryId | null;
   /** 'basic' hides advanced units unless nothing basic matches. Default 'basic'. */
   tier?: Tier | 'all';
@@ -58,8 +58,8 @@ export interface SearchResponse {
   results: SearchResult[];
   /**
    * True when a search for basic units showed advanced ones because nothing basic matched. Nothing
-   * reads it yet: the converter asks for every tier, and a later everyday-only filter would label
-   * such matches (docs/PLAN.md §2, "Everyday or every unit").
+   * reads it: the converter asks for every tier, and leaves specialist units out by Settings'
+   * Specialty switch instead (ADR 0017).
    */
   escalated: boolean;
 }
@@ -301,9 +301,10 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
 
 /**
  * The single unit a query names exactly, or null when it names none or more than one.
- * "ml" → milliliter. "oz" → null (weight ounce and fluid ounce both match) unless the category is locked.
- * Advanced units count: typing an exact name is explicit intent. Where an everyday unit and a
- * specialist one both match exactly, the everyday one is meant: "c" is Celsius, not the speed of light.
+ * "ml" → milliliter. "oz" → null (weight ounce and fluid ounce both match) unless the category
+ * is locked. Advanced units count: typing an exact name is explicit intent. Where an everyday unit
+ * and a specialist one both match exactly, the everyday one is meant: "c" is Celsius, not the
+ * speed of light.
  */
 export function resolveExact(text: string, options: SearchOptions = {}): Unit | null {
   const { results } = search(text, { ...options, tier: 'all', limit: 100 });

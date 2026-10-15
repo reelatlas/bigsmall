@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { panelKeys, rowsIn, stopOf } from '../lib/panel-keys';
-import { CARD, cx, PANEL_ACTIVE, PANEL_TITLE } from '../lib/recipes';
+import { PANEL_CARD, PANEL_HEAD, PANEL_HEADING } from '../lib/recipes';
 import { Button } from './Button';
 import { CloseIcon } from './icons';
 
@@ -67,14 +67,9 @@ export function SidePanel({ title, children, onClose, focusOnOpen = true }: Side
   });
 
   return (
-    <div
-      ref={ref}
-      role="group"
-      aria-labelledby={titleId}
-      className={cx(CARD, 'p-3 shadow-sm', PANEL_ACTIVE)}
-    >
-      <div className="mb-2 flex items-center justify-between">
-        <h2 id={titleId} className={cx('pl-1', PANEL_TITLE)}>
+    <div ref={ref} role="group" aria-labelledby={titleId} className={PANEL_CARD}>
+      <div className={PANEL_HEAD}>
+        <h2 id={titleId} className={PANEL_HEADING}>
           {title}
         </h2>
         <Button

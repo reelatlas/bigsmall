@@ -16,8 +16,8 @@ import {
  *
  * What shows has two layers. The system switches set every category. A unit chosen on its own in
  * a table is an exception, shown or hidden against its switch, until its system's switch changes,
- * which is final for that system, or a preset, which sets exactly its set; Show units hidden one
- * by one, or the table, also clears it (Sean, 2026-10-15: with Specialty unchecked, no specialist
+ * which is final for that system, or a preset, which sets exactly its set; Show custom hidden
+ * units, or the table, also clears it (Sean, 2026-10-15: with Specialty unchecked, no specialist
  * unit shows). The unit in the box always shows, whatever the settings say (the caller's to
  * apply).
  */
@@ -217,13 +217,6 @@ export function shows(unit: Unit, rule: ViewRule, preference: UnitPreference): b
 }
 
 export type GroupState = 'all' | 'some' | 'none';
-
-/** A section's checkbox: all of its units shown, some (a dash), or none. */
-export function groupState<T>(items: readonly T[], isShown: (item: T) => boolean): GroupState {
-  const count = items.filter(isShown).length;
-  if (count === items.length) return 'all';
-  return count === 0 ? 'none' : 'some';
-}
 
 /** Units chosen on their own: an exception where it differs from the switch, none where it agrees. */
 export function withChoice(

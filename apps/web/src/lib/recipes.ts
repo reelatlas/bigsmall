@@ -41,6 +41,18 @@ export const PANEL_TITLE = 'text-sm font-medium text-ink-muted';
 export const PANEL_ACTIVE =
   'transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-1 focus-within:ring-accent';
 
+/** A side panel's card, the calculator's and Settings' (SidePanel): its accent edge while it has the keys. */
+export const PANEL_CARD = cx(CARD, 'p-3 shadow-sm', PANEL_ACTIVE);
+
+/** The row over a side panel's content: its title, then its close button at the right. */
+export const PANEL_HEAD = 'mb-2 flex items-center justify-between';
+
+/** A side panel's title, set in to line up with its content. */
+export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
+
+/** A page's main column, under its header (index and 404). */
+export const PAGE_MAIN = 'mx-auto max-w-4xl px-4 py-8 sm:py-12';
+
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,
 // and `data-open` while open; the shell takes SHELL, its own resting style beside its one use
@@ -110,7 +122,7 @@ const OPTION_BASE =
   'flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink';
 
 /**
- * A setting's row, a checkbox's or a switch's, filled under the pointer and while its control has
+ * A setting's row, a checkbox's, filled under the pointer and while its control has
  * focus (CHOICE_FILL).
  */
 export const OPTION_ROW = cx(OPTION_BASE, CHOICE_FILL);

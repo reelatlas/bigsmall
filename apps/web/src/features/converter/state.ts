@@ -186,7 +186,7 @@ export function noMatchMessage(query: string): string {
 // The table (ADR 0012, docs/UX-SPEC.md §1): under the box, what it needs next: the categories to
 // start from, its category's units with their values, or the units a typed query matches.
 
-/** Significant digits a row shows: few enough to compare rows at a glance. Copying gives them all. */
+/** Significant digits a row shows with No limit: few enough to compare rows at a glance. */
 export const TABLE_PRECISION = 6;
 
 /** In place of a value the table cannot show yet: no number, or no unit to convert from. */

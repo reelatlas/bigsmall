@@ -9,10 +9,11 @@ import { SITE } from '../lib/site';
  * (docs/UX-SPEC.md §1). The link is ink with an accent underline: ink keeps body-text contrast
  * in every theme, which the accent only promises for edges (docs/DESIGN-SYSTEM.md, "Links").
  */
+import { PAGE_MAIN } from '../lib/recipes';
 ---
 
 <Base title={`Page not found · ${SITE.name}`} noindex>
-  <main class="mx-auto max-w-4xl px-4 py-8 sm:py-12">
+  <main class={PAGE_MAIN}>
     <PageHeader />
     <section class="mt-10 max-w-prose" aria-labelledby="not-found">
       <h2 id="not-found" class="font-display text-xl font-semibold">

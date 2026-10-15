@@ -3,10 +3,11 @@ import PageHeader from '../components/PageHeader.astro';
 import { Converter } from '../features/converter/Converter';
 import Base from '../layouts/Base.astro';
 import { SITE } from '../lib/site';
+import { PAGE_MAIN } from '../lib/recipes';
 ---
 
 <Base title={SITE.title}>
-  <main class="mx-auto max-w-4xl px-4 py-8 sm:py-12">
+  <main class={PAGE_MAIN}>
     <PageHeader actions />
     <Converter client:load />
   </main>

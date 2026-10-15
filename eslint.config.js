@@ -127,7 +127,8 @@ export default tseslint.config(
     },
   },
   // Components use semantic tokens, never raw values. A flagged value is matched to an existing
-  // token or brought to the owner as a proposed new one; it is never silenced with a disable comment.
+  // token or brought to the owner as a proposed new one; it is never silenced with a disable
+  // comment.
   {
     files: ['apps/web/src/**/*.{ts,tsx,astro}'],
     rules: { 'no-restricted-syntax': ['error', ...TOKEN_GUARD] },

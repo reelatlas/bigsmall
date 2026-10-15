@@ -63,7 +63,7 @@ export interface SystemRowsProps {
  * the row, the others sliding out of its way and the table's sections gliding to match; a press on
  * the handle without dragging opens Move up and Move down, the way to reorder without dragging
  * (WCAG 2.5.7), by pointer or by key; and Alt+↑ or Alt+↓ on a row moves it at once. Each move is
- * said in a status line ("Metric, 2 of 4"). A drag by touch never scrolls the page: the handle
+ * said in a status line ("Metric, 2 of 5"). A drag by touch never scrolls the page: the handle
  * takes the pointer (`touch-none`, pointer capture).
  */
 export function SystemRows({ settings, preference, onSettings }: SystemRowsProps) {

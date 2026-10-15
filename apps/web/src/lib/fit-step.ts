@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useState, type RefObject } from 'react';
+import { cx } from './recipes';
 
 /**
  * Text that steps down a type ladder to fit (docs/DESIGN-SYSTEM.md, "Type that steps to fit"):
@@ -14,7 +15,7 @@ export interface FitText {
 
 /** Puts the element at one step of its ladder and says whether its text then fits its width. */
 function fitsAt(element: HTMLElement, text: FitText, step: number): boolean {
-  element.className = `${text.base} ${text.steps[step]}`;
+  element.className = cx(text.base, text.steps[step]);
   return element.scrollWidth <= element.clientWidth;
 }
 

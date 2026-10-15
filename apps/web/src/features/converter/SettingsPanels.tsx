@@ -14,7 +14,7 @@ import {
 } from '../../components/SegmentedControl';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
-import { cx, PANEL_TITLE } from '../../lib/recipes';
+import { cx } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
@@ -33,7 +33,8 @@ import {
 } from './settings';
 import { SystemRows } from './SystemRows';
 
-const SUBHEAD = cx(PANEL_TITLE, 'text-xs');
+/** A choice's legend: a panel title's muted ink, a size smaller. */
+const SUBHEAD = 'text-xs font-medium text-ink-muted';
 
 /**
  * A panel's foot, its resets under a line, 4 px between the line and a reset's fill
@@ -229,8 +230,8 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
         <legend className="sr-only">Systems, in the table's order</legend>
         <SystemRows settings={settings} preference={preference} onSettings={onSettings} />
       </fieldset>
-      {/* Its line sits evenly between the last system's ink and the resets', as every divider does:
-          the rows' 44 px leave their ink 12 px inside, so the line comes up past the panel's gap. */}
+      {/* Its line sits evenly between the last system's ink and the resets', as every divider
+          does: the rows' 44 px leave their ink 12 px inside, so the line comes up past the gap. */}
       <div
         className={cx(PANEL_FOOT, '-mt-1.5 flex flex-wrap items-center justify-between gap-x-2')}
       >
@@ -267,10 +268,14 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
 
 /**
  * Display (docs/UX-SPEC.md §1, §7; ADR 0017): how results look. Symbols alone or with names
- * first; then the format, which way values round, what they round to, and a reset of all of it. Copying is
- * no setting: the active row's copy button (Sean, 2026-10-15).
+ * first; then the format, which way values round, what they round to, and a reset of all of it.
+ * Copying is no setting: the active row's copy button (Sean, 2026-10-15).
  */
-export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelProps) {
+export function DisplayPanel({
+  settings,
+  onSettings,
+  onClose,
+}: Omit<SettingsPanelProps, 'preference'>) {
   const { display } = settings;
   const setDisplay = (patch: Partial<Display>) =>
     onSettings((now) => ({ ...now, display: { ...now.display, ...patch } }));

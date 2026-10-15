@@ -60,7 +60,8 @@ function minusSign(locale: string | undefined): string {
 /**
  * A value to `places` decimal places. Null for a value smaller than the last place (under 0.01
  * with two), which keeps its significant digits whatever the rounding, or one too large for places
- * to mean anything. Trailing zeros are not written: 0.1, and 96.
+ * to mean anything. Every place is written, trailing zeros too (96.00, 0.50), so a column of values
+ * reads alike and says how precise each is (Sean, 2026-10-15).
  */
 export function formatPlaces(
   value: number,
@@ -72,6 +73,7 @@ export function formatPlaces(
   const result = rounded(value * scale, options.rounding) / scale;
   if (Math.abs(result) >= PLACES_LIMIT) return null;
   const text = new Intl.NumberFormat(options.locale, {
+    minimumFractionDigits: options.places,
     maximumFractionDigits: options.places,
   }).format(Object.is(result, -0) ? 0 : result);
   return { text, approx: false };

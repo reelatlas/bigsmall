@@ -155,8 +155,8 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
   // Done closes Hidden, whoever just chose what to hide.
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');
 
-  // Unhide units brings it back, and keeps the settings.
-  await setSettings(page, 'Unhide units');
+  // Show units hidden one by one brings it back, and keeps the settings.
+  await setSettings(page, 'Show units hidden one by one');
   await expect(row(page, 'us-teaspoon')).toBeVisible();
 });
 
@@ -306,7 +306,7 @@ test('fractions, both, and rounding write the values and never move the columns'
 
   // Both: the decimal first, its fraction after it.
   await setSettings(page, 'Nearest', 'Both');
-  await expect(row(page, 'foot')).toContainText(/6\.3\s*≈ 6 1\/4/);
+  await expect(row(page, 'foot')).toContainText(/6\.30\s*≈ 6 1\/4/);
   await expectNoA11yViolations(page);
 });
 

@@ -80,14 +80,13 @@ const UNITS_CHOICES = new Set([
   'US (customary)',
   'UK (imperial)',
   'Specialty',
-  'Reset to Standard',
-  'Unhide units',
+  'Show units hidden one by one',
 ]);
 
 /**
  * Opens Units or Display, whichever holds each choice, picks it by its label ("All",
  * "Symbol and name", "No limit"), turns a switch over by its name ("Copy buttons"), or presses a
- * button ("Unhide units"), then closes the panel with its close button.
+ * button ("Show units hidden one by one"), then closes the panel with its close button.
  */
 export async function setSettings(page: Page, ...choices: string[]) {
   for (const choice of choices) {

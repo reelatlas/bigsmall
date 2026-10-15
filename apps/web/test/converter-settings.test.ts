@@ -11,7 +11,6 @@ import {
   sectionOf,
   sectionsOf,
   shows,
-  switchesChanged,
   withChoice,
   withoutHidden,
   withSystem,
@@ -53,8 +52,10 @@ describe('settings: what shows', () => {
     expect(presetOf(FRESH_RULE.shown, 'us')).toBe('standard');
     expect(shows(unit('parsec'), FRESH_RULE, 'us')).toBe(false);
     expect(shows(unit('knot'), { shown: new Set(), overrides: new Map() }, 'us')).toBe(true);
-    expect(switchesChanged(FRESH_RULE)).toBe(false);
-    expect(switchesChanged(withChoice(FRESH_RULE, [unit('inch')], false, 'us'))).toBe(false);
+    // A unit hidden on its own leaves the switches as they were.
+    expect(presetOf(withChoice(FRESH_RULE, [unit('inch')], false, 'us').shown, 'us')).toBe(
+      'standard',
+    );
   });
 
   it('keeps units chosen on their own through the switches and the presets', () => {
@@ -78,7 +79,7 @@ describe('settings: what shows', () => {
     const unhidden = withoutHidden(rule);
     expect(shows(unit('inch'), unhidden, 'us')).toBe(true);
     expect(shows(unit('nanometer'), unhidden, 'us')).toBe(true);
-    expect(switchesChanged(unhidden)).toBe(false);
+    expect(presetOf(unhidden.shown, 'us')).toBe('standard');
   });
 
   it('reads a group as all, some, or none of its units', () => {

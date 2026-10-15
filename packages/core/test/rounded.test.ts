@@ -25,7 +25,13 @@ describe('formatPlaces', () => {
     expect(places(0.473176, 2, 'up')).toBe('0.48');
     expect(places(0.479, 2, 'down')).toBe('0.47');
     expect(places(1234.5678, 1)).toBe('1,234.6');
-    expect(places(96, 2)).toBe('96');
+    expect(places(96, 2)).toBe('96.00');
+  });
+
+  it('writes every place, trailing zeros too, so a column reads alike', () => {
+    expect(places(0.5, 2)).toBe('0.50');
+    expect(places(0.1, 3)).toBe('0.100');
+    expect(places(0, 2)).toBe('0.00');
   });
 
   it('never rounds a value down a step for float noise', () => {

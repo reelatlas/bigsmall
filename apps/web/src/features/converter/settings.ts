@@ -14,7 +14,7 @@ import {
  *
  * What shows has two layers. The system switches set every category. A unit chosen on its own in
  * a table is an exception, shown or hidden against its switch, and a layer of its own: the
- * switches, the presets, and Reset settings leave it; Unhide units, or the table, clears it. The
+ * switches, the presets, and Reset settings leave it; Show units hidden one by one, or the table, clears it. The
  * unit in the box always shows, whatever the settings say (the caller's to apply).
  */
 
@@ -124,12 +124,6 @@ export const FRESH_RULE: ViewRule = {
   overrides: new Map(),
 };
 
-/** Whether the switches differ from a fresh visit's; units chosen on their own are not counted. */
-export function switchesChanged(rule: ViewRule): boolean {
-  const fresh = FRESH_RULE.shown;
-  return rule.shown.size !== fresh.size || [...fresh].some((key) => !rule.shown.has(key));
-}
-
 export type ShowPreset = 'all' | 'standard' | 'region';
 
 export const SHOW_PRESETS: ReadonlyArray<{ id: ShowPreset; name: string }> = [
@@ -210,7 +204,7 @@ export function hiddenByHand(rule: ViewRule): number {
   return [...rule.overrides.values()].filter((show) => !show).length;
 }
 
-/** Unhide units: every unit hidden on its own back to its switch; those shown on their own stay. */
+/** Show units hidden one by one: every unit hidden on its own back to its switch; those shown on their own stay. */
 export function withoutHidden(rule: ViewRule): ViewRule {
   return { ...rule, overrides: new Map([...rule.overrides].filter(([, show]) => show)) };
 }

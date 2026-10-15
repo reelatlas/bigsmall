@@ -15,13 +15,11 @@ import { cx, OPTION_ROW, PANEL_TITLE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
-  FRESH_RULE,
   hiddenByHand,
   presetKeys,
   presetOf,
   SECTION_LABEL,
   SHOW_PRESETS,
-  switchesChanged,
   SYSTEM_KEYS,
   withoutHidden,
   withSystem,
@@ -183,16 +181,18 @@ function Reset({
 
 /**
  * Units (docs/UX-SPEC.md §1, §3; ADR 0017; Filter until Sean renamed it, 2026-10-15): what search
- * and the table show, in every category.
- * The presets first; then a switch per system, and the resets: the switches
- * back to the Standard units (single units chosen in a table stay as set), and Unhide units.
+ * and the table show, in every category. The presets first, Standard among them, which is how the
+ * switches go back to a fresh visit's; then a switch per system; then Show units hidden one by one,
+ * which clears what Edit and the Hidden list hid, the switches staying (Sean, 2026-10-15: a reset to
+ * Standard beside the Standard preset did the same thing twice, and "Unhide units" read as the
+ * switches' units too).
  */
 export function UnitsPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
   const { rule } = settings;
   const hiddenCount = hiddenByHand(rule);
   const setRule = (next: (rule: ViewRule) => ViewRule) =>
     onSettings((now) => ({ ...now, rule: next(now.rule) }));
-  const { copied: done, markCopied, pointerProps } = useCopied<'reset' | 'unhide'>();
+  const { copied: done, markCopied, pointerProps } = useCopied<'unhide'>();
   return (
     <SidePanel title="Units" onClose={onClose}>
       <Choices<ShowPreset>
@@ -220,17 +220,6 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
       </div>
       <div className="flex flex-wrap items-center justify-between gap-x-2 border-t border-line pt-2">
         <Reset
-          off={!switchesChanged(rule)}
-          done={done === 'reset'}
-          onReset={() => {
-            setRule((now) => withSystems(now, FRESH_RULE.shown));
-            markCopied('reset');
-          }}
-          pointer={pointerProps('reset')}
-        >
-          Reset to Standard
-        </Reset>
-        <Reset
           off={hiddenCount === 0}
           done={done === 'unhide'}
           onReset={() => {
@@ -239,11 +228,11 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
           }}
           pointer={pointerProps('unhide')}
         >
-          Unhide units
+          Show units hidden one by one
           {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
         </Reset>
         <p role="status" className="sr-only">
-          {done === 'reset' ? 'Back to Standard' : done === 'unhide' ? 'Units unhidden' : ''}
+          {done === 'unhide' ? 'Units shown' : ''}
         </p>
       </div>
     </SidePanel>

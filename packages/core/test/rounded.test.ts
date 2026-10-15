@@ -55,8 +55,10 @@ describe('fractionsOf', () => {
     expect(listed(sizes(4))).toEqual(['1/4', '2/4', '3/4']);
     expect(listed(sizes(2, 4))).toEqual(['1/4', '1/2', '3/4']);
     expect(listed(sizes(16)).slice(0, 4)).toEqual(['1/16', '2/16', '3/16', '4/16']);
-    // Thirds mix with the rest, for cups.
+    // Thirds mix with the rest, for cups, and fifths as thirds do.
     expect(listed(sizes(2, 3, 4))).toEqual(['1/4', '1/3', '1/2', '2/3', '3/4']);
+    expect(listed(sizes(2, 5))).toEqual(['1/5', '2/5', '1/2', '3/5', '4/5']);
+    expect(listed(sizes(4, 5)).slice(0, 4)).toEqual(['1/5', '1/4', '2/5', '2/4']);
   });
 });
 
@@ -64,6 +66,8 @@ describe('formatFraction', () => {
   it('writes a mixed number in the sizes chosen, marked when not exact', () => {
     expect(fraction(6.3, sizes(2, 4, 8, 16))).toEqual({ text: '6 5/16', approx: true });
     expect(fraction(6.3, sizes(2, 4))?.text).toBe('6 1/4');
+    expect(fraction(2.4, sizes(5))).toEqual({ text: '2 2/5', approx: false });
+    expect(fraction(6.3, sizes(2, 4, 5))).toEqual({ text: '6 1/4', approx: true });
     expect(fraction(6.3, sizes(2, 4), 'up')?.text).toBe('6 1/2');
     expect(fraction(6.3, eighths, 'down')?.text).toBe('6 1/4');
     expect(fraction(2.5, sizes(2, 64))).toEqual({ text: '2 1/2', approx: false });

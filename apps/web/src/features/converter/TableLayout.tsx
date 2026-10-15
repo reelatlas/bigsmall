@@ -33,7 +33,7 @@ import type { ConverterEnv } from './useConverter';
 
 /**
  * The converter from md (docs/UX-SPEC.md §1): the toolbar, the box, and its table in the first
- * column, and the side panel open (the calculator, Filter, or Display) in a column of its own on
+ * column, and the side panel open (the calculator, Units, or Display) in a column of its own on
  * their right, its top level with the box's (Sean, 2026-10-15). It spans the box's row, the
  * table's, and the last, 1fr, which takes whatever of it is taller than the box and the table, so
  * the table always sits right under the box. Below md the side panel opens between the box and the
@@ -44,7 +44,7 @@ const TABLE_GRID =
 /** The toolbar's cell, as wide as the box. */
 const TABLE_TOOLS_CELL = 'max-w-xl md:col-start-1 md:row-start-1';
 /**
- * The toolbar row (Sean, 2026-10-10 and 15): the category menu, the calculator, Filter, and
+ * The toolbar row (Sean, 2026-10-10 and 15): the category menu, the calculator, Units, and
  * Display at its left, the menu's edge on the box's, with no dividers between them; undo, redo,
  * and clear all at its right end. Where the row has no room for both, the right end keeps the top
  * line and the leading four wrap under it, over the box, with no breakpoint: they come first in
@@ -88,7 +88,7 @@ function viewKeyOf(view: TableView): string {
 }
 
 export interface TableLayoutProps {
-  /** The tools after the category menu: the calculator, Filter, and Display. */
+  /** The tools after the category menu: the calculator, Units, and Display. */
   leadingTools: ReactNode;
   /** The toolbar's right end: undo, redo, and clear all. */
   tools: ReactNode;
@@ -107,7 +107,7 @@ export interface TableLayoutProps {
   /** The field's copy button, once it holds a number. */
   copyButton: ReactNode;
   /**
-   * The side panel open, one at a time (the calculator, Filter, or Display): between the box and
+   * The side panel open, one at a time (the calculator, Units, or Display): between the box and
    * the table, or beside them from md.
    */
   side: ReactNode;

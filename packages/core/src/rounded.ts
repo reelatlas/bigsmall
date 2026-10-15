@@ -7,11 +7,11 @@
 /** Up is toward larger values and down toward smaller, below zero too, as ceiling and floor are. */
 export type Rounding = 'nearest' | 'up' | 'down';
 
-/** The fraction sizes offered: halves, thirds, quarters, and on to sixty-fourths. */
-export type FractionSize = 2 | 3 | 4 | 8 | 16 | 32 | 64;
+/** The fraction sizes offered: halves, thirds, quarters, fifths, and on to sixty-fourths. */
+export type FractionSize = 2 | 3 | 4 | 5 | 8 | 16 | 32 | 64;
 
 /** The sizes, from the least fine to the finest. */
-export const FRACTION_SIZES: readonly FractionSize[] = [2, 3, 4, 8, 16, 32, 64];
+export const FRACTION_SIZES: readonly FractionSize[] = [2, 3, 4, 5, 8, 16, 32, 64];
 
 /** A value as written, and whether that is not exact (a fraction that rounds). */
 export interface Rounded {

@@ -126,22 +126,23 @@ export function CalculatorIcon(props: IconProps) {
   );
 }
 
-export function SlidersIcon(props: IconProps) {
+export function FilterIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      {/* Two sliders, their knobs set apart: the settings. */}
-      <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
-      <circle cx="16" cy="7" r="2" />
-      <circle cx="10" cy="17" r="2" />
+      {/* Three lines, each shorter: fewer shown, Settings' Units (Sean, 2026-10-15). */}
+      <path d="M4 6h16M7 12h10M10 18h4" />
     </Icon>
   );
 }
 
-export function FunnelIcon(props: IconProps) {
+export function FractionIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      {/* A funnel: what passes through, Settings' Filter. */}
-      <path d="M4 5h16l-6 7.5V19l-4-2v-4.5z" />
+      {/* ¾ on a diagonal, its digits drawn as strokes: how values are written, Settings' Display
+          (Sean, 2026-10-15). */}
+      <path d="M3.7 3H7.9L5.7 5.8A2.2 2.2 0 1 1 3.5 9.2" />
+      <path d="M17.5 4L6.5 20" />
+      <path d="M17.4 20.5V13.5L14 18.2H18.8" />
     </Icon>
   );
 }

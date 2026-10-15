@@ -37,9 +37,9 @@ test('a fresh visit shows symbols, two places, no copy buttons, and the speciali
     page.getByRole('button', { name: 'Change unit: cups' }).getByText('cups', { exact: true }),
   ).toBeHidden();
 
-  await settingsButton(page, 'Filter').click();
+  await settingsButton(page, 'Units').click();
   await expect(
-    settingsPanel(page, 'Filter')
+    settingsPanel(page, 'Units')
       .locator('label', { hasText: /^Standard$/ })
       .locator('input'),
   ).toBeChecked();
@@ -50,16 +50,16 @@ test('a fresh visit shows symbols, two places, no copy buttons, and the speciali
   await expectNoA11yViolations(page);
 });
 
-test('Filter and Display open beside the table, one side panel at a time with the calculator; Escape closes, a press outside does not', async ({
+test('Units and Display open beside the table, one side panel at a time with the calculator; Escape closes, a press outside does not', async ({
   page,
 }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
-  const filter = settingsPanel(page, 'Filter');
+  const filter = settingsPanel(page, 'Units');
   const display = settingsPanel(page, 'Display');
   const calculator = page.getByRole('group', { name: 'Calculator' });
   // Opening moves focus in, onto its first choice, and its edge turns the accent.
-  await settingsButton(page, 'Filter').click();
+  await settingsButton(page, 'Units').click();
   await expect(filter.locator('label', { hasText: /^Standard$/ }).locator('input')).toBeFocused();
   const edge = () => filter.evaluate((panel) => getComputedStyle(panel).borderTopColor);
   // The theme's accent as a computed color, for the edge to ease to.
@@ -74,10 +74,10 @@ test('Filter and Display open beside the table, one side panel at a time with th
   await expect.poll(edge).toBe(accent);
   await page.keyboard.press('Escape');
   await expect(filter).toHaveCount(0);
-  await expect(settingsButton(page, 'Filter')).toBeFocused();
+  await expect(settingsButton(page, 'Units')).toBeFocused();
 
   // A side panel stays open as the page is used, its edge quiet once focus leaves it.
-  await settingsButton(page, 'Filter').click();
+  await settingsButton(page, 'Units').click();
   await box(page).click();
   await expect(filter).toBeVisible();
   await expect.poll(edge).not.toBe(accent);
@@ -89,7 +89,7 @@ test('Filter and Display open beside the table, one side panel at a time with th
   await page.getByRole('button', { name: 'Calculator', exact: true }).click();
   await expect(display).toHaveCount(0);
   await expect(calculator).toBeVisible();
-  await settingsButton(page, 'Filter').click();
+  await settingsButton(page, 'Units').click();
   await expect(calculator).toHaveCount(0);
   await expectNoA11yViolations(page);
 
@@ -310,7 +310,32 @@ test('fractions, both, and rounding write the values and never move the columns'
   await expectNoA11yViolations(page);
 });
 
-test('Filter and Display follow the calculator in the toolbar; a panel keeps its arrows, and typing lands in the box', async ({
+test("where Both's fraction has no room beside the decimal, it sits under it, lined up on the point, and the row keeps its height", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?a=pound&v=2.3');
+  await ready(page);
+  await setSettings(page, 'Both');
+  const ounce = row(page, 'ounce');
+  const under = ounce.locator('[data-instead="second"]').first();
+  await expect(under).toBeVisible();
+  await expect(ounce.locator('[data-column="second"]')).toBeHidden();
+  await expect(ounce.getByRole('gridcell').first()).toHaveAccessibleName(/≈ 36 3\/4/);
+  const value = (await ounce.locator('[data-whole]').boundingBox())!;
+  const fraction = (await under.boundingBox())!;
+  // "≈ 36" ends where "36" does, at the decimal point, on the line under it.
+  expect(Math.round(fraction.x + fraction.width)).toBe(Math.round(value.x + value.width));
+  expect(fraction.y).toBeGreaterThanOrEqual(value.y + value.height - 1);
+  expect(Math.round((await ounce.boundingBox())!.height)).toBe(44);
+  await expectNoA11yViolations(page);
+  // With the room, it goes back beside the decimal.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect(ounce.locator('[data-column="second"]')).toBeVisible();
+  await expect(under).toBeHidden();
+});
+
+test('Units and Display follow the calculator in the toolbar; a panel keeps its arrows, and typing lands in the box', async ({
   page,
   isMobile,
 }) => {
@@ -319,12 +344,12 @@ test('Filter and Display follow the calculator in the toolbar; a panel keeps its
   await ready(page);
   await page.getByRole('button', { name: 'Calculator', exact: true }).focus();
   await page.keyboard.press('ArrowRight');
-  await expect(settingsButton(page, 'Filter')).toBeFocused();
+  await expect(settingsButton(page, 'Units')).toBeFocused();
   await page.keyboard.press('ArrowRight');
   await expect(settingsButton(page, 'Display')).toBeFocused();
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('Enter');
-  const filter = settingsPanel(page, 'Filter');
+  const filter = settingsPanel(page, 'Units');
   const choice = (label: string) =>
     filter
       .locator('label', { hasText: new RegExp(`^${label.replace(/[()]/g, '\\$&')}$`) })
@@ -341,7 +366,7 @@ test('Filter and Display follow the calculator in the toolbar; a panel keeps its
   await page.keyboard.press('Enter');
   await expect(choice('US (customary)')).not.toBeChecked();
   for (let step = 0; step < 6; step += 1) await page.keyboard.press('ArrowUp');
-  await expect(filter.getByRole('button', { name: 'Close filter' })).toBeFocused();
+  await expect(filter.getByRole('button', { name: 'Close units' })).toBeFocused();
   // A digit lands in the box, after what is there; the panel stays open.
   await page.keyboard.press('7');
   await expect(box(page)).toBeFocused();

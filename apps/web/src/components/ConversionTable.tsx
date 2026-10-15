@@ -124,7 +124,8 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
  * left-aligned in its own; then the copy button, with copy buttons on. The names keep to one line:
  * where one would not fit beside its value (a long value on a phone), the names give way in every
- * row (GIVE_WAY), then Both's fraction. The unit's cell has no column gap, since the symbol and its
+ * row (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
+ * columns, the symbol and the name centred beside both lines. The unit's cell has no column gap, since the symbol and its
  * exponent touch: its parts space themselves (pr-2, pl-2). Eight columns, so a row spans
  * col-span-8.
  */
@@ -154,6 +155,13 @@ const WHOLE_CELL = 'text-right font-numeric whitespace-nowrap';
 const DECIMALS_CELL = 'pr-2 font-numeric whitespace-nowrap';
 const ACROSS_CELL = 'col-span-2 pr-2 font-numeric whitespace-nowrap';
 const SECOND_CELL = 'min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric whitespace-nowrap';
+/**
+ * Both's fraction where its column has no room (a phone): on a second line under the value, a step
+ * smaller so the row keeps its 44 px, lined up on the decimal point as the values are, its whole
+ * number (and "≈") under the value's whole part and the rest after the point (Sean, 2026-10-15).
+ */
+const STACKED_WHOLE_CELL = 'col-start-1 text-right text-sm font-numeric whitespace-nowrap';
+const STACKED_PART_CELL = 'col-start-2 pr-2 pl-1 text-sm font-numeric whitespace-nowrap';
 const SYMBOL_CELL = cx('col-start-5 pl-2 text-right whitespace-nowrap', unitSymbol());
 const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
 const HEADING = cx(PANEL_TITLE, 'px-2 pb-1');
@@ -179,6 +187,21 @@ function firstWritten(value: number, display: TableDisplay, locale: string | und
 function secondWritten(value: number, display: TableDisplay, locale: string | undefined) {
   if (display.format !== 'both') return null;
   return formatFraction(value, { sizes: display.fractions, rounding: display.rounding, locale });
+}
+
+/**
+ * Both's fraction in two, to sit under the decimal: its whole number, "≈" ahead of one that rounds,
+ * and the fraction after it ("≈ 36" and "3/4"). A minus with no whole number stays with the fraction.
+ */
+function splitFraction(written: Rounded): { whole: string; part: string } {
+  const at = written.text.search(/\d+\/\d+$/);
+  let whole = at < 0 ? written.text : written.text.slice(0, at).trimEnd();
+  let part = at < 0 ? '' : written.text.slice(at);
+  if (!/\p{Nd}/u.test(whole)) {
+    part = whole + part;
+    whole = '';
+  }
+  return { whole: (written.approx ? '≈ ' : '') + whole, part };
 }
 
 /** A value as written, "≈" ahead of one that rounds; the row's own text where nothing is. */
@@ -341,18 +364,28 @@ export function ConversionTable<T extends ConversionRow>({
   });
 
   const parts = (row: T, under: TableDisplay = display) => valueParts(row, under, locale, mark);
+  const secondOf = (row: T, under: TableDisplay = display) =>
+    row.tone !== 'value' || row.value === null ? null : secondWritten(row.value, under, locale);
   const second = (row: T, under: TableDisplay = display): ReactNode => {
-    if (row.tone !== 'value' || row.value === null) return null;
-    const fraction = secondWritten(row.value, under, locale);
+    const fraction = secondOf(row, under);
     return fraction ? writtenText(row, fraction) : null;
+  };
+  /** Both's fraction under the decimal, one of its two parts, under a rounding. */
+  const stackedPart = (pick: 'whole' | 'part') => (row: T, under: TableDisplay) => {
+    const fraction = secondOf(row, under);
+    return fraction ? splitFraction(fraction)[pick] : null;
   };
 
   /** A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and name. */
   const cells = (row: T) => {
     const [base, exponent] = splitExponent(row.symbol);
-    const fraction = both ? second(row) : null;
+    const written = both ? secondOf(row) : null;
+    const fraction = written ? writtenText(row, written) : null;
+    const stacked = written ? splitFraction(written) : null;
     const value = parts(row);
     const tone = TONE[row.tone];
+    // With Both's fraction under the value, the unit's columns span both lines, centred.
+    const tall = stacked !== null && secondHidden && 'row-span-2';
     return (
       <>
         {'across' in value ? (
@@ -382,10 +415,30 @@ export function ConversionTable<T extends ConversionRow>({
             {fraction}
           </span>
         )}
-        <span aria-hidden="true" className={SYMBOL_CELL} data-symbol>
+        {written && stacked && (
+          <>
+            <span
+              hidden={!secondHidden}
+              className={cx(STACKED_WHOLE_CELL, 'row-start-2 text-ink-muted')}
+              data-instead="second"
+            >
+              <span aria-hidden="true">{stacked.whole}</span>
+              <span className="sr-only">{fraction}</span>
+            </span>
+            <span
+              hidden={!secondHidden}
+              aria-hidden="true"
+              className={cx(STACKED_PART_CELL, 'row-start-2 text-ink-muted')}
+              data-instead="second"
+            >
+              {stacked.part}
+            </span>
+          </>
+        )}
+        <span aria-hidden="true" className={cx(SYMBOL_CELL, tall)} data-symbol>
           {base}
         </span>
-        <span aria-hidden="true" className={cx('whitespace-nowrap', unitSymbol())}>
+        <span aria-hidden="true" className={cx('whitespace-nowrap', unitSymbol(), tall)}>
           {exponent}
         </span>
         <span className="sr-only">{row.symbol}</span>
@@ -393,14 +446,14 @@ export function ConversionTable<T extends ConversionRow>({
           <span
             aria-hidden="true"
             hidden={namesHidden}
-            className={cx(NAME_CELL, 'text-ink')}
+            className={cx(NAME_CELL, 'text-ink', tall)}
             data-name
             data-column="name"
           >
             {row.name}
           </span>
         ) : (
-          <span aria-hidden="true" />
+          <span aria-hidden="true" className={tall || undefined} />
         )}
         <span className="sr-only">
           {row.name}
@@ -455,6 +508,24 @@ export function ConversionTable<T extends ConversionRow>({
         >
           {stack(everyRounding(second))}
         </span>
+      )}
+      {both && (
+        <>
+          <span
+            hidden={!secondHidden}
+            className={cx(STACKED_WHOLE_CELL, 'row-start-1')}
+            data-instead="second"
+          >
+            {stack(everyRounding(stackedPart('whole')))}
+          </span>
+          <span
+            hidden={!secondHidden}
+            className={cx(STACKED_PART_CELL, 'row-start-1')}
+            data-instead="second"
+          >
+            {stack(everyRounding(stackedPart('part')))}
+          </span>
+        </>
       )}
       <span className={cx(SYMBOL_CELL, 'row-start-1')}>
         {stack((row) => splitExponent(row.symbol)[0])}

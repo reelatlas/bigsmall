@@ -647,7 +647,7 @@ test('a side panel takes a column from md, its top level with the box, and sits 
   expect(wide.calculator.x).toBeGreaterThan(wide.table.x + wide.table.width);
   // Its top level with the box's (Sean, 2026-10-15), and so is a settings panel's.
   expect(Math.abs(wide.calculator.y - wide.field.y)).toBeLessThan(1);
-  for (const name of ['Filter', 'Display'] as const) {
+  for (const name of ['Units', 'Display'] as const) {
     await settingsButton(page, name).click();
     const panel = (await page.getByRole('group', { name, exact: true }).boundingBox())!;
     expect(Math.abs(panel.y - wide.field.y), name).toBeLessThan(1);
@@ -794,7 +794,7 @@ test('at 320 px the rows and the categories fit without scrolling sideways', asy
   expect(await overflow()).toBe(0);
 });
 
-test('the hint has a line of its own; the toolbar under it leads with the menu, the calculator, Filter, and Display, which wrap under the other tools on a phone', async ({
+test('the hint has a line of its own; the toolbar under it leads with the menu, the calculator, Units, and Display, which wrap under the other tools on a phone', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -807,7 +807,7 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
     calculator: (await page
       .getByRole('button', { name: 'Calculator', exact: true })
       .boundingBox())!,
-    filter: (await settingsButton(page, 'Filter').boundingBox())!,
+    filter: (await settingsButton(page, 'Units').boundingBox())!,
     settings: (await settingsButton(page, 'Display').boundingBox())!,
     undo: (await page.getByRole('button', { name: 'Undo' }).boundingBox())!,
     last: (await page.getByRole('button', { name: 'Clear all' }).boundingBox())!,
@@ -817,7 +817,7 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   });
   const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
   // Wide: the menu at the toolbar's left, its edge on the column's, over the box, the calculator
-  // Filter, and Display after it; undo, redo, and clear all at the right end, the last button's edge on
+  // Units, and Display after it; undo, redo, and clear all at the right end, the last button's edge on
   // the column's too, so a fill lines up with the table (Sean, 2026-10-10). The menu is as wide as
   // its widest label in the theme's font, so every theme is checked.
   for (const theme of THEMES) {
@@ -839,7 +839,7 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   }
 
   // A phone has no room for both: undo, redo, and clear all keep the top line at the right end,
-  // and the menu, the calculator, Filter, and Display take the next, flush left, over the box.
+  // and the menu, the calculator, Units, and Display take the next, flush left, over the box.
   await page.setViewportSize({ width: 375, height: 800 });
   for (const theme of THEMES) {
     await applyTheme(page, theme);

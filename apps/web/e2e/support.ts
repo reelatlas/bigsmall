@@ -63,17 +63,17 @@ export const box = (page: Page) => page.getByRole('combobox', { name: 'Value', e
 /** The converter's category menu trigger, before a category is chosen or after. */
 export const menu = (page: Page) => page.getByRole('button', { name: /^Category/ });
 
-/** A settings panel's button, Filter or Display, in the converter's toolbar (not the dev toolbar's). */
-export const settingsButton = (page: Page, name: 'Filter' | 'Display') =>
+/** A settings panel's button, Units or Display, in the converter's toolbar (not the dev toolbar's). */
+export const settingsButton = (page: Page, name: 'Units' | 'Display') =>
   page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name, exact: true });
 
 /** A settings side panel, by its title. */
-export const settingsPanel = (page: Page, name: 'Filter' | 'Display') =>
+export const settingsPanel = (page: Page, name: 'Units' | 'Display') =>
   page.getByRole('group', { name, exact: true });
 
-/** The choices Filter holds; the rest are Display's. */
-const FILTER_CHOICES = new Set([
-  'All units',
+/** The choices Units holds; the rest are Display's. */
+const UNITS_CHOICES = new Set([
+  'All',
   'Standard',
   'Your region',
   'Metric',
@@ -85,13 +85,13 @@ const FILTER_CHOICES = new Set([
 ]);
 
 /**
- * Opens Filter or Display, whichever holds each choice, picks it by its label ("All units",
+ * Opens Units or Display, whichever holds each choice, picks it by its label ("All",
  * "Symbol and name", "No limit"), turns a switch over by its name ("Copy buttons"), or presses a
  * button ("Unhide units"), then closes the panel with its close button.
  */
 export async function setSettings(page: Page, ...choices: string[]) {
   for (const choice of choices) {
-    const name = FILTER_CHOICES.has(choice) ? 'Filter' : 'Display';
+    const name = UNITS_CHOICES.has(choice) ? 'Units' : 'Display';
     const panel = settingsPanel(page, name);
     if (!(await panel.count())) await settingsButton(page, name).click();
     const toggle = panel.getByRole('switch', { name: choice });
@@ -104,7 +104,7 @@ export async function setSettings(page: Page, ...choices: string[]) {
         .filter({ hasText: new RegExp(`^${choice}$`) })
         .click();
   }
-  for (const name of ['Filter', 'Display'] as const) {
+  for (const name of ['Units', 'Display'] as const) {
     const panel = settingsPanel(page, name);
     if (await panel.count()) await panel.getByRole('button', { name: /^Close/ }).click();
     await expect(panel).toHaveCount(0);
@@ -116,5 +116,5 @@ export async function setSettings(page: Page, ...choices: string[]) {
  * significant digits, for tests whose subject is something else.
  */
 export async function showEverything(page: Page) {
-  await setSettings(page, 'All units', 'Symbol and name', 'Copy buttons', 'No limit');
+  await setSettings(page, 'All', 'Symbol and name', 'Copy buttons', 'No limit');
 }

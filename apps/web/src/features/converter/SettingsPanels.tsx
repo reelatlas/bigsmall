@@ -35,16 +35,17 @@ import {
 const SUBHEAD = cx(PANEL_TITLE, 'text-xs');
 const CHECKBOX = 'size-4 accent-accent';
 
-/** The two strips of sizes, from the least fine to the finest, as the places run. */
+/** The two strips of sizes, from the least fine to the finest, as the places run: 1/2 to 1/8, then 1/16 on. */
 const SIZE_ROWS: ReadonlyArray<readonly FractionSize[]> = [
-  FRACTION_SIZES.slice(0, 4),
-  FRACTION_SIZES.slice(4),
+  FRACTION_SIZES.slice(0, 5),
+  FRACTION_SIZES.slice(5),
 ];
 
 const SIZE_NAME: Record<FractionSize, string> = {
   2: 'halves',
   3: 'thirds',
   4: 'quarters',
+  5: 'fifths',
   8: 'eighths',
   16: 'sixteenths',
   32: 'thirty-seconds',
@@ -181,18 +182,19 @@ function Reset({
 }
 
 /**
- * Filter (docs/UX-SPEC.md §1, §3; ADR 0017): what search and the table show, in every category.
+ * Units (docs/UX-SPEC.md §1, §3; ADR 0017; Filter until Sean renamed it, 2026-10-15): what search
+ * and the table show, in every category.
  * The presets first; then a switch per system, and the resets: the switches
  * back to the Standard units (single units chosen in a table stay as set), and Unhide units.
  */
-export function FilterPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
+export function UnitsPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
   const { rule } = settings;
   const hiddenCount = hiddenByHand(rule);
   const setRule = (next: (rule: ViewRule) => ViewRule) =>
     onSettings((now) => ({ ...now, rule: next(now.rule) }));
   const { copied: done, markCopied, pointerProps } = useCopied<'reset' | 'unhide'>();
   return (
-    <SidePanel title="Filter" onClose={onClose}>
+    <SidePanel title="Units" onClose={onClose}>
       <Choices<ShowPreset>
         legend="Show"
         hideLegend
@@ -215,10 +217,6 @@ export function FilterPanel({ settings, preference, onSettings, onClose }: Setti
             </label>
           ))}
         </fieldset>
-        <p className="text-xs text-ink-muted">
-          What search and the table show in every category. Units you hide or show in a table stay
-          as you set them.
-        </p>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-x-2 border-t border-line pt-2">
         <Reset
@@ -245,7 +243,7 @@ export function FilterPanel({ settings, preference, onSettings, onClose }: Setti
           {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
         </Reset>
         <p role="status" className="sr-only">
-          {done === 'reset' ? 'Filter reset' : done === 'unhide' ? 'Units unhidden' : ''}
+          {done === 'reset' ? 'Back to Standard' : done === 'unhide' ? 'Units unhidden' : ''}
         </p>
       </div>
     </SidePanel>

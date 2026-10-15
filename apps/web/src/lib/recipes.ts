@@ -34,7 +34,7 @@ export const LIST_CARD = 'rounded-lg border-2 border-edge bg-surface';
 export const PANEL_TITLE = 'text-sm font-medium text-ink-muted';
 
 /**
- * A side panel while focus is inside it, where the keys go (the calculator, Settings' Filter and
+ * A side panel while focus is inside it, where the keys go (the calculator, Settings' Units and
  * Display): its edge turns accent, 2 px like a focused box (its 1 px border and a 1 px ring, so
  * nothing moves), easing as the shells' edges do.
  */

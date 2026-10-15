@@ -7,10 +7,10 @@ import {
   CopiedIcon,
   CopyIcon,
   EraserIcon,
-  FunnelIcon,
+  FilterIcon,
+  FractionIcon,
   LinkIcon,
   RedoIcon,
-  SlidersIcon,
   UndoIcon,
 } from '../../components/icons';
 import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
@@ -23,7 +23,7 @@ import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { glide } from './glide';
-import { DisplayPanel, FilterPanel } from './SettingsPanels';
+import { DisplayPanel, UnitsPanel } from './SettingsPanels';
 import type { Settings } from './settings';
 import { TableLayout } from './TableLayout';
 import { urlFor } from './url';
@@ -47,9 +47,9 @@ const HINT = 'Type a number, unit, or both to compare all at once.';
 
 /**
  * The converter island (ADR 0012, ADR 0013, ADR 0017, docs/UX-SPEC.md §1): the hint; the
- * toolbar's buttons, the calculator, Filter, and Display after the category menu and undo, redo,
+ * toolbar's buttons, the calculator, Units, and Display after the category menu and undo, redo,
  * and clear all at its right end, which TableLayout sets in a row; the box and its table, with the
- * side panel open, one at a time (the calculator §8, Filter, or Display), between them or beside
+ * side panel open, one at a time (the calculator §8, Units, or Display), between them or beside
  * them; and the live regions. It draws the Copy URL button into the header's slot (§7).
  */
 export function Converter() {
@@ -67,7 +67,7 @@ export function Converter() {
     settings,
     updateSettings,
   } = useConverter(inputRef);
-  const filterToggleId = useId();
+  const unitsToggleId = useId();
   const displayToggleId = useId();
   // Tooltips name the platform's keys; until hydration they read as on the server (Ctrl).
   const apple = hydrated && isApplePlatform();
@@ -78,8 +78,8 @@ export function Converter() {
   const headerActions = useSlot(SLOTS.headerActions);
   const sideId = useId();
   const calculatorToggleId = useId();
-  /** The side panel open, one at a time (Sean, 2026-10-15): the calculator, Filter, or Display. */
-  const [side, setSide] = useState<'calculator' | 'filter' | 'display' | null>(null);
+  /** The side panel open, one at a time (Sean, 2026-10-15): the calculator, Units, or Display. */
+  const [side, setSide] = useState<'calculator' | 'units' | 'display' | null>(null);
   const calculatorOpen = side === 'calculator';
   // The calculator's own entry: a scratch pad in the converter's state, so undo reaches it too.
   const entry = state.calc;
@@ -156,18 +156,18 @@ export function Converter() {
     return () => document.removeEventListener('keydown', onKeyDown);
   });
 
-  /** Filter or Display, from its button: opening one closes whichever side panel was open. */
-  const toggleSettings = (key: 'filter' | 'display') =>
+  /** Units or Display, from its button: opening one closes whichever side panel was open. */
+  const toggleSettings = (key: 'units' | 'display') =>
     setSide((open) => (open === key ? null : key));
 
   /** Closed from inside it (its × or Escape), focus goes back to its button. */
-  const closeSettings = (key: 'filter' | 'display') => {
+  const closeSettings = (key: 'units' | 'display') => {
     setSide(null);
-    document.getElementById(key === 'filter' ? filterToggleId : displayToggleId)?.focus();
+    document.getElementById(key === 'units' ? unitsToggleId : displayToggleId)?.focus();
   };
 
   /**
-   * A change to what shows, from Filter or the table (Edit, Hidden), glides: rows slide to their
+   * A change to what shows, from Units or the table (Edit, Hidden), glides: rows slide to their
    * places and a unit checked in Hidden travels to its row (glide.ts). Display's changes rewrite
    * the values in place and need none.
    */
@@ -257,13 +257,13 @@ export function Converter() {
   );
 
   let sidePanel: ReactNode = calculator;
-  if (side === 'filter') {
+  if (side === 'units') {
     sidePanel = (
-      <FilterPanel
+      <UnitsPanel
         settings={settings}
         preference={env.system}
         onSettings={changeShown}
-        onClose={() => closeSettings('filter')}
+        onClose={() => closeSettings('units')}
       />
     );
   } else if (side === 'display') {
@@ -321,16 +321,16 @@ export function Converter() {
             <Button
               variant="ghost"
               square
-              id={filterToggleId}
-              data-tool="filter"
-              aria-label="Filter"
-              title="Filter"
-              aria-expanded={side === 'filter'}
-              aria-controls={side === 'filter' ? sideId : undefined}
-              on={side === 'filter'}
-              onClick={() => toggleSettings('filter')}
+              id={unitsToggleId}
+              data-tool="units"
+              aria-label="Units"
+              title="Units"
+              aria-expanded={side === 'units'}
+              aria-controls={side === 'units' ? sideId : undefined}
+              on={side === 'units'}
+              onClick={() => toggleSettings('units')}
             >
-              <FunnelIcon />
+              <FilterIcon />
             </Button>
             <Button
               variant="ghost"
@@ -344,7 +344,7 @@ export function Converter() {
               on={side === 'display'}
               onClick={() => toggleSettings('display')}
             >
-              <SlidersIcon />
+              <FractionIcon />
             </Button>
           </>
         }
@@ -400,7 +400,7 @@ export function Converter() {
         copyButton={copyButton}
         side={sidePanel}
         sideId={sideId}
-        sideTypes={side === 'filter' || side === 'display'}
+        sideTypes={side === 'units' || side === 'display'}
         copiedRow={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
         onCopyRow={copyRow}
         copyRowProps={(row) => pointerProps(`row-${row.id}`)}

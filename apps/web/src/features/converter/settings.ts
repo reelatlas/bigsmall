@@ -133,7 +133,7 @@ export function switchesChanged(rule: ViewRule): boolean {
 export type ShowPreset = 'all' | 'standard' | 'region';
 
 export const SHOW_PRESETS: ReadonlyArray<{ id: ShowPreset; name: string }> = [
-  { id: 'all', name: 'All units' },
+  { id: 'all', name: 'All' },
   { id: 'standard', name: 'Standard' },
   { id: 'region', name: 'Your region' },
 ];

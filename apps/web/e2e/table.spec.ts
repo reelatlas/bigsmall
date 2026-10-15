@@ -867,6 +867,28 @@ test('a fill never touches a line: the foot and Edit’s headings keep 4 px from
   }
 });
 
+test('the box’s × clears its text and keeps the unit, one step undo brings back', async ({
+  page,
+}) => {
+  await page.goto('/?a=milliliter&v=250');
+  await ready(page);
+  const clear = page.getByRole('button', { name: 'Clear number' });
+  await clear.click();
+  await expect(box(page)).toHaveValue('');
+  await expect(box(page)).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  // Only while there is text to clear.
+  await expect(clear).toHaveCount(0);
+  await page.keyboard.press('ControlOrMeta+z');
+  await expect(box(page)).toHaveValue('250');
+  // With a unit typed after the number, the whole text goes, and the button says so.
+  await page.keyboard.press('End');
+  await page.keyboard.type(' cu');
+  await page.getByRole('button', { name: 'Clear text' }).click();
+  await expect(box(page)).toHaveValue('');
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+});
+
 test('the hint has a line of its own; the toolbar under it leads with the menu, the calculator, Units, and Display, which wrap under the other tools on a phone', async ({
   page,
 }) => {

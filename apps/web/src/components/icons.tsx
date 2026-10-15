@@ -33,6 +33,19 @@ export function CloseIcon(props: IconProps) {
   );
 }
 
+/**
+ * Clear the text: a × in a circle, the field's own clear (docs/UX-SPEC.md §1), drawn apart from the
+ * chip's plain × so each reads as its own.
+ */
+export function ClearIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.5l5 5M14.5 9.5l-5 5" />
+    </Icon>
+  );
+}
+
 export function CopyIcon(props: IconProps) {
   return (
     <Icon {...props}>

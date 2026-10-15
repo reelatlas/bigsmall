@@ -715,4 +715,4 @@ Format:
 ## 2026-10-15 — A phone's number pad: `inputmode`, read at focus
 
 **What happened.** Sean asked for the number keys when tapping into the box. `inputmode="decimal"` on a text field brings an iPhone's decimal pad: digits and the locale's decimal mark only, no minus, no letters, no operators, and no return key (Safari's bar above the keyboard keeps Done). The keyboard reads the mode when the field gains focus; changing it while the keyboard is up shows nothing until the next tap.
-**Rule.** Ask for the pad only where the field takes nothing but an unsigned number (the box with a unit, outside Temperature and Angle), and keep `type="text"`: a number field drops what a parser reads.
+**Rule.** Ask for the pad only where the field takes nothing but an unsigned number (the box with a unit, outside Temperature and Angle), and keep `type="text"`: a number field drops what a parser reads. A button inside a field that must not take focus (the box's ×) prevents its mousedown; its click still fires, and the caret and a phone's keyboard stay where they were.

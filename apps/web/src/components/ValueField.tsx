@@ -11,6 +11,8 @@ import {
 } from 'react';
 import { useFieldFit, type FitText } from '../lib/fit-step';
 import { cx, FIELD_ROW, NUMBER_SIZES, SHELL, SHELL_BORDERED } from '../lib/recipes';
+import { Button } from './Button';
+import { ClearIcon } from './icons';
 import { NumberText, runningValue } from './NumberText';
 import { UnitChip } from './UnitChip';
 
@@ -48,6 +50,8 @@ export interface ValueFieldProps {
   numberPad?: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
+  /** The field's × was clicked or tapped: its text goes, the unit stays. */
+  onClear: () => void;
   /** The chip's body was clicked or tapped. */
   onChipOpen: () => void;
   /** The chip's × was clicked or tapped. */
@@ -63,10 +67,11 @@ const TEXT_LAYER =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 
 /**
- * The converter's field (docs/DESIGN-SYSTEM.md, "Fields"): a combobox input over a text layer, the
- * unit chip, and a trailing slot, the row fitted by measurement, so the chip gives up its name
- * before the value steps down a size, in a box of any width. Its edge is a shell's at rest, the
- * accent while focus is inside. What the keys do is its host's (TableLayout).
+ * The converter's field (docs/DESIGN-SYSTEM.md, "Fields"): a combobox input over a text layer, its
+ * clear while it holds text, the unit chip, and a trailing slot, the row fitted by measurement, so
+ * the chip gives up its name before the value steps down a size, in a box of any width. Its edge
+ * is a shell's at rest, the accent while focus is inside. What the keys do is its host's
+ * (TableLayout).
  */
 export function ValueField({
   inputRef,
@@ -83,6 +88,7 @@ export function ValueField({
   numberPad = false,
   onChange,
   onKeyDown,
+  onClear,
   onChipOpen,
   onChipRemove,
 }: ValueFieldProps) {
@@ -150,6 +156,22 @@ export function ValueField({
             <NumberText text={text} parsed={parsed} running={runningValue(parsed, locale)} />
           </div>
         </div>
+        {text !== '' && (
+          // The field's own clear, beside what it clears, the chip's × inside the chip: the text
+          // goes, the unit stays (Sean, 2026-10-15). Out of the Tab order, as Escape clears from
+          // the keyboard; a press never takes focus from the field, so a keyboard that is up stays.
+          <Button
+            variant="ghost"
+            square
+            nested
+            tabIndex={-1}
+            aria-label={parsed.query ? 'Clear text' : 'Clear number'}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={onClear}
+          >
+            <ClearIcon />
+          </Button>
+        )}
         {unit && (
           // Out of the Tab order: the field's own keys do what the chip does. Pointers and screen
           // readers still reach both buttons.

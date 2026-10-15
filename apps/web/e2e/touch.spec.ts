@@ -92,6 +92,24 @@ test('the chip’s ×, clear all, and the calculator, tapped, leave the keyboard
   await expect(box(page)).not.toBeFocused();
 });
 
+test('the box’s ×, tapped, clears the number and leaves the keyboard as it was', async ({
+  page,
+}) => {
+  await page.goto('/?a=milliliter&v=250');
+  await ready(page);
+  // Down: it stays down.
+  await page.getByRole('button', { name: 'Clear number' }).tap();
+  await expect(box(page)).toHaveValue('');
+  await expect(box(page)).not.toBeFocused();
+  await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
+  // Up: it stays up, to type the next number.
+  await box(page).tap();
+  await page.keyboard.type('5');
+  await page.getByRole('button', { name: 'Clear number' }).tap();
+  await expect(box(page)).toHaveValue('');
+  await expect(box(page)).toBeFocused();
+});
+
 test('with a unit in the box the number pad comes up, but not where values go below zero', async ({
   page,
 }) => {

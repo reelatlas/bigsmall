@@ -668,6 +668,13 @@ export function TableLayout({
             numberPad={box.unit !== null && !SIGNED.has(box.unit.category)}
             onChange={onChange}
             onKeyDown={onKeyDown}
+            // The field's ×: its text goes and its unit stays, one undoable step, the caret back
+            // in the field after a click; after a tap focus stays where it was (ADR 0015).
+            onClear={() => {
+              dispatch({ type: 'replace', text: '' });
+              setPosition(null);
+              if (!pressedByTouch()) inputRef.current?.focus();
+            }}
             // The chip is a readout here, and part of the box: clicking or tapping it puts the
             // caret in the field, where the arrows reach the units. Its × takes the unit out and
             // keeps the category's table, the caret back in the field after a click, not a tap.

@@ -1,7 +1,7 @@
 # 0015 — On a touch screen, the keyboard comes up only from the box
 
 Date: 2026-10-08
-Status: accepted. Amended 2026-10-15: with a unit in the box, outside Temperature and Angle, the box asks for the number pad
+Status: accepted. Amended 2026-10-15: with a unit in the box, outside Temperature and Angle, the box asks for the number pad; the box's own × leaves the keyboard as it was
 
 ## Context
 
@@ -31,6 +31,8 @@ Behavior: docs/UX-SPEC.md §8, "On a touch screen".
 - A tablet user with a hardware keyboard who tapped into the box loses the caret after Enter, but typing from anywhere lands in the box again (§8), so the next keys still work.
 - Browser tests for touch use `tap()` on the phone project (`e2e/touch.spec.ts`); `click()` there is a mouse click and keeps the desktop's flow, which the other specs check.
 
-## Amended 2026-10-15: the number pad
+## Amended 2026-10-15: the number pad, and the box's ×
 
 Sean asked for the number keys by default (2026-10-15). With a unit in the chip the box takes a number alone, so it carries `inputmode="decimal"` then, and a phone shows its decimal pad: digits and the decimal mark, no letters, no minus, no operators. With no unit it keeps `inputmode="text"`, since letters type a unit (`2 cups`), and so it does in Temperature and Angle, whose values go below zero as often as not. The chip's × brings the letters back; the calculator does the math. The field stays `type="text"`: a number field would drop what the parser reads (grouping, exponents, a unit after the number). The keyboard reads the mode when the field gains focus, so a change shows at the next tap.
+
+The box's × (docs/UX-SPEC.md §1) follows this decision's rule: a tap on it never brings the keyboard up. Its mousedown is prevented, so a keyboard already up stays up, to type the next number.

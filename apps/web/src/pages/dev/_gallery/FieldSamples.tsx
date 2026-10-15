@@ -67,6 +67,7 @@ function FieldSample({
       }
       onChange={noop}
       onKeyDown={noop}
+      onClear={noop}
       onChipOpen={noop}
       onChipRemove={noop}
     />

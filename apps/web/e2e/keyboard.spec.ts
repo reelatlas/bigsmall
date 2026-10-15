@@ -1,6 +1,6 @@
 import { categories } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
-import { box, menu, ready, themeToggle } from './support';
+import { blur, box, menu, ready, shortcutsButton, themeToggle } from './support';
 
 // The page's toolbars and planes (docs/UX-SPEC.md §8, §10, ADR 0014): each toolbar is one Tab
 // stop whose arrows move along it, and which keeps the control last used; ↑ and ↓ move between
@@ -10,14 +10,13 @@ import { box, menu, ready, themeToggle } from './support';
 
 test.skip(({ isMobile }) => isMobile, 'the arrows and Tab need a keyboard');
 
-const shortcuts = (page: Page) => page.getByRole('button', { name: 'Keyboard shortcuts' });
 const tool = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
 
 test('each toolbar is one Tab stop, which keeps the control last used', async ({ page }) => {
   await page.goto('/');
   await ready(page);
   await page.keyboard.press('Tab');
-  await expect(shortcuts(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(menu(page)).toBeFocused();
   await page.keyboard.press('Tab');
@@ -74,18 +73,18 @@ test('the arrows move between the header, the toolbar, and the box, stopping at 
   await page.keyboard.press('ArrowUp');
   await expect(menu(page)).toBeFocused();
   await page.keyboard.press('ArrowUp');
-  await expect(shortcuts(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toBeFocused();
   // In the header, ← and → follow what shows: the shortcuts map, Copy URL, the theme menu.
   await page.keyboard.press('ArrowRight');
   await expect(tool(page, 'Copy URL')).toBeFocused();
   await page.keyboard.press('ArrowRight');
   await expect(themeToggle(page)).toBeFocused();
   await page.keyboard.press('ArrowRight');
-  await expect(shortcuts(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toBeFocused();
   // The header is the top: up from it does nothing (Sean, 2026-10-15). Down, each toolbar keeps
   // where it was left.
   await page.keyboard.press('ArrowUp');
-  await expect(shortcuts(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(menu(page)).toBeFocused();
   await page.keyboard.press('ArrowDown');
@@ -109,7 +108,7 @@ test('with nothing focused, ↑ or ↓ goes into the box, and the next press mov
   await page.keyboard.press('ArrowUp');
   await expect(menu(page)).toBeFocused();
 
-  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await blur(page);
   await page.keyboard.press('ArrowUp');
   await expect(box(page)).toBeFocused();
 });
@@ -127,13 +126,13 @@ test('Escape on a toolbar control goes back to the box; with the map open, it cl
 
   await page.keyboard.press('ArrowUp');
   await page.keyboard.press('ArrowUp');
-  await expect(shortcuts(page)).toBeFocused();
-  await expect(shortcuts(page)).toHaveAttribute('aria-expanded', 'false');
+  await expect(shortcutsButton(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toHaveAttribute('aria-expanded', 'false');
   await page.keyboard.press('Enter');
-  await expect(shortcuts(page)).toHaveAttribute('aria-expanded', 'true');
+  await expect(shortcutsButton(page)).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
-  await expect(shortcuts(page)).toHaveAttribute('aria-expanded', 'false');
-  await expect(shortcuts(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toHaveAttribute('aria-expanded', 'false');
+  await expect(shortcutsButton(page)).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(box(page)).toBeFocused();
 });
@@ -142,7 +141,7 @@ test('typing on a toolbar’s control, the header’s too, lands in the box', as
   await page.goto('/');
   await ready(page);
   await page.keyboard.press('Tab');
-  await expect(shortcuts(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toBeFocused();
   await page.keyboard.type('5');
   await expect(box(page)).toBeFocused();
   await expect(box(page)).toHaveValue('5');
@@ -158,15 +157,15 @@ test('the shortcuts map opens with Enter, never as the keyboard passes, and clos
   await page.goto('/');
   await ready(page);
   const map = page.getByRole('group', { name: 'Keyboard shortcuts' });
-  const ring = () => shortcuts(page).evaluate((icon) => getComputedStyle(icon).outlineStyle);
+  const ring = () => shortcutsButton(page).evaluate((icon) => getComputedStyle(icon).outlineStyle);
   // Reached with Tab it stays shut, the icon showing its ring, which its shell does not clip
   // (Sean, 2026-10-15).
   await page.keyboard.press('Tab');
-  await expect(shortcuts(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toBeFocused();
   await expect(map).toBeHidden();
   expect(await ring()).not.toBe('none');
   const clip = () =>
-    shortcuts(page).evaluate(
+    shortcutsButton(page).evaluate(
       (icon) => getComputedStyle(icon.closest('[data-shell] > *')!).overflow,
     );
   expect(await clip()).toBe('visible');
@@ -176,7 +175,7 @@ test('the shortcuts map opens with Enter, never as the keyboard passes, and clos
   await expect(map).toBeVisible();
   expect(await ring()).toBe('none');
   // The fill eases in with the button's own transition, so wait for it to settle.
-  const soft = await shortcuts(page).evaluate((icon) => {
+  const soft = await shortcutsButton(page).evaluate((icon) => {
     const probe = document.createElement('span');
     probe.style.color = getComputedStyle(icon).getPropertyValue('--accent-soft');
     document.body.append(probe);
@@ -185,17 +184,17 @@ test('the shortcuts map opens with Enter, never as the keyboard passes, and clos
     return color;
   });
   await expect
-    .poll(() => shortcuts(page).evaluate((icon) => getComputedStyle(icon).backgroundColor))
+    .poll(() => shortcutsButton(page).evaluate((icon) => getComputedStyle(icon).backgroundColor))
     .toBe(soft);
   await page.keyboard.press('Escape');
   await expect(map).toBeHidden();
-  await expect(shortcuts(page)).toBeFocused();
+  await expect(shortcutsButton(page)).toBeFocused();
   // Open again, moving on along the toolbar closes it.
   await page.keyboard.press('Enter');
   await expect(map).toBeVisible();
   await page.keyboard.press('ArrowRight');
   await expect(map).toBeHidden();
-  await expect(shortcuts(page)).toHaveAttribute('aria-expanded', 'false');
+  await expect(shortcutsButton(page)).toHaveAttribute('aria-expanded', 'false');
 });
 
 test('in a narrow header the arrows follow what shows, the theme menu first', async ({ page }) => {

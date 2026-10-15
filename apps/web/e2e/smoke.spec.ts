@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { DEFAULT_LIGHT, THEMES } from '../src/lib/themes';
-import { applyTheme, box, expectNoA11yViolations, pickTheme, ready, settled } from './support';
+import { applyTheme, box, expectNoA11yViolations, pickTheme, ready, row, settled } from './support';
 
 // Checks that span the site: every page and every theme pass axe, every Tab stop shows focus,
 // and reduced motion stills every theme. Each feature's flows have a file of their own.
@@ -8,6 +8,7 @@ import { applyTheme, box, expectNoA11yViolations, pickTheme, ready, settled } fr
 for (const path of ['/', '/dev/gallery', '/dev/wordmark-lab']) {
   test(`${path} renders with no WCAG violations`, async ({ page }) => {
     await page.goto(path);
+    if (path === '/') await ready(page);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expectNoA11yViolations(page);
   });
@@ -46,7 +47,7 @@ test('a conversion loads from the URL', async ({ page }) => {
   await page.goto('/?a=mile&v=1');
   await expect(box(page)).toHaveValue('1');
   // Two places, as a fresh visit writes values.
-  await expect(page.locator('[data-row="kilometer"]')).toContainText('1.61');
+  await expect(row(page, 'kilometer')).toContainText('1.61');
 });
 
 test('every theme passes axe on the converter', async ({ page }) => {
@@ -110,10 +111,13 @@ test('reduced motion zeroes the motion tokens in every theme', async ({ page }) 
   await page.goto('/');
   for (const theme of THEMES) {
     await applyTheme(page, theme);
-    const duration = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue('--motion-fast').trim(),
-    );
-    // Zero either way: the production build's minifier writes 0ms as 0s.
-    expect(duration, theme.id).toMatch(/^0m?s$/);
+    for (const token of ['--motion-fast', '--motion-base', '--motion-slow']) {
+      const duration = await page.evaluate(
+        (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim(),
+        token,
+      );
+      // Zero either way: the production build's minifier writes 0ms as 0s.
+      expect(duration, `${theme.id} ${token}`).toMatch(/^0m?s$/);
+    }
   }
 });

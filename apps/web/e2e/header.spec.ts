@@ -2,10 +2,12 @@ import { expect, test } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import {
   applyTheme,
+  calculatorButton,
   expectNoA11yViolations,
   MARGIN_MS,
   pickTheme,
   ready,
+  shortcutsButton,
   themeToggle,
 } from './support';
 
@@ -95,7 +97,7 @@ test('the shortcuts map opens on a click, never on hover, and closes on Escape o
 }) => {
   test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
   await page.goto('/');
-  const toggle = page.getByRole('button', { name: 'Keyboard shortcuts' });
+  const toggle = shortcutsButton(page);
 
   // A resting mouse opens nothing (Sean, 2026-10-15); a click does.
   await toggle.hover();
@@ -138,7 +140,7 @@ test('the shortcuts map opens on a click, never on hover, and closes on Escape o
 test('the shortcuts map is hidden on touch-first devices', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'desktop shows the shortcuts map');
   await page.goto('/');
-  await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeHidden();
+  await expect(shortcutsButton(page)).toBeHidden();
 });
 
 test('shortcuts name ⌘ and ⌥ on Apple devices, Ctrl and Alt elsewhere', async ({
@@ -147,7 +149,7 @@ test('shortcuts name ⌘ and ⌥ on Apple devices, Ctrl and Alt elsewhere', asyn
 }) => {
   test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
   const undo = page.getByRole('button', { name: 'Undo' });
-  const calculator = page.getByRole('button', { name: 'Calculator', exact: true });
+  const calculator = calculatorButton(page);
 
   await page.goto('/');
   await ready(page);
@@ -156,7 +158,7 @@ test('shortcuts name ⌘ and ⌥ on Apple devices, Ctrl and Alt elsewhere', asyn
   await expect(undo).toHaveAttribute('title', 'Undo (Ctrl+Z)');
   await expect(calculator).toHaveAttribute('title', 'Calculator (Alt+C)');
   // The site's shortcuts, then a line, then the toolbar's, from the calculator on.
-  const lined = page.locator('#shortcuts-panel dl > div.border-t');
+  const lined = page.locator('#shortcuts-panel [data-starts-group]');
   await expect(lined).toHaveCount(1);
   await expect(lined).toContainText('Open calculator');
   await expect(page.locator('#shortcuts-panel')).not.toContainText('Reorder');

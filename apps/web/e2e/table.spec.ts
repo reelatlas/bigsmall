@@ -4,14 +4,19 @@ import { THEMES } from '../src/lib/themes';
 import { ANNOUNCE_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
 import {
   applyTheme,
+  blur,
   box,
+  calculatorButton,
+  calculatorPanel,
   expectNoA11yViolations,
+  hiddenToggle,
   MARGIN_MS,
   menu,
   ready,
   row,
   setSettings,
   settingsButton,
+  shortcutsButton,
   showEverything,
   unitCell,
 } from './support';
@@ -284,7 +289,7 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('ArrowRight');
   await expect(radios).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Calculator', exact: true })).toBeFocused();
+  await expect(calculatorButton(page)).toBeFocused();
   await expect(menu(page)).toHaveText(/Temperature/);
 });
 
@@ -322,7 +327,7 @@ test('keyboard: the arrows go through every row from the unit in the box, onto t
   // down again does nothing (ADR 0014; Sean, 2026-10-15: going round to the header jarred), and
   // up goes back to the last row.
   await box(page).press('ArrowDown');
-  const hidden = page.getByRole('button', { name: /^Hidden/ });
+  const hidden = hiddenToggle(page);
   await expect(hidden).toBeFocused();
   await expectCursor(page, null);
   await page.keyboard.press('ArrowDown');
@@ -382,7 +387,7 @@ test('with nothing focused, Escape clears the box a step at a time, as in the bo
   await page.keyboard.type(' cu');
   await expect(matches(page)).toBeVisible();
   // Focus leaves the converter for the page.
-  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await blur(page);
 
   await page.keyboard.press('Escape');
   await expect(box(page)).toHaveValue('250');
@@ -405,7 +410,7 @@ test('the cursor shows only while focus is in the box or its table', async ({ pa
   await box(page).click();
   await box(page).press('ArrowDown');
   await expect(page.locator('[role="row"][aria-selected="true"]')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
+  await calculatorButton(page).click();
   await expect(page.locator('[role="row"][aria-selected="true"]')).toHaveCount(0);
 });
 
@@ -413,7 +418,7 @@ test('an Escape that closes the shortcuts map does nothing else', async ({ page,
   test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
   await page.goto('/?a=milliliter&v=250');
   await ready(page);
-  const toggle = page.getByRole('button', { name: 'Keyboard shortcuts' });
+  const toggle = shortcutsButton(page);
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
@@ -435,7 +440,7 @@ test('typing anywhere lands in the field, after what is there', async ({ page, i
   await expect(box(page)).toHaveValue('55467');
 
   // With nothing focused on the page, too. From the chip, Backspace takes the last character back.
-  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await blur(page);
   await page.keyboard.type('8');
   await expect(box(page)).toBeFocused();
   await expect(box(page)).toHaveValue('554678');
@@ -506,6 +511,11 @@ test('a row reads the value on the left, on the decimal point, then symbol and n
   await setSettings(page, 'No limit');
   await lineUp();
   await expect(unitCell(page, 'us-cup')).toHaveAccessibleName(/^1\.05669 cup cups/);
+  // In every theme, whose number faces differ (monospace, serif), the columns still line up.
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    await lineUp();
+  }
 
   // Symbols line up on their last letter, an exponent hanging after it: "ha" ends where the "m"
   // of "m²" does. Screen readers hear the symbol whole.
@@ -632,7 +642,7 @@ test('a side panel takes a column from md, its top level with the box, and sits 
   await page.goto('/?a=celsius&v=20');
   await ready(page);
   const table = page.getByRole('region', { name: 'Temperature' });
-  const calculator = page.getByRole('group', { name: 'Calculator' });
+  const calculator = calculatorPanel(page);
   const field = page.locator('[data-plane="box"]');
   const gapUnderBox = async () => {
     const edge = (await field.boundingBox())!;
@@ -642,7 +652,7 @@ test('a side panel takes a column from md, its top level with the box, and sits 
   const closed = await gapUnderBox();
   expect(closed).toBe(8);
 
-  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
+  await calculatorButton(page).click();
   const wide = {
     calculator: (await calculator.boundingBox())!,
     table: (await table.boundingBox())!,
@@ -658,7 +668,7 @@ test('a side panel takes a column from md, its top level with the box, and sits 
     expect(Math.abs(panel.y - wide.field.y), name).toBeLessThan(1);
     expect(await gapUnderBox(), name).toBe(closed);
   }
-  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
+  await calculatorButton(page).click();
   // Flush right with the page, and the table still right under the box.
   expect(
     Math.abs(wide.calculator.x + wide.calculator.width - (wide.converter.x + wide.converter.width)),
@@ -720,10 +730,12 @@ test('the chip gives up its name before the number shrinks, sooner in a narrower
 test('before the island hydrates, the server’s page shows the start, so nothing jumps', async ({
   page,
 }) => {
-  // Without the island's code the page stays as the server rendered it.
-  await page.route('**/features/converter/Converter.tsx**', (route) => route.abort());
+  // Without the island's code (its source on the dev server, its chunk in a build) the page stays
+  // as the server rendered it.
+  await page.route(/Converter[\w.-]*\.(tsx|js)/, (route) => route.abort());
   await page.goto('/');
   await expect(box(page)).toBeVisible();
+  await expect(page.locator('section[data-hydrated]')).toHaveCount(0);
   await expect(box(page)).toHaveAttribute('placeholder', 'Number or unit');
   await expect(menu(page)).toBeVisible();
   await expect(tiles(page)).toBeVisible();
@@ -865,9 +877,13 @@ test('a fill never touches a line: the foot and Edit’s headings keep 4 px from
   for (const step of ['rows', 'Hidden open', 'Edit'] as const) {
     if (step === 'Hidden open') await card.getByRole('button', { name: /^Hidden/ }).click();
     if (step === 'Edit') await card.getByRole('button', { name: 'Edit', exact: true }).click();
-    const found = await gaps();
-    expect(found.length, step).toBeGreaterThan(0);
-    for (const gap of found) expect(gap, step).toBeGreaterThanOrEqual(4);
+    // In every theme: the gap is padding, but each theme's type sets the rows' height.
+    for (const theme of THEMES) {
+      await applyTheme(page, theme);
+      const found = await gaps();
+      expect(found.length, `${step}, ${theme.id}`).toBeGreaterThan(0);
+      for (const gap of found) expect(gap, `${step}, ${theme.id}`).toBeGreaterThanOrEqual(4);
+    }
   }
 });
 
@@ -903,11 +919,9 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   const geometry = async () => ({
     hint: (await page.getByText(words).boundingBox())!,
     toolbar: (await page.getByRole('toolbar', { name: 'Tools' }).boundingBox())!,
-    calculator: (await page
-      .getByRole('button', { name: 'Calculator', exact: true })
-      .boundingBox())!,
-    filter: (await settingsButton(page, 'Units').boundingBox())!,
-    settings: (await settingsButton(page, 'Display').boundingBox())!,
+    calculator: (await calculatorButton(page).boundingBox())!,
+    units: (await settingsButton(page, 'Units').boundingBox())!,
+    display: (await settingsButton(page, 'Display').boundingBox())!,
     undo: (await page.getByRole('button', { name: 'Undo' }).boundingBox())!,
     last: (await page.getByRole('button', { name: 'Clear all' }).boundingBox())!,
     menu: (await menu(page).boundingBox())!,
@@ -926,9 +940,9 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
     expect(Math.round(wide.toolbar.y - (wide.hint.y + wide.hint.height)), theme.id).toBe(8);
     expect(Math.abs(middle(wide.menu) - middle(wide.last)), theme.id).toBeLessThan(4);
     expect(wide.menu.x + wide.menu.width, theme.id).toBeLessThan(wide.calculator.x);
-    expect(wide.calculator.x + wide.calculator.width, theme.id).toBeLessThanOrEqual(wide.filter.x);
-    expect(wide.filter.x + wide.filter.width, theme.id).toBeLessThanOrEqual(wide.settings.x);
-    expect(wide.settings.x + wide.settings.width, theme.id).toBeLessThan(wide.undo.x);
+    expect(wide.calculator.x + wide.calculator.width, theme.id).toBeLessThanOrEqual(wide.units.x);
+    expect(wide.units.x + wide.units.width, theme.id).toBeLessThanOrEqual(wide.display.x);
+    expect(wide.display.x + wide.display.width, theme.id).toBeLessThan(wide.undo.x);
     expect(Math.abs(wide.menu.x - wide.start.x), theme.id).toBeLessThanOrEqual(3);
     expect(
       Math.abs(wide.last.x + wide.last.width - (wide.start.x + wide.start.width)),
@@ -948,7 +962,7 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
     expect(Math.round(narrow.toolbar.y - (narrow.hint.y + narrow.hint.height)), theme.id).toBe(8);
     expect(Math.abs(narrow.undo.x - narrow.start.x), theme.id).toBeLessThanOrEqual(1);
     expect(narrow.menu.y, theme.id).toBeGreaterThanOrEqual(narrow.last.y + narrow.last.height);
-    expect(Math.abs(middle(narrow.menu) - middle(narrow.settings)), theme.id).toBeLessThan(4);
+    expect(Math.abs(middle(narrow.menu) - middle(narrow.display)), theme.id).toBeLessThan(4);
     expect(Math.abs(narrow.menu.x - narrow.start.x), theme.id).toBeLessThanOrEqual(3);
     expect(narrow.menu.y + narrow.menu.height, theme.id).toBeLessThanOrEqual(narrow.field.y);
   }

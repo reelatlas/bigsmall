@@ -11,6 +11,8 @@ export default defineConfig({
   // In CI: annotations on the run, plus the HTML report the workflow uploads when a test fails.
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
+    // The visitor is in the US, writing numbers the US way, on any machine.
+    locale: 'en-US',
     baseURL: `http://${HOST}:${PORT}`,
     trace: 'on-first-retry',
   },

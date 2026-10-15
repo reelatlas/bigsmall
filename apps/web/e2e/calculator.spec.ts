@@ -1,6 +1,15 @@
 import { expect, test } from '@playwright/test';
 import { TYPING_CHUNK_MS } from '../src/lib/timing';
-import { box, expectNoA11yViolations, MARGIN_MS, ready } from './support';
+import {
+  blur,
+  box,
+  calculatorButton,
+  calculatorPanel,
+  expectNoA11yViolations,
+  MARGIN_MS,
+  ready,
+  row,
+} from './support';
 
 // The calculator scratch pad (docs/UX-SPEC.md §8, "The calculator"): its keys, its Tab cycle,
 // Escape, "Use" into the box, and one history with the box. Where it opens is in table.spec.ts.
@@ -10,8 +19,8 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
 }) => {
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  const toggle = page.getByRole('button', { name: 'Calculator', exact: true });
-  const calculator = page.getByRole('group', { name: 'Calculator' });
+  const toggle = calculatorButton(page);
+  const calculator = calculatorPanel(page);
   const key = (name: string) => calculator.getByRole('button', { name, exact: true });
   const entry = calculator.locator('[data-entry]');
   const use = calculator.getByRole('button', { name: /^Use/ });
@@ -41,7 +50,7 @@ test('the calculator holds the keyboard, cycles Enter targets with Tab, and step
   await page.keyboard.press('Enter');
   await expect(box(page)).toHaveValue('36');
   // Two places, as a fresh visit writes values.
-  await expect(page.locator('[data-row="liter"]')).toContainText('0.04');
+  await expect(row(page, 'liter')).toContainText('0.04');
   // After a send, focus is back on =, so Enter cannot send the same number again.
   await expect(key('equals')).toBeFocused();
   await expect(page.getByRole('status').filter({ hasText: 'Sent to the value' })).toHaveCount(1);
@@ -99,8 +108,8 @@ test('the arrows move between the calculator’s keys; Enter presses the one wit
   test.skip(isMobile, 'the arrows need a keyboard');
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
-  const calculator = page.getByRole('group', { name: 'Calculator' });
+  await calculatorButton(page).click();
+  const calculator = calculatorPanel(page);
   const key = (name: string) => calculator.getByRole('button', { name, exact: true });
   const entry = calculator.locator('[data-entry]');
   const close = calculator.getByRole('button', { name: 'Close calculator' });
@@ -149,8 +158,8 @@ test('Alt+C opens and closes the calculator; closed from inside, focus goes back
   test.skip(isMobile, 'Alt+C needs a keyboard');
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  const toggle = page.getByRole('button', { name: 'Calculator', exact: true });
-  const calculator = page.getByRole('group', { name: 'Calculator' });
+  const toggle = calculatorButton(page);
+  const calculator = calculatorPanel(page);
   const equals = calculator.getByRole('button', { name: 'equals', exact: true });
   await expect(toggle).toHaveAttribute('aria-keyshortcuts', 'Alt+C');
   await expect(toggle).toHaveAttribute('title', 'Calculator (Alt+C)');
@@ -170,7 +179,7 @@ test('Alt+C opens and closes the calculator; closed from inside, focus goes back
   await expect(box(page)).toBeFocused();
 
   // With nothing focused, closing comes back to the box; Escape on an empty display does too.
-  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await blur(page);
   await page.keyboard.press('Alt+c');
   await expect(equals).toBeFocused();
   await page.keyboard.press('Escape');
@@ -181,8 +190,8 @@ test('Alt+C opens and closes the calculator; closed from inside, focus goes back
 test('the calculator says why its number has no value to use', async ({ page }) => {
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
-  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
-  const calculator = page.getByRole('group', { name: 'Calculator' });
+  await calculatorButton(page).click();
+  const calculator = calculatorPanel(page);
   const message = calculator.locator('[data-calculator-message]');
   const equals = calculator.getByRole('button', { name: 'equals', exact: true });
   const use = calculator.getByRole('button', { name: /^Use/ });

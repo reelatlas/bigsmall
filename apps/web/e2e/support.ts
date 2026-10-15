@@ -6,7 +6,7 @@ import type { ThemeMeta } from '../src/lib/themes';
 export const MARGIN_MS = 200;
 
 /** The rules axe checks: WCAG 2.0, 2.1, and 2.2 at levels A and AA. */
-export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
+const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 /**
  * The converter island is server-rendered; keystrokes typed before it hydrates are lost, so
@@ -63,6 +63,22 @@ export const box = (page: Page) => page.getByRole('combobox', { name: 'Value', e
 /** The converter's category menu trigger, before a category is chosen or after. */
 export const menu = (page: Page) => page.getByRole('button', { name: /^Category/ });
 
+/** The header's keyboard shortcuts button, which opens the shortcuts map. */
+export const shortcutsButton = (page: Page) =>
+  page.getByRole('button', { name: 'Keyboard shortcuts' });
+
+/** The toolbar's calculator button, and the calculator it opens. */
+export const calculatorButton = (page: Page) =>
+  page.getByRole('button', { name: 'Calculator', exact: true });
+export const calculatorPanel = (page: Page) => page.getByRole('group', { name: 'Calculator' });
+
+/** The table's Hidden button, at its foot, with its count. */
+export const hiddenToggle = (page: Page) => page.getByRole('button', { name: /^Hidden/ });
+
+/** Takes focus off the page: nothing focused, as after a click on empty space. */
+export const blur = (page: Page) =>
+  page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+
 /** A unit's row in the table, by its unit id. */
 export const row = (page: Page, unitId: string) => page.locator(`[data-row="${unitId}"]`);
 
@@ -87,7 +103,10 @@ const UNITS_CHOICES = new Set([
   'US (customary)',
   'UK (imperial)',
   'Specialty',
+  'Other',
+  'Custom',
   'Show custom hidden units',
+  'Reset order',
 ]);
 
 /**

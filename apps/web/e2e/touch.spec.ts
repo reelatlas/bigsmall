@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { box, menu, ready, unitCell } from './support';
+import { box, calculatorButton, calculatorPanel, menu, ready, row, unitCell } from './support';
 
 // A touch screen (docs/UX-SPEC.md §8, "On a touch screen", ADR 0015): the on-screen keyboard
 // comes up only from a tap in the box. A tap anywhere else never moves focus into it, a tap in the
@@ -73,9 +73,9 @@ test('the chip’s ×, clear all, and the calculator, tapped, leave the keyboard
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
   await expect(box(page)).not.toBeFocused();
 
-  const calculatorIcon = page.getByRole('button', { name: 'Calculator', exact: true });
+  const calculatorIcon = calculatorButton(page);
   await calculatorIcon.tap();
-  const calculator = page.getByRole('group', { name: 'Calculator' });
+  const calculator = calculatorPanel(page);
   await expect(calculator.getByRole('button', { name: 'equals', exact: true })).toBeFocused();
   await calculator.getByRole('button', { name: '7', exact: true }).tap();
   await calculator.getByRole('button', { name: /^Use/ }).tap();
@@ -143,7 +143,7 @@ test('a tapped row shows its copy button, which copies what the row shows', asyn
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.47');
   await expect(box(page)).not.toBeFocused();
   // Another row's unseen button is out of the way: a tap at its end takes that row.
-  const pint = page.locator('[data-row="us-pint"]');
+  const pint = row(page, 'us-pint');
   const size = (await pint.boundingBox())!;
   await pint.tap({ position: { x: size.width - 12, y: size.height / 2 } });
   await expect(page.getByRole('button', { name: 'Remove pints' })).toBeVisible();

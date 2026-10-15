@@ -1,8 +1,12 @@
 import { unitsIn } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
+import { cssTime } from '../src/lib/css-time';
 import {
   box,
+  calculatorButton,
+  calculatorPanel,
   expectNoA11yViolations,
+  hiddenToggle,
   ready,
   row,
   setSettings,
@@ -17,7 +21,6 @@ import {
 // are in the US: their own units come first (ADR 0011).
 
 const table = (page: Page) => page.getByRole('region', { name: 'Volume' });
-const hiddenToggle = (page: Page) => page.getByRole('button', { name: /^Hidden/ });
 const SPECIALIST = unitsIn('volume').filter((unit) => unit.tier !== 'basic').length;
 
 test('a fresh visit shows symbols and names, two places, and the specialist units hidden', async ({
@@ -88,7 +91,7 @@ test('Alt+V and Alt+B open and close Units and Display from anywhere, focus comi
   await page.keyboard.press('Alt+v');
   await page.keyboard.press('Alt+c');
   await expect(units).toHaveCount(0);
-  await expect(page.getByRole('group', { name: 'Calculator' })).toBeVisible();
+  await expect(calculatorPanel(page)).toBeVisible();
 });
 
 test('Units and Display open beside the table, one side panel at a time with the calculator; Escape closes, a press outside does not', async ({
@@ -96,15 +99,15 @@ test('Units and Display open beside the table, one side panel at a time with the
 }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
-  const filter = settingsPanel(page, 'Units');
+  const units = settingsPanel(page, 'Units');
   const display = settingsPanel(page, 'Display');
-  const calculator = page.getByRole('group', { name: 'Calculator' });
+  const calculator = calculatorPanel(page);
   // Opening moves focus in, onto its first choice, and its edge turns the accent.
   await settingsButton(page, 'Units').click();
-  await expect(filter.locator('label', { hasText: /^Standard$/ }).locator('input')).toBeFocused();
-  const edge = () => filter.evaluate((panel) => getComputedStyle(panel).borderTopColor);
+  await expect(units.locator('label', { hasText: /^Standard$/ }).locator('input')).toBeFocused();
+  const edge = () => units.evaluate((panel) => getComputedStyle(panel).borderTopColor);
   // The theme's accent as a computed color, for the edge to ease to.
-  const accent = await filter.evaluate((panel) => {
+  const accent = await units.evaluate((panel) => {
     const probe = document.createElement('span');
     probe.style.color = getComputedStyle(panel).getPropertyValue('--accent');
     panel.append(probe);
@@ -114,20 +117,20 @@ test('Units and Display open beside the table, one side panel at a time with the
   });
   await expect.poll(edge).toBe(accent);
   await page.keyboard.press('Escape');
-  await expect(filter).toHaveCount(0);
+  await expect(units).toHaveCount(0);
   await expect(settingsButton(page, 'Units')).toBeFocused();
 
   // A side panel stays open as the page is used, its edge quiet once focus leaves it.
   await settingsButton(page, 'Units').click();
   await box(page).click();
-  await expect(filter).toBeVisible();
+  await expect(units).toBeVisible();
   await expect.poll(edge).not.toBe(accent);
 
   // One side panel at a time: each opens in the place of the one before.
   await settingsButton(page, 'Display').click();
-  await expect(filter).toHaveCount(0);
+  await expect(units).toHaveCount(0);
   await expect(display).toBeVisible();
-  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
+  await calculatorButton(page).click();
   await expect(display).toHaveCount(0);
   await expect(calculator).toBeVisible();
   await settingsButton(page, 'Units').click();
@@ -308,7 +311,7 @@ test('under the matches, Show them carries on from the last match, and ↑ comes
   await page.keyboard.press('ArrowUp');
   await expect(box(page)).toBeFocused();
   await expect(
-    page.getByRole('group', { name: 'Hidden' }).getByRole('option').last(),
+    page.getByRole('group', { name: 'Hidden', exact: true }).getByRole('option').last(),
   ).toHaveAttribute('aria-selected', 'true');
   await box(page).press('ArrowDown');
   await expect(hide).toBeFocused();
@@ -543,7 +546,7 @@ test('search leaves hidden units out and offers them; taking one unhides it', as
   await box(page).fill('2 cubic');
   await expect(page.getByText('Only hidden units match')).toBeVisible();
   await page.getByRole('button', { name: 'Show them' }).click();
-  const hidden = page.getByRole('group', { name: 'Hidden' });
+  const hidden = page.getByRole('group', { name: 'Hidden', exact: true });
   await expect(hidden.getByRole('option')).not.toHaveCount(0);
   await expectNoA11yViolations(page);
   await hidden.getByRole('option', { name: /cubic inches/ }).click();
@@ -615,16 +618,16 @@ test('Units and Display follow the calculator in the toolbar; a panel keeps its 
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
-  await page.getByRole('button', { name: 'Calculator', exact: true }).focus();
+  await calculatorButton(page).focus();
   await page.keyboard.press('ArrowRight');
   await expect(settingsButton(page, 'Units')).toBeFocused();
   await page.keyboard.press('ArrowRight');
   await expect(settingsButton(page, 'Display')).toBeFocused();
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('Enter');
-  const filter = settingsPanel(page, 'Units');
+  const units = settingsPanel(page, 'Units');
   const choice = (label: string) =>
-    filter
+    units
       .locator('label', { hasText: new RegExp(`^${label.replace(/[()]/g, '\\$&')}$`) })
       .locator('input');
   await expect(choice('Standard')).toBeFocused();
@@ -640,12 +643,12 @@ test('Units and Display follow the calculator in the toolbar; a panel keeps its 
   await page.keyboard.press('Enter');
   await expect(choice('Metric')).toBeChecked();
   for (let step = 0; step < 6; step += 1) await page.keyboard.press('ArrowUp');
-  await expect(filter.getByRole('button', { name: 'Close units' })).toBeFocused();
+  await expect(units.getByRole('button', { name: 'Close units' })).toBeFocused();
   // A digit lands in the box, after what is there; the panel stays open.
   await page.keyboard.press('7');
   await expect(box(page)).toBeFocused();
   await expect(box(page)).toHaveValue('27');
-  await expect(filter).toBeVisible();
+  await expect(units).toBeVisible();
 });
 
 test('a unit moving between shown and hidden glides to its place and flashes as it lands', async ({
@@ -653,8 +656,18 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
 }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
+  // The theme's own lengths, read as the page reads them (the built site writes 400ms as .4s).
+  const token = async (name: string) =>
+    cssTime(
+      await page.evaluate(
+        (n) => getComputedStyle(document.documentElement).getPropertyValue(n),
+        name,
+      ),
+    );
+  const slow = await token('--motion-slow');
+  const fade = await token('--highlight-fade');
   // How long the animation of `property` on `selector` runs, 0 if there is none: the theme's
-  // length in full, which the built site writes in seconds (400ms as .4s).
+  // length in full.
   const animated = (selector: string, property: string) =>
     page.evaluate(
       ([selector, property]) =>
@@ -680,9 +693,9 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     .click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
   // It slides up from its line in Hidden, and flashes where it lands.
-  expect(await animated('[data-row="cubic-inch"]', 'transform')).toBe(400);
+  expect(await animated('[data-row="cubic-inch"]', 'transform')).toBe(slow);
   expect(await animated('[data-row="cubic-inch"] > [role="gridcell"]', 'backgroundColor')).toBe(
-    1200,
+    fade,
   );
   // The page takes clicks while it moves: a second unit checked straight after the first shows.
   await page
@@ -697,7 +710,7 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     .getByRole('group', { name: 'US (customary)', exact: true })
     .getByLabel(/teaspoons/)
     .click();
-  expect(await animated('[data-table-foot] button[aria-expanded]', 'backgroundColor')).toBe(1200);
+  expect(await animated('[data-table-foot] button[aria-expanded]', 'backgroundColor')).toBe(fade);
   // With Hidden folded, the unit that left fades out where it was, rather than vanishing.
   await hiddenToggle(page).click();
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');

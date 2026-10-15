@@ -267,7 +267,7 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
 
 /**
  * Display (docs/UX-SPEC.md §1, §7; ADR 0017): how results look. Symbols alone or with names
- * first; then the format, what values round to, which way, and a reset of all of it. Copying is
+ * first; then the format, which way values round, what they round to, and a reset of all of it. Copying is
  * no setting: the active row's copy button (Sean, 2026-10-15).
  */
 export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelProps) {
@@ -288,8 +288,11 @@ export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelPro
         value={display.names}
         onChange={(names) => setDisplay({ names })}
       />
+      {/* The format and the names read for themselves, their legends for screen readers alone
+          (Sean, 2026-10-15). */}
       <Choices<Display['format']>
         legend="Format"
+        hideLegend
         options={[
           { value: 'decimal', label: 'Decimals' },
           { value: 'fraction', label: 'Fractions' },
@@ -298,7 +301,19 @@ export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelPro
         value={display.format}
         onChange={(format) => setDisplay({ format })}
       />
-      {/* Decimals first, then fractions, as Format lists them. */}
+      <Choices<Display['rounding']>
+        legend="Rounding"
+        options={[
+          { value: 'nearest', label: 'Nearest' },
+          { value: 'up', label: 'Up' },
+          { value: 'down', label: 'Down' },
+        ]}
+        value={display.rounding}
+        disabled={display.format === 'decimal' && display.places === null}
+        onChange={(rounding) => setDisplay({ rounding })}
+      />
+      {/* Which way first (Sean, 2026-10-15), then what to: decimals, then fractions, as Format
+          lists them. */}
       {display.format !== 'fraction' && (
         <Choices
           legend={both ? 'Round decimals to' : 'Round to'}
@@ -316,17 +331,6 @@ export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelPro
           onChange={(fractions) => setDisplay({ fractions })}
         />
       )}
-      <Choices<Display['rounding']>
-        legend="Rounding"
-        options={[
-          { value: 'nearest', label: 'Nearest' },
-          { value: 'up', label: 'Up' },
-          { value: 'down', label: 'Down' },
-        ]}
-        value={display.rounding}
-        disabled={display.format === 'decimal' && display.places === null}
-        onChange={(rounding) => setDisplay({ rounding })}
-      />
       <div className={PANEL_FOOT}>
         <Reset
           off={!displayChanged(display)}

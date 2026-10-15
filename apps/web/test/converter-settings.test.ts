@@ -63,7 +63,11 @@ describe('settings: what shows', () => {
   it('starts with every system but Specialty, the Standard preset', () => {
     expect(presetOf(FRESH_RULE.shown, 'us')).toBe('standard');
     expect(shows(unit('parsec'), FRESH_RULE, 'us')).toBe(false);
-    expect(shows(unit('knot'), { shown: new Set(), overrides: new Map() }, 'us')).toBe(true);
+    // Other is a switch like the systems (Sean, 2026-10-15): on in the Standard preset, off with it.
+    expect(shows(unit('knot'), FRESH_RULE, 'us')).toBe(true);
+    expect(shows(unit('knot'), { shown: new Set(), overrides: new Map() }, 'us')).toBe(false);
+    // Standard, a category with no regional system, always shows.
+    expect(shows(unit('second'), { shown: new Set(), overrides: new Map() }, 'us')).toBe(true);
     // A unit hidden on its own leaves the switches as they were.
     expect(presetOf(withChoice(FRESH_RULE, [unit('inch')], false, 'us').shown, 'us')).toBe(
       'standard',
@@ -116,19 +120,20 @@ describe('settings: what shows', () => {
     expect(shownChoice(on(withSystem(FRESH_RULE, 'uk', false, 'us')), 'us')).toBe('custom');
   });
 
-  it("orders the sections as set: the visitor's own first on a fresh visit, Standard first, Other after the regional systems", () => {
-    expect(defaultOrder('us')).toEqual(['us', 'metric', 'uk', 'specialist']);
-    expect(defaultOrder('metric')).toEqual(['metric', 'us', 'uk', 'specialist']);
+  it("orders the sections as set: the visitor's own first on a fresh visit, Standard first, Other a system like the rest", () => {
+    expect(defaultOrder('us')).toEqual(['us', 'metric', 'uk', 'other', 'specialist']);
+    expect(defaultOrder('metric')).toEqual(['metric', 'us', 'uk', 'other', 'specialist']);
     const moved = withOrder(FRESH_SETTINGS, 'specialist', 0, 'us');
-    expect(orderOf(moved, 'us')).toEqual(['specialist', 'us', 'metric', 'uk']);
+    expect(orderOf(moved, 'us')).toEqual(['specialist', 'us', 'metric', 'uk', 'other']);
     expect(orderChanged(moved, 'us')).toBe(true);
     expect(orderChanged(withOrder(moved, 'specialist', 9, 'us'), 'us')).toBe(false);
     for (const category of ['speed', 'pressure', 'time'] as const) {
       const rows = unitsIn(category).map((each) => ({ unit: each }));
       const present = new Set(rows.map((row) => sectionOf(row.unit, 'us')));
-      const order = ['uk', 'specialist', 'metric', 'us'] as const;
+      // Other where it is set, as any system: here between UK and Specialty.
+      const order = ['uk', 'other', 'specialist', 'metric', 'us'] as const;
       expect(sectionsOf(rows, 'us', order).map((section) => section.key)).toEqual(
-        ['standard', 'uk', 'specialist', 'metric', 'us', 'other'].filter((key) =>
+        ['standard', 'uk', 'other', 'specialist', 'metric', 'us'].filter((key) =>
           present.has(key as never),
         ),
       );
@@ -176,13 +181,13 @@ describe('settings: what shows', () => {
     expect(Object.keys(stored.display).sort()).toEqual(['format', 'fractions', 'places']);
     const back = settingsFrom(stored)!;
     expect(back.custom).toBe(true);
-    expect(back.order).toEqual(['uk', 'us', 'metric', 'specialist']);
+    expect(back.order).toEqual(['uk', 'us', 'metric', 'other', 'specialist']);
     expect(shows(unit('inch'), back.rule, 'us')).toBe(false);
     expect([...back.rule.shown].sort()).toEqual([...settings.rule.shown].sort());
     expect(back.display).toEqual(settings.display);
     // Units gone since, and parts that do not read, fall away; what is not settings is none.
     const odd = settingsFrom({
-      v: 2,
+      v: 3,
       rule: {
         shown: ['metric', 'martian'],
         overrides: [
@@ -207,9 +212,18 @@ describe('settings: what shows', () => {
     })!;
     expect(first.display.names).toBe('both');
     expect(first.display.places).toBe(3);
+    // Before version 3 Other had no switch and always showed: it comes back on, after the last
+    // regional system in a stored order.
+    const older = settingsFrom({
+      v: 2,
+      rule: { shown: ['us', 'metric'], overrides: [] },
+      order: ['specialist', 'uk', 'us', 'metric'],
+    })!;
+    expect(older.rule.shown.has('other')).toBe(true);
+    expect(older.order).toEqual(['specialist', 'uk', 'us', 'metric', 'other']);
     expect(settingsFrom(null)).toBeNull();
     expect(settingsFrom({ v: 2 })).toBeNull();
-    expect(settingsFrom({ v: 3, rule: { shown: [], overrides: [] } })).toBeNull();
+    expect(settingsFrom({ v: 4, rule: { shown: [], overrides: [] } })).toBeNull();
   });
 
   it('reads a group as all, some, or none of its units', () => {

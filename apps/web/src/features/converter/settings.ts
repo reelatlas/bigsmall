@@ -43,10 +43,13 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
 };
 
 /**
- * The system switches, in their order. Other has none while it holds two units, the knot and the
- * atmosphere, which always show, and so does Standard.
+ * The system switches, in their order: the regional systems, Other (a regional category's
+ * everyday units that belong to none of them, the knot and the atmosphere), and Specialty. Every
+ * heading the table shows has its row in Units but Standard, which is the whole everyday list of a
+ * category with no regional system (time, data, angle): a switch would only empty its table
+ * (Sean, 2026-10-15: Other had none until then, always showing, after the last regional system).
  */
-export const SYSTEM_KEYS: readonly SectionKey[] = ['metric', 'us', 'uk', 'specialist'];
+export const SYSTEM_KEYS: readonly SectionKey[] = ['metric', 'us', 'uk', 'other', 'specialist'];
 
 const REGIONAL: ReadonlySet<UnitSystem> = new Set(['us', 'imperial', 'uk']);
 const regional = new Map<CategoryId, boolean>();
@@ -100,20 +103,15 @@ export function defaultOrder(preference: UnitPreference): readonly SectionKey[] 
 
 /**
  * Rows in their sections, every section headed, even a section of one, in `order`: Standard first
- * (it is a category's only everyday section), then the systems as ordered, Other after the last
- * of Metric, US, and UK. Rows keep the listed order within their section.
+ * (it is a category's only everyday section), then the systems as ordered, Other among them. Rows
+ * keep the listed order within their section.
  */
 export function sectionsOf<T extends { unit: Unit }>(
   rows: readonly T[],
   preference: UnitPreference,
   order: readonly SectionKey[] = defaultOrder(preference),
 ): Section<T>[] {
-  const at = (key: SectionKey) => order.indexOf(key);
-  const rank = (key: SectionKey) => {
-    if (key === 'standard') return -1;
-    if (key === 'other') return Math.max(at('metric'), at('us'), at('uk')) + 0.5;
-    return at(key);
-  };
+  const rank = (key: SectionKey) => (key === 'standard' ? -1 : order.indexOf(key));
   const sections = new Map<SectionKey, Section<T>>();
   for (const row of rows) {
     const key = sectionOf(row.unit, preference);
@@ -159,7 +157,8 @@ export function presetKeys(
 ): ReadonlySet<SectionKey> {
   if (preset === 'all') return new Set(SYSTEM_KEYS);
   if (preset === 'standard') return new Set(SYSTEM_KEYS.filter((key) => key !== 'specialist'));
-  return new Set([ownSection(preference)]);
+  // The visitor's own system, and the units no region owns (the knot, the atmosphere).
+  return new Set([ownSection(preference), 'other']);
 }
 
 /** The preset the switches alone match, or null for a custom set. */
@@ -206,10 +205,10 @@ export function systemState(
   return on ? 'all' : 'none';
 }
 
-/** What the switches alone show: Other and Standard always. */
+/** What the switches alone show: Standard always. */
 function bySystem(unit: Unit, shown: ReadonlySet<SectionKey>, preference: UnitPreference): boolean {
   const key = sectionOf(unit, preference);
-  return key === 'standard' || key === 'other' || shown.has(key);
+  return key === 'standard' || shown.has(key);
 }
 
 /** Whether a unit shows: its exception, if it has one, else its switch. */
@@ -414,11 +413,12 @@ interface StoredRule {
 
 /**
  * Settings as stored: plain JSON, versioned, so a later shape can read or drop an older one.
- * Display keeps only what differs from a fresh visit's (version 2), so a default changed later
- * reaches everyone who never chose otherwise; version 1, a day old, kept all of it.
+ * Display keeps only what differs from a fresh visit's (since version 2), so a default changed
+ * later reaches everyone who never chose otherwise; version 1, a day old, kept all of it. Version
+ * 3 knows Other's switch.
  */
 export interface StoredSettings {
-  v: 2;
+  v: 3;
   rule: StoredRule;
   kept: StoredRule | null;
   custom: boolean;
@@ -441,7 +441,7 @@ export function storedOf(settings: Settings): StoredSettings {
   if (!sameSizes(display.fractions, fresh.fractions)) changed.fractions = [...display.fractions];
   if (display.rounding !== fresh.rounding) changed.rounding = display.rounding;
   return {
-    v: 2,
+    v: 3,
     rule: storedRule(settings.rule),
     kept: settings.kept && storedRule(settings.kept),
     custom: settings.custom,
@@ -479,17 +479,26 @@ function oneOf<T>(value: unknown, allowed: readonly T[], fallback: T): T {
  * Stored settings read back, each part checked: a part that does not read, or was never changed,
  * falls back to a fresh visit's, and anything that is not settings at all reads as none. Version
  * 1 stored every display setting, so its names cannot tell a choice from the old default, symbols
- * alone: they take today's.
+ * alone: they take today's. Before version 3 Other had no switch and always showed: it comes back
+ * on, placed after the last regional system, where it stood.
  */
 export function settingsFrom(value: unknown): Settings | null {
-  if (!isRecord(value) || (value.v !== 1 && value.v !== 2)) return null;
-  const rule = ruleFrom(value.rule);
+  if (!isRecord(value) || (value.v !== 1 && value.v !== 2 && value.v !== 3)) return null;
+  const before3 = value.v !== 3;
+  const withOther = (rule: ViewRule | null): ViewRule | null =>
+    rule && before3 ? { ...rule, shown: new Set([...rule.shown, 'other']) } : rule;
+  const rule = withOther(ruleFrom(value.rule));
   if (!rule) return null;
+  let stored = Array.isArray(value.order) ? (value.order as unknown[]) : null;
+  if (stored && before3 && !stored.includes('other')) {
+    const after = Math.max(...(['metric', 'us', 'uk'] as const).map((key) => stored!.indexOf(key)));
+    stored = [...stored.slice(0, after + 1), 'other', ...stored.slice(after + 1)];
+  }
   const order =
-    Array.isArray(value.order) &&
-    value.order.length === SYSTEM_KEYS.length &&
-    SYSTEM_KEYS.every((key) => (value.order as unknown[]).includes(key))
-      ? (value.order as SectionKey[])
+    stored &&
+    stored.length === SYSTEM_KEYS.length &&
+    SYSTEM_KEYS.every((key) => stored!.includes(key))
+      ? (stored as SectionKey[])
       : null;
   const shown = isRecord(value.display) ? value.display : {};
   const fresh = FRESH_DISPLAY;
@@ -506,7 +515,7 @@ export function settingsFrom(value: unknown): Settings | null {
   return {
     rule,
     display,
-    kept: ruleFrom(value.kept),
+    kept: withOther(ruleFrom(value.kept)),
     custom: value.custom === true,
     order,
   };

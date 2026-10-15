@@ -468,10 +468,13 @@ export function TableLayout({
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.ctrlKey || event.metaKey) {
-      // Ctrl/⌘+C on a row the cursor is on copies its value as the row shows it; undo and redo
-      // are the converter's.
-      if (event.key.toLowerCase() !== 'c' || !browsing || table.kind !== 'units') return;
-      const row = table.rows[at];
+      // Ctrl/⌘+C copies the row whose copy button shows for the keys, as the row shows it: the
+      // cursor's, or resting, the box's unit's, as after Enter took it (Sean, 2026-10-15). Text
+      // selected in the field is the field's own to copy. Undo and redo are the converter's.
+      if (event.key.toLowerCase() !== 'c' || table.kind !== 'units') return;
+      const field = event.currentTarget;
+      if (field.selectionStart !== field.selectionEnd) return;
+      const row = browsing ? table.rows[at] : table.rows.find((each) => each.inBox);
       if (row?.tone !== 'value') return;
       event.preventDefault();
       onCopyRow(row.id);

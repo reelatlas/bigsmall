@@ -998,11 +998,13 @@ test('one copy button, laid over the active row’s end, copies what the row sho
   await page.keyboard.press('Escape');
   await expect.poll(shown).toEqual(['foot']);
 
-  // A row taken into the box shows it, the cursor resting there.
+  // A row taken into the box shows it, the cursor resting there, and Ctrl/⌘+C copies it.
   await unitCell(page, 'yard').click();
   await expect(page.getByRole('button', { name: 'Remove yards' })).toBeVisible();
   await page.mouse.move(0, 0);
   await expect.poll(shown).toEqual(['yard']);
+  await page.keyboard.press('ControlOrMeta+c');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.67');
 
   // The cursor's row shows it, and Ctrl/⌘+C copies that row as shown.
   await page.keyboard.press('ArrowUp');

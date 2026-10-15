@@ -83,6 +83,17 @@
 }
 
 /*
+ * The ring inside a control's own edge, for a control flush in a filled row or a menu's gutter
+ * (Units' handles and Move menu), where the base ring's offset would spill past the row or crowd
+ * the menu's edge (Sean, 2026-10-15). The same color and width, following the control's corners.
+ */
+@utility focus-ring-inset {
+  &:focus-visible {
+    outline-offset: -2px;
+  }
+}
+
+/*
  * A check that draws itself in, for a confirmation such as a reset done (docs/DESIGN-SYSTEM.md,
  * "Motion"). It rests fully drawn and animates from hidden, so reduced motion, which stops every
  * animation, shows it whole. 24 covers the check's path (about 20 units long).

@@ -4,7 +4,7 @@ import { Button } from '../../components/Button';
 import { GripIcon } from '../../components/icons';
 import { TriCheckbox } from '../../components/TriCheckbox';
 import { cssTime } from '../../lib/css-time';
-import { CARD, cx, OPTION_ROW } from '../../lib/recipes';
+import { cx, OPTION_ROW } from '../../lib/recipes';
 import {
   byHand,
   orderOf,
@@ -18,6 +18,14 @@ import {
 
 /** How far a press on a handle travels before it is a drag rather than a click, in CSS pixels. */
 const DRAG_START = 4;
+
+/**
+ * The Move menu: a small menu card under the handle, its edge and gutter a menu's (a 2 px edge, a
+ * 4 px gutter), so its buttons' corners nest inside its own (`rounded-nested-md`) and their focus
+ * ring sits inside them, concentric with the card (Sean, 2026-10-15).
+ */
+const MOVE_MENU =
+  'absolute top-full right-0 z-20 flex gap-1 rounded-md border-2 border-edge bg-surface p-1 shadow-md';
 
 /**
  * A system's row. The row being moved is marked alike however it moves (Sean, 2026-10-15): dragged,
@@ -287,11 +295,12 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
             <Button
               variant="ghost"
               square
+              nested="md"
               aria-label={`Move ${label}`}
               aria-expanded={open}
               aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
               title={`Move ${label}: drag, or press for Move up and Move down`}
-              className="cursor-grab touch-none active:cursor-grabbing"
+              className="cursor-grab touch-none focus-ring-inset active:cursor-grabbing"
               onPointerDown={(event) => onPointerDown(event, key)}
               onPointerMove={onPointerMove}
               onPointerUp={onPointerEnd}
@@ -313,11 +322,12 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
                 aria-label={`Move ${label}`}
                 data-strip
                 data-move-menu
-                className={cx(CARD, 'absolute top-full right-0 z-20 flex gap-1 p-1 shadow-sm')}
+                className={MOVE_MENU}
               >
                 <Button
                   variant="ghost"
-                  className="text-sm"
+                  nested="md"
+                  className="text-sm focus-ring-inset"
                   data-move
                   aria-disabled={at === 0 || undefined}
                   onClick={() => place(key, at - 1, true)}
@@ -326,7 +336,8 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
                 </Button>
                 <Button
                   variant="ghost"
-                  className="text-sm"
+                  nested="md"
+                  className="text-sm focus-ring-inset"
                   data-move
                   aria-disabled={at === order.length - 1 || undefined}
                   onClick={() => place(key, at + 1, true)}

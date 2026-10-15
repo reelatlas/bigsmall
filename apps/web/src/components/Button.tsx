@@ -21,8 +21,12 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   on?: boolean;
   /** Square 44 px button for a lone icon. Pass `aria-label`. */
   square?: boolean;
-  /** Sits inside a field, so its corners nest inside the field's corners (docs/DESIGN-SYSTEM.md, "Fields"). */
-  nested?: boolean;
+  /**
+   * Sits inside a shell, so its corners nest inside the shell's (docs/DESIGN-SYSTEM.md, "Corners"):
+   * true inside a field or its list (`rounded-nested`), `md` inside a menu or a setting's row
+   * (`rounded-nested-md`).
+   */
+  nested?: boolean | 'md';
 }
 
 // Native <button>: accessible by default, no runtime. Tokens only: every color, radius, and
@@ -56,7 +60,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const shape = square ? 'size-11 shrink-0' : 'px-4';
-  const radius = nested ? 'rounded-nested' : 'rounded-md';
+  const radius = nested === 'md' ? 'rounded-nested-md' : nested ? 'rounded-nested' : 'rounded-md';
   return (
     <button
       type={type}

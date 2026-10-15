@@ -22,4 +22,4 @@ export const SITE = {
  * Umami Cloud's id for this site, which turns counting on (ADR 0019; docs/DEPLOYMENT.md,
  * "Analytics"). Not a secret: it ships in every page. Empty, no tracker loads.
  */
-export const UMAMI_WEBSITE_ID: string = '';
+export const UMAMI_WEBSITE_ID: string = '0a3ff4d6-d066-4ed6-97ed-bfb93e047b61';

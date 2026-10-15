@@ -28,7 +28,7 @@ The plan asked for traffic, product events (what people convert, the calculator,
 
 ## Consequences
 
-- Nothing is counted until the website ID is set and deployed.
+- Nothing was counted until the website ID was set; it was, the same day (2026-10-15).
 - Once on, check in Umami that visitors from different places arrive as separate sessions with the right countries: whether Umami's gateway reads the address Vercel forwards is unconfirmed.
 - The free plan's 100,000 events a month cover very roughly 10,000 visits at this event rate; past it Umami stops recording until the month resets, so the $20 plan comes before that.
 - Search performance comes from Google Search Console, verified with a DNS record, apart from this.

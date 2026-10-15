@@ -18,7 +18,7 @@ Kept current at every save and tidy (the `save` skill); history goes in the find
 
 1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, forty-eighth pass):
    - The logo exploration, round 1: a claude.ai design canvas, "bigsmall logo explorations" (https://claude.ai/artifact/QnNwjo9MzhWEYbzC1vKPmL), 36 concepts in six families; his picks shape round 2. Today's mark and link preview stay until then (`docs/DESIGN-SYSTEM.md`, "Brand assets").
-   - Umami's website ID: Sean signed up (free Hobby plan). Once he sends it, set `UMAMI_WEBSITE_ID` in `apps/web/src/lib/site.ts`, ship, and check sessions and countries and leave his own visits out (`docs/DEPLOYMENT.md`, "Analytics"; ADR 0019).
+   - Umami, counting since 2026-10-15: Sean to check two devices show as two visitors with the right countries, and to leave his own visits out (`docs/DEPLOYMENT.md`, "Analytics"; ADR 0019).
    - A one-line note that visits are counted anonymously, without cookies: recommended, its wording his.
 2. **Next, toward v1** (`docs/PLAN.md` §13): the SEO pair pages, in v1 on `bigsmall.work`, the domain for good (Sean, 2026-10-15): plan them, then build; analytics once chosen; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
 3. **Then the accuracy audit** of every conversion and calculation (`docs/PLAN.md` §11), after the rest of this list (Sean, 2026-10-15).

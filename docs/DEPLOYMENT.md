@@ -67,7 +67,7 @@ git push origin v0.1.0
 
 Umami Cloud counts visits (ADR 0019), in Sean's account on the free Hobby plan.
 
-- **Turning it on.** Umami's website id for bigsmall.work goes in `UMAMI_WEBSITE_ID` in `apps/web/src/lib/site.ts`; it is not a secret, since it ships in the page. `layouts/Base.astro` then adds the tracker on production deployments alone (`VERCEL_ENV=production`).
+- **On since 2026-10-15.** Umami's website id for bigsmall.work is `UMAMI_WEBSITE_ID` in `apps/web/src/lib/site.ts`; it is not a secret, since it ships in the page. `layouts/Base.astro` adds the tracker on production deployments alone (`VERCEL_ENV=production`); emptied, counting stops.
 - **First-party paths.** `apps/web/vercel.json` rewrites `/ux/s.js` to `https://cloud.umami.is/script.js` and `/ux/api/send` to `https://gateway.umami.is/api/send`; the tag's `data-host-url` is `https://bigsmall.work/ux`. `astro dev` and `astro preview` do not apply the rewrites, and the tag is not there to need them.
 - **After turning it on.** Visit from two places (a phone on cellular, a computer on Wi-Fi): Umami should show two sessions with the right countries. If they merge or show one country, the gateway is reading Vercel's address rather than the visitor's, and the proxy needs a function that forwards it.
 - **Our own visits.** Once in each browser we use, on bigsmall.work: `localStorage.setItem('umami.disabled', 1)` in the console (any value disables it; `removeItem` turns counting back on).

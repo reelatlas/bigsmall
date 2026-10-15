@@ -48,7 +48,7 @@ Directions Sean wants to explore after the MVP is shared; none is designed or sc
 - **Saved settings and templates (Sean, 2026-10-07).** Every setting is remembered by default, as the theme is: built 2026-10-15 for Units and Display (ADR 0018, docs/UX-SPEC.md §11); multiples would join them once they exist. Later, maybe: templates, named sets of settings to switch between (a construction set with fractional inches, say).
 - **Many more categories and units.** The catalog's plan (docs/UNITS-CATALOG.md §3: fuel economy, energy, pressure, power, angle, and the advanced groups) and more formulas, each category's data loaded on demand against its own budget (§9), every unit cited (ADR 0004).
 - **Search visibility (SEO).** The pair pages already planned for launch (one static page per popular unit pair), plus the technical basics (canonical domain, sitemap, robots, titles and descriptions, structured data, social cards) and Google Search Console and Bing Webmaster Tools.
-- **Analytics and monitoring.** Cookieless traffic analytics and product events: Umami Cloud, built 2026-10-15 (ADR 0019), on once its website ID is set. Still to come: real-user speed (Core Web Vitals, not from Umami's performance option, which sends on every URL change), search performance (Google Search Console), and optionally errors and uptime; each script counted against the budget.
+- **Analytics and monitoring.** Cookieless traffic analytics and product events: Umami Cloud, built and on 2026-10-15 (ADR 0019). Still to come: real-user speed (Core Web Vitals, not from Umami's performance option, which sends on every URL change), search performance (Google Search Console), and optionally errors and uptime; each script counted against the budget.
 
 ### Hygiene backlog (from the full tidy, 2026-10-15)
 
@@ -267,7 +267,7 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 
 11. **Hosting and domains.** Vercel, with `bigsmall.work` as the main domain and `bigsmall.diy` redirecting to it (ADR 0008). Settled for good on 2026-10-15 (Sean): `bigsmall.work`, a .com or .org not being available; a later change would still be a redirect flip (docs/DEPLOYMENT.md), so the SEO work builds on it.
 
-Decided 2026-10-15 (Sean): the SEO pair pages are in v1, built at M5 on `bigsmall.work`. Decided the same day: Umami Cloud for analytics (ADR 0019), counting once its website ID is set.
+Decided 2026-10-15 (Sean): the SEO pair pages are in v1, built at M5 on `bigsmall.work`. Decided the same day: Umami Cloud for analytics (ADR 0019), counting since.
 
 ## 16. Risks and open questions
 

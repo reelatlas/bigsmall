@@ -73,7 +73,7 @@ Built as planned, in `TableLayout.tsx` with the components in the gallery, and t
 - **The tiles go four across at a 512 px column**, the smallest stock container size above the widest case (Theorem's "Temperature" needs 456 px), not at a breakpoint.
 - **The server's page carries both layouts' empty state**, so a saved table layout shows its menu, box, and tiles before the island hydrates.
 
-## Open, after Sean sees it in the product
+## Open, after Sean sees it in the product (both settled)
 
-- An **all-clear** interaction, in the action bar or inline.
-- Whether a category chosen with no unit belongs in the URL.
+- An **all-clear** interaction, in the action bar or inline: clear all in the toolbar (2026-10-08), and the box's own × for its text (2026-10-15).
+- Whether a category chosen with no unit belongs in the URL: no (Sean, 2026-10-08; docs/UX-SPEC.md §11).

@@ -1,7 +1,7 @@
 # 0017 — Settings: what shows and how it looks, sections by system, two layers
 
 Date: 2026-10-11
-Status: accepted; amends 0011 and 0016. Amended 2026-10-14: the specialist units' section reads Specialty, and values line up on the decimal point. Amended 2026-10-15: Settings opens as two side panels, Filter and Display, one side panel at a time with the calculator, and units glide and flash as they move between shown and hidden; later that day Filter was renamed Units, its first preset All, its reset to Standard dropped (the Standard preset does it), Unhide units renamed Show custom hidden units, decimals keep their trailing zeros, small values round as chosen ("< 0.01" where one rounds to zero), and a system's switch is final for its units, its checkbox a dash while some are chosen on their own. Amended again the same day: Symbol and name is a fresh visit's default (symbols alone before), and Display is remembered by what was changed, so a default changed later reaches anyone who never chose otherwise; then Copy buttons left Display: one copy button shows, on the active row, and copies what the row shows (docs/UX-SPEC.md §7); and Other has a switch and a place in the order like the systems, Your region showing it too (Standard alone has none)
+Status: accepted; amends 0011 and 0016. Amended 2026-10-14 and 2026-10-15 (see "Amendments" at the end)
 
 ## Context
 
@@ -29,7 +29,15 @@ Sean asked for a way to section the table reliably and to control what it shows 
 
 ## Consequences
 
-- The table, the matches, and the box take the settings (`features/converter/settings.ts`, `SettingsPanel.tsx`); `SegmentedControl` and `Switch` joined the components.
+- The table, the matches, and the box take the settings (`features/converter/settings.ts`, then `SettingsPanels.tsx` and `SystemRows.tsx`); `SegmentedControl` joined the components, and `Switch` with it until copy buttons left Display (2026-10-15).
 - A fresh visit shows fewer rows (the specialist units under Hidden) and shorter values (two places): browser tests that are about something else set the old view through Settings (`showEverything`, `e2e/support.ts`).
-- Saving settings across visits is an exploration (docs/PLAN.md §2), as is surfacing one setting on its own in the toolbar.
+- Saving settings across visits was an exploration (docs/PLAN.md §2), built 2026-10-15 (see Amendments); surfacing one setting on its own in the toolbar still is.
 - The settings lab retired on 2026-10-15, its last round's answer (two side panels) shipped; its entry is in the retired labs index (docs/research/labs/README.md).
+
+## Amendments
+
+- **2026-10-14.** The specialist units' section reads Specialty, and values line up on the decimal point.
+- **2026-10-15, side panels.** Settings opens as two side panels, Filter and Display, one side panel at a time with the calculator, and units glide and flash as they move between shown and hidden.
+- **2026-10-15, Units.** Filter renamed Units, its first preset All; its reset to Standard dropped (the Standard preset does it); Unhide units renamed Show custom hidden units; a system's switch final for its units, its checkbox a dash while some are chosen on their own; Custom among the presets, lit by any change by hand and never out of reach; the systems reordered by a handle, the table's sections following; Other a switch and a place in the order like the systems, Your region showing it too (Standard alone has none).
+- **2026-10-15, Display.** Decimals keep their trailing zeros; small values round as chosen ("< 0.01" where one rounds to zero); Symbol and name a fresh visit's default (symbols alone before); the format unlabeled, Rounding over Round to; Copy buttons left Display: one copy button shows, on the active row, and copies what the row shows (docs/UX-SPEC.md §7).
+- **2026-10-15, remembered.** Every setting is remembered in this browser, Display by what was changed, so a default changed later reaches anyone who never chose otherwise (`settings-store.ts`, versioned).

@@ -205,6 +205,14 @@ function TableSamples() {
         display={{ ...FRESH_DISPLAY, format: 'both' }}
         itemId={itemIds('both')}
       />
+      <div className="max-w-80">
+        <TableSample
+          view={feet}
+          title="Length, decimals and fractions, on a phone"
+          display={{ ...FRESH_DISPLAY, format: 'both' }}
+          itemId={itemIds('both-narrow')}
+        />
+      </div>
       <TableSample
         view={fresh}
         title="Volume, its hidden units"
@@ -247,6 +255,8 @@ export function FieldSamples({ theme }: { theme: string }) {
       <FieldSample label={`${theme} exponent sample`} text="1.23456789E23" unitId="millimeter" />
       {/* Arithmetic, its running value following it in the muted color. */}
       <FieldSample label={`${theme} arithmetic sample`} text="12×3" unitId="liter" />
+      {/* Empty, its placeholder saying what it takes. */}
+      <FieldSample label={`${theme} empty sample`} text="" unitId="" />
       <CalculatorSample />
       <TableSamples />
     </div>

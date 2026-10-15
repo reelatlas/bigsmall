@@ -1,5 +1,7 @@
 # Findings — friends on the live MVP
 
+**Status (2026-10-15):** the table layout they asked for became the one layout (ADR 0013), so the two boxes no longer stay on a switch; tapping a row to make its value the box's shipped (ADR 0012); favorites are still an exploration (docs/PLAN.md §2).
+
 Friends who use bigsmall tried the live MVP (`v0.1.0`) and told Sean what they wanted; he relayed it on 2026-10-07. They gave Sean the idea for bigsmall in the first place and are its first user group, so their requests carry the weight of users', not of reviewers'. This was not a moderated test: below is what they asked for, in Sean's account, and what came of it.
 
 ## What they asked for

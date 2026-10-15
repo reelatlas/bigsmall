@@ -2,7 +2,7 @@
 
 **Retired 2026-10-15** (docs/research/labs/README.md): built in the converter 2026-10-11 (ADR 0017, docs/UX-SPEC.md §1, §3, §7) as settled below, and its last round (Settings' shape, units moving between shown and hidden) on 2026-10-15. Its own converter is in git at `90f3df3`; the last round's mocks were never committed, and its screenshots are in `docs/research/labs/settings-lab/`.
 
-Sean's model, in the context of the action bar (2026-10-10): one Settings button shapes the results, and the table holds what is specific to them. `/dev/organization-lab` (the settings lab, `apps/web/src/pages/dev/_organization-lab/`) builds it with single units chosen in the table (Separate) and Settings' choices drawn as segmented controls, both Sean's choices: the action bar (the category menu, the calculator, and Settings, then undo, redo, and clear all at the right), the box, and the table or the matches. Nothing is built in the converter yet.
+Sean's model, in the context of the action bar (2026-10-10): one Settings button shapes the results, and the table holds what is specific to them. `/dev/organization-lab` (the settings lab, `apps/web/src/pages/dev/_organization-lab/`) builds it with single units chosen in the table (Separate) and Settings' choices drawn as segmented controls, both Sean's choices: the action bar (the category menu, the calculator, and Settings, then undo, redo, and clear all at the right), the box, and the table or the matches. Nothing was built in the converter until 2026-10-11.
 
 The earlier prototypes, the table controls lab (A to D), this lab's first two rounds (jobs, by system, six filters, and options E to I), variant 2, Together (single units chosen in Settings, under each system), and the compact pills Settings was also drawn in, are retired; they are in git. What they settled is below.
 
@@ -78,7 +78,7 @@ The table's foot has Edit, which puts a checkbox on every row and a three-state 
 3. **Trailing zeros**: rounded to 0.01, a value reads 0.1 and 96 today. Recommended: line the values up on the decimal point, with no zeros added; or pad them (0.10, 96.00); or keep them as they are.
 4. **One button or several**: one Settings button for everything, or, later, a setting people change often (decimals or fractions, say) also in the action bar on its own?
 
-## Next round (Sean, 2026-10-14, saved before a compaction)
+## Next round (Sean, 2026-10-14, saved before a compaction; built the same day)
 
 Decided, to build in the converter (one round, then push):
 

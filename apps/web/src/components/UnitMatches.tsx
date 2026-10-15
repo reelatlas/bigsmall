@@ -219,7 +219,8 @@ export function UnitMatches({
                 aria-expanded={revealed}
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => onReveal(!revealed)}
-                className="text-sm"
+                // Its words keep one line; at 320 px the line's own words wrap beside it.
+                className="text-sm whitespace-nowrap"
               >
                 {revealed ? 'Hide them' : 'Show them'}
               </Button>
@@ -253,8 +254,10 @@ export function UnitMatches({
                     <span className={cx('whitespace-nowrap', unitSymbol())}>
                       <MatchedText text={match.unit.symbol} query={query} className="text-ink" />
                     </span>
-                    <span className="flex min-w-0 items-baseline gap-2">
-                      <span className={symbolOnly ? 'sr-only' : 'min-w-0 truncate text-ink'}>
+                    {/* Where the name and its category share no line, the category goes under
+                        it: the name is never cut short. */}
+                    <span className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+                      <span className={symbolOnly ? 'sr-only' : 'min-w-0 text-ink'}>
                         <MatchedText
                           text={match.unit.plural}
                           query={query}

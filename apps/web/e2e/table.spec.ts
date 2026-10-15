@@ -887,6 +887,55 @@ test('a fill never touches a line: the foot and Edit’s headings keep 4 px from
   }
 });
 
+test('a long name wraps in Edit, in Hidden, and among the hidden matches, never cut short', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto('/?a=liter-per-100-kilometers&v=5');
+  await ready(page);
+  // Each name as it shows: cut at its box's edge, and how many lines it takes.
+  const names = (selector: string) =>
+    page.locator(selector).evaluateAll((all) =>
+      all.map((name) => ({
+        text: name.textContent,
+        cut: name.scrollWidth > name.clientWidth + 1,
+        lines: Math.round(
+          name.getBoundingClientRect().height / parseFloat(getComputedStyle(name).lineHeight),
+        ),
+      })),
+    );
+  const expectWhole = async (selector: string, wrapped: string) => {
+    const seen = await names(selector);
+    expect(seen.filter((name) => name.cut)).toEqual([]);
+    expect(seen.find((name) => name.text?.includes(wrapped))?.lines).toBeGreaterThan(1);
+  };
+  const card = page.locator('[data-table-card]');
+  await card.getByRole('button', { name: 'Edit', exact: true }).click();
+  await expectWhole('[data-list="shown"] label[data-unit] > span:last-child', 'per 100 kilometers');
+  // Sent to Hidden, it wraps there too.
+  await card.getByLabel(/miles per imperial gallon/).click();
+  await card.getByRole('button', { name: 'Done', exact: true }).click();
+  await hiddenToggle(page).click();
+  await expectWhole('[data-list="hidden"] label[data-unit] > span:last-child', 'imperial gallon');
+  // Its symbol keeps one line, as the matches keep theirs.
+  const symbols = await names('[data-list="hidden"] label[data-unit] > span:first-of-type');
+  expect(symbols.filter((symbol) => symbol.lines > 1)).toEqual([]);
+  // And among the hidden matches its name brings up.
+  await box(page).fill('5 miles per imperial');
+  await page.getByRole('button', { name: 'Show them' }).click();
+  await expectWhole(
+    '[role="listbox"][aria-labelledby] [role="option"] > span:last-child > span:first-child',
+    'imperial gallon',
+  );
+  // The line's button keeps its words on one line, the line's own words wrapping beside it.
+  const buttonLines = await page.getByRole('button', { name: 'Hide them' }).evaluate((button) => {
+    const range = document.createRange();
+    range.selectNodeContents(button);
+    return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+  });
+  expect(buttonLines).toBe(1);
+});
+
 test('the box’s × clears its text and keeps the unit, one step undo brings back', async ({
   page,
 }) => {

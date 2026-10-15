@@ -715,8 +715,9 @@ export function ConversionTable<T extends ConversionRow>({
       )}
     >
       {checkbox(row, list === 'shown', list)}
-      <span className={unitSymbol()}>{row.symbol}</span>
-      <span className={withNames ? 'truncate text-ink' : 'sr-only'}>{row.name}</span>
+      {/* The symbol on one line and a long name wrapping, as the matches write them, never cut short. */}
+      <span className={cx('whitespace-nowrap', unitSymbol())}>{row.symbol}</span>
+      <span className={withNames ? 'min-w-0 text-ink' : 'sr-only'}>{row.name}</span>
     </label>
   );
 

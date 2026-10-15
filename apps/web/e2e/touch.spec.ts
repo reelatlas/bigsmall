@@ -60,7 +60,7 @@ test('a tap in the box brings the keyboard up; a tap on a row, or Done, puts it 
   await expect(box(page)).not.toBeFocused();
 
   // The chip's name is part of the box: a tap on it brings the keyboard up too.
-  await page.getByRole('button', { name: 'Change unit: liters' }).tap();
+  await page.getByRole('button', { name: 'Unit: liters' }).tap();
   await expect(box(page)).toBeFocused();
 });
 

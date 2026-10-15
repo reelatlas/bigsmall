@@ -75,13 +75,13 @@ test('open, the theme menu reads "Theme" where its button shows the name alone',
   const toggle = themeToggle(page);
   const name = page.locator('[data-theme-name]');
 
-  // From sm the button shows "Theme" and the name, open or closed.
+  // In a header of 576 px or more the button shows "Theme" and the name, open or closed.
   await page.setViewportSize({ width: 1280, height: 800 });
   await toggle.click();
   await expect(name).toBeVisible();
   await page.keyboard.press('Escape');
 
-  // Below sm it shows the name alone; open, it reads "Theme", the list's fill marking the theme.
+  // In a narrower one it shows the name alone; open, it reads "Theme", the list's fill marking it.
   await page.setViewportSize({ width: 375, height: 800 });
   const word = toggle.getByText('Theme', { exact: true });
   await toggle.click();
@@ -89,6 +89,36 @@ test('open, the theme menu reads "Theme" where its button shows the name alone',
   expect((await word.boundingBox())!.width).toBeGreaterThan(10);
   await page.keyboard.press('Escape');
   await expect(name).toBeVisible();
+});
+
+test('"Theme" and the shortcuts button switch by the header\'s own width, where all of it fits', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the shortcuts button is hidden on touch-first devices');
+  await page.goto('/');
+  const header = page.locator('header');
+  const word = themeToggle(page).getByText('Theme', { exact: true });
+  const headerWidth = () => header.evaluate((el) => el.getBoundingClientRect().width);
+  // The page's 16 px gutters aside, a 600 px window leaves the header under 576 px, its container
+  // xl size: the name alone, no shortcuts button.
+  await page.setViewportSize({ width: 600, height: 800 });
+  expect(await headerWidth()).toBeLessThan(576);
+  await expect(shortcutsButton(page)).toBeHidden();
+  expect((await word.boundingBox())?.width ?? 0).toBeLessThanOrEqual(1);
+  // From 576 px of header both show (the line they share, in every theme, is the width tests'
+  // below), and the shortcuts map opens inside the window.
+  await page.setViewportSize({ width: 610, height: 800 });
+  expect(await headerWidth()).toBeGreaterThanOrEqual(576);
+  await expect(shortcutsButton(page)).toBeVisible();
+  await expect(word).toBeVisible();
+  await shortcutsButton(page).click();
+  await expect(page.getByText('Pick a unit or value')).toBeVisible();
+  // The open card, which grows left from the button.
+  const card = shortcutsButton(page).locator('xpath=ancestor::*[@data-shell]/*[1]');
+  const box = (await card.boundingBox())!;
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(610);
 });
 
 test('the shortcuts map opens on a click, never on hover, and closes on Escape or a second click', async ({
@@ -177,7 +207,7 @@ test('shortcuts name ⌘ and ⌥ on Apple devices, Ctrl and Alt elsewhere', asyn
 
 // Under 416 px the header's menus take a line of their own, theme menu first and flush left; from
 // 416 px every theme's name, art, and menus share one line, the menus on the right.
-for (const width of [320, 375, 400, 414, 416, 430, 520, 640]) {
+for (const width of [320, 375, 400, 414, 416, 430, 520, 600, 610, 640]) {
   const ownLine = width < 416;
   test(`at ${width} px the name keeps its art, and the menus ${ownLine ? 'wrap under it, theme first' : 'share its line'}`, async ({
     page,
@@ -196,7 +226,8 @@ for (const width of [320, 375, 400, 414, 416, 430, 520, 640]) {
         const copyUrl = box('[aria-label="Copy URL"]');
         const button = document.querySelector('[data-theme-name]')!.closest('button')!;
         const trigger = button.getBoundingClientRect();
-        // The first words shown (the label from sm, the name below it) and the chevron at the end.
+        // The first words shown (the label in a header of 576 px or more, else the name) and the
+        // chevron at the end.
         const first = [...button.querySelectorAll('span')]
           .find((span) => getComputedStyle(span).position !== 'absolute')!
           .getBoundingClientRect();

@@ -32,12 +32,13 @@ const titleId = 'shortcuts-title';
  * click elsewhere, or focus leaving closes it (Sean, 2026-10-15: it opened on hover and on focus
  * until then). The inline script in layouts/Base.astro drives it, so it adds no bundle; Button
  * and the icon are TSX components rendered to static HTML. Hidden on touch-first devices, which
- * have no keyboard to use, and below the sm breakpoint, where a panel growing left from beside the
+ * have no keyboard to use, and in a header narrower than its container `xl` size (576 px; the
+ * header is an @container, PageHeader), where a panel growing left from beside the
  * theme menu would run off the screen. The list itself lives in src/lib/shortcuts.ts.
  */
 ---
 
-<div class="group relative hidden size-12 sm:block pointer-coarse:hidden" data-shell>
+<div class="group relative hidden size-12 pointer-coarse:hidden @xl:block" data-shell>
   <div class:list={['absolute top-0 right-0 rounded-md', SHELL, GHOST]}>
     <div class="flex items-center">
       <h2 id={titleId} class:list={['hidden flex-1 px-3 group-data-open:block', PANEL_TITLE]}>

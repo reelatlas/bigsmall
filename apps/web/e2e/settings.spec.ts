@@ -57,7 +57,7 @@ test('a fresh visit shows symbols and names, two places, and the specialist unit
   await expect(row(page, 'liter').locator('[data-name]')).toHaveCount(0);
   await expect(unitCell(page, 'liter')).toHaveAccessibleName(/liters/);
   await expect(
-    page.getByRole('button', { name: 'Change unit: cups' }).getByText('cups', { exact: true }),
+    page.getByRole('button', { name: 'Unit: cups' }).getByText('cups', { exact: true }),
   ).toBeHidden();
 });
 

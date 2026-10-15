@@ -39,7 +39,9 @@ export function UnitChip({ unit, compact, nameRef, onOpen, onRemove }: UnitChipP
     <span className={CHIP}>
       <button
         type="button"
-        aria-label={`Change unit: ${unit.plural}`}
+        // What it is, not a picker it would open: a press puts the caret in the box, whose keys
+        // and table change the unit (the full tidy, 2026-10-15).
+        aria-label={`Unit: ${unit.plural}`}
         tabIndex={tabIndex}
         onClick={onOpen}
         className={cx('inline-flex rounded-l-nested', HOVER)}

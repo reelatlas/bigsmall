@@ -698,7 +698,7 @@ test('the chip gives up its name before the number shrinks, sooner in a narrower
   await ready(page);
   await setSettings(page, 'Symbol and name');
   const name = page
-    .getByRole('button', { name: 'Change unit: milliliters' })
+    .getByRole('button', { name: 'Unit: milliliters' })
     .getByText('milliliters', { exact: true });
   const fontSize = () => box(page).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
   const sweep = async (width: number) => {

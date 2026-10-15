@@ -77,3 +77,21 @@ The table's foot has Edit, which puts a checkbox on every row and a three-state 
 2. **Edit's view**: Edit sets a checkbox in front of each value, so the values move right while it is on. Keep, or show Edit as a list of units without values, as the Hidden list is?
 3. **Trailing zeros**: rounded to 0.01, a value reads 0.1 and 96 today. Recommended: line the values up on the decimal point, with no zeros added; or pad them (0.10, 96.00); or keep them as they are.
 4. **One button or several**: one Settings button for everything, or, later, a setting people change often (decimals or fractions, say) also in the action bar on its own?
+
+## Next round (Sean, 2026-10-14, saved before a compaction)
+
+Decided, to build in the converter (one round, then push):
+
+1. **Edit keeps the footer; Done takes Edit's place.** No header row in Edit (it pushed the table down): the footer stays where it is, its Edit button reads Done in the same spot, and its left slot, where Hidden sits, reads a quiet "Choose the units to show" while Edit is on (Hidden means nothing while Edit lists every unit), so the footer keeps its height. On a phone the footer sticks to the bottom of the screen while Edit is on, so Done is always in reach. The one movement left is the values sliding right for the checkboxes as Edit starts; raise it with Sean only if he finds it jarring (never reserve the space at rest).
+2. **Edit keeps the numbers** (settled).
+3. **Values line up on the decimal point.** Each value carries invisible trailing characters, in an `aria-hidden` span in the same font, written with the locale's decimal mark: 96 carries an invisible ".00" beside 473.18. The count of decimals is the most any value in the column could have (the sizer's rows, every rounding), so tiny values that keep their digits (0.000619) line up too, their extra width falling in the spare space on the right. Nothing visible is added; screen readers and copying read the value alone. Decimals and Both's decimal column only: fractions ("6 5/16") stay right-aligned. Needs a spec line (§7), the sizer to carry the same padding, and a browser test that every shown value's decimal point sits at one x.
+
+Open: **the specialist units' name.** Sean is weighing Anomalous (pushed back: it says abnormal), Dimensional (every unit has a dimension; "dimensionless" is the word for Mach and ratios, and Mach stays out), Non-standard (wrong: the cubic meter is SI's unit of volume, the nautical mile and the astronomical unit international standards; the split is everyday against field-specific), Domain-specific (accurate, long), and Technical (accurate, cold). Recommended: Specialty, which pairs with Standard. Natural units, if ever added, would sit with them, not in Other (Other is the everyday units of neither system, the knot and the atmosphere).
+
+To build in the settings lab, locally (Sean views them on his dev server; push only when he asks), dummy data allowed where it is quicker, since the point is a comparison for his judgment call:
+
+- **A. Today's single dropdown**, for reference.
+- **B. Two buttons**, Filter (what shows) and Display (how it looks), each its own smaller dropdown. Advised against one button per setting: the toolbar has six buttons, wraps on a phone, and more icons get hard to tell apart.
+- **C. Settings as a panel like the calculator**: a column beside the table from md, so results change beside it. "Both" for C (Sean, 2026-10-14), read as both phone placements: between the box and the table, as the calculator opens, and a bottom sheet; if he meant C and B+C together (the two buttons opening the side panel to their section), build that as well. Rule to propose: one side panel at a time, calculator or Settings.
+
+Retiring labs (Sean, 2026-10-14): no browsable copy; an index with notes, screenshots, learnings, decisions, and what was left out, the process in `CLAUDE.md`'s recipes ("Retire a lab"). The settings lab retires after the mocks, since they live in it; its retirement is the first to follow the process, and the index gathers the labs retired before it (the selection lab, the table controls lab, the organization lab's earlier rounds).

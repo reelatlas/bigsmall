@@ -7,6 +7,9 @@ import { applyTheme, box, expectNoA11yViolations, pickTheme, ready, row, settled
 
 for (const path of ['/', '/dev/gallery', '/dev/wordmark-lab']) {
   test(`${path} renders with no WCAG violations`, async ({ page }) => {
+    // The gallery holds every component in every theme: axe takes its time over it, the more so
+    // on CI's dev server.
+    test.slow(path === '/dev/gallery', 'the gallery is every component in every theme');
     await page.goto(path);
     if (path === '/') await ready(page);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

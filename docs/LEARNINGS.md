@@ -690,3 +690,8 @@ Format:
 
 **What happened.** The glide and the flash read their lengths from the theme (`--motion-slow`, `--highlight-fade`) with `parseFloat`, which drops the unit. The themes say `400ms`, so on the dev server it worked; the build's CSS minifier rewrites times in their shortest form, `.4s` and `1.2s`, so on the live site the glide ran for 0.4 ms and the flash for 1.2 ms: each started and was gone the next frame. Sean saw it on a phone and a desktop, two rounds running; frozen frames on the dev server looked right. A probe that sampled every frame after a real click, on the built site, found it at once (the animations' count fell to 0 a frame after they began).
 **Rule.** Read a CSS time with its unit (`lib/css-time.ts`), never `parseFloat` alone. Check motion against the built site (`pnpm build`, then `astro preview`), in real time, sampling each frame; and assert an animation's `getTiming().duration`, not only that one exists.
+
+## 2026-10-15 — A glide's leavers go first and its arrivals last
+
+**What happened.** With the glide finally running on the live site, Sean saw sections ghost: a section switched off faded out where it was over the whole 400 ms while the next section slid up through it, and one switched on faded in under the section still sliding out of its place. Frames at 170 ms showed both sets of text overlapping.
+**Rule.** Pace the three kinds of part within the one length: what leaves is gone in the first 30 %, what moves glides throughout, what arrives fades in over the second half (keyframe offsets on even fades, `glide.ts`). Check a change that removes or adds a whole group, not only a single row, by its frames.

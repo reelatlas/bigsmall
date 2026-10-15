@@ -26,6 +26,16 @@ const MOVING: ReadonlyArray<readonly [selector: string, key: (element: HTMLEleme
   ['[data-table-foot]', () => 'foot'],
 ];
 
+/**
+ * The three beats of a glide, in its one length (Sean, 2026-10-15: what left lingered as a ghost
+ * the rows slid through): what left is gone in the first 30 %, before anything slides over where
+ * it was; what moved glides throughout; what is new waits for the second half, once what moved
+ * out of its place has gone. Both fades are even (an animation's default), the offsets doing the
+ * pacing.
+ */
+const LEAVING: Keyframe[] = [{ opacity: 1 }, { opacity: 0, offset: 0.3 }, { opacity: 0 }];
+const ARRIVING: Keyframe[] = [{ opacity: 0 }, { opacity: 0, offset: 0.5 }, { opacity: 1 }];
+
 interface Place {
   element: HTMLElement;
   left: number;
@@ -72,7 +82,7 @@ function placeOf(element: HTMLElement): Place {
 }
 
 /** A part that left, copied where it was and faded out: never a field, a target, or a name to hear. */
-function fadeOut(place: Place, timing: KeyframeAnimationOptions) {
+function fadeOut(place: Place, duration: number) {
   const copy = place.element.cloneNode(true) as HTMLElement;
   for (const each of [copy, ...copy.querySelectorAll<HTMLElement>('[id]')])
     each.removeAttribute('id');
@@ -90,7 +100,7 @@ function fadeOut(place: Place, timing: KeyframeAnimationOptions) {
   if (place.columns) copy.style.gridTemplateColumns = place.columns;
   document.body.append(copy);
   const remove = () => copy.remove();
-  copy.animate([{ opacity: 1 }, { opacity: 0 }], timing).finished.then(remove, remove);
+  copy.animate(LEAVING, { duration }).finished.then(remove, remove);
 }
 
 /** Runs `change`, a state update, as a glide over the converter at `root`. */
@@ -111,7 +121,7 @@ export function glide(root: HTMLElement | null, change: () => void) {
   for (const [key, element] of after) {
     const was = before.get(key);
     if (!was) {
-      element.animate([{ opacity: 0 }, { opacity: 1 }], timing);
+      element.animate(ARRIVING, { duration });
       continue;
     }
     const now = placeOf(element);
@@ -121,6 +131,6 @@ export function glide(root: HTMLElement | null, change: () => void) {
     element.animate([{ transform: `translate(${x}px, ${y}px)` }, { transform: 'none' }], timing);
   }
   for (const [key, place] of before) {
-    if (!after.has(key)) fadeOut(place, timing);
+    if (!after.has(key)) fadeOut(place, duration);
   }
 }

@@ -106,14 +106,31 @@ export const MENU_CHEVRON =
   'ml-auto shrink-0 text-ink-muted transition-transform group-data-open:rotate-180';
 
 /**
- * A row in a list of choices: 44 px tall, in the nested corner, the raised surface under the
- * pointer. A menu's choice, a setting's switch, a setting's checkbox.
+ * A row holding a control, filled as the table's cursor fills a row: under the pointer, and while
+ * its control has the keyboard's focus, whose own ring stays (Sean, 2026-10-15). A whole row is the
+ * target, so the whole row says which one is meant.
  */
-export const OPTION_ROW =
-  'flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink hover:bg-surface-raised';
+export const CHOICE_FILL = 'hover:bg-surface-raised has-focus-visible:bg-surface-raised';
 
-/** A menu's choice: a label around its visually hidden radio, the checked one in the accent's soft fill. */
-export const MENU_OPTION = cx(OPTION_ROW, 'focus-ring-within-inset has-checked:bg-accent-soft');
+/** A row in a list of choices: 44 px tall, in the nested corner. */
+const OPTION_BASE =
+  'flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink';
+
+/**
+ * A setting's row, a checkbox's or a switch's, filled under the pointer and while its control has
+ * focus (CHOICE_FILL).
+ */
+export const OPTION_ROW = cx(OPTION_BASE, CHOICE_FILL);
+
+/**
+ * A menu's choice: a label around its visually hidden radio, the checked one in the accent's soft
+ * fill, the raised surface under the pointer. Focus moves with the choice, so it is ringed inside
+ * rather than filled, and the accent stays.
+ */
+export const MENU_OPTION = cx(
+  OPTION_BASE,
+  'hover:bg-surface-raised focus-ring-within-inset has-checked:bg-accent-soft',
+);
 
 // Fields (docs/DESIGN-SYSTEM.md, "Fields")
 

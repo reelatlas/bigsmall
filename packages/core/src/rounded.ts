@@ -49,6 +49,14 @@ function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
 
+/**
+ * A value that is not zero but rounds to zero, said as below the step rather than as nothing:
+ * "< 0.01", "< 1/8", and below zero "> −0.01" (Sean, 2026-10-15).
+ */
+function belowStep(value: number, step: string, locale: string | undefined): Rounded {
+  return { text: value > 0 ? `< ${step}` : `> ${minusSign(locale)}${step}`, approx: false };
+}
+
 /** The locale's minus sign, as Intl writes it in the table's own text. */
 function minusSign(locale: string | undefined): string {
   return (
@@ -58,10 +66,11 @@ function minusSign(locale: string | undefined): string {
 }
 
 /**
- * A value to `places` decimal places. Null for a value smaller than the last place (under 0.01
- * with two), which keeps its significant digits whatever the rounding, or one too large for places
- * to mean anything. Every place is written, trailing zeros too (96.00, 0.50), so a column of values
- * reads alike and says how precise each is (Sean, 2026-10-15).
+ * A value to `places` decimal places, rounded as chosen, small values too: 0.006 to two places is
+ * 0.01, and so is 0.001 rounded up. One that is not zero but rounds to zero reads "< 0.01", never
+ * 0.00, so it is never taken for nothing. Every place is written, trailing zeros too (96.00, 0.50),
+ * so a column of values reads alike and says how precise each is (Sean, 2026-10-15). Null for a
+ * value too large for places to mean anything.
  */
 export function formatPlaces(
   value: number,
@@ -69,14 +78,15 @@ export function formatPlaces(
 ): Rounded | null {
   if (!Number.isFinite(value)) return null;
   const scale = 10 ** options.places;
-  if (value !== 0 && Math.abs(value) < 1 / scale) return null;
   const result = rounded(value * scale, options.rounding) / scale;
   if (Math.abs(result) >= PLACES_LIMIT) return null;
-  const text = new Intl.NumberFormat(options.locale, {
+  const written = new Intl.NumberFormat(options.locale, {
     minimumFractionDigits: options.places,
     maximumFractionDigits: options.places,
-  }).format(Object.is(result, -0) ? 0 : result);
-  return { text, approx: false };
+  });
+  if (result === 0 && value !== 0)
+    return belowStep(value, written.format(1 / scale), options.locale);
+  return { text: written.format(Object.is(result, -0) ? 0 : result), approx: false };
 }
 
 /**
@@ -97,9 +107,10 @@ export function fractionsOf(sizes: ReadonlySet<FractionSize>): Fraction[] {
 }
 
 /**
- * A value in the sizes chosen, as a mixed number ("6 5/16"), and whether it rounds. Null with no
- * size chosen, past a million, or for a value smaller than the smallest size chosen (under 1/8
- * with eighths), which keeps its digits whatever the rounding. A tie goes up, as Math.round's does.
+ * A value in the sizes chosen, as a mixed number ("6 5/16"), and whether it rounds, small values
+ * rounded as chosen too (0.07 to eighths is ≈ 1/8). One that is not zero but rounds to zero reads
+ * "< 1/8", the smallest size chosen. Null with no size chosen, or past a million. A tie goes up, as
+ * Math.round's does.
  */
 export function formatFraction(
   value: number,
@@ -107,7 +118,6 @@ export function formatFraction(
 ): Rounded | null {
   const { sizes, rounding, locale } = options;
   if (!Number.isFinite(value) || sizes.size === 0 || Math.abs(value) >= FRACTION_LIMIT) return null;
-  if (value !== 0 && Math.abs(value) < 1 / Math.max(...sizes) - NOISE) return null;
   const base = Math.floor(value);
   const rest = value - base;
   const steps: Fraction[] = [{ n: 0, d: 1 }, ...fractionsOf(sizes), { n: 1, d: 1 }];
@@ -122,7 +132,11 @@ export function formatFraction(
           );
   if (!pick) return null;
   const count = base * pick.d + pick.n;
-  if (count === 0) return value === 0 ? { text: '0', approx: false } : null;
+  if (count === 0) {
+    return value === 0
+      ? { text: '0', approx: false }
+      : belowStep(value, `1/${Math.max(...sizes)}`, locale);
+  }
   // Written in the fraction's own size, never reduced past it: a below-zero part (d − n) has the
   // same lowest terms as n/d, so the same smallest size chosen writes it.
   const size = Math.abs(count);

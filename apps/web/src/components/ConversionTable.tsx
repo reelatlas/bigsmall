@@ -18,6 +18,7 @@ import { useColumnsFit } from '../lib/fit-step';
 import { flash } from '../lib/flash';
 import { panelKeys } from '../lib/panel-keys';
 import {
+  CHOICE_FILL,
   CURSOR_ROW,
   cx,
   LIST_CARD,
@@ -619,13 +620,21 @@ export function ConversionTable<T extends ConversionRow>({
     cardRef.current?.querySelector<HTMLElement>('[data-edit]')?.focus();
   };
 
+  /** Folds Hidden, focus on its button: Escape's first step while it is open (Sean, 2026-10-15). */
+  const foldHidden = () => {
+    onHiddenOpen(false);
+    hiddenToggleRef.current?.focus();
+  };
+
   // The table's own controls take the arrows as a panel's do. Out of Edit they carry on the box's
-  // plane, ↑ from the foot back to the rows and ↓ past the last on to the next plane, and Escape is
-  // the layout's (back to the box); Edit keeps them all, Escape ending it.
+  // plane, ↑ from the foot back to the rows and ↓ past the last on to the next plane. Escape closes
+  // the innermost thing open, one step at a time: Edit, ending it; else an open Hidden, folding it;
+  // else it is the layout's (back to the box). Edit keeps every arrow.
   useLayoutEffect(() => {
     const card = cardRef.current;
     if (!card) return undefined;
-    const onKeyDown = panelKeys(card, editing ? endEdit : undefined, editing ? undefined : onLeave);
+    const escape = editing ? endEdit : hiddenOpen ? foldHidden : undefined;
+    const onKeyDown = panelKeys(card, escape, editing ? undefined : onLeave);
     card.addEventListener('keydown', onKeyDown);
     return () => card.removeEventListener('keydown', onKeyDown);
   });
@@ -653,7 +662,13 @@ export function ConversionTable<T extends ConversionRow>({
     const spot = `section:${section.key}`;
     return (
       <h3 className={edge} {...marker}>
-        <label className={cx(PANEL_TITLE, 'flex min-h-11 items-center gap-2 px-2')}>
+        <label
+          className={cx(
+            PANEL_TITLE,
+            'flex min-h-11 cursor-pointer items-center gap-2 rounded-nested px-2',
+            CHOICE_FILL,
+          )}
+        >
           <SectionCheckbox
             state={state}
             spot={spot}
@@ -678,7 +693,7 @@ export function ConversionTable<T extends ConversionRow>({
       className={cx(
         CURSOR_ROW,
         'flex items-center gap-2 pl-8',
-        row.inBox ? rowFill(true, false) : 'hover:bg-surface-raised',
+        row.inBox ? rowFill(true, false) : CHOICE_FILL,
       )}
     >
       {checkbox(row, list === 'shown', list)}

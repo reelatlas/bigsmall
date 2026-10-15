@@ -44,11 +44,13 @@ describe('formatPlaces', () => {
     expect(places(-2.15, 1, 'down')).toBe('-2.2');
   });
 
-  it('leaves a value smaller than the last place to its digits, whatever the rounding', () => {
-    for (const rounding of ['nearest', 'up', 'down'] as const) {
-      expect(places(0.000473, 2, rounding)).toBeNull();
-      expect(places(-0.006, 2, rounding)).toBeNull();
-    }
+  it('rounds small values as chosen, and says one that rounds to zero is below the last place', () => {
+    expect(places(0.006, 2)).toBe('0.01');
+    expect(places(0.000473, 2, 'up')).toBe('0.01');
+    expect(places(0.000473, 2)).toBe('< 0.01');
+    expect(places(0.000473, 2, 'down')).toBe('< 0.01');
+    expect(places(-0.004, 2)).toBe('> -0.01');
+    expect(places(-0.004, 2, 'down')).toBe('-0.01');
     expect(places(0.01, 2, 'down')).toBe('0.01');
     expect(places(Number.NaN, 2)).toBeNull();
   });
@@ -101,10 +103,13 @@ describe('formatFraction', () => {
     expect(fraction(2.4999999999999996, eighths, 'down')?.text).toBe('2 1/2');
   });
 
-  it('leaves a value smaller than the smallest size to its digits, whatever the rounding', () => {
-    for (const rounding of ['nearest', 'up', 'down'] as const) {
-      expect(fraction(0.0625, eighths, rounding)).toBeNull();
-    }
+  it('rounds small values as chosen, and says one that rounds to zero is below the smallest size', () => {
+    expect(fraction(0.07, eighths)).toEqual({ text: '1/8', approx: true });
+    expect(fraction(0.0012, eighths, 'up')).toEqual({ text: '1/8', approx: true });
+    expect(fraction(0.0012, eighths)).toEqual({ text: '< 1/8', approx: false });
+    expect(fraction(0.05, eighths, 'down')?.text).toBe('< 1/8');
+    expect(fraction(0.001, sizes(2, 64))?.text).toBe('< 1/64');
+    expect(fraction(-0.001, eighths)?.text).toBe('> -1/8');
     expect(fraction(0.125, eighths, 'down')?.text).toBe('1/8');
     expect(fraction(0, eighths)?.text).toBe('0');
   });

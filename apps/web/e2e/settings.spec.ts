@@ -231,6 +231,16 @@ test('the arrows carry on from the rows onto the foot and into Hidden, and ↑ c
   await expect(specialty.getByRole('checkbox').first()).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(specialty.getByRole('checkbox').nth(1)).toBeFocused();
+  // Escape folds Hidden first, focus back on its button; the next goes back to the box.
+  await page.keyboard.press('Escape');
+  await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');
+  await expect(hiddenToggle(page)).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(box(page)).toBeFocused();
+  // Open again, past its last line the arrows go on to the header.
+  await hiddenToggle(page).focus();
+  await page.keyboard.press('Enter');
+  await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('End');
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
@@ -313,7 +323,7 @@ test('fractions, both, and rounding write the values and never move the columns'
 test("where Both's fraction has no room beside the decimal, it sits under it, lined up on the point, and the row keeps its height", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize({ width: 360, height: 844 });
   await page.goto('/?a=pound&v=2.3');
   await ready(page);
   await setSettings(page, 'Both');

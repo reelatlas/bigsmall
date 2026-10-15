@@ -966,7 +966,7 @@ test('Enter works out arithmetic and keeps the unit; with no unit, the next Ente
   await page.goto('/?a=milliliter&v=1');
   await ready(page);
   await box(page).fill('2 × 3');
-  await expect(row(page, 'liter')).toContainText('0.006');
+  await expect(row(page, 'us-teaspoon')).toContainText('1.22');
   await box(page).press('Enter');
   await expect(box(page)).toHaveValue('6');
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();

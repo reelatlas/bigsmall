@@ -659,3 +659,13 @@ Format:
 
 **What happened.** The browser tests' `settled` helper waited on every animation's `finished` promise before running axe. A transition cancelled on the way (a list redrawn under it) rejects that promise with an AbortError, which failed a test with nothing wrong on the page.
 **Rule.** Wait on `animation.finished.catch(() => undefined)`: a cancelled animation is as settled as a finished one.
+
+## 2026-10-14 — Decimal points line up in two columns, not with padding
+
+**What happened.** The plan for lining the table's values up on the decimal point was invisible trailing zeros after each value, as many as it lacked of the most decimals in the column. That works only while everything after the point is a digit: tabular digits share one width, but a value in exponent form ("1.23457E23", which a row writes past 1e15 or with No limit) has a letter and a sign after its point, and no count of zeros matches their width.
+**Rule.** Split each decimal at its decimal mark (at the exponent marker without one) into two subgrid columns, the whole part right-aligned and the rest left-aligned; the grid lines them up whatever the characters. Draw the parts `aria-hidden` with the whole value in an `sr-only` copy, so screen readers never hear "473, point 18". A sizer row measuring the columns places its overlapping cells with `row-start-1`, or auto-placement stacks them in extra rows.
+
+## 2026-10-14 — A sticky bar with rounded corners shows what scrolls under it
+
+**What happened.** Edit's foot was made sticky at the screen's bottom edge, first stretched over the card's bottom padding with rounded corners to sit inside the card's own. Stuck, those corners let the rows scrolling under it show through (the box's row in its accent fill, clearly).
+**Rule.** A bar that sticks over scrolling content is square and opaque edge to edge across what it covers: keep it inside the card's padding, as wide as the rows, rather than reaching for the card's rounded edge.

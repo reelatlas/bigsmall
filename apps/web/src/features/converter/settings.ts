@@ -25,14 +25,17 @@ import {
 /** A section of the table: `standard` holds a category with no regional system (time, data, angle). */
 export type SectionKey = 'metric' | 'us' | 'uk' | 'other' | 'standard' | 'specialist';
 
-/** Only headings take the parentheses; units keep their names and symbols. */
+/**
+ * Only headings take the parentheses; units keep their names and symbols. Specialty, for the units
+ * of a field, pairs with Standard (Sean, 2026-10-14).
+ */
 export const SECTION_LABEL: Record<SectionKey, string> = {
   metric: 'Metric',
   us: 'US (customary)',
   uk: 'UK (imperial)',
   other: 'Other',
   standard: 'Standard',
-  specialist: 'Specialist',
+  specialist: 'Specialty',
 };
 
 /**
@@ -63,7 +66,7 @@ export function ownSection(preference: UnitPreference): SectionKey {
 
 /**
  * The section a unit belongs to, for this visitor. The shared inch, foot, and pound sit with
- * US (customary), or with UK (imperial) for a UK visitor; every specialist unit is Specialist.
+ * US (customary), or with UK (imperial) for a UK visitor; every specialist unit is Specialty.
  */
 export function sectionOf(unit: Unit, preference: UnitPreference): SectionKey {
   if (unit.tier !== 'basic') return 'specialist';
@@ -83,7 +86,7 @@ export interface Section<T> {
 
 /**
  * Rows in their sections, every section headed, even a section of one: the visitor's own first,
- * then the other systems in the listed order, then Other, then Specialist. Rows keep the listed
+ * then the other systems in the listed order, then Other, then Specialty. Rows keep the listed
  * order within their section.
  */
 export function sectionsOf<T extends { unit: Unit }>(
@@ -115,7 +118,7 @@ export interface ViewRule {
   overrides: ReadonlyMap<string, boolean>;
 }
 
-/** A fresh visit's: every system but Specialist, the Standard preset. */
+/** A fresh visit's: every system but Specialty, the Standard preset. */
 export const FRESH_RULE: ViewRule = {
   shown: new Set(SYSTEM_KEYS.filter((key) => key !== 'specialist')),
   overrides: new Map(),

@@ -1,11 +1,19 @@
 import {
   formatFraction,
   formatPlaces,
+  localeSeparators,
   type FractionSize,
   type Rounded,
   type Rounding,
 } from '@bigsmall/core';
-import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import {
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  type ButtonHTMLAttributes,
+  type ReactNode,
+} from 'react';
 import { useColumnsFit } from '../lib/fit-step';
 import {
   CURSOR_ROW,
@@ -102,18 +110,19 @@ export interface ConversionTableProps<T extends ConversionRow> {
 }
 
 /**
- * A row reads "250 … mL milliliters": the value on the left, right-aligned in equal-width digits so
- * values line up at their last digit; with Both, its fraction beside it; past a column that takes
+ * A row reads "250 … mL milliliters": the value on the left in equal-width digits, a decimal in two
+ * columns, its whole part right-aligned and the rest left-aligned after it, so values line up on
+ * the decimal point (96 beside 473.18); with Both, its fraction beside it; past a column that takes
  * the spare width, on the right, the symbol right-aligned in its column, an exponent hanging after
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
  * left-aligned in its own; then the copy button, with copy buttons on. The names keep to one line:
  * where one would not fit beside its value (a long value on a phone), the names give way in every
  * row (GIVE_WAY), then Both's fraction. The unit's cell has no column gap, since the symbol and its
- * exponent touch: its parts space themselves (pr-2, pl-2). Seven columns, so a row spans
- * col-span-7.
+ * exponent touch: its parts space themselves (pr-2, pl-2). Eight columns, so a row spans
+ * col-span-8.
  */
 const ROWS =
-  'grid grid-cols-[auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)_auto] gap-y-0.5';
+  'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)_auto] gap-y-0.5';
 
 /** The columns that give way when a row has no room for them, in that order (useColumnsFit). */
 const GIVE_WAY = ['name', 'second'] as const;
@@ -133,9 +142,12 @@ const TONE: Record<ConversionRow['tone'], string> = {
   message: NO_ANSWER,
 };
 
-const VALUE_CELL = 'pr-2 font-numeric whitespace-nowrap';
+/** A decimal's whole part, and the rest from its decimal mark; a value written whole spans both. */
+const WHOLE_CELL = 'text-right font-numeric whitespace-nowrap';
+const DECIMALS_CELL = 'pr-2 font-numeric whitespace-nowrap';
+const ACROSS_CELL = 'col-span-2 pr-2 font-numeric whitespace-nowrap';
 const SECOND_CELL = 'min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric whitespace-nowrap';
-const SYMBOL_CELL = cx('col-start-4 pl-2 text-right whitespace-nowrap', unitSymbol());
+const SYMBOL_CELL = cx('col-start-5 pl-2 text-right whitespace-nowrap', unitSymbol());
 const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
 const HEADING = cx(PANEL_TITLE, 'px-2 pb-1');
 const CHECKBOX = 'size-4 accent-accent';
@@ -173,6 +185,30 @@ function writtenText(row: ConversionRow, written: Rounded | null): ReactNode {
     );
   }
   return row.tone === 'value' ? <FormattedNumber text={row.text} /> : row.text;
+}
+
+/**
+ * A row's value as the first two columns draw it. A decimal splits at its decimal mark, or at the
+ * exponent marker without one ("1E23"), so its whole part and the rest sit in two columns and every
+ * decimal point lines up; screen readers hear it whole, from `text`. A fraction, whose parts are
+ * not digits after a point, a dash, and a message are written whole across both, right-aligned.
+ */
+type ValueParts = { text: string; whole: string; decimals: string } | { across: ReactNode };
+
+function valueParts(
+  row: ConversionRow,
+  display: TableDisplay,
+  locale: string | undefined,
+  mark: string,
+): ValueParts {
+  if (row.tone !== 'value') return { across: row.text };
+  const written = row.value === null ? null : firstWritten(row.value, display, locale);
+  if (display.format === 'fraction') return { across: writtenText(row, written) };
+  const text = written?.text ?? row.text;
+  let at = text.indexOf(mark);
+  if (at < 0) at = text.indexOf('E');
+  if (at < 0) at = text.length;
+  return { text, whole: text.slice(0, at), decimals: text.slice(at) };
 }
 
 /** A checkbox for a section: checked for all its units, a dash for some, clear for none. */
@@ -243,35 +279,54 @@ export function ConversionTable<T extends ConversionRow>({
   const both = display.format === 'both';
   const hiddenCount = hidden.reduce((sum, section) => sum + section.rows.length, 0);
   const allRows = every.flatMap((section) => section.rows);
+  const mark = useMemo(() => localeSeparators(locale).decimal, [locale]);
 
-  const first = (row: T, under: TableDisplay = display) =>
-    writtenText(
-      row,
-      row.tone === 'value' && row.value !== null ? firstWritten(row.value, under, locale) : null,
-    );
+  const parts = (row: T, under: TableDisplay = display) => valueParts(row, under, locale, mark);
   const second = (row: T, under: TableDisplay = display): ReactNode => {
     if (row.tone !== 'value' || row.value === null) return null;
     const fraction = secondWritten(row.value, under, locale);
     return fraction ? writtenText(row, fraction) : null;
   };
 
-  /** A row's drawn cells: value, Both's fraction, symbol, exponent, and name. */
+  /**
+   * A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and
+   * name. In Edit the row's checkbox leads the value's first cell, set in as a tree's child.
+   */
   const cells = (row: T, muted = false, check?: ReactNode) => {
     const [base, exponent] = splitExponent(row.symbol);
     const fraction = both ? second(row) : null;
+    const value = parts(row);
+    const tone = muted ? 'text-ink-muted' : TONE[row.tone];
+    const lead = (cell: string, content: ReactNode) => (
+      <span className={cx(cell, check ? 'flex items-center gap-3' : null, tone)}>
+        {check && <span className="pl-6">{check}</span>}
+        {check ? <span className="ml-auto">{content}</span> : content}
+      </span>
+    );
     return (
       <>
-        <span
-          className={cx(
-            VALUE_CELL,
-            check ? 'flex items-center gap-3' : 'text-right',
-            muted ? 'text-ink-muted' : TONE[row.tone],
-          )}
-        >
-          {check && <span className="pl-6">{check}</span>}
-          {check ? <span className="ml-auto">{first(row)}</span> : first(row)}
-          {row.tone === 'empty' && <span className="sr-only">no value</span>}
-        </span>
+        {'across' in value ? (
+          lead(
+            cx(ACROSS_CELL, 'text-right'),
+            <>
+              {value.across}
+              {row.tone === 'empty' && <span className="sr-only">no value</span>}
+            </>,
+          )
+        ) : (
+          <>
+            {lead(
+              WHOLE_CELL,
+              <span aria-hidden="true" data-whole>
+                <FormattedNumber text={value.whole} />
+              </span>,
+            )}
+            <span aria-hidden="true" className={cx(DECIMALS_CELL, tone)}>
+              <FormattedNumber text={value.decimals} />
+            </span>
+            <span className="sr-only">{value.text}</span>
+          </>
+        )}
         {both && (
           <span
             hidden={secondHidden}
@@ -326,23 +381,47 @@ export function ConversionTable<T extends ConversionRow>({
         {cell(row, { ...display, rounding })}
       </span>
     ));
+  /** One part of a row's value as drawn, under a rounding: its whole part, the rest, or all of it across. */
+  const part = (pick: 'whole' | 'decimals' | 'across') => (row: T, under: TableDisplay) => {
+    const value = parts(row, under);
+    if ('across' in value) return pick === 'across' ? value.across : null;
+    return pick === 'across' ? null : <FormattedNumber text={value[pick]} />;
+  };
   const sizer = (
     <div
       aria-hidden="true"
-      className="invisible col-span-7 grid h-0 grid-cols-subgrid overflow-hidden px-2"
+      className="invisible col-span-8 grid h-0 grid-cols-subgrid overflow-hidden px-2"
     >
-      <span className={cx(VALUE_CELL, 'col-start-1')}>{stack(everyRounding(first))}</span>
+      <span className={cx(WHOLE_CELL, 'col-start-1 row-start-1')}>
+        {stack(everyRounding(part('whole')))}
+      </span>
+      <span className={cx(DECIMALS_CELL, 'col-start-2 row-start-1')}>
+        {stack(everyRounding(part('decimals')))}
+      </span>
+      <span className={cx(ACROSS_CELL, 'col-start-1 row-start-1')}>
+        {stack(everyRounding(part('across')))}
+      </span>
       {both && (
-        <span hidden={secondHidden} className={cx(SECOND_CELL, 'col-start-2')} data-column="second">
+        <span
+          hidden={secondHidden}
+          className={cx(SECOND_CELL, 'col-start-3 row-start-1')}
+          data-column="second"
+        >
           {stack(everyRounding(second))}
         </span>
       )}
-      <span className={SYMBOL_CELL}>{stack((row) => splitExponent(row.symbol)[0])}</span>
-      <span className={cx('col-start-5 whitespace-nowrap', unitSymbol())}>
+      <span className={cx(SYMBOL_CELL, 'row-start-1')}>
+        {stack((row) => splitExponent(row.symbol)[0])}
+      </span>
+      <span className={cx('col-start-6 row-start-1 whitespace-nowrap', unitSymbol())}>
         {stack((row) => splitExponent(row.symbol)[1])}
       </span>
       {withNames && (
-        <span hidden={namesHidden} className={cx(NAME_CELL, 'col-start-6')} data-column="name">
+        <span
+          hidden={namesHidden}
+          className={cx(NAME_CELL, 'col-start-7 row-start-1')}
+          data-column="name"
+        >
           {stack((row) => row.name)}
         </span>
       )}
@@ -386,9 +465,9 @@ export function ConversionTable<T extends ConversionRow>({
         <div
           key={section.key}
           role="rowgroup"
-          className="col-span-7 grid grid-cols-subgrid gap-y-0.5"
+          className="col-span-8 grid grid-cols-subgrid gap-y-0.5"
         >
-          <div role="row" className={cx('col-span-7', sectionEdge(at))}>
+          <div role="row" className={cx('col-span-8', sectionEdge(at))}>
             <span role="columnheader" className={cx('block', HEADING)}>
               {section.label}
             </span>
@@ -401,7 +480,7 @@ export function ConversionTable<T extends ConversionRow>({
                 role="row"
                 aria-selected={rowIndex === cursor}
                 data-row={row.id}
-                className="col-span-7 grid grid-cols-subgrid items-center"
+                className="col-span-8 grid grid-cols-subgrid items-center"
               >
                 {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field */}
                 <div
@@ -416,7 +495,7 @@ export function ConversionTable<T extends ConversionRow>({
                     CURSOR_ROW,
                     'grid grid-cols-subgrid items-center',
                     // Without copy buttons the row runs to the card's edge: no column is kept for them.
-                    display.copy ? 'col-span-6' : 'col-span-7',
+                    display.copy ? 'col-span-7' : 'col-span-8',
                     rowFill(row.inBox, rowIndex === cursor),
                   )}
                 >
@@ -458,9 +537,9 @@ export function ConversionTable<T extends ConversionRow>({
           key={section.key}
           role="group"
           aria-label={section.label}
-          className="col-span-7 grid grid-cols-subgrid gap-y-0.5"
+          className="col-span-8 grid grid-cols-subgrid gap-y-0.5"
         >
-          <div className="col-span-7">
+          <div className="col-span-8">
             {headedCheck(section.label, section.rows, sectionEdge(at))}
           </div>
           {section.rows.map((row) => {
@@ -471,7 +550,7 @@ export function ConversionTable<T extends ConversionRow>({
                 htmlFor={`${checkId}-${row.id}`}
                 className={cx(
                   CURSOR_ROW,
-                  'col-span-7 grid grid-cols-subgrid items-center',
+                  'col-span-8 grid grid-cols-subgrid items-center',
                   rowFill(row.inBox, false),
                 )}
               >
@@ -498,27 +577,20 @@ export function ConversionTable<T extends ConversionRow>({
         Moves this unit into the box.
       </p>
       <div className={cx(LIST_CARD, 'p-2')}>
-        {editing && (
-          <div className="flex items-center justify-between gap-2 pb-1 pl-2">
-            <span className={PANEL_TITLE}>Choose the units to show</span>
-            {/* Done closes Hidden too: whoever just chose what to hide should not have to fold it. */}
-            <Button
-              variant="ghost"
-              nested
-              onClick={() => {
-                onEditing(false);
-                onHiddenOpen(false);
-              }}
-              className="text-sm"
-            >
-              Done
-            </Button>
-          </div>
-        )}
         {body}
-        {!editing && !message && (
-          <div className="mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1">
-            {hiddenCount > 0 ? (
+        {/* The foot keeps its place in Edit, nothing over the list moving: Edit reads Done where it
+            was, and Hidden's place says what to do. Over a long list the foot stays at the screen's
+            bottom edge, Done in reach, as wide as the rows it covers. */}
+        {!message && (
+          <div
+            className={cx(
+              'mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1',
+              editing && 'sticky bottom-0 bg-surface',
+            )}
+          >
+            {editing ? (
+              <span className="px-2 text-sm text-ink-muted">Choose the units to show</span>
+            ) : hiddenCount > 0 ? (
               <button
                 type="button"
                 aria-expanded={hiddenOpen}
@@ -542,8 +614,17 @@ export function ConversionTable<T extends ConversionRow>({
             ) : (
               <span className="px-2 text-sm text-ink-muted">Every unit shown</span>
             )}
-            <Button variant="ghost" nested onClick={() => onEditing(true)} className="text-sm">
-              Edit
+            {/* Done folds Hidden too: whoever just chose what to hide should not have to fold it. */}
+            <Button
+              variant="ghost"
+              nested
+              onClick={() => {
+                onEditing(!editing);
+                if (editing) onHiddenOpen(false);
+              }}
+              className="text-sm"
+            >
+              {editing ? 'Done' : 'Edit'}
             </Button>
           </div>
         )}

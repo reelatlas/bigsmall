@@ -33,13 +33,13 @@ describe('settings: sections', () => {
       'US (customary)',
       'Metric',
       'UK (imperial)',
-      'Specialist',
+      'Specialty',
     ]);
     expect(labels('volume', 'imperial')[0]).toBe('UK (imperial)');
     expect(labels('volume', 'metric')[0]).toBe('Metric');
-    // Other comes before Specialist; a category with no regions is Standard, never "Metric".
-    expect(labels('speed', 'us')).toEqual(['US (customary)', 'Metric', 'Other', 'Specialist']);
-    expect(labels('time', 'us')).toEqual(['Standard', 'Specialist']);
+    // Other comes before Specialty; a category with no regions is Standard, never "Metric".
+    expect(labels('speed', 'us')).toEqual(['US (customary)', 'Metric', 'Other', 'Specialty']);
+    expect(labels('time', 'us')).toEqual(['Standard', 'Specialty']);
   });
 
   it('puts the shared inch with the visitor’s customary section', () => {
@@ -49,7 +49,7 @@ describe('settings: sections', () => {
 });
 
 describe('settings: what shows', () => {
-  it('starts with every system but Specialist, the Standard preset', () => {
+  it('starts with every system but Specialty, the Standard preset', () => {
     expect(presetOf(FRESH_RULE.shown, 'us')).toBe('standard');
     expect(shows(unit('parsec'), FRESH_RULE, 'us')).toBe(false);
     expect(shows(unit('knot'), { shown: new Set(), overrides: new Map() }, 'us')).toBe(true);
@@ -117,7 +117,7 @@ describe('the table and the matches, by the settings', () => {
       'UK (imperial)',
     ]);
     expect(view.rows).toEqual(view.sections.flatMap((section) => section.rows));
-    expect(view.hidden.map((section) => section.label)).toEqual(['Specialist']);
+    expect(view.hidden.map((section) => section.label)).toEqual(['Specialty']);
     expect(view.all).toHaveLength(unitsIn('volume').length);
     expect(view.announcement).toBe(`2 cups in ${view.rows.length} units of volume`);
   });
@@ -144,7 +144,7 @@ describe('the table and the matches, by the settings', () => {
     if (view.kind !== 'matches') throw new Error(view.kind);
     expect(view.rows.filter((row) => row.kind === 'unit')).toHaveLength(0);
     expect(view.hidden.length).toBeGreaterThan(0);
-    expect(view.hidden[0]).toMatchObject({ section: 'Specialist' });
+    expect(view.hidden[0]).toMatchObject({ section: 'Specialty' });
     expect(view.announcement).toBe('Only hidden units match');
   });
 });

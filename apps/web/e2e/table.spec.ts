@@ -455,7 +455,7 @@ test('× takes the unit out and keeps the category; so does Backspace on an empt
   await expect(page.locator('[data-row]')).toHaveCount(VOLUME_STANDARD);
 });
 
-test('a row reads the value on the left, then symbol and name on the right, each in its column', async ({
+test('a row reads the value on the left, on the decimal point, then symbol and name on the right, each in its column', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -467,8 +467,9 @@ test('a row reads the value on the left, then symbol and name on the right, each
         range.selectNodeContents(element);
         return range.getBoundingClientRect();
       };
+      // The value's first cell holds its whole part: where it ends, the decimal point starts.
       return units.map((unit) => ({
-        valueRight: text(unit.firstElementChild!).right,
+        point: text(unit.firstElementChild!).right,
         symbolRight: text(unit.querySelector('[data-symbol]')!).right,
         nameLeft: text(unit.querySelector('[data-name]')!).left,
       }));
@@ -477,7 +478,7 @@ test('a row reads the value on the left, then symbol and name on the right, each
     const cells = await columns();
     const same = (pick: (cell: (typeof cells)[number]) => number) =>
       new Set(cells.map((cell) => Math.round(pick(cell)))).size;
-    expect(same((cell) => cell.valueRight)).toBe(1);
+    expect(same((cell) => cell.point)).toBe(1);
     expect(same((cell) => cell.symbolRight)).toBe(1);
     expect(same((cell) => cell.nameLeft)).toBe(1);
     return cells;
@@ -491,6 +492,11 @@ test('a row reads the value on the left, then symbol and name on the right, each
   // The names sit on the right: past the middle of the row on a wide table.
   const card = (await page.getByRole('region', { name: 'Volume' }).boundingBox())!;
   expect(cells[0]!.nameLeft).toBeGreaterThan(card.x + card.width / 2);
+  // With no limit the values have every count of decimals, and their points still line up; the
+  // two columns they are drawn in are heard as one value.
+  await setSettings(page, 'No limit');
+  await lineUp();
+  await expect(unitCell(page, 'us-cup')).toHaveAccessibleName(/^1\.05669 cup cups/);
 
   // Symbols line up on their last letter, an exponent hanging after it: "ha" ends where the "m"
   // of "m²" does. Screen readers hear the symbol whole.

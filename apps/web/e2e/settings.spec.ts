@@ -79,29 +79,41 @@ test('Settings closes on Escape, a press outside, or focus moving out, and stays
   }
 });
 
-test('the Hidden list brings a unit back into its section; Edit hides one, and Done folds Hidden', async ({
+test('the Hidden list brings a unit back into its section; Edit hides one, Done in its place, and Done folds Hidden', async ({
   page,
 }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
   await hiddenToggle(page).click();
-  await expect(page.getByRole('group', { name: 'Hidden, Specialist' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Hidden, Specialty' })).toBeVisible();
   await expectNoA11yViolations(page);
   // Checked, it leaves the list for its section, so a click, not a check that waits on it.
   await page
-    .getByRole('group', { name: 'Hidden, Specialist' })
+    .getByRole('group', { name: 'Hidden, Specialty' })
     .getByLabel(/cubic inches/)
     .click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
   await expect(hiddenToggle(page)).toContainText(String(SPECIALIST - 1));
 
-  await page.getByRole('button', { name: 'Edit', exact: true }).click();
-  await expect(page.getByText('Choose the units to show')).toBeVisible();
+  // Edit reads Done in its place, focus staying on it, and nothing over the list moves.
+  const top = async () =>
+    (await table(page).locator('[role="rowgroup"], [role="group"]').first().boundingBox())!.y;
+  const before = await top();
+  await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
+  const done = table(page).getByRole('button', { name: 'Done' });
+  await expect(done).toBeFocused();
+  await expect(table(page).getByText('Choose the units to show')).toBeVisible();
+  expect(await top()).toBe(before);
   await expectNoA11yViolations(page);
+  // Over the long list the foot stays at the screen's bottom edge, Done in reach.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const foot = (await done.boundingBox())!;
+  expect(foot.y + foot.height).toBeLessThanOrEqual(page.viewportSize()!.height);
   await table(page)
     .getByLabel(/teaspoons/)
     .uncheck();
-  await page.getByRole('button', { name: 'Done' }).click();
+  await done.click();
+  await expect(table(page).getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
   await expect(row(page, 'us-teaspoon')).toHaveCount(0);
   // Done closes Hidden, whoever just chose what to hide.
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');

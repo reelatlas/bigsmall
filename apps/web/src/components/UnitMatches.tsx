@@ -13,7 +13,7 @@ export type UnitMatch =
 export interface HiddenUnitMatch {
   unit: Unit;
   category: Category;
-  /** The section it would show in: "Specialist". */
+  /** The section it would show in: "Specialty". */
   section: string;
 }
 

@@ -291,7 +291,7 @@ test('the arrows carry on from the rows onto the foot and into Hidden, and ↑ c
   await expect(page.locator('[data-last-line]')).toBeFocused();
 });
 
-test('under the matches, Show them carries on from the last match, and ↑ comes back to it', async ({
+test('under the matches, Show them carries on from the last match, and lists the hidden ones under its line', async ({
   page,
   isMobile,
 }) => {
@@ -307,17 +307,36 @@ test('under the matches, Show them carries on from the last match, and ↑ comes
   await page.keyboard.press('Enter');
   const hide = page.getByRole('button', { name: 'Hide them' });
   await expect(hide).toBeFocused();
-  // ↑ comes back to the box, the cursor on the last match, now a hidden one.
+  // They list under the line, as Hidden lists its units under the table's foot, not among the
+  // matches over it (Sean, 2026-10-15).
+  const matches = page.getByRole('listbox', { name: 'Matching units' }).getByRole('option');
+  const hidden = page
+    .getByRole('listbox', { name: /hidden units? also match/ })
+    .getByRole('option');
+  await expect(hidden).not.toHaveCount(0);
+  const line = (await hide.boundingBox())!;
+  expect((await hidden.first().boundingBox())!.y).toBeGreaterThanOrEqual(line.y + line.height);
+  // ↓ goes on into them, the cursor back in the box; ↑ from the first comes back to the button.
+  await page.keyboard.press('ArrowDown');
+  await expect(box(page)).toBeFocused();
+  await expect(hidden.first()).toHaveAttribute('aria-selected', 'true');
+  await box(page).press('ArrowUp');
+  await expect(hide).toBeFocused();
+  // ↑ from the button comes back to the box, the cursor on the last match over the line.
   await page.keyboard.press('ArrowUp');
   await expect(box(page)).toBeFocused();
-  await expect(
-    page.getByRole('group', { name: 'Hidden', exact: true }).getByRole('option').last(),
-  ).toHaveAttribute('aria-selected', 'true');
+  await expect(matches.last()).toHaveAttribute('aria-selected', 'true');
+  // On through the hidden ones to the last, the page's bottom: down from it does nothing (Sean,
+  // 2026-10-15).
   await box(page).press('ArrowDown');
   await expect(hide).toBeFocused();
-  // The page's bottom: down from it does nothing (Sean, 2026-10-15).
+  const count = await hidden.count();
   await page.keyboard.press('ArrowDown');
-  await expect(hide).toBeFocused();
+  for (let step = 1; step < count; step += 1) await box(page).press('ArrowDown');
+  await expect(hidden.last()).toHaveAttribute('aria-selected', 'true');
+  await box(page).press('ArrowDown');
+  await expect(box(page)).toBeFocused();
+  await expect(hidden.last()).toHaveAttribute('aria-selected', 'true');
 });
 
 test('with a system unchecked none of its units shows: its switch is final, and its checkbox shows a dash while units are chosen on their own', async ({
@@ -546,7 +565,7 @@ test('search leaves hidden units out and offers them; taking one unhides it', as
   await box(page).fill('2 cubic');
   await expect(page.getByText('Only hidden units match')).toBeVisible();
   await page.getByRole('button', { name: 'Show them' }).click();
-  const hidden = page.getByRole('group', { name: 'Hidden', exact: true });
+  const hidden = page.getByRole('listbox', { name: 'Only hidden units match' });
   await expect(hidden.getByRole('option')).not.toHaveCount(0);
   await expectNoA11yViolations(page);
   await hidden.getByRole('option', { name: /cubic inches/ }).click();

@@ -45,7 +45,7 @@ function FieldSample({ label, text, unitId }: { label: string; text: string; uni
       unit={getUnit(unitId) ?? null}
       placeholder="Number"
       describedBy={hint}
-      popup={{ expanded: false, id: list, activeId: undefined, kind: 'grid' }}
+      popup={{ expanded: false, controls: list, activeId: undefined, kind: 'grid' }}
       onChange={noop}
       onKeyDown={noop}
       onClear={noop}
@@ -231,6 +231,7 @@ function TableSamples() {
       {matches.kind === 'matches' && (
         <UnitMatches
           id={`${id}-matches`}
+          hiddenId={`${id}-matches-hidden`}
           matches={matches.rows}
           counts={matches.counts}
           query={matches.query}

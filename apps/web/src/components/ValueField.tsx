@@ -29,12 +29,14 @@ export interface ValueFieldProps {
   /** Id of the hint that describes the field. */
   describedBy: string;
   /**
-   * The combobox's popup, the list under the field: whether it shows, its id, the item the field
-   * points at, and its kind, a listbox (the matches, the categories) or a grid (the units).
+   * The combobox's popup, the list under the field: whether it shows, the ids of what it controls
+   * (space-separated: the matches, and the hidden ones listed under their line once shown), the
+   * item the field points at, and its kind, a listbox (the matches, the categories) or a grid (the
+   * units).
    */
   popup: {
     expanded: boolean;
-    id: string;
+    controls: string;
     activeId: string | undefined;
     kind: 'listbox' | 'grid';
   };
@@ -134,7 +136,7 @@ export function ValueField({
             type="text"
             role="combobox"
             aria-expanded={popup.expanded}
-            aria-controls={popup.expanded ? popup.id : undefined}
+            aria-controls={popup.expanded ? popup.controls : undefined}
             aria-activedescendant={popup.activeId}
             aria-haspopup={popup.kind}
             aria-autocomplete="list"

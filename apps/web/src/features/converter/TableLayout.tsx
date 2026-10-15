@@ -159,6 +159,7 @@ export function TableLayout({
   copyRowProps,
 }: TableLayoutProps) {
   const listId = useId();
+  const hiddenListId = `${listId}-hidden`;
   const itemId = (index: number) => `${listId}-item-${index}`;
   const rootRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -211,6 +212,18 @@ export function TableLayout({
       : table.kind === 'matches'
         ? table.rows.length + (revealed ? table.hidden.length : 0)
         : table.categories.length;
+  /**
+   * Where the table's foot sits in the cursor's order: after the last row; under the matches,
+   * between them and the hidden ones its line lists once shown (Sean, 2026-10-15).
+   */
+  const foot = table.kind === 'matches' && table.hidden.length > 0 ? table.rows.length : rowCount;
+  /** What the field controls: the table's place, or the matches and the hidden ones while they show. */
+  const controls =
+    table.kind === 'matches'
+      ? [table.rows.length > 0 && listId, revealed && table.hidden.length > 0 && hiddenListId]
+          .filter(Boolean)
+          .join(' ')
+      : listId;
   const rest = table.kind === 'units' && box.unit ? table.rows.findIndex((row) => row.inBox) : -1;
   const at = position === null ? rest : Math.min(position, rowCount - 1);
   /** The arrows have moved the cursor into the table's place: Escape first brings it back. */
@@ -252,14 +265,17 @@ export function TableLayout({
     first.focus();
   };
 
-  /** From the foot: ↑ back into the box, the cursor on the last row; ↓ past its end, nowhere. */
+  /**
+   * From the foot: ↑ back into the box, the cursor on the row over it; ↓ on to the hidden matches
+   * its line lists, the cursor back in the box, else past its end, nowhere.
+   */
   const leaveFoot = (step: 1 | -1) => {
-    if (step === 1) {
+    if (step === 1 && foot >= rowCount) {
       leaveBox(1);
       return;
     }
     inputRef.current?.focus();
-    setPosition(rowCount > 0 ? rowCount - 1 : -1);
+    setPosition(step === 1 ? foot : foot - 1);
   };
 
   /**
@@ -494,17 +510,22 @@ export function TableLayout({
         setPosition(Math.min(Math.max(next, 0), rowCount - 1));
         return;
       }
-      case 'ArrowDown':
+      case 'ArrowDown': {
         // From the field down every row, each step from where the cursor is (the unit in the box
-        // while it rests there), past the last row onto the table's foot, the page's bottom.
+        // while it rests there), onto the table's foot where it sits, on through the hidden
+        // matches its line lists, and past the last nowhere: the page's bottom.
         event.preventDefault();
-        if (at < 0 && rowCount > 0) setPosition(0);
-        else if (at >= 0 && at + step < rowCount) setPosition(at + step);
-        else toFoot();
+        const next = at < 0 ? 0 : at + step;
+        if (at < foot && next >= foot) toFoot();
+        else if (next < rowCount) setPosition(next);
+        else leaveBox(1);
         return;
+      }
       case 'ArrowUp':
         event.preventDefault();
-        if (at >= 0) setPosition(at - step >= 0 ? at - step : -1);
+        // From the first hidden match up onto the foot's line over it.
+        if (at >= 0 && at === foot) toFoot();
+        else if (at >= 0) setPosition(at - step >= 0 ? at - step : -1);
         else leaveBox(-1);
         return;
       case 'Enter': {
@@ -557,6 +578,7 @@ export function TableLayout({
     ) : table.kind === 'matches' ? (
       <UnitMatches
         id={listId}
+        hiddenId={hiddenListId}
         matches={table.rows}
         counts={table.counts}
         query={table.query}
@@ -657,7 +679,7 @@ export function TableLayout({
             describedBy={describedBy}
             popup={{
               expanded: rowCount > 0,
-              id: listId,
+              controls,
               activeId: browsing ? itemId(at) : undefined,
               kind: table.kind === 'units' ? 'grid' : 'listbox',
             }}

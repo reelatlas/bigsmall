@@ -159,15 +159,34 @@ test('the shortcuts map opens with Enter, never as the keyboard passes, and clos
   await ready(page);
   const map = page.getByRole('group', { name: 'Keyboard shortcuts' });
   const ring = () => shortcuts(page).evaluate((icon) => getComputedStyle(icon).outlineStyle);
-  // Reached with Tab it stays shut, the icon showing its ring (Sean, 2026-10-15).
+  // Reached with Tab it stays shut, the icon showing its ring, which its shell does not clip
+  // (Sean, 2026-10-15).
   await page.keyboard.press('Tab');
   await expect(shortcuts(page)).toBeFocused();
   await expect(map).toBeHidden();
   expect(await ring()).not.toBe('none');
-  // Enter opens it: the open map's accent edge shows where focus is, the icon drawing no ring.
+  const clip = () =>
+    shortcuts(page).evaluate(
+      (icon) => getComputedStyle(icon.closest('[data-shell] > *')!).overflow,
+    );
+  expect(await clip()).toBe('visible');
+  // Enter opens it: the icon switched on, as a toolbar's button is while its panel is open; the
+  // open map's accent edge shows where focus is, the icon drawing no ring.
   await page.keyboard.press('Enter');
   await expect(map).toBeVisible();
   expect(await ring()).toBe('none');
+  // The fill eases in with the button's own transition, so wait for it to settle.
+  const soft = await shortcuts(page).evaluate((icon) => {
+    const probe = document.createElement('span');
+    probe.style.color = getComputedStyle(icon).getPropertyValue('--accent-soft');
+    document.body.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  });
+  await expect
+    .poll(() => shortcuts(page).evaluate((icon) => getComputedStyle(icon).backgroundColor))
+    .toBe(soft);
   await page.keyboard.press('Escape');
   await expect(map).toBeHidden();
   await expect(shortcuts(page)).toBeFocused();

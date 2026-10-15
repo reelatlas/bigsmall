@@ -1,9 +1,24 @@
 ---
-import { PANEL_TITLE, SHELL, SHELL_GHOST, SHELL_PANEL } from '../lib/recipes';
+import { PANEL_TITLE, SHELL, SHELL_PANEL } from '../lib/recipes';
 import { SHORTCUTS } from '../lib/shortcuts';
 import { Button } from './Button';
 import { KeyboardIcon } from './icons';
 import { Keycap } from './Keycap';
+
+/**
+ * Its resting style: a borderless icon button that becomes a card when open, clipped to its
+ * corners only then, so the icon's focus ring shows at rest as Copy URL's does. No transition:
+ * its panel appears and vanishes at once, so an edge that faded would be left behind as a green
+ * square around the icon (docs/LEARNINGS.md, "A focus-within edge lingers").
+ */
+const GHOST = 'border-transparent group-data-open:overflow-hidden group-data-open:bg-surface';
+
+/**
+ * Open, the icon is switched on, the accent's soft fill, as the toolbar's buttons are while their
+ * panels are open (Sean, 2026-10-15), the open shell's accent edge showing where focus is.
+ */
+const TOGGLE_OPEN =
+  'group-data-open:bg-accent-soft group-data-open:text-ink group-data-open:outline-none group-data-open:hover:bg-accent-soft';
 
 const panelId = 'shortcuts-panel';
 const titleId = 'shortcuts-title';
@@ -13,8 +28,9 @@ const titleId = 'shortcuts-title';
  * all; open, its shell (lib/recipes.ts) takes the fluid-shell edge, surface, and shadow and grows
  * left and down from the icon over the page, the way the theme menu grows out of its trigger.
  * While it is open, the shell's accent edge is the icon's focus indicator, as a field's is, so the
- * icon draws no ring of its own. A click opens it, and a second click, Escape, a click elsewhere,
- * or focus leaving closes it (Sean, 2026-10-15: it opened on hover and on focus until then). The inline script in layouts/Base.astro drives it, so it adds no bundle; Button
+ * icon, switched on, draws no ring of its own. A click opens it, and a second click, Escape, a
+ * click elsewhere, or focus leaving closes it (Sean, 2026-10-15: it opened on hover and on focus
+ * until then). The inline script in layouts/Base.astro drives it, so it adds no bundle; Button
  * and the icon are TSX components rendered to static HTML. Hidden on touch-first devices, which
  * have no keyboard to use, and below the sm breakpoint, where a panel growing left from beside the
  * theme menu would run off the screen. The list itself lives in src/lib/shortcuts.ts.
@@ -22,7 +38,7 @@ const titleId = 'shortcuts-title';
 ---
 
 <div class="group relative hidden size-12 sm:block pointer-coarse:hidden" data-shell>
-  <div class:list={['absolute top-0 right-0 rounded-md', SHELL, SHELL_GHOST]}>
+  <div class:list={['absolute top-0 right-0 rounded-md', SHELL, GHOST]}>
     <div class="flex items-center">
       <h2 id={titleId} class:list={['hidden flex-1 px-3 group-data-open:block', PANEL_TITLE]}>
         Keyboard shortcuts
@@ -35,7 +51,7 @@ const titleId = 'shortcuts-title';
         aria-expanded="false"
         aria-controls={panelId}
         aria-label="Keyboard shortcuts"
-        className="group-data-open:outline-none"
+        className={TOGGLE_OPEN}
       >
         <KeyboardIcon />
       </Button>

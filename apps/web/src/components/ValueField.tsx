@@ -9,7 +9,7 @@ import {
   type RefObject,
 } from 'react';
 import { useFieldFit, type FitText } from '../lib/fit-step';
-import { cx, FIELD_ROW, NUMBER_SIZES, SHELL, SHELL_BORDERED } from '../lib/recipes';
+import { cx, FIELD_ROW, NUMBER_SIZES, SHELL } from '../lib/recipes';
 import { Button } from './Button';
 import { ClearIcon } from './icons';
 import { NumberText, runningValue } from './NumberText';
@@ -60,6 +60,14 @@ export interface ValueFieldProps {
  * is what lets the exponent marker in "1.5E21" carry weight, since a field cannot style part of
  * its value. The size steps are measured against this layer (docs/DESIGN-SYSTEM.md, "Fields").
  */
+/**
+ * The box's resting edge, a shell's that never opens: bordered, clipped to its corners, the
+ * accent edge showing keyboard focus inside and easing between edge and accent, since the box
+ * stays in view through the change.
+ */
+const FIELD_SHELL =
+  'overflow-hidden border-edge bg-surface transition-[border-color,box-shadow] focus-within:border-accent';
+
 const TEXT_LAYER =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 
@@ -114,7 +122,7 @@ export function ValueField({
   // The chip keeps the same 8 px from the top, bottom, and right edges (docs/DESIGN-SYSTEM.md,
   // "Fields").
   return (
-    <div className={cx('min-w-0 rounded-lg shadow-sm', SHELL, SHELL_BORDERED)}>
+    <div className={cx('min-w-0 rounded-lg shadow-sm', SHELL, FIELD_SHELL)}>
       <label htmlFor={inputId} className="sr-only">
         {label}
       </label>

@@ -43,27 +43,17 @@ export const PANEL_ACTIVE =
 
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,
-// and `data-open` while open; the shell takes SHELL, one of the two resting styles, and its own
-// position and radius. The fields (ValueField), the category menu (TSX), and the header menus
-// (Astro, driven by the inline script in layouts/Base.astro) all build from these.
+// and `data-open` while open; the shell takes SHELL, its own resting style beside its one use
+// (the box's bordered edge in ValueField, the shortcuts map's ghost in ShortcutsHelp), and its own
+// position and radius. The box, the menus, and the shortcuts map all build from these.
 
-/** The edge, clip, and open state every shell shares: an accent edge and a shadow while open. */
+/**
+ * The edge and open state every shell shares: an accent edge and a shadow while open. Each shell
+ * clips as its shape needs, the box always, the shortcuts map only while open, so the focus ring
+ * around its icon at rest is not cut off (Sean, 2026-10-15).
+ */
 export const SHELL =
-  'overflow-hidden border-2 group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md';
-
-/**
- * Bordered at rest (fields, the theme and category menus). The accent edge also shows keyboard
- * focus inside, and it eases between edge and accent because the shell itself stays in view.
- */
-export const SHELL_BORDERED =
-  'border-edge bg-surface transition-[border-color,box-shadow] focus-within:border-accent';
-
-/**
- * A borderless icon button at rest (the shortcuts map) that becomes a card when open. No
- * transition: its panel appears and vanishes at once, so an edge that faded would be left behind
- * as a green square around the icon (docs/LEARNINGS.md, "A focus-within edge lingers").
- */
-export const SHELL_GHOST = 'border-transparent group-data-open:bg-surface';
+  'border-2 group-data-open:z-20 group-data-open:border-accent group-data-open:shadow-md';
 
 /** A menu's panel: hidden at rest, under a divider once its shell opens. */
 export const SHELL_PANEL = 'hidden border-t border-line group-data-open:block';

@@ -46,19 +46,21 @@ const TABLE_TOOLS_CELL = 'max-w-xl md:col-start-1 md:row-start-1';
 /**
  * The toolbar row (Sean, 2026-10-10 and 15): the category menu, the calculator, Units, and
  * Display at its left, the menu's edge on the box's, with no dividers between them; undo, redo,
- * and clear all at its right end. Where the row has no room for both, the right end keeps the top
- * line and the leading four wrap under it, over the box, with no breakpoint: they come first in
- * the markup, `flex-wrap-reverse` stacks a wrapped row's first line at the bottom, and the right
- * end's `ml-auto` keeps it right. The browser's own fit decides, in every theme.
+ * and clear all at its right end. Where the row has no room for both, undo, redo, and clear all
+ * keep the top line and the leading four wrap under it, both lines flush left over the box, on a
+ * phone or a narrow window alike, with no breakpoint: the leading four come first in the markup,
+ * `flex-wrap-reverse` stacks a wrapped row's first line at the bottom, and `justify-between` puts
+ * the two groups at the ends of a shared line and a group alone on its line at its start. The
+ * browser's own fit decides, in every theme.
  */
 const TABLE_TOOLS_ROW = 'mb-2 flex flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2';
 const TABLE_LEADING = 'flex items-center gap-1';
 /**
- * The right end's tools: their outer edges on the box's (the last button's at the row's right
- * end), so a filled one (switched on, hovered) lines up with the box and the table, its glyph
- * inside the column as their text is.
+ * The right end's tools: their outer edges on the box's (the last button's at the row's right end,
+ * or the first's at its left once they have a line of their own), so a filled one (switched on,
+ * hovered) lines up with the box and the table, its glyph inside the column as their text is.
  */
-const TABLE_TOOLS = 'ml-auto flex shrink-0 items-center gap-1';
+const TABLE_TOOLS = 'flex shrink-0 items-center gap-1';
 const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
 /**
  * 8 px under the box, its popup, as the toolbar sits 8 px over it; a container, so the categories

@@ -839,18 +839,16 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
     expect(wide.menu.y + wide.menu.height, theme.id).toBeLessThanOrEqual(wide.field.y);
   }
 
-  // A phone has no room for both: undo, redo, and clear all keep the top line at the right end,
-  // and the menu, the calculator, Units, and Display take the next, flush left, over the box.
+  // A phone has no room for both: undo, redo, and clear all keep the top line, and the menu, the
+  // calculator, Units, and Display take the next, both lines flush left over the box (Sean,
+  // 2026-10-15).
   await page.setViewportSize({ width: 375, height: 800 });
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     const narrow = await geometry();
     // 8 px under the hint on a phone too.
     expect(Math.round(narrow.toolbar.y - (narrow.hint.y + narrow.hint.height)), theme.id).toBe(8);
-    expect(
-      Math.abs(narrow.last.x + narrow.last.width - (narrow.start.x + narrow.start.width)),
-      theme.id,
-    ).toBeLessThanOrEqual(1);
+    expect(Math.abs(narrow.undo.x - narrow.start.x), theme.id).toBeLessThanOrEqual(1);
     expect(narrow.menu.y, theme.id).toBeGreaterThanOrEqual(narrow.last.y + narrow.last.height);
     expect(Math.abs(middle(narrow.menu) - middle(narrow.settings)), theme.id).toBeLessThan(4);
     expect(Math.abs(narrow.menu.x - narrow.start.x), theme.id).toBeLessThanOrEqual(3);

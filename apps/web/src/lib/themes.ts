@@ -108,6 +108,16 @@ export const TOKEN_CONTRACT = {
   art: ['art-1', 'art-2', 'art-3'],
 } as const;
 
+/**
+ * Colors the Tailwind bridge works out from each theme's own (src/styles/global.css), so no theme
+ * defines them: [name, base, the base's share, mixed toward], as `color-mix(in srgb, …)` writes
+ * them. The theme test mixes them as the browser does, for their contrast pairs below.
+ */
+export const DERIVED_COLORS: ReadonlyArray<readonly [string, string, number, string]> = [
+  // The unit chip's hover: its tint lightened toward the surface (the full tidy, 2026-10-15).
+  ['accent-soft-hover', 'accent-soft', 0.6, 'surface'],
+];
+
 /** [foreground, background, minimum contrast ratio]. 4.5 for text, 3 for UI (WCAG 2.2 AA). */
 export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = [
   ['ink', 'canvas', 4.5],
@@ -119,6 +129,9 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = 
   ['on-accent', 'accent', 4.5],
   ['ink', 'accent-soft', 4.5],
   ['ink-muted', 'accent-soft', 4.5],
+  // The chip's name and symbol on its hover.
+  ['ink', 'accent-soft-hover', 4.5],
+  ['ink-muted', 'accent-soft-hover', 4.5],
   ['danger', 'canvas', 4.5],
   // "Too large to convert" is drawn inside a field.
   ['danger', 'surface', 4.5],

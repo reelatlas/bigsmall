@@ -22,9 +22,9 @@ export interface UnitChipProps {
 const CHIP = 'inline-flex min-h-11 shrink-0 items-stretch rounded-nested bg-accent-soft text-ink';
 // Baseline alignment keeps the name and the symbol on one line of type.
 const BODY = 'inline-flex items-baseline gap-2 self-center px-3';
-// Hover keeps the chip color and lightens it toward the surface, so it reads as the same chip.
-// Keyboard focus shows the base focus ring.
-const HOVER = 'transition-colors hover:bg-surface/40';
+// Hover keeps the chip color and lightens it toward the surface, so it reads as the same chip
+// (`accent-soft-hover`, derived in the bridge). Keyboard focus shows the base focus ring.
+const HOVER = 'transition-colors hover:bg-accent-soft-hover';
 
 /**
  * The unit in the field: its symbol, then its name, plus a remove control. The body puts the caret

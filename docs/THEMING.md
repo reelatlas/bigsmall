@@ -32,7 +32,7 @@ A theme that fails any of these fails `pnpm test`, and therefore CI.
 ## Authoring a theme
 
 1. Add the id to `ThemeId` and an entry to `THEMES` in `src/lib/themes.ts` (name, scheme, status, blurb). The theme menu and the browser tests read this list, so nothing else needs the name.
-2. Copy `daylight.css` or `midnight.css` to `themes/<id>.css`, change the selector, set every token (the art tokens included), and add its `@import` to `src/styles/global.css` with the others.
+2. Copy `daylight.css` or `midnight.css` to `themes/<id>.css`, change the selector, set every token (the art tokens included; the derived colors, `DERIVED_COLORS`, are worked out from yours), and add its `@import` to `src/styles/global.css` with the others.
 3. Run `pnpm test`. Adjust colors until every contrast pair passes. Prefer adjusting `--ink-muted`, `--accent`, and `--on-accent`; they fail most often.
 4. Open `/dev/gallery` and check every component in the new card. Check the full page with the theme menu too, since nested cards do not show scrollbars or the header menus in their theme.
 5. Draw the theme's art in `src/components/ThemeArt.astro`: an SVG in `fill-art-*` and `stroke-art-*` classes, plus its entry in `TOGGLE`, which TypeScript requires for every theme.

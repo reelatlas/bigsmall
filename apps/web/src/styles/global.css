@@ -36,6 +36,12 @@
   --color-art-1: var(--art-1);
   --color-art-2: var(--art-2);
   --color-art-3: var(--art-3);
+  /*
+   * Derived colors, worked out from each theme's own, so no theme defines them (DERIVED_COLORS in
+   * src/lib/themes.ts, whose test mixes them as the browser does and checks their contrast).
+   * accent-soft-hover: the soft tint lightened toward the surface, the unit chip's hover.
+   */
+  --color-accent-soft-hover: color-mix(in srgb, var(--accent-soft) 60%, var(--surface));
 
   --font-display: var(--type-display);
   --font-body: var(--type-body);

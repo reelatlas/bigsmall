@@ -38,6 +38,8 @@ Raw values (a hex color, a pixel radius, a literal duration) never appear inside
 
 The full list is the single source of truth in `apps/web/src/lib/themes.ts` (`TOKEN_CONTRACT`), with the contrast pairs every theme must pass (`CONTRAST_PAIRS`).
 
+A derived color is worked out in the bridge from each theme's own (`DERIVED_COLORS` in `themes.ts`), so no theme defines it and it follows a theme's palette when that changes; the theme test mixes it as the browser does and checks its contrast pairs in every theme. One so far: `accent-soft-hover`, the soft tint 60% toward the surface, the unit chip's hover (the full tidy, 2026-10-15; until then a see-through `bg-surface/40`, which the token guard now rejects).
+
 Text that should read quieter takes `--ink-muted`, never opacity: opacity drops below the contrast pairs the themes pass, and differently in each (docs/LEARNINGS.md, "Dim text with the muted ink, never with opacity"). A control that can do nothing right now is the one exception, at 50 % with its label ("Icon buttons and the toolbar").
 
 ## Tailwind bridge
@@ -53,6 +55,7 @@ Text that should read quieter takes `--ink-muted`, never opacity: opacity drops 
 | `font-display`, `font-body`, `font-numeric`                                   | type tokens; `font-numeric` also turns on tabular digits                                    |
 | `rounded-sm`, `rounded-md`, `rounded-lg`                                      | shape tokens                                                                                |
 | `rounded-nested`, `rounded-nested-md`                                         | derived: the shell's corner minus its border and inset (see "Corners")                      |
+| `bg-accent-soft-hover`                                                        | derived: `--accent-soft` 60% toward `--surface`, the unit chip's hover (`DERIVED_COLORS`)   |
 | `shadow-sm`, `shadow-md`                                                      | elevation tokens                                                                            |
 | `duration-fast`, `duration-base`, `duration-slow`, `ease-standard`            | motion tokens; every `transition-*` utility already defaults to fast and the theme's easing |
 
@@ -70,14 +73,15 @@ Layout and spacing use Tailwind's default scale (`p-4`, `gap-2`, `max-w-2xl`). T
 
 `pnpm lint` checks every string in `apps/web/src`, which is where class lists live, and fails on a value that bypasses the tokens. The patterns are in `eslint.config.js` (`RAW_VALUES`). A new pattern is written without "/" (a selector's regex ends at the first one) and tried on a scratch file of violations and allowed look-alikes before it is trusted.
 
-| Flagged                                                                                  | Use instead                                                                       |
-| ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Raw colors: hex, `rgb()`, `hsl()`, `oklch()`, `color-mix()`                              | A color token: `bg-surface`, `text-ink`, `border-line`                            |
-| Tailwind palette colors: `bg-red-500`, `text-white`                                      | A color token. The palette does not follow the theme                              |
-| Arbitrary values holding a length, color, time, or variable: `w-[37px]`, `bg-(--accent)` | The token utility, or the spacing scale                                           |
-| Numbered durations and stock easings: `duration-150`, `ease-in-out`                      | `duration-fast`, `duration-base`, `duration-slow`, `ease-standard`                |
-| Radii, shadows, and fonts outside the tokens: `rounded-xl`, `shadow-lg`, `font-mono`     | `rounded-sm/md/lg`, `rounded-nested`, `shadow-sm/md`, `font-display/body/numeric` |
-| A number of milliseconds in `setTimeout` or `setInterval`                                | A named constant in `src/lib/timing.ts`                                           |
+| Flagged                                                                                  | Use instead                                                                              |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Raw colors: hex, `rgb()`, `hsl()`, `oklch()`, `color-mix()`                              | A color token: `bg-surface`, `text-ink`, `border-line`                                   |
+| Tailwind palette colors: `bg-red-500`, `text-white`                                      | A color token. The palette does not follow the theme                                     |
+| Arbitrary values holding a length, color, time, or variable: `w-[37px]`, `bg-(--accent)` | The token utility, or the spacing scale                                                  |
+| Numbered durations and stock easings: `duration-150`, `ease-in-out`                      | `duration-fast`, `duration-base`, `duration-slow`, `ease-standard`                       |
+| Radii, shadows, and fonts outside the tokens: `rounded-xl`, `shadow-lg`, `font-mono`     | `rounded-sm/md/lg`, `rounded-nested`, `shadow-sm/md`, `font-display/body/numeric`        |
+| A color token made see-through: `bg-surface/40`, `border-edge/[0.5]`                     | A derived color in the bridge (`DERIVED_COLORS`), worked out once from every theme's own |
+| A number of milliseconds in `setTimeout` or `setInterval`                                | A named constant in `src/lib/timing.ts`                                                  |
 
 Allowed: arbitrary values that name structure rather than a value (`transition-[border-color,box-shadow]`, `grid-cols-[1fr_auto_1fr]`), the spacing scale, and `var(--token)` where the gallery paints its swatches. Raw values belong in the theme files and the bridge, which are CSS and outside the guard.
 

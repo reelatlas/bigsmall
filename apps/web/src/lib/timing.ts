@@ -19,12 +19,6 @@ export const COPIED_MIN_MS = 1000;
 /** Without a mouse resting on the copy button (keyboard, touch), the check reverts after this (§7). */
 export const COPIED_MS = 2000;
 
-/** A mouse resting on a hover-enabled header menu opens it after this (§10). */
-export const PEEK_OPEN_MS = 120;
-
-/** A hover-opened header menu closes this long after the mouse leaves (§10). */
-export const PEEK_CLOSE_MS = 200;
-
 /** One frame at 60 Hz: the wordmark times its pace against it, and a flipping letter never changes faster. */
 export const FRAME_MS = 1000 / 60;
 

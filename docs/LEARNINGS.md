@@ -209,7 +209,7 @@ Format:
 
 **What happened.** Sean wanted the shortcuts map to appear on hover. WCAG 1.4.13 asks that content shown on hover or focus can be dismissed without moving the pointer, can be hovered itself without disappearing, and stays until the user leaves or dismisses it. A tooltip-style "show while hovered" fails the first two, and hover alone leaves keyboard and touch users out.
 **Rule.** Hover opens a peek after a short pause and closes it shortly after the pointer leaves the whole shell (trigger and panel are one element, so moving onto the panel keeps it). A click pins it, Escape always closes it, and touch never peeks because a tap is a click. Delegate with `pointerover` and `pointerout` and compare `relatedTarget`, because `pointerenter` does not bubble and the inline script runs before the elements exist.
-**Promoted** to docs/UX-SPEC.md, "§10 Header: theme menu and keyboard shortcuts map".
+**Retired** 2026-10-15: the shortcuts map opens on a click only (Sean), so nothing on the page shows content on hover now. The rule stands for any hover content added later.
 
 ## 2026-10-06 — A focus-within edge lingers on a ghost trigger
 

@@ -3,7 +3,6 @@ import '../styles/global.css';
 import { PLANE_EVENT } from '../lib/planes';
 import { APPLE_PLATFORM } from '../lib/platform';
 import { SITE } from '../lib/site';
-import { PEEK_CLOSE_MS, PEEK_OPEN_MS } from '../lib/timing';
 import { STARTS_TYPING } from '../lib/typing';
 import { DEFAULT_DARK, DEFAULT_LIGHT, THEMES, THEME_STORAGE_KEY } from '../lib/themes';
 
@@ -53,8 +52,6 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         dark: DEFAULT_DARK,
         applePlatform: APPLE_PLATFORM.source,
         applePlatformFlags: APPLE_PLATFORM.flags,
-        peekOpen: PEEK_OPEN_MS,
-        peekClose: PEEK_CLOSE_MS,
         planeEvent: PLANE_EVENT,
         startsTyping: STARTS_TYPING.source,
         startsTypingFlags: STARTS_TYPING.flags,
@@ -101,17 +98,16 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
 
       // Header menus (the theme menu, the shortcuts map) are fluid shells driven from here, so
       // they work before any bundle loads and add none. A [data-shell] holds a
-      // [data-shell-toggle]; [data-open] shows its panel, and [data-pinned] marks one a click
-      // opened, as opposed to a mouse resting on it.
+      // [data-shell-toggle], which a click opens and closes; [data-open] shows its panel. Nothing
+      // opens on hover or on focus (Sean, 2026-10-15: the shortcuts map peeked on both).
       const toggleOf = (shell) => shell.querySelector('[data-shell-toggle]');
-      const setOpen = (shell, open, pinned) => {
+      const setOpen = (shell, open) => {
         shell.toggleAttribute('data-open', open);
-        shell.toggleAttribute('data-pinned', open && pinned);
         toggleOf(shell)?.setAttribute('aria-expanded', String(open));
       };
       const closeAll = (except) => {
         for (const shell of document.querySelectorAll('[data-shell]')) {
-          if (shell !== except) setOpen(shell, false, false);
+          if (shell !== except) setOpen(shell, false);
         }
       };
       document.addEventListener('click', (event) => {
@@ -119,45 +115,14 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         const toggle = target?.closest('[data-shell-toggle]');
         if (toggle) {
           const shell = toggle.closest('[data-shell]');
-          // A click pins a shell that hovering opened; a click on a pinned shell closes it.
-          const open = !shell.hasAttribute('data-pinned');
+          const open = !shell.hasAttribute('data-open');
           closeAll(shell);
-          setOpen(shell, open, true);
+          setOpen(shell, open);
           if (open) shell.querySelector('[data-shell-initial]:checked')?.focus();
           return;
         }
         if (!target?.closest('[data-shell]')) closeAll();
       });
-
-      // A [data-shell-hover] also opens while a mouse rests on it and closes shortly after the
-      // mouse leaves, unless a click pinned it: the panel can be hovered, dismissed with Escape,
-      // and stays until then (WCAG 1.4.13). Touch never peeks; a tap is a click.
-      const peekTimers = new WeakMap();
-      const peek = (event, open) => {
-        if (event.pointerType !== 'mouse' || !(event.target instanceof Element)) return;
-        const shell = event.target.closest('[data-shell-hover]');
-        if (!shell) return;
-        const related =
-          event.relatedTarget instanceof Element
-            ? event.relatedTarget.closest('[data-shell-hover]')
-            : null;
-        if (related === shell) return;
-        clearTimeout(peekTimers.get(shell));
-        const timer = setTimeout(
-          () => {
-            if (open && !shell.hasAttribute('data-open')) {
-              closeAll(shell);
-              setOpen(shell, true, false);
-            } else if (!open && !shell.hasAttribute('data-pinned')) {
-              setOpen(shell, false, false);
-            }
-          },
-          open ? peekOpen : peekClose,
-        );
-        peekTimers.set(shell, timer);
-      };
-      document.addEventListener('pointerover', (event) => peek(event, true));
-      document.addEventListener('pointerout', (event) => peek(event, false));
 
       document.addEventListener('change', (event) => {
         const option = event.target;
@@ -174,7 +139,7 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         // step, so a keyboard choice previews live and the menu stays open until Enter or Escape.
         const shell = option.closest('[data-shell]');
         if (shell && !option.matches(':focus-visible')) {
-          setOpen(shell, false, false);
+          setOpen(shell, false);
           toggleOf(shell)?.focus();
         }
       });
@@ -187,9 +152,9 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         if (!shell) return;
         const next = event.relatedTarget;
         if (next instanceof Node ? shell.contains(next) : shell.matches(':hover')) return;
-        setOpen(shell, false, false);
+        setOpen(shell, false);
       });
-      // Escape closes any open shell, hovered or pinned; focus returns to its toggle if it was inside.
+      // Escape closes any open shell; focus returns to its toggle if it was inside.
       // An Escape that closed one does nothing else, so the converter's Escape from the page waits.
       document.addEventListener('keydown', (event) => {
         // Enter on a theme option keeps the previewed theme and closes the menu.
@@ -199,7 +164,7 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
             : null;
           if (shell) {
             event.preventDefault();
-            setOpen(shell, false, false);
+            setOpen(shell, false);
             toggleOf(shell)?.focus();
           }
           return;
@@ -207,7 +172,7 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         if (event.key !== 'Escape') return;
         for (const shell of document.querySelectorAll('[data-shell][data-open]')) {
           const focusWasInside = shell.contains(document.activeElement);
-          setOpen(shell, false, false);
+          setOpen(shell, false);
           if (focusWasInside) toggleOf(shell)?.focus();
           event.preventDefault();
         }
@@ -277,13 +242,6 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
         const bar = tool === event.target ? tool.closest('[role="toolbar"]') : null;
         if (!bar) return;
         makeStop(bar, tool);
-        // Reached with the keyboard, the shortcuts icon shows its map, as a resting mouse does;
-        // moving on closes it, as focus leaving any shell does.
-        const shell = tool.closest('[data-shell-hover]');
-        if (shell && tool.matches(':focus-visible') && !shell.hasAttribute('data-open')) {
-          closeAll(shell);
-          setOpen(shell, true, false);
-        }
       });
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Tab') settleToolbars();

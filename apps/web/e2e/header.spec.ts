@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
-import { PEEK_CLOSE_MS } from '../src/lib/timing';
 import {
   applyTheme,
   expectNoA11yViolations,
@@ -81,7 +80,7 @@ test('open, the theme menu reads "Theme" where its button shows the name alone',
   await expect(name).toBeVisible();
 });
 
-test('the shortcuts map opens on hover, stays when clicked, and closes on Escape', async ({
+test('the shortcuts map opens on a click, never on hover, and closes on Escape or a second click', async ({
   page,
   isMobile,
 }) => {
@@ -89,7 +88,11 @@ test('the shortcuts map opens on hover, stays when clicked, and closes on Escape
   await page.goto('/');
   const toggle = page.getByRole('button', { name: 'Keyboard shortcuts' });
 
+  // A resting mouse opens nothing (Sean, 2026-10-15); a click does.
   await toggle.hover();
+  await page.waitForTimeout(MARGIN_MS * 2);
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expect(page.getByText('Pick a unit or value')).toBeVisible();
   // The open edge goes with the panel: a fading edge would leave a green square behind.
@@ -106,15 +109,19 @@ test('the shortcuts map opens on hover, stays when clicked, and closes on Escape
       );
   });
   expect(edgeFades).toBe(false);
+  // The mouse leaving keeps it open; a second click closes it.
   await page.mouse.move(5, 5);
-  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-
-  await toggle.click();
-  await page.mouse.move(5, 5);
-  await page.waitForTimeout(PEEK_CLOSE_MS + MARGIN_MS);
+  await page.waitForTimeout(MARGIN_MS * 2);
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expectNoA11yViolations(page);
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 
+  // Reached with the keyboard it stays shut; Enter opens it, Escape closes it.
+  await toggle.focus();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await page.keyboard.press('Enter');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 });

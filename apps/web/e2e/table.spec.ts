@@ -401,15 +401,12 @@ test('the cursor shows only while focus is in the box or its table', async ({ pa
   await expect(page.locator('[role="row"][aria-selected="true"]')).toHaveCount(0);
 });
 
-test('an Escape that closes the hovered shortcuts map does nothing else', async ({
-  page,
-  isMobile,
-}) => {
+test('an Escape that closes the shortcuts map does nothing else', async ({ page, isMobile }) => {
   test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
   await page.goto('/?a=milliliter&v=250');
   await ready(page);
   const toggle = page.getByRole('button', { name: 'Keyboard shortcuts' });
-  await toggle.hover();
+  await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');

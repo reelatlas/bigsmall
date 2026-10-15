@@ -197,8 +197,8 @@ The theme menu and the shortcuts map are fluid shells driven by the inline scrip
   | Move up and down page | ↑ ↓                    |
   | Move across a toolbar | ← →                    |
   | Open calculator       | Alt C                  |
-  | Open Units            | Alt V                  |
-  | Open Display          | Alt B                  |
+  | Open units            | Alt V                  |
+  | Open display          | Alt B                  |
   | Undo                  | Ctrl Z                 |
   | Redo                  | Ctrl Y or Ctrl Shift Z |
 

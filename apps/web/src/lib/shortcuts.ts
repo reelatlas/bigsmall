@@ -32,8 +32,8 @@ export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Move up and down page', keys: [['↑', '↓']] },
   { action: 'Move across a toolbar', keys: [['←', '→']] },
   { action: 'Open calculator', keys: [['Alt', 'C']], startsGroup: true },
-  { action: 'Open Units', keys: [['Alt', 'V']] },
-  { action: 'Open Display', keys: [['Alt', 'B']] },
+  { action: 'Open units', keys: [['Alt', 'V']] },
+  { action: 'Open display', keys: [['Alt', 'B']] },
   { action: 'Undo', keys: [['Mod', 'Z']] },
   {
     action: 'Redo',

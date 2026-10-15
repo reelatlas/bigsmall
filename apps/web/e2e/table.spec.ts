@@ -278,6 +278,14 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   await menu(page).click();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button', { name: 'Remove Fahrenheit' })).toBeVisible();
+
+  // ← and → close it unchanged and move along the toolbar, as from its button (Sean, 2026-10-15).
+  await menu(page).click();
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowRight');
+  await expect(radios).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Calculator', exact: true })).toBeFocused();
+  await expect(menu(page)).toHaveText(/Temperature/);
 });
 
 test('keyboard: the arrows go through every row from the unit in the box, onto the foot, the page’s bottom', async ({

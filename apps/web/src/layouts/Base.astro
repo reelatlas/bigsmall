@@ -157,6 +157,24 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
       // Escape closes any open shell; focus returns to its toggle if it was inside.
       // An Escape that closed one does nothing else, so the converter's Escape from the page waits.
       document.addEventListener('keydown', (event) => {
+        // ← and → on a theme option leave the menu, on the theme reached, and move along the
+        // header's toolbar as from its trigger (Sean, 2026-10-15): ↑ and ↓ alone go through the
+        // themes. The move is the toolbar's own, handed to it as a key on the trigger.
+        const sideways = event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+        if (
+          sideways &&
+          event.target instanceof Element &&
+          event.target.matches('[data-theme-option]')
+        ) {
+          const shell = event.target.closest('[data-shell][data-open]');
+          const toggle = shell ? toggleOf(shell) : null;
+          if (!toggle) return;
+          event.preventDefault();
+          setOpen(shell, false);
+          toggle.focus();
+          toggle.dispatchEvent(new KeyboardEvent('keydown', { key: event.key, bubbles: true }));
+          return;
+        }
         // Enter on a theme option keeps the previewed theme and closes the menu.
         if (event.key === 'Enter' && event.target instanceof Element) {
           const shell = event.target.matches('[data-theme-option]')

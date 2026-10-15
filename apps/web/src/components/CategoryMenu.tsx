@@ -37,9 +37,10 @@ export interface CategoryMenuProps {
  * trigger and its choices, the same size. Its trigger shows the category's name, and the menu is as
  * wide as the widest, so the toolbar keeps it on its line until there is truly no room; open, its
  * trigger reads "Category" over the list, and its counts are bare numbers in the room the chevron
- * takes. The choices are native radios. The arrows move through them without choosing, since a
- * new category takes the unit out of the box and each choice is a step to undo; Enter, a click, or
- * a tap chooses, and Escape, a click outside, or focus leaving closes it unchanged. While a unit is
+ * takes. The choices are native radios. ↑ and ↓ move through them without choosing, since a new
+ * category takes the unit out of the box and each choice is a step to undo; Enter, a click, or a
+ * tap chooses, and Escape, a click outside, or focus leaving closes it unchanged; ← and → close it
+ * unchanged and move along the toolbar, as from the trigger (Sean, 2026-10-15). While a unit is
  * typed, each choice says how many of its units match.
  */
 export function CategoryMenu({ categories, value, counts, onChoose, tool }: CategoryMenuProps) {
@@ -71,8 +72,9 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   }, [open]);
 
   // While open: a click outside closes it; Enter chooses the choice reached and Escape closes it
-  // back on the trigger. Native listeners: the wrapper is not itself interactive. Bound in a
-  // layout effect, so a key pressed straight after opening reaches them.
+  // back on the trigger; ← and → close it there too and hand the key to the toolbar, which moves
+  // on from the trigger (layouts/Base.astro). Native listeners: the wrapper is not itself
+  // interactive. Bound in a layout effect, so a key pressed straight after opening reaches them.
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!open || !root) return;
@@ -89,6 +91,13 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
         event.preventDefault();
         setOpen(false);
         trigger.current?.focus();
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        setOpen(false);
+        trigger.current?.focus();
+        trigger.current?.dispatchEvent(
+          new KeyboardEvent('keydown', { key: event.key, bubbles: true }),
+        );
       } else if (event.key === 'Enter') {
         // The choice with focus: before any category, the first has focus without being checked.
         event.preventDefault();

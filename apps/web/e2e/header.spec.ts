@@ -55,6 +55,15 @@ test('arrow keys preview themes in the open menu; Enter keeps the choice and clo
   await page.keyboard.press('Enter');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(toggle).toBeFocused();
+  // ← and → leave the open menu on the theme reached and move along the header (Sean, 2026-10-15).
+  await toggle.press('Enter');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('ArrowDown');
+  const reached = await page.locator('html').getAttribute('data-theme');
+  await page.keyboard.press('ArrowLeft');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.getByRole('button', { name: 'Copy URL' })).toBeFocused();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', reached!);
 });
 
 test('open, the theme menu reads "Theme" where its button shows the name alone', async ({

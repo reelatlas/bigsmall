@@ -128,9 +128,9 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * left-aligned in its own; then the copy button, with copy buttons on. The names keep to one line:
  * where one would not fit beside its value (a long value on a phone), the names give way in every
  * row (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
- * columns, the symbol and the name centred beside both lines. The unit's cell has no column gap, since the symbol and its
- * exponent touch: its parts space themselves (pr-2, pl-2). Eight columns, so a row spans
- * col-span-8.
+ * columns, the symbol and the name centred beside both lines. The unit's cell has no column gap,
+ * since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2). Eight columns,
+ * so a row spans col-span-8.
  */
 const ROWS =
   'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)_auto] gap-y-0.5';
@@ -171,7 +171,7 @@ const HEADING = cx(PANEL_TITLE, 'px-2 pb-1');
 const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
 
 /**
- * The space over a section, by what shows (docs/DESIGN-SYSTEM.md, "Space by what shows"; Sean,
+ * The space over a section (docs/DESIGN-SYSTEM.md, "Sections and dividers, by what shows"; Sean,
  * 2026-10-15): a line between sections sits evenly between the last row's ink and the next
  * heading's, about 16 px each side, and the first heading sits as far under the card's top as a
  * panel's title does, about 20 px, never hugging it. A grid's heading is a short line of small
@@ -201,8 +201,9 @@ function secondWritten(value: number, display: TableDisplay, locale: string | un
 }
 
 /**
- * Both's fraction in two, to sit under the decimal: its whole number, "≈" ahead of one that rounds,
- * and the fraction after it ("≈ 36" and "3/4"). A minus with no whole number stays with the fraction.
+ * Both's fraction in two, to sit under the decimal: its whole number, "≈" ahead of one that
+ * rounds, and the fraction after it ("≈ 36" and "3/4"). A minus with no whole number stays with
+ * the fraction.
  */
 function splitFraction(written: Rounded): { whole: string; part: string } {
   const at = written.text.search(/\d+\/\d+$/);
@@ -729,7 +730,8 @@ export function ConversionTable<T extends ConversionRow>({
                   className={cx(
                     CURSOR_ROW,
                     'grid grid-cols-subgrid items-center',
-                    // Without copy buttons the row runs to the card's edge: no column is kept for them.
+                    // Without copy buttons the row runs to the card's edge: no column is kept
+                    // for them.
                     display.copy ? 'col-span-7' : 'col-span-8',
                     rowFill(row.inBox, rowIndex === cursor),
                   )}

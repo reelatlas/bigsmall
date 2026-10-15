@@ -1,6 +1,6 @@
 # UX specification — the converter
 
-Current behavior of the build, 2026-10-08: the milestone 2 converter, one box and its table (ADR 0012, ADR 0013). This document describes what the converter does now; anything not built yet is under **Planned** (§14). Change this document before changing behavior, in the same change. How each rule got here, pass by pass, is recorded in `docs/research/findings-0-first-pass.md`.
+Current behavior of the build, 2026-10-15: the milestone 2 converter, one box and its table (ADR 0012, ADR 0013). This document describes what the converter does now; anything not built yet is under **Planned** (§14). Change this document before changing behavior, in the same change. How each rule got here, pass by pass, is recorded in `docs/research/findings-0-first-pass.md`.
 
 ## 1. Layout
 

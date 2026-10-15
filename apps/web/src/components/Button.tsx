@@ -7,10 +7,10 @@ export type ButtonVariant = 'primary' | 'secondary' | 'tonal' | 'soft' | 'ghost'
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   className?: string | undefined;
   /**
-   * ghost: icon actions on the page (undo, copy, clear all). secondary: bordered text button. tonal: a
-   * bordered button on the raised surface in muted ink, a quieter sibling of secondary (the
-   * calculator's C, ⌫, E, and decimal mark). soft: a tinted key that sets itself apart from its
-   * neighbors (the calculator's operators). primary: filled.
+   * ghost: icon actions on the page (undo, copy, clear all). secondary: bordered text button.
+   * tonal: a bordered button on the raised surface in muted ink, a quieter sibling of secondary
+   * (the calculator's C, ⌫, E, and decimal mark). soft: a tinted key that sets itself apart from
+   * its neighbors (the calculator's operators). primary: filled.
    */
   variant: ButtonVariant;
   /**

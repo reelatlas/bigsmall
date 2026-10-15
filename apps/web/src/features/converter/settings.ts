@@ -271,7 +271,10 @@ export function hiddenByHand(rule: ViewRule): number {
   return [...rule.overrides.values()].filter((show) => !show).length;
 }
 
-/** Show units you hid: every unit hidden on its own back to its switch; those shown on their own stay. */
+/**
+ * Show custom hidden units: every unit hidden on its own back to its switch; those shown on their
+ * own stay.
+ */
 export function withoutHidden(rule: ViewRule): ViewRule {
   return { ...rule, overrides: new Map([...rule.overrides].filter(([, show]) => show)) };
 }
@@ -308,7 +311,7 @@ function sameSizes(a: ReadonlySet<FractionSize>, b: ReadonlySet<FractionSize>): 
   return a.size === b.size && [...a].every((size) => b.has(size));
 }
 
-/** Whether any display setting differs from a fresh visit's: what Reset settings would change. */
+/** Whether any display setting differs from a fresh visit's: what Reset display would change. */
 export function displayChanged(display: Display): boolean {
   const fresh = FRESH_DISPLAY;
   return (
@@ -332,8 +335,8 @@ export interface Settings {
   kept: ViewRule | null;
   /**
    * Whether the visitor is on Custom, their own set: Custom picked, or anything changed by hand (a
-   * system's checkbox, a unit shown or hidden in the table, Show custom hidden units), until a preset is
-   * picked. Custom then stays lit even if the set matches a preset (Sean, 2026-10-15).
+   * system's checkbox, a unit shown or hidden in the table, Show custom hidden units), until a
+   * preset is picked. Custom then stays lit even if the set matches a preset (Sean, 2026-10-15).
    */
   custom: boolean;
   /** The sections' order as the visitor set it in Units, or null for a fresh visit's (defaultOrder). */

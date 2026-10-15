@@ -471,7 +471,8 @@ export function TableLayout({
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.ctrlKey || event.metaKey) {
-      // Ctrl/⌘+C on a row the cursor is on copies its full value; undo and redo are the converter's.
+      // Ctrl/⌘+C on a row the cursor is on copies its full value; undo and redo are the
+      // converter's.
       if (event.key.toLowerCase() !== 'c' || !browsing || table.kind !== 'units') return;
       const row = table.rows[at];
       if (row?.tone !== 'value') return;

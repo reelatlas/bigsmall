@@ -91,7 +91,7 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
     listRef.current?.querySelector<HTMLElement>(`[data-system="${key}"]`) ?? null;
   const rows = () => [...(listRef.current?.querySelectorAll<HTMLElement>('[data-system]') ?? [])];
 
-  /** A system moved to place `to`; `said` is whether to say where it went. */
+  /** A system moved to place `to`; `say`, whether to say where it went. */
   const place = (key: SectionKey, to: number, say: boolean) => {
     const last = order.length - 1;
     const target = Math.min(Math.max(to, 0), last);

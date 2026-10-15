@@ -101,7 +101,7 @@ test('Filter and Display open beside the table, one side panel at a time with th
   await expect(display.locator('label', { hasText: /^Decimals$/ }).locator('input')).toBeChecked();
 });
 
-test('the Hidden list brings a unit back into its section; Edit hides one, Done in its place, and Done folds Hidden', async ({
+test('the Hidden list brings a unit back into its section; Edit sends one to Hidden, which stays below it, Done in its place, and Done folds Hidden', async ({
   page,
 }) => {
   await page.goto('/?a=us-cup&v=2');
@@ -117,23 +117,34 @@ test('the Hidden list brings a unit back into its section; Edit hides one, Done 
   await expect(row(page, 'cubic-inch')).toBeVisible();
   await expect(hiddenToggle(page)).toContainText(String(SPECIALIST - 1));
 
-  // Edit reads Done in its place, focus staying on it, and nothing over the list moves.
+  // Edit reads Done in its place, focus staying on it, and nothing over the list moves: the
+  // hidden units stay in Hidden below, never listed among the rows.
   const top = async () =>
     (await table(page).locator('[role="rowgroup"], [role="group"]').first().boundingBox())!.y;
   const before = await top();
   await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
   const done = table(page).getByRole('button', { name: 'Done' });
   await expect(done).toBeFocused();
-  await expect(table(page).getByText('Choose the units to show')).toBeVisible();
   expect(await top()).toBe(before);
+  await expect(page.getByRole('group', { name: 'Hidden, Specialty' })).toBeVisible();
+  await expect(
+    table(page)
+      .getByRole('group', { name: 'Specialty', exact: true })
+      .getByLabel(/cubic feet/),
+  ).toHaveCount(0);
   await expectNoA11yViolations(page);
   // Over the long list the foot stays at the screen's bottom edge, Done in reach.
   await page.evaluate(() => window.scrollTo(0, 0));
   const foot = (await done.boundingBox())!;
   expect(foot.y + foot.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+  // Unchecked, a row leaves for Hidden at once, as a unit checked there leaves for its row.
   await table(page)
+    .getByRole('group', { name: 'US (customary)', exact: true })
     .getByLabel(/teaspoons/)
-    .uncheck();
+    .click();
+  await expect(
+    page.getByRole('group', { name: 'Hidden, US (customary)' }).getByLabel(/teaspoons/),
+  ).toBeVisible();
   await done.click();
   await expect(table(page).getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
   await expect(row(page, 'us-teaspoon')).toHaveCount(0);
@@ -266,6 +277,14 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     .getByLabel(/cubic feet/)
     .click();
   await expect(row(page, 'cubic-foot')).toBeVisible();
+
+  // Edit sends one to Hidden: Hidden flashes as it takes it.
+  await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
+  await table(page)
+    .getByRole('group', { name: 'US (customary)', exact: true })
+    .getByLabel(/teaspoons/)
+    .click();
+  expect(await animated('[data-table-foot] button[aria-expanded]', 'backgroundColor')).toBe(true);
 });
 
 test('with reduced motion a unit moves at once, and still flashes, a change of color only', async ({

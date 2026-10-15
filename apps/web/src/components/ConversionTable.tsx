@@ -80,7 +80,7 @@ export interface ConversionTableProps<T extends ConversionRow> {
   sections: readonly RowSection<T>[];
   /** The rows the settings hide, in their sections, for the Hidden list at the foot. */
   hidden: readonly RowSection<T>[];
-  /** Every row in its section, shown or hidden: Edit's list. */
+  /** Every row in its section, shown or hidden: what the columns are sized to. */
   every: readonly RowSection<T>[];
   /** In place of the rows when the value has no answer: "Too large to convert". */
   message: string | null;
@@ -99,7 +99,7 @@ export interface ConversionTableProps<T extends ConversionRow> {
   copyProps?: (
     row: T,
   ) => Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'onPointerEnter' | 'onPointerLeave'>;
-  /** Edit: the table is a checklist of every unit. */
+  /** Edit: each shown row is a checkbox, the hidden units staying in Hidden. */
   editing: boolean;
   hiddenOpen: boolean;
   /** Whether a row shows, for Edit's and the Hidden list's checkboxes. */
@@ -238,7 +238,9 @@ function SectionCheckbox({
 /**
  * The table's units (docs/UX-SPEC.md §1, §3): those the settings show, in their sections, each
  * headed; those they hide in a Hidden list at the foot, under their sections' names; and Edit,
- * which makes the table a checklist of every unit. The field keeps focus and its cursor moves
+ * which makes each shown row a checkbox, the hidden units staying in Hidden, so shown units are
+ * always above and hidden ones below and a checkbox moves a unit between them (Sean,
+ * 2026-10-15). The field keeps focus and its cursor moves
  * through the shown rows (aria-activedescendant on a grid, ADR 0012), so the rows are no Tab
  * stops; a click or tap on one is the field's to act on, and focus stays in the field. With copy
  * buttons on, each row's sits in a cell of its own beside it, out of the Tab order like the box's
@@ -575,10 +577,13 @@ export function ConversionTable<T extends ConversionRow>({
     </div>
   );
 
-  /** Edit: every unit in its section, each a checkbox set in under its section's, as a tree's child. */
+  /**
+   * Edit: the shown units in their sections, each a checkbox set in under its section's, as a
+   * tree's child; unchecked, a unit leaves for Hidden at once.
+   */
   const checklist = (
     <div ref={gridRef} className={ROWS}>
-      {every.map((section, at) => (
+      {sections.map((section, at) => (
         <div
           key={section.key}
           role="group"
@@ -628,8 +633,8 @@ export function ConversionTable<T extends ConversionRow>({
       <div ref={cardRef} className={cx(LIST_CARD, 'p-2')} data-table-card>
         {body}
         {/* The foot keeps its place in Edit, nothing over the list moving: Edit reads Done where it
-            was, and Hidden's place says what to do. Over a long list the foot stays at the screen's
-            bottom edge, Done in reach, as wide as the rows it covers. */}
+            was, and Hidden stays. Over a long list the foot stays at the screen's bottom edge, Done
+            in reach, as wide as the rows it covers. */}
         {!message && (
           <div
             className={cx(
@@ -638,9 +643,7 @@ export function ConversionTable<T extends ConversionRow>({
             )}
             data-table-foot
           >
-            {editing ? (
-              <span className="px-2 text-sm text-ink-muted">Choose the units to show</span>
-            ) : hiddenCount > 0 ? (
+            {hiddenCount > 0 ? (
               <button
                 ref={hiddenToggleRef}
                 type="button"
@@ -680,8 +683,7 @@ export function ConversionTable<T extends ConversionRow>({
           </div>
         )}
         {/* The Hidden list names its units, without values: it is for bringing them back. */}
-        {!editing &&
-          !message &&
+        {!message &&
           hiddenOpen &&
           hidden.map((section) => (
             <div key={section.key} role="group" aria-label={`Hidden, ${section.label}`}>

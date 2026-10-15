@@ -1,6 +1,14 @@
 import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useFitStep } from '../lib/fit-step';
-import { CARD, cx, FIELD_ROW, NO_ANSWER, NUMBER_SIZES, PANEL_TITLE } from '../lib/recipes';
+import {
+  CARD,
+  cx,
+  FIELD_ROW,
+  NO_ANSWER,
+  NUMBER_SIZES,
+  PANEL_ACTIVE,
+  PANEL_TITLE,
+} from '../lib/recipes';
 import { nextInDirection, type Box, type Direction } from '../lib/spatial';
 import { Button, type ButtonVariant } from './Button';
 import { BackspaceIcon, CloseIcon, CopiedIcon } from './icons';
@@ -66,13 +74,6 @@ function boxOf(element: HTMLElement): Box & { element: HTMLElement } {
   const { left, right, top, bottom } = element.getBoundingClientRect();
   return { element, left, right, top, bottom };
 }
-
-/**
- * The card while focus is inside it, where the keys go: its edge turns accent, 2 px like a
- * focused box (its 1 px border and a 1 px ring, so nothing moves), easing as the shells' edges do.
- */
-const ACTIVE =
-  'transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-1 focus-within:ring-accent';
 
 /** The display's text: one line, sized down like a long number in a field, its end kept in view. */
 const DISPLAY_TEXT = 'min-w-0 flex-1 overflow-hidden font-numeric whitespace-pre text-ink';
@@ -281,7 +282,7 @@ export function Calculator({
       ref={groupRef}
       role="group"
       aria-labelledby={titleId}
-      className={cx(CARD, 'p-3 shadow-sm', ACTIVE)}
+      className={cx(CARD, 'p-3 shadow-sm', PANEL_ACTIVE)}
     >
       <div className="mb-2 flex items-center justify-between">
         <h2 id={titleId} className={cx('pl-1', PANEL_TITLE)}>

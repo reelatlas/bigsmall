@@ -4,13 +4,14 @@ import {
   type FractionSize,
   type UnitPreference,
 } from '@bigsmall/core';
-import { useId, type ReactNode } from 'react';
+import { useId, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Button } from '../../components/Button';
 import { CheckIcon } from '../../components/icons';
 import { SegmentedControl, SegmentedToggles } from '../../components/SegmentedControl';
 import { Switch } from '../../components/Switch';
 import { useCopied } from '../../lib/copied';
-import { CARD, cx, OPTION_ROW, PANEL_TITLE } from '../../lib/recipes';
+import { SidePanel } from '../../components/SidePanel';
+import { cx, OPTION_ROW, PANEL_TITLE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
@@ -138,50 +139,63 @@ function FractionSizes({
 }
 
 export interface SettingsPanelProps {
-  id: string;
   settings: Settings;
   preference: UnitPreference;
   onSettings: (update: (settings: Settings) => Settings) => void;
+  /** The close button, and Escape inside: the converter closes it and focuses its button. */
+  onClose: () => void;
 }
 
 /**
- * Settings (docs/UX-SPEC.md §1, §3, §7; ADR 0017): what search and the table show, in every
- * category, then how results look, then the two resets. A non-modal panel under the toolbar,
- * beside it rather than in it, so its own controls keep their keys; the converter opens and closes
- * it (Escape, a press outside, or focus moving out, never focus merely lost).
+ * A reset: dimmed (aria-disabled, which keeps focus where it was) while it has nothing to do;
+ * done, a check after its label that draws itself in, at full strength for the copy check's time
+ * (useCopied times it), and then the dimmed look.
  */
-export function SettingsPanel({ id, settings, preference, onSettings }: SettingsPanelProps) {
-  const { rule, display } = settings;
+function Reset({
+  off,
+  done,
+  onReset,
+  pointer,
+  children,
+}: {
+  off: boolean;
+  done: boolean;
+  onReset: () => void;
+  pointer: Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'onPointerEnter' | 'onPointerLeave'>;
+  children: ReactNode;
+}) {
+  return (
+    <Button
+      variant="ghost"
+      aria-disabled={off && !done}
+      onClick={() => {
+        if (!off) onReset();
+      }}
+      {...pointer}
+      className="text-sm"
+    >
+      {children}
+      {done && <CheckIcon width="16" height="16" className="check-draw text-success" />}
+    </Button>
+  );
+}
+
+/**
+ * Filter (docs/UX-SPEC.md §1, §3; ADR 0017): what search and the table show, in every category.
+ * The presets lead, level with the box; then a switch per system, and the resets: the switches
+ * back to the Standard units (single units chosen in a table stay as set), and Unhide units.
+ */
+export function FilterPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
+  const { rule } = settings;
   const hiddenCount = hiddenByHand(rule);
-  const settingsChanged = switchesChanged(rule) || displayChanged(display);
   const setRule = (next: (rule: ViewRule) => ViewRule) =>
     onSettings((now) => ({ ...now, rule: next(now.rule) }));
-  const setDisplay = (patch: Partial<Display>) =>
-    onSettings((now) => ({ ...now, display: { ...now.display, ...patch } }));
-  const both = display.format === 'both';
-  // A reset done shows a check after its label that draws itself in, at full strength while it
-  // shows; then the button settles to its off look. useCopied times it as it does a copy's check.
   const { copied: done, markCopied, pointerProps } = useCopied<'reset' | 'unhide'>();
-  const doneCheck = <CheckIcon width="16" height="16" className="check-draw text-success" />;
-
   return (
-    <div
-      id={id}
-      role="dialog"
-      aria-label="Settings"
-      className={cx(
-        CARD,
-        'absolute inset-x-0 top-full z-20 mt-1 grid max-h-120 gap-3 overflow-y-auto p-3 shadow-md sm:right-auto sm:w-80',
-      )}
-    >
-      <section className="grid gap-2" aria-label="Units">
-        <div>
-          <h2 className={PANEL_TITLE}>Units</h2>
-          <p className="text-xs text-ink-muted">
-            What search and the table show in every category. Units you hide or show in a table stay
-            as you set them.
-          </p>
-        </div>
+    <SidePanel
+      title="Filter"
+      onClose={onClose}
+      lead={
         <Choices<ShowPreset>
           legend="Show"
           hideLegend
@@ -189,6 +203,9 @@ export function SettingsPanel({ id, settings, preference, onSettings }: Settings
           value={presetOf(rule.shown, preference)}
           onChange={(preset) => setRule((now) => withSystems(now, presetKeys(preset, preference)))}
         />
+      }
+    >
+      <div className="grid gap-1">
         <fieldset className="grid">
           <legend className="sr-only">Systems</legend>
           {SYSTEM_KEYS.map((key) => (
@@ -203,10 +220,59 @@ export function SettingsPanel({ id, settings, preference, onSettings }: Settings
             </label>
           ))}
         </fieldset>
-      </section>
+        <p className="text-xs text-ink-muted">
+          What search and the table show in every category. Units you hide or show in a table stay
+          as you set them.
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-x-2 border-t border-line pt-2">
+        <Reset
+          off={!switchesChanged(rule)}
+          done={done === 'reset'}
+          onReset={() => {
+            setRule((now) => withSystems(now, FRESH_RULE.shown));
+            markCopied('reset');
+          }}
+          pointer={pointerProps('reset')}
+        >
+          Reset to Standard
+        </Reset>
+        <Reset
+          off={hiddenCount === 0}
+          done={done === 'unhide'}
+          onReset={() => {
+            setRule(withoutHidden);
+            markCopied('unhide');
+          }}
+          pointer={pointerProps('unhide')}
+        >
+          Unhide units
+          {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
+        </Reset>
+        <p role="status" className="sr-only">
+          {done === 'reset' ? 'Filter reset' : done === 'unhide' ? 'Units unhidden' : ''}
+        </p>
+      </div>
+    </SidePanel>
+  );
+}
 
-      <section className="grid gap-2 border-t border-line pt-3" aria-label="Display">
-        <h2 className={PANEL_TITLE}>Display</h2>
+/**
+ * Display (docs/UX-SPEC.md §1, §7; ADR 0017): how results look. Symbols alone or with names
+ * leads, level with the box; then copy buttons, the format, what values round to, which way, and
+ * a reset of all of it.
+ */
+export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelProps) {
+  const { display } = settings;
+  const setDisplay = (patch: Partial<Display>) =>
+    onSettings((now) => ({ ...now, display: { ...now.display, ...patch } }));
+  const both = display.format === 'both';
+  const { copied: done, markCopied, pointerProps } = useCopied<'reset'>();
+  return (
+    <SidePanel
+      title="Display"
+      onClose={onClose}
+      lead={
         <Choices<Display['names']>
           legend="Unit names"
           hideLegend
@@ -217,99 +283,68 @@ export function SettingsPanel({ id, settings, preference, onSettings }: Settings
           value={display.names}
           onChange={(names) => setDisplay({ names })}
         />
-        <Switch
-          label="Copy buttons"
-          checked={display.copy}
-          onChange={(copy) => setDisplay({ copy })}
+      }
+    >
+      <Switch
+        label="Copy buttons"
+        checked={display.copy}
+        onChange={(copy) => setDisplay({ copy })}
+      />
+      <Choices<Display['format']>
+        legend="Format"
+        options={[
+          { value: 'decimal', label: 'Decimals' },
+          { value: 'fraction', label: 'Fractions' },
+          { value: 'both', label: 'Both' },
+        ]}
+        value={display.format}
+        onChange={(format) => setDisplay({ format })}
+      />
+      {/* Decimals first, then fractions, as Format lists them. */}
+      {display.format !== 'fraction' && (
+        <Choices
+          legend={both ? 'Round decimals to' : 'Round to'}
+          options={PLACES}
+          value={PLACES.find((each) => each.places === display.places)?.value ?? null}
+          onChange={(value) =>
+            setDisplay({ places: PLACES.find((each) => each.value === value)?.places ?? null })
+          }
         />
-        <Choices<Display['format']>
-          legend="Format"
-          options={[
-            { value: 'decimal', label: 'Decimals' },
-            { value: 'fraction', label: 'Fractions' },
-            { value: 'both', label: 'Both' },
-          ]}
-          value={display.format}
-          onChange={(format) => setDisplay({ format })}
+      )}
+      {display.format !== 'decimal' && (
+        <FractionSizes
+          legend={both ? 'Round fractions to' : 'Round to'}
+          chosen={display.fractions}
+          onChange={(fractions) => setDisplay({ fractions })}
         />
-        {/* Decimals first, then fractions, as Format lists them. */}
-        {display.format !== 'fraction' && (
-          <Choices
-            legend={both ? 'Round decimals to' : 'Round to'}
-            options={PLACES}
-            value={PLACES.find((each) => each.places === display.places)?.value ?? null}
-            onChange={(value) =>
-              setDisplay({ places: PLACES.find((each) => each.value === value)?.places ?? null })
-            }
-          />
-        )}
-        {display.format !== 'decimal' && (
-          <FractionSizes
-            legend={both ? 'Round fractions to' : 'Round to'}
-            chosen={display.fractions}
-            onChange={(fractions) => setDisplay({ fractions })}
-          />
-        )}
-        <Choices<Display['rounding']>
-          legend="Rounding"
-          options={[
-            { value: 'nearest', label: 'Nearest' },
-            { value: 'up', label: 'Up' },
-            { value: 'down', label: 'Down' },
-          ]}
-          value={display.rounding}
-          disabled={display.format === 'decimal' && display.places === null}
-          onChange={(rounding) => setDisplay({ rounding })}
-        />
-      </section>
-
-      {/*
-       * Two resets: the settings, which leave the units hidden in a table, and the units hidden in
-       * a table, which leave the settings. Off with aria-disabled, which keeps focus where it was,
-       * so the panel stays open to show what changed.
-       */}
-      <div className="grid gap-1 border-t border-line pt-2">
-        <div className="flex items-center justify-between gap-2">
-          <Button
-            variant="ghost"
-            aria-disabled={!settingsChanged && done !== 'reset'}
-            onClick={() => {
-              if (!settingsChanged) return;
-              onSettings((now) => ({
-                rule: withSystems(now.rule, FRESH_RULE.shown),
-                display: FRESH_DISPLAY,
-              }));
-              markCopied('reset');
-            }}
-            {...pointerProps('reset')}
-            className="text-sm"
-          >
-            Reset settings
-            {done === 'reset' && doneCheck}
-          </Button>
-          <Button
-            variant="ghost"
-            aria-disabled={hiddenCount === 0 && done !== 'unhide'}
-            onClick={() => {
-              if (hiddenCount === 0) return;
-              setRule(withoutHidden);
-              markCopied('unhide');
-            }}
-            {...pointerProps('unhide')}
-            className="text-sm"
-          >
-            Unhide units
-            {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
-            {done === 'unhide' && doneCheck}
-          </Button>
-        </div>
-        <p className="px-2 text-xs text-ink-muted">
-          Reset settings keeps the units you hid; Unhide shows them again, in every category.
-        </p>
+      )}
+      <Choices<Display['rounding']>
+        legend="Rounding"
+        options={[
+          { value: 'nearest', label: 'Nearest' },
+          { value: 'up', label: 'Up' },
+          { value: 'down', label: 'Down' },
+        ]}
+        value={display.rounding}
+        disabled={display.format === 'decimal' && display.places === null}
+        onChange={(rounding) => setDisplay({ rounding })}
+      />
+      <div className="border-t border-line pt-2">
+        <Reset
+          off={!displayChanged(display)}
+          done={done === 'reset'}
+          onReset={() => {
+            setDisplay(FRESH_DISPLAY);
+            markCopied('reset');
+          }}
+          pointer={pointerProps('reset')}
+        >
+          Reset display
+        </Reset>
         <p role="status" className="sr-only">
-          {done === 'reset' ? 'Settings reset' : done === 'unhide' ? 'Units unhidden' : ''}
+          {done === 'reset' ? 'Display reset' : ''}
         </p>
       </div>
-    </div>
+    </SidePanel>
   );
 }

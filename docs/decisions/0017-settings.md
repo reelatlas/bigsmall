@@ -1,7 +1,7 @@
 # 0017 — Settings: what shows and how it looks, sections by system, two layers
 
 Date: 2026-10-11
-Status: accepted; amends 0011 and 0016. Amended 2026-10-14: the specialist units' section reads Specialty, and values line up on the decimal point
+Status: accepted; amends 0011 and 0016. Amended 2026-10-14: the specialist units' section reads Specialty, and values line up on the decimal point. Amended 2026-10-15: Settings opens as two side panels, Filter and Display, one side panel at a time with the calculator, and units glide and flash as they move between shown and hidden
 
 ## Context
 

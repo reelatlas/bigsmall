@@ -137,6 +137,15 @@ export function SlidersIcon(props: IconProps) {
   );
 }
 
+export function FunnelIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      {/* A funnel: what passes through, Settings' Filter. */}
+      <path d="M4 5h16l-6 7.5V19l-4-2v-4.5z" />
+    </Icon>
+  );
+}
+
 export function BackspaceIcon(props: IconProps) {
   return (
     <Icon {...props}>

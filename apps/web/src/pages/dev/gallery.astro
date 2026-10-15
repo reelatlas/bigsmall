@@ -3,12 +3,14 @@ import { Button } from '../../components/Button';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import ThemeArt from '../../components/ThemeArt.astro';
 import {
+  CalculatorIcon,
   CopyIcon,
   EraserIcon,
-  CalculatorIcon,
+  FunnelIcon,
   KeyboardIcon,
   LinkIcon,
   RedoIcon,
+  SlidersIcon,
   UndoIcon,
 } from '../../components/icons';
 import { Keycap } from '../../components/Keycap';
@@ -96,6 +98,12 @@ const swatches = TOKEN_CONTRACT.colors;
           </Button>
           <Button variant="ghost" square on aria-pressed="true" aria-label="Calculator sample, on">
             <CalculatorIcon />
+          </Button>
+          <Button variant="ghost" square aria-label="Filter sample">
+            <FunnelIcon />
+          </Button>
+          <Button variant="ghost" square aria-label="Display sample">
+            <SlidersIcon />
           </Button>
         </div>
 

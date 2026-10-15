@@ -1,13 +1,19 @@
 import { unitsIn } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
-import { box, expectNoA11yViolations, ready, setSettings, settingsButton } from './support';
+import {
+  box,
+  expectNoA11yViolations,
+  ready,
+  setSettings,
+  settingsButton,
+  settingsPanel,
+} from './support';
 
 // Settings (ADR 0017, docs/UX-SPEC.md §1, §3, §7): what shows, in every category, and how results
 // look; the table's sections, its Hidden list, and Edit; search leaving hidden units out. Visitors
 // are in the US: their own units come first (ADR 0011).
 
 const row = (page: Page, unitId: string) => page.locator(`[data-row="${unitId}"]`);
-const panel = (page: Page) => page.getByRole('dialog', { name: 'Settings' });
 const table = (page: Page) => page.getByRole('region', { name: 'Volume' });
 const hiddenToggle = (page: Page) => page.getByRole('button', { name: /^Hidden/ });
 const SPECIALIST = unitsIn('volume').filter((unit) => unit.tier !== 'basic').length;
@@ -30,53 +36,69 @@ test('a fresh visit shows symbols, two places, no copy buttons, and the speciali
     page.getByRole('button', { name: 'Change unit: cups' }).getByText('cups', { exact: true }),
   ).toBeHidden();
 
-  await settingsButton(page).click();
+  await settingsButton(page, 'Filter').click();
   await expect(
-    panel(page)
+    settingsPanel(page, 'Filter')
       .locator('label', { hasText: /^Standard$/ })
       .locator('input'),
   ).toBeChecked();
-  await expect(panel(page).getByRole('switch', { name: 'Copy buttons' })).toHaveAttribute(
-    'aria-checked',
-    'false',
-  );
+  await settingsButton(page, 'Display').click();
+  await expect(
+    settingsPanel(page, 'Display').getByRole('switch', { name: 'Copy buttons' }),
+  ).toHaveAttribute('aria-checked', 'false');
   await expectNoA11yViolations(page);
 });
 
-test('Settings closes on Escape, a press outside, or focus moving out, and stays open through its resets', async ({
+test('Filter and Display open beside the table, one side panel at a time with the calculator; Escape closes, a press outside does not', async ({
   page,
-  isMobile,
 }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
-  await settingsButton(page).click();
-  await expect(panel(page)).toBeVisible();
+  const filter = settingsPanel(page, 'Filter');
+  const display = settingsPanel(page, 'Display');
+  const calculator = page.getByRole('group', { name: 'Calculator' });
+  // Opening moves focus in, onto its first choice, and its edge turns the accent.
+  await settingsButton(page, 'Filter').click();
+  await expect(filter.locator('label', { hasText: /^Standard$/ }).locator('input')).toBeFocused();
+  const edge = () => filter.evaluate((panel) => getComputedStyle(panel).borderTopColor);
+  // The theme's accent as a computed color, for the edge to ease to.
+  const accent = await filter.evaluate((panel) => {
+    const probe = document.createElement('span');
+    probe.style.color = getComputedStyle(panel).getPropertyValue('--accent');
+    panel.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  });
+  await expect.poll(edge).toBe(accent);
   await page.keyboard.press('Escape');
-  await expect(panel(page)).toHaveCount(0);
-  await expect(settingsButton(page)).toBeFocused();
+  await expect(filter).toHaveCount(0);
+  await expect(settingsButton(page, 'Filter')).toBeFocused();
 
-  await settingsButton(page).click();
-  await page.mouse.click(5, 5);
-  await expect(panel(page)).toHaveCount(0);
+  // A side panel stays open as the page is used, its edge quiet once focus leaves it.
+  await settingsButton(page, 'Filter').click();
+  await box(page).click();
+  await expect(filter).toBeVisible();
+  await expect.poll(edge).not.toBe(accent);
 
-  // A reset done shows its check, says so, and leaves the panel open to show what changed.
+  // One side panel at a time: each opens in the place of the one before.
+  await settingsButton(page, 'Display').click();
+  await expect(filter).toHaveCount(0);
+  await expect(display).toBeVisible();
+  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
+  await expect(display).toHaveCount(0);
+  await expect(calculator).toBeVisible();
+  await settingsButton(page, 'Filter').click();
+  await expect(calculator).toHaveCount(0);
+  await expectNoA11yViolations(page);
+
+  // A reset done shows its check and says so, and the panel stays open to show what changed.
   await setSettings(page, 'Fractions');
-  await settingsButton(page).click();
-  await panel(page).getByRole('button', { name: 'Reset settings' }).click();
-  await expect(panel(page)).toBeVisible();
-  await expect(panel(page).getByRole('status')).toHaveText('Settings reset');
-  await expect(
-    panel(page)
-      .locator('label', { hasText: /^Decimals$/ })
-      .locator('input'),
-  ).toBeChecked();
-
-  if (!isMobile) {
-    // Tab past the panel's last control moves focus out, which closes it.
-    await panel(page).getByRole('button', { name: 'Unhide units' }).focus();
-    await page.keyboard.press('Tab');
-    await expect(panel(page)).toHaveCount(0);
-  }
+  await settingsButton(page, 'Display').click();
+  await display.getByRole('button', { name: 'Reset display' }).click();
+  await expect(display).toBeVisible();
+  await expect(display.getByRole('status')).toHaveText('Display reset');
+  await expect(display.locator('label', { hasText: /^Decimals$/ }).locator('input')).toBeChecked();
 });
 
 test('the Hidden list brings a unit back into its section; Edit hides one, Done in its place, and Done folds Hidden', async ({
@@ -169,7 +191,7 @@ test('fractions, both, and rounding write the values and never move the columns'
   await expectNoA11yViolations(page);
 });
 
-test('Settings is a stop in the toolbar after the calculator, and its choices take the arrows', async ({
+test('Filter and Display follow the calculator in the toolbar; a panel keeps its arrows, and typing lands in the box', async ({
   page,
   isMobile,
 }) => {
@@ -178,20 +200,107 @@ test('Settings is a stop in the toolbar after the calculator, and its choices ta
   await ready(page);
   await page.getByRole('button', { name: 'Calculator', exact: true }).focus();
   await page.keyboard.press('ArrowRight');
-  await expect(settingsButton(page)).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(panel(page)).toBeVisible();
-  // A segmented control is a group of radios: the arrows move the choice.
-  const standard = panel(page)
-    .locator('label', { hasText: /^Standard$/ })
-    .locator('input');
-  await standard.focus();
+  await expect(settingsButton(page, 'Filter')).toBeFocused();
   await page.keyboard.press('ArrowRight');
-  await expect(
-    panel(page)
-      .locator('label', { hasText: /^Your region$/ })
-      .locator('input'),
-  ).toBeChecked();
-  await expect(panel(page)).toBeVisible();
-  await expect(row(page, 'milliliter')).toHaveCount(0);
+  await expect(settingsButton(page, 'Display')).toBeFocused();
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('Enter');
+  const filter = settingsPanel(page, 'Filter');
+  const choice = (label: string) =>
+    filter
+      .locator('label', { hasText: new RegExp(`^${label.replace(/[()]/g, '\\$&')}$`) })
+      .locator('input');
+  await expect(choice('Standard')).toBeFocused();
+  // ← and → move a strip's choice; ↑ and ↓ move between rows, never out of the panel.
+  await page.keyboard.press('ArrowRight');
+  await expect(choice('Your region')).toBeChecked();
+  await page.keyboard.press('ArrowDown');
+  await expect(choice('Metric')).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(choice('US (customary)')).toBeFocused();
+  // Enter works a checkbox as Space does.
+  await page.keyboard.press('Enter');
+  await expect(choice('US (customary)')).not.toBeChecked();
+  for (let step = 0; step < 6; step += 1) await page.keyboard.press('ArrowUp');
+  await expect(filter.getByRole('button', { name: 'Close filter' })).toBeFocused();
+  // A digit lands in the box, after what is there; the panel stays open.
+  await page.keyboard.press('7');
+  await expect(box(page)).toBeFocused();
+  await expect(box(page)).toHaveValue('27');
+  await expect(filter).toBeVisible();
+});
+
+test('a unit moving between shown and hidden glides to its place and flashes as it lands', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  const animated = (selector: string, property: string) =>
+    page.evaluate(
+      ([selector, property]) =>
+        document
+          .getAnimations()
+          .some(
+            (animation) =>
+              animation.effect instanceof KeyframeEffect &&
+              animation.effect.target instanceof Element &&
+              animation.effect.target.matches(selector!) &&
+              animation.effect.getKeyframes().some((frame) => property! in frame),
+          ),
+      [selector, property],
+    );
+  await hiddenToggle(page).click();
+  await page
+    .getByRole('group', { name: 'Hidden, Specialty' })
+    .getByLabel(/cubic inches/)
+    .click();
+  await expect(row(page, 'cubic-inch')).toBeVisible();
+  // It slides up from its line in Hidden, and flashes where it lands.
+  expect(await animated('[data-row="cubic-inch"]', 'transform')).toBe(true);
+  expect(await animated('[data-row="cubic-inch"] > [role="gridcell"]', 'backgroundColor')).toBe(
+    true,
+  );
+  // The page takes clicks while it moves: a second unit checked straight after the first shows.
+  await page
+    .getByRole('group', { name: 'Hidden, Specialty' })
+    .getByLabel(/cubic feet/)
+    .click();
+  await expect(row(page, 'cubic-foot')).toBeVisible();
+});
+
+test('with reduced motion a unit moves at once, and still flashes, a change of color only', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await hiddenToggle(page).click();
+  await page
+    .getByRole('group', { name: 'Hidden, Specialty' })
+    .getByLabel(/cubic inches/)
+    .click();
+  await expect(row(page, 'cubic-inch')).toBeVisible();
+  expect(
+    await page.evaluate(() =>
+      document
+        .getAnimations()
+        .every(
+          (animation) =>
+            !(animation.effect instanceof KeyframeEffect) ||
+            animation.effect.getKeyframes().every((frame) => !('transform' in frame)),
+        ),
+    ),
+  ).toBe(true);
+  expect(
+    await page.evaluate(() =>
+      document
+        .getAnimations()
+        .some(
+          (animation) =>
+            animation.effect instanceof KeyframeEffect &&
+            animation.effect.target instanceof Element &&
+            animation.effect.target.matches('[data-row="cubic-inch"] > [role="gridcell"]'),
+        ),
+    ),
+  ).toBe(true);
 });

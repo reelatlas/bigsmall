@@ -669,3 +669,8 @@ Format:
 
 **What happened.** Edit's foot was made sticky at the screen's bottom edge, first stretched over the card's bottom padding with rounded corners to sit inside the card's own. Stuck, those corners let the rows scrolling under it show through (the box's row in its accent fill, clearly).
 **Rule.** A bar that sticks over scrolling content is square and opaque edge to edge across what it covers: keep it inside the card's padding, as wide as the rows, rather than reaching for the card's rounded edge.
+
+## 2026-10-15 — A view transition takes no clicks
+
+**What happened.** The settings lab's glide, a unit checked in Hidden travelling to its row, ran as a same-document view transition (`document.startViewTransition`). In the converter, a second unit checked straight after the first never showed: while a view transition runs, Chrome hit-tests every press to the document element, and `::view-transition { pointer-events: none }`, the usual advice, did not change it. A browser test clicking during the 400 ms also made Playwright scroll the page as it retried.
+**Rule.** For motion inside a page someone keeps working in, move the real elements (measure, render the change at once, animate each from where it was with the Web Animations API, the FLIP technique; `features/converter/glide.ts`), so it stays interactive throughout. Keep view transitions for changes that replace the view, where a moment without input costs nothing.

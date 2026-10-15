@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { SegmentedControl, SegmentedToggles } from '../../../components/SegmentedControl';
+import { SidePanel } from '../../../components/SidePanel';
 import { Switch } from '../../../components/Switch';
 
 // Gallery-only: the settings' controls in frozen states, so every theme is checked against what
@@ -51,6 +52,29 @@ export function SettingSamples({ theme }: { theme: string }) {
       <div className="grid sm:grid-cols-2">
         <Switch label="Switch, off" checked={false} onChange={noop} />
         <Switch label="Switch, on" checked onChange={noop} />
+      </div>
+      <div className="max-w-72">
+        <SidePanel
+          title="Display"
+          focusOnOpen={false}
+          onClose={noop}
+          lead={
+            <fieldset className="grid">
+              <legend className="sr-only">Side panel's lead</legend>
+              <SegmentedControl
+                name={`${id}-lead`}
+                options={[
+                  { value: 'symbol', label: 'Symbol only' },
+                  { value: 'both', label: 'Symbol and name' },
+                ]}
+                value="symbol"
+                onChange={noop}
+              />
+            </fieldset>
+          }
+        >
+          <Switch label="Copy buttons" checked={false} onChange={noop} />
+        </SidePanel>
       </div>
     </div>
   );

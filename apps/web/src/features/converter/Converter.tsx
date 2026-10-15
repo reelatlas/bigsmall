@@ -1,5 +1,5 @@
 import { formatNumber, parse } from '@bigsmall/core';
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button';
 import {
@@ -7,6 +7,7 @@ import {
   CopiedIcon,
   CopyIcon,
   EraserIcon,
+  FunnelIcon,
   LinkIcon,
   RedoIcon,
   SlidersIcon,
@@ -21,7 +22,9 @@ import { pressedByTouch } from '../../lib/modality';
 import { isApplePlatform } from '../../lib/platform';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
-import { SettingsPanel } from './SettingsPanel';
+import { glide } from './glide';
+import { DisplayPanel, FilterPanel } from './SettingsPanels';
+import type { Settings } from './settings';
 import { TableLayout } from './TableLayout';
 import { urlFor } from './url';
 import { useConverter } from './useConverter';
@@ -44,10 +47,10 @@ const HINT = 'Type a number, unit, or both to compare all at once.';
 
 /**
  * The converter island (ADR 0012, ADR 0013, ADR 0017, docs/UX-SPEC.md §1): the hint; the
- * toolbar's buttons, the calculator and Settings after the category menu and undo, redo, and
- * clear all at its right end, which TableLayout sets in a row; Settings' panel; the box and its
- * table, with the calculator when open between them or beside them (§8); and the live regions. It
- * draws the Copy URL button into the header's slot (§7).
+ * toolbar's buttons, the calculator, Filter, and Display after the category menu and undo, redo,
+ * and clear all at its right end, which TableLayout sets in a row; the box and its table, with the
+ * side panel open, one at a time (the calculator §8, Filter, or Display), between them or beside
+ * them; and the live regions. It draws the Copy URL button into the header's slot (§7).
  */
 export function Converter() {
   const hydrated = useIsHydrated();
@@ -64,9 +67,8 @@ export function Converter() {
     settings,
     updateSettings,
   } = useConverter(inputRef);
-  const settingsId = useId();
-  const settingsToggleId = useId();
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const filterToggleId = useId();
+  const displayToggleId = useId();
   // Tooltips name the platform's keys; until hydration they read as on the server (Ctrl).
   const apple = hydrated && isApplePlatform();
   const hintId = useId();
@@ -74,9 +76,11 @@ export function Converter() {
   const sectionRef = useRef<HTMLElement>(null);
   const { copied, copy, markCopied, pointerProps } = useCopied<Confirmable>();
   const headerActions = useSlot(SLOTS.headerActions);
-  const calculatorId = useId();
+  const sideId = useId();
   const calculatorToggleId = useId();
-  const [calculatorOpen, setCalculatorOpen] = useState(false);
+  /** The side panel open, one at a time (Sean, 2026-10-15): the calculator, Filter, or Display. */
+  const [side, setSide] = useState<'calculator' | 'filter' | 'display' | null>(null);
+  const calculatorOpen = side === 'calculator';
   // The calculator's own entry: a scratch pad in the converter's state, so undo reaches it too.
   const entry = state.calc;
   const entryParsed = parse(entry.text, env.separators);
@@ -123,11 +127,11 @@ export function Converter() {
 
   const openCalculator = (from: HTMLElement | null) => {
     returnTo.current = from;
-    setCalculatorOpen(true);
+    setSide('calculator');
   };
 
   const closeCalculator = (focus: HTMLElement | null = returnTo.current) => {
-    setCalculatorOpen(false);
+    setSide(null);
     (focus?.isConnected ? focus : calculatorToggle())?.focus();
   };
 
@@ -145,47 +149,30 @@ export function Converter() {
       const here =
         focused instanceof HTMLElement && focused !== document.body ? focused : inputRef.current;
       if (!calculatorOpen) openCalculator(here);
-      else if (document.getElementById(calculatorId)?.contains(focused)) closeCalculator();
-      else setCalculatorOpen(false);
+      else if (document.getElementById(sideId)?.contains(focused)) closeCalculator();
+      else setSide(null);
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   });
 
-  /*
-   * Settings closes on Escape, which brings focus back to its button, a press outside it and its
-   * button, or focus moving outside them; never on focus merely lost, as when a reset turns itself
-   * off or Reset settings takes the fraction sizes away (docs/LEARNINGS.md, "A panel that closes
-   * on blur"). In a layout effect, so the listeners are there before the next press. Escape is
-   * heard in the capture phase and marked handled, so on the Settings button it closes the panel
-   * first, before the toolbar's Escape goes back to the box, as an open menu's does.
+  /** Filter or Display, from its button: opening one closes whichever side panel was open. */
+  const toggleSettings = (key: 'filter' | 'display') =>
+    setSide((open) => (open === key ? null : key));
+
+  /** Closed from inside it (its × or Escape), focus goes back to its button. */
+  const closeSettings = (key: 'filter' | 'display') => {
+    setSide(null);
+    document.getElementById(key === 'filter' ? filterToggleId : displayToggleId)?.focus();
+  };
+
+  /**
+   * A change to what shows, from Filter or the table (Edit, Hidden), glides: rows slide to their
+   * places and a unit checked in Hidden travels to its row (glide.ts). Display's changes rewrite
+   * the values in place and need none.
    */
-  useLayoutEffect(() => {
-    if (!settingsOpen) return undefined;
-    const inside = (target: EventTarget | null) =>
-      target instanceof Node &&
-      [settingsId, settingsToggleId].some((id) => document.getElementById(id)?.contains(target));
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || !inside(event.target)) return;
-      event.preventDefault();
-      setSettingsOpen(false);
-      document.getElementById(settingsToggleId)?.focus();
-    };
-    const onPress = (event: PointerEvent) => {
-      if (!inside(event.target)) setSettingsOpen(false);
-    };
-    const onFocus = (event: FocusEvent) => {
-      if (!inside(event.target)) setSettingsOpen(false);
-    };
-    document.addEventListener('keydown', onKey, true);
-    document.addEventListener('pointerdown', onPress);
-    document.addEventListener('focusin', onFocus);
-    return () => {
-      document.removeEventListener('keydown', onKey, true);
-      document.removeEventListener('pointerdown', onPress);
-      document.removeEventListener('focusin', onFocus);
-    };
-  }, [settingsOpen, settingsId, settingsToggleId]);
+  const changeShown = (update: (settings: Settings) => Settings) =>
+    glide(sectionRef.current, () => updateSettings(update));
 
   /** Keys change only the calculator's own entry (calculator.ts); the box waits for a send. */
   const press = (key: CalculatorKey) => {
@@ -269,6 +256,27 @@ export function Converter() {
     />
   );
 
+  let sidePanel: ReactNode = calculator;
+  if (side === 'filter') {
+    sidePanel = (
+      <FilterPanel
+        settings={settings}
+        preference={env.system}
+        onSettings={changeShown}
+        onClose={() => closeSettings('filter')}
+      />
+    );
+  } else if (side === 'display') {
+    sidePanel = (
+      <DisplayPanel
+        settings={settings}
+        preference={env.system}
+        onSettings={updateSettings}
+        onClose={() => closeSettings('display')}
+      />
+    );
+  }
+
   return (
     <section
       ref={sectionRef}
@@ -299,7 +307,7 @@ export function Converter() {
               aria-keyshortcuts="Alt+C"
               title={apple ? 'Calculator (⌥C)' : 'Calculator (Alt+C)'}
               aria-expanded={calculatorOpen}
-              aria-controls={calculatorOpen ? calculatorId : undefined}
+              aria-controls={calculatorOpen ? sideId : undefined}
               onClick={() => {
                 // Closed with the icon, focus stays on it, wherever the calculator was opened from.
                 const icon = calculatorToggle();
@@ -313,14 +321,28 @@ export function Converter() {
             <Button
               variant="ghost"
               square
-              id={settingsToggleId}
-              data-tool="settings"
-              aria-label="Settings"
-              title="Settings"
-              aria-expanded={settingsOpen}
-              aria-controls={settingsOpen ? settingsId : undefined}
-              on={settingsOpen}
-              onClick={() => setSettingsOpen((open) => !open)}
+              id={filterToggleId}
+              data-tool="filter"
+              aria-label="Filter"
+              title="Filter"
+              aria-expanded={side === 'filter'}
+              aria-controls={side === 'filter' ? sideId : undefined}
+              on={side === 'filter'}
+              onClick={() => toggleSettings('filter')}
+            >
+              <FunnelIcon />
+            </Button>
+            <Button
+              variant="ghost"
+              square
+              id={displayToggleId}
+              data-tool="display"
+              aria-label="Display"
+              title="Display"
+              aria-expanded={side === 'display'}
+              aria-controls={side === 'display' ? sideId : undefined}
+              on={side === 'display'}
+              onClick={() => toggleSettings('display')}
             >
               <SlidersIcon />
             </Button>
@@ -367,18 +389,8 @@ export function Converter() {
             </Button>
           </>
         }
-        panel={
-          settingsOpen && (
-            <SettingsPanel
-              id={settingsId}
-              settings={settings}
-              preference={env.system}
-              onSettings={updateSettings}
-            />
-          )
-        }
         settings={settings}
-        onSettings={updateSettings}
+        onSettings={changeShown}
         inputRef={inputRef}
         box={box}
         table={table}
@@ -386,8 +398,9 @@ export function Converter() {
         dispatch={dispatch}
         describedBy={hintId}
         copyButton={copyButton}
-        calculator={calculator}
-        calculatorId={calculatorId}
+        side={sidePanel}
+        sideId={sideId}
+        sideTypes={side === 'filter' || side === 'display'}
         copiedRow={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
         onCopyRow={copyRow}
         copyRowProps={(row) => pointerProps(`row-${row.id}`)}

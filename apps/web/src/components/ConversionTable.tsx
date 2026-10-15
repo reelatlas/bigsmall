@@ -15,6 +15,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useColumnsFit } from '../lib/fit-step';
+import { flash } from '../lib/flash';
 import {
   CURSOR_ROW,
   cx,
@@ -280,6 +281,46 @@ export function ConversionTable<T extends ConversionRow>({
   const hiddenCount = hidden.reduce((sum, section) => sum + section.rows.length, 0);
   const allRows = every.flatMap((section) => section.rows);
   const mark = useMemo(() => localeSeparators(locale).decimal, [locale]);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const hiddenToggleRef = useRef<HTMLButtonElement>(null);
+
+  /**
+   * What showed after the last change, so the next one can mark what moved (docs/UX-SPEC.md §3,
+   * Sean 2026-10-15): a unit that arrives among the rows, or in the open Hidden list, flashes the
+   * accent's soft tint, and so does Hidden when units go into it. Within one category only; a
+   * change that brings every row is a new table, not units arriving.
+   */
+  const seen = useRef<{
+    title: string;
+    shown: ReadonlySet<string>;
+    lines: ReadonlySet<string> | null;
+    hidden: number;
+  } | null>(null);
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    const shown = new Set(sections.flatMap((section) => section.rows.map((row) => row.id)));
+    const lines =
+      hiddenOpen && !message
+        ? new Set(hidden.flatMap((section) => section.rows.map((row) => row.id)))
+        : null;
+    const before = seen.current;
+    seen.current = { title, shown, lines, hidden: hiddenCount };
+    if (!card || !before || before.title !== title || message) return;
+    const arrived = [...shown].filter((id) => !before.shown.has(id));
+    if (arrived.length < shown.size) {
+      for (const id of arrived) {
+        flash(
+          card.querySelector(`[data-row="${id}"] > [role="gridcell"], label[data-unit="${id}"]`),
+        );
+      }
+    }
+    if (before.lines && lines) {
+      for (const id of lines) {
+        if (!before.lines.has(id)) flash(card.querySelector(`label[data-unit="${id}"]`));
+      }
+    }
+    if (hiddenCount > before.hidden) flash(hiddenToggleRef.current);
+  });
 
   const parts = (row: T, under: TableDisplay = display) => valueParts(row, under, locale, mark);
   const second = (row: T, under: TableDisplay = display): ReactNode => {
@@ -441,12 +482,17 @@ export function ConversionTable<T extends ConversionRow>({
   );
 
   /** A section's heading with its three-state checkbox, in Edit and the Hidden list. */
-  const headedCheck = (label: string, rows: readonly T[], edge: string) => {
+  const headedCheck = (
+    label: string,
+    rows: readonly T[],
+    edge: string,
+    marker: Record<`data-${string}`, string>,
+  ) => {
     const shownCount = rows.filter(isShown).length;
     const state = shownCount === rows.length ? 'all' : shownCount === 0 ? 'none' : 'some';
     const movable = rows.filter((row) => !row.inBox);
     return (
-      <h3 className={edge}>
+      <h3 className={edge} {...marker}>
         <label className={cx(PANEL_TITLE, 'flex min-h-11 items-center gap-2 px-2')}>
           <SectionCheckbox state={state} onChange={() => onChoose(movable, state !== 'all')} />
           {label}
@@ -467,7 +513,7 @@ export function ConversionTable<T extends ConversionRow>({
           role="rowgroup"
           className="col-span-8 grid grid-cols-subgrid gap-y-0.5"
         >
-          <div role="row" className={cx('col-span-8', sectionEdge(at))}>
+          <div role="row" className={cx('col-span-8', sectionEdge(at))} data-section={section.key}>
             <span role="columnheader" className={cx('block', HEADING)}>
               {section.label}
             </span>
@@ -540,7 +586,9 @@ export function ConversionTable<T extends ConversionRow>({
           className="col-span-8 grid grid-cols-subgrid gap-y-0.5"
         >
           <div className="col-span-8">
-            {headedCheck(section.label, section.rows, sectionEdge(at))}
+            {headedCheck(section.label, section.rows, sectionEdge(at), {
+              'data-section': section.key,
+            })}
           </div>
           {section.rows.map((row) => {
             const on = isShown(row);
@@ -548,6 +596,7 @@ export function ConversionTable<T extends ConversionRow>({
               <label
                 key={row.id}
                 htmlFor={`${checkId}-${row.id}`}
+                data-unit={row.id}
                 className={cx(
                   CURSOR_ROW,
                   'col-span-8 grid grid-cols-subgrid items-center',
@@ -576,7 +625,7 @@ export function ConversionTable<T extends ConversionRow>({
       <p id={moveHintId} className="sr-only">
         Moves this unit into the box.
       </p>
-      <div className={cx(LIST_CARD, 'p-2')}>
+      <div ref={cardRef} className={cx(LIST_CARD, 'p-2')} data-table-card>
         {body}
         {/* The foot keeps its place in Edit, nothing over the list moving: Edit reads Done where it
             was, and Hidden's place says what to do. Over a long list the foot stays at the screen's
@@ -587,11 +636,13 @@ export function ConversionTable<T extends ConversionRow>({
               'mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1',
               editing && 'sticky bottom-0 bg-surface',
             )}
+            data-table-foot
           >
             {editing ? (
               <span className="px-2 text-sm text-ink-muted">Choose the units to show</span>
             ) : hiddenCount > 0 ? (
               <button
+                ref={hiddenToggleRef}
                 type="button"
                 aria-expanded={hiddenOpen}
                 onClick={() => onHiddenOpen(!hiddenOpen)}
@@ -634,11 +685,14 @@ export function ConversionTable<T extends ConversionRow>({
           hiddenOpen &&
           hidden.map((section) => (
             <div key={section.key} role="group" aria-label={`Hidden, ${section.label}`}>
-              {headedCheck(section.label, section.rows, 'pt-1')}
+              {headedCheck(section.label, section.rows, 'pt-1', {
+                'data-hidden-section': section.key,
+              })}
               {section.rows.map((row) => (
                 <label
                   key={row.id}
                   htmlFor={`${checkId}-${row.id}`}
+                  data-unit={row.id}
                   className={cx(CURSOR_ROW, 'flex items-center gap-2 pl-8 hover:bg-surface-raised')}
                 >
                   {checkbox(row, false)}

@@ -33,6 +33,14 @@ export const LIST_CARD = 'rounded-lg border-2 border-edge bg-surface';
  */
 export const PANEL_TITLE = 'text-sm font-medium text-ink-muted';
 
+/**
+ * A side panel while focus is inside it, where the keys go (the calculator, Settings' Filter and
+ * Display): its edge turns accent, 2 px like a focused box (its 1 px border and a 1 px ring, so
+ * nothing moves), easing as the shells' edges do.
+ */
+export const PANEL_ACTIVE =
+  'transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-1 focus-within:ring-accent';
+
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,
 // and `data-open` while open; the shell takes SHELL, one of the two resting styles, and its own

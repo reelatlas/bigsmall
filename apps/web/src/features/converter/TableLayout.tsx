@@ -32,26 +32,24 @@ import type { ConverterEnv } from './useConverter';
 
 /**
  * The converter from md (docs/UX-SPEC.md §1): the toolbar, the box, and its table in the first
- * column, and the calculator in a column of its own on their right. Its card is a subgrid of the
- * first three rows, so its title row sits level with the toolbar, its display level with the box,
- * and its keys in the third row, which the table shares with the last; the last row, 1fr, takes
- * the rest of a long table, so the card hugs its keys and the table always sits right under the
- * box. Below md the calculator opens between the box and the table, flush left.
+ * column, and the side panel open (the calculator, Filter, or Display) in a column of its own on
+ * their right. Its card is a subgrid of the first three rows, so its title row sits level with the
+ * toolbar, its lead (the calculator's display, a settings panel's first choice) level with the
+ * box, and the rest in the third row, which the table shares with the last; the last row, 1fr,
+ * takes the rest of a long table, so the card hugs its content and the table always sits right
+ * under the box. Below md the side panel opens between the box and the table, flush left.
  */
 const TABLE_GRID =
   'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_auto_1fr] md:gap-x-4';
+/** The toolbar's cell, as wide as the box. */
+const TABLE_TOOLS_CELL = 'max-w-xl md:col-start-1 md:row-start-1';
 /**
- * The toolbar's cell, as wide as the box, and what Settings' panel opens under: the panel sits
- * beside the toolbar, not in it, so its own controls keep their keys.
- */
-const TABLE_TOOLS_CELL = 'relative max-w-xl md:col-start-1 md:row-start-1';
-/**
- * The toolbar row (Sean, 2026-10-10): the category menu, the calculator, and Settings at its left,
- * the menu's edge on the box's, with no dividers between them; undo, redo, and clear all at its
- * right end. Where the row has no room for both, the right end keeps the top line and the leading
- * three wrap under it, over the box, with no breakpoint: they come first in the markup,
- * `flex-wrap-reverse` stacks a wrapped row's first line at the bottom, and the right end's
- * `ml-auto` keeps it right. The browser's own fit decides, in every theme.
+ * The toolbar row (Sean, 2026-10-10 and 15): the category menu, the calculator, Filter, and
+ * Display at its left, the menu's edge on the box's, with no dividers between them; undo, redo,
+ * and clear all at its right end. Where the row has no room for both, the right end keeps the top
+ * line and the leading four wrap under it, over the box, with no breakpoint: they come first in
+ * the markup, `flex-wrap-reverse` stacks a wrapped row's first line at the bottom, and the right
+ * end's `ml-auto` keeps it right. The browser's own fit decides, in every theme.
  */
 const TABLE_TOOLS_ROW = 'mb-2 flex flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2';
 const TABLE_LEADING = 'flex items-center gap-1';
@@ -64,18 +62,18 @@ const TABLE_TOOLS = 'ml-auto flex shrink-0 items-center gap-1';
 const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
 /**
  * 8 px under the box, its popup, as the toolbar sits 8 px over it; a container, so the categories
- * go four across once it has the room. Under an open calculator (below md) the calculator's own
- * 16 px wins, the two margins collapsing.
+ * go four across once it has the room. Under an open side panel (below md) the panel's own 16 px
+ * wins, the two margins collapsing.
  */
 const TABLE_ROWS_CELL = '@container mt-2 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';
 /**
- * Where the calculator opens (docs/DESIGN-SYSTEM.md, "Calculator"): 16 px from the box and from the
- * table, a panel apart, at most 384 px wide. From md, a column of its own: a subgrid of the first
- * three rows, and the card in it one too (`*:`), its three parts in the three rows. The card's top
- * padding shrinks to 1 px there, so its title row, 44 px and its 8 px margin, sits as high as the
- * toolbar's icons and never makes the first row taller.
+ * Where a side panel opens (docs/DESIGN-SYSTEM.md, "Calculator" and "Side panels"): 16 px from the
+ * box and from the table, a panel apart, at most 384 px wide. From md, a column of its own: a
+ * subgrid of the first three rows, and the card in it one too (`*:`), its three parts in the three
+ * rows. The card's top padding shrinks to 1 px there, so its title row, 44 px and its 8 px margin,
+ * sits as high as the toolbar's icons and never makes the first row taller.
  */
-const TABLE_CALCULATOR_CELL =
+const TABLE_SIDE_CELL =
   'my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-1 md:my-0 md:grid md:w-72 md:grid-rows-subgrid md:*:row-span-3 md:*:grid md:*:grid-rows-subgrid md:*:pt-px';
 
 /**
@@ -92,12 +90,10 @@ function viewKeyOf(view: TableView): string {
 }
 
 export interface TableLayoutProps {
-  /** The tools after the category menu: the calculator and Settings. */
+  /** The tools after the category menu: the calculator, Filter, and Display. */
   leadingTools: ReactNode;
   /** The toolbar's right end: undo, redo, and clear all. */
   tools: ReactNode;
-  /** Settings' panel while it is open, under the toolbar. */
-  panel: ReactNode;
   /** What shows and how it looks (settings.ts). */
   settings: Settings;
   onSettings: (update: (settings: Settings) => Settings) => void;
@@ -112,9 +108,17 @@ export interface TableLayoutProps {
   describedBy: string;
   /** The field's copy button, once it holds a number. */
   copyButton: ReactNode;
-  /** The calculator while it is open: between the box and the table, or beside them from md. */
-  calculator: ReactNode;
-  calculatorId: string;
+  /**
+   * The side panel open, one at a time (the calculator, Filter, or Display): between the box and
+   * the table, or beside them from md.
+   */
+  side: ReactNode;
+  sideId: string;
+  /**
+   * Whether typing in the side panel lands in the field, as from the toolbar: so for a settings
+   * panel; the calculator keeps its keys.
+   */
+  sideTypes: boolean;
   /** The row whose copy button shows the check, by unit id. */
   copiedRow: string | null;
   onCopyRow: (unitId: string) => void;
@@ -134,7 +138,6 @@ export interface TableLayoutProps {
 export function TableLayout({
   leadingTools,
   tools,
-  panel,
   settings,
   onSettings,
   inputRef,
@@ -144,8 +147,9 @@ export function TableLayout({
   dispatch,
   describedBy,
   copyButton,
-  calculator,
-  calculatorId,
+  side,
+  sideId,
+  sideTypes,
   copiedRow,
   onCopyRow,
   copyRowProps,
@@ -156,6 +160,7 @@ export function TableLayout({
   const toolsRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
   const placeRef = useRef<HTMLDivElement>(null);
+  const sideRef = useRef<HTMLDivElement>(null);
   /**
    * Where the cursor is, in the view it was set in, so a change from outside (undo, clear all, a
    * send from the calculator) brings it back to rest. A null position rests on the unit in the
@@ -248,9 +253,10 @@ export function TableLayout({
     setPosition(null);
   };
 
-  // Keys pressed on the layout's other parts: the toolbar, the chip, a copy button. Native
-  // listeners: the wrapper is not itself interactive. The calculator keeps its own keys, and the
-  // toolbar's arrows and Escape are the page's toolbar controller's (layouts/Base.astro).
+  // Keys pressed on the layout's other parts: the toolbar, the chip, a copy button, a settings
+  // panel. Native listeners: the wrapper is not itself interactive. The calculator keeps its own
+  // keys, a settings panel its arrows and Escape (SidePanel), and the toolbar's arrows and Escape
+  // are the page's toolbar controller's (layouts/Base.astro).
   // - Escape on the chip or a copy button brings the caret back to the field.
   // - A letter, a digit, or Backspace lands in the field, as typing in a combobox's list does
   //   (WAI-ARIA). Space keeps its own job on a button or a radio.
@@ -262,7 +268,10 @@ export function TableLayout({
       const input = inputRef.current;
       const target = event.target as Node;
       if (!input || target === input || event.defaultPrevented || event.isComposing) return;
-      const own = [toolsRef, fieldRef, placeRef].some((part) => part.current?.contains(target));
+      const parts = sideTypes
+        ? [toolsRef, fieldRef, placeRef, sideRef]
+        : [toolsRef, fieldRef, placeRef];
+      const own = parts.some((part) => part.current?.contains(target));
       if (!own) return;
       if (event.key === 'Escape') {
         if ((target as Element).closest('[data-tool]')) return;
@@ -576,7 +585,6 @@ export function TableLayout({
             </div>
             <div className={TABLE_TOOLS}>{tools}</div>
           </div>
-          {panel}
         </div>
         <div
           ref={fieldRef}
@@ -617,9 +625,9 @@ export function TableLayout({
             }}
           />
         </div>
-        {calculator && (
-          <div id={calculatorId} className={TABLE_CALCULATOR_CELL}>
-            {calculator}
+        {side && (
+          <div ref={sideRef} id={sideId} className={TABLE_SIDE_CELL}>
+            {side}
           </div>
         )}
         <div ref={placeRef} className={TABLE_ROWS_CELL}>

@@ -6,7 +6,8 @@ import type { ReactNode } from 'react';
  * filled with the accent's soft tint. Each segment is drawn 32 px tall with less padding than the
  * converter's controls, the text kept at text-sm, and still takes a 44 px tap: the label is the
  * target, the shape inside it is what shows. The caller wraps a strip in a fieldset whose legend
- * names it (a visually hidden one where the choices say what they are).
+ * names it (a visually hidden one where the choices say what they are). A strip is marked
+ * `data-strip`, so a side panel's arrows take it as one row (SidePanel).
  */
 
 const TARGET =
@@ -32,7 +33,7 @@ export function SegmentedControl<T extends string | number>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div className="flex w-fit">
+    <div className="flex w-fit" data-strip>
       {options.map((option) => (
         <label key={option.value} className={TARGET}>
           <input
@@ -60,7 +61,7 @@ export function SegmentedToggles<T extends string | number>({
   onToggle: (value: T) => void;
 }) {
   return (
-    <div className="flex w-fit">
+    <div className="flex w-fit" data-strip>
       {options.map((option) => (
         <label key={option.value} className={TARGET}>
           <input

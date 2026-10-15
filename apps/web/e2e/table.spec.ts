@@ -10,6 +10,7 @@ import {
   menu,
   ready,
   setSettings,
+  settingsButton,
   showEverything,
 } from './support';
 
@@ -786,7 +787,7 @@ test('at 320 px the rows and the categories fit without scrolling sideways', asy
   expect(await overflow()).toBe(0);
 });
 
-test('the hint has a line of its own; the toolbar under it leads with the menu, the calculator, and Settings, which wrap under the other tools on a phone', async ({
+test('the hint has a line of its own; the toolbar under it leads with the menu, the calculator, Filter, and Display, which wrap under the other tools on a phone', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -799,10 +800,8 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
     calculator: (await page
       .getByRole('button', { name: 'Calculator', exact: true })
       .boundingBox())!,
-    settings: (await page
-      .getByRole('toolbar', { name: 'Tools' })
-      .getByRole('button', { name: 'Settings', exact: true })
-      .boundingBox())!,
+    filter: (await settingsButton(page, 'Filter').boundingBox())!,
+    settings: (await settingsButton(page, 'Display').boundingBox())!,
     undo: (await page.getByRole('button', { name: 'Undo' }).boundingBox())!,
     last: (await page.getByRole('button', { name: 'Clear all' }).boundingBox())!,
     menu: (await menu(page).boundingBox())!,
@@ -811,7 +810,7 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   });
   const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
   // Wide: the menu at the toolbar's left, its edge on the column's, over the box, the calculator
-  // and Settings after it; undo, redo, and clear all at the right end, the last button's edge on
+  // Filter, and Display after it; undo, redo, and clear all at the right end, the last button's edge on
   // the column's too, so a fill lines up with the table (Sean, 2026-10-10). The menu is as wide as
   // its widest label in the theme's font, so every theme is checked.
   for (const theme of THEMES) {
@@ -821,9 +820,8 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
     expect(Math.round(wide.toolbar.y - (wide.hint.y + wide.hint.height)), theme.id).toBe(8);
     expect(Math.abs(middle(wide.menu) - middle(wide.last)), theme.id).toBeLessThan(4);
     expect(wide.menu.x + wide.menu.width, theme.id).toBeLessThan(wide.calculator.x);
-    expect(wide.calculator.x + wide.calculator.width, theme.id).toBeLessThanOrEqual(
-      wide.settings.x,
-    );
+    expect(wide.calculator.x + wide.calculator.width, theme.id).toBeLessThanOrEqual(wide.filter.x);
+    expect(wide.filter.x + wide.filter.width, theme.id).toBeLessThanOrEqual(wide.settings.x);
     expect(wide.settings.x + wide.settings.width, theme.id).toBeLessThan(wide.undo.x);
     expect(Math.abs(wide.menu.x - wide.start.x), theme.id).toBeLessThanOrEqual(3);
     expect(
@@ -834,7 +832,7 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   }
 
   // A phone has no room for both: undo, redo, and clear all keep the top line at the right end,
-  // and the menu, the calculator, and Settings take the next, flush left, over the box.
+  // and the menu, the calculator, Filter, and Display take the next, flush left, over the box.
   await page.setViewportSize({ width: 375, height: 800 });
   for (const theme of THEMES) {
     await applyTheme(page, theme);

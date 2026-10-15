@@ -674,3 +674,13 @@ Format:
 
 **What happened.** The settings lab's glide, a unit checked in Hidden travelling to its row, ran as a same-document view transition (`document.startViewTransition`). In the converter, a second unit checked straight after the first never showed: while a view transition runs, Chrome hit-tests every press to the document element, and `::view-transition { pointer-events: none }`, the usual advice, did not change it. A browser test clicking during the 400 ms also made Playwright scroll the page as it retried.
 **Rule.** For motion inside a page someone keeps working in, move the real elements (measure, render the change at once, animate each from where it was with the Web Animations API, the FLIP technique; `features/converter/glide.ts`), so it stays interactive throughout. Keep view transitions for changes that replace the view, where a moment without input costs nothing.
+
+## 2026-10-15 — Safari scrolls to the top as a list is swapped
+
+**What happened.** Entering Edit replaces the table's rows with Edit's list, a little taller. Chrome kept the page where it was; WebKit (Safari, on the live site too) scrolled to the very top, with no script scrolling or focusing anything. WebKit has no scroll anchoring, and swapping the list left it at 0.
+**Rule.** Around a change that swaps a long part of the page, measure where it sat on the screen before (`getBoundingClientRect().top`) and scroll by the difference after, in a layout effect, as Edit and Done do in `ConversionTable`. Test page jumps in WebKit, not only Chromium (`npx playwright install webkit`).
+
+## 2026-10-15 — A glide on a decelerating curve reads as a jump
+
+**What happened.** Units moving between shown and hidden glided over 400 ms, yet Sean saw them snap in, on a phone and on a desktop. Freezing every animation 120 ms in showed why: the theme's easing, `cubic-bezier(0.2, 0, 0, 1)`, had done about 70 % of the travel, and the flash on it faded as fast. A list of `document.getAnimations()` said all was well; only frames showed it.
+**Rule.** Travel uses an even curve (`--motion-glide`); a decelerating one suits things appearing in place. Check motion by pausing animations at a few moments (`animation.pause(); animation.currentTime = t`) and looking, not by counting them. Measure positions on the page (adding the scroll offsets), or a page that scrolls as content changes slides everything by the scroll.

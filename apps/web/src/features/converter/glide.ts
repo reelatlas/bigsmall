@@ -2,14 +2,18 @@ import { flushSync } from 'react-dom';
 
 /**
  * A change to what the table shows, as a glide (docs/UX-SPEC.md §3; docs/DESIGN-SYSTEM.md,
- * "Motion"; Sean, 2026-10-15). Where each part of the table sits is measured, the change rendered
- * at once (flushSync), and each part that moved slides from where it was to where it is: a unit
- * keeps its key wherever it is, its row or its line in Hidden, so one checked in Hidden travels to
- * its row and the rows around it make room or close up; a part new to the table fades in. The
+ * "Motion"; Sean, 2026-10-15). Where each part of the table sits on the page is measured, the
+ * change rendered at once (flushSync), and each part that moved slides from where it was to where
+ * it is: a unit keeps its key wherever it is, its row or its line in Hidden, so one checked in
+ * Hidden travels to its row and the rows around it make room or close up; a part new to the table
+ * fades in, and one that left fades out where it was, a copy of it laid over the page. Positions
+ * are the page's, not the screen's, so the page scrolling as the table changes moves nothing. The
  * parts carry data attributes (ConversionTable). The rows themselves move, so the page stays
  * usable throughout: a view transition, which moves pictures of them, takes no clicks while it
  * runs (docs/LEARNINGS.md, "A view transition takes no clicks"). Its pace is the theme's
- * --motion-slow, which reduced motion zeroes, so then the change just happens.
+ * --motion-slow, which reduced motion zeroes, so then the change just happens, on --motion-glide,
+ * an even curve: the theme's own easing does most of its travel in the first fifth, and a glide
+ * then reads as a jump (Sean, 2026-10-15).
  */
 
 /** What moves, and the key that follows each part from one place to the other. */
@@ -21,6 +25,19 @@ const MOVING: ReadonlyArray<readonly [selector: string, key: (element: HTMLEleme
   ['[data-table-foot]', () => 'foot'],
 ];
 
+interface Place {
+  element: HTMLElement;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  /**
+   * The columns a row of the table's grid sat in, which a copy of it needs once it is out of the
+   * grid: a subgrid's own columns read only "subgrid", so they are its grid's, resolved.
+   */
+  columns: string | null;
+}
+
 function parts(root: HTMLElement): Map<string, HTMLElement> {
   const found = new Map<string, HTMLElement>();
   for (const [selector, key] of MOVING) {
@@ -29,6 +46,50 @@ function parts(root: HTMLElement): Map<string, HTMLElement> {
     }
   }
   return found;
+}
+
+/** The resolved columns of the nearest grid that is not a subgrid, for a row that is one. */
+function columnsOf(element: HTMLElement): string | null {
+  if (!getComputedStyle(element).gridTemplateColumns.startsWith('subgrid')) return null;
+  for (let at = element.parentElement; at; at = at.parentElement) {
+    const columns = getComputedStyle(at).gridTemplateColumns;
+    if (columns !== 'none' && !columns.startsWith('subgrid')) return columns;
+  }
+  return null;
+}
+
+function placeOf(element: HTMLElement): Place {
+  const box = element.getBoundingClientRect();
+  return {
+    element,
+    left: box.left + window.scrollX,
+    top: box.top + window.scrollY,
+    width: box.width,
+    height: box.height,
+    columns: columnsOf(element),
+  };
+}
+
+/** A part that left, copied where it was and faded out: never a field, a target, or a name to hear. */
+function fadeOut(place: Place, timing: KeyframeAnimationOptions) {
+  const copy = place.element.cloneNode(true) as HTMLElement;
+  for (const each of [copy, ...copy.querySelectorAll<HTMLElement>('[id]')])
+    each.removeAttribute('id');
+  copy.setAttribute('aria-hidden', 'true');
+  copy.inert = true;
+  Object.assign(copy.style, {
+    position: 'absolute',
+    left: `${place.left}px`,
+    top: `${place.top}px`,
+    width: `${place.width}px`,
+    height: `${place.height}px`,
+    margin: '0',
+    pointerEvents: 'none',
+  });
+  if (place.columns) copy.style.gridTemplateColumns = place.columns;
+  document.body.append(copy);
+  const remove = () => copy.remove();
+  copy.animate([{ opacity: 1 }, { opacity: 0 }], timing).finished.then(remove, remove);
 }
 
 /** Runs `change`, a state update, as a glide over the converter at `root`. */
@@ -40,26 +101,25 @@ export function glide(root: HTMLElement | null, change: () => void) {
     change();
     return;
   }
-  const easing = style.getPropertyValue('--motion-ease');
-  const before = new Map(
-    [...parts(root)].map(([key, element]) => [key, element.getBoundingClientRect()]),
-  );
+  const timing = { duration, easing: style.getPropertyValue('--motion-glide') };
+  const before = new Map([...parts(root)].map(([key, element]) => [key, placeOf(element)]));
   flushSync(change);
+  const after = parts(root);
   // What slides in from outside the card stays inside its edge on the way.
   card.animate([{ clipPath: 'inset(0)' }, { clipPath: 'inset(0)' }], { duration });
-  for (const [key, element] of parts(root)) {
+  for (const [key, element] of after) {
     const was = before.get(key);
     if (!was) {
-      element.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing });
+      element.animate([{ opacity: 0 }, { opacity: 1 }], timing);
       continue;
     }
-    const now = element.getBoundingClientRect();
+    const now = placeOf(element);
     const x = was.left - now.left;
     const y = was.top - now.top;
     if (Math.abs(x) < 0.5 && Math.abs(y) < 0.5) continue;
-    element.animate([{ transform: `translate(${x}px, ${y}px)` }, { transform: 'none' }], {
-      duration,
-      easing,
-    });
+    element.animate([{ transform: `translate(${x}px, ${y}px)` }, { transform: 'none' }], timing);
+  }
+  for (const [key, place] of before) {
+    if (!after.has(key)) fadeOut(place, timing);
   }
 }

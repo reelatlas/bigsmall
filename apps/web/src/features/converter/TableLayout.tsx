@@ -33,11 +33,10 @@ import type { ConverterEnv } from './useConverter';
 /**
  * The converter from md (docs/UX-SPEC.md §1): the toolbar, the box, and its table in the first
  * column, and the side panel open (the calculator, Filter, or Display) in a column of its own on
- * their right. Its card is a subgrid of the first three rows, so its title row sits level with the
- * toolbar, its lead (the calculator's display, a settings panel's first choice) level with the
- * box, and the rest in the third row, which the table shares with the last; the last row, 1fr,
- * takes the rest of a long table, so the card hugs its content and the table always sits right
- * under the box. Below md the side panel opens between the box and the table, flush left.
+ * their right, its top level with the box's (Sean, 2026-10-15). It spans the box's row, the
+ * table's, and the last, 1fr, which takes whatever of it is taller than the box and the table, so
+ * the table always sits right under the box. Below md the side panel opens between the box and the
+ * table, flush left.
  */
 const TABLE_GRID =
   'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_auto_1fr] md:gap-x-4';
@@ -67,14 +66,12 @@ const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
  */
 const TABLE_ROWS_CELL = '@container mt-2 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';
 /**
- * Where a side panel opens (docs/DESIGN-SYSTEM.md, "Calculator" and "Side panels"): 16 px from the
- * box and from the table, a panel apart, at most 384 px wide. From md, a column of its own: a
- * subgrid of the first three rows, and the card in it one too (`*:`), its three parts in the three
- * rows. The card's top padding shrinks to 1 px there, so its title row, 44 px and its 8 px margin,
- * sits as high as the toolbar's icons and never makes the first row taller.
+ * Where a side panel opens (docs/DESIGN-SYSTEM.md, "Side panels"): 16 px from the box and from the
+ * table, a panel apart, at most 384 px wide. From md, a column of its own, its top on the box's,
+ * as tall as its card (`self-start`).
  */
 const TABLE_SIDE_CELL =
-  'my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-1 md:my-0 md:grid md:w-72 md:grid-rows-subgrid md:*:row-span-3 md:*:grid md:*:grid-rows-subgrid md:*:pt-px';
+  'my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-2 md:my-0 md:w-72 md:self-start';
 
 /**
  * Keys that type into the field from a control beside it (a toolbar's, the chip, a copy button):
@@ -185,6 +182,14 @@ export function TableLayout({
   const [editingIn, setEditingIn] = useState<string | null>(null);
   const editing = table.kind === 'units' && editingIn === table.category;
   const [hiddenOpen, setHiddenOpen] = useState(false);
+  /**
+   * Edit ends, as Done ends it, when the box changes (typing in it, or typing from the table that
+   * lands in it) or Escape is pressed there: back in the box, converting is the job again.
+   */
+  const endEdit = () => {
+    setEditingIn(null);
+    setHiddenOpen(false);
+  };
   /** The hidden matches shown, for the query they were shown for: a new query hides them again. */
   const [revealedFor, setRevealedFor] = useState<string | null>(null);
   const revealed = table.kind === 'matches' && revealedFor === table.query;
@@ -247,6 +252,7 @@ export function TableLayout({
     const input = inputRef.current;
     if (!input) return;
     const text = key === 'Backspace' ? input.value.slice(0, -1) : input.value + key;
+    if (editing) endEdit();
     caretToEnd.current = true;
     input.focus();
     dispatch({ type: 'input', text, at: performance.now() });
@@ -310,7 +316,10 @@ export function TableLayout({
         return;
       }
       if (event.key === 'Escape') {
-        if (clearStep()) event.preventDefault();
+        if (editing) {
+          endEdit();
+          event.preventDefault();
+        } else if (clearStep()) event.preventDefault();
         return;
       }
       if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -415,6 +424,7 @@ export function TableLayout({
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (editing) endEdit();
     dispatch({
       type: 'input',
       text: event.currentTarget.value,
@@ -480,7 +490,8 @@ export function TableLayout({
         // lets go, leaving just the page. Right after Enter the cursor only rests, so the first
         // Escape already clears.
         event.preventDefault();
-        if (browsing) {
+        if (editing) endEdit();
+        else if (browsing) {
           setPosition(null);
           inputRef.current?.scrollIntoView({ block: 'nearest' });
         } else if (!clearStep()) inputRef.current?.blur();

@@ -16,6 +16,7 @@ import {
 } from 'react';
 import { useColumnsFit } from '../lib/fit-step';
 import { flash } from '../lib/flash';
+import { panelKeys } from '../lib/panel-keys';
 import {
   CURSOR_ROW,
   cx,
@@ -212,12 +213,18 @@ function valueParts(
   return { text, whole: text.slice(0, at), decimals: text.slice(at) };
 }
 
+/** Which of the two lists a unit's line is in: the shown units in Edit, or Hidden. */
+type List = 'shown' | 'hidden';
+
 /** A checkbox for a section: checked for all its units, a dash for some, clear for none. */
 function SectionCheckbox({
   state,
+  spot,
   onChange,
 }: {
   state: 'all' | 'some' | 'none';
+  /** Where focus can come back to after a change (`data-spot`). */
+  spot: string;
   onChange: () => void;
 }) {
   const ref = useRef<HTMLInputElement>(null);
@@ -231,6 +238,7 @@ function SectionCheckbox({
       checked={state === 'all'}
       onChange={onChange}
       className={CHECKBOX}
+      data-spot={spot}
     />
   );
 }
@@ -238,9 +246,11 @@ function SectionCheckbox({
 /**
  * The table's units (docs/UX-SPEC.md §1, §3): those the settings show, in their sections, each
  * headed; those they hide in a Hidden list at the foot, under their sections' names; and Edit,
- * which makes each shown row a checkbox, the hidden units staying in Hidden, so shown units are
- * always above and hidden ones below and a checkbox moves a unit between them (Sean,
- * 2026-10-15). The field keeps focus and its cursor moves
+ * which lists the shown units as Hidden lists its own, a checkbox, the symbol, and the name, with
+ * no values, the hidden units staying in Hidden below, so a checkbox moves a unit between the two
+ * (Sean, 2026-10-15). The table's controls (its foot, Edit, Hidden) take the arrows as a panel
+ * does, Edit Escape too, and after a unit moves focus stays where it was, on the line that took
+ * its place. The field keeps focus and its cursor moves
  * through the shown rows (aria-activedescendant on a grid, ADR 0012), so the rows are no Tab
  * stops; a click or tap on one is the field's to act on, and focus stays in the field. With copy
  * buttons on, each row's sits in a cell of its own beside it, out of the Tab order like the box's
@@ -331,39 +341,26 @@ export function ConversionTable<T extends ConversionRow>({
     return fraction ? writtenText(row, fraction) : null;
   };
 
-  /**
-   * A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and
-   * name. In Edit the row's checkbox leads the value's first cell, set in as a tree's child.
-   */
-  const cells = (row: T, muted = false, check?: ReactNode) => {
+  /** A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and name. */
+  const cells = (row: T) => {
     const [base, exponent] = splitExponent(row.symbol);
     const fraction = both ? second(row) : null;
     const value = parts(row);
-    const tone = muted ? 'text-ink-muted' : TONE[row.tone];
-    const lead = (cell: string, content: ReactNode) => (
-      <span className={cx(cell, check ? 'flex items-center gap-3' : null, tone)}>
-        {check && <span className="pl-6">{check}</span>}
-        {check ? <span className="ml-auto">{content}</span> : content}
-      </span>
-    );
+    const tone = TONE[row.tone];
     return (
       <>
         {'across' in value ? (
-          lead(
-            cx(ACROSS_CELL, 'text-right'),
-            <>
-              {value.across}
-              {row.tone === 'empty' && <span className="sr-only">no value</span>}
-            </>,
-          )
+          <span className={cx(ACROSS_CELL, 'text-right', tone)}>
+            {value.across}
+            {row.tone === 'empty' && <span className="sr-only">no value</span>}
+          </span>
         ) : (
           <>
-            {lead(
-              WHOLE_CELL,
+            <span className={cx(WHOLE_CELL, tone)}>
               <span aria-hidden="true" data-whole>
                 <FormattedNumber text={value.whole} />
-              </span>,
-            )}
+              </span>
+            </span>
             <span aria-hidden="true" className={cx(DECIMALS_CELL, tone)}>
               <FormattedNumber text={value.decimals} />
             </span>
@@ -390,7 +387,7 @@ export function ConversionTable<T extends ConversionRow>({
           <span
             aria-hidden="true"
             hidden={namesHidden}
-            className={cx(NAME_CELL, muted ? 'text-ink-muted' : 'text-ink')}
+            className={cx(NAME_CELL, 'text-ink')}
             data-name
             data-column="name"
           >
@@ -471,37 +468,146 @@ export function ConversionTable<T extends ConversionRow>({
     </div>
   );
 
-  const checkbox = (row: T, on: boolean) => (
+  /**
+   * Units moved from one list to the other by a checkbox. If focus was on it, it comes back to the
+   * line that takes the moved one's place in its list (the next, or else the one before), so
+   * Enter or Space can go down a list unit by unit; the effect below puts it there once drawn.
+   */
+  const focusNext = useRef<{ list: List; spot: string } | null>(null);
+  const move = (list: List, rows: readonly T[], show: boolean, from: string) => {
+    if (cardRef.current?.contains(document.activeElement)) {
+      const leaving = new Set(rows.map((row) => row.id));
+      const groups = list === 'shown' ? sections : hidden;
+      const spots = groups.flatMap((section) => [
+        `section:${section.key}`,
+        ...section.rows.map((row) => row.id),
+      ]);
+      // Where focus can land: a heading that keeps a unit, and units that stay, but never the
+      // box's unit, whose checkbox is fixed.
+      const staying = new Set(
+        groups.flatMap((section) => {
+          const left = section.rows.filter((row) => !leaving.has(row.id));
+          const open = left.filter((row) => !row.inBox).map((row) => row.id);
+          return left.length ? [`section:${section.key}`, ...open] : [];
+        }),
+      );
+      const at = spots.indexOf(from);
+      const next = staying.has(from)
+        ? from
+        : (spots.slice(at + 1).find((spot) => staying.has(spot)) ??
+          spots
+            .slice(0, at)
+            .reverse()
+            .find((spot) => staying.has(spot)));
+      focusNext.current = { list, spot: next ?? '' };
+    }
+    onChoose(rows, show);
+  };
+  useLayoutEffect(() => {
+    const pending = focusNext.current;
+    const card = cardRef.current;
+    if (!pending || !card) return;
+    focusNext.current = null;
+    const there = pending.spot
+      ? card.querySelector<HTMLElement>(
+          `[data-list="${pending.list}"] [data-spot="${pending.spot}"]`,
+        )
+      : null;
+    (there ?? card.querySelector<HTMLElement>('[data-edit]'))?.focus({ preventScroll: true });
+  });
+
+  /**
+   * Where the card's top sat on the screen as Edit started or ended, so it stays there: nothing
+   * over the list moves. WebKit (Safari) otherwise scrolls the page to its top as Edit's list
+   * takes the rows' place (docs/LEARNINGS.md, "Safari scrolls to the top as a list is swapped").
+   */
+  const editAnchor = useRef<number | null>(null);
+  const holdCard = () => {
+    editAnchor.current = cardRef.current?.getBoundingClientRect().top ?? null;
+  };
+  useLayoutEffect(() => {
+    const was = editAnchor.current;
+    const card = cardRef.current;
+    editAnchor.current = null;
+    if (was === null || !card) return;
+    const moved = card.getBoundingClientRect().top - was;
+    if (Math.abs(moved) >= 1) window.scrollBy(0, moved);
+  }, [editing]);
+
+  /** Ends Edit, as Done does, folding Hidden, with focus back on the button that reads Edit again. */
+  const endEdit = () => {
+    holdCard();
+    onEditing(false);
+    onHiddenOpen(false);
+    cardRef.current?.querySelector<HTMLElement>('[data-edit]')?.focus();
+  };
+
+  // The table's own controls take the arrows as a panel's do; in Edit, Escape ends it. Out of
+  // Edit, Escape is the layout's (back to the box).
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (!card) return undefined;
+    const onKeyDown = panelKeys(card, editing ? endEdit : undefined);
+    card.addEventListener('keydown', onKeyDown);
+    return () => card.removeEventListener('keydown', onKeyDown);
+  });
+
+  const checkbox = (row: T, on: boolean, list: List) => (
     <input
       id={`${checkId}-${row.id}`}
       type="checkbox"
       checked={on}
       // The unit in the box always shows.
       disabled={row.inBox}
-      onChange={() => onChoose([row], !on)}
+      onChange={() => move(list, [row], !on, row.id)}
       className={CHECKBOX}
+      data-spot={row.id}
     />
   );
 
-  /** A section's heading with its three-state checkbox, in Edit and the Hidden list. */
-  const headedCheck = (
-    label: string,
-    rows: readonly T[],
-    edge: string,
-    marker: Record<`data-${string}`, string>,
-  ) => {
-    const shownCount = rows.filter(isShown).length;
-    const state = shownCount === rows.length ? 'all' : shownCount === 0 ? 'none' : 'some';
-    const movable = rows.filter((row) => !row.inBox);
+  /** A section's heading with its three-state checkbox, acting on the units listed under it. */
+  const headedCheck = (section: RowSection<T>, list: List, edge: string) => {
+    const shownCount = section.rows.filter(isShown).length;
+    const state = shownCount === section.rows.length ? 'all' : shownCount === 0 ? 'none' : 'some';
+    const movable = section.rows.filter((row) => !row.inBox);
+    const marker =
+      list === 'shown' ? { 'data-section': section.key } : { 'data-hidden-section': section.key };
+    const spot = `section:${section.key}`;
     return (
       <h3 className={edge} {...marker}>
         <label className={cx(PANEL_TITLE, 'flex min-h-11 items-center gap-2 px-2')}>
-          <SectionCheckbox state={state} onChange={() => onChoose(movable, state !== 'all')} />
-          {label}
+          <SectionCheckbox
+            state={state}
+            spot={spot}
+            onChange={() => move(list, movable, state !== 'all', spot)}
+          />
+          {section.label}
         </label>
       </h3>
     );
   };
+
+  /**
+   * A unit as a line of a list, in Edit and in Hidden alike: its checkbox, set in under its
+   * section's as a tree's child, the symbol, and the name where names show; no values, since the
+   * lists are for choosing units. The box's unit keeps its fill, checked and fixed.
+   */
+  const line = (row: T, list: List) => (
+    <label
+      key={row.id}
+      htmlFor={`${checkId}-${row.id}`}
+      data-unit={row.id}
+      className={cx(
+        CURSOR_ROW,
+        'flex items-center gap-2 pl-8',
+        row.inBox ? rowFill(true, false) : 'hover:bg-surface-raised',
+      )}
+    >
+      {checkbox(row, list === 'shown', list)}
+      <span className={unitSymbol()}>{row.symbol}</span>
+      <span className={withNames ? 'truncate text-ink' : 'sr-only'}>{row.name}</span>
+    </label>
+  );
 
   /** Where each section's rows start in the cursor's count. */
   const starts = sections.map((_, at) =>
@@ -577,50 +683,21 @@ export function ConversionTable<T extends ConversionRow>({
     </div>
   );
 
-  /**
-   * Edit: the shown units in their sections, each a checkbox set in under its section's, as a
-   * tree's child; unchecked, a unit leaves for Hidden at once.
-   */
-  const checklist = (
-    <div ref={gridRef} className={ROWS}>
+  /** Edit: the shown units in their sections, as Hidden lists its own. */
+  const shownList = (
+    <div data-list="shown">
       {sections.map((section, at) => (
-        <div
-          key={section.key}
-          role="group"
-          aria-label={section.label}
-          className="col-span-8 grid grid-cols-subgrid gap-y-0.5"
-        >
-          <div className="col-span-8">
-            {headedCheck(section.label, section.rows, sectionEdge(at), {
-              'data-section': section.key,
-            })}
-          </div>
-          {section.rows.map((row) => {
-            const on = isShown(row);
-            return (
-              <label
-                key={row.id}
-                htmlFor={`${checkId}-${row.id}`}
-                data-unit={row.id}
-                className={cx(
-                  CURSOR_ROW,
-                  'col-span-8 grid grid-cols-subgrid items-center',
-                  rowFill(row.inBox, false),
-                )}
-              >
-                {cells(row, !on, checkbox(row, on))}
-              </label>
-            );
-          })}
+        <div key={section.key} role="group" aria-label={section.label}>
+          {headedCheck(section, 'shown', sectionEdge(at))}
+          {section.rows.map((row) => line(row, 'shown'))}
         </div>
       ))}
-      {sizer}
     </div>
   );
 
   let body: ReactNode;
   if (message) body = <p className="px-2 py-2.5 font-medium text-danger">{message}</p>;
-  else body = editing ? checklist : grid;
+  else body = editing ? shownList : grid;
 
   return (
     <section aria-labelledby={titleId}>
@@ -630,7 +707,16 @@ export function ConversionTable<T extends ConversionRow>({
       <p id={moveHintId} className="sr-only">
         Moves this unit into the box.
       </p>
-      <div ref={cardRef} className={cx(LIST_CARD, 'p-2')} data-table-card>
+      <div
+        ref={cardRef}
+        // In Edit the card is where the keys go, its edge the accent while focus is in it.
+        className={cx(
+          LIST_CARD,
+          'p-2',
+          editing && 'transition-[border-color] focus-within:border-accent',
+        )}
+        data-table-card
+      >
         {body}
         {/* The foot keeps its place in Edit, nothing over the list moving: Edit reads Done where it
             was, and Hidden stays. Over a long list the foot stays at the screen's bottom edge, Done
@@ -668,42 +754,37 @@ export function ConversionTable<T extends ConversionRow>({
             ) : (
               <span className="px-2 text-sm text-ink-muted">Every unit shown</span>
             )}
-            {/* Done folds Hidden too: whoever just chose what to hide should not have to fold it. */}
+            {/* Done, switched on to show Edit is, folds Hidden too: whoever just chose what to hide
+                should not have to fold it. */}
             <Button
               variant="ghost"
               nested
+              on={editing}
               onClick={() => {
-                onEditing(!editing);
-                if (editing) onHiddenOpen(false);
+                if (editing) endEdit();
+                else {
+                  holdCard();
+                  onEditing(true);
+                }
               }}
               className="text-sm"
+              data-edit
             >
               {editing ? 'Done' : 'Edit'}
             </Button>
           </div>
         )}
         {/* The Hidden list names its units, without values: it is for bringing them back. */}
-        {!message &&
-          hiddenOpen &&
-          hidden.map((section) => (
-            <div key={section.key} role="group" aria-label={`Hidden, ${section.label}`}>
-              {headedCheck(section.label, section.rows, 'pt-1', {
-                'data-hidden-section': section.key,
-              })}
-              {section.rows.map((row) => (
-                <label
-                  key={row.id}
-                  htmlFor={`${checkId}-${row.id}`}
-                  data-unit={row.id}
-                  className={cx(CURSOR_ROW, 'flex items-center gap-2 pl-8 hover:bg-surface-raised')}
-                >
-                  {checkbox(row, false)}
-                  <span className={unitSymbol()}>{row.symbol}</span>
-                  <span className={withNames ? 'truncate text-ink' : 'sr-only'}>{row.name}</span>
-                </label>
-              ))}
-            </div>
-          ))}
+        {!message && hiddenOpen && (
+          <div data-list="hidden">
+            {hidden.map((section) => (
+              <div key={section.key} role="group" aria-label={`Hidden, ${section.label}`}>
+                {headedCheck(section, 'hidden', 'pt-1')}
+                {section.rows.map((row) => line(row, 'hidden'))}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

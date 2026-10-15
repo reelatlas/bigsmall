@@ -54,25 +54,19 @@ export function SettingSamples({ theme }: { theme: string }) {
         <Switch label="Switch, on" checked onChange={noop} />
       </div>
       <div className="max-w-72">
-        <SidePanel
-          title="Display"
-          focusOnOpen={false}
-          onClose={noop}
-          lead={
-            <fieldset className="grid">
-              <legend className="sr-only">Side panel's lead</legend>
-              <SegmentedControl
-                name={`${id}-lead`}
-                options={[
-                  { value: 'symbol', label: 'Symbol only' },
-                  { value: 'both', label: 'Symbol and name' },
-                ]}
-                value="symbol"
-                onChange={noop}
-              />
-            </fieldset>
-          }
-        >
+        <SidePanel title="Display" focusOnOpen={false} onClose={noop}>
+          <fieldset className="grid">
+            <legend className="sr-only">Unit names</legend>
+            <SegmentedControl
+              name={`${id}-side`}
+              options={[
+                { value: 'symbol', label: 'Symbol only' },
+                { value: 'both', label: 'Symbol and name' },
+              ]}
+              value="symbol"
+              onChange={noop}
+            />
+          </fieldset>
           <Switch label="Copy buttons" checked={false} onChange={noop} />
         </SidePanel>
       </div>

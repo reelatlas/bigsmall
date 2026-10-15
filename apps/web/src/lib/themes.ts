@@ -91,8 +91,19 @@ export const TOKEN_CONTRACT = {
   type: ['type-display', 'type-body', 'type-numeric'],
   shape: ['shape-sm', 'shape-md', 'shape-lg'],
   elevation: ['elevation-sm', 'elevation-md'],
-  /** highlight-fade is a fade of color with no movement: reduced motion keeps it (lib/flash.ts). */
-  motion: ['motion-fast', 'motion-base', 'motion-slow', 'motion-ease', 'highlight-fade'],
+  /**
+   * motion-glide is the even curve for something travelling a distance (a unit gliding to its
+   * place), where motion-ease front-loads; highlight-fade is a fade of color with no movement:
+   * reduced motion keeps it (lib/flash.ts).
+   */
+  motion: [
+    'motion-fast',
+    'motion-base',
+    'motion-slow',
+    'motion-ease',
+    'motion-glide',
+    'highlight-fade',
+  ],
   /** Theme art's palette: decoration, so it has no contrast pair. */
   art: ['art-1', 'art-2', 'art-3'],
 } as const;

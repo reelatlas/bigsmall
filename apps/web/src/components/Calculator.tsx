@@ -120,8 +120,7 @@ export interface CalculatorProps {
  * open. What a key does is the caller's (features/converter/calculator.ts).
  *
  * The card is three parts, one after another: the title row, the display, and the keys with the
- * footer. A host that makes the card a subgrid lines them up with rows of its own (TableLayout
- * from md: the display level with the box).
+ * footer. The converter opens it as a side panel (TableLayout), its top level with the box.
  */
 export function Calculator({
   display,

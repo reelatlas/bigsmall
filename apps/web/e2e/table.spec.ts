@@ -615,7 +615,7 @@ test('the live region says how many units the value is shown in', async ({ page 
   );
 });
 
-test('the calculator takes a column from md, its top level with the toolbar and its display with the box, and sits between them below it', async ({
+test('a side panel takes a column from md, its top level with the box, and sits between the box and the table below it', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -636,17 +636,20 @@ test('the calculator takes a column from md, its top level with the toolbar and 
   await page.getByRole('button', { name: 'Calculator', exact: true }).click();
   const wide = {
     calculator: (await calculator.boundingBox())!,
-    display: (await calculator.locator('[data-entry]').boundingBox())!,
     table: (await table.boundingBox())!,
-    field: (await box(page).boundingBox())!,
-    toolbar: (await page.getByRole('toolbar', { name: 'Tools' }).boundingBox())!,
+    field: (await field.boundingBox())!,
     converter: (await page.getByRole('region', { name: 'Unit converter' }).boundingBox())!,
   };
-  const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
   expect(wide.calculator.x).toBeGreaterThan(wide.table.x + wide.table.width);
-  // Its top level with the toolbar's, and its display level with the box.
-  expect(Math.abs(wide.calculator.y - wide.toolbar.y)).toBeLessThan(1);
-  expect(Math.abs(middle(wide.display) - middle(wide.field))).toBeLessThan(1);
+  // Its top level with the box's (Sean, 2026-10-15), and so is a settings panel's.
+  expect(Math.abs(wide.calculator.y - wide.field.y)).toBeLessThan(1);
+  for (const name of ['Filter', 'Display'] as const) {
+    await settingsButton(page, name).click();
+    const panel = (await page.getByRole('group', { name, exact: true }).boundingBox())!;
+    expect(Math.abs(panel.y - wide.field.y), name).toBeLessThan(1);
+    expect(await gapUnderBox(), name).toBe(closed);
+  }
+  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
   // Flush right with the page, and the table still right under the box.
   expect(
     Math.abs(wide.calculator.x + wide.calculator.width - (wide.converter.x + wide.converter.width)),

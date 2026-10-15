@@ -37,4 +37,5 @@
   --motion-slow: 260ms;
   --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --highlight-fade: 1200ms;
+  --motion-glide: cubic-bezier(0.4, 0, 0.2, 1);
 }

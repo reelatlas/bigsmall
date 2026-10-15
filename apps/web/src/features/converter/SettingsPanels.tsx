@@ -182,7 +182,7 @@ function Reset({
 
 /**
  * Filter (docs/UX-SPEC.md §1, §3; ADR 0017): what search and the table show, in every category.
- * The presets lead, level with the box; then a switch per system, and the resets: the switches
+ * The presets first; then a switch per system, and the resets: the switches
  * back to the Standard units (single units chosen in a table stay as set), and Unhide units.
  */
 export function FilterPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
@@ -192,19 +192,14 @@ export function FilterPanel({ settings, preference, onSettings, onClose }: Setti
     onSettings((now) => ({ ...now, rule: next(now.rule) }));
   const { copied: done, markCopied, pointerProps } = useCopied<'reset' | 'unhide'>();
   return (
-    <SidePanel
-      title="Filter"
-      onClose={onClose}
-      lead={
-        <Choices<ShowPreset>
-          legend="Show"
-          hideLegend
-          options={SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name }))}
-          value={presetOf(rule.shown, preference)}
-          onChange={(preset) => setRule((now) => withSystems(now, presetKeys(preset, preference)))}
-        />
-      }
-    >
+    <SidePanel title="Filter" onClose={onClose}>
+      <Choices<ShowPreset>
+        legend="Show"
+        hideLegend
+        options={SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name }))}
+        value={presetOf(rule.shown, preference)}
+        onChange={(preset) => setRule((now) => withSystems(now, presetKeys(preset, preference)))}
+      />
       <div className="grid gap-1">
         <fieldset className="grid">
           <legend className="sr-only">Systems</legend>
@@ -259,7 +254,7 @@ export function FilterPanel({ settings, preference, onSettings, onClose }: Setti
 
 /**
  * Display (docs/UX-SPEC.md §1, §7; ADR 0017): how results look. Symbols alone or with names
- * leads, level with the box; then copy buttons, the format, what values round to, which way, and
+ * first; then copy buttons, the format, what values round to, which way, and
  * a reset of all of it.
  */
 export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelProps) {
@@ -269,22 +264,17 @@ export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelPro
   const both = display.format === 'both';
   const { copied: done, markCopied, pointerProps } = useCopied<'reset'>();
   return (
-    <SidePanel
-      title="Display"
-      onClose={onClose}
-      lead={
-        <Choices<Display['names']>
-          legend="Unit names"
-          hideLegend
-          options={[
-            { value: 'symbol', label: 'Symbol only' },
-            { value: 'both', label: 'Symbol and name' },
-          ]}
-          value={display.names}
-          onChange={(names) => setDisplay({ names })}
-        />
-      }
-    >
+    <SidePanel title="Display" onClose={onClose}>
+      <Choices<Display['names']>
+        legend="Unit names"
+        hideLegend
+        options={[
+          { value: 'symbol', label: 'Symbol only' },
+          { value: 'both', label: 'Symbol and name' },
+        ]}
+        value={display.names}
+        onChange={(names) => setDisplay({ names })}
+      />
       <Switch
         label="Copy buttons"
         checked={display.copy}

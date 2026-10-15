@@ -156,6 +156,45 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
   await expect(row(page, 'us-teaspoon')).toBeVisible();
 });
 
+test('Edit lists units as Hidden does and takes the keys: the arrows move, Enter moves a unit and focus stays, Escape or typing ends it', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  const edit = table(page).getByRole('button', { name: 'Edit', exact: true });
+  await edit.focus();
+  await page.keyboard.press('Enter');
+  const done = table(page).getByRole('button', { name: 'Done' });
+  await expect(done).toBeFocused();
+  // No values in Edit: each unit is a checkbox, its symbol, and its name, as in Hidden.
+  await expect(table(page).locator('[data-row]')).toHaveCount(0);
+  await expect(table(page).locator('[data-whole]')).toHaveCount(0);
+  const line = (name: RegExp) =>
+    table(page).getByRole('group', { name: 'US (customary)', exact: true }).getByLabel(name);
+  await page.keyboard.press('Home');
+  await page.keyboard.press('ArrowDown');
+  await expect(line(/teaspoons/)).toBeFocused();
+  // Enter hides it, and focus stays where it was, on the line that took its place.
+  await page.keyboard.press('Enter');
+  await expect(line(/teaspoons/)).toHaveCount(0);
+  await expect(line(/tablespoons/)).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(line(/fluid ounces/)).toBeFocused();
+  await expect(hiddenToggle(page)).toContainText(String(SPECIALIST + 2));
+  // Escape ends Edit, focus on the button that reads Edit again.
+  await page.keyboard.press('Escape');
+  await expect(edit).toBeFocused();
+  await expect(table(page).locator('[data-row]').first()).toBeVisible();
+  // Typing ends it too, landing in the box.
+  await page.keyboard.press('Enter');
+  await expect(done).toBeFocused();
+  await page.keyboard.press('5');
+  await expect(box(page)).toHaveValue('25');
+  await expect(edit).toBeVisible();
+});
+
 test('search leaves hidden units out and offers them; taking one unhides it', async ({ page }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
@@ -285,6 +324,52 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     .getByLabel(/teaspoons/)
     .click();
   expect(await animated('[data-table-foot] button[aria-expanded]', 'backgroundColor')).toBe(true);
+  // With Hidden folded, the unit that left fades out where it was, rather than vanishing.
+  await hiddenToggle(page).click();
+  await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');
+  await table(page)
+    .getByRole('group', { name: 'US (customary)', exact: true })
+    .getByLabel(/tablespoons/)
+    .click();
+  expect(
+    await page.evaluate(() =>
+      [...document.body.children].some(
+        (child) =>
+          child instanceof HTMLElement &&
+          child.dataset.unit === 'us-tablespoon' &&
+          child.style.position === 'absolute' &&
+          child.getAnimations().length > 0,
+      ),
+    ),
+  ).toBe(true);
+});
+
+test('a glide moves only what moved on the page, however the page scrolls', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 640 });
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await hiddenToggle(page).click();
+  const cubicInches = page
+    .getByRole('group', { name: 'Hidden, Specialty' })
+    .getByLabel(/cubic inches/);
+  await cubicInches.scrollIntoViewIfNeeded();
+  await cubicInches.click();
+  await expect(row(page, 'cubic-inch')).toBeVisible();
+  // The rows above the one that arrived did not move on the page, so none of them slides.
+  const moved = await page.evaluate(
+    () =>
+      document
+        .getAnimations()
+        .filter(
+          (animation) =>
+            animation.effect instanceof KeyframeEffect &&
+            animation.effect.target instanceof HTMLElement &&
+            ['us-teaspoon', 'milliliter', 'imperial-gallon'].includes(
+              animation.effect.target.dataset.row ?? '',
+            ),
+        ).length,
+  );
+  expect(moved).toBe(0);
 });
 
 test('with reduced motion a unit moves at once, and still flashes, a change of color only', async ({

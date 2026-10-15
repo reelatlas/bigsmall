@@ -85,6 +85,12 @@ function typesIntoField(event: globalThis.KeyboardEvent): boolean {
   return event.key === 'Backspace' || (event.key.length === 1 && event.key !== ' ');
 }
 
+/**
+ * Categories whose values go below zero as often as not (-40 °C, -90°): the box keeps the full
+ * keyboard there, since a phone's number pad has no minus (docs/UX-SPEC.md §1).
+ */
+const SIGNED: ReadonlySet<CategoryId> = new Set(['temperature', 'angle']);
+
 /** Which list the table's place shows, for a cursor to belong to: the start, the matches, or one category's units. */
 function viewKeyOf(view: TableView): string {
   return view.kind === 'units' ? `units:${view.category}` : view.kind;
@@ -656,6 +662,10 @@ export function TableLayout({
             }}
             trailing={copyButton}
             symbolOnly={display.names === 'symbol'}
+            // With a unit in the chip the box takes a number alone, so a phone brings up its
+            // number pad; with none, letters type a unit ("2 cups"), and the chip's × brings
+            // them back (Sean, 2026-10-15).
+            numberPad={box.unit !== null && !SIGNED.has(box.unit.category)}
             onChange={onChange}
             onKeyDown={onKeyDown}
             // The chip is a readout here, and part of the box: clicking or tapping it puts the

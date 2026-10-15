@@ -41,6 +41,11 @@ export interface ValueFieldProps {
   trailing?: ReactNode;
   /** Symbol only (docs/UX-SPEC.md §7): the chip shows its symbol alone, as when it lacks the room. */
   symbolOnly?: boolean;
+  /**
+   * The field takes a number alone (a unit in the chip, no sign likely): a touch screen brings up
+   * its number pad rather than letters (docs/UX-SPEC.md §1, ADR 0015).
+   */
+  numberPad?: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
   /** The chip's body was clicked or tapped. */
@@ -75,6 +80,7 @@ export function ValueField({
   popup,
   trailing,
   symbolOnly = false,
+  numberPad = false,
   onChange,
   onKeyDown,
   onChipOpen,
@@ -128,6 +134,7 @@ export function ValueField({
             autoCapitalize="off"
             autoCorrect="off"
             spellcheck={false}
+            inputMode={numberPad ? 'decimal' : 'text'}
             enterKeyHint="done"
             placeholder={placeholder}
             value={text}

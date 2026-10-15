@@ -103,6 +103,9 @@ function tableOf(state: Partial<ConverterState>, rule?: ViewRule): TableView {
 /** Names and copy buttons on, the way the table showed before Settings. */
 const NAMED: Display = { ...FRESH_DISPLAY, names: 'both', copy: true, places: null };
 
+/** Symbol only: the names off the screen. */
+const SYMBOLS: Display = { ...FRESH_DISPLAY, names: 'symbol' };
+
 /** A table in a frozen state: nothing it does changes anything. */
 function TableSample({
   view,
@@ -200,7 +203,12 @@ function TableSamples() {
         copied="liter"
         itemId={itemIds('values')}
       />
-      <TableSample view={dashes} title="Area, no unit yet" itemId={itemIds('dashes')} />
+      <TableSample
+        view={dashes}
+        title="Area, no unit yet, symbols only"
+        display={SYMBOLS}
+        itemId={itemIds('dashes')}
+      />
       <div className="max-w-80">
         <TableSample
           view={narrow}
@@ -212,7 +220,7 @@ function TableSamples() {
       <TableSample
         view={feet}
         title="Length, decimals and fractions"
-        display={{ ...FRESH_DISPLAY, names: 'both', format: 'both' }}
+        display={{ ...FRESH_DISPLAY, format: 'both' }}
         itemId={itemIds('both')}
       />
       <TableSample

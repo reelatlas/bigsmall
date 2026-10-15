@@ -91,3 +91,23 @@ test('the chip’s ×, clear all, and the calculator, tapped, leave the keyboard
   await expect(box(page)).toHaveValue('');
   await expect(box(page)).not.toBeFocused();
 });
+
+test('with a unit in the box the number pad comes up, but not where values go below zero', async ({
+  page,
+}) => {
+  const mode = async (path: string) => {
+    await page.goto(path);
+    await ready(page);
+    return box(page).getAttribute('inputmode');
+  };
+  // No unit yet: letters type one ("2 cups").
+  expect(await mode('/')).toBe('text');
+  expect(await mode('/?a=milliliter')).toBe('decimal');
+  expect(await mode('/?a=celsius&v=-40')).toBe('text');
+  expect(await mode('/?a=degree')).toBe('text');
+  // The chip's × takes the unit out, and the letters come back.
+  await page.goto('/?a=milliliter&v=250');
+  await ready(page);
+  await page.getByRole('button', { name: 'Remove milliliters' }).tap();
+  await expect(box(page)).toHaveAttribute('inputmode', 'text');
+});

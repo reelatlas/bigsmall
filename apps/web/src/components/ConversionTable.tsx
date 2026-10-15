@@ -176,10 +176,11 @@ const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
  * heading's, about 16 px each side, and the first heading sits as far under the card's top as a
  * panel's title does, about 20 px, never hugging it. A grid's heading is a short line of small
  * text; Edit's is a 44 px row whose text sits 12 px inside it, so each takes its own padding to
- * show the same space.
+ * show the same space. A row that fills (hovered, focused) keeps 4 px between its fill and the
+ * line, so the two never touch.
  */
 function sectionEdge(at: number, kind: 'heading' | 'row'): string {
-  if (kind === 'row') return at === 0 ? '' : 'mt-1 border-t border-line pt-0.5';
+  if (kind === 'row') return at === 0 ? '' : 'mt-1 border-t border-line pt-1';
   return at === 0 ? 'pt-3' : 'mt-0.5 border-t border-line pt-3.5';
 }
 
@@ -805,7 +806,7 @@ export function ConversionTable<T extends ConversionRow>({
         {!message && (
           <div
             className={cx(
-              'mt-0.5 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-0.5',
+              'mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1',
               editing && 'sticky bottom-0 bg-surface',
             )}
             data-table-foot

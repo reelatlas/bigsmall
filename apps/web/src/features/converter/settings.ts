@@ -291,9 +291,12 @@ export interface Display {
   rounding: Rounding;
 }
 
-/** A fresh visit's: symbols, no copy buttons, two places, rounded to the nearest, eighths in waiting. */
+/**
+ * A fresh visit's: symbols with their names (Sean, 2026-10-15; symbols alone until then), no copy
+ * buttons, two places, rounded to the nearest, eighths in waiting.
+ */
 export const FRESH_DISPLAY: Display = {
-  names: 'symbol',
+  names: 'both',
   copy: false,
   format: 'decimal',
   places: 2,
@@ -409,29 +412,42 @@ interface StoredRule {
   overrides: [string, boolean][];
 }
 
-/** Settings as stored: plain JSON, versioned, so a later shape can read or drop an older one. */
+/**
+ * Settings as stored: plain JSON, versioned, so a later shape can read or drop an older one.
+ * Display keeps only what differs from a fresh visit's (version 2), so a default changed later
+ * reaches everyone who never chose otherwise; version 1, a day old, kept all of it.
+ */
 export interface StoredSettings {
-  v: 1;
+  v: 2;
   rule: StoredRule;
   kept: StoredRule | null;
   custom: boolean;
   order: string[] | null;
-  display: Omit<Display, 'fractions'> & { fractions: number[] };
+  display: Partial<Omit<Display, 'fractions'> & { fractions: number[] }>;
 }
 
 function storedRule(rule: ViewRule): StoredRule {
   return { shown: [...rule.shown], overrides: [...rule.overrides] };
 }
 
-/** Settings as they are stored. */
+/** Settings as stored, Display by what was changed. */
 export function storedOf(settings: Settings): StoredSettings {
+  const { display } = settings;
+  const fresh = FRESH_DISPLAY;
+  const changed: StoredSettings['display'] = {};
+  if (display.names !== fresh.names) changed.names = display.names;
+  if (display.copy !== fresh.copy) changed.copy = display.copy;
+  if (display.format !== fresh.format) changed.format = display.format;
+  if (display.places !== fresh.places) changed.places = display.places;
+  if (!sameSizes(display.fractions, fresh.fractions)) changed.fractions = [...display.fractions];
+  if (display.rounding !== fresh.rounding) changed.rounding = display.rounding;
   return {
-    v: 1,
+    v: 2,
     rule: storedRule(settings.rule),
     kept: settings.kept && storedRule(settings.kept),
     custom: settings.custom,
     order: settings.order && [...settings.order],
-    display: { ...settings.display, fractions: [...settings.display.fractions] },
+    display: changed,
   };
 }
 
@@ -461,11 +477,13 @@ function oneOf<T>(value: unknown, allowed: readonly T[], fallback: T): T {
 }
 
 /**
- * Stored settings read back, each part checked: a part that does not read falls back to a fresh
- * visit's, and anything that is not settings at all reads as none.
+ * Stored settings read back, each part checked: a part that does not read, or was never changed,
+ * falls back to a fresh visit's, and anything that is not settings at all reads as none. Version
+ * 1 stored every display setting, so its names cannot tell a choice from the old default, symbols
+ * alone: they take today's.
  */
 export function settingsFrom(value: unknown): Settings | null {
-  if (!isRecord(value) || value.v !== 1) return null;
+  if (!isRecord(value) || (value.v !== 1 && value.v !== 2)) return null;
   const rule = ruleFrom(value.rule);
   if (!rule) return null;
   const order =
@@ -477,7 +495,8 @@ export function settingsFrom(value: unknown): Settings | null {
   const shown = isRecord(value.display) ? value.display : {};
   const fresh = FRESH_DISPLAY;
   const display: Display = {
-    names: oneOf(shown.names, ['symbol', 'both'] as const, fresh.names),
+    names:
+      value.v === 1 ? fresh.names : oneOf(shown.names, ['symbol', 'both'] as const, fresh.names),
     copy: typeof shown.copy === 'boolean' ? shown.copy : fresh.copy,
     format: oneOf(shown.format, ['decimal', 'fraction', 'both'] as const, fresh.format),
     places: oneOf(shown.places, [1, 2, 3, null] as const, fresh.places),

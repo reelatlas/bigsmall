@@ -706,3 +706,13 @@ Format:
 
 **What happened.** Reordering Units' systems re-renders the rows in their new order, and Preact moves a row's element to its new place. A browser drops focus from anything inside an element it moves, so after Alt and an arrow, or Move up and Move down from the handle's menu, focus fell to the page and the keys could not find their way back (Sean, on his keyboard). The browser tests had passed: which rows the diff moves depends on the direction, so a move one way kept focus and the other lost it.
 **Rule.** Around a change that reorders keyed elements, note `document.activeElement` before it, and in a layout effect after it, focus that element again if it is still in the page and lost focus (`SystemRows`). Test moves in both directions, more than once.
+
+## 2026-10-15 — Remember what was changed, not every setting
+
+**What happened.** Settings were remembered whole: any change wrote every display setting, the defaults included. When Sean made Symbol and name the fresh default, a browser that had saved anything kept Symbol only, a choice nobody made, and his own browser would have shown the old default as if the change had not landed.
+**Rule.** Store only what differs from the defaults (`storedOf` in `settings.ts`), so a default changed later reaches everyone who never chose otherwise. Version the stored shape; reading an older version that stored everything, a setting whose default has since changed cannot tell a choice from the old default, so it takes the new one.
+
+## 2026-10-15 — A phone's number pad: `inputmode`, read at focus
+
+**What happened.** Sean asked for the number keys when tapping into the box. `inputmode="decimal"` on a text field brings an iPhone's decimal pad: digits and the locale's decimal mark only, no minus, no letters, no operators, and no return key (Safari's bar above the keyboard keeps Done). The keyboard reads the mode when the field gains focus; changing it while the keyboard is up shows nothing until the next tap.
+**Rule.** Ask for the pad only where the field takes nothing but an unsigned number (the box with a unit, outside Temperature and Angle), and keep `type="text"`: a number field drops what a parser reads.

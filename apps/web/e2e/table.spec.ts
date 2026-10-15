@@ -830,6 +830,43 @@ test('a line between sections sits evenly between their text, and the first head
   }
 });
 
+test('a fill never touches a line: the foot and Edit’s headings keep 4 px from it', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  // Around each line in the card, the nearest box that can fill (a button, a checkbox's row, a
+  // unit's row) above it and below it (docs/DESIGN-SYSTEM.md, "Sections and dividers").
+  const gaps = () =>
+    page.locator('[data-table-card]').evaluate((card) => {
+      const boxes = [...card.querySelectorAll('button, label, [data-row]')]
+        .map((el) => el.getBoundingClientRect())
+        .filter((r) => r.width > 0 && r.height >= 28);
+      const found: number[] = [];
+      for (const el of card.querySelectorAll('*')) {
+        const style = getComputedStyle(el);
+        const width = parseFloat(style.borderTopWidth);
+        if (width < 1 || parseFloat(style.borderLeftWidth) >= 1) continue;
+        const top = el.getBoundingClientRect().top;
+        const above = boxes.filter((r) => r.bottom <= top + 0.5).map((r) => top - r.bottom);
+        const below = boxes
+          .filter((r) => r.top >= top + width - 0.5)
+          .map((r) => r.top - top - width);
+        if (above.length) found.push(Math.min(...above));
+        if (below.length) found.push(Math.min(...below));
+      }
+      return found.map((gap) => Math.round(gap * 10) / 10);
+    });
+  const card = page.locator('[data-table-card]');
+  for (const step of ['rows', 'Hidden open', 'Edit'] as const) {
+    if (step === 'Hidden open') await card.getByRole('button', { name: /^Hidden/ }).click();
+    if (step === 'Edit') await card.getByRole('button', { name: 'Edit', exact: true }).click();
+    const found = await gaps();
+    expect(found.length, step).toBeGreaterThan(0);
+    for (const gap of found) expect(gap, step).toBeGreaterThanOrEqual(4);
+  }
+});
+
 test('the hint has a line of its own; the toolbar under it leads with the menu, the calculator, Units, and Display, which wrap under the other tools on a phone', async ({
   page,
 }) => {

@@ -19,23 +19,18 @@ const table = (page: Page) => page.getByRole('region', { name: 'Volume' });
 const hiddenToggle = (page: Page) => page.getByRole('button', { name: /^Hidden/ });
 const SPECIALIST = unitsIn('volume').filter((unit) => unit.tier !== 'basic').length;
 
-test('a fresh visit shows symbols, two places, no copy buttons, and the specialist units hidden', async ({
+test('a fresh visit shows symbols and names, two places, no copy buttons, and the specialist units hidden', async ({
   page,
 }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
   await expect(row(page, 'liter')).toContainText('0.47');
-  await expect(row(page, 'liter').locator('[data-name]')).toHaveCount(0);
-  // The name stays for screen readers.
-  await expect(row(page, 'liter').getByRole('gridcell')).toHaveAccessibleName(/liters/);
+  // Symbol and name since 2026-10-15 (Sean); symbols alone until then.
+  await expect(row(page, 'liter').locator('[data-name]')).toBeVisible();
   await expect(table(page).getByRole('button', { name: /^Copy/ })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Copy value' })).toHaveCount(0);
   await expect(row(page, 'cubic-meter')).toHaveCount(0);
   await expect(hiddenToggle(page)).toContainText(String(SPECIALIST));
-  // The chip shows its symbol alone too.
-  await expect(
-    page.getByRole('button', { name: 'Change unit: cups' }).getByText('cups', { exact: true }),
-  ).toBeHidden();
 
   await settingsButton(page, 'Units').click();
   await expect(
@@ -47,7 +42,20 @@ test('a fresh visit shows symbols, two places, no copy buttons, and the speciali
   await expect(
     settingsPanel(page, 'Display').getByRole('switch', { name: 'Copy buttons' }),
   ).toHaveAttribute('aria-checked', 'false');
+  await expect(
+    settingsPanel(page, 'Display')
+      .locator('label', { hasText: /^Symbol and name$/ })
+      .locator('input'),
+  ).toBeChecked();
   await expectNoA11yViolations(page);
+
+  // Symbol only: the names leave the rows and the chip, kept for screen readers.
+  await setSettings(page, 'Symbol only');
+  await expect(row(page, 'liter').locator('[data-name]')).toHaveCount(0);
+  await expect(row(page, 'liter').getByRole('gridcell')).toHaveAccessibleName(/liters/);
+  await expect(
+    page.getByRole('button', { name: 'Change unit: cups' }).getByText('cups', { exact: true }),
+  ).toBeHidden();
 });
 
 test('Units and Display open beside the table, one side panel at a time with the calculator; Escape closes, a press outside does not', async ({

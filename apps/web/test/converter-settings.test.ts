@@ -171,7 +171,10 @@ describe('settings: what shows', () => {
         fractions: new Set([2, 5] as const),
       },
     };
-    const back = settingsFrom(JSON.parse(JSON.stringify(storedOf(settings))))!;
+    const stored = JSON.parse(JSON.stringify(storedOf(settings)));
+    // Display keeps only what was changed, so a later default reaches what was never chosen.
+    expect(Object.keys(stored.display).sort()).toEqual(['format', 'fractions', 'places']);
+    const back = settingsFrom(stored)!;
     expect(back.custom).toBe(true);
     expect(back.order).toEqual(['uk', 'us', 'metric', 'specialist']);
     expect(shows(unit('inch'), back.rule, 'us')).toBe(false);
@@ -179,7 +182,7 @@ describe('settings: what shows', () => {
     expect(back.display).toEqual(settings.display);
     // Units gone since, and parts that do not read, fall away; what is not settings is none.
     const odd = settingsFrom({
-      v: 1,
+      v: 2,
       rule: {
         shown: ['metric', 'martian'],
         overrides: [
@@ -193,11 +196,20 @@ describe('settings: what shows', () => {
     expect([...odd.rule.shown]).toEqual(['metric']);
     expect(odd.rule.overrides.size).toBe(0);
     expect(odd.order).toBeNull();
-    expect(odd.display.names).toBe('symbol');
+    expect(odd.display.names).toBe('both');
     expect(odd.display.places).toBe(2);
     expect([...odd.display.fractions]).toEqual([5]);
+    // Version 1 stored every display setting: its names, maybe the old default, take today's.
+    const first = settingsFrom({
+      v: 1,
+      rule: { shown: ['metric'], overrides: [] },
+      display: { names: 'symbol', places: 3 },
+    })!;
+    expect(first.display.names).toBe('both');
+    expect(first.display.places).toBe(3);
     expect(settingsFrom(null)).toBeNull();
     expect(settingsFrom({ v: 2 })).toBeNull();
+    expect(settingsFrom({ v: 3, rule: { shown: [], overrides: [] } })).toBeNull();
   });
 
   it('reads a group as all, some, or none of its units', () => {
@@ -209,9 +221,9 @@ describe('settings: what shows', () => {
 });
 
 describe('settings: how it looks', () => {
-  it('starts with symbols, no copy buttons, two places, the nearest, eighths in waiting', () => {
+  it('starts with symbols and names, no copy buttons, two places, the nearest, eighths in waiting', () => {
     expect(FRESH_DISPLAY).toMatchObject({
-      names: 'symbol',
+      names: 'both',
       copy: false,
       format: 'decimal',
       places: 2,

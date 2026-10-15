@@ -155,8 +155,8 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
   // Done closes Hidden, whoever just chose what to hide.
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');
 
-  // Show units hidden one by one brings it back, and keeps the settings.
-  await setSettings(page, 'Show units hidden one by one');
+  // Show units you hid brings it back, and keeps the settings.
+  await setSettings(page, 'Show units you hid');
   await expect(row(page, 'us-teaspoon')).toBeVisible();
 });
 

@@ -135,14 +135,15 @@ export function FilterIcon(props: IconProps) {
   );
 }
 
-export function FractionIcon(props: IconProps) {
+export function RulerIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      {/* ¾ on a diagonal, its digits drawn as strokes: how values are written, Settings' Display
-          (Sean, 2026-10-15). */}
-      <path d="M3.7 3H7.9L5.7 5.8A2.2 2.2 0 1 1 3.5 9.2" />
-      <path d="M17.5 4L6.5 20" />
-      <path d="M17.4 20.5V13.5L14 18.2H18.8" />
+      {/* A ruler on a diagonal, its marks long and short: how values are measured and written,
+          Settings' Display (Sean, 2026-10-15). */}
+      <g transform="rotate(-45 12 12)">
+        <rect x="1.5" y="8" width="21" height="8" rx="1.5" />
+        <path d="M5.5 8v3M9 8v4M12.5 8v3M16 8v4M19.5 8v3" />
+      </g>
     </Icon>
   );
 }

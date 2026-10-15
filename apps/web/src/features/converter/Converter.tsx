@@ -8,9 +8,9 @@ import {
   CopyIcon,
   EraserIcon,
   FilterIcon,
-  FractionIcon,
   LinkIcon,
   RedoIcon,
+  RulerIcon,
   UndoIcon,
 } from '../../components/icons';
 import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
@@ -344,7 +344,7 @@ export function Converter() {
               on={side === 'display'}
               onClick={() => toggleSettings('display')}
             >
-              <FractionIcon />
+              <RulerIcon />
             </Button>
           </>
         }

@@ -247,7 +247,7 @@ export function hiddenByHand(rule: ViewRule): number {
   return [...rule.overrides.values()].filter((show) => !show).length;
 }
 
-/** Show units hidden one by one: every unit hidden on its own back to its switch; those shown on their own stay. */
+/** Show units you hid: every unit hidden on its own back to its switch; those shown on their own stay. */
 export function withoutHidden(rule: ViewRule): ViewRule {
   return { ...rule, overrides: new Map([...rule.overrides].filter(([, show]) => show)) };
 }

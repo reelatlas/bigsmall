@@ -183,7 +183,7 @@ function Reset({
 /**
  * Units (docs/UX-SPEC.md §1, §3; ADR 0017; Filter until Sean renamed it, 2026-10-15): what search
  * and the table show, in every category. The presets first, Standard among them, which is how the
- * switches go back to a fresh visit's; then a switch per system; then Show units hidden one by one,
+ * switches go back to a fresh visit's; then a switch per system; then Show units you hid,
  * which clears what Edit and the Hidden list hid, the switches staying (Sean, 2026-10-15: a reset to
  * Standard beside the Standard preset did the same thing twice, and "Unhide units" read as the
  * switches' units too).
@@ -234,7 +234,7 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
           }}
           pointer={pointerProps('unhide')}
         >
-          Show units hidden one by one
+          Show units you hid
           {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
         </Reset>
         <p role="status" className="sr-only">

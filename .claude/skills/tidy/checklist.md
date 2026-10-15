@@ -43,7 +43,8 @@ Walk each section over the files in scope. Searches find candidates; reading the
 
 - Every behavior is in `docs/UX-SPEC.md`; code and spec agree. When they disagree, check the findings log, the ADRs, and the research doc behind the feature for which was intended; fix the doc if the code is right, and ask Sean if neither says.
 - Work that must happen before the next key runs in a layout effect; keys on a wrapper use native listeners; a widget answers its keys only while focus is inside it, unless an ADR records otherwise.
-- Every keyboard shortcut is in `src/lib/shortcuts.ts` and `UX-SPEC.md` §8.
+- Every keyboard shortcut agrees everywhere it is named: the handler, `src/lib/shortcuts.ts` (the map), `UX-SPEC.md` §8's key table and §10's map table, the controls' tooltips and `aria-keyshortcuts`, and `header.spec.ts`. A shortcut kept but left out of the map (Alt+↑ ↓ in Units) says so in §8.
+- The page's planes stop at their ends (ADR 0014): nothing wraps from the header to the table or back; a toolbar's ← and → go round their one row.
 - No conversion math in the UI; core imports nothing from the DOM, the framework, or `apps/web` (ADR 0003).
 - Anything the user edits lives in the reducer's state and its one history.
 
@@ -65,7 +66,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - Unused exports: for each export in scope, search its name across `apps/web` and `packages`; one hit (its own definition) means dead, unless it is core's public API (`packages/core/src/index.ts`).
 - Unused props, options, recipes, constants, test helpers, e2e selectors, files, and custom CSS utilities in `src/styles/global.css`.
 - An option that existed for one caller that has since gone (a layout-only prop after that layout got its own component; `useFieldFit`'s list of texts after the field's second text left with two boxes), and a recipe whose other users were removed, which moves back beside its one use.
-- Comments and docblocks that name a function, file, prop, or behavior that no longer exists. Read every docblock in the files that changed.
+- Comments and docblocks that name a function, file, prop, or behavior that no longer exists. Read every docblock in the files that changed, and measure wrapped comments by characters (not bytes: ↑ and × count once): one ragged past 100 after an edit gets rewrapped.
 - `TODO`, `FIXME`, and `XXX`: each becomes a fix, a `docs/PLAN.md` item, or goes.
 - A prototype the product now duplicates: once a lab's pattern has shipped, the product is the reference. Whether the lab stays is Sean's call.
 
@@ -74,16 +75,20 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - Each UX-SPEC flow the scope touches has a browser test; each reducer or core rule a unit test.
 - Tests assert what something means (a zero duration, `/^0m?s$/`), not how one tool writes it, and check rules across a sweep rather than a count tuned to one machine's font.
 - Selectors use roles and names (`exact: true` where one name contains another) or stable `data-*` marks; shared helpers live in `e2e/support.ts`.
-- A claim about geometry (it fits, it aligns, it goes four across) is pinned by a test in every theme where the fonts differ.
+- A claim about geometry (it fits, it aligns, it goes four across, a fill keeps its gap) is pinned by a test in every theme where the fonts differ (`THEMES` loop).
+- The suite runs in one locale (`en-US` in `playwright.config.ts`, core's format tests passing theirs), so it means the same on any machine; a test that needs another locale sets its own.
+- A theme's lengths are read from its tokens (`cssTime`), never written as Daylight's numbers.
 - `docs/TESTING.md` describes each spec file as it is.
 
 ## Docs
 
 - `UX-SPEC.md`: current behavior only; built items in §14 say so; open questions in §15 still open.
-- `DESIGN-SYSTEM.md`: the recipes paragraph, the patterns, the inventory, and the gallery paragraph match the code.
+- `DESIGN-SYSTEM.md`: the recipes paragraph, the patterns, the inventory, and the gallery paragraph match the code. The spacing rules hold: a line sits evenly between the ink on either side, and a fill (hovered, focused, switched on) keeps 4 px from a line. A control shown only on the active row stays reachable (`opacity-0 pointer-events-none`); dim text takes the muted ink, never opacity.
 - `ARCHITECTURE.md`: the file tables match the tree, and the conventions hold.
 - ADRs: a decision explained twice has one; a replaced one says so in its status line; the index lists all.
-- `LEARNINGS.md`: every gotcha found has a dated entry; one that keeps coming back is promoted into `CLAUDE.md` or an ADR.
-- Research docs say when they were built or superseded; the findings log has a section for the pass.
-- `CLAUDE.md`: the status paragraph and the recipes are current.
+- `LEARNINGS.md`: every gotcha found has a dated entry, listed in its topic index; one that keeps coming back is promoted into `CLAUDE.md`, an ADR, or the doc where the rule lives, its entry saying **Promoted** to where.
+- Research docs say when they were built or superseded; the findings log has a section for the pass, a pass saved before a compaction says where it was built, and rows once open say how they settled.
+- ADRs keep a short status line; amendments go in a dated list at the end, never rewriting the decision.
+- Persisted settings stay readable: stored by what changed, the version raised when the shape changes, an older version migrated (`settingsFrom`).
+- `CLAUDE.md`: "Current status" short and current, "Pick up here" listing the trials (with their reverting commits) and the questions open with Sean, the recipes current.
 - Each fact lives in one doc; the others link to it.

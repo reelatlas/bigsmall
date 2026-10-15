@@ -24,7 +24,8 @@ The system's own docs are the yardstick, so read them before judging anything: `
 
 ## 3. Audit
 
-1. Run the gates: `pnpm check` (lint with the token guard, format, types, unit tests, build, bundle budget). A failure here is the first finding.
+1. Run the gates: `pnpm check` (lint with the token guard, format, types, unit tests, build, bundle budget), and the browser suite for a baseline. A failure here is the first finding.
+   For the `full` scope, the audit can fan out to read-only reviewers in parallel, one per area (tokens, recipes, and components; behavior against the spec; dead code and stale comments; tests; docs and skills), each reporting `file:line` findings sorted as in step 4. Check each finding by reading before acting on it; a reviewer's claim is a candidate, not a fact.
 2. Walk [checklist.md](checklist.md) over every file in scope: tokens and values, recipes, components and variants, type, layout, behavior and keys, accessibility, copy, dead code, tests, and docs. Look with the searches it gives, then read the files; a search finds candidates, reading decides.
 3. Note each finding with `file:line`, what is off, and the rule it breaks (a `CLAUDE.md` rule, a `DESIGN-SYSTEM.md` pattern, an ADR, a learning).
 
@@ -39,28 +40,30 @@ The system's own docs are the yardstick, so read them before judging anything: `
 - Small commits, one kind of change each, with the `tidy` scope: `refactor(tidy): one recipe for the menu trigger`, `docs(tidy): …`, `test(tidy): …`, `chore(tidy): …`. The newest one marks the base for the next tidy.
 - A visible change is never a side effect. If Sean approves one, it goes in a commit of its own, so rolling it back is one revert, and the report says so.
 - When a fix extends the system (a new recipe, component, variant, or token), document it where that kind of thing is documented (step 7) in the same commit.
-- Run `pnpm check` before each commit.
+- Commit only on `pnpm check`'s exit status (`pnpm check && git commit …`), never chained with `;` (the ship skill).
+- After a rename, search the old name everywhere it can hide: code, docblocks, e2e variable names, test titles, docs, and the findings log's open rows.
 
 ## 6. Verify
 
 - `pnpm check` passes.
-- The browser suite passes: `pnpm e2e`. Astro allows one dev server per project; if Sean's dev server holds it, never stop it: build (`pnpm build`) and run the suite against `pnpm preview` on another port with a Playwright config in the scratchpad that points at it. A test that only means something on the dev server (one that blocks the island's source module) passes trivially there, so CI's run on the dev server is the one that counts for it.
+- The browser suite passes: `pnpm e2e`. Astro allows one dev server per project; if Sean's dev server holds it, never stop it: build (`pnpm build`) and run the suite against `astro preview` on port 4322 with a Playwright config in the scratchpad (`baseURL` and `webServer` at 4322, `reuseExistingServer`, the `en-US` locale), as the ship skill says. A test that blocks the island must block its chunk in a build too (`/Converter[\w.-]*\.(tsx|js)/`), or it passes trivially there.
+- Motion and CSS values count only on the built site (the minifier writes 400ms as .4s): read them through `cssTime`, and sample frames rather than trusting one read.
 - For anything visual, take screenshots in a background browser (headless Playwright against the running server), at a phone width and a wide one, in more than one theme. Never drive the tab Sean is looking at.
 
 ## 7. Record, each kind of note in its home
 
-| Note                                                     | Home                                                                                      |
-| -------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| What the converter does                                  | `docs/UX-SPEC.md` (planned work in §14)                                                   |
-| How things look and are built: tokens, recipes, patterns | `docs/DESIGN-SYSTEM.md`, and its inventory row for each component                         |
-| Where code lives, conventions                            | `docs/ARCHITECTURE.md`                                                                    |
-| What is tested where                                     | `docs/TESTING.md`                                                                         |
-| A decision anyone would explain twice                    | A new ADR in `docs/decisions/` and its index row; a replaced ADR gets a status line note  |
-| A gotcha, a workaround, a best practice found            | A dated entry at the bottom of `docs/LEARNINGS.md`                                        |
-| Sean's feedback and what changed for it                  | `docs/research/findings-0-first-pass.md`, a section per pass; this pass as "Tidy pass, …" |
-| Plans, explorations, milestones                          | `docs/PLAN.md`                                                                            |
-| Where things stand                                       | The status paragraph in `CLAUDE.md`                                                       |
-| A rule that keeps coming back                            | Promoted from `LEARNINGS.md` into `CLAUDE.md` or an ADR, linked back                      |
+| Note                                                     | Home                                                                                                                                              |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What the converter does                                  | `docs/UX-SPEC.md` (planned work in §14)                                                                                                           |
+| How things look and are built: tokens, recipes, patterns | `docs/DESIGN-SYSTEM.md`, and its inventory row for each component                                                                                 |
+| Where code lives, conventions                            | `docs/ARCHITECTURE.md`                                                                                                                            |
+| What is tested where                                     | `docs/TESTING.md`                                                                                                                                 |
+| A decision anyone would explain twice                    | A new ADR in `docs/decisions/` and its index row; a replaced ADR gets a status line note                                                          |
+| A gotcha, a workaround, a best practice found            | A dated entry at the bottom of `docs/LEARNINGS.md`                                                                                                |
+| Sean's feedback and what changed for it                  | `docs/research/findings-0-first-pass.md`, a section per pass; this pass as "Tidy pass, …"                                                         |
+| Plans, explorations, milestones                          | `docs/PLAN.md`                                                                                                                                    |
+| Where things stand                                       | `CLAUDE.md`'s "Current status", short, and its "Pick up here" list: trials with their reverting commits, questions open with Sean, the next build |
+| A rule that keeps coming back                            | Promoted from `LEARNINGS.md` into `CLAUDE.md` or an ADR, linked back                                                                              |
 
 Docs point to each other rather than repeating: a rule lives in one file and the others link to it.
 
@@ -75,4 +78,4 @@ Short, plain, and in this order:
 
 ## 9. Ship
 
-Push the commits to `main` and watch CI, as every change to bigsmall ships (`CLAUDE.md`, "Ship"), unless Sean asked to hold. Report the outcome.
+Use the ship skill: push the commits to `main` and watch CI, as every change to bigsmall ships (`CLAUDE.md`, "Ship"), unless Sean asked to hold. Report the outcome.

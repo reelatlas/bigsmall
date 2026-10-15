@@ -1,8 +1,17 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
   "eslint.validate": ["javascript", "typescript", "typescriptreact", "astro"],
-  "files.associations": { "*.css": "tailwindcss" },
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "tailwindCSS.classFunctions": ["cx"],
+  "tailwindCSS.experimental.classRegex": [
+    ["const [A-Z][A-Z0-9_]*\\s*=\\s*\n?\\s*(['\"`][^;]*?['\"`]);", "['\"`]([^'\"`]*)['\"`]"]
+  ],
+  "markdown.validate.enabled": true
 }

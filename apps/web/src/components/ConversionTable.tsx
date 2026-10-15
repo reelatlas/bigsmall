@@ -100,10 +100,10 @@ export interface ConversionTableProps<T extends ConversionRow> {
   onPick: (index: number) => void;
   /** A row's copy button was pressed: the converter copies what it shows (`copiedText`). */
   onCopy: (row: T) => void;
-  /** More props for a row's copy button: the copy hook's pointer handlers. */
+  /** More props for a row's copy button: the copy hook's pointer handlers, its tooltip. */
   copyProps?: (
     row: T,
-  ) => Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'onPointerEnter' | 'onPointerLeave'>;
+  ) => Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'onPointerEnter' | 'onPointerLeave' | 'title'>;
   /** Edit: each shown row is a checkbox, the hidden units staying in Hidden. */
   editing: boolean;
   hiddenOpen: boolean;
@@ -802,6 +802,10 @@ export function ConversionTable<T extends ConversionRow>({
                         nested
                         tabIndex={-1}
                         aria-label={`Copy ${row.name}`}
+                        aria-keyshortcuts="Control+C Meta+C"
+                        // A click never takes focus from the field, as a row's doesn't: the
+                        // arrows go on through the rows after a copy (Sean, 2026-10-15).
+                        onMouseDown={(event) => event.preventDefault()}
                         onClick={() => onCopy(row)}
                         {...copyProps?.(row)}
                       >

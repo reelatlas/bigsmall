@@ -958,6 +958,7 @@ test('one copy button, laid over the active row’s end, copies what the row sho
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/?a=foot&v=2');
   await ready(page);
+  await box(page).click();
   const copyCell = (unitId: string) => row(page, unitId).locator('[data-copy-cell]');
   const shown = () =>
     page
@@ -987,7 +988,14 @@ test('one copy button, laid over the active row’s end, copies what the row sho
   await expect(copyMeter.locator('[data-copied]')).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.61');
+  await expect(copyMeter).toHaveAttribute('title', 'Copy (Ctrl+C)');
+  // The click kept focus in the box: the arrows go on through the rows, the cursor's row showing it.
+  await expect(box(page)).toBeFocused();
   await page.mouse.move(0, 0);
+  await expect.poll(shown).toEqual(['foot']);
+  await page.keyboard.press('ArrowDown');
+  await expect.poll(shown).toEqual(['yard']);
+  await page.keyboard.press('Escape');
   await expect.poll(shown).toEqual(['foot']);
 
   // A row taken into the box shows it, the cursor resting there.

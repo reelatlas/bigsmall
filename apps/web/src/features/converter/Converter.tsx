@@ -426,7 +426,10 @@ export function Converter() {
         sideTypes={side === 'units' || side === 'display'}
         copiedRow={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
         onCopyRow={copyRow}
-        copyRowProps={(row) => pointerProps(`row-${row.id}`)}
+        copyRowProps={(row) => ({
+          ...pointerProps(`row-${row.id}`),
+          title: apple ? 'Copy (⌘C)' : 'Copy (Ctrl+C)',
+        })}
       />
 
       {/* The two live regions (docs/UX-SPEC.md §12): the table's sentence, once it settles; and action feedback. */}

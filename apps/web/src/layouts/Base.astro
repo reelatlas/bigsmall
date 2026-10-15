@@ -230,7 +230,8 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
       // and → (Home, End) move along its [data-tool] controls in the order they show, round from
       // end to end, and the control last reached stays its stop (a roving tabindex; before that,
       // its [data-default-tool], or its first). ↑ and ↓ move between the page's [data-plane]s, top
-      // to bottom and round, landing on a toolbar's stop or a plane's first control; the
+      // to bottom, stopping at either end (Sean, 2026-10-15: going round jumped the length of the
+      // page), landing on a toolbar's stop or a plane's first control; the
       // converter's box, a plane of its own, hands its ↑ and ↓ over once its rows run out (a
       // planeEvent from src/lib/planes.ts). Escape on a tool goes back to the box. Only a tool
       // itself answers, so a menu open inside a toolbar keeps its own keys.
@@ -267,8 +268,8 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
       const movePlane = (from, step) => {
         const planes = [...document.querySelectorAll('[data-plane]')].filter(shown);
         const at = planes.findIndex((plane) => plane.contains(from));
-        if (planes.length < 2 || at < 0) return;
-        planeEntry(planes[(at + step + planes.length) % planes.length])?.focus();
+        const next = at < 0 ? undefined : planes[at + step];
+        if (next) planeEntry(next)?.focus();
       };
       document.addEventListener(planeEvent, (event) => movePlane(event.target, event.detail));
       document.addEventListener('focusin', (event) => {

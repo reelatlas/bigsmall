@@ -1,7 +1,7 @@
 # 0014 — The arrow keys move between the page's planes
 
 Date: 2026-10-08
-Status: accepted. Amended 2026-10-15: the table's foot carries on the box's plane
+Status: accepted. Amended 2026-10-15: the table's foot carries on the box's plane; later that day the page's ends became stops, ↑ and ↓ no longer going round (see "No wrapping at the edges")
 
 ## Context
 
@@ -23,7 +23,7 @@ The controller lives in the inline script of `layouts/Base.astro`, beside the he
 
 - **Tab only, every control a stop.** The web's default. It still works, but a keyboard user crosses every icon to get anywhere, and the arrows do nothing outside the box.
 - **Spatial navigation everywhere**, the arrows moving to the nearest control in a direction, as on a television. Predictable in a grid, surprising across a page whose rows have different lengths, and it would fight the box's own arrows. The calculator, which is a grid, does move this way (`src/lib/spatial.ts`).
-- **No wrapping at the edges.** Easier to explain, but the box's loop already went round (ADR 0012), and Sean wanted the same feel across the page.
+- **No wrapping at the edges.** Easier to explain, but the box's loop already went round (ADR 0012), and Sean wanted the same feel across the page. Taken on 2026-10-15 after all: going round from the table's foot to the header, or from the header to the box, jumped the length of the page, which Sean found jarring. ↑ on the header and ↓ past the table's last control now do nothing; a toolbar's ← and → still go round, along one row.
 
 ## Consequences
 

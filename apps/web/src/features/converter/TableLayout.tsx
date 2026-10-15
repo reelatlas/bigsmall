@@ -230,8 +230,9 @@ export function TableLayout({
   };
 
   /**
-   * Past the field or the last row, ↑ and ↓ go on to the plane above or below, the toolbar or
-   * the header (ADR 0014); the cursor rests again as focus leaves.
+   * Past the field, ↑ goes on to the plane above, the toolbar (ADR 0014), the cursor resting
+   * again as focus leaves; below the box there is none, the page's bottom a stop (Sean,
+   * 2026-10-15).
    */
   const leaveBox = (step: 1 | -1) => {
     if (inputRef.current) stepPlane(inputRef.current, step);
@@ -239,7 +240,7 @@ export function TableLayout({
 
   /**
    * ↓ past the last row: onto the table's foot (Hidden, or Edit; Show them under the matches),
-   * which carries on the box's plane, else on to the next plane (ADR 0014, Sean 2026-10-15).
+   * which carries on the box's plane (ADR 0014, Sean 2026-10-15); with no foot, nowhere.
    */
   const toFoot = () => {
     const first = placeRef.current ? stopOf(rowsIn(placeRef.current)[0]) : undefined;
@@ -251,7 +252,7 @@ export function TableLayout({
     first.focus();
   };
 
-  /** From the foot: ↑ back into the box, the cursor on the last row; ↓ past its last control, on. */
+  /** From the foot: ↑ back into the box, the cursor on the last row; ↓ past its end, nowhere. */
   const leaveFoot = (step: 1 | -1) => {
     if (step === 1) {
       leaveBox(1);
@@ -495,8 +496,7 @@ export function TableLayout({
       }
       case 'ArrowDown':
         // From the field down every row, each step from where the cursor is (the unit in the box
-        // while it rests there), past the last row onto the table's foot, and from there on to the
-        // next plane, the header's toolbar.
+        // while it rests there), past the last row onto the table's foot, the page's bottom.
         event.preventDefault();
         if (at < 0 && rowCount > 0) setPosition(0);
         else if (at >= 0 && at + step < rowCount) setPosition(at + step);

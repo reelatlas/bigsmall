@@ -4,7 +4,7 @@ import { box, menu, ready, themeToggle } from './support';
 
 // The page's toolbars and planes (docs/UX-SPEC.md §8, §10, ADR 0014): each toolbar is one Tab
 // stop whose arrows move along it, and which keeps the control last used; ↑ and ↓ move between
-// the header's toolbar, the converter's, and the box, round from end to end; Escape on a
+// the header's toolbar, the converter's, and the box, stopping at either end; Escape on a
 // toolbar's control goes back to the box. The box's own arrows through its rows are in
 // table.spec.ts, the calculator's in calculator.spec.ts.
 
@@ -64,7 +64,7 @@ test('tools that can do nothing yet stay in the order, dimmed, and do nothing', 
   await expect(tool(page, 'Redo')).toBeFocused();
 });
 
-test('the arrows move between the header, the toolbar, and the box, round from end to end', async ({
+test('the arrows move between the header, the toolbar, and the box, stopping at either end', async ({
   page,
 }) => {
   await page.goto('/');
@@ -82,20 +82,21 @@ test('the arrows move between the header, the toolbar, and the box, round from e
   await expect(themeToggle(page)).toBeFocused();
   await page.keyboard.press('ArrowRight');
   await expect(shortcuts(page)).toBeFocused();
-  // Up from the header goes round to the box; each toolbar keeps where it was left.
+  // The header is the top: up from it does nothing (Sean, 2026-10-15). Down, each toolbar keeps
+  // where it was left.
   await page.keyboard.press('ArrowUp');
-  await expect(box(page)).toBeFocused();
-  await page.keyboard.press('ArrowUp');
-  await expect(menu(page)).toBeFocused();
-  await page.keyboard.press('ArrowDown');
-  await expect(box(page)).toBeFocused();
-  // Down into the start's categories, four across, through each row, then on round to the header.
-  for (let row = 0; row <= Math.ceil(categories.length / 4); row += 1) {
-    await page.keyboard.press('ArrowDown');
-  }
   await expect(shortcuts(page)).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(menu(page)).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(box(page)).toBeFocused();
+  // Down into the start's categories, four across, through each row; past the last row, the
+  // bottom: focus stays in the box, the cursor on the last row.
+  for (let row = 0; row <= Math.ceil(categories.length / 4); row += 1) {
+    await page.keyboard.press('ArrowDown');
+  }
+  await expect(box(page)).toBeFocused();
+  await expect(box(page)).toHaveAttribute('aria-activedescendant', /.+/);
 });
 
 test('with nothing focused, ↑ or ↓ goes into the box, and the next press moves on from there', async ({

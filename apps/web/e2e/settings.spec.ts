@@ -278,13 +278,14 @@ test('the arrows carry on from the rows onto the foot and into Hidden, and ↑ c
   await expect(hiddenToggle(page)).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(box(page)).toBeFocused();
-  // Open again, past its last line the arrows go on to the header.
+  // Open again, its last line is the page's bottom: down from it does nothing (Sean, 2026-10-15).
   await hiddenToggle(page).focus();
   await page.keyboard.press('Enter');
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('End');
+  await page.evaluate(() => document.activeElement?.setAttribute('data-last-line', ''));
   await page.keyboard.press('ArrowDown');
-  await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
+  await expect(page.locator('[data-last-line]')).toBeFocused();
 });
 
 test('under the matches, Show them carries on from the last match, and ↑ comes back to it', async ({
@@ -311,8 +312,9 @@ test('under the matches, Show them carries on from the last match, and ↑ comes
   ).toHaveAttribute('aria-selected', 'true');
   await box(page).press('ArrowDown');
   await expect(hide).toBeFocused();
+  // The page's bottom: down from it does nothing (Sean, 2026-10-15).
   await page.keyboard.press('ArrowDown');
-  await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
+  await expect(hide).toBeFocused();
 });
 
 test('with a system unchecked none of its units shows: its switch is final, and its checkbox shows a dash while units are chosen on their own', async ({

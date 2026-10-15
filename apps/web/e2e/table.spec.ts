@@ -280,7 +280,7 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   await expect(page.getByRole('button', { name: 'Remove Fahrenheit' })).toBeVisible();
 });
 
-test('keyboard: the arrows go through every row from the unit in the box, then on round the page', async ({
+test('keyboard: the arrows go through every row from the unit in the box, onto the foot, the page’s bottom', async ({
   page,
   context,
   isMobile,
@@ -310,19 +310,18 @@ test('keyboard: the arrows go through every row from the unit in the box, then o
   await expect(page.getByRole('button', { name: 'Remove imperial gallons' })).toBeVisible();
   await expectCursor(page, null);
 
-  // Past the last row, the table's foot, Hidden, the cursor resting; then the loop goes on round
-  // the page (ADR 0014): the header's toolbar, the converter's, first reached at the menu, and the
-  // box again, the cursor resting.
+  // Past the last row, the table's foot, Hidden, the cursor resting; it is the page's bottom, so
+  // down again does nothing (ADR 0014; Sean, 2026-10-15: going round to the header jarred), and
+  // up goes back to the last row.
   await box(page).press('ArrowDown');
-  await expect(page.getByRole('button', { name: /^Hidden/ })).toBeFocused();
+  const hidden = page.getByRole('button', { name: /^Hidden/ });
+  await expect(hidden).toBeFocused();
   await expectCursor(page, null);
   await page.keyboard.press('ArrowDown');
-  await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
-  await page.keyboard.press('ArrowDown');
-  await expect(menu(page)).toBeFocused();
-  await page.keyboard.press('ArrowDown');
+  await expect(hidden).toBeFocused();
+  await page.keyboard.press('ArrowUp');
   await expect(box(page)).toBeFocused();
-  await expectCursor(page, null);
+  await expectCursor(page, 'imperial gallons');
 });
 
 test('Escape steps back: off the table, the typed unit, the number, the unit and category, the page', async ({

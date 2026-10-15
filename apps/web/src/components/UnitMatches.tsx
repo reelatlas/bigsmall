@@ -1,5 +1,6 @@
 import type { Category, CategoryId, Unit } from '@bigsmall/core';
-import { useId } from 'react';
+import { useId, useLayoutEffect, useRef } from 'react';
+import { panelKeys } from '../lib/panel-keys';
 import { CURSOR_ROW, cx, LIST_CARD, rowFill, unitSymbol } from '../lib/recipes';
 import { Button } from './Button';
 import { MatchedText } from './MatchedText';
@@ -41,6 +42,11 @@ export interface UnitMatchesProps {
   onReveal: (revealed: boolean) => void;
   /** Symbol only: the names leave the screen, kept for screen readers (docs/UX-SPEC.md §7). */
   symbolOnly: boolean;
+  /**
+   * ↑ (-1) and ↓ (1) from Show them, which carries on from the matches (ADR 0014): back to the last
+   * match, or on to the next plane.
+   */
+  onLeave?: (step: 1 | -1) => void;
 }
 
 /** The columns of a match: the symbol, then the name, both left-aligned so they read down easily. */
@@ -65,8 +71,20 @@ export function UnitMatches({
   revealed,
   onReveal,
   symbolOnly,
+  onLeave,
 }: UnitMatchesProps) {
   const groupId = useId();
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Native listeners: the card is not itself interactive. In a layout effect, so a key pressed
+  // straight after another finds the latest onLeave.
+  useLayoutEffect(() => {
+    const card = ref.current;
+    if (!card) return undefined;
+    const onKeyDown = panelKeys(card, undefined, onLeave);
+    card.addEventListener('keydown', onKeyDown);
+    return () => card.removeEventListener('keydown', onKeyDown);
+  });
   const groups: { category: Category; first: number; items: UnitMatch[] }[] = [];
   matches.forEach((match, index) => {
     const last = groups[groups.length - 1];
@@ -88,7 +106,7 @@ export function UnitMatches({
   );
 
   return (
-    <div className={cx(LIST_CARD, 'p-2')}>
+    <div ref={ref} className={cx(LIST_CARD, 'p-2')}>
       {matches.length === 0 && hidden.length === 0 && (
         <p className="px-2 py-2.5 text-sm text-ink-muted">{notFound}</p>
       )}

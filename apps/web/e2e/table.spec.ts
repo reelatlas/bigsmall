@@ -310,9 +310,13 @@ test('keyboard: the arrows go through every row from the unit in the box, then o
   await expect(page.getByRole('button', { name: 'Remove imperial gallons' })).toBeVisible();
   await expectCursor(page, null);
 
-  // Past the last row the loop goes on round the page (ADR 0014): the header's toolbar, the
-  // converter's, first reached at the menu, and the box again, the cursor resting.
+  // Past the last row, the table's foot, Hidden, the cursor resting; then the loop goes on round
+  // the page (ADR 0014): the header's toolbar, the converter's, first reached at the menu, and the
+  // box again, the cursor resting.
   await box(page).press('ArrowDown');
+  await expect(page.getByRole('button', { name: /^Hidden/ })).toBeFocused();
+  await expectCursor(page, null);
+  await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(menu(page)).toBeFocused();

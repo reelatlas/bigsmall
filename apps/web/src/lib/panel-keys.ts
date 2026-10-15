@@ -4,8 +4,9 @@
  * between its rows, a strip of choices (`data-strip`) one row, never past the first or the last;
  * Home and End go to the first and the last; ← and → move within a strip, a strip of radios
  * choosing as it goes; Enter works a checkbox or a radio as Space does; Escape is the caller's,
- * when it has one. Controls out of the Tab order (a row's copy button) and disabled ones are no
- * rows.
+ * when it has one. A caller can also take ↑ from the first row and ↓ from the last (`onEdge`), as
+ * the table's foot does, which carries on from the box's rows (ADR 0014). Controls out of the Tab
+ * order (a row's copy button) and disabled ones are no rows.
  */
 
 /** The controls the arrows move between, by row. */
@@ -27,8 +28,15 @@ export function stopOf(row: readonly HTMLElement[] | undefined): HTMLElement | u
   return row?.find((control) => control instanceof HTMLInputElement && control.checked) ?? row?.[0];
 }
 
-/** A keydown listener for `container`; `onEscape`, when given, takes Escape. */
-export function panelKeys(container: HTMLElement, onEscape?: () => void) {
+/**
+ * A keydown listener for `container`; `onEscape`, when given, takes Escape, and `onEdge` ↑ from the
+ * first row (-1) and ↓ from the last (1), which otherwise go nowhere.
+ */
+export function panelKeys(
+  container: HTMLElement,
+  onEscape?: () => void,
+  onEdge?: (step: 1 | -1) => void,
+) {
   return (event: KeyboardEvent) => {
     if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
     const target = event.target as HTMLElement;
@@ -51,11 +59,16 @@ export function panelKeys(container: HTMLElement, onEscape?: () => void) {
     let next: HTMLElement | undefined;
     switch (event.key) {
       case 'ArrowUp':
-        next = stopOf(rows[at - 1]);
+      case 'ArrowDown': {
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        next = stopOf(rows[at + step]);
+        if (!next && onEdge) {
+          event.preventDefault();
+          onEdge(step);
+          return;
+        }
         break;
-      case 'ArrowDown':
-        next = stopOf(rows[at + 1]);
-        break;
+      }
       case 'Home':
         next = stopOf(rows[0]);
         break;

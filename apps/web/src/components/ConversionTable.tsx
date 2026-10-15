@@ -109,6 +109,11 @@ export interface ConversionTableProps<T extends ConversionRow> {
   onChoose: (rows: readonly T[], show: boolean) => void;
   onEditing: (editing: boolean) => void;
   onHiddenOpen: (open: boolean) => void;
+  /**
+   * ↑ from the foot (-1) and ↓ past the table's last control (1), out of Edit: the foot carries on
+   * from the box's rows (ADR 0014), so the layout puts focus back on them, or on the next plane.
+   */
+  onLeave?: (step: 1 | -1) => void;
 }
 
 /**
@@ -280,6 +285,7 @@ export function ConversionTable<T extends ConversionRow>({
   onChoose,
   onEditing,
   onHiddenOpen,
+  onLeave,
 }: ConversionTableProps<T>) {
   const titleId = useId();
   const moveHintId = useId();
@@ -542,12 +548,13 @@ export function ConversionTable<T extends ConversionRow>({
     cardRef.current?.querySelector<HTMLElement>('[data-edit]')?.focus();
   };
 
-  // The table's own controls take the arrows as a panel's do; in Edit, Escape ends it. Out of
-  // Edit, Escape is the layout's (back to the box).
+  // The table's own controls take the arrows as a panel's do. Out of Edit they carry on the box's
+  // plane, ↑ from the foot back to the rows and ↓ past the last on to the next plane, and Escape is
+  // the layout's (back to the box); Edit keeps them all, Escape ending it.
   useLayoutEffect(() => {
     const card = cardRef.current;
     if (!card) return undefined;
-    const onKeyDown = panelKeys(card, editing ? endEdit : undefined);
+    const onKeyDown = panelKeys(card, editing ? endEdit : undefined, editing ? undefined : onLeave);
     card.addEventListener('keydown', onKeyDown);
     return () => card.removeEventListener('keydown', onKeyDown);
   });
@@ -720,7 +727,8 @@ export function ConversionTable<T extends ConversionRow>({
         {body}
         {/* The foot keeps its place in Edit, nothing over the list moving: Edit reads Done where it
             was, and Hidden stays. Over a long list the foot stays at the screen's bottom edge, Done
-            in reach, as wide as the rows it covers. */}
+            in reach, as wide as the rows it covers. One row to the arrows, ← → between Hidden and
+            Edit (a strip). */}
         {!message && (
           <div
             className={cx(
@@ -728,6 +736,7 @@ export function ConversionTable<T extends ConversionRow>({
               editing && 'sticky bottom-0 bg-surface',
             )}
             data-table-foot
+            data-strip
           >
             {hiddenCount > 0 ? (
               <button

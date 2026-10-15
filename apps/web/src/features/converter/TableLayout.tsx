@@ -17,6 +17,7 @@ import { ConversionTable, type ConversionTableProps } from '../../components/Con
 import { UnitMatches } from '../../components/UnitMatches';
 import { ValueField } from '../../components/ValueField';
 import { pressedByTouch } from '../../lib/modality';
+import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
@@ -228,6 +229,30 @@ export function TableLayout({
    */
   const leaveBox = (step: 1 | -1) => {
     if (inputRef.current) stepPlane(inputRef.current, step);
+  };
+
+  /**
+   * ↓ past the last row: onto the table's foot (Hidden, or Edit; Show them under the matches),
+   * which carries on the box's plane, else on to the next plane (ADR 0014, Sean 2026-10-15).
+   */
+  const toFoot = () => {
+    const first = placeRef.current ? stopOf(rowsIn(placeRef.current)[0]) : undefined;
+    if (!first) {
+      leaveBox(1);
+      return;
+    }
+    setPosition(null);
+    first.focus();
+  };
+
+  /** From the foot: ↑ back into the box, the cursor on the last row; ↓ past its last control, on. */
+  const leaveFoot = (step: 1 | -1) => {
+    if (step === 1) {
+      leaveBox(1);
+      return;
+    }
+    inputRef.current?.focus();
+    setPosition(rowCount > 0 ? rowCount - 1 : -1);
   };
 
   /**
@@ -458,11 +483,12 @@ export function TableLayout({
       }
       case 'ArrowDown':
         // From the field down every row, each step from where the cursor is (the unit in the box
-        // while it rests there), and past the last row on to the next plane, the header's toolbar.
+        // while it rests there), past the last row onto the table's foot, and from there on to the
+        // next plane, the header's toolbar.
         event.preventDefault();
         if (at < 0 && rowCount > 0) setPosition(0);
         else if (at >= 0 && at + step < rowCount) setPosition(at + step);
-        else leaveBox(1);
+        else toFoot();
         return;
       case 'ArrowUp':
         event.preventDefault();
@@ -530,6 +556,7 @@ export function TableLayout({
         revealed={revealed}
         onReveal={(show) => setRevealedFor(show ? table.query : null)}
         symbolOnly={display.names === 'symbol'}
+        onLeave={leaveFoot}
       />
     ) : (
       <ConversionTable<TableRow>
@@ -556,6 +583,7 @@ export function TableLayout({
           setPosition(null);
         }}
         onHiddenOpen={setHiddenOpen}
+        onLeave={leaveFoot}
       />
     );
 

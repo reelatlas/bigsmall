@@ -1,7 +1,7 @@
 # 0014 — The arrow keys move between the page's planes
 
 Date: 2026-10-08
-Status: accepted
+Status: accepted. Amended 2026-10-15: the table's foot carries on the box's plane
 
 ## Context
 
@@ -31,3 +31,7 @@ The controller lives in the inline script of `layouts/Base.astro`, beside the he
 - Screen readers announce two named toolbars, "Site" and "Tools", and their arrows. In browse mode a screen reader keeps the arrows for itself, and Tab still reaches everything.
 - ↑ and ↓ no longer scroll the converter's page: from anywhere they go into the box and on through the planes, and a row the cursor reaches scrolls into view. Space and Page Down still scroll, and pages without the converter (the gallery, the labs) keep the arrows for scrolling.
 - A header menu added later joins the header's toolbar by carrying `data-tool` (CLAUDE.md, "Add a header menu").
+
+## Amendment (2026-10-15): the table's foot carries on the box's plane
+
+Past the last row, ↓ went straight on to the header, so the arrows never reached the table's foot (Hidden and Edit, or Show them under the matches), only Tab did; Sean found Hidden out of the arrows' reach (2026-10-15). The foot now carries on the box's plane: past the last row ↓ lands on it, the cursor resting, ← and → move between Hidden and Edit, ↓ goes on through Hidden's lines while it is open, and past the last control on to the next plane as before; ↑ from the foot comes back to the box with the cursor on the last row. The foot stays a Tab stop, Escape on it goes back to the box, and Edit keeps every arrow for itself, Escape ending it (docs/UX-SPEC.md §3, §8). The table hands its edges back to the layout through `panelKeys`' `onEdge` (`src/lib/panel-keys.ts`).

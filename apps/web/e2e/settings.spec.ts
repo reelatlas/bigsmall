@@ -199,6 +199,71 @@ test('Edit lists units as Hidden does and takes the keys: the arrows move, Enter
   await expect(edit).toBeVisible();
 });
 
+test('the arrows carry on from the rows onto the foot and into Hidden, and ↑ comes back to the last row', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await box(page).click();
+  const inBox = () => box(page).evaluate((input) => input === document.activeElement);
+  for (let step = 0; step < 40 && (await inBox()); step += 1) await box(page).press('ArrowDown');
+  // Past the last row, the foot: Hidden, the cursor resting; Edit beside it, by ← and →.
+  await expect(hiddenToggle(page)).toBeFocused();
+  await expect(box(page)).not.toHaveAttribute('aria-activedescendant');
+  const edit = table(page).getByRole('button', { name: 'Edit', exact: true });
+  await page.keyboard.press('ArrowRight');
+  await expect(edit).toBeFocused();
+  await page.keyboard.press('ArrowLeft');
+  await expect(hiddenToggle(page)).toBeFocused();
+  // ↑ goes back to the box, the cursor on the last row.
+  await page.keyboard.press('ArrowUp');
+  await expect(box(page)).toBeFocused();
+  await expect(page.locator('[data-row]').last()).toHaveAttribute('aria-selected', 'true');
+  // Open, Hidden's lines carry on under it, and past the last the arrows go on to the header.
+  await box(page).press('ArrowDown');
+  await page.keyboard.press('Enter');
+  await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'true');
+  await expect(hiddenToggle(page)).toBeFocused();
+  const specialty = page.getByRole('group', { name: 'Hidden, Specialty' });
+  await page.keyboard.press('ArrowDown');
+  await expect(specialty.getByRole('checkbox').first()).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(specialty.getByRole('checkbox').nth(1)).toBeFocused();
+  await page.keyboard.press('End');
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
+});
+
+test('under the matches, Show them carries on from the last match, and ↑ comes back to it', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await box(page).fill('2 cu');
+  const show = page.getByRole('button', { name: 'Show them' });
+  await expect(show).toBeVisible();
+  const inBox = () => box(page).evaluate((input) => input === document.activeElement);
+  for (let step = 0; step < 40 && (await inBox()); step += 1) await box(page).press('ArrowDown');
+  await expect(show).toBeFocused();
+  await page.keyboard.press('Enter');
+  const hide = page.getByRole('button', { name: 'Hide them' });
+  await expect(hide).toBeFocused();
+  // ↑ comes back to the box, the cursor on the last match, now a hidden one.
+  await page.keyboard.press('ArrowUp');
+  await expect(box(page)).toBeFocused();
+  await expect(
+    page.getByRole('group', { name: 'Hidden' }).getByRole('option').last(),
+  ).toHaveAttribute('aria-selected', 'true');
+  await box(page).press('ArrowDown');
+  await expect(hide).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
+});
+
 test('search leaves hidden units out and offers them; taking one unhides it', async ({ page }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);

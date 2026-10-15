@@ -233,7 +233,7 @@ Not built yet; each item names its milestone in docs/PLAN.md §13.
 - **One layout**, decided 2026-10-07 (ADR 0013): two boxes and the layout switch retired, the table the converter. Their last version, consistent with the table, is in git at commit `f4563f2`; bringing them back starts from reverting the retirement.
 - **Modes**, dropped (Sean, 2026-10-08): the table lists every unit, specialist ones included, and there is no basic and advanced switch (ADR 0016, §3).
 - **Calculator, phase 2.** `( )`, `½ ¼ ⅛`, and `′ ″` keys; the open state and the display remembered with the other preferences.
-- **Persistence**, decided (Sean, 2026-10-08): a visit starts fresh, or opens what a link names; only the theme is remembered, the one setting there is. Settings such as a table filter are remembered once they exist, and saved templates may follow (docs/PLAN.md §2).
+- **Persistence**, decided (Sean, 2026-10-08): a visit starts fresh, or opens what a link names; only the theme is remembered. Settings start fresh each visit too (ADR 0017); remembering them, and saved templates, may follow (docs/PLAN.md §2).
 - **Early keystrokes**, built 2026-10-08 (§13): the server's field keeps keys typed into it, and the island adopts its text as it loads.
 - **URL keeps the typed text**, built 2026-10-08 (§11): `v` holds the digits as typed, so eighteen of them come back whole.
 - **Unit notes.** A short definition for units that need one (US vs imperial gallon), shown with ambiguous rows and on the chip.

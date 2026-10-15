@@ -20,12 +20,14 @@ import {
 const DRAG_START = 4;
 
 /**
- * The Move menu: a small menu card under the handle, its edge and gutter a menu's (a 2 px edge, a
- * 4 px gutter), so its buttons' corners nest inside its own (`rounded-nested-md`) and their focus
- * ring sits inside them, concentric with the card (Sean, 2026-10-15).
+ * The Move menu, drawn as a segmented control is (SegmentedControl; Sean, 2026-10-15): its two
+ * moves joined in one strip under the handle, no gutter, each seam drawn once (a move's left edge
+ * clear over its neighbour's line), and the move with focus turning its own edge the focus color,
+ * lifted over its neighbour, so the highlight is the strip's edge itself, never a ring inside it.
  */
-const MOVE_MENU =
-  'absolute top-full right-0 z-20 flex gap-1 rounded-md border-2 border-edge bg-surface p-1 shadow-md';
+const MOVE_MENU = 'absolute top-full right-0 z-20 flex rounded-md bg-surface shadow-md';
+const MOVE =
+  'flex min-h-11 items-center justify-center border-2 border-edge border-l-transparent bg-surface bg-clip-padding px-4 text-sm font-medium text-ink not-first:-ml-0.5 first:rounded-l-md first:border-l-edge last:rounded-r-md hover:bg-surface-raised aria-disabled:text-ink-muted focus-visible:relative focus-visible:z-10 focus-visible:border-focus focus-visible:outline-0';
 
 /**
  * A system's row. The row being moved is marked alike however it moves (Sean, 2026-10-15): dragged,
@@ -324,26 +326,24 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
                 data-move-menu
                 className={MOVE_MENU}
               >
-                <Button
-                  variant="ghost"
-                  nested="md"
-                  className="text-sm focus-ring-inset"
+                <button
+                  type="button"
+                  className={MOVE}
                   data-move
                   aria-disabled={at === 0 || undefined}
                   onClick={() => place(key, at - 1, true)}
                 >
                   Move up
-                </Button>
-                <Button
-                  variant="ghost"
-                  nested="md"
-                  className="text-sm focus-ring-inset"
+                </button>
+                <button
+                  type="button"
+                  className={MOVE}
                   data-move
                   aria-disabled={at === order.length - 1 || undefined}
                   onClick={() => place(key, at + 1, true)}
                 >
                   Move down
-                </Button>
+                </button>
               </div>
             )}
           </div>

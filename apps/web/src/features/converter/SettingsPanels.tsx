@@ -36,6 +36,12 @@ import { SystemRows } from './SystemRows';
 
 const SUBHEAD = cx(PANEL_TITLE, 'text-xs');
 
+/**
+ * A panel's foot, its resets under a line, 4 px between the line and a reset's fill
+ * (docs/DESIGN-SYSTEM.md, "Sections and dividers, by what shows").
+ */
+const PANEL_FOOT = 'border-t border-line pt-1';
+
 /** The two strips of sizes, from the least fine to the finest, as the places run: 1/2 to 1/8, then 1/16 on. */
 const SIZE_ROWS: ReadonlyArray<readonly FractionSize[]> = [
   FRACTION_SIZES.slice(0, 5),
@@ -188,8 +194,8 @@ function Reset({
  * change by hand puts them on it, picking a preset keeps it aside, and picking Custom brings it
  * back, or with none kept makes what shows their own. Then the systems, in the order the table's
  * sections follow, each a checkbox (a dash while some of its units are chosen on their own) and a
- * handle to reorder it by (SystemRows); then Show custom hidden units, which clears what Edit and the
- * Hidden list hid, the switches staying, and Reset order.
+ * handle to reorder it by (SystemRows); then Show custom hidden units, which clears what Edit and
+ * the Hidden list hid, the switches staying, and Reset order.
  */
 export function UnitsPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
   const { rule } = settings;
@@ -226,7 +232,9 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
       </fieldset>
       {/* Its line sits evenly between the last system's ink and the resets', as every divider does:
           the rows' 44 px leave their ink 12 px inside, so the line comes up past the panel's gap. */}
-      <div className="-mt-1.5 flex flex-wrap items-center justify-between gap-x-2 border-t border-line pt-1">
+      <div
+        className={cx(PANEL_FOOT, '-mt-1.5 flex flex-wrap items-center justify-between gap-x-2')}
+      >
         <Reset
           off={hiddenCount === 0}
           done={done === 'unhide'}
@@ -325,7 +333,7 @@ export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelPro
         disabled={display.format === 'decimal' && display.places === null}
         onChange={(rounding) => setDisplay({ rounding })}
       />
-      <div className="border-t border-line pt-1">
+      <div className={PANEL_FOOT}>
         <Reset
           off={!displayChanged(display)}
           done={done === 'reset'}

@@ -2,6 +2,7 @@ import { unitsIn } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
 import { cssTime } from '../src/lib/css-time';
 import {
+  applyTheme,
   box,
   calculatorButton,
   calculatorPanel,
@@ -573,6 +574,28 @@ test('search leaves hidden units out and offers them; taking one unhides it', as
   // Out of Hidden for good: clearing the box leaves it in the table.
   await page.getByRole('button', { name: 'Remove cubic inches' }).click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
+});
+
+test("Display's figures are set in the numeric face: Round to's as the fraction sizes'", async ({
+  page,
+}) => {
+  await page.goto('/?a=foot&v=6.3');
+  await ready(page);
+  await settingsButton(page, 'Display').click();
+  const panel = settingsPanel(page, 'Display');
+  await panel
+    .locator('label')
+    .filter({ hasText: /^Both$/ })
+    .click();
+  // Hardhat sets figures in a face of their own (monospace), so the faces differ there.
+  await applyTheme(page, { id: 'hardhat', name: 'Hardhat' });
+  const face = (text: string) =>
+    panel
+      .getByText(text, { exact: true })
+      .evaluate((element) => getComputedStyle(element).fontFamily);
+  const figures = await face('1/2');
+  expect(await face('No limit')).not.toBe(figures);
+  for (const places of ['0.1', '0.01', '0.001']) expect(await face(places), places).toBe(figures);
 });
 
 test('fractions, both, and rounding write the values and never move the columns', async ({

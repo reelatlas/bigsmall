@@ -59,10 +59,11 @@ const SIZE_NAME: Record<FractionSize, string> = {
   64: 'sixty-fourths',
 };
 
-const PLACES: ReadonlyArray<{ value: string; label: string; places: Display['places'] }> = [
-  { value: '1', label: '0.1', places: 1 },
-  { value: '2', label: '0.01', places: 2 },
-  { value: '3', label: '0.001', places: 3 },
+/** The decimal places to round to, their figures in the numeric face as the fraction sizes' are. */
+const PLACES: ReadonlyArray<{ value: string; label: ReactNode; places: Display['places'] }> = [
+  { value: '1', label: <span className="font-numeric">0.1</span>, places: 1 },
+  { value: '2', label: <span className="font-numeric">0.01</span>, places: 2 },
+  { value: '3', label: <span className="font-numeric">0.001</span>, places: 3 },
   { value: 'none', label: 'No limit', places: null },
 ];
 

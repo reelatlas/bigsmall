@@ -114,8 +114,15 @@ describe('formatFraction', () => {
     expect(fraction(0, eighths)?.text).toBe('0');
   });
 
-  it('leaves a value with no size chosen, or past a million, to its digits', () => {
+  it('writes a value past a million as its whole number, rounded as chosen', () => {
+    expect(fraction(2_000_000, eighths)).toEqual({ text: '2,000,000', approx: false });
+    expect(fraction(1_043_262.45, eighths)).toEqual({ text: '1,043,262', approx: true });
+    expect(fraction(1_043_262.45, eighths, 'up')?.text).toBe('1,043,263');
+    expect(fraction(-1_043_262.45, eighths, 'down')?.text).toBe('-1,043,263');
+  });
+
+  it('leaves a value with no size chosen, or past where places mean anything, to its digits', () => {
     expect(fraction(0.5, sizes())).toBeNull();
-    expect(fraction(2_000_000, eighths)).toBeNull();
+    expect(fraction(2e15, eighths)).toBeNull();
   });
 });

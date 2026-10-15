@@ -28,7 +28,7 @@ export interface Fraction {
 /** Below this, a difference is float noise: 2.4999999999999996 is 2 1/2. */
 const NOISE = 1e-9;
 
-/** Past this, a value keeps its decimals rather than a fraction. */
+/** Past this, a value's fraction is only its whole number: an eighth is noise beside a million. */
 const FRACTION_LIMIT = 1e6;
 
 /** Past this, places would only repeat the significant digits' scientific form. */
@@ -109,15 +109,25 @@ export function fractionsOf(sizes: ReadonlySet<FractionSize>): Fraction[] {
 /**
  * A value in the sizes chosen, as a mixed number ("6 5/16"), and whether it rounds, small values
  * rounded as chosen too (0.07 to eighths is ≈ 1/8). One that is not zero but rounds to zero reads
- * "< 1/8", the smallest size chosen. Null with no size chosen, or past a million. A tie goes up, as
- * Math.round's does.
+ * "< 1/8", the smallest size chosen. Past a million it is the whole number, rounded as chosen
+ * ("≈ 1,043,262"), so no row's fraction is left blank (Sean, 2026-10-15). Null with no size
+ * chosen, or past where places stop meaning anything. A tie goes up, as Math.round's does.
  */
 export function formatFraction(
   value: number,
   options: { sizes: ReadonlySet<FractionSize>; rounding: Rounding; locale?: string | undefined },
 ): Rounded | null {
   const { sizes, rounding, locale } = options;
-  if (!Number.isFinite(value) || sizes.size === 0 || Math.abs(value) >= FRACTION_LIMIT) return null;
+  if (!Number.isFinite(value) || sizes.size === 0 || Math.abs(value) >= PLACES_LIMIT) return null;
+  if (Math.abs(value) >= FRACTION_LIMIT) {
+    const whole = rounded(value, rounding);
+    return {
+      text:
+        (whole < 0 ? minusSign(locale) : '') +
+        new Intl.NumberFormat(locale).format(Math.abs(whole)),
+      approx: Math.abs(value - whole) > NOISE,
+    };
+  }
   const base = Math.floor(value);
   const rest = value - base;
   const steps: Fraction[] = [{ n: 0, d: 1 }, ...fractionsOf(sizes), { n: 1, d: 1 }];

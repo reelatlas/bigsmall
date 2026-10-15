@@ -134,7 +134,7 @@ export const OPTION_ROW = cx(OPTION_BASE, CHOICE_FILL);
  */
 export const MENU_OPTION = cx(
   OPTION_BASE,
-  'hover:bg-surface-raised focus-ring-within-inset has-checked:bg-accent-soft',
+  'focus-ring-within-inset hover:bg-surface-raised has-checked:bg-accent-soft',
 );
 
 // Fields (docs/DESIGN-SYSTEM.md, "Fields")

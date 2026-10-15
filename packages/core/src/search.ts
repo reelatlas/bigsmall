@@ -59,7 +59,7 @@ export interface SearchResponse {
   /**
    * True when a search for basic units showed advanced ones because nothing basic matched. Nothing
    * reads it: the converter asks for every tier, and leaves specialist units out by Settings'
-   * Specialty switch instead (ADR 0017).
+   * Specialty switch instead (ADR 0018).
    */
   escalated: boolean;
 }

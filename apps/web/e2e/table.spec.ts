@@ -30,7 +30,7 @@ import {
 const tiles = (page: Page) => page.getByRole('listbox', { name: 'Categories' });
 const matches = (page: Page) => page.getByRole('listbox', { name: 'Matching units' });
 const VOLUME_UNITS = unitsIn('volume').length;
-/** What a fresh visit lists: every unit but the specialist ones, the Standard preset (ADR 0017). */
+/** What a fresh visit lists: every unit but the specialist ones, the Standard preset (ADR 0018). */
 const VOLUME_STANDARD = unitsIn('volume').filter((unit) => unit.tier === 'basic').length;
 
 /** What the field's cursor is on, as it reads, or null while it rests. */
@@ -139,7 +139,7 @@ test('a number and a unit list the category’s standard units in their sections
   const table = page.getByRole('region', { name: 'Volume' });
   await expect(table).toBeVisible();
   // A fresh visit lists every unit but the specialist ones, the visitor's own system first, each
-  // section headed; the rest wait in Hidden at the foot (ADR 0017).
+  // section headed; the rest wait in Hidden at the foot (ADR 0018).
   await expect(table.locator('[data-row]')).toHaveCount(VOLUME_STANDARD);
   await expect(table.getByRole('columnheader')).toHaveText([
     'US (customary)',

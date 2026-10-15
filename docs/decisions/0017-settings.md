@@ -1,7 +1,7 @@
 # 0017 — Settings: what shows and how it looks, sections by system, two layers
 
 Date: 2026-10-11
-Status: accepted; amends 0011 and 0016. Amended 2026-10-14 and 2026-10-15 (see "Amendments" at the end)
+Status: superseded by 0018 (2026-10-15); amended 2026-10-14 and 2026-10-15 (see "Amendments" at the end)
 
 ## Context
 
@@ -41,3 +41,7 @@ Sean asked for a way to section the table reliably and to control what it shows 
 - **2026-10-15, Units.** Filter renamed Units, its first preset All; its reset to Standard dropped (the Standard preset does it); Unhide units renamed Show custom hidden units; a system's switch final for its units, its checkbox a dash while some are chosen on their own; Custom among the presets, lit by any change by hand and never out of reach; the systems reordered by a handle, the table's sections following; Other a switch and a place in the order like the systems, Your region showing it too (Standard alone has none).
 - **2026-10-15, Display.** Decimals keep their trailing zeros; small values round as chosen ("< 0.01" where one rounds to zero); Symbol and name a fresh visit's default (symbols alone before); the format unlabeled, Rounding over Round to; Copy buttons left Display: one copy button shows, on the active row, and copies what the row shows (docs/UX-SPEC.md §7).
 - **2026-10-15, remembered.** Every setting is remembered in this browser, Display by what was changed, so a default changed later reaches anyone who never chose otherwise (`settings-store.ts`, versioned).
+
+## Outcome
+
+- **2026-10-15.** Superseded by [0018](0018-settings-as-they-stand.md), which states the settings as they stand with these amendments folded in (the full tidy; Sean: a decision is upgraded when the process teaches better).

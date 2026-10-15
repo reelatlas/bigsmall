@@ -20,7 +20,7 @@ import {
 } from './support';
 import { THEMES } from '../src/lib/themes';
 
-// Settings (ADR 0017, docs/UX-SPEC.md §1, §3, §7): what shows, in every category, and how results
+// Settings (ADR 0018, docs/UX-SPEC.md §1, §3, §7): what shows, in every category, and how results
 // look; the table's sections, its Hidden list, and Edit; search leaving hidden units out. Visitors
 // are in the US: their own units come first (ADR 0011).
 

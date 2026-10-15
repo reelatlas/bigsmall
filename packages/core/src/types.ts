@@ -22,7 +22,7 @@ export type CategoryId =
 /**
  * Everyday (basic) or specialist (advanced). Specialist units are listed after every everyday
  * one, and rank after them among equal matches; the web's Specialty switch shows or hides them
- * (ADR 0016, ADR 0017).
+ * (ADR 0016, ADR 0018).
  */
 export type Tier = 'basic' | 'advanced';
 

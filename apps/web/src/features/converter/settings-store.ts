@@ -1,7 +1,7 @@
 import { settingsFrom, storedOf, type Settings } from './settings';
 
 /**
- * Settings remembered in this browser (docs/UX-SPEC.md §11; ADR 0017 amended, Sean 2026-10-15):
+ * Settings remembered in this browser (docs/UX-SPEC.md §11; ADR 0018):
  * what shows, Custom and the set kept for it, the sections' order, and how values look. In local
  * storage, as the theme is; never in the URL or on a server. Storage can be blocked (a private
  * window): then settings last for the visit only, and nothing fails.

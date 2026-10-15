@@ -11,7 +11,7 @@ import {
 } from '@bigsmall/core';
 
 /**
- * Settings: what shows and how it looks (docs/UX-SPEC.md §3, §7; ADR 0017). Pure, no React, no
+ * Settings: what shows and how it looks (docs/UX-SPEC.md §3, §7; ADR 0018). Pure, no React, no
  * DOM: everything here is unit-tested in node.
  *
  * What shows has two layers. The system switches set every category. A unit chosen on its own in

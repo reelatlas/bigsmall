@@ -1,5 +1,5 @@
 /**
- * Values written to a chosen step (docs/UX-SPEC.md §7, ADR 0017): to a number of decimal places,
+ * Values written to a chosen step (docs/UX-SPEC.md §7, ADR 0018): to a number of decimal places,
  * or as fractions in the sizes chosen, rounded to the nearest, up, or down. The table's own text,
  * six significant digits (formatNumber), is what a caller falls back to wherever these return null.
  */

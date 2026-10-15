@@ -190,7 +190,7 @@ function Reset({
 }
 
 /**
- * Units (docs/UX-SPEC.md §1, §3; ADR 0017; Filter until Sean renamed it, 2026-10-15): what search
+ * Units (docs/UX-SPEC.md §1, §3; ADR 0018; Filter until Sean renamed it, 2026-10-15): what search
  * and the table show, in every category. The presets first, and Custom, the visitor's own set: a
  * change by hand puts them on it, picking a preset keeps it aside, and picking Custom brings it
  * back, or with none kept makes what shows their own. Then the systems, in the order the table's
@@ -268,7 +268,7 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
 }
 
 /**
- * Display (docs/UX-SPEC.md §1, §7; ADR 0017): how results look. Symbols alone or with names
+ * Display (docs/UX-SPEC.md §1, §7; ADR 0018): how results look. Symbols alone or with names
  * first; then the format, which way values round, what they round to, and a reset of all of it.
  * Copying is no setting: the active row's copy button (Sean, 2026-10-15).
  */

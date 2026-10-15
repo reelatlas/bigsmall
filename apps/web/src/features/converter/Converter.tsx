@@ -55,7 +55,7 @@ const SIDE_KEYS: Readonly<Record<string, Side>> = { c: 'calculator', v: 'units',
 const HINT = 'Type a number, unit, or both to compare all at once.';
 
 /**
- * The converter island (ADR 0012, ADR 0013, ADR 0017, docs/UX-SPEC.md §1): the hint; the
+ * The converter island (ADR 0012, ADR 0013, ADR 0018, docs/UX-SPEC.md §1): the hint; the
  * toolbar's buttons, the calculator, Units, and Display after the category menu and undo, redo,
  * and clear all at its right end, which TableLayout sets in a row; the box and its table, with the
  * side panel open, one at a time (the calculator §8, Units, or Display), between them or beside

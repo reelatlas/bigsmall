@@ -65,7 +65,7 @@ export interface ConverterController {
   /** Debounced copy of the table's announcement, so screen readers are not flooded while typing. */
   announcement: string | null;
   /**
-   * What shows and how it looks (ADR 0017): remembered in this browser, kept apart from the
+   * What shows and how it looks (ADR 0018): remembered in this browser, kept apart from the
    * conversion's history and the URL, so undo steps through what was typed and converted.
    */
   settings: Settings;

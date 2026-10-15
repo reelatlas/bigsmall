@@ -190,7 +190,7 @@ export async function setSettings(page: Page, ...choices: string[]) {
 }
 
 /**
- * The table as it was before Settings (ADR 0017): every unit, names, and six significant digits,
+ * The table as it was before Settings (ADR 0018): every unit, names, and six significant digits,
  * for tests whose subject is something else.
  */
 export async function showEverything(page: Page) {

@@ -11,6 +11,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
   type ButtonHTMLAttributes,
   type ReactNode,
 } from 'react';
@@ -46,7 +47,7 @@ export interface ConversionRow {
   symbol: string;
   /**
    * What the text is: a value; a dash, while there is no number or no unit to convert from; or a
-   * message, in the danger color. Only a value has a copy button.
+   * message, in the danger color. Only a value can be copied.
    */
   tone: 'value' | 'empty' | 'message';
   /** The unit in the box: marked in the accent's soft fill. */
@@ -63,7 +64,6 @@ export interface RowSection<T extends ConversionRow> {
 /** How values and names show (docs/UX-SPEC.md §7): the converter's Display settings. */
 export interface TableDisplay {
   names: 'symbol' | 'both';
-  copy: boolean;
   /** Both writes the decimal, then its fraction after it in the muted ink. */
   format: 'decimal' | 'fraction' | 'both';
   /** Decimal places, or null for the six significant digits. */
@@ -98,6 +98,7 @@ export interface ConversionTableProps<T extends ConversionRow> {
   copied: string | null;
   /** A row was clicked or tapped, by index. */
   onPick: (index: number) => void;
+  /** A row's copy button was pressed: the converter copies what it shows (`copiedText`). */
   onCopy: (row: T) => void;
   /** More props for a row's copy button: the copy hook's pointer handlers. */
   copyProps?: (
@@ -125,15 +126,15 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * the decimal point (96 beside 473.18); with Both, its fraction beside it; past a column that takes
  * the spare width, on the right, the symbol right-aligned in its column, an exponent hanging after
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
- * left-aligned in its own; then the copy button, with copy buttons on. The names keep to one line:
+ * left-aligned in its own; the active row's copy button laid over its end. The names keep to one line:
  * where one would not fit beside its value (a long value on a phone), the names give way in every
  * row (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
  * columns, the symbol and the name centred beside both lines. The unit's cell has no column gap,
- * since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2). Eight columns,
- * so a row spans col-span-8.
+ * since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2). Seven
+ * columns, so a row spans col-span-7.
  */
 const ROWS =
-  'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)_auto] gap-y-0.5';
+  'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
 
 /** The columns that give way when a row has no room for them, in that order (useColumnsFit). */
 const GIVE_WAY = ['name', 'second'] as const;
@@ -182,6 +183,38 @@ const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
 function sectionEdge(at: number, kind: 'heading' | 'row'): string {
   if (kind === 'row') return at === 0 ? '' : 'mt-1 border-t border-line pt-1';
   return at === 0 ? 'pt-3' : 'mt-0.5 border-t border-line pt-3.5';
+}
+
+/**
+ * The active row's copy button, laid over the row's end (Sean, 2026-10-15): no column is kept for
+ * it, so names keep their room; a short fade of the row's own fill, then the fill behind the
+ * button, its corners the row's.
+ */
+const COPY_CELL = 'absolute inset-y-0 right-0 flex';
+
+/** The minus sign some locales write (U+2212), which a copy turns into a plain hyphen. */
+const MINUS = String.fromCharCode(0x2212);
+
+/** What shows behind the copy button: the row's fill, the accent's soft tint for the box's unit. */
+function copyBehind(inBox: boolean): { fade: string; fill: string } {
+  return inBox
+    ? { fade: 'bg-linear-to-r from-transparent to-accent-soft', fill: 'bg-accent-soft' }
+    : { fade: 'bg-linear-to-r from-transparent to-surface-raised', fill: 'bg-surface-raised' };
+}
+
+/**
+ * What a row's copy takes: its value as the row shows it (Sean, 2026-10-15), the decimal with
+ * Both, without the "≈" of one that rounds, its minus a plain hyphen so it pastes as a number
+ * anywhere (some locales write U+2212). Null for a dash or a message.
+ */
+export function copiedText(
+  row: ConversionRow,
+  display: TableDisplay,
+  locale: string | undefined,
+): string | null {
+  if (row.tone !== 'value') return null;
+  const written = row.value === null ? null : firstWritten(row.value, display, locale);
+  return (written?.text ?? row.text).replaceAll(MINUS, '-');
 }
 
 /** A value as the display writes it first: its fraction with Fractions, else its decimal. */
@@ -266,9 +299,11 @@ type List = 'shown' | 'hidden';
  * open Hidden; and after a unit moves focus stays where it was, on the line that took its place.
  * The field keeps focus and its cursor moves through the shown rows (aria-activedescendant on a
  * grid, ADR 0012), so the rows are no Tab
- * stops; a click or tap on one is the field's to act on, and focus stays in the field. With copy
- * buttons on, each row's sits in a cell of its own beside it, out of the Tab order like the box's
- * own. Columns line up across rows through a subgrid (ROWS), each as wide as the widest it could
+ * stops; a click or tap on one is the field's to act on, and focus stays in the field. One copy
+ * button shows at a time, laid over the active row's end in a cell of its own: the row under the
+ * mouse, else the row the cursor is on, else the box's unit's (the row a tap took in), out of the
+ * Tab order since Ctrl/⌘+C copies the cursor's row; the others stay for screen readers, unseen and
+ * out of the pointer's way. Columns line up across rows through a subgrid (ROWS), each as wide as the widest it could
  * hold across every row and every rounding (a sizer row no one sees), so a setting that changes
  * what shows never moves the rest. Screen readers hear the symbol whole ("km²") and the name,
  * shown or not, from copies of their own; the columns they are drawn in are hidden from them.
@@ -310,6 +345,10 @@ export function ConversionTable<T extends ConversionRow>({
   const mark = useMemo(() => localeSeparators(locale).decimal, [locale]);
   const cardRef = useRef<HTMLDivElement>(null);
   const hiddenToggleRef = useRef<HTMLButtonElement>(null);
+  /** The row the mouse is over, whose copy button shows before any other's. */
+  const [pointed, setPointed] = useState<string | null>(null);
+  const shownRows = sections.flatMap((section) => section.rows);
+  const active = pointed ?? shownRows[cursor]?.id ?? shownRows.find((row) => row.inBox)?.id ?? null;
 
   /**
    * What showed after the last change, so the next one can mark what moved (docs/UX-SPEC.md §3,
@@ -475,7 +514,7 @@ export function ConversionTable<T extends ConversionRow>({
   const sizer = (
     <div
       aria-hidden="true"
-      className="invisible col-span-8 grid h-0 grid-cols-subgrid overflow-hidden px-2"
+      className="invisible col-span-7 grid h-0 grid-cols-subgrid overflow-hidden px-2"
     >
       <span className={cx(WHOLE_CELL, 'col-start-1 row-start-1')}>
         {stack(everyRounding(part('whole')))}
@@ -692,16 +731,29 @@ export function ConversionTable<T extends ConversionRow>({
     sections.slice(0, at).reduce((sum, section) => sum + section.rows.length, 0),
   );
   const grid = (
-    <div ref={gridRef} id={id} role="grid" aria-labelledby={titleId} className={ROWS}>
+    <div
+      ref={gridRef}
+      id={id}
+      role="grid"
+      aria-labelledby={titleId}
+      className={ROWS}
+      // The mouse's row shows its copy button; a touch never leaves a row pointed at.
+      onPointerOver={(event) => {
+        if (event.pointerType !== 'mouse') return;
+        const row = (event.target as Element).closest<HTMLElement>('[data-row]');
+        setPointed(row?.dataset.row ?? null);
+      }}
+      onPointerLeave={() => setPointed(null)}
+    >
       {sections.map((section, at) => (
         <div
           key={section.key}
           role="rowgroup"
-          className="col-span-8 grid grid-cols-subgrid gap-y-0.5"
+          className="col-span-7 grid grid-cols-subgrid gap-y-0.5"
         >
           <div
             role="row"
-            className={cx('col-span-8', sectionEdge(at, 'heading'))}
+            className={cx('col-span-7', sectionEdge(at, 'heading'))}
             data-section={section.key}
           >
             <span role="columnheader" className={cx('block', HEADING)}>
@@ -710,13 +762,14 @@ export function ConversionTable<T extends ConversionRow>({
           </div>
           {section.rows.map((row, offset) => {
             const rowIndex = (starts[at] ?? 0) + offset;
+            const behind = copyBehind(row.inBox);
             return (
               <div
                 key={row.id}
                 role="row"
                 aria-selected={rowIndex === cursor}
                 data-row={row.id}
-                className="col-span-8 grid grid-cols-subgrid items-center"
+                className="relative col-span-7 grid grid-cols-subgrid items-center"
               >
                 {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field */}
                 <div
@@ -729,18 +782,20 @@ export function ConversionTable<T extends ConversionRow>({
                   onClick={() => onPick(rowIndex)}
                   className={cx(
                     CURSOR_ROW,
-                    'grid grid-cols-subgrid items-center',
-                    // Without copy buttons the row runs to the card's edge: no column is kept
-                    // for them.
-                    display.copy ? 'col-span-7' : 'col-span-8',
+                    'col-span-7 grid grid-cols-subgrid items-center',
                     rowFill(row.inBox, rowIndex === cursor),
                   )}
                 >
                   {cells(row)}
                 </div>
-                {display.copy && (
-                  <div role="gridcell">
-                    {row.tone === 'value' ? (
+                {row.tone === 'value' && (
+                  <div
+                    role="gridcell"
+                    className={cx(COPY_CELL, row.id !== active && 'pointer-events-none opacity-0')}
+                    data-copy-cell
+                  >
+                    <span aria-hidden="true" className={cx('w-4', behind.fade)} />
+                    <span className={cx('flex items-center rounded-r-nested', behind.fill)}>
                       <Button
                         variant="ghost"
                         square
@@ -752,9 +807,7 @@ export function ConversionTable<T extends ConversionRow>({
                       >
                         {copied === row.id ? <CopiedIcon /> : <CopyIcon />}
                       </Button>
-                    ) : (
-                      <span className="block size-11" />
-                    )}
+                    </span>
                   </div>
                 )}
               </div>

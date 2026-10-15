@@ -284,7 +284,6 @@ export function withoutHidden(rule: ViewRule): ViewRule {
 
 export interface Display {
   names: 'symbol' | 'both';
-  copy: boolean;
   /** Both writes the decimal, then its fraction, as Format lists them. */
   format: 'decimal' | 'fraction' | 'both';
   /** Decimal places, or null for no limit: the table's six significant digits. */
@@ -295,12 +294,11 @@ export interface Display {
 }
 
 /**
- * A fresh visit's: symbols with their names (Sean, 2026-10-15; symbols alone until then), no copy
- * buttons, two places, rounded to the nearest, eighths in waiting.
+ * A fresh visit's: symbols with their names (Sean, 2026-10-15; symbols alone until then), two
+ * places, rounded to the nearest, eighths in waiting.
  */
 export const FRESH_DISPLAY: Display = {
   names: 'both',
-  copy: false,
   format: 'decimal',
   places: 2,
   fractions: new Set([2, 4, 8]),
@@ -316,7 +314,6 @@ export function displayChanged(display: Display): boolean {
   const fresh = FRESH_DISPLAY;
   return (
     display.names !== fresh.names ||
-    display.copy !== fresh.copy ||
     display.format !== fresh.format ||
     display.places !== fresh.places ||
     !sameSizes(display.fractions, fresh.fractions) ||
@@ -439,7 +436,6 @@ export function storedOf(settings: Settings): StoredSettings {
   const fresh = FRESH_DISPLAY;
   const changed: StoredSettings['display'] = {};
   if (display.names !== fresh.names) changed.names = display.names;
-  if (display.copy !== fresh.copy) changed.copy = display.copy;
   if (display.format !== fresh.format) changed.format = display.format;
   if (display.places !== fresh.places) changed.places = display.places;
   if (!sameSizes(display.fractions, fresh.fractions)) changed.fractions = [...display.fractions];
@@ -500,7 +496,6 @@ export function settingsFrom(value: unknown): Settings | null {
   const display: Display = {
     names:
       value.v === 1 ? fresh.names : oneOf(shown.names, ['symbol', 'both'] as const, fresh.names),
-    copy: typeof shown.copy === 'boolean' ? shown.copy : fresh.copy,
     format: oneOf(shown.format, ['decimal', 'fraction', 'both'] as const, fresh.format),
     places: oneOf(shown.places, [1, 2, 3, null] as const, fresh.places),
     fractions: Array.isArray(shown.fractions)

@@ -1,7 +1,5 @@
 import { DEFAULT_SEPARATORS, getUnit, parse } from '@bigsmall/core';
 import { useId, useRef } from 'react';
-import { Button } from '../../../components/Button';
-import { CopiedIcon } from '../../../components/icons';
 import { Calculator, SendButton } from '../../../components/Calculator';
 import { CategoryMenu } from '../../../components/CategoryMenu';
 import { CategoryTiles } from '../../../components/CategoryTiles';
@@ -33,17 +31,7 @@ const ENV: ConverterEnv = { locale: 'en-US', separators: DEFAULT_SEPARATORS, sys
 const noop = () => undefined;
 
 /** The field in a frozen state: what is typed, and the unit in its chip. */
-function FieldSample({
-  label,
-  text,
-  unitId,
-  copied = false,
-}: {
-  label: string;
-  text: string;
-  unitId: string;
-  copied?: boolean;
-}) {
+function FieldSample({ label, text, unitId }: { label: string; text: string; unitId: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const hint = useId();
   const list = useId();
@@ -58,13 +46,6 @@ function FieldSample({
       placeholder="Number"
       describedBy={hint}
       popup={{ expanded: false, id: list, activeId: undefined, kind: 'grid' }}
-      trailing={
-        copied && (
-          <Button variant="ghost" square nested tabIndex={-1} aria-label="Copy sample value">
-            <CopiedIcon />
-          </Button>
-        )
-      }
       onChange={noop}
       onKeyDown={noop}
       onClear={noop}
@@ -101,8 +82,8 @@ function tableOf(state: Partial<ConverterState>, rule?: ViewRule): TableView {
   return selectTable({ ...initialState, ...state }, rule ? { ...ENV, rule } : ENV);
 }
 
-/** Names and copy buttons on, the way the table showed before Settings. */
-const NAMED: Display = { ...FRESH_DISPLAY, names: 'both', copy: true, places: null };
+/** Names on and six significant digits, the way the table showed before Settings. */
+const NAMED: Display = { ...FRESH_DISPLAY, names: 'both', places: null };
 
 /** Symbol only: the names off the screen. */
 const SYMBOLS: Display = { ...FRESH_DISPLAY, names: 'symbol' };
@@ -159,8 +140,8 @@ function TableSample({
 /**
  * The table's pieces in frozen states, from the real table view: the category menu before and
  * after a category is chosen; the start's categories, the cursor on one; 250 mL in every unit of
- * volume in its sections, names and copy buttons on, milliliters marked as the unit in the box,
- * the cursor on cups and one copy confirmed; Area chosen with no unit, as a fresh visit shows it,
+ * volume in its sections, names on, milliliters marked as the unit in the box, the cursor on
+ * cups, its copy button laid over its end and confirmed; Area chosen with no unit, as a fresh visit shows it,
  * each value a dash, the symbols lined up on their last letter with their exponents hanging after
  * it; a million square kilometers in a phone's width, the names given way in every row and the
  * exponent markers bold; 6.3 feet as decimals with their fractions (Both); a fresh visit's volume
@@ -201,7 +182,7 @@ function TableSamples() {
         title="Volume"
         display={NAMED}
         cursor={cups}
-        copied="liter"
+        copied="us-cup"
         itemId={itemIds('values')}
       />
       <TableSample
@@ -262,13 +243,8 @@ function TableSamples() {
 export function FieldSamples({ theme }: { theme: string }) {
   return (
     <div className="grid gap-3">
-      {/* A long number with its exponent marker in bold, the chip giving up its name for it, and the copy check. */}
-      <FieldSample
-        label={`${theme} exponent sample`}
-        text="1.23456789E23"
-        unitId="millimeter"
-        copied
-      />
+      {/* A long number with its exponent marker in bold, the chip giving up its name for it. */}
+      <FieldSample label={`${theme} exponent sample`} text="1.23456789E23" unitId="millimeter" />
       {/* Arithmetic, its running value following it in the muted color. */}
       <FieldSample label={`${theme} arithmetic sample`} text="12×3" unitId="liter" />
       <CalculatorSample />

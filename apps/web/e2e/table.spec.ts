@@ -1,7 +1,7 @@
 import { categories, unitsIn } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
-import { ANNOUNCE_MS, COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
+import { ANNOUNCE_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
 import {
   applyTheme,
   box,
@@ -296,10 +296,10 @@ test('keyboard: the arrows go through every row from the unit in the box, then o
   await box(page).press('ArrowUp');
   await box(page).press('ArrowUp');
   await expectCursor(page, 'fluid ounces');
-  // Ctrl+C copies the row the cursor is on, at full precision.
+  // Ctrl+C copies the row the cursor is on, as the row shows it (Sean, 2026-10-15).
   await box(page).press('Control+c');
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
-  expect(Number(await page.evaluate(() => navigator.clipboard.readText()))).toBeCloseTo(2000, 9);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2,000.00');
 
   // Down across the sections, past their headings, to the last row, the UK's gallon (fluid ounces
   // are the third); Enter takes it, its value to the box's 10 digits, and the cursor rests on it.
@@ -951,37 +951,56 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   await expect(box(page)).toHaveAccessibleDescription(words);
 });
 
-test('the box and a row copy their full values, and the copy confirms with a check', async ({
+test('one copy button, laid over the active row’s end, copies what the row shows', async ({
   page,
   context,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/?a=mile&v=2');
+  await page.goto('/?a=foot&v=2');
   await ready(page);
-  // Copy buttons are off on a fresh visit (ADR 0017).
+  const copyCell = (unitId: string) => row(page, unitId).locator('[data-copy-cell]');
+  const shown = () =>
+    page
+      .locator('[data-copy-cell]')
+      .evaluateAll((cells) =>
+        cells
+          .filter((cell) => getComputedStyle(cell).opacity !== '0')
+          .map((cell) => cell.closest<HTMLElement>('[data-row]')!.dataset.row),
+      );
+  // The box has no copy button; at rest the row of the box's unit shows the table's one.
   await expect(page.getByRole('button', { name: 'Copy value' })).toHaveCount(0);
-  await setSettings(page, 'Copy buttons');
-  const copyValue = page.getByRole('button', { name: 'Copy value' });
-  const copyRow = row(page, 'kilometer').getByRole('button', { name: /^Copy/ });
-  const checks = page.locator('[data-copied]');
+  await expect.poll(shown).toEqual(['foot']);
+  // No column is kept: the row runs to the card's edge, the button over its end.
+  const edges = await row(page, 'yard').evaluate((each) => {
+    const cell = each.querySelector('[role="gridcell"]')!.getBoundingClientRect();
+    const copy = each.querySelector('[data-copy-cell]')!.getBoundingClientRect();
+    return { row: each.getBoundingClientRect().right, cell: cell.right, copy: copy.right };
+  });
+  expect(Math.abs(edges.cell - edges.row)).toBeLessThanOrEqual(1);
+  expect(Math.abs(edges.copy - edges.row)).toBeLessThanOrEqual(1);
 
-  await copyRow.click();
-  await expect(copyRow.locator('[data-copied]')).toBeVisible();
+  // The mouse's row shows it instead, and it copies what the row shows, not the full value.
+  await unitCell(page, 'meter').hover();
+  await expect.poll(shown).toEqual(['meter']);
+  const copyMeter = copyCell('meter').getByRole('button', { name: /^Copy/ });
+  await copyMeter.click();
+  await expect(copyMeter.locator('[data-copied]')).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
-  // The full value, not the six digits the row shows.
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('3.218688');
-
-  // The check moves to whichever button copied last.
-  await copyValue.click();
-  await expect(copyValue.locator('[data-copied]')).toBeVisible();
-  await expect(checks).toHaveCount(1);
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');
-
-  // It stays while the mouse rests on the button and reverts once the mouse leaves.
-  await page.waitForTimeout(COPIED_MS + MARGIN_MS);
-  await expect(checks).toHaveCount(1);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.61');
   await page.mouse.move(0, 0);
-  await expect(checks).toHaveCount(0);
+  await expect.poll(shown).toEqual(['foot']);
+
+  // A row taken into the box shows it, the cursor resting there.
+  await unitCell(page, 'yard').click();
+  await expect(page.getByRole('button', { name: 'Remove yards' })).toBeVisible();
+  await page.mouse.move(0, 0);
+  await expect.poll(shown).toEqual(['yard']);
+
+  // The cursor's row shows it, and Ctrl/⌘+C copies that row as shown.
+  await page.keyboard.press('ArrowUp');
+  await expect.poll(shown).toEqual(['foot']);
+  await page.keyboard.press('ControlOrMeta+c');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2.00');
 });
 
 test('Copy URL copies the current conversion and confirms with a check', async ({

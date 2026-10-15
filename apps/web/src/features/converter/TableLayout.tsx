@@ -113,8 +113,6 @@ export interface TableLayoutProps {
   dispatch: (action: HistoryAction) => void;
   /** Id of the converter's hint, which describes the field. */
   describedBy: string;
-  /** The field's copy button, once it holds a number. */
-  copyButton: ReactNode;
   /**
    * The side panel open, one at a time (the calculator, Units, or Display): between the box and
    * the table, or beside them from md.
@@ -153,7 +151,6 @@ export function TableLayout({
   env,
   dispatch,
   describedBy,
-  copyButton,
   side,
   sideId,
   sideTypes,
@@ -471,8 +468,8 @@ export function TableLayout({
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.ctrlKey || event.metaKey) {
-      // Ctrl/⌘+C on a row the cursor is on copies its full value; undo and redo are the
-      // converter's.
+      // Ctrl/⌘+C on a row the cursor is on copies its value as the row shows it; undo and redo
+      // are the converter's.
       if (event.key.toLowerCase() !== 'c' || !browsing || table.kind !== 'units') return;
       const row = table.rows[at];
       if (row?.tone !== 'value') return;
@@ -661,7 +658,6 @@ export function TableLayout({
               activeId: browsing ? itemId(at) : undefined,
               kind: table.kind === 'units' ? 'grid' : 'listbox',
             }}
-            trailing={copyButton}
             symbolOnly={display.names === 'symbol'}
             // With a unit in the chip the box takes a number alone, so a phone brings up its
             // number pad; with none, letters type a unit ("2 cups"), and the chip's × brings

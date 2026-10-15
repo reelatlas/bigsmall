@@ -1,7 +1,6 @@
 import { useId } from 'react';
 import { SegmentedControl, SegmentedToggles } from '../../../components/SegmentedControl';
 import { SidePanel } from '../../../components/SidePanel';
-import { Switch } from '../../../components/Switch';
 import { TriCheckbox } from '../../../components/TriCheckbox';
 import { cx, OPTION_ROW } from '../../../lib/recipes';
 
@@ -51,10 +50,6 @@ export function SettingSamples({ theme }: { theme: string }) {
           onChange={noop}
         />
       </fieldset>
-      <div className="grid sm:grid-cols-2">
-        <Switch label="Switch, off" checked={false} onChange={noop} />
-        <Switch label="Switch, on" checked onChange={noop} />
-      </div>
       <fieldset className="grid">
         <legend className={LEGEND}>Checkbox over a group: all, some, none</legend>
         {(['all', 'some', 'none'] as const).map((state) => (
@@ -78,7 +73,6 @@ export function SettingSamples({ theme }: { theme: string }) {
               onChange={noop}
             />
           </fieldset>
-          <Switch label="Copy buttons" checked={false} onChange={noop} />
         </SidePanel>
       </div>
     </div>

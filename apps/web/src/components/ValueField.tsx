@@ -6,7 +6,6 @@ import {
   useRef,
   type ChangeEvent,
   type KeyboardEvent,
-  type ReactNode,
   type RefObject,
 } from 'react';
 import { useFieldFit, type FitText } from '../lib/fit-step';
@@ -39,8 +38,6 @@ export interface ValueFieldProps {
     activeId: string | undefined;
     kind: 'listbox' | 'grid';
   };
-  /** Rendered at the end of the field: the copy button. */
-  trailing?: ReactNode;
   /** Symbol only (docs/UX-SPEC.md §7): the chip shows its symbol alone, as when it lacks the room. */
   symbolOnly?: boolean;
   /**
@@ -68,10 +65,9 @@ const TEXT_LAYER =
 
 /**
  * The converter's field (docs/DESIGN-SYSTEM.md, "Fields"): a combobox input over a text layer, its
- * clear while it holds text, the unit chip, and a trailing slot, the row fitted by measurement, so
- * the chip gives up its name before the value steps down a size, in a box of any width. Its edge
- * is a shell's at rest, the accent while focus is inside. What the keys do is its host's
- * (TableLayout).
+ * clear while it holds text, and the unit chip, the row fitted by measurement, so the chip gives
+ * up its name before the value steps down a size, in a box of any width. Its edge is a shell's at
+ * rest, the accent while focus is inside. What the keys do is its host's (TableLayout).
  */
 export function ValueField({
   inputRef,
@@ -83,7 +79,6 @@ export function ValueField({
   placeholder,
   describedBy,
   popup,
-  trailing,
   symbolOnly = false,
   numberPad = false,
   onChange,
@@ -116,8 +111,8 @@ export function ValueField({
   };
   useLayoutEffect(syncScroll);
 
-  // The chip and the trailing button keep the same 8 px from the top, bottom, and right edges
-  // (docs/DESIGN-SYSTEM.md, "Fields").
+  // The chip keeps the same 8 px from the top, bottom, and right edges (docs/DESIGN-SYSTEM.md,
+  // "Fields").
   return (
     <div className={cx('min-w-0 rounded-lg shadow-sm', SHELL, SHELL_BORDERED)}>
       <label htmlFor={inputId} className="sr-only">
@@ -183,7 +178,6 @@ export function ValueField({
             onRemove={onChipRemove}
           />
         )}
-        {trailing}
       </div>
     </div>
   );

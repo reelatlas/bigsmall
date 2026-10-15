@@ -716,3 +716,8 @@ Format:
 
 **What happened.** Sean asked for the number keys when tapping into the box. `inputmode="decimal"` on a text field brings an iPhone's decimal pad: digits and the locale's decimal mark only, no minus, no letters, no operators, and no return key (Safari's bar above the keyboard keeps Done). The keyboard reads the mode when the field gains focus; changing it while the keyboard is up shows nothing until the next tap.
 **Rule.** Ask for the pad only where the field takes nothing but an unsigned number (the box with a unit, outside Temperature and Angle), and keep `type="text"`: a number field drops what a parser reads. A button inside a field that must not take focus (the box's ×) prevents its mousedown; its click still fires, and the caret and a phone's keyboard stay where they were.
+
+## 2026-10-15 — A copied number pastes as a number: a plain hyphen, and buttons unseen but there
+
+**What happened.** Copy now takes what a row shows rather than its full value (Sean). Some locales write negatives with U+2212, the typographic minus, which reads well but pastes into a spreadsheet or a calculator as text. And with one copy button shown at a time, the others had to stay for screen readers without catching a tap meant for their row.
+**Rule.** Copied text swaps U+2212 for a hyphen (`copiedText` in `ConversionTable`); "≈" stays off it. A control that shows only on the active row stays in the accessibility tree with `opacity-0 pointer-events-none` rather than `invisible` or `hidden`, so screen readers reach it and a pointer passes through to the row. A test that clicks at a row's end with a mouse hovers it first, which shows that row's button: test pass-through with a tap.

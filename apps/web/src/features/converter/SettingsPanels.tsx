@@ -12,7 +12,6 @@ import {
   SegmentedToggles,
   type SegmentedOption,
 } from '../../components/SegmentedControl';
-import { Switch } from '../../components/Switch';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
 import { cx, PANEL_TITLE } from '../../lib/recipes';
@@ -268,8 +267,8 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
 
 /**
  * Display (docs/UX-SPEC.md §1, §7; ADR 0017): how results look. Symbols alone or with names
- * first; then copy buttons, the format, what values round to, which way, and
- * a reset of all of it.
+ * first; then the format, what values round to, which way, and a reset of all of it. Copying is
+ * no setting: the active row's copy button (Sean, 2026-10-15).
  */
 export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelProps) {
   const { display } = settings;
@@ -288,11 +287,6 @@ export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelPro
         ]}
         value={display.names}
         onChange={(names) => setDisplay({ names })}
-      />
-      <Switch
-        label="Copy buttons"
-        checked={display.copy}
-        onChange={(copy) => setDisplay({ copy })}
       />
       <Choices<Display['format']>
         legend="Format"

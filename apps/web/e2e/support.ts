@@ -92,18 +92,16 @@ const UNITS_CHOICES = new Set([
 
 /**
  * Opens Units or Display, whichever holds each choice, picks it by its label ("All",
- * "Symbol and name", "No limit"), turns a switch over by its name ("Copy buttons"), or presses a
- * button ("Show custom hidden units"), then closes the panel with its close button.
+ * "Symbol and name", "No limit") or presses a button ("Show custom hidden units"), then closes the
+ * panel with its close button.
  */
 export async function setSettings(page: Page, ...choices: string[]) {
   for (const choice of choices) {
     const name = UNITS_CHOICES.has(choice) ? 'Units' : 'Display';
     const panel = settingsPanel(page, name);
     if (!(await panel.count())) await settingsButton(page, name).click();
-    const toggle = panel.getByRole('switch', { name: choice });
     const button = panel.getByRole('button', { name: new RegExp(`^${choice}`) });
-    if (await toggle.count()) await toggle.click();
-    else if (await button.count()) await button.click();
+    if (await button.count()) await button.click();
     else
       await panel
         .locator('label')
@@ -118,9 +116,9 @@ export async function setSettings(page: Page, ...choices: string[]) {
 }
 
 /**
- * The table as it was before Settings (ADR 0017): every unit, names, copy buttons, and six
- * significant digits, for tests whose subject is something else.
+ * The table as it was before Settings (ADR 0017): every unit, names, and six significant digits,
+ * for tests whose subject is something else.
  */
 export async function showEverything(page: Page) {
-  await setSettings(page, 'All', 'Symbol and name', 'Copy buttons', 'No limit');
+  await setSettings(page, 'All', 'Symbol and name', 'No limit');
 }

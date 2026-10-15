@@ -9,6 +9,7 @@ import {
   settingsButton,
   settingsPanel,
   settled,
+  unitCell,
 } from './support';
 
 // Settings (ADR 0017, docs/UX-SPEC.md §1, §3, §7): what shows, in every category, and how results
@@ -19,7 +20,7 @@ const table = (page: Page) => page.getByRole('region', { name: 'Volume' });
 const hiddenToggle = (page: Page) => page.getByRole('button', { name: /^Hidden/ });
 const SPECIALIST = unitsIn('volume').filter((unit) => unit.tier !== 'basic').length;
 
-test('a fresh visit shows symbols and names, two places, no copy buttons, and the specialist units hidden', async ({
+test('a fresh visit shows symbols and names, two places, and the specialist units hidden', async ({
   page,
 }) => {
   await page.goto('/?a=us-cup&v=2');
@@ -27,8 +28,6 @@ test('a fresh visit shows symbols and names, two places, no copy buttons, and th
   await expect(row(page, 'liter')).toContainText('0.47');
   // Symbol and name since 2026-10-15 (Sean); symbols alone until then.
   await expect(row(page, 'liter').locator('[data-name]')).toBeVisible();
-  await expect(table(page).getByRole('button', { name: /^Copy/ })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Copy value' })).toHaveCount(0);
   await expect(row(page, 'cubic-meter')).toHaveCount(0);
   await expect(hiddenToggle(page)).toContainText(String(SPECIALIST));
 
@@ -40,9 +39,6 @@ test('a fresh visit shows symbols and names, two places, no copy buttons, and th
   ).toBeChecked();
   await settingsButton(page, 'Display').click();
   await expect(
-    settingsPanel(page, 'Display').getByRole('switch', { name: 'Copy buttons' }),
-  ).toHaveAttribute('aria-checked', 'false');
-  await expect(
     settingsPanel(page, 'Display')
       .locator('label', { hasText: /^Symbol and name$/ })
       .locator('input'),
@@ -52,7 +48,7 @@ test('a fresh visit shows symbols and names, two places, no copy buttons, and th
   // Symbol only: the names leave the rows and the chip, kept for screen readers.
   await setSettings(page, 'Symbol only');
   await expect(row(page, 'liter').locator('[data-name]')).toHaveCount(0);
-  await expect(row(page, 'liter').getByRole('gridcell')).toHaveAccessibleName(/liters/);
+  await expect(unitCell(page, 'liter')).toHaveAccessibleName(/liters/);
   await expect(
     page.getByRole('button', { name: 'Change unit: cups' }).getByText('cups', { exact: true }),
   ).toBeHidden();

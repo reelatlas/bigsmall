@@ -15,12 +15,14 @@ export interface Shortcut {
   keys: readonly (readonly Key[])[];
 }
 
-// In the order people use them (docs/UX-SPEC.md §10). Tab, Home and End in a toolbar, Backspace
-// on an empty box, and Ctrl+C, which everyone knows, work too but are left out to keep it short.
+// In the order people use them (docs/UX-SPEC.md §10). Tab, Home and End in a toolbar, and
+// Backspace on an empty box work too but are left out to keep it short. Copying is in: its button
+// shows only on the active row (Sean, 2026-10-15).
 // Letters in lowercase, as most unit symbols are written.
 export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Type from anywhere', keys: [['0–9'], ['a–z']] },
   { action: 'Pick a unit or value', keys: [['Enter']] },
+  { action: 'Copy a row’s value', keys: [['Mod', 'C']] },
   { action: 'Step back or clear', keys: [['Esc']] },
   // Each pair of arrows shares one group so they sit side by side with nothing between them.
   { action: 'Move up and down page', keys: [['↑', '↓']] },

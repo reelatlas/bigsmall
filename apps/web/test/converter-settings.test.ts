@@ -221,10 +221,9 @@ describe('settings: what shows', () => {
 });
 
 describe('settings: how it looks', () => {
-  it('starts with symbols and names, no copy buttons, two places, the nearest, eighths in waiting', () => {
+  it('starts with symbols and names, two places, the nearest, eighths in waiting', () => {
     expect(FRESH_DISPLAY).toMatchObject({
       names: 'both',
-      copy: false,
       format: 'decimal',
       places: 2,
       rounding: 'nearest',

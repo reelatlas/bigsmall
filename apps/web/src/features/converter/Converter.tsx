@@ -5,7 +5,6 @@ import { Button } from '../../components/Button';
 import {
   CalculatorIcon,
   CopiedIcon,
-  CopyIcon,
   EraserIcon,
   FilterIcon,
   LinkIcon,
@@ -14,6 +13,7 @@ import {
   UndoIcon,
 } from '../../components/icons';
 import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
+import { copiedText } from '../../components/ConversionTable';
 import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { useCopied } from '../../lib/copied';
@@ -30,10 +30,10 @@ import { urlFor } from './url';
 import { useConverter } from './useConverter';
 
 /**
- * The buttons that confirm with a check: copying the box's value, a row's, or the page's URL, and
- * sending the calculator's value to the box.
+ * The buttons that confirm with a check: copying a row's value or the page's URL, and sending the
+ * calculator's value to the box.
  */
-type Confirmable = 'value' | 'url' | 'use' | `row-${string}`;
+type Confirmable = 'url' | 'use' | `row-${string}`;
 
 /** What the status region says when a button confirms. */
 function confirmation(key: Confirmable): string {
@@ -202,29 +202,16 @@ export function Converter() {
     markCopied('use');
   };
 
-  /** Copies a table row's full-precision value, not the 6 digits it shows (docs/UX-SPEC.md §7). */
+  /**
+   * Copies a table row's value as the row shows it (docs/UX-SPEC.md §7; Sean, 2026-10-15), from
+   * its copy button or Ctrl/⌘+C. A check in the success color confirms it, and the status line
+   * says so; useCopied decides when it reverts.
+   */
   const copyRow = (unitId: string) => {
     const row = table.kind === 'units' ? table.rows.find((each) => each.id === unitId) : undefined;
-    if (row?.value != null) copy(String(row.value), `row-${unitId}`);
+    const text = row ? copiedText(row, settings.display, env.locale) : null;
+    if (text !== null) copy(text, `row-${unitId}`);
   };
-
-  // The box's copy button, with copy buttons on and whenever it holds a number: out of the Tab
-  // order, since Ctrl/⌘+C copies from the field itself. A check in the success color confirms the
-  // copy (the status line announces it); useCopied decides when it reverts.
-  const value = box.parsed.value;
-  const copyButton = settings.display.copy && value !== undefined && (
-    <Button
-      variant="ghost"
-      square
-      nested
-      tabIndex={-1}
-      aria-label="Copy value"
-      onClick={() => copy(String(value), 'value')}
-      {...pointerProps('value')}
-    >
-      {copied === 'value' ? <CopiedIcon /> : <CopyIcon />}
-    </Button>
-  );
 
   const calculator = calculatorOpen && (
     <Calculator
@@ -397,7 +384,6 @@ export function Converter() {
         env={env}
         dispatch={dispatch}
         describedBy={hintId}
-        copyButton={copyButton}
         side={sidePanel}
         sideId={sideId}
         sideTypes={side === 'units' || side === 'display'}

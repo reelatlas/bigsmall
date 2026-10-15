@@ -12,6 +12,23 @@ Format:
 
 ---
 
+## Index by topic
+
+Entries are cited by their titles, which stay as written; this index finds them. A note under an entry says what became of it: **Promoted** (the rule now lives in the doc named), **See also** (a related entry), **Superseded** or **Retired** (no longer how things are, kept for the history), **Since then** or **Came back** (what changed after).
+
+- **Environment, tooling, CI, hosting:** Fresh Windows machine has git but nothing else; Bash tool commands over ~8 KB fail on this machine; pnpm 12 blocks dependency install scripts until approved; TypeScript 7 drops the JavaScript compiler API; ESLint 10 and the JSX accessibility plugin; Claude desktop preview launcher on Windows; Backslash escapes in files written through tool calls; A lint rule can guard class strings without a plugin; An action's major tag can lag its newest release; CI runs on a named Ubuntu image; String.replace reads `$` patterns in the replacement text; Vite wraps every dynamic import in a preload helper; A build fails when a shell sits inside its output folder; pnpm's release-age policy holds back a package published today; Astro template comments ship in the page; astro check's deprecation hints come from preact/compat's types; Vercel picks pnpm from the lockfile, and only up to 10; A page kept out of search names no canonical address; Vercel hides plain GitHub checks behind "Show All Checks".
+- **Testing:** A browser test found a real handoff bug; A dev server reused by Playwright can serve stale modules; The dev server can serve a file caught between two writes; Playwright cannot check a visually hidden radio; A scrolling code block fails axe only where the font is wide; The browser pane's "type" inserts text; key handlers need key presses; A layout test tuned to one machine's font failed on CI's; A new island's classes can miss the dev server's CSS; A test that reads a duration's text fails against the build; getByRole's name matches part of a name; A browser test that counts registry data reads the count from core; Waiting on animations: a cancelled one has settled; Safari scrolls to the top as a list is swapped; The build writes 400ms as .4s.
+- **Preact, Astro, hydration:** Interactions that must work before hydration; React Aria cost 12 KB for two buttons; Typing before hydration is lost on a server-rendered island; Astro renders React components to static HTML when no client directive is given; Astro passes children to a React component as markup; preact/compat's useSyncExternalStore has no server snapshot; Preact runs effects after paint; Preact drops a camelCase attribute set to false; Preact never warns about hydration mismatches; Measure a framework switch on a branch before deciding it; A saved layout must not flash on a server-rendered island; The compiler lint and refs passed into a custom hook; An inline script can keep an attribute on an island's element; A memoized callback that reads only a ref's current loses its memoization; Text typed into a server-rendered field survives hydration, until the next render.
+- **Focus, keys, ARIA:** jsx-a11y and virtual-focus listboxes; Text fields match :focus-visible on a mouse click; Chrome makes a scrolling list a Tab stop; jsx-a11y cannot see attributes passed through a spread; Hover follows a pointer that stays still while the list changes; Chromium reports the Mac platform as "macOS", lowercase m; Content shown on hover has three duties; A focus-within edge lingers on a ghost trigger; `outline-none` hides Tailwind v4 focus rings; Radios fire change on every arrow key; Astro's dev toolbar is a Tab stop in development; A `div` with `aria-label` needs a role; A keyboard widget must take focus when it opens; Scroll a list to its highlight only when the keyboard moved it; Tab leaving the page for the browser is correct; Move focus to another field after the commit renders; A menu that closes on blur shuts before a pick lands; A radio group with nothing checked focuses the first without checking it; A cursor kept across a change it did not make lands on a stale row; Arrow keys through radios that apply would each be an undo step; A page-wide key must yield to what the key already did; A focus rule written against a wrapper breaks when the wrapper gains parts; The label lint cannot see a control passed through a prop; A panel that closes on blur closes when its focused control disables or leaves; A listbox holds options and groups, never a button; A popover's Escape on a toolbar control needs the capture phase; A shared edge puts an inset focus ring off centre; Moving an element drops the focus inside it.
+- **Touch:** A tap's click lands on what it uncovered; A phone's number pad: `inputmode`, read at focus.
+- **Layout and fitting:** Two children reporting into one parent value clobber each other; Rounded shells need overflow-hidden; Styling part of a field's value needs a text layer; Fit text by measuring, not by counting characters; "Cramped" was uneven insets, found by measuring; A header outside a scrolling list drifts by the scrollbar's width; Every header or toolbar addition gets a phone-width check; Taking a layer out of flow collapses its box; Fit moving text instead of clipping it; Group digits with a no-break space when text may wrap; Text set during measurement shows for a frame; Closed details are not laid out; buttons center their text; Size a control to the widest of its labels with a stacked grid; CSS cannot tell that a row wrapped: switch at a measured container size; A count that stood in for room broke in a wider box; A column spanning two rows stretches the first; A control that reads a stand-in for its value is right only some of the time; Line a column's parts up with the rows beside it: subgrid, and a row for the long side; A word and a number in another font share a baseline, not a centre; A subgrid's padding counts toward its parent's edge columns; A wrapper made a grid item needs `min-w-0` again; Decimal points line up in two columns, not with padding; A sticky bar with rounded corners shows what scrolls under it.
+- **Tokens, Tailwind, color:** Native popups cannot join the design language; An inset ring is painted under the children; a border is not; A hover token equal to its surface hides every hover; Unlayered theme tokens beat a layered reduced-motion override; A control's edge and a divider need different colors; Merging recipes can undo a fix; Dim text with the muted ink, never with opacity.
+- **Motion:** A background tab pauses requestAnimationFrame; An animation that reveals rests revealed; A view transition takes no clicks; A glide on a decelerating curve reads as a jump; A glide's leavers go first and its arrivals last.
+- **Engine, input, values:** Reference sites use Copyscape; Floating-point realities in the engine tests; Aliases outrank prefixes, by design; Undo chunks need a clock, and the reducer should own it; A number too large to hold is still a number; Text the user typed is re-read with the separators it was typed with; Arithmetic and unit names share characters; One undo history for everything the user does in the converter; A half-typed number parses as a unit query; A symbol made only of a mark folds to nothing; Snap a scaled value before rounding it up or down; A copied number pastes as a number: a plain hyphen, and buttons unseen but there.
+- **Settings and state:** Export settings from their own keys; Remember what was changed, not every setting.
+
+---
+
 ## 2026-10-06 — Fresh Windows machine has git but nothing else
 
 **What happened.** First environment check found git 2.55 but no Node, npm, pnpm, or GitHub CLI, and no git identity configured.
@@ -81,14 +98,14 @@ Format:
 ## 2026-10-06 — Typing before hydration is lost on a server-rendered island
 
 **What happened.** Browser tests typed into the converter before React attached; the controlled inputs reset to empty when hydration finished. The island now marks itself with `data-hydrated` through a `useSyncExternalStore` hook, and tests wait for it.
-**Rule.** Any island that takes typed input needs a ready mark for tests, and an inline listener that captures early keystrokes for users is on the milestone 3 list (docs/UX-SPEC.md §14). `useSyncExternalStore` with a server snapshot of `false` is the effect-free way to know you are on the client.
+**Rule.** Any island that takes typed input needs a ready mark for tests, and an inline listener that captures early keystrokes for users (built 2026-10-08, docs/UX-SPEC.md §13). `useSyncExternalStore` with a server snapshot of `false` is the effect-free way to know you are on the client.
 **Since then.** On Preact, compat's `useSyncExternalStore` ignores the server snapshot, so `useIsHydrated` is a store that turns true when first subscribed (ADR 0007, and "preact/compat's useSyncExternalStore has no server snapshot" below).
 
 ## 2026-10-06 — A browser test found a real handoff bug
 
 **What happened.** Typing a bare unit letter into the second box made it the source, which blanked the number in the first box. Unit tests had not covered "type a unit into the derived box". The browser test for switching categories did.
 **Rule.** Only a number transfers the source between boxes (docs/UX-SPEC.md §14). Keep at least one browser test per user flow in the spec; the reducer tests cover rules, the browser tests cover sequences people actually perform.
-**Since then.** The source rule lives in docs/UX-SPEC.md §6, not §14.
+**Since then.** Two boxes and the source rule retired with ADR 0013; the testing rule stands.
 **Promoted** to docs/TESTING.md, "End to end".
 
 ## 2026-10-06 — jsx-a11y and virtual-focus listboxes
@@ -102,6 +119,7 @@ Format:
 **What happened.** After rewriting several components in quick succession, every converter browser test timed out on the island's ready mark while lint, types, and unit tests passed. The console showed Vite serving a transform captured mid-write ("does not provide an export named 'UnitChip'") and React keeping the old hook state when the reducer's shape changed under hot reload.
 **Rule.** When browser tests fail wholesale right after a batch of rewrites, read the browser console before touching code. Restart the dev server (or touch the rewritten files) and rerun; Playwright reuses whatever is on port 4321 locally. A reducer whose state shape changes needs a full reload, not a hot one.
 **Promoted** to docs/TESTING.md, "End to end".
+**See also** "The dev server can serve a file caught between two writes" and "A new island's classes can miss the dev server's CSS".
 
 ## 2026-10-06 — Native popups cannot join the design language
 
@@ -113,7 +131,7 @@ Format:
 
 **What happened.** Both smart inputs told the converter which category they were browsing through one `onBrowse(category)` callback. When one box's scope changed while it was closed, its effect reported `null` after the other box had reported its category, and the global label blanked. A browser test caught it; the reducer tests could not.
 **Rule.** When several children report state to a parent, key the report by child (`onBrowse(boxId, value)`) and derive the combined value in the parent. Never let a child's "nothing" overwrite a sibling's "something".
-**Superseded in part (2026-10-06).** `onBrowse` is gone: the category label now comes from the reducer's view (`anchor`), and an open list names its own category on its Back row. The general rule stands.
+**Superseded in part (2026-10-06).** `onBrowse` is gone, and so, later, the Back row and two boxes (ADR 0013). The general rule stands.
 
 ## 2026-10-06 — Rounded shells need overflow-hidden
 
@@ -167,7 +185,7 @@ Format:
 
 **What happened.** The category name on the list's Back row sat 10 px right of the symbol column below it, because the list's scrollbar narrowed the rows but not the header above the scroll container. Moving the Back row inside the list, as its first option pinned with `sticky top-0`, made both share one content box, and it also made the arrow keys able to reach it: `aria-activedescendant` must point inside the listbox the combobox controls, so a Back button outside the list could never be the active row.
 **Rule.** Anything that must align with scrolling rows lives inside the same scroll container. Use `scroll-padding-top` on the list so a row scrolled into view is not hidden under the pinned one.
-**Promoted** to docs/DESIGN-SYSTEM.md, "Lists".
+**Since then.** The list and its Back row are gone (ADR 0012); the rule stands for any pinned row.
 
 ## 2026-10-06 — Chrome makes a scrolling list a Tab stop
 
@@ -215,7 +233,7 @@ Format:
 
 **What happened.** The shortcuts shell showed its accent edge whenever anything inside had focus. After a click closed the panel, focus stayed on the icon, so a green square remained around it with nothing open, and closing by hover faded the edge out after the panel had vanished.
 **Rule.** A trigger that is borderless at rest uses the button's own `focus-visible` ring, which a mouse click does not trigger, and its open edge comes and goes with `[data-open]` without a transition, so the edge and the panel always change together. Keep `focus-within` edges for controls that are bordered at rest, such as fields and the theme menu.
-**Came back (2026-10-06).** The hygiene pass merged the shells into one recipe (`src/lib/shell.ts`) and put the fields' edge transition in the shared part, so the shortcuts map faded its green edge again. The transition now lives in `SHELL_BORDERED` only, and a browser test fails if the ghost edge can animate. See "Merging recipes can undo a fix" below.
+**Came back (2026-10-06).** The hygiene pass merged the shells into one recipe (then `src/lib/shell.ts`, now `recipes.ts`) and put the fields' edge transition in the shared part, so the shortcuts map faded its green edge again. The transition now lives in the box's own resting style only (`FIELD_SHELL`), and a browser test fails if the ghost edge can animate. See "Merging recipes can undo a fix" below.
 **Promoted** to docs/DESIGN-SYSTEM.md, "Fluid shells".
 
 ## 2026-10-06 — Astro renders React components to static HTML when no client directive is given
@@ -293,7 +311,7 @@ Format:
 
 **What happened.** A test called `check()` on a radio styled `sr-only` inside a segmented control, and it timed out: Playwright waits for the element to be visible and stable before it clicks, and a one-pixel clipped input never is.
 **Rule.** Reach a visually hidden input the way a person does, by clicking its visible label (`locator('label').filter({ hasText })`). Assert its state with `toBeChecked()`, which needs no visibility.
-**Since then.** The Segmented control is gone: the calculator sends its number with "Use in 1st" and "Use in 2nd". The theme menu's radios are hidden the same way, and `pickTheme` in `e2e/support.ts` clicks their labels.
+**Since then.** The calculator's segmented control went with two boxes; a segmented control came back for Settings (`SegmentedControl`), its radios hidden the same way, as the theme menu's are; `pickTheme` and `setSettings` in `e2e/support.ts` click their labels.
 **Promoted** to docs/TESTING.md, "End to end".
 
 ## 2026-10-06 — Every header or toolbar addition gets a phone-width check
@@ -455,7 +473,7 @@ Format:
 
 **What happened.** Sean noticed that moving the mouse over an open list scrolled it. A hovered row became the highlight, and the effect that scrolls the highlight into view, written for the arrow keys, then scrolled any partly hidden row in, sliding new rows under a still cursor.
 **Rule.** Record why the highlight moved and reveal it accordingly: the keyboard scrolls the row in, a list opening on a row centers it, and the pointer leaves the scroll alone. A browser test points at the partly hidden rows at the list's edges and checks the list stays put.
-**Promoted** to docs/UX-SPEC.md, "§3 The suggestion list".
+**Promoted** to docs/UX-SPEC.md (the suggestion list then; the table's cursor, §5 and §8, now).
 
 ## 2026-10-07 — Vercel picks pnpm from the lockfile, and only up to 10
 
@@ -500,6 +518,7 @@ Format:
 
 **What happened.** `useFieldFit` takes refs as arguments. Setting `hidden` on `name.current` inside the hook failed `react-hooks/immutability` (a hook argument cannot be modified), and reading only `name.current` inside a `useCallback` that listed `[name]` failed `react-hooks/preserve-manual-memoization`: the compiler inferred the dependency as `name.current`, not `name`.
 **Rule.** In a custom hook, do the DOM work in a module-level function and pass it the ref object itself (`fitField(name, texts)`), reading `.current` there. The hook body then neither changes an argument nor depends on a `.current`.
+**See also** "A memoized callback that reads only a ref's current loses its memoization".
 
 ## 2026-10-07 — A column spanning two rows stretches the first
 
@@ -527,11 +546,13 @@ Format:
 
 **What happened.** The selection lab's category menu closes when focus leaves it, and applies a pointer's pick on release. Picking did nothing: pressing an option's label moved focus off the focused radio (a label takes no focus), the menu closed on that blur, and the release landed on a menu already gone.
 **Rule.** In a menu that closes when focus leaves, keep focus put when a choice is pressed (`preventDefault` on `mousedown` inside the panel), as the smart input's list does for its rows. Apply the pick on release, not on click, where radios are involved: the arrow keys check radios with a click of their own.
+**See also** "A panel that closes on blur closes when its focused control disables or leaves".
 
 ## 2026-10-07 — A test that reads a duration's text fails against the build
 
 **What happened.** Run against a production build for the first time (the dev server was taken), the reduced-motion test failed in every theme: it expected `--motion-fast` to read `0ms`, and the build's minifier writes it as `0s`. Reduced motion worked; only the text differed. CI runs the suite against the dev server, so the test had never met minified CSS.
 **Rule.** A test of a CSS value checks what it means (a zero duration, `/^0m?s$/`), not how one tool happens to write it. The suite should pass against a built site too, since that is what ships.
+**See also** "The build writes 400ms as .4s".
 
 ## 2026-10-07 — getByRole's name matches part of a name
 
@@ -559,6 +580,7 @@ Format:
 
 **What happened.** Escape with nothing focused was made to clear the converter's box. The header's shortcuts map can be open with nothing focused (a resting mouse opens it), and its Escape closes it from a document listener in the inline script, which ran first but left the event alone, so one Escape would also have cleared the box behind the map.
 **Rule.** A listener that acts on a key from anywhere checks `event.defaultPrevented` first, and every handler that consumes the key, the inline script's included, calls `preventDefault()`, so one press does one thing. Document listeners run in the order they were added: the inline script's before any island's.
+**See also** "A popover's Escape on a toolbar control needs the capture phase".
 
 ## 2026-10-07 — A control that reads a stand-in for its value is right only some of the time
 
@@ -579,6 +601,8 @@ Format:
 
 **What happened.** Sean asked for the calculator's top to sit level with the toolbar and its display level with the box. Matching them with padding would have tuned the card to the toolbar's height, and broken as soon as the toolbar wrapped. Made a subgrid of the converter's rows, the card's parts sit in those rows by construction. Two things had to hold: the card's padding and border land on its first and last parts as margin, so its title row had to fit the toolbar's row (1 px of top padding there); and a margin on the display would have made the box's row taller, so the gaps went on the title row and the keys instead. A table spanning the same third row would also have stretched the card to the table's length, so the table spans that row and a last `1fr` row, which takes the rest.
 **Rule.** To line parts of one column up with another column's rows, make it a subgrid of those rows rather than matching numbers. Keep margins off the parts whose rows must not grow, fit the edge parts' padding inside the edge rows, and give a long neighbor a `1fr` row of its own after the shared ones, so the subgrid hugs its content.
+
+**Since then.** The calculator's subgrid retired on 2026-10-15, when side panels opened level with the box (docs/DESIGN-SYSTEM.md, "Side panels"); the rule stands for any column that must line up with another's rows.
 
 ## 2026-10-08 — A tap's click lands on what it uncovered
 
@@ -609,6 +633,7 @@ Format:
 
 **What happened.** The settings lab dimmed hidden units' rows with `opacity-60`. Axe failed them on color contrast in every theme: fading the ink and the muted ink over the surface drops both below 4.5:1.
 **Rule.** A row or label that reads as set aside takes `text-ink-muted`, which every theme already holds to body-text contrast (docs/DESIGN-SYSTEM.md, colors), never an opacity on readable text. Opacity is for a control that is disabled and says so, where WCAG asks no contrast.
+**Promoted** to docs/DESIGN-SYSTEM.md, "Semantic tokens".
 
 ## 2026-10-10 — A word and a number in another font share a baseline, not a centre
 
@@ -679,6 +704,7 @@ Format:
 
 **What happened.** Entering Edit replaces the table's rows with Edit's list, a little taller. Chrome kept the page where it was; WebKit (Safari, on the live site too) scrolled to the very top, with no script scrolling or focusing anything. WebKit has no scroll anchoring, and swapping the list left it at 0.
 **Rule.** Around a change that swaps a long part of the page, measure where it sat on the screen before (`getBoundingClientRect().top`) and scroll by the difference after, in a layout effect, as Edit and Done do in `ConversionTable`. Test page jumps in WebKit, not only Chromium (`npx playwright install webkit`).
+**Promoted** to docs/TESTING.md, "End to end".
 
 ## 2026-10-15 — A glide on a decelerating curve reads as a jump
 
@@ -706,11 +732,13 @@ Format:
 
 **What happened.** Reordering Units' systems re-renders the rows in their new order, and Preact moves a row's element to its new place. A browser drops focus from anything inside an element it moves, so after Alt and an arrow, or Move up and Move down from the handle's menu, focus fell to the page and the keys could not find their way back (Sean, on his keyboard). The browser tests had passed: which rows the diff moves depends on the direction, so a move one way kept focus and the other lost it.
 **Rule.** Around a change that reorders keyed elements, note `document.activeElement` before it, and in a layout effect after it, focus that element again if it is still in the page and lost focus (`SystemRows`). Test moves in both directions, more than once.
+**See also** "Move focus to another field after the commit renders". **Promoted** to docs/ARCHITECTURE.md, "Conventions".
 
 ## 2026-10-15 — Remember what was changed, not every setting
 
 **What happened.** Settings were remembered whole: any change wrote every display setting, the defaults included. When Sean made Symbol and name the fresh default, a browser that had saved anything kept Symbol only, a choice nobody made, and his own browser would have shown the old default as if the change had not landed.
 **Rule.** Store only what differs from the defaults (`storedOf` in `settings.ts`), so a default changed later reaches everyone who never chose otherwise. Version the stored shape; reading an older version that stored everything, a setting whose default has since changed cannot tell a choice from the old default, so it takes the new one.
+**Promoted** to docs/ARCHITECTURE.md, "State and URLs".
 
 ## 2026-10-15 — A phone's number pad: `inputmode`, read at focus
 
@@ -721,3 +749,4 @@ Format:
 
 **What happened.** Copy now takes what a row shows rather than its full value (Sean). Some locales write negatives with U+2212, the typographic minus, which reads well but pastes into a spreadsheet or a calculator as text. And with one copy button shown at a time, the others had to stay for screen readers without catching a tap meant for their row.
 **Rule.** Copied text swaps U+2212 for a hyphen (`copiedText` in `ConversionTable`); "≈" stays off it. A control that shows only on the active row stays in the accessibility tree with `opacity-0 pointer-events-none` rather than `invisible` or `hidden`, so screen readers reach it and a pointer passes through to the row. A test that clicks at a row's end with a mouse hovers it first, which shows that row's button: test pass-through with a tap.
+**Promoted** to docs/DESIGN-SYSTEM.md, "Lists" (the copy button on the active row).

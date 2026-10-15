@@ -16,14 +16,16 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, forty-eighth pass):
-   - The logo exploration, round 1: a claude.ai design canvas, "bigsmall logo explorations" (https://claude.ai/artifact/QnNwjo9MzhWEYbzC1vKPmL), 36 concepts in six families; his picks shape round 2. Today's mark and link preview stay until then (`docs/DESIGN-SYSTEM.md`, "Brand assets").
-   - Umami, counting since 2026-10-15: Sean to check two devices show as two visitors with the right countries, and to leave his own visits out (`docs/DEPLOYMENT.md`, "Analytics"; ADR 0019).
-   - A one-line note that visits are counted anonymously, without cookies: recommended, its wording his.
-2. **Next, toward v1** (`docs/PLAN.md` §13): the SEO pair pages, in v1 on `bigsmall.work`, the domain for good (Sean, 2026-10-15): plan them, then build; analytics once chosen; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
-3. **Then the accuracy audit** of every conversion and calculation (`docs/PLAN.md` §11), after the rest of this list (Sean, 2026-10-15).
-4. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).
-5. **Later.** The hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search); the five-person test once there is traction.
+1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, forty-ninth pass, saved before a compaction):
+   - The mark: R6 recommended over A1; round 2 of the logo canvas (https://claude.ai/artifact/QnNwjo9MzhWEYbzC1vKPmL) shows both in context first.
+   - `/about` reached from a footer ("About · Feedback"), holding the sources, the privacy line, feedback by `hello@bigsmall.work` forwarded to his Gmail, and the sketchbook easter egg: recommended, to confirm.
+   - Rotating favicons on the live site: recommended against; the fun goes to the sketchbook page.
+   - Umami, counting since 2026-10-15: his own visit in Realtime, two devices as two visitors with the right countries, his own visits left out (`docs/DEPLOYMENT.md`, "Analytics"; an iPhone opt-out link to offer).
+2. **Next build:** round 2 of the logo canvas (the forty-ninth pass, rows 3 and 5); then, on Sean's go, the footer, `/about`, and the sketchbook, its motion tuned in a `/dev` lab first (rows 1, 2, 6).
+3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages, in v1 on `bigsmall.work`, the domain for good (Sean, 2026-10-15): plan them, then build; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
+4. **Then the accuracy audit** of every conversion and calculation (`docs/PLAN.md` §11), after the rest of this list (Sean, 2026-10-15).
+5. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).
+6. **Later.** The hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search); the five-person test once there is traction.
 
 ## Non-negotiables
 

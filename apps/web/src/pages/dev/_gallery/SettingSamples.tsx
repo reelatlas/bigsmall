@@ -64,7 +64,7 @@ export function SettingSamples({ theme }: { theme: string }) {
           </label>
         ))}
       </fieldset>
-      <div className="max-w-72">
+      <div className="max-w-80">
         <SidePanel title="Display" focusOnOpen={false} onClose={noop}>
           <fieldset className="grid">
             <legend className="sr-only">Unit names</legend>

@@ -68,11 +68,12 @@ const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
 const TABLE_ROWS_CELL = '@container mt-2 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';
 /**
  * Where a side panel opens (docs/DESIGN-SYSTEM.md, "Side panels"): 16 px from the box and from the
- * table, a panel apart, at most 384 px wide. From md, a column of its own, its top on the box's,
- * as tall as its card (`self-start`).
+ * table, a panel apart, at most 384 px wide. From md, a column of its own, 320 px wide, room for
+ * Units' four presets on one line (Sean, 2026-10-15), its top on the box's, as tall as its card
+ * (`self-start`).
  */
 const TABLE_SIDE_CELL =
-  'my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-2 md:my-0 md:w-72 md:self-start';
+  'my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-2 md:my-0 md:w-80 md:self-start';
 
 /**
  * Keys that type into the field from a control beside it (a toolbar's, the chip, a copy button):

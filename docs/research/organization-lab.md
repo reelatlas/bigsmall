@@ -1,6 +1,6 @@
 # Settings lab: what shows and how it looks (2026-10-10)
 
-**Built in the converter 2026-10-11** (ADR 0017, docs/UX-SPEC.md §1, §3, §7), as settled below. The lab stays until Sean retires it.
+**Retired 2026-10-15** (docs/research/labs/README.md): built in the converter 2026-10-11 (ADR 0017, docs/UX-SPEC.md §1, §3, §7) as settled below, and its last round (Settings' shape, units moving between shown and hidden) on 2026-10-15. Its own converter is in git at `90f3df3`; the last round's mocks were never committed, and its screenshots are in `docs/research/labs/settings-lab/`.
 
 Sean's model, in the context of the action bar (2026-10-10): one Settings button shapes the results, and the table holds what is specific to them. `/dev/organization-lab` (the settings lab, `apps/web/src/pages/dev/_organization-lab/`) builds it with single units chosen in the table (Separate) and Settings' choices drawn as segmented controls, both Sean's choices: the action bar (the category menu, the calculator, and Settings, then undo, redo, and clear all at the right), the box, and the table or the matches. Nothing is built in the converter yet.
 
@@ -97,3 +97,13 @@ To build in the settings lab, locally (Sean views them on his dev server; push o
 - **C. Settings as a panel like the calculator**: a column beside the table from md, so results change beside it. "Both" for C (Sean, 2026-10-14), read as both phone placements: between the box and the table, as the calculator opens, and a bottom sheet; if he meant C and B+C together (the two buttons opening the side panel to their section), build that as well. Rule to propose: one side panel at a time, calculator or Settings.
 
 Retiring labs (Sean, 2026-10-14): no browsable copy; an index with notes, screenshots, learnings, decisions, and what was left out, the process in `CLAUDE.md`'s recipes ("Retire a lab"). The settings lab retires after the mocks, since they live in it; its retirement is the first to follow the process, and the index gathers the labs retired before it (the selection lab, the table controls lab, the organization lab's earlier rounds).
+
+### The mocks (built 2026-10-15, local)
+
+At `/dev/organization-lab` on the dev server, on the live converter's own parts (`useConverter`, `TableLayout`, Settings' sections, exported from `SettingsPanel.tsx` for it), with the lab's choices in the address's hash:
+
+- **Settings' shape**: A, today's one dropdown; B, Filter (a funnel) and Display (the sliders), a dropdown each, Filter with Reset to Standard and Unhide units, Display with Reset display; C, a side panel like the calculator, its title row level with the toolbar and its presets level with the box from md, the rest beside the table, one side panel at a time (opening it closes the calculator, and the other way round). On a phone, C opens between the box and the table, as the calculator does, or as a sheet along the bottom over the table.
+- **A unit moving between shown and hidden** (Sean, 2026-10-15: moving one by a checkbox is not always clear): None; Highlight, a unit arriving in the table or the open Hidden list flashing the accent's soft tint and fading back, and the Hidden count flashing when units leave for it; Glide, the change as a view transition, rows sliding to their places, a unit checked in Hidden travelling to its row, arrivals fading in; and Glide with the highlight. Sliders tune each length (lab defaults 1600 ms and 350 ms), and Copy the timings copies them.
+- **Preview**: wide, or a 390 px frame (`/dev/organization-lab-phone`), where the page's breakpoints see a phone.
+
+The old lab's own converter (its copies of the sections, the rule, and the formats) was removed with them, the live converter now holding all of it; it lives in git at `90f3df3`, and its screenshots are in `docs/research/labs/settings-lab/` for the retired labs index.

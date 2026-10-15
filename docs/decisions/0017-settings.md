@@ -32,4 +32,4 @@ Sean asked for a way to section the table reliably and to control what it shows 
 - The table, the matches, and the box take the settings (`features/converter/settings.ts`, `SettingsPanel.tsx`); `SegmentedControl` and `Switch` joined the components.
 - A fresh visit shows fewer rows (the specialist units under Hidden) and shorter values (two places): browser tests that are about something else set the old view through Settings (`showEverything`, `e2e/support.ts`).
 - Saving settings across visits is an exploration (docs/PLAN.md §2), as is surfacing one setting on its own in the toolbar.
-- The settings lab may now retire, its answer shipped; that is Sean's call.
+- The settings lab retired on 2026-10-15, its last round's answer (two side panels) shipped; its entry is in the retired labs index (docs/research/labs/README.md).

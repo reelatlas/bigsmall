@@ -13,11 +13,15 @@ export interface Shortcut {
   action: string;
   /** Alternatives, shown separated by "or"; each is the keys pressed together, in order. */
   keys: readonly (readonly Key[])[];
+  /** A line over it: the converter's toolbar's own shortcuts start here, the site's above. */
+  startsGroup?: boolean;
 }
 
-// In the order people use them (docs/UX-SPEC.md §10). Tab, Home and End in a toolbar, and
-// Backspace on an empty box work too but are left out to keep it short. Copying is in: its button
-// shows only on the active row (Sean, 2026-10-15).
+// In the order people use them (docs/UX-SPEC.md §10): the site's first, then under a line the
+// toolbar's, its side panels in its order, then undo and redo (Sean, 2026-10-15). Tab, Home and
+// End in a toolbar, Backspace on an empty box, and Alt+↑ ↓ on a system's row in Units work too
+// but are left out, to keep it short and until reordering has a way to be shown. Copying is in:
+// its button shows only on the active row.
 // Letters in lowercase, as most unit symbols are written.
 export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Type from anywhere', keys: [['0–9'], ['a–z']] },
@@ -27,14 +31,9 @@ export const SHORTCUTS: readonly Shortcut[] = [
   // Each pair of arrows shares one group so they sit side by side with nothing between them.
   { action: 'Move up and down page', keys: [['↑', '↓']] },
   { action: 'Move across a toolbar', keys: [['←', '→']] },
-  { action: 'Open calculator', keys: [['Alt', 'C']] },
-  {
-    action: 'Reorder a system in Units',
-    keys: [
-      ['Alt', '↑'],
-      ['Alt', '↓'],
-    ],
-  },
+  { action: 'Open calculator', keys: [['Alt', 'C']], startsGroup: true },
+  { action: 'Open Units', keys: [['Alt', 'V']] },
+  { action: 'Open Display', keys: [['Alt', 'B']] },
   { action: 'Undo', keys: [['Mod', 'Z']] },
   {
     action: 'Redo',

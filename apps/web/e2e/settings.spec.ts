@@ -54,6 +54,43 @@ test('a fresh visit shows symbols and names, two places, and the specialist unit
   ).toBeHidden();
 });
 
+test('Alt+V and Alt+B open and close Units and Display from anywhere, focus coming back where it was', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'keys need a keyboard');
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  const units = settingsPanel(page, 'Units');
+  const display = settingsPanel(page, 'Display');
+  await expect(settingsButton(page, 'Units')).toHaveAttribute('aria-keyshortcuts', 'Alt+V');
+  await expect(settingsButton(page, 'Units')).toHaveAttribute('title', 'Units (Alt+V)');
+  await expect(settingsButton(page, 'Display')).toHaveAttribute('title', 'Display (Alt+B)');
+  await box(page).click();
+  await page.keyboard.press('Alt+v');
+  await expect(units).toBeVisible();
+  await expect(units.locator('label', { hasText: /^Standard$/ }).locator('input')).toBeFocused();
+  // One over the other: Display replaces Units, focus going into it.
+  await page.keyboard.press('Alt+b');
+  await expect(units).toHaveCount(0);
+  await expect(display).toBeVisible();
+  await expect(display.locator('input:checked').first()).toBeFocused();
+  // Its key from inside closes it, focus back in the box, where the first key was pressed.
+  await page.keyboard.press('Alt+b');
+  await expect(display).toHaveCount(0);
+  await expect(box(page)).toBeFocused();
+  // From outside, it closes and focus stays put; the calculator's key opens over a panel too.
+  await page.keyboard.press('Alt+v');
+  await box(page).click();
+  await page.keyboard.press('Alt+v');
+  await expect(units).toHaveCount(0);
+  await expect(box(page)).toBeFocused();
+  await page.keyboard.press('Alt+v');
+  await page.keyboard.press('Alt+c');
+  await expect(units).toHaveCount(0);
+  await expect(page.getByRole('group', { name: 'Calculator' })).toBeVisible();
+});
+
 test('Units and Display open beside the table, one side panel at a time with the calculator; Escape closes, a press outside does not', async ({
   page,
 }) => {

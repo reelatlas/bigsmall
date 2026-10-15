@@ -42,6 +42,15 @@ function confirmation(key: Confirmable): string {
   return 'Copied';
 }
 
+/** The side panels the toolbar opens, one at a time. */
+type Side = 'calculator' | 'units' | 'display';
+
+/**
+ * Each side panel's key with Alt, side by side on the keyboard as the panels are in the toolbar
+ * (Sean, 2026-10-15): C, V, B.
+ */
+const SIDE_KEYS: Readonly<Record<string, Side>> = { c: 'calculator', v: 'units', b: 'display' };
+
 /** The hint over the toolbar (docs/UX-SPEC.md §1). */
 const HINT = 'Type a number, unit, or both to compare all at once.';
 
@@ -79,7 +88,7 @@ export function Converter() {
   const sideId = useId();
   const calculatorToggleId = useId();
   /** The side panel open, one at a time (Sean, 2026-10-15): the calculator, Units, or Display. */
-  const [side, setSide] = useState<'calculator' | 'units' | 'display' | null>(null);
+  const [side, setSide] = useState<Side | null>(null);
   const calculatorOpen = side === 'calculator';
   // The calculator's own entry: a scratch pad in the converter's state, so undo reaches it too.
   const entry = state.calc;
@@ -119,8 +128,9 @@ export function Converter() {
   }, [dispatch]);
 
   /**
-   * Where focus goes back to when the calculator closes from inside: the icon, when the icon
-   * opened it, or where Alt+C was pressed (docs/UX-SPEC.md §8).
+   * Where focus goes back to when a side panel closes from inside: the calculator's icon, when the
+   * icon opened it, or where its key was pressed (docs/UX-SPEC.md §8). Null for a settings panel
+   * opened from its button, which closes back onto the button.
    */
   const returnTo = useRef<HTMLElement | null>(null);
   const calculatorToggle = () => document.getElementById(calculatorToggleId);
@@ -135,30 +145,55 @@ export function Converter() {
     (focus?.isConnected ? focus : calculatorToggle())?.focus();
   };
 
-  // Alt+C (⌥C on Apple devices, where Option+C types ç) from anywhere on the page opens the
-  // calculator and closes it. Closed from inside it, focus goes back where it was; closed from
-  // outside, focus stays put. AltGr, which is Ctrl+Alt, is left alone.
+  /** The open side panel closed by its key from inside it: focus back where the key opened it. */
+  const closeSide = () => {
+    const button = {
+      calculator: calculatorToggleId,
+      units: unitsToggleId,
+      display: displayToggleId,
+    };
+    const toggle = side ? document.getElementById(button[side]) : null;
+    const focus = returnTo.current;
+    setSide(null);
+    (focus?.isConnected ? focus : toggle)?.focus();
+  };
+
+  // Alt+C, Alt+V, and Alt+B (⌥ on Apple devices, where Option and a letter type a character)
+  // from anywhere on the page open the calculator, Units, and Display, one over whichever was
+  // open, and close them. Closed from inside it, focus goes back where it was when a key opened
+  // it (from a panel it replaced, where that one was opened from); closed from outside, focus
+  // stays put. AltGr, which is Ctrl+Alt, is left alone.
   useLayoutEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.repeat) return;
-      const isC = event.key.toLowerCase() === 'c' || (isApplePlatform() && event.code === 'KeyC');
-      if (!isC) return;
+      const physical = /^Key[A-Z]$/.test(event.code) ? event.code.slice(3).toLowerCase() : '';
+      const which =
+        SIDE_KEYS[event.key.toLowerCase()] ?? (isApplePlatform() ? SIDE_KEYS[physical] : undefined);
+      if (!which) return;
       event.preventDefault();
       const focused = document.activeElement;
+      const inside = document.getElementById(sideId)?.contains(focused) ?? false;
+      if (side === which) {
+        if (inside) closeSide();
+        else setSide(null);
+        return;
+      }
       // With nothing focused, closing comes back to the box.
-      const here =
-        focused instanceof HTMLElement && focused !== document.body ? focused : inputRef.current;
-      if (!calculatorOpen) openCalculator(here);
-      else if (document.getElementById(sideId)?.contains(focused)) closeCalculator();
-      else setSide(null);
+      if (!inside) {
+        returnTo.current =
+          focused instanceof HTMLElement && focused !== document.body ? focused : inputRef.current;
+      }
+      setSide(which);
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   });
 
   /** Units or Display, from its button: opening one closes whichever side panel was open. */
-  const toggleSettings = (key: 'units' | 'display') =>
+  const toggleSettings = (key: 'units' | 'display') => {
+    returnTo.current = null;
     setSide((open) => (open === key ? null : key));
+  };
 
   /** Closed from inside it (its × or Escape), focus goes back to its button. */
   const closeSettings = (key: 'units' | 'display') => {
@@ -311,7 +346,8 @@ export function Converter() {
               id={unitsToggleId}
               data-tool="units"
               aria-label="Units"
-              title="Units"
+              aria-keyshortcuts="Alt+V"
+              title={apple ? 'Units (⌥V)' : 'Units (Alt+V)'}
               aria-expanded={side === 'units'}
               aria-controls={side === 'units' ? sideId : undefined}
               on={side === 'units'}
@@ -325,7 +361,8 @@ export function Converter() {
               id={displayToggleId}
               data-tool="display"
               aria-label="Display"
-              title="Display"
+              aria-keyshortcuts="Alt+B"
+              title={apple ? 'Display (⌥B)' : 'Display (Alt+B)'}
               aria-expanded={side === 'display'}
               aria-controls={side === 'display' ? sideId : undefined}
               on={side === 'display'}

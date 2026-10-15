@@ -139,6 +139,11 @@ test('shortcuts name ⌘ and ⌥ on Apple devices, Ctrl and Alt elsewhere', asyn
   await expect(page.locator('[data-alt-key]').first()).toHaveText('Alt');
   await expect(undo).toHaveAttribute('title', 'Undo (Ctrl+Z)');
   await expect(calculator).toHaveAttribute('title', 'Calculator (Alt+C)');
+  // The site's shortcuts, then a line, then the toolbar's, from the calculator on.
+  const lined = page.locator('#shortcuts-panel dl > div.border-t');
+  await expect(lined).toHaveCount(1);
+  await expect(lined).toContainText('Open calculator');
+  await expect(page.locator('#shortcuts-panel')).not.toContainText('Reorder');
 
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' });

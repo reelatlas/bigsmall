@@ -23,6 +23,8 @@ const SEGMENT =
 export interface SegmentedOption<T> {
   value: T;
   label: ReactNode;
+  /** Out of reach for now, in the muted ink, skipped by the arrows (Units' Custom with no set yet). */
+  disabled?: boolean;
 }
 
 /** One of a few: radios, which share `name`. */
@@ -45,6 +47,7 @@ export function SegmentedControl<T extends string | number>({
             type="radio"
             name={name}
             checked={value === option.value}
+            disabled={option.disabled}
             onChange={() => onChange(option.value)}
             className="peer sr-only"
           />

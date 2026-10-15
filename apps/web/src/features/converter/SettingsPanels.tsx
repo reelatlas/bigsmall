@@ -7,7 +7,11 @@ import {
 import { useId, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Button } from '../../components/Button';
 import { CheckIcon } from '../../components/icons';
-import { SegmentedControl, SegmentedToggles } from '../../components/SegmentedControl';
+import {
+  SegmentedControl,
+  SegmentedToggles,
+  type SegmentedOption,
+} from '../../components/SegmentedControl';
 import { Switch } from '../../components/Switch';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
@@ -16,19 +20,20 @@ import { cx, OPTION_ROW, PANEL_TITLE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
+  customReady,
   hiddenByHand,
-  litPreset,
-  presetKeys,
-  presetRule,
   SECTION_LABEL,
   SHOW_PRESETS,
+  shownChoice,
   SYSTEM_KEYS,
   systemState,
+  withCustomPicked,
   withoutHidden,
+  withPresetPicked,
   withSystem,
   type Display,
   type Settings,
-  type ShowPreset,
+  type ShowChoice,
   type ViewRule,
 } from './settings';
 
@@ -75,7 +80,7 @@ function Choices<T extends string | number>({
   onChange,
 }: {
   legend: string;
-  options: ReadonlyArray<{ value: T; label: ReactNode }>;
+  options: ReadonlyArray<SegmentedOption<T>>;
   value: T | null;
   disabled?: boolean;
   hideLegend?: boolean;
@@ -182,11 +187,11 @@ function Reset({
 
 /**
  * Units (docs/UX-SPEC.md §1, §3; ADR 0017; Filter until Sean renamed it, 2026-10-15): what search
- * and the table show, in every category. The presets first, Standard among them, which is how the
- * switches go back to a fresh visit's; then a switch per system; then Show units you hid,
- * which clears what Edit and the Hidden list hid, the switches staying (Sean, 2026-10-15: a reset to
- * Standard beside the Standard preset did the same thing twice, and "Unhide units" read as the
- * switches' units too).
+ * and the table show, in every category. The presets first, and Custom, the visitor's own set,
+ * which lights the moment anything departs from every preset; picking a preset keeps that set
+ * aside, and picking Custom brings it back. Then a switch per system, a dash while some of its
+ * units are chosen on their own; then Show units you hid, which clears what Edit and the Hidden
+ * list hid, the switches staying.
  */
 export function UnitsPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
   const { rule } = settings;
@@ -196,12 +201,27 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
   const { copied: done, markCopied, pointerProps } = useCopied<'unhide'>();
   return (
     <SidePanel title="Units" onClose={onClose}>
-      <Choices<ShowPreset>
+      <Choices<ShowChoice>
         legend="Show"
         hideLegend
-        options={SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name }))}
-        value={litPreset(rule, preference)}
-        onChange={(preset) => setRule(() => presetRule(presetKeys(preset, preference)))}
+        options={[
+          ...SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name })),
+          {
+            value: 'custom',
+            label: (
+              <>
+                Custom<span className="sr-only">, your own set</span>
+              </>
+            ),
+            disabled: !customReady(settings, preference),
+          },
+        ]}
+        value={shownChoice(rule, preference)}
+        onChange={(choice) =>
+          onSettings((now) =>
+            choice === 'custom' ? withCustomPicked(now) : withPresetPicked(now, choice, preference),
+          )
+        }
       />
       <div className="grid gap-1">
         <fieldset className="grid">

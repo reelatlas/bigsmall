@@ -305,6 +305,37 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   await expect(units.getByRole('radio', { name: 'Standard' })).toBeChecked();
 });
 
+test("Custom lights for a set of the visitor's own; a preset keeps it aside, and Custom brings it back", async ({
+  page,
+}) => {
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await settingsButton(page, 'Units').click();
+  const units = settingsPanel(page, 'Units');
+  const custom = units.getByRole('radio', { name: /^Custom/ });
+  const pick = (name: RegExp) => units.locator('label').filter({ hasText: name }).click();
+  // A fresh visit has no set of its own: Standard is lit, Custom out of reach.
+  await expect(units.getByRole('radio', { name: 'Standard' })).toBeChecked();
+  await expect(custom).toBeDisabled();
+  // A unit hidden in Edit makes one, and Custom lights.
+  await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
+  await table(page)
+    .getByRole('group', { name: 'US (customary)', exact: true })
+    .getByLabel(/teaspoons/)
+    .click();
+  await table(page).getByRole('button', { name: 'Done' }).click();
+  await expect(custom).toBeChecked();
+  // Standard sets exactly its set, teaspoons back; Custom brings the visitor's set back.
+  await pick(/^Standard$/);
+  await expect(row(page, 'us-teaspoon')).toBeVisible();
+  await expect(custom).toBeEnabled();
+  await expect(custom).not.toBeChecked();
+  await pick(/^Custom/);
+  await expect(custom).toBeChecked();
+  await expect(row(page, 'us-teaspoon')).toHaveCount(0);
+  await expectNoA11yViolations(page);
+});
+
 test('search leaves hidden units out and offers them; taking one unhides it', async ({ page }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);

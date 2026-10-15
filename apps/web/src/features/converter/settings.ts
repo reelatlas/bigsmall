@@ -129,6 +129,9 @@ export const FRESH_RULE: ViewRule = {
 
 export type ShowPreset = 'all' | 'standard' | 'region';
 
+/** What Units' presets can light: a preset, or Custom, the visitor's own set (Sean, 2026-10-15). */
+export type ShowChoice = ShowPreset | 'custom';
+
 export const SHOW_PRESETS: ReadonlyArray<{ id: ShowPreset; name: string }> = [
   { id: 'all', name: 'All' },
   { id: 'standard', name: 'Standard' },
@@ -154,9 +157,12 @@ export function presetOf(
   return SHOW_PRESETS.find((preset) => same(presetKeys(preset.id, preference)))?.id ?? null;
 }
 
-/** The preset lit in Units: the one the switches match, while no unit is chosen on its own. */
-export function litPreset(rule: ViewRule, preference: UnitPreference): ShowPreset | null {
-  return rule.overrides.size > 0 ? null : presetOf(rule.shown, preference);
+/**
+ * What lights in Units: the preset the switches match while no unit is chosen on its own, else
+ * Custom, the moment anything departs from every preset.
+ */
+export function shownChoice(rule: ViewRule, preference: UnitPreference): ShowChoice {
+  return (rule.overrides.size > 0 ? null : presetOf(rule.shown, preference)) ?? 'custom';
 }
 
 /** The section of a unit chosen on its own, by its id; undefined for an id no longer known. */
@@ -298,6 +304,39 @@ export function displayChanged(display: Display): boolean {
 export interface Settings {
   rule: ViewRule;
   display: Display;
+  /**
+   * The visitor's own set, kept aside when a preset was picked over it, for Custom to bring back:
+   * the switches and the units chosen on their own. Null until there is one.
+   */
+  kept: ViewRule | null;
 }
 
-export const FRESH_SETTINGS: Settings = { rule: FRESH_RULE, display: FRESH_DISPLAY };
+export const FRESH_SETTINGS: Settings = { rule: FRESH_RULE, display: FRESH_DISPLAY, kept: null };
+
+/**
+ * A preset picked in Units: exactly its set; a custom set that was showing is kept aside, not lost,
+ * so Custom can bring it back (the pattern of a browser's tracking protection: Standard, Strict,
+ * Custom).
+ */
+export function withPresetPicked(
+  settings: Settings,
+  preset: ShowPreset,
+  preference: UnitPreference,
+): Settings {
+  const custom = shownChoice(settings.rule, preference) === 'custom';
+  return {
+    ...settings,
+    rule: presetRule(presetKeys(preset, preference)),
+    kept: custom ? settings.rule : settings.kept,
+  };
+}
+
+/** Custom picked: the set kept aside comes back. Nothing to bring back, nothing changes. */
+export function withCustomPicked(settings: Settings): Settings {
+  return settings.kept ? { ...settings, rule: settings.kept } : settings;
+}
+
+/** Whether Custom can be picked: it is showing, or a set is kept aside for it. */
+export function customReady(settings: Settings, preference: UnitPreference): boolean {
+  return settings.kept !== null || shownChoice(settings.rule, preference) === 'custom';
+}

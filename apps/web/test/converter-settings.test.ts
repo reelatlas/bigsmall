@@ -5,17 +5,21 @@ import {
   FRESH_DISPLAY,
   FRESH_RULE,
   groupState,
+  customReady,
+  FRESH_SETTINGS,
   hiddenByHand,
-  litPreset,
   presetKeys,
   presetOf,
   presetRule,
   sectionOf,
   sectionsOf,
+  shownChoice,
   shows,
   systemState,
   withChoice,
+  withCustomPicked,
   withoutHidden,
+  withPresetPicked,
   withSystem,
 } from '../src/features/converter/settings';
 import { initialState, selectTable } from '../src/features/converter/state';
@@ -99,9 +103,30 @@ describe('settings: what shows', () => {
     const nanometer = withChoice(FRESH_RULE, [unit('nanometer')], true, 'us');
     expect(systemState(nanometer, 'specialist', 'us')).toBe('some');
     expect(systemState(nanometer, 'us', 'us')).toBe('all');
-    // No preset is lit while a unit is chosen on its own.
-    expect(litPreset(nanometer, 'us')).toBeNull();
-    expect(litPreset(FRESH_RULE, 'us')).toBe('standard');
+    // Custom lights while a unit is chosen on its own.
+    expect(shownChoice(nanometer, 'us')).toBe('custom');
+    expect(shownChoice(FRESH_RULE, 'us')).toBe('standard');
+    expect(shownChoice(withSystem(FRESH_RULE, 'uk', false, 'us'), 'us')).toBe('custom');
+  });
+
+  it('keeps a custom set aside when a preset is picked, and Custom brings it back', () => {
+    // A fresh visit has no custom set to bring back.
+    expect(customReady(FRESH_SETTINGS, 'us')).toBe(false);
+    const noInch = withChoice(FRESH_RULE, [unit('inch')], false, 'us');
+    const custom = { ...FRESH_SETTINGS, rule: noInch };
+    expect(customReady(custom, 'us')).toBe(true);
+    const all = withPresetPicked(custom, 'all', 'us');
+    expect(shownChoice(all.rule, 'us')).toBe('all');
+    expect(shows(unit('inch'), all.rule, 'us')).toBe(true);
+    expect(customReady(all, 'us')).toBe(true);
+    // A preset picked over a preset keeps the set already aside.
+    const standard = withPresetPicked(all, 'standard', 'us');
+    expect(standard.kept).toBe(noInch);
+    const back = withCustomPicked(standard);
+    expect(shows(unit('inch'), back.rule, 'us')).toBe(false);
+    expect(shownChoice(back.rule, 'us')).toBe('custom');
+    // Nothing kept, nothing changes.
+    expect(withCustomPicked(FRESH_SETTINGS)).toBe(FRESH_SETTINGS);
   });
 
   it('reads a group as all, some, or none of its units', () => {

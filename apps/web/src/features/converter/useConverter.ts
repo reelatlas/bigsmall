@@ -4,7 +4,15 @@ import {
   regionDefaults,
   type UnitPreference,
 } from '@bigsmall/core';
-import { useEffect, useLayoutEffect, useMemo, useReducer, useState, type RefObject } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useState,
+  type RefObject,
+} from 'react';
 import { browserLocale, detectRegion } from '../../lib/region';
 import { ANNOUNCE_MS, URL_WRITE_MS } from '../../lib/timing';
 import {
@@ -19,6 +27,7 @@ import {
   type TableView,
 } from './state';
 import { defaultOrder, FRESH_SETTINGS, type Settings } from './settings';
+import { loadSettings, saveSettings } from './settings-store';
 import { paramsToState, stateToParams } from './url';
 
 /** How this visitor writes numbers (NumberEnv), and which unit family their region expects. */
@@ -56,11 +65,20 @@ export interface ConverterController {
   /** Debounced copy of the table's announcement, so screen readers are not flooded while typing. */
   announcement: string | null;
   /**
-   * What shows and how it looks (ADR 0017): a fresh visit's on every visit, kept apart from the
-   * conversion's history, so undo steps through what was typed and converted.
+   * What shows and how it looks (ADR 0017): remembered in this browser, kept apart from the
+   * conversion's history and the URL, so undo steps through what was typed and converted.
    */
   settings: Settings;
   updateSettings: (update: (settings: Settings) => Settings) => void;
+}
+
+/** Settings change by an update, or come back whole from where they were remembered. */
+type SettingsAction =
+  | { type: 'update'; update: (settings: Settings) => Settings }
+  | { type: 'restore'; settings: Settings };
+
+function reduceSettings(now: Settings, action: SettingsAction): Settings {
+  return action.type === 'restore' ? action.settings : action.update(now);
 }
 
 /**
@@ -71,7 +89,11 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
   const [history, dispatch] = useReducer(reduceWithHistory, initialHistory);
   const state = history.present;
   const [env] = useState(detectEnv);
-  const [settings, setSettings] = useState<Settings>(FRESH_SETTINGS);
+  const [settings, dispatchSettings] = useReducer(reduceSettings, FRESH_SETTINGS);
+  const updateSettings = useCallback(
+    (update: (settings: Settings) => Settings) => dispatchSettings({ type: 'update', update }),
+    [],
+  );
   const box = useMemo(() => selectBox(state, env), [state, env]);
   const order = settings.order;
   const table = useMemo(
@@ -94,6 +116,17 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
     else if (restored) dispatch({ type: 'hydrate', state: restored });
     // Both are fixed for the island's life, so this runs once, as the page loads.
   }, [env.separators, input]);
+
+  // The visitor's settings, remembered in this browser, once, at hydration (the server renders a
+  // fresh visit's), before paint; then saved as they change. A fresh visit's are not saved over
+  // what was remembered before they load.
+  useLayoutEffect(() => {
+    const saved = loadSettings();
+    if (saved) dispatchSettings({ type: 'restore', settings: saved });
+  }, []);
+  useEffect(() => {
+    if (settings !== FRESH_SETTINGS) saveSettings(settings);
+  }, [settings]);
 
   // Keep the URL in step with the state, without flooding history.
   useEffect(() => {
@@ -125,6 +158,6 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
     canRedo: history.future.length > 0,
     announcement,
     settings,
-    updateSettings: setSettings,
+    updateSettings,
   };
 }

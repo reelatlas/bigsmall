@@ -509,9 +509,8 @@ test('a row reads the value on the left, on the decimal point, then symbol and n
   await ready(page);
   await setSettings(page, 'Symbol and name');
   await lineUp();
-  await expect(unitCell(page, 'square-kilometer')).toHaveAccessibleName(
-    /^1\.00 km² square kilometer/,
-  );
+  // No limit, set above and remembered across the page change, writes it whole.
+  await expect(unitCell(page, 'square-kilometer')).toHaveAccessibleName(/^1 km² square kilometer/);
 });
 
 test('where a name would not fit on one line, the names give way in every row, and come back with the room', async ({

@@ -5,7 +5,7 @@ import {
   FRESH_DISPLAY,
   FRESH_RULE,
   groupState,
-  customReady,
+  byHand,
   defaultOrder,
   FRESH_SETTINGS,
   hiddenByHand,
@@ -16,8 +16,10 @@ import {
   presetRule,
   sectionOf,
   sectionsOf,
+  settingsFrom,
   shownChoice,
   shows,
+  storedOf,
   systemState,
   withChoice,
   withCustomPicked,
@@ -108,9 +110,10 @@ describe('settings: what shows', () => {
     expect(systemState(nanometer, 'specialist', 'us')).toBe('some');
     expect(systemState(nanometer, 'us', 'us')).toBe('all');
     // Custom lights while a unit is chosen on its own.
-    expect(shownChoice(nanometer, 'us')).toBe('custom');
-    expect(shownChoice(FRESH_RULE, 'us')).toBe('standard');
-    expect(shownChoice(withSystem(FRESH_RULE, 'uk', false, 'us'), 'us')).toBe('custom');
+    const on = (rule: typeof FRESH_RULE) => ({ ...FRESH_SETTINGS, rule });
+    expect(shownChoice(on(nanometer), 'us')).toBe('custom');
+    expect(shownChoice(FRESH_SETTINGS, 'us')).toBe('standard');
+    expect(shownChoice(on(withSystem(FRESH_RULE, 'uk', false, 'us')), 'us')).toBe('custom');
   });
 
   it("orders the sections as set: the visitor's own first on a fresh visit, Standard first, Other after the regional systems", () => {
@@ -133,23 +136,68 @@ describe('settings: what shows', () => {
   });
 
   it('keeps a custom set aside when a preset is picked, and Custom brings it back', () => {
-    // A fresh visit has no custom set to bring back.
-    expect(customReady(FRESH_SETTINGS, 'us')).toBe(false);
+    // Custom is always in reach: picked on a fresh visit, what shows becomes the visitor's own.
+    const picked = withCustomPicked(FRESH_SETTINGS);
+    expect(shownChoice(picked, 'us')).toBe('custom');
+    expect(picked.rule).toBe(FRESH_RULE);
+    // A change by hand puts the visitor on Custom, and it stays lit even matching a preset.
     const noInch = withChoice(FRESH_RULE, [unit('inch')], false, 'us');
-    const custom = { ...FRESH_SETTINGS, rule: noInch };
-    expect(customReady(custom, 'us')).toBe(true);
+    const custom = byHand(FRESH_SETTINGS, noInch);
+    expect(shownChoice(custom, 'us')).toBe('custom');
+    expect(shownChoice(byHand(custom, FRESH_RULE), 'us')).toBe('custom');
     const all = withPresetPicked(custom, 'all', 'us');
-    expect(shownChoice(all.rule, 'us')).toBe('all');
+    expect(shownChoice(all, 'us')).toBe('all');
     expect(shows(unit('inch'), all.rule, 'us')).toBe(true);
-    expect(customReady(all, 'us')).toBe(true);
     // A preset picked over a preset keeps the set already aside.
     const standard = withPresetPicked(all, 'standard', 'us');
     expect(standard.kept).toBe(noInch);
     const back = withCustomPicked(standard);
     expect(shows(unit('inch'), back.rule, 'us')).toBe(false);
-    expect(shownChoice(back.rule, 'us')).toBe('custom');
-    // Nothing kept, nothing changes.
-    expect(withCustomPicked(FRESH_SETTINGS)).toBe(FRESH_SETTINGS);
+    expect(shownChoice(back, 'us')).toBe('custom');
+  });
+
+  it('reads remembered settings back as they were, and anything that does not read as a fresh part', () => {
+    const settings = {
+      ...withOrder(
+        byHand(FRESH_SETTINGS, withChoice(FRESH_RULE, [unit('inch')], false, 'us')),
+        'uk',
+        0,
+        'us',
+      ),
+      display: {
+        ...FRESH_DISPLAY,
+        format: 'both' as const,
+        places: null,
+        fractions: new Set([2, 5] as const),
+      },
+    };
+    const back = settingsFrom(JSON.parse(JSON.stringify(storedOf(settings))))!;
+    expect(back.custom).toBe(true);
+    expect(back.order).toEqual(['uk', 'us', 'metric', 'specialist']);
+    expect(shows(unit('inch'), back.rule, 'us')).toBe(false);
+    expect([...back.rule.shown].sort()).toEqual([...settings.rule.shown].sort());
+    expect(back.display).toEqual(settings.display);
+    // Units gone since, and parts that do not read, fall away; what is not settings is none.
+    const odd = settingsFrom({
+      v: 1,
+      rule: {
+        shown: ['metric', 'martian'],
+        overrides: [
+          ['no-such-unit', true],
+          ['inch', 'yes'],
+        ],
+      },
+      order: ['us', 'us'],
+      display: { names: 'loud', places: 7, fractions: [5, 9] },
+    })!;
+    expect([...odd.rule.shown]).toEqual(['metric']);
+    expect(odd.rule.overrides.size).toBe(0);
+    expect(odd.order).toBeNull();
+    expect(odd.display.names).toBe('symbol');
+    expect(odd.display.places).toBe(2);
+    expect([...odd.display.fractions]).toEqual([5]);
+    expect(settingsFrom(null)).toBeNull();
+    expect(settingsFrom({ v: 2 })).toBeNull();
   });
 
   it('reads a group as all, some, or none of its units', () => {

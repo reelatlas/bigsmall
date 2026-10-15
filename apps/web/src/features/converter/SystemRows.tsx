@@ -6,6 +6,7 @@ import { TriCheckbox } from '../../components/TriCheckbox';
 import { cssTime } from '../../lib/css-time';
 import { CARD, cx, OPTION_ROW } from '../../lib/recipes';
 import {
+  byHand,
   orderOf,
   SECTION_LABEL,
   systemState,
@@ -18,9 +19,16 @@ import {
 /** How far a press on a handle travels before it is a drag rather than a click, in CSS pixels. */
 const DRAG_START = 4;
 
-/** A row while it is dragged: lifted over the others, on the surface, with a shadow. */
-const ROW =
-  'relative flex items-center rounded-nested-md data-dragging:z-10 data-dragging:bg-surface data-dragging:shadow-sm';
+/**
+ * A system's row. The row being moved is marked alike however it moves (Sean, 2026-10-15): dragged,
+ * or with its Move menu open, it is lifted over the others, filled, with a shadow; with focus in
+ * it from the keys (Alt and an arrow), the whole row fills, its handle too, as a cursor row does.
+ */
+const ROW = cx(
+  'relative flex items-center rounded-nested-md has-focus-visible:bg-surface-raised',
+  'data-dragging:z-10 data-dragging:bg-surface-raised data-dragging:shadow-sm',
+  'data-moving:z-10 data-moving:bg-surface-raised data-moving:shadow-sm',
+);
 
 interface Drag {
   key: SectionKey;
@@ -61,6 +69,13 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
   const before = useRef<Map<string, number> | null>(null);
   /** Set as the menu opens, for the effect below to put focus in it. */
   const focusMenu = useRef(false);
+  /**
+   * What had focus as a row moved. Reordering moves the row's element in the page, and a browser
+   * drops focus from whatever is inside an element it moves, so the effect below gives it back:
+   * the checkbox after Alt and an arrow, the Move button after a move from the menu (Sean,
+   * 2026-10-15; docs/LEARNINGS.md, "Moving an element drops the focus inside it").
+   */
+  const refocus = useRef<HTMLElement | null>(null);
 
   const rowOf = (key: SectionKey) =>
     listRef.current?.querySelector<HTMLElement>(`[data-system="${key}"]`) ?? null;
@@ -74,6 +89,9 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
     before.current = new Map(
       rows().map((row) => [row.dataset.system ?? '', row.getBoundingClientRect().top]),
     );
+    const active = document.activeElement;
+    refocus.current =
+      active instanceof HTMLElement && listRef.current?.contains(active) ? active : null;
     onSettings((now) => withOrder(now, key, target, preference));
     if (say) setSaid(`${SECTION_LABEL[key]}, ${target + 1} of ${order.length}`);
   };
@@ -89,7 +107,12 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
   useLayoutEffect(() => {
     const was = before.current;
     const list = listRef.current;
+    const focused = refocus.current;
     before.current = null;
+    refocus.current = null;
+    if (focused?.isConnected && document.activeElement !== focused) {
+      focused.focus({ preventScroll: true });
+    }
     if (!was || !list) return;
     const style = getComputedStyle(list);
     const duration = cssTime(style.getPropertyValue('--motion-base'));
@@ -188,9 +211,10 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
   };
 
   // The rows' keys, one native listener on the list (the rows are not themselves interactive):
-  // Alt+↑ and Alt+↓ move the row focus is in; Escape in an open Move menu closes it, focus back on
-  // its handle, before the panel takes Escape. In a layout effect, so a key pressed straight after
-  // another finds the latest order.
+  // Alt+↑ and Alt+↓ move the row focus is in, focus staying where it was; an open Move menu keeps
+  // the keys until Escape closes it, focus back on its handle: Tab and the arrows go between Move
+  // up and Move down and never out (Sean, 2026-10-15), all before the panel takes them. In a
+  // layout effect, so a key pressed straight after another finds the latest order.
   useLayoutEffect(() => {
     const list = listRef.current;
     if (!list) return undefined;
@@ -199,11 +223,29 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
       const row = target.closest<HTMLElement>('[data-system]');
       const key = row?.dataset.system as SectionKey | undefined;
       if (!row || !key) return;
-      if (event.key === 'Escape' && target.closest('[data-move-menu]')) {
-        event.preventDefault();
-        setMenuFor(null);
-        row.querySelector<HTMLElement>('button[aria-expanded]')?.focus();
-        return;
+      const menu = target.closest<HTMLElement>('[data-move-menu]');
+      if (menu) {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          setMenuFor(null);
+          row.querySelector<HTMLElement>('button[aria-expanded]')?.focus();
+          return;
+        }
+        const [up, down] = [...menu.querySelectorAll<HTMLElement>('[data-move]')];
+        const next = {
+          ArrowLeft: up,
+          ArrowUp: up,
+          Home: up,
+          ArrowRight: down,
+          ArrowDown: down,
+          End: down,
+          Tab: target === up ? down : up,
+        }[event.key];
+        if (next && !event.altKey && !event.ctrlKey && !event.metaKey) {
+          event.preventDefault();
+          next.focus();
+          return;
+        }
       }
       const step = event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0;
       if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || !step) return;
@@ -223,16 +265,21 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
         const label = SECTION_LABEL[key];
         const open = menuFor === key;
         return (
-          <div key={key} data-system={key} data-strip className={ROW}>
+          <div
+            key={key}
+            data-system={key}
+            data-strip
+            data-moving={open || undefined}
+            className={ROW}
+          >
             <label className={cx(OPTION_ROW, 'min-w-0 flex-1 gap-2')}>
               <TriCheckbox
                 state={state}
                 aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
                 onChange={() =>
-                  onSettings((now) => ({
-                    ...now,
-                    rule: withSystem(now.rule, key, state !== 'all', preference),
-                  }))
+                  onSettings((now) =>
+                    byHand(now, withSystem(now.rule, key, state !== 'all', preference)),
+                  )
                 }
               />
               {label}

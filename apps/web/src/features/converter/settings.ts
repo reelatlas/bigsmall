@@ -1,4 +1,5 @@
 import {
+  FRACTION_SIZES,
   getUnit,
   unitsIn,
   type CategoryId,
@@ -172,10 +173,13 @@ export function presetOf(
 }
 
 /**
- * What lights in Units: the preset the switches match while no unit is chosen on its own, else
- * Custom, the moment anything departs from every preset.
+ * What lights in Units: Custom while the visitor is on their own set (Custom picked, or anything
+ * changed by hand), else the preset the switches match with no unit chosen on its own, else
+ * Custom.
  */
-export function shownChoice(rule: ViewRule, preference: UnitPreference): ShowChoice {
+export function shownChoice(settings: Settings, preference: UnitPreference): ShowChoice {
+  if (settings.custom) return 'custom';
+  const { rule } = settings;
   return (rule.overrides.size > 0 ? null : presetOf(rule.shown, preference)) ?? 'custom';
 }
 
@@ -323,6 +327,12 @@ export interface Settings {
    * the switches and the units chosen on their own. Null until there is one.
    */
   kept: ViewRule | null;
+  /**
+   * Whether the visitor is on Custom, their own set: Custom picked, or anything changed by hand (a
+   * system's checkbox, a unit shown or hidden in the table, Show custom hidden units), until a preset is
+   * picked. Custom then stays lit even if the set matches a preset (Sean, 2026-10-15).
+   */
+  custom: boolean;
   /** The sections' order as the visitor set it in Units, or null for a fresh visit's (defaultOrder). */
   order: readonly SectionKey[] | null;
 }
@@ -331,8 +341,14 @@ export const FRESH_SETTINGS: Settings = {
   rule: FRESH_RULE,
   display: FRESH_DISPLAY,
   kept: null,
+  custom: false,
   order: null,
 };
+
+/** What shows changed by hand: the visitor is on Custom from here. */
+export function byHand(settings: Settings, rule: ViewRule): Settings {
+  return { ...settings, rule, custom: true };
+}
 
 /** The sections' order in force. */
 export function orderOf(settings: Settings, preference: UnitPreference): readonly SectionKey[] {
@@ -367,20 +383,114 @@ export function withPresetPicked(
   preset: ShowPreset,
   preference: UnitPreference,
 ): Settings {
-  const custom = shownChoice(settings.rule, preference) === 'custom';
+  const custom = shownChoice(settings, preference) === 'custom';
   return {
     ...settings,
     rule: presetRule(presetKeys(preset, preference)),
     kept: custom ? settings.rule : settings.kept,
+    custom: false,
   };
 }
 
-/** Custom picked: the set kept aside comes back. Nothing to bring back, nothing changes. */
+/**
+ * Custom picked: the set kept aside comes back; with none kept, what shows stays as it is, now
+ * the visitor's own to change. Custom is never out of reach (Sean, 2026-10-15).
+ */
 export function withCustomPicked(settings: Settings): Settings {
-  return settings.kept ? { ...settings, rule: settings.kept } : settings;
+  return { ...settings, rule: settings.kept ?? settings.rule, custom: true };
 }
 
-/** Whether Custom can be picked: it is showing, or a set is kept aside for it. */
-export function customReady(settings: Settings, preference: UnitPreference): boolean {
-  return settings.kept !== null || shownChoice(settings.rule, preference) === 'custom';
+// ---------------------------------------------------------------------------
+// Remembered in this browser (settings-store.ts; Sean, 2026-10-15).
+
+/** A view rule as stored: plain lists. */
+interface StoredRule {
+  shown: string[];
+  overrides: [string, boolean][];
+}
+
+/** Settings as stored: plain JSON, versioned, so a later shape can read or drop an older one. */
+export interface StoredSettings {
+  v: 1;
+  rule: StoredRule;
+  kept: StoredRule | null;
+  custom: boolean;
+  order: string[] | null;
+  display: Omit<Display, 'fractions'> & { fractions: number[] };
+}
+
+function storedRule(rule: ViewRule): StoredRule {
+  return { shown: [...rule.shown], overrides: [...rule.overrides] };
+}
+
+/** Settings as they are stored. */
+export function storedOf(settings: Settings): StoredSettings {
+  return {
+    v: 1,
+    rule: storedRule(settings.rule),
+    kept: settings.kept && storedRule(settings.kept),
+    custom: settings.custom,
+    order: settings.order && [...settings.order],
+    display: { ...settings.display, fractions: [...settings.display.fractions] },
+  };
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+/** A stored rule read back: unknown systems and units, gone since it was saved, are left out. */
+function ruleFrom(value: unknown): ViewRule | null {
+  if (!isRecord(value) || !Array.isArray(value.shown) || !Array.isArray(value.overrides)) {
+    return null;
+  }
+  const shown = new Set(
+    value.shown.filter((key): key is SectionKey => SYSTEM_KEYS.includes(key as SectionKey)),
+  );
+  const overrides = new Map<string, boolean>();
+  for (const entry of value.overrides) {
+    if (Array.isArray(entry) && getUnit(String(entry[0])) && typeof entry[1] === 'boolean') {
+      overrides.set(String(entry[0]), entry[1]);
+    }
+  }
+  return { shown, overrides };
+}
+
+/** One of `allowed`, or the fallback. */
+function oneOf<T>(value: unknown, allowed: readonly T[], fallback: T): T {
+  return allowed.includes(value as T) ? (value as T) : fallback;
+}
+
+/**
+ * Stored settings read back, each part checked: a part that does not read falls back to a fresh
+ * visit's, and anything that is not settings at all reads as none.
+ */
+export function settingsFrom(value: unknown): Settings | null {
+  if (!isRecord(value) || value.v !== 1) return null;
+  const rule = ruleFrom(value.rule);
+  if (!rule) return null;
+  const order =
+    Array.isArray(value.order) &&
+    value.order.length === SYSTEM_KEYS.length &&
+    SYSTEM_KEYS.every((key) => (value.order as unknown[]).includes(key))
+      ? (value.order as SectionKey[])
+      : null;
+  const shown = isRecord(value.display) ? value.display : {};
+  const fresh = FRESH_DISPLAY;
+  const display: Display = {
+    names: oneOf(shown.names, ['symbol', 'both'] as const, fresh.names),
+    copy: typeof shown.copy === 'boolean' ? shown.copy : fresh.copy,
+    format: oneOf(shown.format, ['decimal', 'fraction', 'both'] as const, fresh.format),
+    places: oneOf(shown.places, [1, 2, 3, null] as const, fresh.places),
+    fractions: Array.isArray(shown.fractions)
+      ? new Set(FRACTION_SIZES.filter((size) => (shown.fractions as unknown[]).includes(size)))
+      : fresh.fractions,
+    rounding: oneOf(shown.rounding, ['nearest', 'up', 'down'] as const, fresh.rounding),
+  };
+  return {
+    rule,
+    display,
+    kept: ruleFrom(value.kept),
+    custom: value.custom === true,
+    order,
+  };
 }

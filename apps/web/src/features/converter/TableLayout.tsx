@@ -21,7 +21,7 @@ import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
-import { orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
+import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
 import {
   noMatchMessage,
   type BoxView,
@@ -391,15 +391,17 @@ export function TableLayout({
 
   /** Units shown or hidden on their own, from Edit, the Hidden list, or a hidden unit taken. */
   const choose = (rows: readonly Pick<TableRow, 'unit'>[], show: boolean) =>
-    onSettings((now) => ({
-      ...now,
-      rule: withChoice(
-        now.rule,
-        rows.map((row) => row.unit),
-        show,
-        env.system,
+    onSettings((now) =>
+      byHand(
+        now,
+        withChoice(
+          now.rule,
+          rows.map((row) => row.unit),
+          show,
+          env.system,
+        ),
       ),
-    }));
+    );
 
   /** A unit taken into the box, with its new text; the category follows, and the cursor rests on its row. */
   const take = (unitId: string, text: string) => {

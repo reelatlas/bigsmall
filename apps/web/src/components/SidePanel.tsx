@@ -20,7 +20,8 @@ export interface SidePanelProps {
  * turns accent (PANEL_ACTIVE) and its keys stay in it (lib/panel-keys.ts): the arrows move between
  * its rows and within a strip of choices, Enter works a checkbox or a radio, and Escape is the
  * caller's (close, focus back on its button). Typing that lands in the box is the host's
- * (TableLayout). Opening moves focus onto its first control after the close button.
+ * (TableLayout). Opening moves focus onto its first control after the close button, and a click
+ * anywhere in it brings focus in, so the keys reach it after a click as they do after opening.
  */
 export function SidePanel({ title, children, onClose, focusOnOpen = true }: SidePanelProps) {
   const titleId = useId();
@@ -34,13 +35,35 @@ export function SidePanel({ title, children, onClose, focusOnOpen = true }: Side
   }, [focusOnOpen]);
 
   // Native listeners: the card is not itself interactive. In a layout effect, so a key pressed
-  // straight after another finds the latest onClose.
+  // straight after another finds the latest onClose. A click in the panel makes it where the keys
+  // go, as a click in the calculator does (Sean, 2026-10-15): on a control, focus goes to it
+  // (Safari leaves a clicked button or checkbox without focus); anywhere else in the panel, focus
+  // stays inside it, or comes in onto its first control.
   useLayoutEffect(() => {
     const panel = ref.current;
     if (!panel) return undefined;
     const onKeyDown = panelKeys(panel, onClose);
+    const onMouseDown = (event: MouseEvent) => {
+      const target = event.target as Element;
+      const control =
+        target.closest<HTMLElement>('button, input') ??
+        (target.closest('label')?.control as HTMLElement | null | undefined);
+      if (control && !control.matches(':disabled')) {
+        control.focus({ preventScroll: true });
+        return;
+      }
+      event.preventDefault();
+      if (!panel.contains(document.activeElement)) {
+        const rows = rowsIn(panel);
+        stopOf(rows[1] ?? rows[0])?.focus({ preventScroll: true });
+      }
+    };
     panel.addEventListener('keydown', onKeyDown);
-    return () => panel.removeEventListener('keydown', onKeyDown);
+    panel.addEventListener('mousedown', onMouseDown);
+    return () => {
+      panel.removeEventListener('keydown', onKeyDown);
+      panel.removeEventListener('mousedown', onMouseDown);
+    };
   });
 
   return (

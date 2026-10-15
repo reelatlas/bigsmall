@@ -19,7 +19,7 @@ import { cx, PANEL_TITLE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
-  customReady,
+  byHand,
   hiddenByHand,
   SHOW_PRESETS,
   orderChanged,
@@ -184,18 +184,18 @@ function Reset({
 
 /**
  * Units (docs/UX-SPEC.md §1, §3; ADR 0017; Filter until Sean renamed it, 2026-10-15): what search
- * and the table show, in every category. The presets first, and Custom, the visitor's own set,
- * which lights the moment anything departs from every preset; picking a preset keeps that set
- * aside, and picking Custom brings it back. Then the systems, in the order the table's sections
- * follow, each a checkbox (a dash while some of its units are chosen on their own) and a handle to
- * reorder it by (SystemRows); then Show units you hid, which clears what Edit and the Hidden list
- * hid, the switches staying, and Reset order.
+ * and the table show, in every category. The presets first, and Custom, the visitor's own set: a
+ * change by hand puts them on it, picking a preset keeps it aside, and picking Custom brings it
+ * back, or with none kept makes what shows their own. Then the systems, in the order the table's
+ * sections follow, each a checkbox (a dash while some of its units are chosen on their own) and a
+ * handle to reorder it by (SystemRows); then Show custom hidden units, which clears what Edit and the
+ * Hidden list hid, the switches staying, and Reset order.
  */
 export function UnitsPanel({ settings, preference, onSettings, onClose }: SettingsPanelProps) {
   const { rule } = settings;
   const hiddenCount = hiddenByHand(rule);
   const setRule = (next: (rule: ViewRule) => ViewRule) =>
-    onSettings((now) => ({ ...now, rule: next(now.rule) }));
+    onSettings((now) => byHand(now, next(now.rule)));
   const { copied: done, markCopied, pointerProps } = useCopied<'unhide' | 'order'>();
   return (
     <SidePanel title="Units" onClose={onClose}>
@@ -211,10 +211,9 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
                 Custom<span className="sr-only">, your own set</span>
               </>
             ),
-            disabled: !customReady(settings, preference),
           },
         ]}
-        value={shownChoice(rule, preference)}
+        value={shownChoice(settings, preference)}
         onChange={(choice) =>
           onSettings((now) =>
             choice === 'custom' ? withCustomPicked(now) : withPresetPicked(now, choice, preference),
@@ -235,7 +234,7 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
           }}
           pointer={pointerProps('unhide')}
         >
-          Show units you hid
+          Show custom hidden units
           {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
         </Reset>
         <Reset
@@ -250,7 +249,7 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
           Reset order
         </Reset>
         <p role="status" className="sr-only">
-          {done === 'unhide' ? 'Units shown' : done === 'order' ? 'Order reset' : ''}
+          {done === 'unhide' ? 'Hidden units shown' : done === 'order' ? 'Order reset' : ''}
         </p>
       </div>
     </SidePanel>

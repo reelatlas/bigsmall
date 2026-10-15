@@ -155,8 +155,8 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
   // Done closes Hidden, whoever just chose what to hide.
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');
 
-  // Show units you hid brings it back, and keeps the settings.
-  await setSettings(page, 'Show units you hid');
+  // Show custom hidden units brings it back, and keeps the settings.
+  await setSettings(page, 'Show custom hidden units');
   await expect(row(page, 'us-teaspoon')).toBeVisible();
 });
 
@@ -295,14 +295,14 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   // No preset is lit while a unit departs from it.
   await expect(units.getByRole('radio', { name: 'Standard' })).not.toBeChecked();
   // A press on the dash shows every specialist unit; the next hides every one, the unit shown on
-  // its own too, and Standard is lit again.
+  // its own too; changed by hand, the set stays the visitor's own, Custom lit.
   await specialty.click();
   await expect(specialty).toBeChecked();
   await specialty.click();
   await expect(specialty).not.toBeChecked();
   await expect(row(page, 'nanometer')).toHaveCount(0);
   await expect(page.locator('[data-section="specialist"]')).toHaveCount(0);
-  await expect(units.getByRole('radio', { name: 'Standard' })).toBeChecked();
+  await expect(units.getByRole('radio', { name: /^Custom/ })).toBeChecked();
 });
 
 test("Custom lights for a set of the visitor's own; a preset keeps it aside, and Custom brings it back", async ({
@@ -314,9 +314,14 @@ test("Custom lights for a set of the visitor's own; a preset keeps it aside, and
   const units = settingsPanel(page, 'Units');
   const custom = units.getByRole('radio', { name: /^Custom/ });
   const pick = (name: RegExp) => units.locator('label').filter({ hasText: name }).click();
-  // A fresh visit has no set of its own: Standard is lit, Custom out of reach.
+  // A fresh visit lights Standard; Custom is in reach all the same, and picked, it makes what
+  // shows the visitor's own, nothing changing.
   await expect(units.getByRole('radio', { name: 'Standard' })).toBeChecked();
-  await expect(custom).toBeDisabled();
+  await expect(custom).toBeEnabled();
+  await pick(/^Custom/);
+  await expect(custom).toBeChecked();
+  await expect(row(page, 'us-teaspoon')).toBeVisible();
+  await pick(/^Standard$/);
   // A unit hidden in Edit makes one, and Custom lights.
   await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
   await table(page)
@@ -404,10 +409,89 @@ test("Alt and an arrow move a system's row; Escape closes its Move menu, the pan
   const handle = units.getByRole('button', { name: 'Move UK (imperial)' });
   await expect(handle).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(units.getByRole('button', { name: 'Move up' })).toBeFocused();
+  const up = units.getByRole('button', { name: 'Move up' });
+  const down = units.getByRole('button', { name: 'Move down' });
+  await expect(up).toBeFocused();
+  // The menu keeps the keys: Tab and the arrows go between its two moves and never out.
+  await page.keyboard.press('Tab');
+  await expect(down).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(up).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(down).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(down).toBeFocused();
+  // A move keeps focus on the move pressed, the menu open, however far the row goes.
+  await page.keyboard.press('Enter');
+  await expect.poll(sections).toEqual(['us', 'metric', 'uk']);
+  await expect(down).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  await expect.poll(sections).toEqual(['uk', 'us', 'metric']);
+  await expect(up).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(handle).toBeFocused();
   await expect(units).toBeVisible();
+  // Alt and an arrow down a row keeps focus on it at every step.
+  await page.keyboard.press('ArrowLeft');
+  await expect(uk).toBeFocused();
+  await page.keyboard.press('Alt+ArrowDown');
+  await page.keyboard.press('Alt+ArrowDown');
+  await expect.poll(sections).toEqual(['us', 'metric', 'uk']);
+  await expect(uk).toBeFocused();
+  // Without Alt, the arrows walk the rows as ever.
+  await page.keyboard.press('ArrowUp');
+  await expect(units.getByRole('checkbox', { name: 'Metric' })).toBeFocused();
+});
+
+test('a click anywhere in a side panel brings the keys to it, as a click in the calculator does', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await settingsButton(page, 'Units').click();
+  const units = settingsPanel(page, 'Units');
+  await box(page).click();
+  await expect(box(page)).toBeFocused();
+  // On the panel's title, no control: focus comes in, and the arrows answer there.
+  await units.getByRole('heading', { name: 'Units' }).click();
+  await expect(units.getByRole('radio', { name: 'Standard' })).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(units.getByRole('checkbox', { name: 'US (customary)' })).toBeFocused();
+  // On a control's label, focus goes to its control.
+  await box(page).click();
+  await units.getByText('Metric', { exact: true }).click();
+  await expect(units.getByRole('checkbox', { name: 'Metric' })).toBeFocused();
+});
+
+test('settings are remembered in this browser: what shows, Custom, the order, and how values look', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  await settingsButton(page, 'Units').click();
+  const units = settingsPanel(page, 'Units');
+  await units.getByRole('checkbox', { name: 'UK (imperial)' }).click();
+  await units.getByRole('button', { name: 'Move Metric' }).click();
+  await units.getByRole('button', { name: 'Move up' }).click();
+  await setSettings(page, 'Fractions');
+  await expect(row(page, 'us-teaspoon')).toContainText('96');
+  await page.reload();
+  await ready(page);
+  await expect(row(page, 'imperial-gallon')).toHaveCount(0);
+  await expect(row(page, 'liter')).toContainText('1/2');
+  await expect
+    .poll(() =>
+      table(page)
+        .locator('[data-section]')
+        .evaluateAll((all) => all.map((each) => each.getAttribute('data-section'))),
+    )
+    .toEqual(['metric', 'us']);
+  await settingsButton(page, 'Units').click();
+  await expect(settingsPanel(page, 'Units').getByRole('radio', { name: /^Custom/ })).toBeChecked();
 });
 
 test('search leaves hidden units out and offers them; taking one unhides it', async ({ page }) => {

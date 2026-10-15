@@ -695,3 +695,8 @@ Format:
 
 **What happened.** With the glide finally running on the live site, Sean saw sections ghost: a section switched off faded out where it was over the whole 400 ms while the next section slid up through it, and one switched on faded in under the section still sliding out of its place. Frames at 170 ms showed both sets of text overlapping.
 **Rule.** Pace the three kinds of part within the one length: what leaves is gone in the first 30 %, what moves glides throughout, what arrives fades in over the second half (keyframe offsets on even fades, `glide.ts`). Check a change that removes or adds a whole group, not only a single row, by its frames.
+
+## 2026-10-15 — A shared edge puts an inset focus ring off centre
+
+**What happened.** The segmented control drew one line between segments by giving each a right edge and only the first a left one. Its focus ring is an outline inset by the edge's width, so on the first segment it lay over the edge on all four sides, but on every later one it sat inside on the left, beside the neighbour's edge: Sean saw that side twice as thick, moving along with the arrows.
+**Rule.** Give each joined piece its whole edge and overlap neighbours by the edge's width (a negative margin), and lift the focused one (`relative z-10`), so an inset ring covers its four sides alike. Check a ring on a middle and a last piece, not only the first.

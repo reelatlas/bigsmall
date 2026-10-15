@@ -1,5 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
-import { box, menu, ready } from './support';
+import { expect, test } from '@playwright/test';
+import { box, menu, ready, unitCell } from './support';
 
 // A touch screen (docs/UX-SPEC.md §8, "On a touch screen", ADR 0015): the on-screen keyboard
 // comes up only from a tap in the box. A tap anywhere else never moves focus into it, a tap in the
@@ -7,9 +7,6 @@ import { box, menu, ready } from './support';
 // key keeps the desktop's flow, the caret back in the box (table.spec.ts, keyboard.spec.ts).
 
 test.skip(({ isMobile }) => !isMobile, 'taps need a touch screen');
-
-const unitCell = (page: Page, unitId: string) =>
-  page.locator(`[data-row="${unitId}"]`).getByRole('gridcell').first();
 
 test('a tile, a row, and a choice in the category menu, tapped, never bring the keyboard up', async ({
   page,

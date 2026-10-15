@@ -9,9 +9,11 @@ import {
   MARGIN_MS,
   menu,
   ready,
+  row,
   setSettings,
   settingsButton,
   showEverything,
+  unitCell,
 } from './support';
 
 // The converter (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §5, §7–§9, §11): one box, a category menu
@@ -20,9 +22,6 @@ import {
 // through the table. The calculator's own flows are in calculator.spec.ts. Visitors are in the
 // US: their own units come first (ADR 0011).
 
-const row = (page: Page, unitId: string) => page.locator(`[data-row="${unitId}"]`);
-/** A row's unit cell: what a click takes and the cursor lands on. */
-const unitCell = (page: Page, unitId: string) => row(page, unitId).getByRole('gridcell').first();
 const tiles = (page: Page) => page.getByRole('listbox', { name: 'Categories' });
 const matches = (page: Page) => page.getByRole('listbox', { name: 'Matching units' });
 const VOLUME_UNITS = unitsIn('volume').length;
@@ -228,7 +227,8 @@ test('a typed category name opens the category with no unit chosen, and the menu
   await expect(menu(page)).toHaveText(/Category\s*Length/);
   await expect(row(page, 'inch')).toContainText('—');
 
-  // Typing a unit then lists the matches, and the menu still names the category, its choice checked.
+  // Typing a unit then lists the matches, and the menu still names the category, its choice
+  // checked.
   await box(page).press('End');
   await page.keyboard.type(' f');
   await expect(matches(page)).toBeVisible();
@@ -911,10 +911,10 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
     start: (await tiles(page).boundingBox())!,
   });
   const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
-  // Wide: the menu at the toolbar's left, its edge on the column's, over the box, the calculator
-  // Units, and Display after it; undo, redo, and clear all at the right end, the last button's edge on
-  // the column's too, so a fill lines up with the table (Sean, 2026-10-10). The menu is as wide as
-  // its widest label in the theme's font, so every theme is checked.
+  // Wide: the menu at the toolbar's left, its edge on the column's, over the box, the calculator,
+  // Units, and Display after it; undo, redo, and clear all at the right end, the last button's edge
+  // on the column's too, so a fill lines up with the table (Sean, 2026-10-10). The menu is as wide
+  // as its widest label in the theme's font, so every theme is checked.
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     const wide = await geometry();

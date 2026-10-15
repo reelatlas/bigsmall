@@ -63,6 +63,13 @@ export const box = (page: Page) => page.getByRole('combobox', { name: 'Value', e
 /** The converter's category menu trigger, before a category is chosen or after. */
 export const menu = (page: Page) => page.getByRole('button', { name: /^Category/ });
 
+/** A unit's row in the table, by its unit id. */
+export const row = (page: Page, unitId: string) => page.locator(`[data-row="${unitId}"]`);
+
+/** A row's unit cell: what a click or a tap takes, and the cursor lands on. */
+export const unitCell = (page: Page, unitId: string) =>
+  row(page, unitId).getByRole('gridcell').first();
+
 /** A settings panel's button, Units or Display, in the converter's toolbar (not the dev toolbar's). */
 export const settingsButton = (page: Page, name: 'Units' | 'Display') =>
   page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name, exact: true });

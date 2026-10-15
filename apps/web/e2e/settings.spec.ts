@@ -4,6 +4,7 @@ import {
   box,
   expectNoA11yViolations,
   ready,
+  row,
   setSettings,
   settingsButton,
   settingsPanel,
@@ -14,7 +15,6 @@ import {
 // look; the table's sections, its Hidden list, and Edit; search leaving hidden units out. Visitors
 // are in the US: their own units come first (ADR 0011).
 
-const row = (page: Page, unitId: string) => page.locator(`[data-row="${unitId}"]`);
 const table = (page: Page) => page.getByRole('region', { name: 'Volume' });
 const hiddenToggle = (page: Page) => page.getByRole('button', { name: /^Hidden/ });
 const SPECIALIST = unitsIn('volume').filter((unit) => unit.tier !== 'basic').length;

@@ -18,6 +18,7 @@ import { useColumnsFit } from '../lib/fit-step';
 import { flash } from '../lib/flash';
 import { panelKeys } from '../lib/panel-keys';
 import {
+  CHECKBOX,
   CHOICE_FILL,
   CURSOR_ROW,
   cx,
@@ -30,6 +31,7 @@ import {
 import { Button } from './Button';
 import { ChevronDownIcon, CopiedIcon, CopyIcon } from './icons';
 import { FormattedNumber } from './NumberText';
+import { TriCheckbox } from './TriCheckbox';
 
 /** One row as the table shows it; the converter maps its view onto these. */
 export interface ConversionRow {
@@ -166,7 +168,6 @@ const STACKED_PART_CELL = 'col-start-2 pr-2 pl-1 text-sm font-numeric whitespace
 const SYMBOL_CELL = cx('col-start-5 pl-2 text-right whitespace-nowrap', unitSymbol());
 const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
 const HEADING = cx(PANEL_TITLE, 'px-2 pb-1');
-const CHECKBOX = 'size-4 accent-accent';
 const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
 
 /** The edge over a section: none over the first, a line over the rest. */
@@ -244,33 +245,6 @@ function valueParts(
 
 /** Which of the two lists a unit's line is in: the shown units in Edit, or Hidden. */
 type List = 'shown' | 'hidden';
-
-/** A checkbox for a section: checked for all its units, a dash for some, clear for none. */
-function SectionCheckbox({
-  state,
-  spot,
-  onChange,
-}: {
-  state: 'all' | 'some' | 'none';
-  /** Where focus can come back to after a change (`data-spot`). */
-  spot: string;
-  onChange: () => void;
-}) {
-  const ref = useRef<HTMLInputElement>(null);
-  useLayoutEffect(() => {
-    if (ref.current) ref.current.indeterminate = state === 'some';
-  });
-  return (
-    <input
-      ref={ref}
-      type="checkbox"
-      checked={state === 'all'}
-      onChange={onChange}
-      className={CHECKBOX}
-      data-spot={spot}
-    />
-  );
-}
 
 /**
  * The table's units (docs/UX-SPEC.md §1, §3): those the settings show, in their sections, each
@@ -669,9 +643,9 @@ export function ConversionTable<T extends ConversionRow>({
             CHOICE_FILL,
           )}
         >
-          <SectionCheckbox
+          <TriCheckbox
             state={state}
-            spot={spot}
+            data-spot={spot}
             onChange={() => move(list, movable, state !== 'all', spot)}
           />
           {section.label}

@@ -2,6 +2,8 @@ import { useId } from 'react';
 import { SegmentedControl, SegmentedToggles } from '../../../components/SegmentedControl';
 import { SidePanel } from '../../../components/SidePanel';
 import { Switch } from '../../../components/Switch';
+import { TriCheckbox } from '../../../components/TriCheckbox';
+import { cx, OPTION_ROW } from '../../../lib/recipes';
 
 // Gallery-only: the settings' controls in frozen states, so every theme is checked against what
 // ships. Nothing here changes; a press does nothing.
@@ -53,6 +55,15 @@ export function SettingSamples({ theme }: { theme: string }) {
         <Switch label="Switch, off" checked={false} onChange={noop} />
         <Switch label="Switch, on" checked onChange={noop} />
       </div>
+      <fieldset className="grid">
+        <legend className={LEGEND}>Checkbox over a group: all, some, none</legend>
+        {(['all', 'some', 'none'] as const).map((state) => (
+          <label key={state} className={cx(OPTION_ROW, 'gap-2')}>
+            <TriCheckbox state={state} onChange={noop} />
+            {state === 'all' ? 'All shown' : state === 'some' ? 'Some shown' : 'None shown'}
+          </label>
+        ))}
+      </fieldset>
       <div className="max-w-72">
         <SidePanel title="Display" focusOnOpen={false} onClose={noop}>
           <fieldset className="grid">

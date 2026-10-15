@@ -11,19 +11,21 @@ import { SegmentedControl, SegmentedToggles } from '../../components/SegmentedCo
 import { Switch } from '../../components/Switch';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
+import { TriCheckbox } from '../../components/TriCheckbox';
 import { cx, OPTION_ROW, PANEL_TITLE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
   hiddenByHand,
+  litPreset,
   presetKeys,
-  presetOf,
+  presetRule,
   SECTION_LABEL,
   SHOW_PRESETS,
   SYSTEM_KEYS,
+  systemState,
   withoutHidden,
   withSystem,
-  withSystems,
   type Display,
   type Settings,
   type ShowPreset,
@@ -31,7 +33,6 @@ import {
 } from './settings';
 
 const SUBHEAD = cx(PANEL_TITLE, 'text-xs');
-const CHECKBOX = 'size-4 accent-accent';
 
 /** The two strips of sizes, from the least fine to the finest, as the places run: 1/2 to 1/8, then 1/16 on. */
 const SIZE_ROWS: ReadonlyArray<readonly FractionSize[]> = [
@@ -199,23 +200,28 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
         legend="Show"
         hideLegend
         options={SHOW_PRESETS.map((preset) => ({ value: preset.id, label: preset.name }))}
-        value={presetOf(rule.shown, preference)}
-        onChange={(preset) => setRule((now) => withSystems(now, presetKeys(preset, preference)))}
+        value={litPreset(rule, preference)}
+        onChange={(preset) => setRule(() => presetRule(presetKeys(preset, preference)))}
       />
       <div className="grid gap-1">
         <fieldset className="grid">
           <legend className="sr-only">Systems</legend>
-          {SYSTEM_KEYS.map((key) => (
-            <label key={key} className={cx(OPTION_ROW, 'gap-2')}>
-              <input
-                type="checkbox"
-                checked={rule.shown.has(key)}
-                onChange={() => setRule((now) => withSystem(now, key, !now.shown.has(key)))}
-                className={CHECKBOX}
-              />
-              {SECTION_LABEL[key]}
-            </label>
-          ))}
+          {SYSTEM_KEYS.map((key) => {
+            // A dash while some of the system's units are chosen on their own; a press on a dash
+            // or a clear box shows them all, on a checked one hides them all.
+            const state = systemState(rule, key, preference);
+            return (
+              <label key={key} className={cx(OPTION_ROW, 'gap-2')}>
+                <TriCheckbox
+                  state={state}
+                  onChange={() =>
+                    setRule((now) => withSystem(now, key, state !== 'all', preference))
+                  }
+                />
+                {SECTION_LABEL[key]}
+              </label>
+            );
+          })}
         </fieldset>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-x-2 border-t border-line pt-2">

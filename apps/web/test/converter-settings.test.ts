@@ -6,15 +6,17 @@ import {
   FRESH_RULE,
   groupState,
   hiddenByHand,
+  litPreset,
   presetKeys,
   presetOf,
+  presetRule,
   sectionOf,
   sectionsOf,
   shows,
+  systemState,
   withChoice,
   withoutHidden,
   withSystem,
-  withSystems,
 } from '../src/features/converter/settings';
 import { initialState, selectTable } from '../src/features/converter/state';
 
@@ -58,12 +60,21 @@ describe('settings: what shows', () => {
     );
   });
 
-  it('keeps units chosen on their own through the switches and the presets', () => {
+  it("makes a switch's change final for its system, other systems' choices staying, and a preset exact", () => {
     const noInch = withChoice(FRESH_RULE, [unit('inch')], false, 'us');
-    expect(shows(unit('inch'), withSystem(withSystem(noInch, 'us', false), 'us', true), 'us')).toBe(
-      false,
-    );
-    expect(withSystems(noInch, presetKeys('all', 'us')).overrides.get('inch')).toBe(false);
+    const both = withChoice(noInch, [unit('nanometer')], true, 'us');
+    expect(
+      shows(
+        unit('inch'),
+        withSystem(withSystem(noInch, 'us', false, 'us'), 'us', true, 'us'),
+        'us',
+      ),
+    ).toBe(true);
+    // Specialty unchecked hides every specialist unit, one shown on its own too; US's choice stays.
+    const off = withSystem(both, 'specialist', false, 'us');
+    expect(shows(unit('nanometer'), off, 'us')).toBe(false);
+    expect(off.overrides.get('inch')).toBe(false);
+    expect(presetRule(presetKeys('all', 'us')).overrides.size).toBe(0);
     // A choice that agrees with its switch records nothing.
     expect(withChoice(noInch, [unit('inch')], true, 'us').overrides.has('inch')).toBe(false);
   });
@@ -80,6 +91,17 @@ describe('settings: what shows', () => {
     expect(shows(unit('inch'), unhidden, 'us')).toBe(true);
     expect(shows(unit('nanometer'), unhidden, 'us')).toBe(true);
     expect(presetOf(unhidden.shown, 'us')).toBe('standard');
+  });
+
+  it('reads a system as all, some, or none of its units, units chosen on their own counted', () => {
+    expect(systemState(FRESH_RULE, 'specialist', 'us')).toBe('none');
+    expect(systemState(FRESH_RULE, 'us', 'us')).toBe('all');
+    const nanometer = withChoice(FRESH_RULE, [unit('nanometer')], true, 'us');
+    expect(systemState(nanometer, 'specialist', 'us')).toBe('some');
+    expect(systemState(nanometer, 'us', 'us')).toBe('all');
+    // No preset is lit while a unit is chosen on its own.
+    expect(litPreset(nanometer, 'us')).toBeNull();
+    expect(litPreset(FRESH_RULE, 'us')).toBe('standard');
   });
 
   it('reads a group as all, some, or none of its units', () => {

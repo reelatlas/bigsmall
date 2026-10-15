@@ -1,4 +1,5 @@
 import {
+  getUnit,
   unitsIn,
   type CategoryId,
   type FractionSize,
@@ -13,9 +14,11 @@ import {
  * DOM: everything here is unit-tested in node.
  *
  * What shows has two layers. The system switches set every category. A unit chosen on its own in
- * a table is an exception, shown or hidden against its switch, and a layer of its own: the
- * switches, the presets, and Reset settings leave it; Show units hidden one by one, or the table, clears it. The
- * unit in the box always shows, whatever the settings say (the caller's to apply).
+ * a table is an exception, shown or hidden against its switch, until its system's switch changes,
+ * which is final for that system, or a preset, which sets exactly its set; Show units hidden one
+ * by one, or the table, also clears it (Sean, 2026-10-15: with Specialty unchecked, no specialist
+ * unit shows). The unit in the box always shows, whatever the settings say (the caller's to
+ * apply).
  */
 
 // ---------------------------------------------------------------------------
@@ -141,7 +144,7 @@ export function presetKeys(
   return new Set([ownSection(preference)]);
 }
 
-/** The preset the switches match, or null for a custom set. */
+/** The preset the switches alone match, or null for a custom set. */
 export function presetOf(
   shown: ReadonlySet<SectionKey>,
   preference: UnitPreference,
@@ -149,6 +152,34 @@ export function presetOf(
   const same = (keys: ReadonlySet<SectionKey>) =>
     keys.size === shown.size && [...keys].every((key) => shown.has(key));
   return SHOW_PRESETS.find((preset) => same(presetKeys(preset.id, preference)))?.id ?? null;
+}
+
+/** The preset lit in Units: the one the switches match, while no unit is chosen on its own. */
+export function litPreset(rule: ViewRule, preference: UnitPreference): ShowPreset | null {
+  return rule.overrides.size > 0 ? null : presetOf(rule.shown, preference);
+}
+
+/** The section of a unit chosen on its own, by its id; undefined for an id no longer known. */
+function sectionOfId(id: string, preference: UnitPreference): SectionKey | undefined {
+  const unit = getUnit(id);
+  return unit ? sectionOf(unit, preference) : undefined;
+}
+
+/**
+ * A system's checkbox in Units: all its units shown, none, or some (a dash) while units of it are
+ * chosen on their own against its switch, in any category.
+ */
+export function systemState(
+  rule: ViewRule,
+  key: SectionKey,
+  preference: UnitPreference,
+): GroupState {
+  const on = rule.shown.has(key);
+  const against = [...rule.overrides].some(
+    ([id, show]) => show !== on && sectionOfId(id, preference) === key,
+  );
+  if (against) return 'some';
+  return on ? 'all' : 'none';
 }
 
 /** What the switches alone show: Other and Standard always. */
@@ -186,17 +217,29 @@ export function withChoice(
   return { ...rule, overrides };
 }
 
-/** One system switched on or off, in every category; units chosen on their own stay. */
-export function withSystem(rule: ViewRule, key: SectionKey, on: boolean): ViewRule {
+/**
+ * One system switched on or off, in every category, and final for it: its units chosen on their
+ * own go back to the switch, so unchecking Specialty hides every specialist unit. Other systems'
+ * exceptions stay.
+ */
+export function withSystem(
+  rule: ViewRule,
+  key: SectionKey,
+  on: boolean,
+  preference: UnitPreference,
+): ViewRule {
   const shown = new Set(rule.shown);
   if (on) shown.add(key);
   else shown.delete(key);
-  return { ...rule, shown };
+  const overrides = new Map(
+    [...rule.overrides].filter(([id]) => sectionOfId(id, preference) !== key),
+  );
+  return { shown, overrides };
 }
 
-/** A whole set of switches (a preset, or Reset settings); units chosen on their own stay. */
-export function withSystems(rule: ViewRule, shown: ReadonlySet<SectionKey>): ViewRule {
-  return { ...rule, shown };
+/** A preset: exactly its systems, every unit chosen on its own back to its switch. */
+export function presetRule(shown: ReadonlySet<SectionKey>): ViewRule {
+  return { shown, overrides: new Map() };
 }
 
 /** The units hidden on their own, in every category. */

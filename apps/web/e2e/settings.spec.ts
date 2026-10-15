@@ -274,6 +274,37 @@ test('under the matches, Show them carries on from the last match, and ↑ comes
   await expect(page.getByRole('button', { name: 'Keyboard shortcuts' })).toBeFocused();
 });
 
+test('with a system unchecked none of its units shows: its switch is final, and its checkbox shows a dash while units are chosen on their own', async ({
+  page,
+}) => {
+  await page.goto('/?a=foot&v=6.3');
+  await ready(page);
+  // A specialist unit shown on its own, from Hidden.
+  await hiddenToggle(page).click();
+  await page
+    .getByRole('group', { name: 'Hidden, Specialty' })
+    .getByLabel(/nanometers/)
+    .click();
+  await expect(row(page, 'nanometer')).toBeVisible();
+  await settingsButton(page, 'Units').click();
+  const units = settingsPanel(page, 'Units');
+  const specialty = units.getByLabel('Specialty');
+  await expect
+    .poll(() => specialty.evaluate((input) => (input as HTMLInputElement).indeterminate))
+    .toBe(true);
+  // No preset is lit while a unit departs from it.
+  await expect(units.getByRole('radio', { name: 'Standard' })).not.toBeChecked();
+  // A press on the dash shows every specialist unit; the next hides every one, the unit shown on
+  // its own too, and Standard is lit again.
+  await specialty.click();
+  await expect(specialty).toBeChecked();
+  await specialty.click();
+  await expect(specialty).not.toBeChecked();
+  await expect(row(page, 'nanometer')).toHaveCount(0);
+  await expect(page.locator('[data-section="specialist"]')).toHaveCount(0);
+  await expect(units.getByRole('radio', { name: 'Standard' })).toBeChecked();
+});
+
 test('search leaves hidden units out and offers them; taking one unhides it', async ({ page }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);

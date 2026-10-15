@@ -105,6 +105,9 @@ export const MENU_TRIGGER =
 export const MENU_CHEVRON =
   'ml-auto shrink-0 text-ink-muted transition-transform group-data-open:rotate-180';
 
+/** A checkbox: the native one, 16 px, in the accent. */
+export const CHECKBOX = 'size-4 accent-accent';
+
 /**
  * A row holding a control, filled as the table's cursor fills a row: under the pointer, and while
  * its control has the keyboard's focus, whose own ring stays (Sean, 2026-10-15). A whole row is the

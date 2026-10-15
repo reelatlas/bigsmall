@@ -26,6 +26,8 @@ Every push to `main` that passes CI deploys to `https://bigsmall.work` (CLAUDE.m
 - `git push origin HEAD:main`.
 - Find the run by the full SHA, not the short one: `gh run list --limit 5 --json databaseId,headSha -q '.[] | select(.headSha=="'"$(git rev-parse HEAD)"'") | .databaseId'`, retrying for a few seconds until it appears.
 - `gh run watch <id> --exit-status`, then `gh run view <id> --json conclusion -q .conclusion`.
+- CI runs the browser suite on the dev server, where Astro's dev toolbar adds elements a loose locator also finds: a new browser test runs on a dev server too before it ships, not only on the build.
+- Say CI passed only from the conclusion. A watch run in the background reports the exit status of its last command, so read the conclusion it printed (docs/LEARNINGS.md, "A test that passes on the build can fail on CI's dev server").
 - A failure: read the failed step (`gh run view <id> --log-failed`), fix, and ship again. Never force-push `main`.
 
 ## 4. Report

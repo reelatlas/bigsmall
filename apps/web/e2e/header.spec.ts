@@ -97,7 +97,8 @@ test('"Theme" and the shortcuts button switch by the header\'s own width, where 
 }) => {
   test.skip(isMobile, 'the shortcuts button is hidden on touch-first devices');
   await page.goto('/');
-  const header = page.locator('header');
+  // The page's own header: on the dev server, as on CI, Astro's dev toolbar draws headers too.
+  const header = page.locator('main > header');
   const word = themeToggle(page).getByText('Theme', { exact: true });
   const headerWidth = () => header.evaluate((el) => el.getBoundingClientRect().width);
   // The page's 16 px gutters aside, a 600 px window leaves the header under 576 px, its container

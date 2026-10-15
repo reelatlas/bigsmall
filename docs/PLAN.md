@@ -48,7 +48,7 @@ Directions Sean wants to explore after the MVP is shared; none is designed or sc
 - **Saved settings and templates (Sean, 2026-10-07).** Every setting is remembered by default, as the theme is: built 2026-10-15 for Units and Display (ADR 0018, docs/UX-SPEC.md §11); multiples would join them once they exist. Later, maybe: templates, named sets of settings to switch between (a construction set with fractional inches, say).
 - **Many more categories and units.** The catalog's plan (docs/UNITS-CATALOG.md §3: fuel economy, energy, pressure, power, angle, and the advanced groups) and more formulas, each category's data loaded on demand against its own budget (§9), every unit cited (ADR 0004).
 - **Search visibility (SEO).** The pair pages already planned for launch (one static page per popular unit pair), plus the technical basics (canonical domain, sitemap, robots, titles and descriptions, structured data, social cards) and Google Search Console and Bing Webmaster Tools.
-- **Analytics and monitoring.** Cookieless traffic analytics, product events (what people convert, calculator and Copy URL use, themes chosen), real-user speed (Core Web Vitals), search performance, and optionally errors and uptime; each script counted against the budget.
+- **Analytics and monitoring.** Cookieless traffic analytics and product events: Umami Cloud, built 2026-10-15 (ADR 0019), on once its website ID is set. Still to come: real-user speed (Core Web Vitals, not from Umami's performance option, which sends on every URL change), search performance (Google Search Console), and optionally errors and uptime; each script counted against the budget.
 
 ### Hygiene backlog (from the full tidy, 2026-10-15)
 
@@ -170,6 +170,8 @@ Rules: every theme passes the same contrast checks; decoration costs nothing whe
 
 The JS and CSS budgets gate CI (`pnpm bundle:check`), counting everything the page can load, lazily loaded chunks included. Measured 2026-10-06 at the end of milestone 2: 82.0 KB JS and 5.3 KB CSS gzipped; with copy link, the calculator, and arithmetic, 86.5 KB JS and 5.7 KB CSS; with the wordmark at play and theme art, 89.2 KB JS and 5.9 KB CSS; on Preact (ADR 0007), 33.9 KB JS; with the tuned wordmark, 38.2 KB JS and 6.2 KB CSS; after the pre-launch tidy-up, 39.6 KB JS and 6.3 KB CSS; with launch prep (the not-found page, the head tags), 40.0 KB JS and 6.5 KB CSS (2026-10-07, `pnpm bundle`). The Lighthouse budgets join CI at milestone 5.
 
+Umami's tracker (ADR 0019), about 2.4 KB compressed and deferred, loads from the site's address on the production deployment alone, so `pnpm bundle`, which measures the build, does not see it: counted here by hand, the page's 62.0 KB of JS (2026-10-15) and the tracker stay well under 90.
+
 ## 10. Accessibility targets
 
 WCAG 2.2 AA throughout. Specifically:
@@ -265,7 +267,7 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 
 11. **Hosting and domains.** Vercel, with `bigsmall.work` as the main domain and `bigsmall.diy` redirecting to it (ADR 0008). Settled for good on 2026-10-15 (Sean): `bigsmall.work`, a .com or .org not being available; a later change would still be a redirect flip (docs/DEPLOYMENT.md), so the SEO work builds on it.
 
-Decided 2026-10-15 (Sean): the SEO pair pages are in v1, built at M5 on `bigsmall.work`. Still open: the analytics tool, its options compared in docs/research/findings-0-first-pass.md, forty-seventh pass.
+Decided 2026-10-15 (Sean): the SEO pair pages are in v1, built at M5 on `bigsmall.work`. Decided the same day: Umami Cloud for analytics (ADR 0019), counting once its website ID is set.
 
 ## 16. Risks and open questions
 

@@ -1,5 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/ux/s.js",
+      "destination": "https://cloud.umami.is/script.js"
+    },
+    {
+      "source": "/ux/api/send",
+      "destination": "https://gateway.umami.is/api/send"
+    }
+  ],
   "headers": [
     {
       "source": "/_astro/(.*)",

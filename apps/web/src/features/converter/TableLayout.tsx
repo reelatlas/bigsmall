@@ -1,4 +1,4 @@
-import { formatNumber, type CategoryId } from '@bigsmall/core';
+import { formatNumber, getUnit, type CategoryId } from '@bigsmall/core';
 import {
   useEffect,
   useId,
@@ -16,6 +16,7 @@ import { CategoryTiles } from '../../components/CategoryTiles';
 import { ConversionTable, type ConversionTableProps } from '../../components/ConversionTable';
 import { UnitMatches } from '../../components/UnitMatches';
 import { ValueField } from '../../components/ValueField';
+import { track } from '../../lib/analytics';
 import { pressedByTouch } from '../../lib/modality';
 import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
@@ -428,6 +429,8 @@ export function TableLayout({
   /** A unit taken into the box, with its new text; the category follows, and the cursor rests on its row. */
   const take = (unitId: string, text: string) => {
     dispatch({ type: 'use', unit: unitId, text });
+    // Which units people convert in, counted as each is taken (ADR 0019).
+    track('Unit chosen', { category: getUnit(unitId)?.category ?? '', unit: unitId });
     setPosition(null);
     caretToEnd.current = true;
   };

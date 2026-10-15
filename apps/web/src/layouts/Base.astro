@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import { PLANE_EVENT } from '../lib/planes';
 import { APPLE_PLATFORM } from '../lib/platform';
-import { SITE } from '../lib/site';
+import { SITE, UMAMI_WEBSITE_ID } from '../lib/site';
 import { STARTS_TYPING } from '../lib/typing';
 import { DEFAULT_DARK, DEFAULT_LIGHT, THEMES, THEME_STORAGE_KEY } from '../lib/themes';
 
@@ -19,6 +19,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 const image = new URL(SITE.image, Astro.site);
 const themeIds = THEMES.map((t) => t.id);
 const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
+/*
+ * Counting (ADR 0019): Umami's tracker, served from the site's own address by vercel.json's
+ * rewrites, on the production deployment alone, so local builds, the browser tests, and preview
+ * deployments load nothing. No query string or hash is sent, so the URL's conversion stays out and
+ * the page counts once however often the URL is rewritten.
+ */
+const analytics = UMAMI_WEBSITE_ID !== '' && process.env['VERCEL_ENV'] === 'production';
 ---
 
 <!doctype html>
@@ -43,6 +50,18 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={SITE.imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    {analytics && (
+      <script
+        is:inline
+        defer
+        src="/ux/s.js"
+        data-website-id={UMAMI_WEBSITE_ID}
+        data-host-url={new URL('/ux', Astro.site).href}
+        data-domains={Astro.site?.hostname}
+        data-exclude-search="true"
+        data-exclude-hash="true"
+      />
+    )}
     <script
       define:vars={{
         ids: themeIds,
@@ -101,9 +120,17 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
       // [data-shell-toggle], which a click opens and closes; [data-open] shows its panel. Nothing
       // opens on hover or on focus (Sean, 2026-10-15: the shortcuts map peeked on both).
       const toggleOf = (shell) => shell.querySelector('[data-shell-toggle]');
+      // Counting (ADR 0019): a theme kept when its menu closes, however it closes, not the
+      // previews the arrow keys step through.
+      let themeAtOpen = null;
       const setOpen = (shell, open) => {
+        const wasOpen = shell.hasAttribute('data-open');
         shell.toggleAttribute('data-open', open);
         toggleOf(shell)?.setAttribute('aria-expanded', String(open));
+        if (wasOpen === open || !shell.querySelector('[data-theme-option]')) return;
+        const theme = document.documentElement.dataset.theme;
+        if (open) themeAtOpen = theme;
+        else if (theme !== themeAtOpen) window.umami?.track('Theme picked', { theme });
       };
       const closeAll = (except) => {
         for (const shell of document.querySelectorAll('[data-shell]')) {

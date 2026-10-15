@@ -24,6 +24,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0016](0016-every-unit-listed.md)       | Every unit in the table: specialist units listed with the everyday ones, no modes      | accepted; amended by 0018                       |
 | [0017](0017-settings.md)                | Settings: what shows and how it looks, sections by system, two layers                  | superseded by 0018                              |
 | [0018](0018-settings-as-they-stand.md)  | Settings as they stand: Units and Display, the visitor's own set and order, remembered | accepted; supersedes 0017                       |
+| [0019](0019-analytics.md)               | Analytics: Umami Cloud, cookieless, through the site's own address                     | accepted                                        |
 
 ## Template
 

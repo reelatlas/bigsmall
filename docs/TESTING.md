@@ -56,7 +56,7 @@ Adding a unit means adding at least one row that exercises it; a test fails when
 
 ## Theme contract
 
-`apps/web/test/themes.test.ts` parses each theme CSS file and checks the token contract and the contrast pairs from `src/lib/themes.ts`. A failing pair prints both colors and the achieved ratio.
+`apps/web/test/analytics.test.ts` checks that a count does nothing without the tracker and never throws, and hands the event to it when there. `test/themes.test.ts` parses each theme CSS file and checks the token contract and the contrast pairs from `src/lib/themes.ts`. A failing pair prints both colors and the achieved ratio.
 
 ## End to end
 

@@ -12,6 +12,7 @@ import {
   SegmentedToggles,
   type SegmentedOption,
 } from '../../components/SegmentedControl';
+import { track } from '../../lib/analytics';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
 import { cx } from '../../lib/recipes';
@@ -94,7 +95,16 @@ function Choices<T extends string | number>({
   return (
     <fieldset disabled={disabled} className="grid">
       <legend className={hideLegend ? 'sr-only' : SUBHEAD}>{legend}</legend>
-      <SegmentedControl name={name} options={options} value={value} onChange={onChange} />
+      <SegmentedControl
+        name={name}
+        options={options}
+        value={value}
+        onChange={(choice) => {
+          // Which settings people change, and to what (ADR 0019): the presets and Display's choices.
+          track('Setting changed', { setting: legend, value: String(choice) });
+          onChange(choice);
+        }}
+      />
     </fieldset>
   );
 }

@@ -63,6 +63,16 @@ git push origin v0.1.0
 - **Rolling back.** In Vercel, **Deployments**, open an earlier production deployment and choose **Instant Rollback**; then fix forward on `main`.
 - **Checking a build locally.** `pnpm build` then `pnpm preview` serves `apps/web/dist` as Vercel will, except the headers.
 
+## Analytics
+
+Umami Cloud counts visits (ADR 0019), in Sean's account on the free Hobby plan.
+
+- **Turning it on.** Umami's website id for bigsmall.work goes in `UMAMI_WEBSITE_ID` in `apps/web/src/lib/site.ts`; it is not a secret, since it ships in the page. `layouts/Base.astro` then adds the tracker on production deployments alone (`VERCEL_ENV=production`).
+- **First-party paths.** `apps/web/vercel.json` rewrites `/ux/s.js` to `https://cloud.umami.is/script.js` and `/ux/api/send` to `https://gateway.umami.is/api/send`; the tag's `data-host-url` is `https://bigsmall.work/ux`. `astro dev` and `astro preview` do not apply the rewrites, and the tag is not there to need them.
+- **After turning it on.** Visit from two places (a phone on cellular, a computer on Wi-Fi): Umami should show two sessions with the right countries. If they merge or show one country, the gateway is reading Vercel's address rather than the visitor's, and the proxy needs a function that forwards it.
+- **Our own visits.** Once in each browser we use, on bigsmall.work: `localStorage.setItem('umami.disabled', 1)` in the console (any value disables it; `removeItem` turns counting back on).
+- **Limits.** Hobby: 100,000 events a month (each event, and each property on it, counts), one site, six months of history; past the limit Umami stops recording until the month resets. The $20 plan before that, or for a second site.
+
 ## Changing the main domain
 
 A config change and a redirect flip (ADR 0008): set `site` in `apps/web/astro.config.mjs` to the new domain, make it the main domain in Vercel's Domains list, and redirect the old one to it with a 308. Search rankings follow permanent redirects, but slowly, so settle the domain before investing in search.

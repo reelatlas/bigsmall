@@ -16,6 +16,7 @@ import { Calculator, SendButton, type CalculatorKey } from '../../components/Cal
 import { copiedText } from '../../components/ConversionTable';
 import { NumberText, runningValue } from '../../components/NumberText';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
+import { track } from '../../lib/analytics';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { pressedByTouch } from '../../lib/modality';
@@ -50,6 +51,13 @@ type Side = 'calculator' | 'units' | 'display';
  * (Sean, 2026-10-15): C, V, B.
  */
 const SIDE_KEYS: Readonly<Record<string, Side>> = { c: 'calculator', v: 'units', b: 'display' };
+
+/** What a side panel's opening is counted as (ADR 0019). */
+const SIDE_OPENED = {
+  calculator: 'Calculator opened',
+  units: 'Units opened',
+  display: 'Display opened',
+} as const;
 
 /** The hint over the toolbar (docs/UX-SPEC.md §1). */
 const HINT = 'Type a number, unit, or both to compare all at once.';
@@ -90,6 +98,10 @@ export function Converter() {
   /** The side panel open, one at a time (Sean, 2026-10-15): the calculator, Units, or Display. */
   const [side, setSide] = useState<Side | null>(null);
   const calculatorOpen = side === 'calculator';
+  // Counted however a side panel opens, from its button or its key (ADR 0019).
+  useEffect(() => {
+    if (side) track(SIDE_OPENED[side]);
+  }, [side]);
   // The calculator's own entry: a scratch pad in the converter's state, so undo reaches it too.
   const entry = state.calc;
   const entryParsed = parse(entry.text, env.separators);
@@ -235,6 +247,7 @@ export function Converter() {
     const number = formatNumber(entryValue, { locale: env.locale });
     dispatch({ type: 'replace', text: placeNumber(state.text, number, env.separators) });
     markCopied('use');
+    track('Calculator sent');
   };
 
   /**
@@ -245,7 +258,10 @@ export function Converter() {
   const copyRow = (unitId: string) => {
     const row = table.kind === 'units' ? table.rows.find((each) => each.id === unitId) : undefined;
     const text = row ? copiedText(row, settings.display, env.locale) : null;
-    if (text !== null) copy(text, `row-${unitId}`);
+    if (text === null) return;
+    copy(text, `row-${unitId}`);
+    // The pair someone needed: from the box's unit to the row's (ADR 0019).
+    track('Value copied', { from: box.unit?.id ?? '', to: unitId });
   };
 
   const calculator = calculatorOpen && (
@@ -449,7 +465,10 @@ export function Converter() {
             data-tool="copy-url"
             aria-label="Copy URL"
             title="Copy URL"
-            onClick={() => copy(urlFor(state, env.separators, window.location), 'url')}
+            onClick={() => {
+              copy(urlFor(state, env.separators, window.location), 'url');
+              track('URL copied');
+            }}
             {...pointerProps('url')}
           >
             {copied === 'url' ? <CopiedIcon /> : <LinkIcon />}

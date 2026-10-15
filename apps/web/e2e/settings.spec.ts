@@ -7,6 +7,7 @@ import {
   setSettings,
   settingsButton,
   settingsPanel,
+  settled,
 } from './support';
 
 // Settings (ADR 0017, docs/UX-SPEC.md §1, §3, §7): what shows, in every category, and how results
@@ -116,6 +117,9 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
     .click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
   await expect(hiddenToggle(page)).toContainText(String(SPECIALIST - 1));
+  // A press lands while units glide, but Playwright waits for a still target, then scrolls it into
+  // view a different way on each retry, moving the page this test measures.
+  await settled(page);
 
   // Edit reads Done in its place, focus staying on it, and nothing over the list moves: the
   // hidden units stay in Hidden below, never listed among the rows.
@@ -285,18 +289,24 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
 }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
+  // How long the animation of `property` on `selector` runs, 0 if there is none: the theme's
+  // length in full, which the built site writes in seconds (400ms as .4s).
   const animated = (selector: string, property: string) =>
     page.evaluate(
       ([selector, property]) =>
-        document
-          .getAnimations()
-          .some(
-            (animation) =>
-              animation.effect instanceof KeyframeEffect &&
-              animation.effect.target instanceof Element &&
-              animation.effect.target.matches(selector!) &&
-              animation.effect.getKeyframes().some((frame) => property! in frame),
-          ),
+        Math.max(
+          0,
+          ...document
+            .getAnimations()
+            .filter(
+              (animation) =>
+                animation.effect instanceof KeyframeEffect &&
+                animation.effect.target instanceof Element &&
+                animation.effect.target.matches(selector!) &&
+                animation.effect.getKeyframes().some((frame) => property! in frame),
+            )
+            .map((animation) => Number(animation.effect!.getTiming().duration)),
+        ),
       [selector, property],
     );
   await hiddenToggle(page).click();
@@ -306,9 +316,9 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     .click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
   // It slides up from its line in Hidden, and flashes where it lands.
-  expect(await animated('[data-row="cubic-inch"]', 'transform')).toBe(true);
+  expect(await animated('[data-row="cubic-inch"]', 'transform')).toBe(400);
   expect(await animated('[data-row="cubic-inch"] > [role="gridcell"]', 'backgroundColor')).toBe(
-    true,
+    1200,
   );
   // The page takes clicks while it moves: a second unit checked straight after the first shows.
   await page
@@ -323,7 +333,7 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     .getByRole('group', { name: 'US (customary)', exact: true })
     .getByLabel(/teaspoons/)
     .click();
-  expect(await animated('[data-table-foot] button[aria-expanded]', 'backgroundColor')).toBe(true);
+  expect(await animated('[data-table-foot] button[aria-expanded]', 'backgroundColor')).toBe(1200);
   // With Hidden folded, the unit that left fades out where it was, rather than vanishing.
   await hiddenToggle(page).click();
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');

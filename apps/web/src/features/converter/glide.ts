@@ -1,4 +1,5 @@
 import { flushSync } from 'react-dom';
+import { cssTime } from '../../lib/css-time';
 
 /**
  * A change to what the table shows, as a glide (docs/UX-SPEC.md §3; docs/DESIGN-SYSTEM.md,
@@ -96,7 +97,7 @@ function fadeOut(place: Place, timing: KeyframeAnimationOptions) {
 export function glide(root: HTMLElement | null, change: () => void) {
   const card = root?.querySelector<HTMLElement>('[data-table-card]');
   const style = card && getComputedStyle(card);
-  const duration = style ? Number.parseFloat(style.getPropertyValue('--motion-slow')) : 0;
+  const duration = style ? cssTime(style.getPropertyValue('--motion-slow')) : 0;
   if (!root || !card || !style || !duration || typeof card.animate !== 'function') {
     change();
     return;

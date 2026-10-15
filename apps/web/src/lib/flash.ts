@@ -1,3 +1,5 @@
+import { cssTime } from './css-time';
+
 /**
  * A flash of the accent's soft tint that fades back to the element's own fill
  * (docs/DESIGN-SYSTEM.md, "Motion"; Sean, 2026-10-15): what just arrived, as a unit shown or
@@ -8,7 +10,7 @@
 export function flash(element: Element | null | undefined) {
   if (!(element instanceof HTMLElement) || typeof element.animate !== 'function') return;
   const style = getComputedStyle(element);
-  const duration = Number.parseFloat(style.getPropertyValue('--highlight-fade'));
+  const duration = cssTime(style.getPropertyValue('--highlight-fade'));
   if (!duration) return;
   const tint = style.getPropertyValue('--accent-soft');
   element.animate(

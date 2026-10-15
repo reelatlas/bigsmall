@@ -9,13 +9,16 @@ import {
   expectNoA11yViolations,
   hiddenToggle,
   ready,
+  recordAnimations,
   row,
   setSettings,
   settingsButton,
   settingsPanel,
   settled,
+  startedAnimations,
   unitCell,
 } from './support';
+import { THEMES } from '../src/lib/themes';
 
 // Settings (ADR 0017, docs/UX-SPEC.md §1, §3, §7): what shows, in every category, and how results
 // look; the table's sections, its Hidden list, and Edit; search leaving hidden units out. Visitors
@@ -647,6 +650,29 @@ test("where Both's fraction has no room beside the decimal, it sits under it, li
   expect(fraction.y).toBeGreaterThanOrEqual(value.y + value.height - 1);
   expect(Math.round((await ounce.boundingBox())!.height)).toBe(44);
   await expectNoA11yViolations(page);
+  // In every theme, whose figures differ in width (monospace, serif), the rule holds where the
+  // fraction falls: beside the decimal and whole, or under it on the point; the row keeps its height.
+  const beside = ounce.locator('[data-column="second"]');
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    await expect
+      .poll(async () => (await under.isVisible()) !== (await beside.isVisible()), theme.id)
+      .toBe(true);
+    if (await under.isVisible()) {
+      const whole = (await ounce.locator('[data-whole]').boundingBox())!;
+      const stacked = (await under.boundingBox())!;
+      expect(Math.round(stacked.x + stacked.width), theme.id).toBe(
+        Math.round(whole.x + whole.width),
+      );
+      expect(stacked.y, theme.id).toBeGreaterThanOrEqual(whole.y + whole.height - 1);
+    } else {
+      expect(await beside.evaluate((cell) => cell.scrollWidth <= cell.clientWidth), theme.id).toBe(
+        true,
+      );
+    }
+    expect(Math.round((await ounce.boundingBox())!.height), theme.id).toBe(44);
+  }
+  await applyTheme(page, THEMES[0]!);
   // With the room, it goes back beside the decimal.
   await page.setViewportSize({ width: 1280, height: 900 });
   await expect(ounce.locator('[data-column="second"]')).toBeVisible();
@@ -708,27 +734,12 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     );
   const slow = await token('--motion-slow');
   const fade = await token('--highlight-fade');
-  // How long the animation of `property` on `selector` runs, 0 if there is none: the theme's
-  // length in full.
-  const animated = (selector: string, property: string) =>
-    page.evaluate(
-      ([selector, property]) =>
-        Math.max(
-          0,
-          ...document
-            .getAnimations()
-            .filter(
-              (animation) =>
-                animation.effect instanceof KeyframeEffect &&
-                animation.effect.target instanceof Element &&
-                animation.effect.target.matches(selector!) &&
-                animation.effect.getKeyframes().some((frame) => property! in frame),
-            )
-            .map((animation) => Number(animation.effect!.getTiming().duration)),
-        ),
-      [selector, property],
-    );
+  // How long the animation of `property` on `selector` ran, 0 if none did: the theme's length in
+  // full. Recorded as each starts, so a slow machine that finishes it first still shows it.
+  const animated = async (selector: string, property: string) =>
+    Math.max(0, ...(await startedAnimations(page, selector, property)));
   await hiddenToggle(page).click();
+  await recordAnimations(page);
   await page
     .getByRole('group', { name: 'Hidden, Specialty' })
     .getByLabel(/cubic inches/)
@@ -748,29 +759,24 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
 
   // Edit sends one to Hidden: Hidden flashes as it takes it.
   await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
+  await recordAnimations(page);
   await table(page)
     .getByRole('group', { name: 'US (customary)', exact: true })
     .getByLabel(/teaspoons/)
     .click();
   expect(await animated('[data-table-foot] button[aria-expanded]', 'backgroundColor')).toBe(fade);
-  // With Hidden folded, the unit that left fades out where it was, rather than vanishing.
+  // With Hidden folded, the unit that left fades out where it was, rather than vanishing: a copy
+  // laid over the page where it stood.
   await hiddenToggle(page).click();
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');
+  await recordAnimations(page);
   await table(page)
     .getByRole('group', { name: 'US (customary)', exact: true })
     .getByLabel(/tablespoons/)
     .click();
-  expect(
-    await page.evaluate(() =>
-      [...document.body.children].some(
-        (child) =>
-          child instanceof HTMLElement &&
-          child.dataset.unit === 'us-tablespoon' &&
-          child.style.position === 'absolute' &&
-          child.getAnimations().length > 0,
-      ),
-    ),
-  ).toBe(true);
+  await expect
+    .poll(() => startedAnimations(page, '[data-unit="us-tablespoon"][style*="absolute"]'))
+    .not.toEqual([]);
 });
 
 test('a glide moves only what moved on the page, however the page scrolls', async ({ page }) => {
@@ -782,23 +788,19 @@ test('a glide moves only what moved on the page, however the page scrolls', asyn
     .getByRole('group', { name: 'Hidden, Specialty' })
     .getByLabel(/cubic inches/);
   await cubicInches.scrollIntoViewIfNeeded();
+  await recordAnimations(page);
   await cubicInches.click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
-  // The rows above the one that arrived did not move on the page, so none of them slides.
-  const moved = await page.evaluate(
-    () =>
-      document
-        .getAnimations()
-        .filter(
-          (animation) =>
-            animation.effect instanceof KeyframeEffect &&
-            animation.effect.target instanceof HTMLElement &&
-            ['us-teaspoon', 'milliliter', 'imperial-gallon'].includes(
-              animation.effect.target.dataset.row ?? '',
-            ),
-        ).length,
-  );
-  expect(moved).toBe(0);
+  // The one that arrived glided; the rows above it did not move on the page, so none of them did.
+  await expect
+    .poll(() => startedAnimations(page, '[data-row="cubic-inch"]', 'transform'))
+    .not.toEqual([]);
+  expect(
+    await startedAnimations(
+      page,
+      '[data-row="us-teaspoon"], [data-row="milliliter"], [data-row="imperial-gallon"]',
+    ),
+  ).toEqual([]);
 });
 
 test('with reduced motion a unit moves at once, and still flashes, a change of color only', async ({
@@ -808,32 +810,16 @@ test('with reduced motion a unit moves at once, and still flashes, a change of c
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
   await hiddenToggle(page).click();
+  await recordAnimations(page);
   await page
     .getByRole('group', { name: 'Hidden, Specialty' })
     .getByLabel(/cubic inches/)
     .click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
-  expect(
-    await page.evaluate(() =>
-      document
-        .getAnimations()
-        .every(
-          (animation) =>
-            !(animation.effect instanceof KeyframeEffect) ||
-            animation.effect.getKeyframes().every((frame) => !('transform' in frame)),
-        ),
-    ),
-  ).toBe(true);
-  expect(
-    await page.evaluate(() =>
-      document
-        .getAnimations()
-        .some(
-          (animation) =>
-            animation.effect instanceof KeyframeEffect &&
-            animation.effect.target instanceof Element &&
-            animation.effect.target.matches('[data-row="cubic-inch"] > [role="gridcell"]'),
-        ),
-    ),
-  ).toBe(true);
+  // It flashed where it landed, and nothing moved (a move of no length is none).
+  await expect
+    .poll(() => startedAnimations(page, '[data-row="cubic-inch"] > [role="gridcell"]'))
+    .not.toEqual([]);
+  const moves = await startedAnimations(page, '*', 'transform');
+  expect(moves.filter((length) => length > 0)).toEqual([]);
 });

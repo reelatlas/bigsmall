@@ -725,6 +725,13 @@ test('the chip gives up its name before the number shrinks, sooner in a narrower
   // A phone's box gives it up sooner, and the number then keeps its size for a while.
   expect(firstUnnamed(narrow)).toBeLessThan(firstUnnamed(wide));
   expect(narrow.some((step) => !step.named && step.full)).toBe(true);
+  // In every theme, whose figures differ in width (monospace, serif), the rule holds on a phone.
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    for (const step of await sweep(375)) {
+      expect(step.named && !step.full, `${theme.id}, ${step.digits} digits`).toBe(false);
+    }
+  }
 });
 
 test('before the island hydrates, the server’s page shows the start, so nothing jumps', async ({
@@ -1182,12 +1189,19 @@ test('a long number steps down a size and fits, or scrolls at the smallest; its 
   const fits = () => box(page).evaluate((el) => el.scrollWidth <= el.clientWidth);
   const short = await fontSize();
   await box(page).fill('1234567890123456789012345678901234567890');
-  const smallest = await fontSize();
-  expect(smallest).toBeLessThan(short);
-  for (let digits = 1; digits <= 24; digits += 1) {
-    await box(page).fill('123456789012345678901234'.slice(0, digits));
-    expect((await fits()) || (await fontSize()) === smallest, `${digits} digits`).toBe(true);
+  expect(await fontSize()).toBeLessThan(short);
+  // In every theme, whose figures differ in width (monospace, serif).
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    await box(page).fill('1234567890123456789012345678901234567890');
+    const smallest = await fontSize();
+    for (let digits = 1; digits <= 24; digits += 1) {
+      await box(page).fill('123456789012345678901234'.slice(0, digits));
+      const ok = (await fits()) || (await fontSize()) === smallest;
+      expect(ok, `${theme.id}, ${digits} digits`).toBe(true);
+    }
   }
+  await applyTheme(page, THEMES[0]!);
   await box(page).fill('1.5E21');
   await expect(page.locator('[data-plane="box"] [data-marker]')).toHaveText('E');
   // A row's value in exponent form sets its marker as the box does, and reads whole.

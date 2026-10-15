@@ -27,6 +27,61 @@ export async function settled(page: Page) {
   );
 }
 
+/** An animation a script started, as recordAnimations keeps it. */
+interface Started {
+  target: Element;
+  /** What its keyframes move, as they name it: "transform", "backgroundColor". */
+  properties: string[];
+  duration: number;
+}
+
+/**
+ * Keeps every animation a script starts from here on (`Element.animate`, as the glide and the
+ * flash start theirs): its target, what it moves, and its length, so a test reads them however
+ * long ago they ran. Reading `document.getAnimations()` after a step misses one a slow machine
+ * already finished (the full tidy, 2026-10-15). Called again, it starts the record afresh.
+ */
+export async function recordAnimations(page: Page) {
+  await page.evaluate(() => {
+    const store = window as unknown as { started?: Started[] };
+    if (store.started) {
+      store.started.length = 0;
+      return;
+    }
+    const started: Started[] = [];
+    store.started = started;
+    const animate = Element.prototype.animate;
+    Element.prototype.animate = function (this: Element, ...args: Parameters<typeof animate>) {
+      const animation = animate.apply(this, args);
+      const effect = animation.effect;
+      const frames = effect instanceof KeyframeEffect ? effect.getKeyframes() : [];
+      started.push({
+        target: this,
+        properties: [...new Set(frames.flatMap((frame) => Object.keys(frame)))],
+        duration: Number(effect?.getTiming().duration ?? 0),
+      });
+      return animation;
+    };
+  });
+}
+
+/**
+ * The lengths of the animations recorded since recordAnimations on what matches `selector`, those
+ * that move `property` when it is given; none ran, [].
+ */
+export async function startedAnimations(page: Page, selector: string, property?: string) {
+  return page.evaluate(
+    ([selector, property]) =>
+      ((window as unknown as { started?: Started[] }).started ?? [])
+        .filter(
+          (each) =>
+            each.target.matches(selector) && (!property || each.properties.includes(property)),
+        )
+        .map((each) => each.duration),
+    [selector, property] as const,
+  );
+}
+
 /** Runs axe on the page as it is and fails on any violation. */
 export async function expectNoA11yViolations(page: Page) {
   await settled(page);

@@ -192,8 +192,8 @@ The theme menu and the shortcuts map are fluid shells driven by the inline scrip
   | --------------------- | ---------------------- |
   | Type from anywhere    | 0–9 or a–z             |
   | Pick a unit or value  | Enter                  |
-  | Copy a row’s value    | Ctrl C                 |
   | Step back or clear    | Esc                    |
+  | Copy row value        | Ctrl C                 |
   | Move up and down page | ↑ ↓                    |
   | Move across a toolbar | ← →                    |
   | Open calculator       | Alt C                  |

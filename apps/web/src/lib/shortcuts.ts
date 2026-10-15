@@ -26,8 +26,8 @@ export interface Shortcut {
 export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Type from anywhere', keys: [['0–9'], ['a–z']] },
   { action: 'Pick a unit or value', keys: [['Enter']] },
-  { action: 'Copy a row’s value', keys: [['Mod', 'C']] },
   { action: 'Step back or clear', keys: [['Esc']] },
+  { action: 'Copy row value', keys: [['Mod', 'C']] },
   // Each pair of arrows shares one group so they sit side by side with nothing between them.
   { action: 'Move up and down page', keys: [['↑', '↓']] },
   { action: 'Move across a toolbar', keys: [['←', '→']] },

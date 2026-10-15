@@ -24,3 +24,7 @@ ADR 0002 planned Cloudflare Pages for hosting. The site is fully static (Astro `
 - Vercel's free Hobby plan is for non-commercial use. If bigsmall earns money (ads, sponsorship), it moves to Vercel Pro or to Cloudflare Pages.
 - Changing the main domain later is a config change (`site`) and a redirect flip. Search rankings carry over through permanent redirects, but slowly, so the main domain should be settled before investing in SEO.
 - ADR 0002's hosting row is superseded by this decision; the rest of 0002 stands.
+
+## Outcome
+
+- **2026-10-15.** The main domain is settled for good as `bigsmall.work` (Sean; a .com or .org is not available), so the SEO pair pages build on it.

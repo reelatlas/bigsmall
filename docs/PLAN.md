@@ -19,11 +19,11 @@ Positioning in one line: _type anything into the box and see it in every unit at
 - **Every unit, no modes.** Each category's table lists all its units, everyday and specialist, in the visitor's order; there is no basic and advanced switch (ADR 0016, Sean, 2026-10-08).
 - **Themes.** Two neutral defaults (light, dark) plus distinctive aesthetic themes. Theme choice persists.
 - **Shareable URLs.** The current conversion is in the URL, so links and bookmarks work; a Copy URL button in the header copies it.
+- **Pages for search.** One static page per popular unit pair ("cm to inches"), generated from the unit data, each opening the converter on its pair with a short original explanation (Sean, 2026-10-15: in v1, built at milestone 5).
 - **Fast, accessible, responsive.** See budgets and targets below.
 
 ### Later
 
-- SEO landing pages, one static page per popular unit pair, generated from the unit data.
 - PWA: installable, works offline. This covers most of the "app" ambition with no app store.
 - Currency (needs live rates from an API, still no database).
 - Ingredient-aware cooking conversions (cups of flour to grams).
@@ -189,7 +189,7 @@ WCAG 2.2 AA throughout. Specifically:
 - **Golden tests.** A fixture file of known conversions taken from those sources. Every unit appears in at least one row. Tests assert relative error ≤ 1e-12.
 - **Round-trip tests.** For every unit, `fromBase(toBase(x)) ≈ x` for several magnitudes.
 - **Spot checks against the incumbents.** A small set of conversions compared against the two reference sites as a sanity check only. Disagreements are resolved by the standards source, never by the site. See ADR 0004.
-- **An accuracy audit (Sean, 2026-10-15), a much later pass.** Accuracy is the product's foundation, so one pass checks every calculation from first principles, apart from the tests that grew with the code: each unit's factor and offset against its cited source (NIST SP 811, Handbook 44, the SI Brochure), recomputed independently rather than read off the golden rows; the formulas (temperature's offsets, fuel economy's reciprocal, any unit defined through another); the arithmetic parser (precedence, `^` right to left, unary minus, implied multiplication, overflow and underflow, division by zero); rounding and fractions (`rounded.ts`: nearest, up and down below zero, ties, float noise, the smallest size, past a million); numbers read and written in every locale (decimal marks, grouping, the URL's `v`); the calculator's entry and its send; and the precision a value keeps through the box, a row, a copy, and the URL. Method: an independent reimplementation or reference table per category diffed against core, property tests (round trips, size order, inverses), and a second reviewer for every factor. A disagreement is settled by the standard (ADR 0004).
+- **An accuracy audit (Sean, 2026-10-15), a later pass, after the list of the full tidy's verdicts.** Accuracy is the product's foundation, so one pass checks every calculation from first principles, apart from the tests that grew with the code: each unit's factor and offset against its cited source (NIST SP 811, Handbook 44, the SI Brochure), recomputed independently rather than read off the golden rows; the formulas (temperature's offsets, fuel economy's reciprocal, any unit defined through another); the arithmetic parser (precedence, `^` right to left, unary minus, implied multiplication, overflow and underflow, division by zero); rounding and fractions (`rounded.ts`: nearest, up and down below zero, ties, float noise, the smallest size, past a million); numbers read and written in every locale (decimal marks, grouping, the URL's `v`); the calculator's entry and its send; and the precision a value keeps through the box, a row, a copy, and the URL. Method: an independent reimplementation or reference table per category diffed against core, property tests (round trips, size order, inverses), and a second reviewer for every factor. A disagreement is settled by the standard (ADR 0004).
 - **Arithmetic.** Double precision via the base unit. Display formatting at 10 significant digits with trailing zeros trimmed hides floating-point noise. Move to a decimal library only if a real test case fails.
 
 ## 12. Documentation system
@@ -260,12 +260,12 @@ Supabase or any database. A backend. A paid analytics tier. An app store account
 6. **Input flexibility.** Spacing, locale number formats, typed math, and Enter-as-equals are a standing UX principle, phased in `docs/UX-SPEC.md` §14.
 7. **Commit rules.** Nothing commits on a keystroke. Enter commits the highlighted best match, or a pick does; Tab and clicking away never commit, so moving between boxes never changes what was typed (`docs/UX-SPEC.md` §5).
 8. **Token guard.** `pnpm lint` rejects raw colors, palette colors, one-off arbitrary values, untokened radii, shadows, fonts, and literal durations and delays in components. A flagged need is matched to an existing token or brought to the owner as a proposed new one (`docs/DESIGN-SYSTEM.md`, "Token guard").
-9. **Control edges.** Fields, the theme menu, and secondary buttons are edged in a new `--edge` token at 3:1 against the page and the surface (WCAG 1.4.11); `--line` stays for dividers. A trial: reverting its one commit restores the lighter edges.
+9. **Control edges.** Fields, the theme menu, and secondary buttons are edged in a new `--edge` token at 3:1 against the page and the surface (WCAG 1.4.11); `--line` stays for dividers. Kept after a trial (Sean, 2026-10-15).
 10. **Framework.** The island runs on Preact through `preact/compat` (ADR 0007): 89.2 KB of JavaScript became 33.9 KB with no change to how components are written, and the 90 KB budget stays, so the room goes to the product. Owner's choice after a measured spike.
 
-11. **Hosting and domains.** Vercel, with `bigsmall.work` as the main domain and `bigsmall.diy` redirecting to it (ADR 0008). The main domain can change later with a redirect flip; settle it before SEO work.
+11. **Hosting and domains.** Vercel, with `bigsmall.work` as the main domain and `bigsmall.diy` redirecting to it (ADR 0008). Settled for good on 2026-10-15 (Sean): `bigsmall.work`, a .com or .org not being available; a later change would still be a redirect flip (docs/DEPLOYMENT.md), so the SEO work builds on it.
 
-Still open: SEO pages in v1 (proposed yes, built at M5), and the analytics tool (to explore with the owner).
+Decided 2026-10-15 (Sean): the SEO pair pages are in v1, built at M5 on `bigsmall.work`. Still open: the analytics tool, its options compared in docs/research/findings-0-first-pass.md, forty-seventh pass.
 
 ## 16. Risks and open questions
 

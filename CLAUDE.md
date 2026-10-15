@@ -16,10 +16,14 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Trials awaiting Sean's verdict**, each one commit to revert: the Units icon, a list with an arrow up and down (`334b2eb`); the box's own × (`0178c30`); one spacing rule for sections and dividers (`fba392a`); the control edge `--edge` and the mark and link preview card (`docs/DESIGN-SYSTEM.md`, "Edges and borders", "Brand assets").
-2. **Open with Sean**, from the full tidy (`docs/research/findings-0-first-pass.md`, "Tidy pass, full, 2026-10-15", each with a recommendation): first, "Standard" names both a Units preset and the heading of a category with no regional system (Time, Data, Angle).
-3. **Next.** Send a build to friends, now that the table's controls are built (Sean, 2026-10-08). Toward v1 (`docs/PLAN.md` §13): the SEO pair pages and an analytics tool to decide; Lighthouse budgets (milestone 5); the manual screen-reader, keyboard, and zoom passes (`docs/TESTING.md`, "Before launch").
-4. **Later.** The accuracy audit of every conversion and calculation (`docs/PLAN.md` §11); the hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search, analytics); the five-person test once there is traction.
+1. **Open with Sean**, each explained to him on 2026-10-15 with a recommendation (`docs/research/findings-0-first-pass.md`, "Forty-seventh pass"):
+   - The mark and the link preview card (`docs/DESIGN-SYSTEM.md`, "Brand assets"), a trial since 2026-10-07: keep it until a logo round (recommended), or start one.
+   - The header's two viewport switches (the shortcuts button, the word "Theme") moved to the header's own width, matched so nothing moves; and the chip's spoken name, "Unit: pints" for "Change unit: pints", with Edit/Done recorded as the exception to `aria-pressed`. Recommended, waiting on his go.
+   - The analytics tool: Umami Cloud recommended, Vercel's own runner-up; the comparison is in that pass.
+2. **Next, toward v1** (`docs/PLAN.md` §13): the SEO pair pages, in v1 on `bigsmall.work`, the domain for good (Sean, 2026-10-15): plan them, then build; analytics once chosen; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
+3. **Then the accuracy audit** of every conversion and calculation (`docs/PLAN.md` §11), after the rest of this list (Sean, 2026-10-15).
+4. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).
+5. **Later.** The hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search); the five-person test once there is traction.
 
 ## Non-negotiables
 
@@ -34,6 +38,14 @@ Kept current at every save and tidy (the `save` skill); history goes in the find
 9. **Decisions are recorded.** Anything you would explain twice becomes an ADR in `docs/decisions/`.
 10. **Learnings are logged.** A gotcha, workaround, or best practice found during work gets a dated entry in `docs/LEARNINGS.md` in the same change.
 11. **Modern where compatible.** Newest tool majors whose peers are satisfied; pins and overrides are documented with reasons. Never drop accessibility tooling to make an upgrade work. (ADR 0005)
+
+## Working habits
+
+How work is checked, not limits on what to try: labs, trials, and experiments stay welcome (Sean, 2026-10-15).
+
+- **Verify on the built site.** Motion, CSS, and anything the minifier rewrites are checked on `pnpm build` and its preview, not only the dev server.
+- **Measure, never count.** Decide and test by a box's measured size and each theme's fonts, never a character count, a breakpoint standing in for width, or a number tuned to one machine.
+- **Commit on the gate's exit status.** `pnpm check && git commit …`, never `;` (the `ship` skill).
 
 ## Commands
 

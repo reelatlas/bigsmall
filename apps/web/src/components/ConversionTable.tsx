@@ -170,9 +170,17 @@ const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
 const HEADING = cx(PANEL_TITLE, 'px-2 pb-1');
 const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
 
-/** The edge over a section: none over the first, a line over the rest. */
-function sectionEdge(at: number): string {
-  return at === 0 ? 'pt-1' : 'mt-1 border-t border-line pt-2';
+/**
+ * The space over a section, by what shows (docs/DESIGN-SYSTEM.md, "Space by what shows"; Sean,
+ * 2026-10-15): a line between sections sits evenly between the last row's ink and the next
+ * heading's, about 16 px each side, and the first heading sits as far under the card's top as a
+ * panel's title does, about 20 px, never hugging it. A grid's heading is a short line of small
+ * text; Edit's is a 44 px row whose text sits 12 px inside it, so each takes its own padding to
+ * show the same space.
+ */
+function sectionEdge(at: number, kind: 'heading' | 'row'): string {
+  if (kind === 'row') return at === 0 ? '' : 'mt-1 border-t border-line pt-0.5';
+  return at === 0 ? 'pt-3' : 'mt-0.5 border-t border-line pt-3.5';
 }
 
 /** A value as the display writes it first: its fraction with Fractions, else its decimal. */
@@ -689,7 +697,11 @@ export function ConversionTable<T extends ConversionRow>({
           role="rowgroup"
           className="col-span-8 grid grid-cols-subgrid gap-y-0.5"
         >
-          <div role="row" className={cx('col-span-8', sectionEdge(at))} data-section={section.key}>
+          <div
+            role="row"
+            className={cx('col-span-8', sectionEdge(at, 'heading'))}
+            data-section={section.key}
+          >
             <span role="columnheader" className={cx('block', HEADING)}>
               {section.label}
             </span>
@@ -756,7 +768,7 @@ export function ConversionTable<T extends ConversionRow>({
     <div data-list="shown">
       {sections.map((section, at) => (
         <div key={section.key} role="group" aria-label={section.label}>
-          {headedCheck(section, 'shown', sectionEdge(at))}
+          {headedCheck(section, 'shown', sectionEdge(at, 'row'))}
           {section.rows.map((row) => line(row, 'shown'))}
         </div>
       ))}
@@ -793,7 +805,7 @@ export function ConversionTable<T extends ConversionRow>({
         {!message && (
           <div
             className={cx(
-              'mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1',
+              'mt-0.5 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-0.5',
               editing && 'sticky bottom-0 bg-surface',
             )}
             data-table-foot

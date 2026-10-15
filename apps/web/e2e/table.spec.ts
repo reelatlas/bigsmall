@@ -795,6 +795,41 @@ test('at 320 px the rows and the categories fit without scrolling sideways', asy
   expect(await overflow()).toBe(0);
 });
 
+test('a line between sections sits evenly between their text, and the first heading clear of the top', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-cup&v=2');
+  await ready(page);
+  // The ink the eye measures: text runs' own boxes, not their elements'.
+  const gaps = () =>
+    page.locator('[data-table-card]').evaluate((card) => {
+      const text = (el: Element) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return range.getBoundingClientRect();
+      };
+      const top =
+        card.getBoundingClientRect().top + parseFloat(getComputedStyle(card).borderTopWidth);
+      const headings = [...card.querySelectorAll('[data-section]')];
+      const lines = headings.slice(1).map((heading) => {
+        const line = heading.getBoundingClientRect().top;
+        const group = heading.closest('[role="rowgroup"]')!.previousElementSibling!;
+        const above =
+          line - text(group.querySelector('[data-row]:last-of-type [data-symbol]')!).bottom;
+        const below = text(heading).top - line;
+        return [Math.round(above), Math.round(below)];
+      });
+      return { first: Math.round(text(headings[0]!).top - top), lines };
+    });
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const { first, lines } = await gaps();
+    expect(first, theme.id).toBeGreaterThanOrEqual(16);
+    for (const [above, below] of lines)
+      expect(Math.abs(above! - below!), theme.id).toBeLessThanOrEqual(4);
+  }
+});
+
 test('the hint has a line of its own; the toolbar under it leads with the menu, the calculator, Units, and Display, which wrap under the other tools on a phone', async ({
   page,
 }) => {

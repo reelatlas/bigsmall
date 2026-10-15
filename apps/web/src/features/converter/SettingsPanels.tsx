@@ -224,7 +224,9 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
         <legend className="sr-only">Systems, in the table's order</legend>
         <SystemRows settings={settings} preference={preference} onSettings={onSettings} />
       </fieldset>
-      <div className="flex flex-wrap items-center justify-between gap-x-2 border-t border-line pt-2">
+      {/* Its line sits evenly between the last system's ink and the resets', as every divider does:
+          the rows' 44 px leave their ink 12 px inside, so the line comes up past the panel's gap. */}
+      <div className="-mt-1.5 flex flex-wrap items-center justify-between gap-x-2 border-t border-line pt-1">
         <Reset
           off={hiddenCount === 0}
           done={done === 'unhide'}
@@ -323,7 +325,7 @@ export function DisplayPanel({ settings, onSettings, onClose }: SettingsPanelPro
         disabled={display.format === 'decimal' && display.places === null}
         onChange={(rounding) => setDisplay({ rounding })}
       />
-      <div className="border-t border-line pt-2">
+      <div className="border-t border-line pt-1">
         <Reset
           off={!displayChanged(display)}
           done={done === 'reset'}

@@ -352,9 +352,9 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   await hiddenToggle(page).click();
   await page
     .getByRole('group', { name: 'Hidden, Specialty' })
-    .getByLabel(/nanometers/)
+    .getByLabel(/micrometers/)
     .click();
-  await expect(row(page, 'nanometer')).toBeVisible();
+  await expect(row(page, 'micrometer')).toBeVisible();
   await settingsButton(page, 'Units').click();
   const units = settingsPanel(page, 'Units');
   const specialty = units.getByRole('checkbox', { name: 'Specialty' });
@@ -369,7 +369,7 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   await expect(specialty).toBeChecked();
   await specialty.click();
   await expect(specialty).not.toBeChecked();
-  await expect(row(page, 'nanometer')).toHaveCount(0);
+  await expect(row(page, 'micrometer')).toHaveCount(0);
   await expect(page.locator('[data-section="specialist"]')).toHaveCount(0);
   await expect(units.getByRole('radio', { name: /^Custom/ })).toBeChecked();
 });

@@ -134,7 +134,7 @@ export const massUnits: readonly Unit[] = [
     symbol: 'µg',
     aliases: ['microgramme', 'microgrammes', 'mcg'],
     system: 'si',
-    tier: 'advanced',
+    tier: 'basic',
     factor: 1e-9,
     exact: true,
     source: SI,

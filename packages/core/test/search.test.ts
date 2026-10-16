@@ -32,12 +32,14 @@ describe('search: idle lists', () => {
       'foot',
       'yard',
       'mile',
+      'nanometer',
       'millimeter',
       'centimeter',
       'meter',
       'kilometer',
     ]);
     expect(ids(search('', { category: 'length', system: 'metric' }))).toEqual([
+      'nanometer',
       'millimeter',
       'centimeter',
       'meter',
@@ -89,6 +91,7 @@ describe('search: idle lists', () => {
       'ounce',
       'pound',
       'stone',
+      'microgram',
       'milligram',
       'gram',
       'kilogram',
@@ -99,6 +102,7 @@ describe('search: idle lists', () => {
       'ounce',
       'pound',
       'short-ton',
+      'microgram',
       'milligram',
       'gram',
       'kilogram',
@@ -128,7 +132,7 @@ describe('search: idle lists', () => {
       'fahrenheit',
       'kelvin',
     ]);
-    expect(ids(search('', { category: 'length' }))[0]).toBe('millimeter');
+    expect(ids(search('', { category: 'length' }))[0]).toBe('nanometer');
   });
 
   it('lists the specialist units after every everyday one, smallest to largest', () => {
@@ -137,11 +141,11 @@ describe('search: idle lists', () => {
       'foot',
       'yard',
       'mile',
+      'nanometer',
       'millimeter',
       'centimeter',
       'meter',
       'kilometer',
-      'nanometer',
       'micrometer',
       'mil',
       'fathom',
@@ -181,7 +185,8 @@ describe('search: idle lists', () => {
     expect(group('imperial-pint', 'us')).toBe('neither');
     expect(group('imperial-pint', 'imperial')).toBe('own');
     expect(group('knot', 'metric')).toBe('neither');
-    expect(group('nanometer', 'metric')).toBe('specialist');
+    expect(group('nanometer', 'metric')).toBe('own');
+    expect(group('micrometer', 'metric')).toBe('specialist');
   });
 
   it('orders the newer categories by the same rule', () => {
@@ -419,6 +424,25 @@ describe('search: case', () => {
     expect(resolveExact('kN')?.id).toBe('kilonewton');
     // Neither as typed: both are offered, as before.
     expect(resolveExact('KN')).toBeNull();
+  });
+
+  it('the current category’s exact match leads, then the one written as typed', () => {
+    // In Torque, "nm" is the newton meter; in Length, "Nm" the nanometer.
+    expect(ids(search('nm', { prefer: 'torque' })).slice(0, 2)).toEqual([
+      'newton-meter',
+      'nanometer',
+    ]);
+    expect(ids(search('Nm', { prefer: 'length' })).slice(0, 2)).toEqual([
+      'nanometer',
+      'newton-meter',
+    ]);
+    expect(resolveExact('nm', { prefer: 'torque' })?.id).toBe('newton-meter');
+    expect(resolveExact('Nm', { prefer: 'length' })?.id).toBe('nanometer');
+    // With no category chosen, the spelling decides.
+    expect(ids(search('nm')).slice(0, 2)).toEqual(['nanometer', 'newton-meter']);
+    expect(resolveExact('nm')?.id).toBe('nanometer');
+    // In Speed, "c" is the speed of light; anywhere else Celsius.
+    expect(resolveExact('c', { prefer: 'speed' })?.id).toBe('speed-of-light');
   });
 
   it('keys both written as typed still put the everyday unit first', () => {

@@ -75,7 +75,7 @@ describe('settings: what shows', () => {
 
   it("makes a switch's change final for its system, other systems' choices staying, and a preset exact", () => {
     const noInch = withChoice(FRESH_RULE, [unit('inch')], false, 'us');
-    const both = withChoice(noInch, [unit('nanometer')], true, 'us');
+    const both = withChoice(noInch, [unit('micrometer')], true, 'us');
     expect(
       shows(
         unit('inch'),
@@ -85,7 +85,7 @@ describe('settings: what shows', () => {
     ).toBe(true);
     // Specialty unchecked hides every specialist unit, one shown on its own too; US's choice stays.
     const off = withSystem(both, 'specialist', false, 'us');
-    expect(shows(unit('nanometer'), off, 'us')).toBe(false);
+    expect(shows(unit('micrometer'), off, 'us')).toBe(false);
     expect(off.overrides.get('inch')).toBe(false);
     expect(presetRule(presetKeys('all', 'us')).overrides.size).toBe(0);
     // A choice that agrees with its switch records nothing.
@@ -95,26 +95,26 @@ describe('settings: what shows', () => {
   it('unhides the units hidden on their own, keeping those shown on their own and the switches', () => {
     const rule = withChoice(
       withChoice(FRESH_RULE, [unit('inch')], false, 'us'),
-      [unit('nanometer')],
+      [unit('micrometer')],
       true,
       'us',
     );
     expect(hiddenByHand(rule)).toBe(1);
     const unhidden = withoutHidden(rule);
     expect(shows(unit('inch'), unhidden, 'us')).toBe(true);
-    expect(shows(unit('nanometer'), unhidden, 'us')).toBe(true);
+    expect(shows(unit('micrometer'), unhidden, 'us')).toBe(true);
     expect(presetOf(unhidden.shown, 'us')).toBe('standard');
   });
 
   it('reads a system as all, some, or none of its units, units chosen on their own counted', () => {
     expect(systemState(FRESH_RULE, 'specialist', 'us')).toBe('none');
     expect(systemState(FRESH_RULE, 'us', 'us')).toBe('all');
-    const nanometer = withChoice(FRESH_RULE, [unit('nanometer')], true, 'us');
-    expect(systemState(nanometer, 'specialist', 'us')).toBe('some');
-    expect(systemState(nanometer, 'us', 'us')).toBe('all');
+    const micrometer = withChoice(FRESH_RULE, [unit('micrometer')], true, 'us');
+    expect(systemState(micrometer, 'specialist', 'us')).toBe('some');
+    expect(systemState(micrometer, 'us', 'us')).toBe('all');
     // Custom lights while a unit is chosen on its own.
     const on = (rule: typeof FRESH_RULE) => ({ ...FRESH_SETTINGS, rule });
-    expect(shownChoice(on(nanometer), 'us')).toBe('custom');
+    expect(shownChoice(on(micrometer), 'us')).toBe('custom');
     expect(shownChoice(FRESH_SETTINGS, 'us')).toBe('standard');
     expect(shownChoice(on(withSystem(FRESH_RULE, 'uk', false, 'us')), 'us')).toBe('custom');
   });

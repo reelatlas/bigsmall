@@ -188,11 +188,16 @@ function tierRank(result: SearchResult): number {
 function compareRanked(a: Ranked, b: Ranked, options: SearchOptions): number {
   const ra = a.result;
   const rb = b.result;
-  // Among exact matches, a key written as typed, its case included, comes first: symbols are
-  // case-sensitive, so "nm" is the nanometer and "Nm" the newton meter. Then an everyday unit,
-  // whichever key it matched: "c" is Celsius's alias and the speed of light's symbol, and Celsius
-  // leads.
+  // Among exact matches, the current category's comes first: in Torque, "nm" is the newton
+  // meter. Then a key written as typed, its case included: symbols are case-sensitive, so "nm" is
+  // the nanometer and "Nm" the newton meter (Sean, 2026-10-16). Then an everyday unit, whichever
+  // key it matched: "c" is Celsius's alias and the speed of light's symbol, and Celsius leads.
   if (ra.matchClass <= 2 && rb.matchClass <= 2) {
+    if (options.prefer) {
+      const here = (r: SearchResult) => (categoryOf(r) === options.prefer ? 0 : 1);
+      const preferred = here(ra) - here(rb);
+      if (preferred !== 0) return preferred;
+    }
     const typed = Number(b.asTyped) - Number(a.asTyped);
     if (typed !== 0) return typed;
     const tier = tierRank(ra) - tierRank(rb);
@@ -315,17 +320,20 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
 /**
  * The single unit a query names exactly, or null when it names none or more than one.
  * "ml" → milliliter. "oz" → null (weight ounce and fluid ounce both match) unless the category
- * is locked. Advanced units count: typing an exact name is explicit intent. A key written as
- * typed, its case included, is meant over one that matches only with case folded: "nm" is the
- * nanometer, "Nm" the newton meter. Where an everyday unit and a specialist one both match
+ * is locked. Advanced units count: typing an exact name is explicit intent. The preferred
+ * category's exact match is meant over another's (in Torque, "nm" is the newton meter); then a
+ * key written as typed, its case included, over one that matches only with case folded ("nm" is
+ * the nanometer, "Nm" the newton meter). Where an everyday unit and a specialist one both match
  * exactly, the everyday one is meant: "c" is Celsius, not the speed of light.
  */
 export function resolveExact(text: string, options: SearchOptions = {}): Unit | null {
   const { results } = search(text, { ...options, tier: 'all', limit: 100 });
   const exact = results.filter((r): r is UnitMatch => r.kind === 'unit' && r.matchClass <= 2);
+  const here = exact.filter((r) => r.unit.category === options.prefer);
+  const found = here.length > 0 ? here : exact;
   const raw = toQuery(text).raw;
-  const typed = exact.filter((r) => r.matchedKey === raw);
-  const meant = typed.length > 0 ? typed : exact;
+  const typed = found.filter((r) => r.matchedKey === raw);
+  const meant = typed.length > 0 ? typed : found;
   const everyday = meant.filter((r) => r.unit.tier === 'basic');
   const named = everyday.length > 0 ? everyday : meant;
   return named.length === 1 ? named[0]!.unit : null;

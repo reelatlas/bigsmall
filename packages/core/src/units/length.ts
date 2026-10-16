@@ -146,7 +146,7 @@ export const lengthUnits: readonly Unit[] = [
     symbol: 'nm',
     aliases: ['nanometre', 'nanometres'],
     system: 'si',
-    tier: 'advanced',
+    tier: 'basic',
     factor: 1e-9,
     exact: true,
     source: SI,

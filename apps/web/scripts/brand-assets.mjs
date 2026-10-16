@@ -93,6 +93,10 @@ const images = [];
 for (const size of sizes) images.push({ size, data: await png(mark(7), size, size) });
 writeFileSync(out('favicon.ico'), ico(images));
 writeFileSync(out('apple-touch-icon.png'), await png(mark(0), 180, 180));
+// PNG icons Google can show beside a result (its favicon guide lists PNG, not SVG) and the
+// installed app's icons later (docs/SEO.md).
+for (const size of [192, 512])
+  writeFileSync(out(`icon-${size}.png`), await png(mark(7), size, size));
 
 // The link preview: the mark, the name, and what it is, on the page color.
 const card = `
@@ -108,4 +112,6 @@ await page.setContent(`<!doctype html><html><body style="margin:0">${card}</body
 writeFileSync(out('og.png'), await page.screenshot({ type: 'png' }));
 
 await browser.close();
-console.log('Wrote icon.svg, favicon.ico, apple-touch-icon.png, and og.png to apps/web/public.');
+console.log(
+  'Wrote icon.svg, favicon.ico, apple-touch-icon.png, icon-192.png, icon-512.png, and og.png to apps/web/public.',
+);

@@ -27,6 +27,43 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
  * the page counts once however often the URL is rewritten.
  */
 const analytics = UMAMI_WEBSITE_ID !== '' && process.env['VERCEL_ENV'] === 'production';
+/*
+ * Structured data on the converter's page, the site's home (docs/SEO.md): its name in results
+ * (WebSite), who makes it, with the logo (Organization), and what it is (WebApplication). Written
+ * as JSON with "<" escaped, so nothing in it can close the script.
+ */
+const homeUrl = new URL('/', Astro.site).href;
+const structured =
+  !noindex && Astro.url.pathname === '/'
+    ? JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'WebSite',
+            '@id': `${homeUrl}#website`,
+            name: SITE.name,
+            url: homeUrl,
+            description,
+            inLanguage: 'en',
+          },
+          {
+            '@type': 'Organization',
+            '@id': `${homeUrl}#organization`,
+            name: SITE.name,
+            url: homeUrl,
+            logo: new URL(SITE.logo, Astro.site).href,
+          },
+          {
+            '@type': 'WebApplication',
+            name: SITE.name,
+            url: homeUrl,
+            applicationCategory: 'UtilitiesApplication',
+            operatingSystem: 'Any',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+          },
+        ],
+      }).replace(/</g, '\\u003c')
+    : null;
 ---
 
 <!doctype html>
@@ -40,7 +77,9 @@ const analytics = UMAMI_WEBSITE_ID !== '' && process.env['VERCEL_ENV'] === 'prod
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {structured && <script is:inline type="application/ld+json" set:html={structured} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={title} />

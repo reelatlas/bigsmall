@@ -298,12 +298,13 @@ A design question with a few answers gets a prototype lab instead, each answer b
 
 The mark is a big circle with a small one in front of it, on a rounded tile in the accent: it reads like the name, big then small, the small one nearer. A ring in the tile's color sets the small circle apart, 1.8 units of the tile's 32 so it still shows at 16 px, and the small circle takes the mark's own mint, `#99f6e4`, the one color not from a token: `accent-soft` blends into the white beside it at 16 px. `apps/web/scripts/brand-assets.mjs` draws it, and everything made from it, from the Daylight theme's tokens into `apps/web/public/`:
 
-| File                   | Use                                                                                                                                     |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `icon.svg`             | The tab icon, in browsers that take SVG                                                                                                 |
-| `favicon.ico`          | The tab icon elsewhere, at 16 and 32 px                                                                                                 |
-| `apple-touch-icon.png` | The home-screen icon on iOS: 180 px and square, since iOS rounds the corners itself                                                     |
-| `og.png`               | The link preview, 1200 × 630: the mark beside the name and the line under it (`SITE.tagline` in `src/lib/site.ts`), in the display face |
+| File                           | Use                                                                                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `icon.svg`                     | The tab icon, in browsers that take SVG                                                                                                                                |
+| `favicon.ico`                  | The tab icon elsewhere, at 16 and 32 px                                                                                                                                |
+| `apple-touch-icon.png`         | The home-screen icon on iOS: 180 px and square, since iOS rounds the corners itself                                                                                    |
+| `icon-192.png`, `icon-512.png` | PNG icons, rounded like the SVG: search results' favicon (Google's guide lists PNG, not SVG), the logo in the structured data (docs/SEO.md), the installed app's later |
+| `og.png`                       | The link preview, 1200 × 630: the mark beside the name and the line under it (`SITE.tagline` in `src/lib/site.ts`), in the display face                                |
 
 Run `pnpm --filter @bigsmall/web brand` after changing the mark, the Daylight colors, the name, or the tagline, and commit what it writes. The files are images, so the token guard does not reach them; their colors come from the theme file. Introduced 2026-10-07 as a trial in its own commit: reverting it leaves the browser's default icon and no preview image. The mark is R6 from the logo canvas's first round (Sean, 2026-10-15), in place of the first one, two circles side by side on one baseline: a trial in its own commit, which a revert takes back.
 

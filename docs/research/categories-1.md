@@ -14,7 +14,7 @@ Wait to choose the pair pages until a few more categories are in, then pick what
 
 ## Recommended next, in order
 
-1. **Force and torque** (N, kN, lbf, kgf, dyn; N·m, lbf·ft, lbf·in, kgf·m), Sean's pick. A torque wrench's setting, a bike's or a car's specification, furniture's assembly sheet; a load rating in kN. Torque is missing from Google's box; force is in it, but its tables and pitfalls are not. The plan:
+1. **Force and torque** (N, kN, lbf, kgf, dyn; N·m, lbf·ft, lbf·in, kgf·m), Sean's pick. **Built 2026-10-15** (docs/UNITS-CATALOG.md §3, the mechanics group), every factor checked blind as below; pace, a temperature change, and cooking are mocked in `/dev/categories-lab`. A torque wrench's setting, a bike's or a car's specification, furniture's assembly sheet; a load rating in kN. Torque is missing from Google's box; force is in it, but its tables and pitfalls are not. The plan:
    - Two categories in a new mechanics group, the everyday units listed first (N, kN, lbf, kgf; N·m, lbf·ft, lbf·in) and the specialist after (dyn, ozf, kip; kgf·m, kgf·cm, ozf·in, N·cm).
    - The aliases people type: Nm, N-m, ft-lb, ft lbs, lb-ft, in-lb, in lbs, kN.
    - The pitfall said in the units' notes: torque and energy share N·m, so the foot-pound in Energy (work) and the pound-foot in Torque (turning) point to each other.

@@ -243,3 +243,31 @@ Core's value is one of the unit in its category's base unit, or the formula for 
 | arcminute (′)    | 0.000290888208666        | 0.000290888208666  | 0.000290888208666  | yes   | BIPM SI Brochure, 9th ed. (2019), Table 8: 1° = (π/180) rad; 1′ = (1/60)° = (π/10 800) rad; 1″ = (1/60)′ = (π/648 000) rad | agrees  |
 | arcsecond (″)    | 0.0000048481368111       | 0.0000048481368111 | 0.0000048481368111 | yes   | BIPM SI Brochure, 9th ed. (2019), Table 8: 1° = (π/180) rad; 1′ = (1/60)° = (π/10 800) rad; 1″ = (1/60)′ = (π/648 000) rad | agrees  |
 | revolution (rev) | 6.28318530718            | 6.28318530718      | 6.28318530718      | yes   | Definition: 1 revolution = 360°; BIPM SI Brochure, 9th ed. (2019), Table 8: 1° = (π/180) rad                               | agrees  |
+
+## Added since: Force and Torque (2026-10-15)
+
+The same method for the first mechanics categories (docs/UNITS-CATALOG.md §3): two reviewers, blind, with only the units' ids, names, symbols, and systems, A deriving each factor from the 1959 pound, foot, and inch and standard gravity (gₙ = 9.80665 m/s², 3rd CGPM, 1901), B looking each up in NIST SP 811 (2008) Appendix B.8 and B.9 and the SI Brochure; the diff through `toBase()` at 1, 10, and 0.5. **All 14 agree with both to 1e-12, every exact flag too, and with NIST's printed seven digits to 1e-6.** NIST prints the pound-force rounded and gives its exact value under standard gravity in footnote 23, so the pound-force, the kip, and the torques built on them are exact by that definition, as core marks them; the kilogram-force centimeter and the newton centimeter are not printed and follow from the kilogram-force meter and the SI prefix.
+
+### Force (base: newton)
+
+| Unit                 | Core: 1 unit in the base | Derived (A)    | Looked up (B)  | NIST prints                                | Exact | Verdict |
+| -------------------- | ------------------------ | -------------- | -------------- | ------------------------------------------ | ----- | ------- |
+| newton (N)           | 1                        | 1              | 1              | (the base)                                 | yes   | agrees  |
+| kilonewton (kN)      | 1000                     | 1000           | 1000           | (SI prefix)                                | yes   | agrees  |
+| pound-force (lbf)    | 4.44822161526            | 4.44822161526  | 4.44822161526  | 4.448222E+00; footnote 23: 4.4482216152605 | yes   | agrees  |
+| kilogram-force (kgf) | 9.80665                  | 9.80665        | 9.80665        | 9.80665E+00, exact                         | yes   | agrees  |
+| dyne (dyn)           | 0.00001                  | 0.00001        | 0.00001        | 1.0E-05, exact                             | yes   | agrees  |
+| ounce-force (ozf)    | 0.278013850954           | 0.278013850954 | 0.278013850954 | 2.780139E-01                               | yes   | agrees  |
+| kip (kip)            | 4448.22161526            | 4448.22161526  | 4448.22161526  | 4.448222E+03                               | yes   | agrees  |
+
+### Torque (base: newton meter)
+
+| Unit                               | Core: 1 unit in the base | Derived (A)      | Looked up (B)    | NIST prints                   | Exact | Verdict |
+| ---------------------------------- | ------------------------ | ---------------- | ---------------- | ----------------------------- | ----- | ------- |
+| newton meter (N·m)                 | 1                        | 1                | 1                | (the base)                    | yes   | agrees  |
+| pound-foot (lbf·ft)                | 1.35581794833            | 1.35581794833    | 1.35581794833    | 1.355818E+00                  | yes   | agrees  |
+| pound-inch (lbf·in)                | 0.112984829028           | 0.112984829028   | 0.112984829028   | 1.129848E-01                  | yes   | agrees  |
+| kilogram-force meter (kgf·m)       | 9.80665                  | 9.80665          | 9.80665          | 9.80665E+00, exact            | yes   | agrees  |
+| kilogram-force centimeter (kgf·cm) | 0.0980665                | 0.0980665        | 0.0980665        | (not printed; kgf·m over 100) | yes   | agrees  |
+| newton centimeter (N·cm)           | 0.01                     | 0.01             | 0.01             | (SI prefix)                   | yes   | agrees  |
+| ounce-force inch (ozf·in)          | 0.00706155181423         | 0.00706155181423 | 0.00706155181423 | 7.061552E-03                  | yes   | agrees  |

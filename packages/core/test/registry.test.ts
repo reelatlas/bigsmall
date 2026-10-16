@@ -17,6 +17,8 @@ describe('registry integrity', () => {
       'energy',
       'pressure',
       'power',
+      'force',
+      'torque',
       'angle',
     ]);
   });

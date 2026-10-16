@@ -2,6 +2,7 @@ import { angle } from './angle';
 import { area } from './area';
 import { data } from './data';
 import { energy } from './energy';
+import { force } from './force';
 import { fuelEconomy } from './fuel-economy';
 import { length } from './length';
 import { mass } from './mass';
@@ -10,6 +11,7 @@ import { pressure } from './pressure';
 import { speed } from './speed';
 import { temperature } from './temperature';
 import { time } from './time';
+import { torque } from './torque';
 import type { GoldenRow } from './types';
 import { volume } from './volume';
 
@@ -27,6 +29,8 @@ export const golden: Record<string, GoldenRow[]> = {
   energy,
   pressure,
   power,
+  force,
+  torque,
   angle,
 };
 

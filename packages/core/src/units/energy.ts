@@ -178,7 +178,7 @@ export const energyUnits: readonly Unit[] = [
     factor: 0.3048 * 0.45359237 * 9.80665,
     exact: true,
     source: FOOT_POUND,
-    note: 'The foot-pound-force: a pound of force acting over one foot.',
+    note: 'Work: a pound-force acting over a foot. A torque wrench’s “ft-lb” is torque: Torque’s pound-foot.',
   },
   {
     kind: 'linear',

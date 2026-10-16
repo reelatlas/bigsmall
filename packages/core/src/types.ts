@@ -17,6 +17,8 @@ export type CategoryId =
   | 'energy'
   | 'pressure'
   | 'power'
+  | 'force'
+  | 'torque'
   | 'angle';
 
 /**

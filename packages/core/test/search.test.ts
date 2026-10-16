@@ -220,6 +220,25 @@ describe('search: idle lists', () => {
     expect(ids(search('', { category: 'fuel-economy', system: 'metric' }))[0]).toBe(
       'liter-per-100-kilometers',
     );
+    // Force and torque: the visitor's own pound-based units first, then the metric ones.
+    expect(ids(search('', { category: 'force', system: 'us', tier: 'all' }))).toEqual([
+      'pound-force',
+      'newton',
+      'kilogram-force',
+      'kilonewton',
+      'dyne',
+      'ounce-force',
+      'kip',
+    ]);
+    expect(ids(search('', { category: 'torque', system: 'metric', tier: 'all' }))).toEqual([
+      'newton-meter',
+      'pound-inch',
+      'pound-foot',
+      'ounce-force-inch',
+      'newton-centimeter',
+      'kilogram-force-centimeter',
+      'kilogram-force-meter',
+    ]);
     // Angles have no customary system: degrees and radians, the gradian, then the specialist ones.
     expect(ids(search('', { category: 'angle', system: 'us', tier: 'all' }))).toEqual([
       'degree',
@@ -377,12 +396,38 @@ describe('search: categories and scope', () => {
       'foot',
     ]);
     // Categories still lead their class.
-    expect(ids(search('t', { prefer: 'volume' })).slice(0, 4)).toEqual([
+    expect(ids(search('t', { prefer: 'volume' })).slice(0, 5)).toEqual([
       'tonne',
       '#temperature',
       '#time',
+      '#torque',
       'us-teaspoon',
     ]);
+  });
+});
+
+describe('search: case', () => {
+  it('a key written as typed, its case included, leads one found by folding case', () => {
+    // Symbols are case-sensitive: the nanometer and the newton meter, the knot and the kilonewton.
+    expect(ids(search('nm', { tier: 'all' })).slice(0, 2)).toEqual(['nanometer', 'newton-meter']);
+    expect(ids(search('Nm', { tier: 'all' })).slice(0, 2)).toEqual(['newton-meter', 'nanometer']);
+    expect(ids(search('kn')).slice(0, 2)).toEqual(['knot', 'kilonewton']);
+    expect(ids(search('kN')).slice(0, 2)).toEqual(['kilonewton', 'knot']);
+    expect(resolveExact('nm')?.id).toBe('nanometer');
+    expect(resolveExact('Nm')?.id).toBe('newton-meter');
+    expect(resolveExact('kn')?.id).toBe('knot');
+    expect(resolveExact('kN')?.id).toBe('kilonewton');
+    // Neither as typed: both are offered, as before.
+    expect(resolveExact('KN')).toBeNull();
+  });
+
+  it('keys both written as typed still put the everyday unit first', () => {
+    expect(ids(search('c', { tier: 'all' })).slice(0, 2)).toEqual(['celsius', 'speed-of-light']);
+    expect(resolveExact('c')?.id).toBe('celsius');
+    // A torque wrench's "ft-lb" is torque; Energy's foot-pound, a specialist unit, follows it.
+    expect(ids(search('ft-lb', { tier: 'all' }))).toEqual(['pound-foot', 'foot-pound']);
+    expect(resolveExact('ft-lb')?.id).toBe('pound-foot');
+    expect(resolveExact('oz')).toBeNull();
   });
 });
 

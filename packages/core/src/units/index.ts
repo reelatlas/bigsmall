@@ -3,6 +3,7 @@ import { angle, angleUnits } from './angle';
 import { area, areaUnits } from './area';
 import { data, dataUnits } from './data';
 import { energy, energyUnits } from './energy';
+import { force, forceUnits } from './force';
 import { fuelEconomy, fuelEconomyUnits } from './fuel-economy';
 import { length, lengthUnits } from './length';
 import { mass, massUnits } from './mass';
@@ -11,6 +12,7 @@ import { pressure, pressureUnits } from './pressure';
 import { speed, speedUnits } from './speed';
 import { temperature, temperatureUnits } from './temperature';
 import { time, timeUnits } from './time';
+import { torque, torqueUnits } from './torque';
 import { volume, volumeUnits } from './volume';
 
 /** Every category the engine knows, in display order. Add new categories here and in CategoryId. */
@@ -27,6 +29,8 @@ export const categories: readonly Category[] = [
   energy,
   pressure,
   power,
+  force,
+  torque,
   angle,
 ];
 
@@ -44,6 +48,8 @@ export const units: readonly Unit[] = [
   ...energyUnits,
   ...pressureUnits,
   ...powerUnits,
+  ...forceUnits,
+  ...torqueUnits,
   ...angleUnits,
 ];
 

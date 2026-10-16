@@ -5,7 +5,7 @@ import { applyTheme, box, expectNoA11yViolations, pickTheme, ready, row, settled
 // Checks that span the site: every page and every theme pass axe, every Tab stop shows focus,
 // and reduced motion stills every theme. Each feature's flows have a file of their own.
 
-for (const path of ['/', '/dev/gallery', '/dev/wordmark-lab']) {
+for (const path of ['/', '/dev/gallery', '/dev/wordmark-lab', '/dev/sketchbook-lab']) {
   test(`${path} renders with no WCAG violations`, async ({ page }) => {
     // The gallery holds every component in every theme: axe takes its time over it, the more so
     // on CI's dev server.
@@ -39,7 +39,7 @@ test('pages tell search engines and link previews what they are; dev pages stay 
     'https://bigsmall.work/og.png',
   );
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
-  for (const path of ['/dev/gallery', '/dev/wordmark-lab']) {
+  for (const path of ['/dev/gallery', '/dev/wordmark-lab', '/dev/sketchbook-lab']) {
     await page.goto(path);
     await expect(page.locator('meta[name="robots"]'), path).toHaveAttribute('content', 'noindex');
     await expect(page.locator('link[rel="canonical"]'), path).toHaveCount(0);

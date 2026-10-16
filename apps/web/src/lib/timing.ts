@@ -41,3 +41,17 @@ export const WORDMARK_TIMING = {
   /** On a touch screen, a tap on the heading plays the wordmark this long. */
   tapMs: 4000,
 } as const;
+
+/**
+ * The sketchbook at play (docs/UX-SPEC.md §14, the About page), which /dev/sketchbook-lab tunes:
+ * how soon a hovered tile first changes, how long each sketch shows while it stays hovered, how
+ * long a change takes, how far apart the tiles start in a shuffle, and, above 0, how often a tile
+ * changes by itself.
+ */
+export const SKETCHBOOK_TIMING = {
+  firstMs: 150,
+  holdMs: 900,
+  swapMs: 560,
+  waveMs: 60,
+  idleMs: 0,
+} as const;

@@ -180,3 +180,14 @@ export function BackspaceIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function ShuffleIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      {/* Two paths crossing, each ending in an arrow: deal again, the sketchbook's Shuffle. */}
+      <path d="M3 17h2.5a4 4 0 0 0 3.3-1.8l5.4-8.4A4 4 0 0 1 17.5 5H21" />
+      <path d="M3 7h2.5a4 4 0 0 1 3.3 1.8l.7 1.1M14.5 14.1l.7 1.1a4 4 0 0 0 3.3 1.8H21" />
+      <path d="M18 2l3 3-3 3M18 14l3 3-3 3" />
+    </Icon>
+  );
+}

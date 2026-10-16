@@ -1,0 +1,22 @@
+---
+import SketchSprite from '../../features/sketchbook/SketchSprite.astro';
+import DevPage from '../../layouts/DevPage.astro';
+import { SketchbookLab } from './_sketchbook-lab/SketchbookLab';
+
+/*
+ * The sketchbook at play with every setting on a control (docs/DESIGN-SYSTEM.md, "Tuning labs"),
+ * before it goes on the About page (docs/UX-SPEC.md §14). Settings apply live and persist in this
+ * browser, and "Copy settings" gives the values to paste into lib/timing.ts and
+ * features/sketchbook/sketches.ts, where they become the defaults. Under them, every sketch, each
+ * in or out of the rotation.
+ */
+---
+
+<DevPage title="sketchbook lab" description="Tune the sketchbook at play.">
+  <Fragment slot="intro">
+    Sketchbook lab. Hover a tile to play it, click or tap one to change it, or shuffle them all,
+    with the settings below. Every sketch is listed under them, each in or out of the rotation.
+  </Fragment>
+  <SketchSprite />
+  <SketchbookLab client:load />
+</DevPage>

@@ -6,9 +6,14 @@ import ThemePicker from './ThemePicker.astro';
 interface Props {
   /** Reserve the slot the page's island fills: its header actions (the converter's Copy URL button). */
   actions?: boolean;
+  /**
+   * Show the keyboard shortcuts map: on the converter's page, whose shortcuts they are, and in the
+   * gallery's sample of it (Sean, 2026-10-15: on About they mean nothing).
+   */
+  shortcuts?: boolean;
 }
 
-const { actions = false } = Astro.props;
+const { actions = false, shortcuts = false } = Astro.props;
 
 /*
  * The header's controls, in one place so every page shows the same ones in the same order. The
@@ -40,7 +45,7 @@ const { actions = false } = Astro.props;
   data-plane="header"
 >
   <div class="flex items-start">
-    <ShortcutsHelp />
+    {shortcuts && <ShortcutsHelp />}
     {actions && <div id={SLOTS.headerActions} class="size-12 p-0.5" />}
   </div>
   <div class="flex items-start @max-sm:order-first">

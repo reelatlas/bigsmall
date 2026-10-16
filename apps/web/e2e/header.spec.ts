@@ -255,3 +255,14 @@ for (const width of [320, 375, 400, 414, 416, 430, 520, 600, 610, 640]) {
     }
   });
 }
+
+test('the shortcuts map is the converter page’s alone', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the shortcuts map is hidden on touch-first devices');
+  await page.goto('/');
+  await expect(shortcutsButton(page)).toBeVisible();
+  for (const path of ['/about/', '/not-a-page']) {
+    await page.goto(path);
+    await expect(themeToggle(page), path).toBeVisible();
+    await expect(shortcutsButton(page), path).toHaveCount(0);
+  }
+});

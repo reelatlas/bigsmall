@@ -8,9 +8,11 @@ interface Props {
   description: string;
   /** The wordmark waits for the page to play it (the wordmark lab). */
   manual?: boolean;
+  /** Show the keyboard shortcuts map in the header (the gallery's sample of it). */
+  shortcuts?: boolean;
 }
 
-const { title, description, manual = false } = Astro.props;
+const { title, description, manual = false, shortcuts = false } = Astro.props;
 
 /*
  * A development page under /dev: the site's header, a line saying what the page is for, then its
@@ -21,7 +23,7 @@ const { title, description, manual = false } = Astro.props;
 
 <Base title={`bigsmall · ${title}`} description={description} noindex>
   <main class="mx-auto max-w-5xl px-4 py-10">
-    <PageHeader manual={manual} />
+    <PageHeader manual={manual} shortcuts={shortcuts} />
     <p class="mt-2 max-w-prose text-sm text-ink-muted">
       <slot name="intro" />
     </p>

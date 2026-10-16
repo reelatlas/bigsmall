@@ -3,7 +3,7 @@
  * turn into, how often each kind comes up, and the split-flap frames between one phrase and the
  * next. Pure, so the variety and the frame math are unit-tested; lib/wordmark-motion.ts
  * puts it on the page, and /dev/wordmark-lab tunes it. Every figure is a standard or published
- * value (SI, CODATA, NIST, the IAU's nominal solar values); the wordplay is ours (ADR 0004).
+ * value (SI, CODATA, NIST, the IAU's nominal solar values); the wordplay is ours (ADR 0020).
  */
 
 import { WORDMARK_SIZES, type WordmarkSize } from './recipes';

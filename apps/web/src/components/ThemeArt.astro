@@ -22,7 +22,7 @@ const TOGGLE: Record<ThemeId, string> = {
 const toggle = (id: ThemeId) => (theme ? 'block' : TOGGLE[id]);
 
 /*
- * A small drawing for each theme beside the wordmark, made for bigsmall (ADR 0004). Decorative:
+ * A small drawing for each theme beside the wordmark, made for bigsmall (ADR 0020). Decorative:
  * hidden from screen readers. Colors come from each theme's art tokens (--art-1, --art-2, --art-3)
  * through the bridge, so a drawing always matches the theme it belongs to (docs/THEMING.md).
  */

@@ -13,7 +13,7 @@ The existing converters have the math right and the experience wrong: dense page
 1. **Fast on any device.** Static site, small JS, no backend. Budgets are enforced in CI.
 2. **Accessible by default.** WCAG 2.2 AA, keyboard-complete, screen-reader-announced results, in every theme.
 3. **Correct and sourced.** Every conversion factor cites a standards body (NIST or BIPM). Golden tests guard them.
-4. **Original.** Our own code, taxonomy, copy, and UI. Other sites inform coverage only. See [ADR 0004](docs/decisions/0004-originality-and-sources.md).
+4. **Our own.** Our own concept, UX, design, and code. Other converters are references we use freely, and every number is checked on our own. See [ADR 0020](docs/decisions/0020-references-and-our-own-checks.md).
 5. **Systemized.** Tokens over one-off values, shared components over one-off markup, recorded decisions over tribal knowledge.
 
 ## Run it

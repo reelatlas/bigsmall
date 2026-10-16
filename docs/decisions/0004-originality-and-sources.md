@@ -1,7 +1,7 @@
 # 0004 — Original code; factors verified against standards bodies
 
 Date: 2026-10-06
-Status: accepted
+Status: superseded by 0020 (2026-10-15)
 
 ## Context
 
@@ -24,3 +24,7 @@ Two existing converter sites inspired this project. Both carry Copyscape "do not
 - Authoring the catalog takes real effort (hundreds of units, each with a citation). Spread across milestones 1 and 3.
 - The golden test fixture doubles as the provenance record.
 - We can publish the core package under a permissive license later with a clean history.
+
+## Outcome
+
+- **2026-10-15.** Superseded by [0020](0020-references-and-our-own-checks.md). Sean explained this was a caution for the start, so that bigsmall would grow its own concept, UX, and design; other converters are now references used freely, and every factor is still checked against its standard on our own.

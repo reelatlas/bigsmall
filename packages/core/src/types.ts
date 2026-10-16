@@ -69,7 +69,7 @@ interface UnitMeta {
   tier: Tier;
   /** True when the relationship to the base unit is exact by definition rather than measured. */
   exact: boolean;
-  /** Citation for the factor or formula (ADR 0004). Example: "NIST SP 811 (2008) Appendix B.8". */
+  /** Citation for the factor or formula (ADR 0020). Example: "NIST SP 811 (2008) Appendix B.8". */
   source: string;
   /** Short definition shown to users when the unit has a variant or convention worth stating. */
   note?: string;

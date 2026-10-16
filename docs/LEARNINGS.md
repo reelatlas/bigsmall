@@ -38,6 +38,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** Both inspiration sites carry Copyscape "do not copy" badges.
 **Rule.** Treat them as coverage research only. Verify factors against NIST and BIPM, not against the sites. Never copy text, code, markup, or unit descriptions. Recorded as ADR 0004.
+**Superseded** (2026-10-15): the sites are references used freely, and every factor is still checked against the standards on our own (ADR 0020).
 
 ## 2026-10-06 — Bash tool commands over ~8 KB fail on this machine
 

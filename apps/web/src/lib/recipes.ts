@@ -68,6 +68,9 @@ export const PAGE_COLUMN = 'mx-auto w-full max-w-4xl px-4';
 /** A page's main column (the converter, About, and 404). */
 export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8 sm:py-12');
 
+/** A section's heading on a page, centered over it: About's "The sketchbook" and "Every formula". */
+export const SECTION_HEADING = 'text-center font-display text-xl font-semibold';
+
 // A link standing on its own line (docs/DESIGN-SYSTEM.md, "Links"): ink, underlined in the accent,
 // 44 px tall. The not-found page's way back.
 export const LINK =

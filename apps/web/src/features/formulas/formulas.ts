@@ -32,8 +32,11 @@ export interface FormulaGroup {
 export const FORMULAS_HEADING =
   'bigsmall: every conversion factor and formula, each with the standard it was checked against (https://bigsmall.work/about/).';
 
-/** The most digits a double holds, so float noise never shows (0.0311034768, not 0.031103476799999998). */
-const SIGNIFICANT = 16;
+/**
+ * The most digits a double holds, so float noise never shows (0.0311034768, not
+ * 0.031103476799999998); the page says it ("16 digits in each factor").
+ */
+export const SIGNIFICANT = 16;
 
 /** Factors people know by their exact form, written that way. */
 const NAMED: ReadonlyArray<readonly [number, string]> = [

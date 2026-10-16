@@ -116,11 +116,11 @@ Every conversion is `from → base → to`. Nothing chains through a third unit,
 
 ### The formulas (`apps/web/src/features/formulas`)
 
-| File                | Responsibility                                                                                                                                |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `formulas.ts`       | Every unit's formula in its category's base unit, from `@bigsmall/core`'s units, by kind, with its source and a plain line for Copy all. Pure |
-| `Formulas.astro`    | The About page's list, drawn when the site is built: a `<details>` per category, a row per unit                                               |
-| `FormulasTools.tsx` | The island: Show all and Hide all, and Copy all as text, read from the list on the page                                                       |
+| File                | Responsibility                                                                                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `formulas.ts`       | Every unit's formula in its category's base unit, from `@bigsmall/core`'s units, by kind, with its source and a plain line for Copy all. Pure                |
+| `Formulas.astro`    | The About page's list, drawn when the site is built: a `<details>` per category, a row per unit                                                              |
+| `FormulasTools.tsx` | The island: Show all and Hide all, and Copy all as text, read from the list on the page, in a bar that stays at the window's top while the list scrolls past |
 
 ### Islands and the inline script
 

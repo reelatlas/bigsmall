@@ -1,6 +1,7 @@
 ---
 import { ChevronDownIcon } from '../../components/icons';
-import { FORMULAS_HEADING, formulaGroups } from './formulas';
+import { SECTION_HEADING } from '../../lib/recipes';
+import { FORMULAS_HEADING, formulaGroups, SIGNIFICANT } from './formulas';
 import { FormulasTools } from './FormulasTools';
 
 /*
@@ -8,7 +9,9 @@ import { FormulasTools } from './FormulasTools';
  * 2026-10-15 and 16): each category folded, its units inside, each with what one of it is in the
  * category's base unit, exact or measured, and the standard it was checked against. Drawn when the
  * site is built from core's own units (formulas.ts), so a check reads what the converter runs;
- * the categories open with their own summaries, and FormulasTools adds Show all and Copy all.
+ * the categories open with their own summaries, and FormulasTools adds Show all and Copy all, in
+ * a bar that stays at the window's top while the list scrolls past. In a centered column, its
+ * heading and lines centered as the sketchbook is, its rows left-aligned to be scanned.
  */
 const groups = formulaGroups();
 const units = groups.reduce((count, group) => count + group.lines.length, 0);
@@ -25,21 +28,26 @@ const ROW = 'grid gap-x-3 gap-y-0.5 py-1.5 @lg:grid-cols-[minmax(0,--spacing(48)
 const TAG = 'rounded-full px-2 text-xs font-medium';
 const EXACT = `${TAG} bg-accent-soft text-ink`;
 const MEASURED = `${TAG} bg-surface-raised text-ink-muted`;
+
+/** A number in the line of counts, in the ink beside its muted words, so the values stand out. */
+const STAT = 'font-numeric text-ink';
 ---
 
-<section class="mt-16 sm:mt-24" aria-labelledby="formulas">
-  <h2 id="formulas" class="font-display text-xl font-semibold">
+<section class="mx-auto mt-16 max-w-2xl sm:mt-24" aria-labelledby="formulas">
+  <h2 id="formulas" class={SECTION_HEADING}>
     Every formula
   </h2>
-  <p class="mt-2 max-w-prose text-sm text-ink-muted">
-    Every conversion bigsmall makes, unit by unit, each in its category's base unit, with the
-    standard it was checked against: {units} units in {groups.length} categories, each factor to 16
-    significant digits.
+  <p class="mt-2 text-center text-sm text-ink-muted">
+    Each conversion in its category’s base unit and the source it was checked against.
+  </p>
+  <p class="mt-1 text-center text-sm text-ink-muted">
+    <span class={STAT}>{units}</span> units · <span class={STAT}>{groups.length}</span> categories ·{' '}
+    <span class={STAT}>{SIGNIFICANT}</span> digits in each factor
   </p>
   <FormulasTools client:idle listId={listId} heading={FORMULAS_HEADING} />
-  <div id={listId} class="@container mt-4">
+  <div id={listId} class="@container">
     {groups.map(({ category, base, lines, plain }) => (
-      <details class="group border-t border-line last:border-b" data-plain={plain}>
+      <details class="group border-t border-line first:border-t-0 last:border-b" data-plain={plain}>
         <summary class="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-md px-1 [&::-webkit-details-marker]:hidden">
           <ChevronDownIcon
             width="16"
@@ -48,7 +56,7 @@ const MEASURED = `${TAG} bg-surface-raised text-ink-muted`;
           />
           <span class="font-medium">{category.name}</span>
           <span class="text-sm text-ink-muted">
-            {lines.length} units, in {base.plural}
+            {lines.length} units in {base.plural}
           </span>
         </summary>
         <ol class="mb-4 pl-8">
@@ -56,14 +64,12 @@ const MEASURED = `${TAG} bg-surface-raised text-ink-muted`;
             <li class={ROW} data-plain={line.plain}>
               <span>{line.name}</span>
               <span class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                <span class="font-numeric [overflow-wrap:anywhere]">{line.formula}</span>
+                <span class="font-numeric wrap-anywhere">{line.formula}</span>
                 <span class={line.exact ? EXACT : MEASURED}>
                   {line.exact ? 'exact' : 'measured'}
                 </span>
               </span>
-              <p class="text-xs text-ink-muted [overflow-wrap:anywhere] @lg:col-start-2">
-                {line.source}
-              </p>
+              <p class="text-xs text-ink-muted wrap-anywhere @lg:col-start-2">{line.source}</p>
             </li>
           ))}
         </ol>

@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { cx } from '../../lib/recipes';
 import { SKETCHBOOK_TIMING } from '../../lib/timing';
 import { FlipButton } from './FlipButton';
 import { play, sketchHref, type SketchbookPlayer } from './motion';
@@ -12,7 +13,7 @@ import {
 
 /**
  * A tile's layers, bottom to top: the sketch showing, the one arriving, and four pieces the
- * stepped effects and the flap cut a tile into (motion.ts); all but the first rest unseen.
+ * stepped effects, Flap, and Doors cut a tile into (motion.ts); all but the first rest unseen.
  */
 const LAYERS = ['front', 'back', 'piece', 'piece', 'piece', 'piece'] as const;
 
@@ -89,11 +90,7 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
                 aria-hidden="true"
                 focusable="false"
                 data-layer={layer}
-                className={
-                  layer === 'front'
-                    ? 'absolute inset-0 size-full'
-                    : 'absolute inset-0 size-full opacity-0'
-                }
+                className={cx('absolute inset-0 size-full', layer !== 'front' && 'opacity-0')}
               >
                 <use href={sketchHref(id)} />
               </svg>
@@ -101,7 +98,7 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
           </button>
         ))}
       </div>
-      <FlipButton particles={settings.tuning.particles} onFlip={() => player.current?.shuffle()} />
+      <FlipButton particles={settings.tuning.particles} onFlip={() => player.current?.flip()} />
       <p role="status" className="sr-only">
         {said}
       </p>

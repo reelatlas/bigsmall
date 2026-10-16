@@ -34,7 +34,6 @@ type TimingKey = keyof Timing;
 
 const DEFAULTS: SketchbookSettings = { timing: SKETCHBOOK_TIMING, tuning: SKETCHBOOK_TUNING };
 
-/** Saved settings over the defaults, so a setting added since keeps its default. */
 /**
  * What the lab keeps in this browser: the settings, with the rotation kept as the sketches left
  * out of it, so a sketch added to the catalog since joins it (version 2). A save from before kept
@@ -544,7 +543,7 @@ export function SketchbookLab() {
             hint="After each change, every tile waits a random time between these two, drawn afresh each time, then changes by itself, so the tiles drift apart. Both at 0 is never."
             onChange={(value) => setTiming('idleMaxMs', value)}
           />
-          <Button variant="secondary" onClick={() => player?.shuffle()}>
+          <Button variant="secondary" onClick={() => player?.flip()}>
             Flip them all
           </Button>
         </Panel>

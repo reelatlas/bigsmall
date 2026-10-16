@@ -344,8 +344,8 @@ export function TableLayout({
     return () => root.removeEventListener('keydown', onKeyDown);
   });
 
-  // With nothing on the page focused, the page has one job: a letter or a digit starts typing in
-  // the field, ↑ or ↓ goes into it, the next press moving on from there (ADR 0014), and Escape
+  // With nothing on the page focused, the page has one job: a key that starts typing (a letter, a
+  // digit, `-`, `.`, or `,`) types in the field, ↑ or ↓ goes into it, the next press moving on from there (ADR 0014), and Escape
   // takes the ladder's clearing steps, as it would in the field. Typing only types, never acts;
   // none of it works with focus in another control or with Ctrl, ⌘, or Alt held (WCAG 2.1.4;
   // ADR 0012). An Escape that closed a header menu has done its job already.

@@ -25,32 +25,54 @@ import {
 } from './sketches';
 
 /**
- * The sketchbook at play (docs/UX-SPEC.md §1, the About page). Hovering a tile with a mouse
- * changes it to the next sketch, and keeps changing it while the mouse stays; a click, a tap,
- * Enter, or Space changes it at once; Flip changes every tile in a wave. A change runs between
- * the tile's layers: the sketch showing (front), the one arriving (back), and pieces the stepped
- * effects and the flap cut a tile into. The moving effects and the flap run on the Web Animations
- * API; the stepped ones draw a frame every frameMs, planned in frames.ts. Under reduced motion
- * nothing changes by itself: a press cross-fades, and Flip changes every tile at once.
+ * The sketchbook at play (docs/UX-SPEC.md §1, the About page). Each tile changes by itself on its
+ * own time; hovering one with a mouse changes it to the next sketch, once, or on while the mouse
+ * stays with `cycle` (the lab's Keep changing); a click, a tap, Enter, or Space changes it at
+ * once; Flip changes every tile in a wave. A change runs between the tile's layers: the sketch
+ * showing (front), the one arriving (back), and pieces the stepped effects, Flap, and Doors cut a
+ * tile into. The moving effects, Flap, and Doors run on the Web Animations API; the stepped ones
+ * draw a frame every frameMs, planned in frames.ts. Under reduced motion nothing changes by
+ * itself: a press cross-fades, and Flip changes every tile at once.
  */
 
 /** Where a sketch's symbol is on the page (SketchSprite.astro). */
 export const sketchHref = (id: string) => `#sketch-${id}`;
 
 /** A point in a tile, as fractions of its width and height: where a press landed. */
-export interface Point {
+interface Point {
   x: number;
   y: number;
 }
 
 const MIDDLE: Point = { x: 0.5, y: 0.5 };
 
+type Timing = SketchbookSettings['timing'];
+
+/**
+ * The pause before a playing tile's next change: Hold, never so short that a change starts
+ * sooner than SKETCH_MIN_GAP_MS after the last began.
+ */
+export function restMs({ holdMs, swapMs }: Pick<Timing, 'holdMs' | 'swapMs'>): number {
+  return Math.max(holdMs, SKETCH_MIN_GAP_MS - swapMs);
+}
+
+/**
+ * How long a tile waits to change by itself: a random time between the least and the most, never
+ * under SKETCH_MIN_GAP_MS; null when both are 0, which turns it off.
+ */
+export function idleWaitMs(
+  { idleMinMs, idleMaxMs }: Pick<Timing, 'idleMinMs' | 'idleMaxMs'>,
+  random: () => number,
+): number | null {
+  const [least, most] = [Math.min(idleMinMs, idleMaxMs), Math.max(idleMinMs, idleMaxMs)];
+  if (most <= 0) return null;
+  return Math.max(SKETCH_MIN_GAP_MS, least + random() * (most - least));
+}
+
 /** Controls besides the pointer and the keys, for Flip and /dev/sketchbook-lab. */
 export interface SketchbookPlayer {
-  /** Changes a tile now, from a point in it, cutting short a change under way. */
-  next(tile: HTMLElement, at?: Point): Promise<void>;
   /** Flip: changes every tile, in a wave, and says what they brought. */
-  shuffle(): void;
+  flip(): void;
   /** Plays every tile as if hovered. */
   pin(on: boolean): void;
   /** Plays as under reduced motion, whatever the system asks. */
@@ -644,11 +666,7 @@ export function play(
     return state.done;
   }
 
-  /** The pause before a playing tile's next change: Hold, never so short it plays too fast to be safe. */
-  const rest = () => {
-    const { holdMs, swapMs } = live.current.timing;
-    return Math.max(holdMs, SKETCH_MIN_GAP_MS - swapMs);
-  };
+  const rest = () => restMs(live.current.timing);
 
   /** While hovered, or pinned, the next change after `ms`, and on after each. */
   function cycle(tile: HTMLElement, ms: number) {
@@ -715,9 +733,9 @@ export function play(
 
   /**
    * Flip: every tile changes, in waves; then a press hears the sketches it brought, by name. The
-   * shuffle as the page opens says nothing.
+   * flip as the page opens says nothing.
    */
-  function shuffle(say = true) {
+  function flip(say = true) {
     const all = tiles();
     const { tuning, timing } = live.current;
     const ranks = waveRanks(tuning.wave, all.length, tuning.columns, random);
@@ -756,10 +774,8 @@ export function play(
     const state = stateOf(tile);
     cancel(state.idle);
     state.idle = undefined;
-    const { idleMinMs, idleMaxMs } = live.current.timing;
-    const [least, most] = [Math.min(idleMinMs, idleMaxMs), Math.max(idleMinMs, idleMaxMs)];
-    if (stopped || most <= 0) return;
-    const wait = Math.max(SKETCH_MIN_GAP_MS, least + random() * (most - least));
+    const wait = idleWaitMs(live.current.timing, random);
+    if (stopped || wait === null) return;
     state.idle = later(() => {
       state.idle = undefined;
       if (still() || document.hidden || state.hovered || state.done) {
@@ -791,13 +807,12 @@ export function play(
   idleAll();
   // Read when it is due, not now: the lab's saved settings arrive after the play starts.
   later(() => {
-    if (live.current.tuning.intro && !still()) shuffle(false);
+    if (live.current.tuning.intro && !still()) flip(false);
   }, live.current.timing.firstMs);
   grid.dataset['playing'] = '';
 
   return {
-    next: (tile, at = MIDDLE) => change(tile, at, true),
-    shuffle: () => shuffle(),
+    flip: () => flip(),
     pin(on) {
       pinned = on;
       const { firstMs, waveMs } = live.current.timing;

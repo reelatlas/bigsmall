@@ -5,7 +5,7 @@ import { shuffle } from './sketches';
  * Scramble, Scan), planned here and drawn by motion.ts, a new frame every frameMs. However fast
  * the frames come, a change swaps a tile's whole picture once, and what changes between frames
  * is at most a quarter of the tile (FLICKER_SHARE), so nothing on the page strobes, a whole grid
- * shuffling included (WCAG 2.3.1). Pure; tested in node.
+ * flipping included (WCAG 2.3.1). Pure; tested in node.
  */
 
 /** The most of a tile's area that may change from one frame to the next. */

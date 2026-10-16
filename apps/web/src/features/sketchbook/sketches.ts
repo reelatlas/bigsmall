@@ -27,8 +27,6 @@ export type FamilyId =
 export interface Family {
   id: FamilyId;
   name: string;
-  /** The round it began in: the logo canvas's first (Sean chose R6 from it), or a later one drawn for the sketchbook. */
-  round: Round;
   /** What the family is, for the lab's sheet. */
   blurb: string;
 }
@@ -45,18 +43,18 @@ export interface Sketch {
 }
 
 export const FAMILIES: readonly Family[] = [
-  { id: 'refined', name: 'Refined', round: 1, blurb: 'The first mark, evolved. R6 is the mark.' },
-  { id: 'abstract', name: 'Abstract', round: 1, blurb: 'Shapes stepping down in size.' },
-  { id: 'bold', name: 'Bold', round: 1, blurb: 'Black and yellow, loud.' },
-  { id: 'unique', name: 'Unique', round: 1, blurb: 'Things that hold a big and a small.' },
-  { id: 'fun', name: 'Fun', round: 1, blurb: 'Characters and scenes.' },
-  { id: 'measures', name: 'Measures', round: 2, blurb: 'Tools that measure, big and small.' },
-  { id: 'creatures', name: 'Creatures', round: 2, blurb: 'A big animal and a small one.' },
-  { id: 'outdoors', name: 'Outdoors', round: 2, blurb: 'Big and small, outside.' },
-  { id: 'seasons', name: 'Seasons', round: 2, blurb: 'One for each time of year.' },
-  { id: 'geometry', name: 'Geometry', round: 2, blurb: 'Patterns from big to small.' },
-  { id: 'math', name: 'Math', round: 3, blurb: 'Calculus and friends, on a chalkboard.' },
-  { id: 'kin', name: 'Kin', round: 2, blurb: 'The mark’s own family.' },
+  { id: 'refined', name: 'Refined', blurb: 'The first mark, evolved. R6 is the mark.' },
+  { id: 'abstract', name: 'Abstract', blurb: 'Shapes stepping down in size.' },
+  { id: 'bold', name: 'Bold', blurb: 'Black and yellow, loud.' },
+  { id: 'unique', name: 'Unique', blurb: 'Things that hold a big and a small.' },
+  { id: 'fun', name: 'Fun', blurb: 'Characters and scenes.' },
+  { id: 'measures', name: 'Measures', blurb: 'Tools that measure, big and small.' },
+  { id: 'creatures', name: 'Creatures', blurb: 'A big animal and a small one.' },
+  { id: 'outdoors', name: 'Outdoors', blurb: 'Big and small, outside.' },
+  { id: 'seasons', name: 'Seasons', blurb: 'One for each time of year.' },
+  { id: 'geometry', name: 'Geometry', blurb: 'Patterns from big to small.' },
+  { id: 'math', name: 'Math', blurb: 'Calculus and friends, on a chalkboard.' },
+  { id: 'kin', name: 'Kin', blurb: 'The mark’s own family.' },
 ];
 
 /**
@@ -169,9 +167,10 @@ export const SKETCH_BY_ID: ReadonlyMap<string, Sketch> = new Map(
 );
 
 /**
- * The grid's first sketches, before any play: the mark near the middle of the default grid, four
- * by three, among sketches from the other families, light and dark tiles in turn. The rest of the
- * set follows in the catalog's order.
+ * The grid's first sketches, before any play, laid out for the lab's first grid, four by three,
+ * the mark near its middle among sketches from the other families, light and dark tiles in turn;
+ * the shipped row of three shows the first three. The rest of the set follows in the catalog's
+ * order.
  */
 export const START: readonly string[] = [
   'c1',

@@ -12,7 +12,10 @@ export interface UnitChipProps {
    * lib/fit-step.ts). Compact hides it rather than leaving it out, so it can be measured.
    */
   nameRef?: Ref<HTMLSpanElement>;
-  /** Called when the user activates the chip body, to change the unit. */
+  /**
+   * Called when the user activates the chip's body: the caret goes into the field, whose keys and
+   * table change the unit.
+   */
   onOpen: () => void;
   /** Called when the user removes the chip. */
   onRemove: () => void;

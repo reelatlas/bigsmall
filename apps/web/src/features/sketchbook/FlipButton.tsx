@@ -3,9 +3,9 @@ import { Button } from '../../components/Button';
 import { burst, type Mood } from './burst';
 
 /**
- * The sketchbook's Flip (Sean, 2026-10-15, in place of Shuffle): changes every tile, and answers
- * the press with a few calm particles inside the button, behind its label, or with a flash of its
- * fill under reduced motion (burst.ts).
+ * The sketchbook's Flip (Sean, 2026-10-15): changes every tile, and answers the press with a few
+ * calm particles inside the button, behind its label, or with a flash of its fill under reduced
+ * motion (burst.ts).
  */
 export function FlipButton({
   particles,

@@ -198,7 +198,8 @@ test('the shortcuts map opens with Enter, never as the keyboard passes, and clos
 });
 
 test('in a narrow header the arrows follow what shows, the theme menu first', async ({ page }) => {
-  // Under 416 px the menus take their own line, theme menu first, and below sm the map hides.
+  // Under 416 px the menus take their own line, theme menu first, and in a header under 576 px
+  // the shortcuts button hides.
   await page.setViewportSize({ width: 400, height: 800 });
   await page.goto('/');
   await ready(page);

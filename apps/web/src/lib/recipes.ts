@@ -16,7 +16,7 @@ export function cx(...parts: ReadonlyArray<string | false | null | undefined>): 
 
 // Surfaces
 
-/** A card: one raised area of related controls (the calculator, the wordmark lab's panels). */
+/** A card: one raised area of related controls (the side panels through PANEL_CARD, the labs'). */
 export const CARD = 'rounded-lg border border-line bg-surface';
 
 /**
@@ -38,7 +38,7 @@ export const PANEL_TITLE = 'text-sm font-medium text-ink-muted';
  * Display): its edge turns accent, 2 px like a focused box (its 1 px border and a 1 px ring, so
  * nothing moves), easing as the shells' edges do.
  */
-export const PANEL_ACTIVE =
+const PANEL_ACTIVE =
   'transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-1 focus-within:ring-accent';
 
 /** A side panel's card, the calculator's and Settings' (SidePanel): its accent edge while it has the keys. */
@@ -50,11 +50,14 @@ export const PANEL_HEAD = 'mb-2 flex items-center justify-between';
 /** A side panel's title, set in to line up with its content. */
 export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
 
-/** A page's main column, under its header (index and 404). */
-export const PAGE_MAIN = 'mx-auto max-w-4xl px-4 py-8 sm:py-12';
+/** A page's column, under its header: the main content's and the footer's. */
+export const PAGE_COLUMN = 'mx-auto max-w-4xl px-4';
+
+/** A page's main column (the converter, About, and 404). */
+export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8 sm:py-12');
 
 // A link standing on its own line (docs/DESIGN-SYSTEM.md, "Links"): ink, underlined in the accent,
-// 44 px tall. The not-found page's way back and the footer's link.
+// 44 px tall. The not-found page's way back.
 export const LINK =
   'inline-flex min-h-11 items-center font-medium underline decoration-accent decoration-2 underline-offset-4';
 

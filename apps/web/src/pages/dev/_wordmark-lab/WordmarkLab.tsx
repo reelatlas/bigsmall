@@ -11,7 +11,6 @@ import {
   type RefObject,
 } from 'react';
 import { Button } from '../../../components/Button';
-import { CHECK, FIELD, HEADING, INPUT, Panel, SELECT, Slider } from '../_lab/controls';
 import { CheckIcon, CopyIcon } from '../../../components/icons';
 import {
   ART_LINE,
@@ -31,6 +30,7 @@ import {
 } from '../../../lib/wordmark-motion';
 import { useCopied } from '../../../lib/copied';
 import { FRAME_MS, WORDMARK_TIMING } from '../../../lib/timing';
+import { CHECK, FIELD, HEADING, INPUT, Panel, SELECT, Slider } from '../_lab/controls';
 import { PRESETS, SHIPPED } from './presets';
 import {
   ART_GLYPHS,
@@ -51,7 +51,6 @@ import {
 
 const STORAGE_KEY = 'bigsmall:wordmark-lab';
 type Timing = WordmarkSettings['timing'];
-
 type TimingKey = keyof Timing;
 
 const defaults = (): WordmarkSettings => ({

@@ -29,12 +29,12 @@ import {
   waveRanks,
 } from '../src/features/sketchbook/sketches';
 
-// The sketchbook's catalog, its art, and how it deals sketches out (docs/UX-SPEC.md §14).
+// The sketchbook's catalog, its art, and how it deals sketches out (docs/UX-SPEC.md §1, "About").
 
 const ART = new URL('../src/assets/sketchbook/', import.meta.url);
 const ids = SKETCHES.map(({ id }) => id);
 
-/** A random source that counts up, so a shuffle is the same every run. */
+/** A seeded random source, so a shuffle is the same every run. */
 const seeded = () => {
   let seed = 7;
   return () => {

@@ -263,16 +263,11 @@ function start(mood: Mood, { x, y, size }: Particle, width: number, height: numb
 let last: Mood | undefined;
 
 /**
- * Plays a press in `layer`, the button's particle layer behind its label: a mood at random, or
- * `mood` when one is chosen (the lab), from `at`, where the press landed. Under reduced motion,
+ * Plays a press in `layer`, the button's particle layer behind its label: a mood at random
+ * (`'any'`), or `mood` when one is chosen (the lab), from `at`, where the press landed. Under reduced motion,
  * a flash of `button` instead.
  */
-export function burst(
-  layer: HTMLElement,
-  button: HTMLElement,
-  at: At = { x: 0.5, y: 0.5 },
-  mood: Mood | 'any' = 'any',
-): void {
+export function burst(layer: HTMLElement, button: HTMLElement, at: At, mood: Mood | 'any'): void {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     flash(button);
     return;

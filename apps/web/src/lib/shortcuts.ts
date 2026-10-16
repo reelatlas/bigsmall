@@ -22,7 +22,8 @@ export interface Shortcut {
 // End in a toolbar, Backspace on an empty box, and Alt+↑ ↓ on a system's row in Units work too
 // but are left out, to keep it short and until reordering has a way to be shown. Copying is in:
 // its button shows only on the active row.
-// Letters in lowercase, as most unit symbols are written.
+// The range of letters reads a–z, lowercase as most unit symbols are; a shortcut's letter reads
+// as its keycap prints it.
 export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Type from anywhere', keys: [['0–9'], ['a–z']] },
   { action: 'Pick a unit or value', keys: [['Enter']] },

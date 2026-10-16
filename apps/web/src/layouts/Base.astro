@@ -224,9 +224,10 @@ const analytics = UMAMI_WEBSITE_ID !== '' && process.env['VERCEL_ENV'] === 'prod
         }
       });
 
-      // Typing from anywhere, before the converter's code has loaded (docs/UX-SPEC.md §8): a letter
-      // or a digit typed with nothing focused moves focus into the box, so the key lands in its
-      // field, which the island keeps as it loads. Once loaded, the island does this itself.
+      // Typing from anywhere, before the converter's code has loaded (docs/UX-SPEC.md §8): a key
+      // that starts typing (a letter, a digit, `-`, `.`, or `,`) pressed with nothing focused moves
+      // focus into the box, so the key lands in its field, which the island keeps as it loads.
+      // Once loaded, the island does this itself.
       const startsTypingKey = new RegExp(startsTyping, startsTypingFlags);
       document.addEventListener('keydown', (event) => {
         if (document.querySelector('[data-hydrated]')) return;

@@ -24,7 +24,7 @@ import {
 } from './sketches';
 
 /**
- * The sketchbook at play (docs/UX-SPEC.md §14, the About page). Hovering a tile with a mouse
+ * The sketchbook at play (docs/UX-SPEC.md §1, the About page). Hovering a tile with a mouse
  * changes it to the next sketch, and keeps changing it while the mouse stays; a click, a tap,
  * Enter, or Space changes it at once; Shuffle changes every tile in a wave. A change runs between
  * the tile's layers: the sketch showing (front), the one arriving (back), and pieces the stepped
@@ -54,7 +54,7 @@ export interface SketchbookPlayer {
   pin(on: boolean): void;
   /** Plays as under reduced motion, whatever the system asks. */
   still(on: boolean): void;
-  /** Takes in changed settings: restarts the idle changes at their new pace. */
+  /** Takes in changed settings: each tile's next change by itself is drawn afresh. */
   update(): void;
   stop(): void;
 }
@@ -80,8 +80,8 @@ interface TileState {
   run: Run | null;
   /** Settles when the change under way has. */
   done: Promise<void> | null;
-  /** When its last change started, so it never plays faster than SKETCH_MIN_GAP_MS. */
-  changedAt: number;
+  /** Its next change by itself, while the tiles change by themselves. */
+  idle: number | undefined;
 }
 
 type Moving = Exclude<SketchEffect, 'glitch' | 'scramble' | 'scan' | 'flap'>;
@@ -290,7 +290,7 @@ export function play(
   const random = Math.random;
   let forcedStill = false;
   let pinned = false;
-  let idle: number | undefined;
+  let stopped = false;
   let deck: string[] = [];
   let lastEffect: SketchEffect | undefined;
 
@@ -305,7 +305,7 @@ export function play(
         timer: undefined,
         run: null,
         done: null,
-        changedAt: -Infinity,
+        idle: undefined,
       };
       states.set(tile, state);
     }
@@ -497,7 +497,6 @@ export function play(
 
     show(layers.back, id);
     tile.dataset['next'] = id;
-    state.changedAt = performance.now();
     const effect = effectFor();
     const size = tile.getBoundingClientRect().width;
     let ended: Promise<boolean>;
@@ -548,6 +547,7 @@ export function play(
       tile.style.overflow = '';
       state.run = null;
       state.done = null;
+      idleFor(tile);
     };
     state.done = ended.then(settle);
     return state.done;
@@ -634,24 +634,36 @@ export function play(
     announce('Shuffled');
   }
 
-  /** Above 0, a tile nobody is hovering, and not changed of late, changes by itself every idleMs. */
-  function idleLoop() {
-    cancel(idle);
-    const ms = live.current.timing.idleMs;
-    if (ms <= 0) return;
-    idle = later(() => {
-      if (!still() && !document.hidden) {
-        const now = performance.now();
-        const free = tiles().filter((tile) => {
-          const state = stateOf(tile);
-          return !state.hovered && !state.done && now - state.changedAt >= SKETCH_MIN_GAP_MS;
-        });
-        const tile = free[Math.floor(random() * free.length)];
-        if (tile) void change(tile, MIDDLE, false);
+  /**
+   * Each tile changes by itself on its own time: after every change, whatever made it, it waits
+   * a random time between idleMinMs and idleMaxMs, drawn afresh each time, so the tiles drift
+   * apart. A tile hovered or changing when its time comes waits for its next.
+   */
+  function idleFor(tile: HTMLElement) {
+    const state = stateOf(tile);
+    cancel(state.idle);
+    state.idle = undefined;
+    const { idleMinMs, idleMaxMs } = live.current.timing;
+    const [least, most] = [Math.min(idleMinMs, idleMaxMs), Math.max(idleMinMs, idleMaxMs)];
+    if (stopped || most <= 0) return;
+    const wait = Math.max(SKETCH_MIN_GAP_MS, least + random() * (most - least));
+    state.idle = later(() => {
+      state.idle = undefined;
+      if (still() || document.hidden || state.hovered || state.done) {
+        idleFor(tile);
+        return;
       }
-      idleLoop();
-    }, ms);
+      // A change that lands draws the next wait itself; one with nothing to show does not.
+      void change(tile, MIDDLE, false).then(() => {
+        if (state.idle === undefined) idleFor(tile);
+      });
+    }, wait);
   }
+
+  /** Every tile's next change by itself drawn afresh, for new settings or new tiles. */
+  const idleAll = () => {
+    for (const tile of tiles()) idleFor(tile);
+  };
 
   const onReduced = () => {
     if (!still()) return;
@@ -663,7 +675,7 @@ export function play(
   grid.addEventListener('pointerout', onOut);
   grid.addEventListener('click', onClick);
   reduced.addEventListener('change', onReduced);
-  idleLoop();
+  idleAll();
   // Read when it is due, not now: the lab's saved settings arrive after the play starts.
   later(() => {
     if (live.current.tuning.intro && !still()) shuffle();
@@ -686,8 +698,9 @@ export function play(
       forcedStill = on;
       onReduced();
     },
-    update: idleLoop,
+    update: idleAll,
     stop() {
+      stopped = true;
       grid.removeEventListener('pointerover', onOver);
       grid.removeEventListener('pointermove', onMove);
       grid.removeEventListener('pointerout', onOut);

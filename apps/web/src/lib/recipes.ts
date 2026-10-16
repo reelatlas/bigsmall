@@ -53,6 +53,11 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
 /** A page's main column, under its header (index and 404). */
 export const PAGE_MAIN = 'mx-auto max-w-4xl px-4 py-8 sm:py-12';
 
+// A link standing on its own line (docs/DESIGN-SYSTEM.md, "Links"): ink, underlined in the accent,
+// 44 px tall. The not-found page's way back and the footer's link.
+export const LINK =
+  'inline-flex min-h-11 items-center font-medium underline decoration-accent decoration-2 underline-offset-4';
+
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,
 // and `data-open` while open; the shell takes SHELL, its own resting style beside its one use

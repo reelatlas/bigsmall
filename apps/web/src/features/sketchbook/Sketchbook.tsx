@@ -28,7 +28,7 @@ interface SketchbookProps {
 }
 
 /**
- * The sketchbook (docs/UX-SPEC.md §14, the About page): the logo sketches in a grid, each tile a
+ * The sketchbook (docs/UX-SPEC.md §1, the About page): the logo sketches in a grid, each tile a
  * button that changes to another sketch, with Shuffle under them. The page sets the art once
  * with SketchSprite.astro, and motion.ts plays it once the island runs. The first render shows
  * the server's sketches, START's order, so hydration changes nothing.

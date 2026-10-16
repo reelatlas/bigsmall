@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import SiteFooter from '../components/SiteFooter.astro';
 import { PLANE_EVENT } from '../lib/planes';
 import { APPLE_PLATFORM } from '../lib/platform';
 import { SITE, UMAMI_WEBSITE_ID } from '../lib/site';
@@ -322,5 +323,6 @@ const analytics = UMAMI_WEBSITE_ID !== '' && process.env['VERCEL_ENV'] === 'prod
   </head>
   <body class="min-h-dvh bg-canvas font-body text-ink antialiased">
     <slot />
+    <SiteFooter />
   </body>
 </html>

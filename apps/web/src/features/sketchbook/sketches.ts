@@ -1,7 +1,7 @@
 import type { SKETCHBOOK_TIMING } from '../../lib/timing';
 
 /**
- * The sketchbook (docs/UX-SPEC.md §14, the About page): the logo sketches from the logo canvas's
+ * The sketchbook (docs/UX-SPEC.md §1, the About page): the logo sketches from the logo canvas's
  * rounds, each a big thing and a small one on a 32-unit tile, played as the About page's easter
  * egg and tuned in /dev/sketchbook-lab. The art is one file per sketch in
  * src/assets/sketchbook/<id>.svg, in colors of its own like the brand assets, so the token guard
@@ -220,17 +220,18 @@ export interface SketchbookSettings {
   tuning: SketchbookTuning;
 }
 
+/** The settings Sean tuned in the lab and shipped on the About page (2026-10-15). */
 export const SKETCHBOOK_TUNING: SketchbookTuning = {
-  effect: 'glitch',
-  easing: 'spring',
-  strength: 0.6,
-  wave: 'diagonal',
-  cycle: true,
+  effect: 'mixed',
+  easing: 'ease',
+  strength: 1,
+  wave: 'random',
+  cycle: false,
   intro: true,
   order: 'shuffled',
-  columns: 4,
-  rows: 3,
-  tile: 28,
+  columns: 3,
+  rows: 1,
+  tile: 32,
   gap: 4,
   set: SKETCHES.map(({ id }) => id),
 };

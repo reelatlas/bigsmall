@@ -8,8 +8,8 @@ import {
 import { SKETCHBOOK_TIMING } from '../src/lib/timing';
 import { MARGIN_MS, recordAnimations, startedAnimations } from './support';
 
-// The sketchbook (docs/UX-SPEC.md §14, the About page), played on /dev/sketchbook-lab until the
-// About page ships.
+// The sketchbook (docs/UX-SPEC.md §1, the About page), played on the About page as shipped and on
+// /dev/sketchbook-lab, which tunes it.
 
 const { firstMs, holdMs, swapMs } = SKETCHBOOK_TIMING;
 const tiles = (page: Page) => page.locator('[data-sketch-tile]');
@@ -18,15 +18,22 @@ const shown = (page: Page) =>
   tiles(page).evaluateAll((all) => all.map((tile) => (tile as HTMLElement).dataset['sketch']));
 
 /**
- * Opens the lab with these settings saved, and without the shuffle as it opens unless asked, then
- * waits for the play to start.
+ * Opens the lab with these settings saved, without the shuffle as it opens or the tiles changing
+ * by themselves unless asked, so only what a test does changes a tile; then waits for the play.
  */
-async function openLab(page: Page, tuning: Partial<SketchbookTuning> = {}) {
+async function openLab(
+  page: Page,
+  tuning: Partial<SketchbookTuning> = {},
+  timing: Partial<Record<keyof typeof SKETCHBOOK_TIMING, number>> = {},
+) {
   await page.addInitScript(
     (saved) => {
-      localStorage.setItem('bigsmall:sketchbook-lab', JSON.stringify({ tuning: saved }));
+      localStorage.setItem('bigsmall:sketchbook-lab', JSON.stringify(saved));
     },
-    { intro: false, ...tuning },
+    {
+      tuning: { intro: false, ...tuning },
+      timing: { idleMinMs: 0, idleMaxMs: 0, ...timing },
+    },
   );
   await page.goto('/dev/sketchbook-lab');
   await page.locator('[data-playing]').waitFor();
@@ -39,12 +46,30 @@ const named = (tile: Locator) =>
     name: element.getAttribute('aria-label'),
   }));
 
-test('hovering a tile changes its sketch, and keeps changing it while the mouse stays', async ({
+test('hovering a tile changes it once, as shipped, and again on the next hover', async ({
   page,
   isMobile,
 }) => {
   test.skip(isMobile, 'hover needs a mouse; a tap changes a tile instead');
   await openLab(page);
+  const tile = tiles(page).first();
+  const first = await sketchOf(tile);
+  await tile.hover();
+  await expect(tile).not.toHaveAttribute('data-sketch', first!);
+  const second = await sketchOf(tile);
+  await page.waitForTimeout(holdMs + swapMs + MARGIN_MS);
+  await expect(tile).toHaveAttribute('data-sketch', second!);
+  await page.mouse.move(0, 0);
+  await tile.hover();
+  await expect(tile).not.toHaveAttribute('data-sketch', second!);
+});
+
+test('with Keep changing on, a hovered tile keeps changing until the mouse leaves', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'hover needs a mouse');
+  await openLab(page, { cycle: true });
   const tile = tiles(page).first();
   const first = await sketchOf(tile);
   await tile.hover();
@@ -58,6 +83,14 @@ test('hovering a tile changes its sketch, and keeps changing it while the mouse 
   const rested = await sketchOf(tile);
   await page.waitForTimeout(holdMs + swapMs + MARGIN_MS);
   await expect(tile).toHaveAttribute('data-sketch', rested!);
+});
+
+test('each tile changes by itself, on its own time', async ({ page }) => {
+  await openLab(page, {}, { idleMinMs: 300, idleMaxMs: 700 });
+  const before = await shown(page);
+  await expect
+    .poll(async () => (await shown(page)).every((id, index) => id !== before[index]))
+    .toBe(true);
 });
 
 test('a click, a tap, Enter, and Space change a tile at once, its name following', async ({
@@ -147,7 +180,7 @@ test('under reduced motion nothing changes by itself, and a press cross-fades', 
   isMobile,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await openLab(page, { intro: true });
+  await openLab(page, { intro: true }, { idleMinMs: 300, idleMaxMs: 500 });
   const tile = tiles(page).first();
   const before = await sketchOf(tile);
   if (!isMobile) await tile.hover();
@@ -173,6 +206,19 @@ test('the lab copies its settings as code', async ({ page, context, isMobile }) 
   for (const key of Object.keys(SKETCHBOOK_TIMING)) expect(copied, key).toContain(`  ${key}: `);
   expect(copied).toContain('export const SKETCHBOOK_TUNING');
   for (const key of Object.keys(SKETCHBOOK_TUNING)) expect(copied, key).toContain(`  ${key}: `);
-  expect(copied).toContain("effect: 'glitch',");
+  expect(copied).toContain("effect: 'mixed',");
   expect(copied).toContain('set: SKETCHES.map(({ id }) => id),');
+});
+
+test('the About page plays the sketchbook as shipped, reached from the footer and back', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('contentinfo').getByRole('link', { name: 'About' }).click();
+  await expect(page).toHaveURL(/\/about\/?$/);
+  await page.locator('[data-playing]').waitFor();
+  await expect(tiles(page)).toHaveCount(SKETCHBOOK_TUNING.columns * SKETCHBOOK_TUNING.rows);
+  await expect(page.getByRole('button', { name: 'Shuffle', exact: true })).toBeVisible();
+  await page.getByRole('contentinfo').getByRole('link', { name: 'Converter' }).click();
+  await expect(page).toHaveURL(/\/$/);
 });

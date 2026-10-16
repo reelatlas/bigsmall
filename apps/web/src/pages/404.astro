@@ -9,7 +9,7 @@ import { SITE } from '../lib/site';
  * (docs/UX-SPEC.md §1). The link is ink with an accent underline: ink keeps body-text contrast
  * in every theme, which the accent only promises for edges (docs/DESIGN-SYSTEM.md, "Links").
  */
-import { PAGE_MAIN } from '../lib/recipes';
+import { LINK, PAGE_MAIN } from '../lib/recipes';
 ---
 
 <Base title={`Page not found · ${SITE.name}`} noindex>
@@ -20,10 +20,7 @@ import { PAGE_MAIN } from '../lib/recipes';
         Page not found
       </h2>
       <p class="mt-2 text-ink-muted">Address may be mistyped or the page may have moved.</p>
-      <a
-        href="/"
-        class="mt-4 inline-flex min-h-11 items-center font-medium underline decoration-accent decoration-2 underline-offset-4"
-      >
+      <a href="/" class:list={['mt-4', LINK]}>
         Go to the converter
       </a>
     </section>

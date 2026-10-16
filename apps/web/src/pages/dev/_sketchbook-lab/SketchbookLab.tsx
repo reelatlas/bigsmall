@@ -22,6 +22,7 @@ import { useIsHydrated } from '../../../lib/hydrated';
 import { CARD, CHECKBOX, cx } from '../../../lib/recipes';
 import { FRAME_MS, SKETCHBOOK_TIMING } from '../../../lib/timing';
 import { CHECK, FIELD, HEADING, Panel, SELECT, Slider } from '../_lab/controls';
+import { SHIPPED } from './presets';
 
 // Development page: tunes the sketchbook at play (pages/dev/sketchbook-lab.astro). Settings apply
 // live and persist in this browser; none of this ships to the converter.
@@ -462,15 +463,25 @@ export function SketchbookLab() {
             onChange={(value) => setTuning('order', value)}
           />
           <Slider
-            label="Changes by itself"
-            value={timing.idleMs}
-            shipped={SKETCHBOOK_TIMING.idleMs}
+            label="Changes by itself, soonest"
+            value={timing.idleMinMs}
+            shipped={SKETCHBOOK_TIMING.idleMinMs}
             min={0}
             max={10000}
-            step={250}
+            step={50}
             unit=" ms"
-            hint="Above 0, a tile nobody is hovering changes this often; 0 is never."
-            onChange={(value) => setTiming('idleMs', value)}
+            onChange={(value) => setTiming('idleMinMs', value)}
+          />
+          <Slider
+            label="Changes by itself, latest"
+            value={timing.idleMaxMs}
+            shipped={SKETCHBOOK_TIMING.idleMaxMs}
+            min={0}
+            max={10000}
+            step={50}
+            unit=" ms"
+            hint="After each change, every tile waits a random time between these two, drawn afresh each time, then changes by itself, so the tiles drift apart. Both at 0 is never."
+            onChange={(value) => setTiming('idleMaxMs', value)}
           />
           <Button variant="secondary" onClick={() => player?.shuffle()}>
             Shuffle
@@ -531,7 +542,7 @@ export function SketchbookLab() {
               Copy settings
             </Button>
             <Button variant="secondary" onClick={() => setSettings(() => DEFAULTS)}>
-              Reset to defaults
+              Reset to shipped ({SHIPPED})
             </Button>
           </div>
           <p className="text-sm text-ink-muted">

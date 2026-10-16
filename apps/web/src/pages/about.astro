@@ -1,0 +1,30 @@
+---
+import PageHeader from '../components/PageHeader.astro';
+import SketchSprite from '../features/sketchbook/SketchSprite.astro';
+import { Sketchbook } from '../features/sketchbook/Sketchbook';
+import Base from '../layouts/Base.astro';
+import { PAGE_MAIN } from '../lib/recipes';
+import { SITE } from '../lib/site';
+
+/*
+ * The About page (docs/UX-SPEC.md §1), reached from the footer. For now it holds only the
+ * sketchbook, centered (Sean, 2026-10-15): the logo sketches at play, as tuned in
+ * /dev/sketchbook-lab. What bigsmall is, its sources, the privacy line, and feedback may follow.
+ */
+---
+
+<Base
+  title={`About · ${SITE.name}`}
+  description="The bigsmall sketchbook: every sketch of its logo, each a big thing and a small one."
+>
+  <main class={PAGE_MAIN}>
+    <PageHeader />
+    <section class="mt-12 sm:mt-20" aria-labelledby="sketchbook">
+      <h2 id="sketchbook" class="sr-only">
+        Sketchbook
+      </h2>
+      <SketchSprite />
+      <Sketchbook client:load />
+    </section>
+  </main>
+</Base>

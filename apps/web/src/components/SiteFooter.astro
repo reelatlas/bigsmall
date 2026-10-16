@@ -1,0 +1,23 @@
+---
+import { LINK } from '../lib/recipes';
+
+/*
+ * The footer every page shares (docs/UX-SPEC.md §1, Sean, 2026-10-15): one quiet link, to the
+ * About page, or, on the About page, back to the converter, on the left edge of the page's
+ * content like the header and the converter. Feedback and more may join it later. The address
+ * ends in a slash, as the build writes the page and its canonical address.
+ */
+const onAbout = Astro.url.pathname.replace(/\/+$/, '') === '/about';
+---
+
+<footer class="mx-auto flex max-w-4xl px-4 pb-8 text-sm">
+  {onAbout ? (
+    <a href="/" class={LINK}>
+      Converter
+    </a>
+  ) : (
+    <a href="/about/" class={LINK}>
+      About
+    </a>
+  )}
+</footer>

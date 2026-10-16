@@ -9,19 +9,19 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 ## Current status (2026-10-15)
 
 - **Where it stands.** Milestones 0 (setup), 1 (core engine), and 2 (smart input) are complete; milestone 3, the complete converter, is under way (`docs/PLAN.md` §13). Milestone 2's five-person usability test is set aside until the product gains traction; friends' feedback rounds give the signal for now (`docs/research/usability-test-1.md`).
-- **Live.** `https://bigsmall.work` on Vercel since 2026-10-07 (`v0.1.0`, ADR 0008); `bigsmall.diy` and both `www` names redirect to it. Every push to `main` that passes CI deploys; the two CI jobs are Vercel's Deployment Checks (`docs/DEPLOYMENT.md`).
+- **Live.** `https://bigsmall.work` on Vercel since 2026-10-07 (`v0.1.0`, ADR 0008); `bigsmall.diy` and both `www` names redirect to it. Every push to `main` that passes CI deploys; the two CI jobs are Vercel's Deployment Checks (`docs/DEPLOYMENT.md`). Besides the converter, an About page holds the logo sketchbook, reached from the footer (2026-10-15).
 - **The converter.** One box and its table, the table being the unit list (ADR 0012, ADR 0013), over thirteen categories with every unit listed (ADR 0016; `docs/UNITS-CATALOG.md` §3), in sections by system, the visitor's own first (ADR 0011). The toolbar holds the category menu, the calculator, and Settings as two side panels, Units and Display, remembered in this browser (ADR 0018), then undo, redo, and clear all. The arrows move across the page's planes and stop at its ends (ADR 0014); on a touch screen the keyboard comes up only from the box (ADR 0015). What it does: `docs/UX-SPEC.md`. How it got here: `docs/research/findings-0-first-pass.md`, a pass per round of Sean's feedback, the newest at the bottom, and `docs/research/findings-friends-1.md`. What Sean has decided or kept is recorded where it applies (`docs/DESIGN-SYSTEM.md`, `docs/UX-SPEC.md`); don't reopen it unasked.
 
 ## Pick up here
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, fiftieth pass):
-   - The sketchbook: tune it in `/dev/sketchbook-lab` (on the live site too), Glitch, Scramble, Flap, and Scan among its effects (the fifty-first pass), and choose its rotation, then paste Copy settings in chat. The spring curve, if chosen, becomes a motion token.
+1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, fifty-second pass):
+   - The sketchbook is live on `/about` with his tuning (v1), reached from the footer; it is tuned in `/dev/sketchbook-lab`.
    - R6 is the mark, live as a trial (`1fa40fa` reverts it); its small circle's mint is the one color in it that is not a token.
    - Feedback: undecided; the fiftieth pass lists the ways (a prefilled email, a form service, a function of ours), each wanting `hello@bigsmall.work` first.
    - Umami, counting since 2026-10-15: his own visit in Realtime, two devices as two visitors with the right countries, his own visits left out (`docs/DEPLOYMENT.md`, "Analytics"; an iPhone opt-out link to offer).
-2. **Next build, on Sean's tuning:** his settings as the defaults; then `/about` with the sketchbook alone, centered, and a footer on every page reading "About" (the fiftieth pass, rows 2 and 3; `docs/UX-SPEC.md` §14).
+2. **Next build:** round 3 of the sketches (more in each family, a new Math family) and more effects (the fifty-second pass, its last row).
 3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages, in v1 on `bigsmall.work`, the domain for good (Sean, 2026-10-15): plan them, then build; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
 4. **Then the accuracy audit** of every conversion and calculation (`docs/PLAN.md` §11), after the rest of this list (Sean, 2026-10-15).
 5. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).

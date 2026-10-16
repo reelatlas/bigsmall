@@ -818,6 +818,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** The sketchbook's header-style changes step at the name's pace, about thirty frames a second, and a shuffle runs every tile at once: whole tiles flipping through other sketches that fast would strobe across the grid, past WCAG 2.3.1's threshold (more than three flashes a second over more than a quarter of a 10° field, about 341 × 256 px).
 **Rule.** A change swaps a picture's whole area once; what changes from frame to frame stays a small share of it (a quarter of a tile: bands, a few blocks, one row), and anything that repeats a whole change waits a third of a second between starts. Put the limits in the code (`FLICKER_SHARE`, `SKETCH_MIN_GAP_MS`) and test the frame planner against them, so no setting in a lab can cross them.
+**Since then.** The full tidy (2026-10-15) found that each frame keeps to a quarter, but from one frame to the next up to half changes, one frame's bands leaving as the next's arrive; at the shipped size the grid stays under WCAG 2.3.1's flash area, and Sean kept the look. State a limit on change between frames as the code keeps it, frame by frame and between frames.
 
 ## 2026-10-15 — A filter is drawn before the clip-path
 

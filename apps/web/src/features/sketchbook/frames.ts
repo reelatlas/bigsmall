@@ -3,12 +3,14 @@ import { shuffle } from './sketches';
 /**
  * The sketchbook's changes that step frame by frame, like the name's split-flap letters (Glitch,
  * Scramble, Scan), planned here and drawn by motion.ts, a new frame every frameMs. However fast
- * the frames come, a change swaps a tile's whole picture once, and what changes between frames
- * is at most a quarter of the tile (FLICKER_SHARE), so nothing on the page strobes, a whole grid
- * flipping included (WCAG 2.3.1). Pure; tested in node.
+ * the frames come, a change swaps a tile's whole picture once, and each frame's bands, blocks, or
+ * row cover at most a quarter of the tile (FLICKER_SHARE). From one frame to the next up to half
+ * of it changes, one frame's bands leaving as the next's arrive, which at the shipped size, tiles
+ * at most 128 px, keeps a whole grid flipping under WCAG 2.3.1's flash area (Sean kept the look,
+ * 2026-10-15). Pure; tested in node.
  */
 
-/** The most of a tile's area that may change from one frame to the next. */
+/** The most of a tile's area one frame's bands or blocks cover; twice it may change between two. */
 export const FLICKER_SHARE = 0.25;
 
 /** A horizontal slice of a tile, in fractions of its height, moved sideways `shift` tile widths. */

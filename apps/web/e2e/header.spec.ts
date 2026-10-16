@@ -266,3 +266,23 @@ test('the shortcuts map is the converter page’s alone', async ({ page, isMobil
     await expect(shortcutsButton(page), path).toHaveCount(0);
   }
 });
+
+test('off the converter’s page the name leads home on a 44 px target in every theme, moving nothing', async ({
+  page,
+}) => {
+  const heights = new Map<string, number>();
+  const heading = page.getByRole('heading', { level: 1 });
+  // On the converter's page the name is no link: the heading's height there is the name's own.
+  await page.goto('/');
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    heights.set(theme.id, (await heading.boundingBox())?.height ?? 0);
+  }
+  await page.goto('/about/');
+  const home = page.getByRole('link', { name: 'bigsmall' });
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    expect((await home.boundingBox())?.height, theme.id).toBeGreaterThanOrEqual(44);
+    expect((await heading.boundingBox())?.height, theme.id).toBeCloseTo(heights.get(theme.id)!, 1);
+  }
+});

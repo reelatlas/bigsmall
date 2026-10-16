@@ -1,7 +1,8 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { MOODS, nextMood, particles } from '../src/features/sketchbook/burst';
-import { BURST_TIMING } from '../src/lib/timing';
+import { COUNT, MOODS, nextMood, particles, SIZE } from '../src/features/sketchbook/burst';
+import { idleWaitMs, restMs } from '../src/features/sketchbook/motion';
+import { BURST_TIMING, SKETCH_MIN_GAP_MS } from '../src/lib/timing';
 import {
   bandClip,
   blockClip,
@@ -197,15 +198,23 @@ describe('the Flip button’s particles', () => {
     expect(MOODS).toHaveLength(9);
     const random = seeded();
     for (const mood of MOODS) {
-      const made = particles(mood, random);
-      expect(made.length).toBeGreaterThan(0);
+      const at = { x: 0.3, y: 0.7 };
+      const made = particles(mood, random, at);
+      expect(made, mood).toHaveLength(COUNT[mood]);
+      const [least, most] = SIZE[mood];
       for (const particle of made) {
         expect(particle.x).toBeGreaterThanOrEqual(0);
         expect(particle.x).toBeLessThanOrEqual(1);
+        expect(particle.y).toBeGreaterThanOrEqual(0);
+        expect(particle.y).toBeLessThanOrEqual(1);
+        expect(particle.delay).toBeGreaterThanOrEqual(0);
         expect(particle.delay).toBeLessThanOrEqual(BURST_TIMING.spreadMs);
         expect(particle.duration).toBeGreaterThanOrEqual(BURST_TIMING[mood].leastMs);
         expect(particle.duration).toBeLessThanOrEqual(BURST_TIMING[mood].mostMs);
-        expect(particle.size).toBeGreaterThanOrEqual(0);
+        expect(particle.size, mood).toBeGreaterThanOrEqual(least);
+        expect(particle.size, mood).toBeLessThanOrEqual(most);
+        // Ripples spread from where the press landed.
+        if (mood === 'ripples') expect([particle.x, particle.y]).toEqual([at.x, at.y]);
       }
     }
   });
@@ -218,5 +227,29 @@ describe('the Flip button’s particles', () => {
       expect(mood).not.toBe(last);
       last = mood;
     }
+  });
+});
+
+describe('the sketchbook’s pace', () => {
+  // The lab's ranges: changes of 100 to 2000 ms, holds of 100 to 4000, waits of 0 to 10000.
+  it('never starts a playing tile’s next change sooner than the gap after the last began', () => {
+    for (let swapMs = 100; swapMs <= 2000; swapMs += 50) {
+      for (let holdMs = 100; holdMs <= 4000; holdMs += 100) {
+        expect(swapMs + restMs({ holdMs, swapMs })).toBeGreaterThanOrEqual(SKETCH_MIN_GAP_MS);
+      }
+    }
+  });
+
+  it('waits at least the gap before a tile changes by itself, and never with both waits at 0', () => {
+    const random = seeded();
+    for (let idleMinMs = 0; idleMinMs <= 10000; idleMinMs += 250) {
+      for (let idleMaxMs = 0; idleMaxMs <= 10000; idleMaxMs += 250) {
+        const wait = idleWaitMs({ idleMinMs, idleMaxMs }, random);
+        if (idleMinMs === 0 && idleMaxMs === 0) expect(wait).toBeNull();
+        else expect(wait).toBeGreaterThanOrEqual(SKETCH_MIN_GAP_MS);
+      }
+    }
+    expect(idleWaitMs({ idleMinMs: 2250, idleMaxMs: 6550 }, () => 0)).toBe(2250);
+    expect(idleWaitMs({ idleMinMs: 2250, idleMaxMs: 6550 }, () => 1)).toBe(6550);
   });
 });

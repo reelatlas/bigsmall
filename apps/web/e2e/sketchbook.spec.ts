@@ -7,12 +7,13 @@ import {
   type SketchbookTuning,
 } from '../src/features/sketchbook/sketches';
 import { SKETCHBOOK_TIMING } from '../src/lib/timing';
-import { MARGIN_MS, recordAnimations, startedAnimations } from './support';
+import { MARGIN_MS, recordAnimations, startedAnimations, themeTime } from './support';
 
 // The sketchbook (docs/UX-SPEC.md §1, the About page), played on the About page as shipped and on
 // /dev/sketchbook-lab, which tunes it.
 
 const { firstMs, holdMs, swapMs } = SKETCHBOOK_TIMING;
+const status = (page: Page) => page.locator('[data-playing]').locator('..').getByRole('status');
 const tiles = (page: Page) => page.locator('[data-sketch-tile]');
 const sketchOf = (tile: Locator) => tile.getAttribute('data-sketch');
 const shown = (page: Page) =>
@@ -83,7 +84,7 @@ test('with Keep changing on, a hovered tile keeps changing until the mouse leave
 
   // Once the mouse leaves, the change under way lands and the tile rests.
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(swapMs + MARGIN_MS);
+  await expect(tile).not.toHaveAttribute('data-next');
   const rested = await sketchOf(tile);
   await page.waitForTimeout(holdMs + swapMs + MARGIN_MS);
   await expect(tile).toHaveAttribute('data-sketch', rested!);
@@ -113,7 +114,7 @@ test('a click, a tap, Enter, and Space change a tile at once, its name following
 
   // From the keys, with the mouse away so no hover changes it too.
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(swapMs + MARGIN_MS);
+  await expect(tile).not.toHaveAttribute('data-next');
   for (const key of ['Enter', 'Space']) {
     const was = await sketchOf(tile);
     await tile.focus();
@@ -150,7 +151,7 @@ test('every effect lands on the next sketch and leaves the tile at rest', async 
 test('Flip changes every tile, and no two show the same sketch', async ({ page }) => {
   await openLab(page);
   const before = await shown(page);
-  await page.getByRole('button', { name: 'Flip', exact: true }).first().click();
+  await page.getByRole('button', { name: 'Flip', exact: true }).click();
   await expect
     .poll(async () => (await shown(page)).every((id, index) => id !== before[index]))
     .toBe(true);
@@ -175,7 +176,7 @@ test('only sketches in the rotation are dealt, and the sheet chooses them', asyn
     await expect(tile).not.toHaveAttribute('data-sketch', was!);
     expect(await sketchOf(tile)).toMatch(/^k\d$/);
   }
-  await page.getByLabel('Squares in front: In the rotation').uncheck();
+  await page.getByLabel(`${SKETCH_BY_ID.get('k1')!.name}: In the rotation`).uncheck();
   await expect(count).toContainText('5 of');
 });
 
@@ -195,8 +196,56 @@ test('under reduced motion nothing changes by itself, and a press cross-fades', 
   if (isMobile) await tile.tap();
   else await tile.click();
   await expect(tile).not.toHaveAttribute('data-sketch', before!);
-  expect(await startedAnimations(page, '[data-layer]', 'opacity')).not.toEqual([]);
+  // The sketch showing fades out as the next fades in, for a change's length.
+  expect(await startedAnimations(page, '[data-layer]', 'opacity')).toEqual([swapMs, swapMs]);
   expect(await startedAnimations(page, '[data-layer]', 'transform')).toEqual([]);
+});
+
+test('under reduced motion Flip changes every tile at once, never in a wave', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  // A wave this slow never has every tile changing at once: the first lands before the last starts.
+  await openLab(page, {}, { waveMs: 600 });
+  await page.getByRole('button', { name: 'Flip', exact: true }).click();
+  await expect
+    .poll(() =>
+      tiles(page).evaluateAll((all) => all.every((tile) => tile.hasAttribute('data-next'))),
+    )
+    .toBe(true);
+});
+
+test('a press and Flip say what they brought, for a screen reader', async ({ page, isMobile }) => {
+  await openLab(page);
+  const tile = tiles(page).first();
+  const before = await sketchOf(tile);
+  if (isMobile) await tile.tap();
+  else await tile.click();
+  await expect(tile).not.toHaveAttribute('data-sketch', before!);
+  await expect(tile).not.toHaveAttribute('data-next');
+  const now = await named(tile);
+  await expect(status(page)).toHaveText(now.name!);
+
+  await page.getByRole('button', { name: 'Flip', exact: true }).click();
+  await expect(status(page)).toContainText(', ');
+  const names = await tiles(page).evaluateAll((all) =>
+    all.map((each) => each.getAttribute('aria-label')),
+  );
+  await expect(status(page)).toHaveText(names.join(', '));
+});
+
+test('the lab loads an earlier version’s settings to compare or roll back', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'one viewport is enough');
+  await openLab(page);
+  const latest = page.getByLabel('Changes by itself, latest', { exact: true });
+  // openLab saves the tiles still, so the lab starts at 0.
+  await expect(latest).toHaveValue('0');
+  await page.getByLabel('Earlier version').selectOption('v2');
+  await page.getByRole('button', { name: 'Load', exact: true }).click();
+  await expect(latest).toHaveValue('5800');
+  await page.getByRole('button', { name: /^Reset to shipped/ }).click();
+  await expect(latest).toHaveValue(String(SKETCHBOOK_TIMING.idleMaxMs));
 });
 
 test('the lab copies its settings as code', async ({ page, context, isMobile }) => {
@@ -248,8 +297,9 @@ test('Flip answers a press with particles in the button, and with a flash under 
   await expect(particles).toHaveCount(0);
   await recordAnimations(page);
   await flip.click();
-  await expect(particles).toHaveCount(0);
-  expect(await startedAnimations(page, 'button:has([data-burst])', 'backgroundColor')).not.toEqual(
-    [],
-  );
+  // Read at once: particles made wrongly would be gone within seconds, and a wait would miss them.
+  expect(await startedAnimations(page, '[data-burst] > *')).toEqual([]);
+  expect(await startedAnimations(page, 'button:has([data-burst])', 'backgroundColor')).toEqual([
+    await themeTime(page, '--highlight-fade'),
+  ]);
 });

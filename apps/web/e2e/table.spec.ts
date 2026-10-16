@@ -421,6 +421,9 @@ test('an Escape that closes the shortcuts map does nothing else', async ({ page,
   const toggle = shortcutsButton(page);
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  // With nothing focused the page's own Escape would clear the box, so the map's must stop there.
+  await blur(page);
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(box(page)).toHaveValue('250');

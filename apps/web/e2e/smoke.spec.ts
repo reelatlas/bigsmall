@@ -78,6 +78,16 @@ test('every Tab stop shows a visible focus indicator', async ({ page, isMobile }
   await walkTabStops(page);
 });
 
+test('every Tab stop on the About page shows a visible focus indicator', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/about/');
+  await page.locator('[data-playing]').waitFor();
+  await walkTabStops(page);
+});
+
 /** Tabs through the page's first stops and fails on any that shows no focus indicator. */
 async function walkTabStops(page: Page) {
   const missing: string[] = [];
@@ -141,7 +151,9 @@ test('the footer links to the About page, quietly until hovered or focused', asy
   if (isMobile) return;
   await about.hover();
   await expect(about).not.toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
+  // Once the hover's underline has faded out, focus brings it back.
   await page.mouse.move(0, 0);
+  await expect(about).toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
   await about.focus();
   await expect(about).not.toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
 });

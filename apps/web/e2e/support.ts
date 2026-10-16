@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page } from '@playwright/test';
+import { cssTime } from '../src/lib/css-time';
 import type { ThemeMeta } from '../src/lib/themes';
 
 /** How long past a delay a test waits for its effect, so a slow machine still sees it land. */
@@ -79,6 +80,16 @@ export async function startedAnimations(page: Page, selector: string, property?:
         )
         .map((each) => each.duration),
     [selector, property] as const,
+  );
+}
+
+/** A theme's length in ms, read as the page reads it (the built site writes 400ms as .4s). */
+export async function themeTime(page: Page, name: string) {
+  return cssTime(
+    await page.evaluate(
+      (n) => getComputedStyle(document.documentElement).getPropertyValue(n),
+      name,
+    ),
   );
 }
 

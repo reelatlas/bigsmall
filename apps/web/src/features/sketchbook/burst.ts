@@ -53,7 +53,7 @@ export interface Particle {
 }
 
 /** How many particles a press makes in each mood. */
-const COUNT: Readonly<Record<Mood, number>> = {
+export const COUNT: Readonly<Record<Mood, number>> = {
   bubbles: 14,
   feathers: 12,
   sparkles: 16,
@@ -66,7 +66,7 @@ const COUNT: Readonly<Record<Mood, number>> = {
 };
 
 /** The smallest and largest particle of each mood, in px; a ripple grows to the whole button. */
-const SIZE: Readonly<Record<Mood, readonly [number, number]>> = {
+export const SIZE: Readonly<Record<Mood, readonly [number, number]>> = {
   bubbles: [6, 13],
   feathers: [11, 18],
   sparkles: [6, 12],

@@ -1,6 +1,5 @@
 import { unitsIn } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
-import { cssTime } from '../src/lib/css-time';
 import {
   applyTheme,
   box,
@@ -17,6 +16,7 @@ import {
   settled,
   startedAnimations,
   unitCell,
+  themeTime,
 } from './support';
 import { THEMES } from '../src/lib/themes';
 
@@ -724,16 +724,8 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
 }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
-  // The theme's own lengths, read as the page reads them (the built site writes 400ms as .4s).
-  const token = async (name: string) =>
-    cssTime(
-      await page.evaluate(
-        (n) => getComputedStyle(document.documentElement).getPropertyValue(n),
-        name,
-      ),
-    );
-  const slow = await token('--motion-slow');
-  const fade = await token('--highlight-fade');
+  const slow = await themeTime(page, '--motion-slow');
+  const fade = await themeTime(page, '--highlight-fade');
   // How long the animation of `property` on `selector` ran, 0 if none did: the theme's length in
   // full. Recorded as each starts, so a slow machine that finishes it first still shows it.
   const animated = async (selector: string, property: string) =>
@@ -816,10 +808,12 @@ test('with reduced motion a unit moves at once, and still flashes, a change of c
     .getByLabel(/cubic inches/)
     .click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
-  // It flashed where it landed, and nothing moved (a move of no length is none).
-  await expect
-    .poll(() => startedAnimations(page, '[data-row="cubic-inch"] > [role="gridcell"]'))
-    .not.toEqual([]);
+  // It flashed where it landed, for the theme's length, and nothing moved (a move of no length
+  // is none).
+  const cells = '[data-row="cubic-inch"] > [role="gridcell"]';
+  await expect.poll(() => startedAnimations(page, cells)).not.toEqual([]);
+  const fade = await themeTime(page, '--highlight-fade');
+  expect(new Set(await startedAnimations(page, cells))).toEqual(new Set([fade]));
   const moves = await startedAnimations(page, '*', 'transform');
   expect(moves.filter((length) => length > 0)).toEqual([]);
 });

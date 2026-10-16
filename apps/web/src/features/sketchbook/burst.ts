@@ -138,13 +138,16 @@ export function nextMood(last: Mood | undefined, random: () => number): Mood {
 /** A sparkle's four points. */
 const STAR = 'polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%)';
 
-/** The moods drawn as small pictures rather than shapes of CSS, on a 32-unit grid. */
-const PICTURES: Partial<Record<Mood, (fill: string) => string>> = {
+/**
+ * The moods drawn as small pictures rather than shapes of CSS, on a 32-unit grid: in `fill`, and
+ * the mark's ring, between its circles, in `ground`, the button's fill at the press.
+ */
+const PICTURES: Partial<Record<Mood, (fill: string, ground: string) => string>> = {
   hearts: (fill) =>
     `<path d="M16 28C7 21.5 3 16.5 3 11.2C3 7 6.2 4 10 4C12.6 4 14.8 5.3 16 7.4C17.2 5.3 19.4 4 22 4C25.8 4 29 7 29 11.2C29 16.5 25 21.5 16 28Z" style="fill:${fill}"/>`,
-  marks: (fill) =>
+  marks: (fill, ground) =>
     `<circle cx="13" cy="15" r="8.5" style="fill:${fill}"/>` +
-    '<circle cx="21.5" cy="21.5" r="5.7" style="fill:var(--surface)"/>' +
+    `<circle cx="21.5" cy="21.5" r="5.7" style="fill:${ground}"/>` +
     '<circle cx="21.5" cy="21.5" r="3.9" style="fill:var(--art-2)"/>',
   blossoms: (fill) =>
     [0, 72, 144, 216, 288]
@@ -276,6 +279,8 @@ export function burst(layer: HTMLElement, button: HTMLElement, at: At, mood: Moo
   last = playing;
   const { width, height } = layer.getBoundingClientRect();
   const easing = getComputedStyle(layer).getPropertyValue('--motion-glide').trim() || 'linear';
+  // The mark's ring takes the button's fill as pressed, hovered or not, so it never shows a crescent.
+  const ground = getComputedStyle(button).backgroundColor;
   // A ripple grows until it reaches the button's farthest corner from the press.
   const reach = 2 * Math.hypot(Math.max(at.x, 1 - at.x) * width, Math.max(at.y, 1 - at.y) * height);
   for (const particle of particles(playing, Math.random, at)) {
@@ -288,7 +293,7 @@ export function burst(layer: HTMLElement, button: HTMLElement, at: At, mood: Moo
       : document.createElement('span');
     if (picture) {
       dot.setAttribute('viewBox', '0 0 32 32');
-      dot.innerHTML = picture(fill);
+      dot.innerHTML = picture(fill, ground);
     }
     const { left, top } =
       playing === 'ripples'

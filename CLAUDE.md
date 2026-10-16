@@ -16,11 +16,11 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Waiting on Sean's yes** (the sixtieth pass in `docs/research/findings-0-first-pass.md`; every SEO change shown first, `docs/SEO.md` §2):
-   1. The description in his words, the page's hint, and the preview card's line "unit converter" ("bigsmall in search", https://claude.ai/artifact/FMatWDVSx5JsFurZNbmsyL).
-   2. The formulas on the About page and About's new description ("bigsmall formulas", https://claude.ai/artifact/WC5DJGJnz6MTCtfrkn6bxS); built on his yes.
-   3. The categories lab's questions (`/dev/categories-lab`): pace, a temperature change, cooking by ingredient.
-2. **Open with Sean:** Search Console and Bing at his screen, a text record at Porkbun (`docs/SEO.md` §3); the SEO plan's other decisions ("bigsmall SEO plan", https://claude.ai/artifact/7eXfYjEdTn4zKXXGLug3pT). Trials: the footer at the window's bottom (`55b12aa` reverts it); Pause beside Flip (`3fb2da3`); R6 as the mark (`1fa40fa`). Feedback undecided (the fiftieth pass); Umami's checks (`docs/DEPLOYMENT.md`, "Analytics").
+1. **Waiting on Sean** (the sixty-first pass in `docs/research/findings-0-first-pass.md`):
+   1. The categories lab's second round (`/dev/categories-lab`): pace with its systems or in a Pace section; a temperature change inside Temperature or a category of its own; cooking with two pills, weight first. Then the first to build.
+   2. Which other units turn everyday (the pass's list; recommended: µm, m³, hPa, BTU/h, therm, PS).
+   3. Search Console and Bing at his screen, a text record at Porkbun (`docs/SEO.md` §3), once he is happy with the rest.
+2. **Open with Sean:** the SEO plan's other decisions ("bigsmall SEO plan", https://claude.ai/artifact/7eXfYjEdTn4zKXXGLug3pT). Trials: R6 as the mark (`1fa40fa`). Feedback undecided (the fiftieth pass); Umami's checks (`docs/DEPLOYMENT.md`, "Analytics").
 3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages built and launched (`docs/SEO.md`), in v1 on `bigsmall.work`; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
 4. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).
 5. **Later.** The hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search); the five-person test once there is traction.

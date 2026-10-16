@@ -57,7 +57,8 @@ describe('the catalog', () => {
     const families = new Set(FAMILIES.map(({ id }) => id));
     for (const sketch of SKETCHES) expect(families.has(sketch.family), sketch.id).toBe(true);
     for (const id of START) expect(SKETCH_BY_ID.has(id), id).toBe(true);
-    expect(START[5]).toBe('r6');
+    // The mark in the middle of the shipped row of three, first to show.
+    expect(START[1]).toBe('r6');
   });
 
   it('draws each sketch on a rounded 32-unit tile, with nothing that could clash on a page or load', () => {

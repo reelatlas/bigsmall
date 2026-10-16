@@ -167,18 +167,17 @@ export const SKETCH_BY_ID: ReadonlyMap<string, Sketch> = new Map(
 );
 
 /**
- * The grid's first sketches, before any play, laid out for the lab's first grid, four by three,
- * the mark near its middle among sketches from the other families, light and dark tiles in turn;
- * the shipped row of three shows the first three. The rest of the set follows in the catalog's
- * order.
+ * The grid's first sketches, before any play: the mark in the middle of the shipped row of three,
+ * so it shows first, under reduced motion too (Sean, 2026-10-15), among sketches from the other
+ * families, light and dark tiles in turn. The rest of the set follows in the catalog's order.
  */
 export const START: readonly string[] = [
   'c1',
-  'u1',
+  'r6',
   'o3',
   'b5',
   's3',
-  'r6',
+  'u1',
   'm1',
   'g1',
   'f3',

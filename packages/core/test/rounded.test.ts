@@ -56,6 +56,20 @@ describe('formatPlaces', () => {
   });
 });
 
+describe('ties to places', () => {
+  it('round away from zero, below zero as above it', () => {
+    const at = (value: number, places: number) =>
+      formatPlaces(value, { places, rounding: 'nearest', locale: 'en-US' })?.text;
+    expect([at(2.5, 0), at(-2.5, 0)]).toEqual(['3', '-3']);
+    expect([at(0.125, 2), at(-0.125, 2)]).toEqual(['0.13', '-0.13']);
+    expect([at(0.5, 0), at(-0.5, 0)]).toEqual(['1', '-1']);
+    expect([at(1.005, 2), at(-1.005, 2)]).toEqual(['1.01', '-1.01']);
+    // Up and down keep their direction, toward larger and smaller values.
+    expect(formatPlaces(-2.5, { places: 0, rounding: 'up', locale: 'en-US' })?.text).toBe('-2');
+    expect(formatPlaces(-2.5, { places: 0, rounding: 'down', locale: 'en-US' })?.text).toBe('-3');
+  });
+});
+
 describe('fractionsOf', () => {
   it('writes each fraction in the smallest size chosen that writes it', () => {
     expect(listed(eighths)).toEqual(['1/8', '1/4', '3/8', '1/2', '5/8', '3/4', '7/8']);
@@ -101,6 +115,14 @@ describe('formatFraction', () => {
 
   it('never rounds a value down a step for float noise', () => {
     expect(fraction(2.4999999999999996, eighths, 'down')?.text).toBe('2 1/2');
+  });
+
+  it('rounds a tie away from zero, below zero as above it', () => {
+    expect(fraction(2.0625, eighths)).toEqual({ text: '2 1/8', approx: true });
+    expect(fraction(-2.0625, eighths)).toEqual({ text: '-2 1/8', approx: true });
+    expect(fraction(0.0625, eighths)).toEqual({ text: '1/8', approx: true });
+    expect(fraction(-0.0625, eighths)).toEqual({ text: '-1/8', approx: true });
+    expect(fraction(-2.5, sizes(2), 'up')?.text).toBe('-2 1/2');
   });
 
   it('rounds small values as chosen, and says one that rounds to zero is below the smallest size', () => {

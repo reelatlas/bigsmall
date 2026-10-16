@@ -44,13 +44,14 @@ const PLACES_LIMIT = 1e15;
 
 /**
  * A scaled value snapped to 12 significant digits before rounding, so float noise (0.29 × 100 is
- * 28.999…) never rounds a value down a step.
+ * 28.999…) never rounds a value down a step. To the nearest, a tie rounds away from zero, below
+ * zero as above it: −2.5 is −3, as 2.5 is 3 (Sean, 2026-10-15).
  */
 function rounded(scaled: number, rounding: Rounding): number {
   const value = Number(scaled.toPrecision(12));
   if (rounding === 'up') return Math.ceil(value);
   if (rounding === 'down') return Math.floor(value);
-  return Math.round(value);
+  return Math.sign(value) * Math.round(Math.abs(value));
 }
 
 function gcd(a: number, b: number): number {
@@ -119,7 +120,8 @@ export function fractionsOf(sizes: ReadonlySet<FractionSize>): Fraction[] {
  * rounded as chosen too (0.07 to eighths is ≈ 1/8). One that is not zero but rounds to zero reads
  * "< 1/8", the smallest size chosen. Past a million it is the whole number, rounded as chosen
  * ("≈ 1,043,262"), so no row's fraction is left blank (Sean, 2026-10-15). Null with no size
- * chosen, or past where places stop meaning anything. A tie goes up, as Math.round's does.
+ * chosen, or past where places stop meaning anything. A tie rounds away from zero: 2 1/16 to
+ * eighths is 2 1/8, and −2 1/16 is −2 1/8.
  */
 export function formatFraction(
   value: number,
@@ -145,9 +147,11 @@ export function formatFraction(
       ? steps.find((fraction) => at(fraction) >= rest - NOISE)
       : rounding === 'down'
         ? steps.findLast((fraction) => at(fraction) <= rest + NOISE)
-        : steps.reduce((best, fraction) =>
-            Math.abs(at(fraction) - rest) <= Math.abs(at(best) - rest) + NOISE ? fraction : best,
-          );
+        : steps.reduce((best, fraction) => {
+            const gap = Math.abs(at(fraction) - rest) - Math.abs(at(best) - rest);
+            // A tie goes away from zero: to the larger step above zero, the smaller below it.
+            return gap < -NOISE || (gap <= NOISE && value > 0) ? fraction : best;
+          });
   if (!pick) return null;
   const count = base * pick.d + pick.n;
   if (count === 0) {

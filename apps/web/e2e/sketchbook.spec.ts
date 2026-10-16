@@ -225,11 +225,17 @@ test('a press and Flip say what they brought, for a screen reader', async ({ pag
   await expect(status(page)).toHaveText(now.name!);
 
   await page.getByRole('button', { name: 'Flip', exact: true }).click();
-  await expect(status(page)).toContainText(', ');
-  const names = await tiles(page).evaluateAll((all) =>
-    all.map((each) => each.getAttribute('aria-label')),
-  );
-  await expect(status(page)).toHaveText(names.join(', '));
+  // Flip has spoken once the press's sentence is gone: a sketch's own name can hold a comma
+  // ("Big b, small s"), so a comma alone does not say so. Then the tiles name what it said.
+  await expect(status(page)).not.toHaveText(now.name!);
+  const said = await status(page).textContent();
+  await expect
+    .poll(() =>
+      tiles(page).evaluateAll((all) =>
+        all.map((each) => each.getAttribute('aria-label')).join(', '),
+      ),
+    )
+    .toBe(said);
 });
 
 test('the lab loads an earlier version’s settings to compare or roll back', async ({

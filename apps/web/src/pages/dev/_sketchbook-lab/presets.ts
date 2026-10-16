@@ -29,6 +29,7 @@ export const PRESETS: ReadonlyArray<{ id: string; label: string; settings: Sketc
         effect: 'mixed',
         easing: 'ease',
         strength: 1,
+        particles: 'any',
         wave: 'random',
         cycle: false,
         intro: true,

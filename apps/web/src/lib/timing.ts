@@ -74,6 +74,12 @@ export const SKETCH_MIN_GAP_MS = 1000 / 3;
 export const BURST_TIMING = {
   bubbles: { leastMs: 1300, mostMs: 2000 },
   feathers: { leastMs: 1800, mostMs: 2600 },
-  sparkles: { leastMs: 600, mostMs: 1000 },
+  sparkles: { leastMs: 700, mostMs: 1200 },
+  confetti: { leastMs: 1400, mostMs: 2200 },
+  hearts: { leastMs: 1500, mostMs: 2300 },
+  ripples: { leastMs: 900, mostMs: 1400 },
+  fireflies: { leastMs: 1800, mostMs: 2600 },
+  marks: { leastMs: 1500, mostMs: 2300 },
+  blossoms: { leastMs: 1800, mostMs: 2600 },
   spreadMs: 600,
 } as const;

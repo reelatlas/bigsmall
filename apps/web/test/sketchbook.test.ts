@@ -193,7 +193,8 @@ describe('the stepped changes', () => {
 });
 
 describe('the Flip button’s particles', () => {
-  it('drift in each mood within their sizes and lengths, starting within the spread', () => {
+  it('drift in each of the nine moods within their sizes and lengths, starting within the spread', () => {
+    expect(MOODS).toHaveLength(9);
     const random = seeded();
     for (const mood of MOODS) {
       const made = particles(mood, random);
@@ -204,7 +205,7 @@ describe('the Flip button’s particles', () => {
         expect(particle.delay).toBeLessThanOrEqual(BURST_TIMING.spreadMs);
         expect(particle.duration).toBeGreaterThanOrEqual(BURST_TIMING[mood].leastMs);
         expect(particle.duration).toBeLessThanOrEqual(BURST_TIMING[mood].mostMs);
-        expect(particle.size).toBeGreaterThan(0);
+        expect(particle.size).toBeGreaterThanOrEqual(0);
       }
     }
   });

@@ -1,4 +1,5 @@
 import type { SKETCHBOOK_TIMING } from '../../lib/timing';
+import type { Mood } from './burst';
 
 /**
  * The sketchbook (docs/UX-SPEC.md §1, the About page): the logo sketches from the logo canvas's
@@ -241,6 +242,8 @@ export interface SketchbookTuning {
   easing: SketchEasing;
   /** How far a glitch shifts its slices and splits its edges, 0 to 1. */
   strength: number;
+  /** How the Flip button answers a press: a mood of particles, or any, a new one each press. */
+  particles: Mood | 'any';
   wave: Wave;
   /** Hovering keeps a tile changing until the pointer leaves; off, a hover changes it once. */
   cycle: boolean;
@@ -271,6 +274,7 @@ export const SKETCHBOOK_TUNING: SketchbookTuning = {
   effect: 'mixed',
   easing: 'ease',
   strength: 1,
+  particles: 'any',
   wave: 'random',
   cycle: false,
   intro: true,

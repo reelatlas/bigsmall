@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 import { Button } from '../../../components/Button';
 import { CheckIcon, CopyIcon } from '../../../components/icons';
+import { MOODS, type Mood } from '../../../features/sketchbook/burst';
 import { sketchHref, type SketchbookPlayer } from '../../../features/sketchbook/motion';
 import { Sketchbook } from '../../../features/sketchbook/Sketchbook';
 import {
@@ -166,6 +167,19 @@ const EFFECT_LABELS: Readonly<Record<SketchEffect | 'mixed', string>> = {
   spin: 'Spin: twirls away, the next twirls in',
   fade: 'Fade: a cross-fade, as under reduced motion',
   mixed: 'Mixed: a different one each time',
+};
+
+const PARTICLE_LABELS: Readonly<Record<Mood | 'any', string>> = {
+  any: 'Any: a new mood each press',
+  bubbles: 'Bubbles rising',
+  feathers: 'Feathers falling',
+  sparkles: 'Sparkles twinkling',
+  confetti: 'Confetti tumbling',
+  hearts: 'Hearts floating up',
+  ripples: 'Ripples from the press',
+  fireflies: 'Fireflies wandering',
+  marks: 'Little marks rising',
+  blossoms: 'Blossoms on a breeze',
 };
 
 const EASING_LABELS: Readonly<Record<SketchEasing, string>> = {
@@ -447,6 +461,14 @@ export function SketchbookLab() {
             unit=" ms"
             hint="How often Glitch, Scramble, and Scan show a new frame, as the name’s Flip does for its letters."
             onChange={(value) => setTiming('frameMs', value)}
+          />
+          <Choice
+            label="Flip's particles"
+            value={tuning.particles}
+            choices={['any', ...MOODS] as const}
+            labels={PARTICLE_LABELS}
+            hint="How the Flip button answers a press. Any takes a new mood each press."
+            onChange={(value) => setTuning('particles', value)}
           />
           <Slider
             label="Glitch strength"

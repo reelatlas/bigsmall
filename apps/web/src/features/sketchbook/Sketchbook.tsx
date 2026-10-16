@@ -101,7 +101,7 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
           </button>
         ))}
       </div>
-      <FlipButton onFlip={() => player.current?.shuffle()} />
+      <FlipButton particles={settings.tuning.particles} onFlip={() => player.current?.shuffle()} />
       <p role="status" className="sr-only">
         {said}
       </p>

@@ -1,7 +1,8 @@
 // Draws the site's icons and its link preview image into public/ from the default theme's tokens
 // (docs/DESIGN-SYSTEM.md, "Brand assets"). Run after changing the mark or the Daylight colors:
 //   pnpm --filter @bigsmall/web brand
-// The mark is a big circle and a small one on one baseline, read like the name: big, then small.
+// The mark is a big circle with a small one in front of it, read like the name: big, then small,
+// the small one nearer (R6 on the logo canvas, chosen by Sean on 2026-10-15).
 import { chromium } from '@playwright/test';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +20,11 @@ const token = (name) => {
 const color = {
   tile: token('accent'),
   dot: token('on-accent'),
+  /*
+   * The small circle's tint, the mark's own: between the accent and accent-soft, which at 16 px
+   * blends into the white beside it. No theme token holds it, since only these images use it.
+   */
+  near: '#99f6e4',
   canvas: token('canvas'),
   ink: token('ink'),
   muted: token('ink-muted'),
@@ -36,12 +42,17 @@ const site = {
   tagline: read('src/lib/site.ts', /tagline: '([^']+)'/),
 };
 
-/** The mark on a 32-unit tile. `corner` rounds the tile; iOS rounds its own, so it gets none. */
+/**
+ * The mark on a 32-unit tile. `corner` rounds the tile; iOS rounds its own, so it gets none. A ring
+ * in the tile's color sets the small circle in front of the big one, 1.8 units wide so it still
+ * shows at 16 px.
+ */
 const mark = (corner) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">` +
   `<rect width="32" height="32" rx="${corner}" fill="${color.tile}"/>` +
-  `<circle cx="11.5" cy="16" r="8" fill="${color.dot}"/>` +
-  `<circle cx="25.5" cy="21" r="3" fill="${color.dot}"/>` +
+  `<circle cx="13" cy="15" r="8.5" fill="${color.dot}"/>` +
+  `<circle cx="21.5" cy="21.5" r="5.7" fill="${color.tile}"/>` +
+  `<circle cx="21.5" cy="21.5" r="3.9" fill="${color.near}"/>` +
   `</svg>`;
 
 const browser = await chromium.launch();

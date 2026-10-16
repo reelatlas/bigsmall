@@ -15,7 +15,7 @@ export const SITE = {
   /** The link preview image, 1200 × 630, in public/. */
   image: '/og.png',
   imageAlt:
-    'The bigsmall mark, a big circle and a small one, beside the name and “efficient unit converter”.',
+    'The bigsmall mark, a big circle with a small one in front, beside the name and “efficient unit converter”.',
 } as const;
 
 /**

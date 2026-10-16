@@ -141,6 +141,34 @@ test('reduced motion zeroes the motion tokens in every theme', async ({ page }) 
   }
 });
 
+test('the footer sits at the window’s bottom on a short page, and after the content on a long one', async ({
+  page,
+}) => {
+  const place = () =>
+    page.evaluate(() => {
+      const footer = document.querySelector('body > footer')?.getBoundingClientRect();
+      const main = document.querySelector('main')?.getBoundingClientRect();
+      return {
+        footerTop: (footer?.top ?? 0) + scrollY,
+        footerBottom: (footer?.bottom ?? 0) + scrollY,
+        mainBottom: (main?.bottom ?? 0) + scrollY,
+        window: innerHeight,
+        page: document.documentElement.scrollHeight,
+      };
+    });
+  await page.goto('/no-such-page');
+  const short = await place();
+  expect(short.page).toBeLessThanOrEqual(short.window);
+  expect(Math.abs(short.footerBottom - short.window)).toBeLessThanOrEqual(1);
+  // A table taller than the window: the footer follows it.
+  await page.setViewportSize({ width: page.viewportSize()?.width ?? 1280, height: 480 });
+  await page.goto('/?a=mile&v=1');
+  await ready(page);
+  const long = await place();
+  expect(long.page).toBeGreaterThan(long.window);
+  expect(Math.abs(long.footerTop - long.mainBottom)).toBeLessThanOrEqual(1);
+});
+
 test('the footer links to the About page, quietly until hovered or focused', async ({
   page,
   isMobile,

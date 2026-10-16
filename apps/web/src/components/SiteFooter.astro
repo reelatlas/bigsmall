@@ -4,7 +4,9 @@ import { PAGE_COLUMN, QUIET_LINK } from '../lib/recipes';
 /*
  * The footer under every page but the About page (docs/UX-SPEC.md §1, Sean, 2026-10-15): one
  * quiet link to it, on the left edge of the page's content like the header, out of the way until
- * hovered or focused. On the About page the name in the header leads home, so it has none.
+ * hovered or focused. On a page shorter than the window it sits at the window's bottom, the body
+ * being a column at least the window's height (Base.astro), and otherwise after the content (a
+ * trial, Sean, 2026-10-15). On the About page the name in the header leads home, so it has none.
  * Feedback and more may join it later. The address ends in a slash, as the build writes the page
  * and its canonical address.
  */
@@ -12,7 +14,7 @@ const onAbout = Astro.url.pathname.replace(/\/+$/, '') === '/about';
 ---
 
 {!onAbout && (
-  <footer class:list={[PAGE_COLUMN, 'flex pb-8 text-sm']}>
+  <footer class:list={[PAGE_COLUMN, 'mt-auto flex pb-8 text-sm']}>
     <a href="/about/" class={QUIET_LINK}>
       About
     </a>

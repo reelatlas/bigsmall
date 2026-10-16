@@ -27,6 +27,8 @@ const themeNames = Object.fromEntries(THEMES.map((t) => [t.id, t.name]));
  * the page counts once however often the URL is rewritten.
  */
 const analytics = UMAMI_WEBSITE_ID !== '' && process.env['VERCEL_ENV'] === 'production';
+// The body is a column at least the window's height, so the footer (SiteFooter) sits at the
+// window's bottom on a page shorter than it; each page's column fills its width (PAGE_COLUMN).
 /*
  * Structured data on the converter's page, the site's home (docs/SEO.md): its name in results
  * (WebSite), who makes it, with the logo (Organization), and what it is (WebApplication). Written
@@ -361,7 +363,7 @@ const structured =
       });
     </script>
   </head>
-  <body class="min-h-dvh bg-canvas font-body text-ink antialiased">
+  <body class="flex min-h-dvh flex-col bg-canvas font-body text-ink antialiased">
     <slot />
     <SiteFooter />
   </body>

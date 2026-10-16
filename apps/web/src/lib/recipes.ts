@@ -59,8 +59,11 @@ export const PANEL_HEAD = 'mb-2 flex items-center justify-between';
 /** A side panel's title, set in to line up with its content. */
 export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
 
-/** A page's column, under its header: the main content's and the footer's. */
-export const PAGE_COLUMN = 'mx-auto max-w-4xl px-4';
+/**
+ * A page's column, under its header: the main content's and the footer's. Full width up to its
+ * own, since in the body's column (Base.astro) side margins of auto would shrink it to its content.
+ */
+export const PAGE_COLUMN = 'mx-auto w-full max-w-4xl px-4';
 
 /** A page's main column (the converter, About, and 404). */
 export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8 sm:py-12');

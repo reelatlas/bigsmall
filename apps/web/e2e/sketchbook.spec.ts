@@ -303,3 +303,31 @@ test('Flip answers a press with particles in the button, and with a flash under 
     await themeTime(page, '--highlight-fade'),
   ]);
 });
+
+test('Pause holds the tiles from changing by themselves until Play', async ({ page }) => {
+  await openLab(page, {}, { idleMinMs: 300, idleMaxMs: 500 });
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  const play = page.getByRole('button', { name: 'Play', exact: true });
+  await expect(play).toBeVisible();
+  // A change already under way lands; then, for longer than the longest wait, nothing changes.
+  await expect
+    .poll(() =>
+      tiles(page).evaluateAll((all) => all.some((tile) => tile.hasAttribute('data-next'))),
+    )
+    .toBe(false);
+  const held = await shown(page);
+  await page.waitForTimeout(2 * 500 + swapMs + MARGIN_MS);
+  expect(await shown(page)).toEqual(held);
+  await play.click();
+  await expect
+    .poll(async () => (await shown(page)).some((id, index) => id !== held[index]))
+    .toBe(true);
+});
+
+test('under reduced motion there is nothing to pause', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/about/');
+  await page.locator('[data-playing]').waitFor();
+  await expect(page.getByRole('button', { name: 'Flip', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeHidden();
+});

@@ -73,6 +73,11 @@ export function idleWaitMs(
 export interface SketchbookPlayer {
   /** Flip: changes every tile, in a wave, and says what they brought. */
   flip(): void;
+  /**
+   * Holds every tile from changing by itself, or lets them again (the About page's Pause, WCAG
+   * 2.2.2); a hover, a press, and Flip still change them.
+   */
+  pause(on: boolean): void;
   /** Plays every tile as if hovered. */
   pin(on: boolean): void;
   /** Plays as under reduced motion, whatever the system asks. */
@@ -402,6 +407,7 @@ export function play(
   const random = Math.random;
   let forcedStill = false;
   let pinned = false;
+  let paused = false;
   let stopped = false;
   let deck: string[] = [];
   let lastEffect: SketchEffect | undefined;
@@ -768,14 +774,14 @@ export function play(
   /**
    * Each tile changes by itself on its own time: after every change, whatever made it, it waits
    * a random time between idleMinMs and idleMaxMs, drawn afresh each time, so the tiles drift
-   * apart. A tile hovered or changing when its time comes waits for its next.
+   * apart. A tile hovered or changing when its time comes waits for its next; paused, none waits.
    */
   function idleFor(tile: HTMLElement) {
     const state = stateOf(tile);
     cancel(state.idle);
     state.idle = undefined;
     const wait = idleWaitMs(live.current.timing, random);
-    if (stopped || wait === null) return;
+    if (stopped || paused || wait === null) return;
     state.idle = later(() => {
       state.idle = undefined;
       if (still() || document.hidden || state.hovered || state.done) {
@@ -813,6 +819,11 @@ export function play(
 
   return {
     flip: () => flip(),
+    pause(on) {
+      paused = on;
+      if (!on) idleAll();
+      else for (const tile of tiles()) cancel(stateOf(tile).idle);
+    },
     pin(on) {
       pinned = on;
       const { firstMs, waveMs } = live.current.timing;

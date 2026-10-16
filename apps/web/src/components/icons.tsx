@@ -180,3 +180,21 @@ export function BackspaceIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** Pause: two bars, the sketchbook's tiles held from changing by themselves. */
+export function PauseIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M9 6v12M15 6v12" />
+    </Icon>
+  );
+}
+
+/** Play: a triangle pointing on, the tiles changing by themselves again. */
+export function PlayIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8 5.5v13l10.5-6.5z" />
+    </Icon>
+  );
+}

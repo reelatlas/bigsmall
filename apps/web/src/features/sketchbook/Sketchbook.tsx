@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Button } from '../../components/Button';
+import { PauseIcon, PlayIcon } from '../../components/icons';
 import { cx } from '../../lib/recipes';
 import { SKETCHBOOK_TIMING } from '../../lib/timing';
 import { FlipButton } from './FlipButton';
@@ -29,15 +31,16 @@ interface SketchbookProps {
 
 /**
  * The sketchbook (docs/UX-SPEC.md §1, the About page): the logo sketches in a grid, each tile a
- * button that changes to another sketch, with Flip under them. The page sets the art once
- * with SketchSprite.astro, and motion.ts plays it once the island runs. The first render shows
- * the server's sketches, START's order, so hydration changes nothing.
+ * button that changes to another sketch, with Flip and Pause under them. The page sets the art
+ * once with SketchSprite.astro, and motion.ts plays it once the island runs. The first render
+ * shows the server's sketches, START's order, and Pause, so hydration changes nothing.
  */
 export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
   const grid = useRef<HTMLDivElement>(null);
   const live = useRef(settings);
   const player = useRef<SketchbookPlayer | null>(null);
   const [said, setSaid] = useState('');
+  const [paused, setPaused] = useState(false);
 
   // The play reads `live` at every change, so new settings apply to the next one.
   useLayoutEffect(() => {
@@ -98,7 +101,26 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
           </button>
         ))}
       </div>
-      <FlipButton particles={settings.tuning.particles} onFlip={() => player.current?.flip()} />
+      {/* Flip stays centered under the tiles, Pause beside it on the right. */}
+      <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <div className="col-start-2">
+          <FlipButton particles={settings.tuning.particles} onFlip={() => player.current?.flip()} />
+        </div>
+        {/* Under reduced motion nothing changes by itself, so there is nothing to pause. */}
+        <Button
+          variant="ghost"
+          square
+          className="justify-self-start motion-reduce:hidden"
+          aria-label={paused ? 'Play' : 'Pause'}
+          title={paused ? 'Play' : 'Pause'}
+          onClick={() => {
+            player.current?.pause(!paused);
+            setPaused(!paused);
+          }}
+        >
+          {paused ? <PlayIcon /> : <PauseIcon />}
+        </Button>
+      </div>
       <p role="status" className="sr-only">
         {said}
       </p>

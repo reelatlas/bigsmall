@@ -15,7 +15,7 @@ import {
 import { track } from '../../lib/analytics';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
-import { cx, GROUP_TITLE, ROW_RULE } from '../../lib/recipes';
+import { COUNT, cx, GROUP_TITLE, ROW_RULE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
@@ -248,7 +248,7 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
           pointer={pointerProps('unhide')}
         >
           Show custom hidden units
-          {hiddenCount > 0 && <span className="font-numeric font-normal">{hiddenCount}</span>}
+          {hiddenCount > 0 && <span className={COUNT}>{hiddenCount}</span>}
         </Reset>
         <Reset
           off={!orderChanged(settings, preference)}

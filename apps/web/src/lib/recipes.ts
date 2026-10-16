@@ -36,6 +36,9 @@ export const PANEL_TITLE = 'text-sm font-medium text-ink-muted';
 /** A group's title, a step smaller: Units' and Display's legends, the matches' groups. */
 export const GROUP_TITLE = 'text-xs font-medium text-ink-muted';
 
+/** A count beside a label (Hidden's, Units' reset, the matches' groups): its digits at the regular weight. */
+export const COUNT = 'font-numeric font-normal';
+
 /** A line over a row or a foot that fills, 4 px from it; each use sets its own margin. */
 export const ROW_RULE = 'border-t border-line pt-1';
 

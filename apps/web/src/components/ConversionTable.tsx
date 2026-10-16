@@ -21,6 +21,7 @@ import { panelKeys } from '../lib/panel-keys';
 import {
   CHECKBOX,
   CHOICE_FILL,
+  COUNT,
   CURSOR_ROW,
   cx,
   LIST_CARD,
@@ -888,7 +889,7 @@ export function ConversionTable<T extends ConversionRow>({
                 {/* The word and its count on one baseline, as the matches' headers; the icon centred. */}
                 <span className="flex items-baseline gap-1.5">
                   Hidden
-                  <span className="font-numeric font-normal">{hiddenCount}</span>
+                  <span className={COUNT}>{hiddenCount}</span>
                 </span>
               </button>
             ) : (

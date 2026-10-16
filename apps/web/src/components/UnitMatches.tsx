@@ -2,6 +2,7 @@ import type { Category, CategoryId, Unit } from '@bigsmall/core';
 import { useId, useLayoutEffect, useRef } from 'react';
 import { panelKeys } from '../lib/panel-keys';
 import {
+  COUNT,
   CURSOR_ROW,
   cx,
   GROUP_TITLE,
@@ -152,7 +153,7 @@ export function UnitMatches({
                       <span className="text-ink">{group.category.name}</span>
                       {/* The group's name is its category alone; each option says its category too. */}
                       {count > 0 && (
-                        <span aria-hidden="true" className="font-numeric">
+                        <span aria-hidden="true" className={COUNT}>
                           {count}
                         </span>
                       )}

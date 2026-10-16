@@ -1,5 +1,5 @@
 ---
-import { PANEL_TITLE, SHELL, SHELL_PANEL } from '../lib/recipes';
+import { PANEL_TITLE, ROW_RULE, SHELL, SHELL_PANEL } from '../lib/recipes';
 import { SHORTCUTS } from '../lib/shortcuts';
 import { Button } from './Button';
 import { KeyboardIcon } from './icons';
@@ -33,8 +33,8 @@ const titleId = 'shortcuts-title';
  * until then). The inline script in layouts/Base.astro drives it, so it adds no bundle; Button
  * and the icon are TSX components rendered to static HTML. Hidden on touch-first devices, which
  * have no keyboard to use, and in a header narrower than its container `xl` size (576 px; the
- * header is an @container, PageHeader), where a panel growing left from beside the
- * theme menu would run off the screen. The list itself lives in src/lib/shortcuts.ts.
+ * header is an @container, PageHeader), where a panel growing left from beside the theme menu
+ * would run off the screen. The list itself lives in src/lib/shortcuts.ts.
  */
 ---
 
@@ -68,7 +68,7 @@ const titleId = 'shortcuts-title';
           <div
             class:list={[
               'flex min-h-8 items-center justify-between gap-3',
-              shortcut.startsGroup && 'mt-1 border-t border-line pt-1',
+              shortcut.startsGroup && ['mt-1', ROW_RULE],
             ]}
             data-starts-group={shortcut.startsGroup || undefined}
           >

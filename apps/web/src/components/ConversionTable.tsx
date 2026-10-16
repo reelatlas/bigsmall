@@ -26,7 +26,9 @@ import {
   LIST_CARD,
   NO_ANSWER,
   PANEL_TITLE,
+  ROW_RULE,
   rowFill,
+  unitName,
   unitSymbol,
 } from '../lib/recipes';
 import { Button } from './Button';
@@ -166,7 +168,7 @@ const SECOND_CELL = 'min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric w
  */
 const STACKED_WHOLE_CELL = 'col-start-1 text-right text-sm font-numeric whitespace-nowrap';
 const STACKED_PART_CELL = 'col-start-2 pr-2 pl-1 text-sm font-numeric whitespace-nowrap';
-const SYMBOL_CELL = cx('col-start-5 pl-2 text-right whitespace-nowrap', unitSymbol());
+const SYMBOL_CELL = cx('col-start-5 pl-2 text-right', unitSymbol());
 const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
 const HEADING = cx(PANEL_TITLE, 'px-2 pb-1');
 const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
@@ -181,7 +183,7 @@ const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
  * line, so the two never touch.
  */
 function sectionEdge(at: number, kind: 'heading' | 'row'): string {
-  if (kind === 'row') return at === 0 ? '' : 'mt-1 border-t border-line pt-1';
+  if (kind === 'row') return at === 0 ? '' : cx('mt-1', ROW_RULE);
   return at === 0 ? 'pt-3' : 'mt-0.5 border-t border-line pt-3.5';
 }
 
@@ -463,7 +465,7 @@ export function ConversionTable<T extends ConversionRow>({
         <span aria-hidden="true" className={cx(SYMBOL_CELL, tall)} data-symbol>
           {base}
         </span>
-        <span aria-hidden="true" className={cx('whitespace-nowrap', unitSymbol(), tall)}>
+        <span aria-hidden="true" className={cx(unitSymbol(), tall)}>
           {exponent}
         </span>
         <span className="sr-only">{row.symbol}</span>
@@ -555,7 +557,7 @@ export function ConversionTable<T extends ConversionRow>({
       <span className={cx(SYMBOL_CELL, 'row-start-1')}>
         {stack((row) => splitExponent(row.symbol)[0])}
       </span>
-      <span className={cx('col-start-6 row-start-1 whitespace-nowrap', unitSymbol())}>
+      <span className={cx('col-start-6 row-start-1', unitSymbol())}>
         {stack((row) => splitExponent(row.symbol)[1])}
       </span>
       {withNames && (
@@ -716,8 +718,8 @@ export function ConversionTable<T extends ConversionRow>({
     >
       {checkbox(row, list === 'shown', list)}
       {/* The symbol on one line and a long name wrapping, as the matches write them, never cut short. */}
-      <span className={cx('whitespace-nowrap', unitSymbol())}>{row.symbol}</span>
-      <span className={withNames ? 'min-w-0 text-ink' : 'sr-only'}>{row.name}</span>
+      <span className={unitSymbol()}>{row.symbol}</span>
+      <span className={unitName(withNames)}>{row.name}</span>
     </label>
   );
 
@@ -860,7 +862,8 @@ export function ConversionTable<T extends ConversionRow>({
         {!message && (
           <div
             className={cx(
-              'mt-1 flex min-h-11 items-center justify-between gap-2 border-t border-line pt-1',
+              ROW_RULE,
+              'mt-1 flex min-h-11 items-center justify-between gap-2',
               editing && 'sticky bottom-0 bg-surface',
             )}
             data-table-foot

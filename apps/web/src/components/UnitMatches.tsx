@@ -1,7 +1,16 @@
 import type { Category, CategoryId, Unit } from '@bigsmall/core';
 import { useId, useLayoutEffect, useRef } from 'react';
 import { panelKeys } from '../lib/panel-keys';
-import { CURSOR_ROW, cx, LIST_CARD, rowFill, unitSymbol } from '../lib/recipes';
+import {
+  CURSOR_ROW,
+  cx,
+  GROUP_TITLE,
+  LIST_CARD,
+  ROW_RULE,
+  rowFill,
+  unitName,
+  unitSymbol,
+} from '../lib/recipes';
 import { Button } from './Button';
 import { MatchedText } from './MatchedText';
 
@@ -104,10 +113,10 @@ export function UnitMatches({
   /** A unit's symbol and name, as every match writes them; the name for screen readers alone with Symbol only. */
   const unitText = (unit: Unit) => (
     <>
-      <span className={cx('whitespace-nowrap', unitSymbol())}>
+      <span className={unitSymbol()}>
         <MatchedText text={unit.symbol} query={query} className="text-ink" />
       </span>
-      <span className={symbolOnly ? 'sr-only' : 'min-w-0 text-ink'}>
+      <span className={unitName(!symbolOnly)}>
         <MatchedText text={unit.plural} query={query} className="font-semibold" />
       </span>
     </>
@@ -135,7 +144,8 @@ export function UnitMatches({
                     <div
                       id={headerId}
                       className={cx(
-                        'col-span-2 flex items-baseline gap-1.5 px-2 pb-1 text-xs font-medium text-ink-muted',
+                        GROUP_TITLE,
+                        'col-span-2 flex items-baseline gap-1.5 px-2 pb-1',
                         groupIndex === 0 ? 'pt-1' : 'mt-1.5 border-t border-line pt-2',
                       )}
                     >
@@ -200,7 +210,7 @@ export function UnitMatches({
             <div
               className={cx(
                 'col-span-2 flex min-h-11 items-center justify-between gap-2',
-                matches.length > 0 && 'mt-1.5 border-t border-line pt-1',
+                matches.length > 0 && cx('mt-1.5', ROW_RULE),
               )}
             >
               <span id={lineId} className="px-2 text-sm text-ink-muted">
@@ -251,13 +261,13 @@ export function UnitMatches({
                       rowFill(false, index === cursor),
                     )}
                   >
-                    <span className={cx('whitespace-nowrap', unitSymbol())}>
+                    <span className={unitSymbol()}>
                       <MatchedText text={match.unit.symbol} query={query} className="text-ink" />
                     </span>
                     {/* Where the name and its category share no line, the category goes under
                         it: the name is never cut short. */}
                     <span className="flex min-w-0 flex-wrap items-baseline gap-x-2">
-                      <span className={symbolOnly ? 'sr-only' : 'min-w-0 text-ink'}>
+                      <span className={unitName(!symbolOnly)}>
                         <MatchedText
                           text={match.unit.plural}
                           query={query}

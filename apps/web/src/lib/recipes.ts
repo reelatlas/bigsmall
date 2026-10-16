@@ -33,6 +33,12 @@ export const LIST_CARD = 'rounded-lg border-2 border-edge bg-surface';
  */
 export const PANEL_TITLE = 'text-sm font-medium text-ink-muted';
 
+/** A group's title, a step smaller: Units' and Display's legends, the matches' groups. */
+export const GROUP_TITLE = 'text-xs font-medium text-ink-muted';
+
+/** A line over a row or a foot that fills, 4 px from it; each use sets its own margin. */
+export const ROW_RULE = 'border-t border-line pt-1';
+
 /**
  * A side panel while focus is inside it, where the keys go (the calculator, Settings' Units and
  * Display): its edge turns accent, 2 px like a focused box (its 1 px border and a 1 px ring, so
@@ -164,10 +170,16 @@ export const FIELD_ROW = 'flex h-15 items-center gap-2 pr-2 pl-4';
 
 /**
  * A unit's symbol, wherever it shows (the chip, the lists, the table, the matches): semibold in
- * equal-width digits, muted beside its name, in ink when it stands alone (a collapsed chip).
+ * equal-width digits, on one line, muted beside its name, in ink when it stands alone (a collapsed
+ * chip).
  */
 export function unitSymbol(alone = false): string {
-  return cx('font-numeric font-semibold', alone ? 'text-ink' : 'text-ink-muted');
+  return cx('font-numeric font-semibold whitespace-nowrap', alone ? 'text-ink' : 'text-ink-muted');
+}
+
+/** A unit's name beside its symbol: in the ink, or kept for screen readers alone (Symbol only). */
+export function unitName(shown: boolean): string {
+  return shown ? 'min-w-0 text-ink' : 'sr-only';
 }
 
 /**

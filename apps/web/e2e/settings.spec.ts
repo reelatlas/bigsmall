@@ -651,7 +651,8 @@ test("where Both's fraction has no room beside the decimal, it sits under it, li
   expect(Math.round((await ounce.boundingBox())!.height)).toBe(44);
   await expectNoA11yViolations(page);
   // In every theme, whose figures differ in width (monospace, serif), the rule holds where the
-  // fraction falls: beside the decimal and whole, or under it on the point; the row keeps its height.
+  // fraction falls: beside the decimal and whole, or under it on the point; the row keeps its
+  // height.
   const beside = ounce.locator('[data-column="second"]');
   for (const theme of THEMES) {
     await applyTheme(page, theme);

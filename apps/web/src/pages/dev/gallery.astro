@@ -18,6 +18,7 @@ import { Keycap } from '../../components/Keycap';
 import { FieldSamples } from './_gallery/FieldSamples';
 import { SettingSamples } from './_gallery/SettingSamples';
 import DevPage from '../../layouts/DevPage.astro';
+import { LINK, QUIET_LINK } from '../../lib/recipes';
 import { THEMES, TOKEN_CONTRACT } from '../../lib/themes';
 
 // Every component in every theme, in the variants and states that ship, for visual QA
@@ -127,6 +128,15 @@ const swatches = TOKEN_CONTRACT.colors;
             <Keycap label="Shift" />
             <Keycap label="Z" />
           </span>
+        </div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-x-6">
+          <a href="/" class={LINK}>
+            Go to the converter
+          </a>
+          <a href="/about/" class:list={[QUIET_LINK, 'text-sm']}>
+            About
+          </a>
         </div>
       </section>
     ))}

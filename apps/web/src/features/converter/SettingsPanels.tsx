@@ -15,7 +15,7 @@ import {
 import { track } from '../../lib/analytics';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
-import { cx } from '../../lib/recipes';
+import { cx, GROUP_TITLE, ROW_RULE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
@@ -33,15 +33,6 @@ import {
   type ViewRule,
 } from './settings';
 import { SystemRows } from './SystemRows';
-
-/** A choice's legend: a panel title's muted ink, a size smaller. */
-const SUBHEAD = 'text-xs font-medium text-ink-muted';
-
-/**
- * A panel's foot, its resets under a line, 4 px between the line and a reset's fill
- * (docs/DESIGN-SYSTEM.md, "Sections and dividers, by what shows").
- */
-const PANEL_FOOT = 'border-t border-line pt-1';
 
 /** The two strips of sizes, from the least fine to the finest, as the places run: 1/2 to 1/8, then 1/16 on. */
 const SIZE_ROWS: ReadonlyArray<readonly FractionSize[]> = [
@@ -94,7 +85,7 @@ function Choices<T extends string | number>({
   const name = useId();
   return (
     <fieldset disabled={disabled} className="grid">
-      <legend className={hideLegend ? 'sr-only' : SUBHEAD}>{legend}</legend>
+      <legend className={hideLegend ? 'sr-only' : GROUP_TITLE}>{legend}</legend>
       <SegmentedControl
         name={name}
         options={options}
@@ -109,7 +100,10 @@ function Choices<T extends string | number>({
   );
 }
 
-/** Fractions in the sizes chosen, each on or off by itself; the line under them says what they write. */
+/**
+ * Fractions in the sizes chosen, each on or off by itself; the line under them says what they
+ * write.
+ */
 function FractionSizes({
   legend,
   chosen,
@@ -127,7 +121,7 @@ function FractionSizes({
   };
   return (
     <fieldset className="grid">
-      <legend className={SUBHEAD}>{legend}</legend>
+      <legend className={GROUP_TITLE}>{legend}</legend>
       {SIZE_ROWS.map((sizes) => (
         <SegmentedToggles<FractionSize>
           key={sizes.join()}
@@ -243,9 +237,7 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
       </fieldset>
       {/* Its line sits evenly between the last system's ink and the resets', as every divider
           does: the rows' 44 px leave their ink 12 px inside, so the line comes up past the gap. */}
-      <div
-        className={cx(PANEL_FOOT, '-mt-1.5 flex flex-wrap items-center justify-between gap-x-2')}
-      >
+      <div className={cx(ROW_RULE, '-mt-1.5 flex flex-wrap items-center justify-between gap-x-2')}>
         <Reset
           off={hiddenCount === 0}
           done={done === 'unhide'}
@@ -347,7 +339,7 @@ export function DisplayPanel({
           onChange={(fractions) => setDisplay({ fractions })}
         />
       )}
-      <div className={PANEL_FOOT}>
+      <div className={ROW_RULE}>
         <Reset
           off={!displayChanged(display)}
           done={done === 'reset'}

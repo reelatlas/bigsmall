@@ -22,7 +22,8 @@ const RAW_VALUES = [
     message: 'Tailwind palette color. Use a color token; the palette does not follow the theme.',
   },
   {
-    // A color token with an opacity modifier (bg-surface/40); \x2F is the slash a pattern cannot hold.
+    // A color token with an opacity modifier (bg-surface/40); \x2F is the slash a pattern cannot
+    // hold.
     pattern: String.raw`\b(?:bg|text|border|outline|ring|fill|stroke|caret|accent|decoration|divide|placeholder|from|via|to|shadow)-(?:canvas|surface(?:-raised)?|ink(?:-muted)?|accent(?:-soft(?:-hover)?)?|on-accent|line|edge|focus|danger|success|art-[1-3])\x2F`,
     message:
       'See-through color. Work it out once from the theme as a derived color in the bridge (DERIVED_COLORS in src/lib/themes.ts), or use a color token.',

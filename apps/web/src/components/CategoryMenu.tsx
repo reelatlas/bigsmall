@@ -51,6 +51,8 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   const [reached, setReached] = useState<CategoryId | null>(value);
   const rootRef = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  /** Opened by a click or a tap, not by Enter or Space (a click with no pointer, detail 0). */
+  const openedByPointer = useRef(false);
   const chosenName = categories.find((category) => category.id === value)?.name;
 
   const choose = (id: CategoryId) => {
@@ -61,14 +63,18 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
     if (rootRef.current?.contains(document.activeElement)) trigger.current?.focus();
   };
 
-  // Opening moves focus onto the chosen category, or the first, as the theme menu does.
+  // Opening moves focus onto the chosen category, or the first, as the theme menu does, without
+  // moving the page: a click or a tap leaves it where it was, even with the choice below the
+  // window's edge, and from the keyboard the choice comes into view, as little as it takes (Sean,
+  // 2026-10-16: the page jumped to a category low in the list).
   useLayoutEffect(() => {
     if (!open) return;
     const root = rootRef.current;
-    (
+    const choice =
       root?.querySelector<HTMLInputElement>('input:checked') ??
-      root?.querySelector<HTMLInputElement>('input')
-    )?.focus();
+      root?.querySelector<HTMLInputElement>('input');
+    choice?.focus({ preventScroll: true });
+    if (!openedByPointer.current) choice?.scrollIntoView({ block: 'nearest' });
   }, [open]);
 
   // While open: a click outside closes it; Enter chooses the choice reached and Escape closes it
@@ -144,7 +150,8 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           data-tool={tool}
           aria-expanded={open}
           aria-controls={menuId}
-          onClick={() => {
+          onClick={(event) => {
+            openedByPointer.current = event.detail > 0;
             setReached(value);
             setOpen((now) => !now);
           }}

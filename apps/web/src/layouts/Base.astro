@@ -187,7 +187,11 @@ const structured =
           const open = !shell.hasAttribute('data-open');
           closeAll(shell);
           setOpen(shell, open);
-          if (open) shell.querySelector('[data-shell-initial]:checked')?.focus();
+          // Focus goes to the choice without moving the page; from the keyboard (a click with no
+          // pointer, detail 0) it comes into view, as little as it takes, as the category menu's.
+          const choice = open ? shell.querySelector('[data-shell-initial]:checked') : null;
+          choice?.focus({ preventScroll: true });
+          if (event.detail === 0) choice?.scrollIntoView({ block: 'nearest' });
           return;
         }
         if (!target?.closest('[data-shell]')) closeAll();

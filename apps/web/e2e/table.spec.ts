@@ -242,6 +242,30 @@ test('a typed category name opens the category with no unit chosen, and the menu
   await expect(page.getByRole('radio', { name: /^Length/ })).toBeChecked();
 });
 
+test('opening the category menu leaves the page where it was; the keyboard brings the choice into view', async ({
+  page,
+  isMobile,
+}) => {
+  // A window short enough that Torque, near the list's end, opens below its edge.
+  await page.setViewportSize({ width: page.viewportSize()?.width ?? 1280, height: 600 });
+  await page.goto('/?a=pound-foot&v=80');
+  await ready(page);
+  const torque = page.getByRole('radio', { name: 'Torque' });
+  await menu(page).click();
+  await expect(torque).toBeFocused();
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+  if (isMobile) return;
+  await page.keyboard.press('Escape');
+  await expect(menu(page)).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(torque).toBeFocused();
+  // The radio itself is visually hidden; the choice people see is its label.
+  const label = page
+    .getByRole('group', { name: 'Category' })
+    .locator('label', { hasText: 'Torque' });
+  await expect(label).toBeInViewport();
+});
+
 test('the category menu: the arrows move without choosing, Enter chooses, Escape closes', async ({
   page,
   isMobile,

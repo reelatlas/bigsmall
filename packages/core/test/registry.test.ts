@@ -74,7 +74,7 @@ describe('registry integrity', () => {
     }
   });
 
-  it('linear and affine factors are positive finite numbers', () => {
+  it('linear, affine, and reciprocal factors are positive finite numbers', () => {
     for (const u of units) {
       if (u.kind === 'functional') continue;
       expect(Number.isFinite(u.factor), `${u.id} factor`).toBe(true);

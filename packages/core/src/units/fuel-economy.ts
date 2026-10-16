@@ -30,7 +30,7 @@ const PER_100_MI_KM_PER_L = (100 * MILE_KM) / US_GALLON_L;
  */
 export const fuelEconomyUnits: readonly Unit[] = [
   {
-    kind: 'functional',
+    kind: 'reciprocal',
     id: 'liter-per-100-kilometers',
     category: 'fuel-economy',
     name: 'liter per 100 kilometers',
@@ -45,8 +45,7 @@ export const fuelEconomyUnits: readonly Unit[] = [
     ],
     system: 'metric',
     tier: 'basic',
-    toBase: (value) => 100 / value,
-    fromBase: (value) => 100 / value,
+    factor: 100,
     exact: true,
     source: PER_100_KM,
     note: 'Fuel used over 100 km, so lower is more economical.',
@@ -104,7 +103,7 @@ export const fuelEconomyUnits: readonly Unit[] = [
     note: 'Miles per imperial gallon (4.54609 L), about a fifth larger than the US gallon.',
   },
   {
-    kind: 'functional',
+    kind: 'reciprocal',
     id: 'us-gallon-per-100-miles',
     category: 'fuel-economy',
     name: 'US gallon per 100 miles',
@@ -113,8 +112,7 @@ export const fuelEconomyUnits: readonly Unit[] = [
     aliases: ['gallons per 100 miles', 'gallon per 100 miles', 'gal per 100 mi'],
     system: 'us',
     tier: 'advanced',
-    toBase: (value) => PER_100_MI_KM_PER_L / value,
-    fromBase: (value) => PER_100_MI_KM_PER_L / value,
+    factor: PER_100_MI_KM_PER_L,
     exact: true,
     source: PER_100_MI,
     note: 'Fuel used over 100 miles, as US fuel economy labels also give it.',

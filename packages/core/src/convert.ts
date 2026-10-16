@@ -20,6 +20,8 @@ export function toBase(unit: Unit, value: number): number {
       return value * unit.factor;
     case 'affine':
       return (value + unit.offset) * unit.factor;
+    case 'reciprocal':
+      return unit.factor / value;
     case 'functional':
       return unit.toBase(value);
   }
@@ -32,6 +34,8 @@ export function fromBase(unit: Unit, value: number): number {
       return value / unit.factor;
     case 'affine':
       return value / unit.factor - unit.offset;
+    case 'reciprocal':
+      return unit.factor / value;
     case 'functional':
       return unit.fromBase(value);
   }

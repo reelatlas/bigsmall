@@ -1,5 +1,6 @@
 ---
 import PageHeader from '../components/PageHeader.astro';
+import Formulas from '../features/formulas/Formulas.astro';
 import SketchSprite from '../features/sketchbook/SketchSprite.astro';
 import { Sketchbook } from '../features/sketchbook/Sketchbook';
 import Base from '../layouts/Base.astro';
@@ -7,15 +8,15 @@ import { PAGE_MAIN } from '../lib/recipes';
 import { SITE } from '../lib/site';
 
 /*
- * The About page (docs/UX-SPEC.md §1), reached from the footer. For now it holds only the
- * sketchbook, centered (Sean, 2026-10-15): the logo sketches at play, as tuned in
- * /dev/sketchbook-lab. What bigsmall is, its sources, the privacy line, and feedback may follow.
+ * The About page (docs/UX-SPEC.md §1), reached from the footer: the sketchbook, centered (Sean,
+ * 2026-10-15), the logo sketches at play as tuned in /dev/sketchbook-lab; then every formula the
+ * converter uses, with its source (Sean, 2026-10-16). The privacy line and feedback may follow.
  */
 ---
 
 <Base
   title={`About · ${SITE.name}`}
-  description="The bigsmall sketchbook: every sketch of its logo, each a big thing and a small one."
+  description="The bigsmall sketchbook and every formula and reference behind each calculation."
 >
   <main class={PAGE_MAIN}>
     <PageHeader />
@@ -26,5 +27,6 @@ import { SITE } from '../lib/site';
       <SketchSprite />
       <Sketchbook client:load />
     </section>
+    <Formulas />
   </main>
 </Base>

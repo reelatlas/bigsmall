@@ -90,11 +90,20 @@ export interface AffineUnit extends UnitMeta {
   offset: number;
 }
 
-/** Anything else, such as reciprocal units (fuel economy, pace). */
+/**
+ * base = factor ÷ value: a unit of the inverse quantity, fuel per distance against distance per
+ * fuel (L/100 km against km/L), or pace against speed. The same division goes both ways.
+ */
+export interface ReciprocalUnit extends UnitMeta {
+  kind: 'reciprocal';
+  factor: number;
+}
+
+/** Anything else: a pair of functions, for a relation no factor can say. */
 export interface FunctionalUnit extends UnitMeta {
   kind: 'functional';
   toBase(value: number): number;
   fromBase(value: number): number;
 }
 
-export type Unit = LinearUnit | AffineUnit | FunctionalUnit;
+export type Unit = LinearUnit | AffineUnit | ReciprocalUnit | FunctionalUnit;

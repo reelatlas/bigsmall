@@ -19,7 +19,7 @@ Alias decisions so far (each one changes the ranking, and so which row Enter tak
 
 ## 1. Coverage research
 
-Checked 2026-10-06 for coverage, which quantity types people expect. Since 2026-10-15 both are references used freely, their categories, units, and names included, and every factor is still checked on our own against §2's standards (ADR 0020).
+Checked 2026-10-06 for coverage, which quantity types people expect. Since 2026-10-15 both are references used freely, their categories, units, and names included, and every factor is still checked on our own against §2's standards (ADR 0020). Re-checked the same day against unitconverters.net's 80 or so converters: §3 already plans nearly all of them, and what to add next, in order, is docs/research/categories-1.md.
 
 - **unitconverters.net** groups roughly 80 converters into Common, Engineering, Heat, Fluids, Light, Electricity, Magnetism, Radiology, and Other.
 - **onlineconversion.com** lists about 30 categories and highlights a popular set: Fractions, Length, Temperature, Speed, Volume, Weight, Cooking, Area, Fuel Economy, Currency.

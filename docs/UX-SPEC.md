@@ -39,7 +39,7 @@ The box's text is parsed on every keystroke into `{ raw, value?, valueText?, que
 - one mark used more than once: grouping (`1,000,000`);
 - one mark used once: the locale's reading, unless the tail is not exactly three digits, which can only be a fraction (`1,5` is 1.5 even in en-US; `1,000` is a thousand in en-US and one in de-DE).
 
-Non-breaking spaces always group. Whitespace between the number and the unit is optional.
+Non-breaking spaces always group, and so does an apostrophe before a group of exactly three digits, as Swiss numbers are written (`1'234'567`), while `5'10` keeps its apostrophe for the unit. Digits in any script read as their values (`١٢٣`, `१२३`), as do fullwidth forms (`１２．５`), the Arabic decimal and group marks, and a locale's exponent written in letters; the marks Intl sets around a minus for a script's direction are passed over. So the box reads back every number the table writes, in any locale (the accuracy audit, 2026-10-15). Whitespace between the number and the unit is optional.
 
 A decimal mark still waiting for its digits belongs to the number (`5.` on the way to `5.5` is 5).
 

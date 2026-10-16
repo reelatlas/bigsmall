@@ -2,6 +2,8 @@
 export interface Separators {
   decimal: string;
   group: string;
+  /** How the locale writes an exponent, when not with an E: Arabic's "أس", Swedish "×10^". */
+  exponent?: string;
 }
 
 /** The separators used when a locale gives none: a period for decimals and a comma for grouping. */
@@ -16,7 +18,10 @@ export function localeSeparators(locale?: string): Separators {
     const parts = new Intl.NumberFormat(locale, { useGrouping: true }).formatToParts(1234567.5);
     const group = parts.find((p) => p.type === 'group')?.value ?? DEFAULT_SEPARATORS.group;
     const decimal = parts.find((p) => p.type === 'decimal')?.value ?? DEFAULT_SEPARATORS.decimal;
-    return { decimal, group };
+    const exponent = new Intl.NumberFormat(locale, { notation: 'scientific' })
+      .formatToParts(1e21)
+      .find((p) => p.type === 'exponentSeparator')?.value;
+    return exponent && exponent !== 'E' ? { decimal, group, exponent } : { decimal, group };
   } catch {
     return { ...DEFAULT_SEPARATORS };
   }

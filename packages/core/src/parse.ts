@@ -38,6 +38,18 @@ const NARROW_NBSP = String.fromCharCode(0x202f);
 const UNICODE_MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);
+const RIGHT_QUOTE = String.fromCharCode(0x2019);
+const ARABIC_DECIMAL = String.fromCharCode(0x066b);
+const ARABIC_GROUP = String.fromCharCode(0x066c);
+/** The marks that set a run's direction, which Intl writes around a minus sign in some scripts. */
+const DIRECTION_MARKS = new Set([0x200e, 0x200f, 0x061c].map((code) => String.fromCharCode(code)));
+
+/** Fullwidth forms, as a Japanese or Chinese keyboard types them, sit this far above ASCII. */
+const FULLWIDTH = { first: 0xff01, last: 0xff5e, offset: 0xfee0 } as const;
+const DECIMAL_DIGIT = /\p{Nd}/u;
+const LETTERS = /^\p{L}+$/u;
+/** An apostrophe between a digit and a group of exactly three: grouping, as Swiss numbers write. */
+const GROUPING_APOSTROPHE = new RegExp(`([0-9])['${RIGHT_QUOTE}](?=[0-9]{3}(?![0-9]))`, 'g');
 
 type Operator = 'add' | 'subtract' | 'multiply' | 'divide' | 'power';
 
@@ -90,14 +102,19 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
   const trimmed = text.trim();
   if (!trimmed) return { raw: text };
 
-  const scanned = scan(trimmed, separators);
+  // Scanned in a readable copy, mapped back to the typed text, so the number and the query keep
+  // the characters that were typed.
+  const read = readable(trimmed, separators.exponent);
+  const marked = readableSeparators(separators);
+  const scanned = scan(read.text, marked);
   if (!scanned) return { raw: text, query: trimmed };
 
-  const result: ParsedInput = { raw: text, valueText: trimmed.slice(0, scanned.end) };
+  const end = read.at[scanned.end] ?? trimmed.length;
+  const result: ParsedInput = { raw: text, valueText: trimmed.slice(0, end) };
   const numbers = scanned.tokens.filter((token): token is NumberToken => token.kind === 'number');
   const marks = numbers.flatMap((token) => {
     const at = token.text.search(EXPONENT_MARK);
-    return at >= 0 ? [token.start + at] : [];
+    return at >= 0 ? [read.at[token.start + at] ?? token.start + at] : [];
   });
   if (marks.length > 0) result.exponentMarks = marks;
 
@@ -117,10 +134,10 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
   const [only] = numbers;
   if (result.value !== undefined && !result.expression && only && numbers.length === 1) {
     const signs = scanned.tokens.filter((token) => token.kind === 'sign' && token.negative);
-    result.canonical = `${signs.length % 2 === 1 ? '-' : ''}${canonicalNumber(only.text, separators)}`;
+    result.canonical = `${signs.length % 2 === 1 ? '-' : ''}${canonicalNumber(only.text, marked)}`;
   }
 
-  const rest = trimmed.slice(scanned.end).trim();
+  const rest = trimmed.slice(end).trim();
   if (rest) result.query = rest;
   return result;
 }
@@ -187,6 +204,68 @@ function scan(text: string, separators: Separators): { tokens: Token[]; end: num
   }
 
   return tokens.some((token) => token.kind === 'number') ? { tokens, end } : null;
+}
+
+/** A readable copy of typed text, and where each of its characters was typed. */
+interface Readable {
+  text: string;
+  /** The typed index of each character of `text`, then the typed text's length. */
+  at: number[];
+}
+
+/**
+ * The text as the scanner reads it, each character mapped back to where it was typed: any
+ * script's digits as ASCII (١٢٣ and १२३ are 123), fullwidth forms as ASCII (１２．５ is 12.5), the
+ * Arabic decimal and group marks as a period and a comma, direction marks dropped, a locale's
+ * exponent written in letters (Arabic's أس) as E, and an apostrophe between digit groups of three
+ * as grouping (1'234'567), while 5'10 keeps its own.
+ */
+function readable(typed: string, exponent: string | undefined): Readable {
+  let text = '';
+  const at: number[] = [];
+  let index = 0;
+  for (const char of typed) {
+    const read = DIRECTION_MARKS.has(char) ? '' : readableChar(char);
+    for (let unit = 0; unit < read.length; unit += 1) at.push(index + unit);
+    text += read;
+    index += char.length;
+  }
+  at.push(typed.length);
+  if (exponent && exponent.toUpperCase() !== 'E' && LETTERS.test(exponent)) {
+    for (let from = text.indexOf(exponent); from >= 0; from = text.indexOf(exponent, from + 1)) {
+      if (from === 0 || !/[0-9.,]/.test(text[from - 1] ?? '')) continue;
+      text = `${text.slice(0, from)}E${text.slice(from + exponent.length)}`;
+      at.splice(from + 1, exponent.length - 1);
+    }
+  }
+  text = text.replace(GROUPING_APOSTROPHE, (_, digit: string) => `${digit}${NARROW_NBSP}`);
+  return { text, at };
+}
+
+function readableChar(char: string): string {
+  const code = char.charCodeAt(0);
+  // A character outside the basic plane is two units long, and stays as typed to keep the length.
+  if (code < 0x80 || char.length > 1) return char;
+  if (code >= FULLWIDTH.first && code <= FULLWIDTH.last) {
+    return String.fromCharCode(code - FULLWIDTH.offset);
+  }
+  if (char === ARABIC_DECIMAL) return '.';
+  if (char === ARABIC_GROUP) return ',';
+  return DECIMAL_DIGIT.test(char) ? String(digitValue(code)) : char;
+}
+
+/** A decimal digit's value: how far it sits from the zero that starts its run of ten. */
+function digitValue(code: number): number {
+  let zero = code;
+  while (DECIMAL_DIGIT.test(String.fromCharCode(zero - 1))) zero -= 1;
+  return (code - zero) % 10;
+}
+
+/** The locale's marks as readable() writes them: the Arabic ones as a period and a comma. */
+function readableSeparators(separators: Separators): Separators {
+  const read = (mark: string) =>
+    mark === ARABIC_DECIMAL ? '.' : mark === ARABIC_GROUP ? ',' : mark;
+  return { decimal: read(separators.decimal), group: read(separators.group) };
 }
 
 function skipSpace(text: string, from: number): number {

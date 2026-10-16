@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { localeSeparators, parse } from '../src/index';
+import { formatNumber, localeSeparators, parse } from '../src/index';
 import type { Separators } from '../src/index';
 
 const EN: Separators = { decimal: '.', group: ',' };
@@ -133,6 +133,69 @@ describe('localeSeparators', () => {
   it('round-trips with parse', () => {
     const de = localeSeparators('de-DE');
     expect(parse('1.234,5 km', de).value).toBe(1234.5);
+  });
+
+  it('reads back every number Intl writes, in any locale and script', () => {
+    // A row's value goes into the box as the table writes it, so the box must read whatever Intl
+    // writes: Swiss apostrophes, Indian grouping, other scripts' digits, the direction marks
+    // around a minus, and exponents written in letters or as ×10^.
+    const locales = [
+      'en-US',
+      'de-DE',
+      'fr-FR',
+      'sv-SE',
+      'de-CH',
+      'fr-CH',
+      'it-CH',
+      'en-IN',
+      'ja-JP',
+    ];
+    const scripts = [
+      'ar-EG',
+      'ar-MA',
+      'fa-IR',
+      'ps-AF',
+      'ckb-IQ',
+      'he-IL',
+      'ur-PK',
+      'bn-BD',
+      'mr-IN',
+      'my-MM',
+    ];
+    for (const locale of [...locales, ...scripts]) {
+      for (const value of [1234567.891, -1234.5, -0.5, 1e-7, -2.5e20, 0]) {
+        const written = formatNumber(value, { locale });
+        const parsed = parse(written, localeSeparators(locale));
+        expect(parsed.value, `${locale}: ${written}`).toBe(value);
+        expect(parsed.query, `${locale}: ${written}`).toBeUndefined();
+      }
+    }
+  });
+});
+
+const RIGHT_QUOTE = String.fromCharCode(0x2019);
+
+describe('parse in other scripts and conventions', () => {
+  it('reads an apostrophe as grouping only before a group of three', () => {
+    expect(parse(`1${RIGHT_QUOTE}234${RIGHT_QUOTE}567.891`).value).toBe(1234567.891);
+    expect(parse("12'345 ft")).toMatchObject({ value: 12345, query: 'ft' });
+    // Feet and inches keep their apostrophe for the query.
+    expect(parse(`5'10"`)).toMatchObject({ value: 5, query: `'10"` });
+  });
+
+  it('reads digits typed in any script, and fullwidth forms, keeping what was typed', () => {
+    expect(parse('١٢٣٫٥', localeSeparators('ar-EG'))).toMatchObject({
+      value: 123.5,
+      valueText: '١٢٣٫٥',
+      canonical: '123.5',
+    });
+    expect(parse('१२,३४,५६७.८९१ km')).toMatchObject({ value: 1234567.891, query: 'km' });
+    expect(parse('１２．５ ｋｍ')).toMatchObject({
+      value: 12.5,
+      valueText: '１２．５',
+      query: 'ｋｍ',
+    });
+    expect(parse('１０＋５').value).toBe(15);
   });
 });
 

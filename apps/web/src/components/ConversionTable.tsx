@@ -285,6 +285,8 @@ function valueParts(
   const text = written?.text ?? row.text;
   let at = text.indexOf(mark);
   if (at < 0) at = text.indexOf('E');
+  // A time's colon lines up as a decimal point does: a pace, 5:30 (mocked in /dev/categories-lab).
+  if (at < 0) at = text.indexOf(':');
   if (at < 0) at = text.length;
   return { text, whole: text.slice(0, at), decimals: text.slice(at) };
 }

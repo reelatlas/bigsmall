@@ -44,3 +44,4 @@ Behavior: docs/UX-SPEC.md §1, §8, §9, §12.
 
 - The selection lab retired once A shipped; it is in git as of commit `f1321b0` (`apps/web/src/pages/dev/_selection-lab/`).
 - Escape works from the page too, with nothing focused: it takes the ladder's clearing steps one a press (Sean, 2026-10-07). The cursor shows only while focus is in the converter, and an Escape that closes a header menu does only that (docs/UX-SPEC.md §9).
+- **2026-10-15 (the full tidy).** The three items left open have settled: clear all is built (docs/UX-SPEC.md §1); the URL holds the unit and the number, no category (docs/UX-SPEC.md §11); and the second box retired with the two-box layout (ADR 0013).

@@ -6,7 +6,7 @@ v0.3, 2026-10-15. Taxonomy, tiers, special-logic units, and verification sources
 
 Milestone 1 (2026-10-06): all eight primary categories ship their basic tier, 54 units, every one cited and covered by a golden test row. Base units: meter, kilogram, liter, kelvin, square meter, meter per second, second, byte.
 
-2026-10-08: Energy, Pressure, Power, and Angle join, 35 units with their specialist ones, every one cited and covered by a golden row (base units: joule, pascal, watt, radian). Fuel economy follows the same day, 5 units (base: kilometer per liter), its reciprocal units saying "Undefined for 0" where they have no value. With the modes dropped, the table lists every unit, the specialist ones after all the everyday ones (ADR 0016). The first eight categories gain their specialist units the same day, 36 more (nanometers to parsecs, micrograms to long tons, cubic meters and imperial measures to oil barrels, Rankine, square yards, nanoseconds, binary prefixes and bits).
+2026-10-08: Energy, Pressure, Power, and Angle join, 35 units with their specialist ones, every one cited and covered by a golden row (base units: joule, pascal, watt, radian). Fuel economy follows the same day, 5 units (base: kilometer per liter), its reciprocal units saying "Undefined for 0" where they have no value. With the modes dropped, the table lists every unit, the specialist ones after all the everyday ones (ADR 0016). The first eight categories gain their specialist units the same day, 36 more (nanometers to parsecs, micrograms to long tons, cubic meters and imperial measures to oil barrels, Rankine, square yards, nanoseconds, binary prefixes and bits), and Speed the speed of light.
 
 Alias decisions so far (each one changes the ranking, and so which row Enter takes; see docs/UX-SPEC.md §4 and §5):
 
@@ -37,7 +37,7 @@ Every factor is checked against these on our own, wherever it was found; a refer
 | BIPM SI Brochure, 9th edition (2019)                        | SI base and derived units, accepted non-SI units      |
 | International Yard and Pound Agreement (1959)               | 1 yd = 0.9144 m exactly; 1 lb = 0.45359237 kg exactly |
 | IEC 80000-13                                                | Binary prefixes (KiB, MiB) versus decimal (kB, MB)    |
-| NIST/NGS notice on the US survey foot (retired end of 2022) | Keep as a distinct advanced unit                      |
+| NIST/NGS notice on the US survey foot (retired end of 2022) | Left out: retired (ADR 0016)                          |
 
 Every unit record carries `source` and `exact`. Exact factors are written as the defining number, not a rounded decimal.
 
@@ -54,22 +54,22 @@ The categories that ship are marked ★: the first eight since milestone 1, and 
 
 The ★ rows ship with exactly these basic units, and the advanced column is what shipped (2026-10-08), with what was left out after "not:".
 
-| Category      | ★   | Basic units                                              | Advanced units (examples)                                                                                                                                                              |
-| ------------- | --- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Length        | ★   | mm, cm, m, km, in, ft, yd, mi                            | nm, µm, mil (thou), fathom, furlong, nautical mile, au, light-year, parsec; not: chain, ångström (its Å folds to "a" in search), US survey foot (retired), pica and point (typography) |
-| Weight (mass) | ★   | mg, g, kg, t (metric ton), oz, lb, st                    | µg, carat, grain, troy oz, short ton, long ton; not: slug, dalton, hundredweight                                                                                                       |
-| Volume        | ★   | mL, L, tsp, tbsp, fl oz, cup, pt, qt, gal                | m³, in³, ft³, yd³, UK fl oz, pint, and gallon, oil barrel; not: cm³ (mL's alias cc), UK quart, US dry measures, bushel, peck, board foot                                               |
-| Temperature   | ★   | °C, °F, K                                                | °R (Rankine)                                                                                                                                                                           |
-| Area          | ★   | cm², m², km², in², ft², acre, hectare, mi²               | yd²; not: are, barn, section, rood                                                                                                                                                     |
-| Speed         | ★   | m/s, km/h, mph, knot, ft/s                               | speed of light; not: km/s, cm/s, in/s, Mach (depends on the air's temperature), pace (min/km, min/mi; a reciprocal, held for its own design, docs/PLAN.md §2)                          |
-| Time          | ★   | ms, s, min, h, day, week, month, year                    | ns, µs; not: fortnight, decade, century, millennium, sidereal day and year, shake                                                                                                      |
-| Data          | ★   | bit, B, kB, MB, GB, TB                                   | PB, KiB, MiB, GiB, TiB, PiB, kbit, Mbit, Gbit; not: nibble                                                                                                                             |
-| Fuel economy  | ★   | mpg (US), mpg (UK), L/100 km, km/L                       | gal/100 mi (US); not: mi/L                                                                                                                                                             |
-| Energy        | ★   | J, kJ, cal, kcal, Wh, kWh, BTU                           | MJ, GJ, ft·lbf, therm (US), eV; not: erg, hp·h, ton of TNT                                                                                                                             |
-| Pressure      | ★   | Pa, kPa, bar, psi, atm, mmHg, inHg                       | hPa (millibar its alias), MPa; not: kgf/cm², ksi, torr, inH₂O                                                                                                                          |
-| Power         | ★   | W, kW, MW, hp (mechanical)                               | metric hp (PS), BTU/h, ton of refrigeration, GW; not: ft·lbf/s                                                                                                                         |
-| Angle         | ★   | °, rad, grad                                             | arcminute, arcsecond, revolution; not: NATO mil                                                                                                                                        |
-| Cooking       |     | (a lens over Volume and Weight, not a separate category) | ingredient-aware conversions later                                                                                                                                                     |
+| Category      | ★   | Basic units                                                           | Advanced units (examples)                                                                                                                                                              |
+| ------------- | --- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Length        | ★   | mm, cm, m, km, in, ft, yd, mi                                         | nm, µm, mil (thou), fathom, furlong, nautical mile, au, light-year, parsec; not: chain, ångström (its Å folds to "a" in search), US survey foot (retired), pica and point (typography) |
+| Weight (mass) | ★   | mg, g, kg, t (metric ton), oz, lb, st, short ton                      | µg, carat, grain, troy oz, long ton; not: slug, dalton, hundredweight                                                                                                                  |
+| Volume        | ★   | mL, L, tsp, tbsp, fl oz, cup, pt, qt, gal, UK fl oz, pint, and gallon | m³, in³, ft³, yd³, oil barrel; not: cm³ (mL's alias cc), UK quart, US dry measures, bushel, peck, board foot                                                                           |
+| Temperature   | ★   | °C, °F, K                                                             | °R (Rankine)                                                                                                                                                                           |
+| Area          | ★   | cm², m², km², in², ft², acre, hectare, mi²                            | yd²; not: are, barn, section, rood                                                                                                                                                     |
+| Speed         | ★   | m/s, km/h, mph, knot, ft/s                                            | speed of light; not: km/s, cm/s, in/s, Mach (depends on the air's temperature), pace (min/km, min/mi; a reciprocal, held for its own design, docs/PLAN.md §2)                          |
+| Time          | ★   | ms, s, min, h, day, week, month, year                                 | ns, µs; not: fortnight, decade, century, millennium, sidereal day and year, shake                                                                                                      |
+| Data          | ★   | bit, B, kB, MB, GB, TB                                                | PB, KiB, MiB, GiB, TiB, PiB, kbit, Mbit, Gbit; not: nibble                                                                                                                             |
+| Fuel economy  | ★   | mpg (US), mpg (UK), L/100 km, km/L                                    | gal/100 mi (US); not: mi/L                                                                                                                                                             |
+| Energy        | ★   | J, kJ, cal, kcal, Wh, kWh, BTU                                        | MJ, GJ, ft·lbf, therm (US), eV; not: erg, hp·h, ton of TNT                                                                                                                             |
+| Pressure      | ★   | Pa, kPa, bar, psi, atm, mmHg, inHg                                    | hPa (millibar its alias), MPa; not: kgf/cm², ksi, torr, inH₂O                                                                                                                          |
+| Power         | ★   | W, kW, MW, hp (mechanical)                                            | metric hp (PS), BTU/h, ton of refrigeration, GW; not: ft·lbf/s                                                                                                                         |
+| Angle         | ★   | °, rad, grad                                                          | arcminute, arcsecond, revolution; not: NATO mil                                                                                                                                        |
+| Cooking       |     | (a lens over Volume and Weight, not a separate category)              | ingredient-aware conversions later                                                                                                                                                     |
 
 ### Group: mechanics (advanced)
 
@@ -139,7 +139,7 @@ No-match queries are the best signal for missing aliases. Log them (locally in d
 
 1. Create or open `packages/core/src/units/<category>.ts`. Write units most common first: lists order them by tier, by the visitor's system, and by size (ADR 0011, ADR 0016), and this order breaks ties and orders a category with no size (temperature).
 2. Add the unit with `id`, `category`, `name`, `plural`, `symbol`, `aliases`, `system`, `tier`, its `kind` with a `factor` (plus an `offset` when affine) or a function pair, `exact`, `source`, and a `note` when its definition has a variant.
-3. Add at least one golden row from the cited source in `packages/core/test/golden/<category>.ts`.
+3. Check the factor on our own against the standard that defines it, wherever it was found (§2, ADR 0020), and add at least one golden row from that standard in `packages/core/test/golden/<category>.ts`.
 4. Add the unit to this catalog under the right tier.
 5. If the unit introduces a definition choice (like cup), add it to the special-logic table.
 6. A new category also needs its id in `CategoryId` (`src/types.ts`), its file registered in `src/units/index.ts`, its golden file listed in `test/golden/index.ts`, and its id in the category lists of `test/registry.test.ts` and `test/search.test.ts`, all under `packages/core`.

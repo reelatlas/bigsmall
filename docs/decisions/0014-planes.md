@@ -1,7 +1,7 @@
 # 0014 — The arrow keys move between the page's planes
 
 Date: 2026-10-08
-Status: accepted. Amended 2026-10-15: the table's foot carries on the box's plane; later that day the page's ends became stops, ↑ and ↓ no longer going round (see "No wrapping at the edges")
+Status: accepted. Amended 2026-10-15: the table's foot carries on the box's plane; later that day the page's ends became stops, ↑ and ↓ no longer going round (see "No wrapping at the edges"), and the shortcuts map came to open on a click alone (see the amendments at the end)
 
 ## Context
 
@@ -35,3 +35,11 @@ The controller lives in the inline script of `layouts/Base.astro`, beside the he
 ## Amendment (2026-10-15): the table's foot carries on the box's plane
 
 Past the last row, ↓ went straight on to the header, so the arrows never reached the table's foot (Hidden and Edit, or Show them under the matches), only Tab did; Sean found Hidden out of the arrows' reach (2026-10-15). The foot now carries on the box's plane: past the last row ↓ lands on it, the cursor resting, ← and → move between Hidden and Edit, ↓ goes on through Hidden's lines while it is open, and past the last control on to the next plane as before; ↑ from the foot comes back to the box with the cursor on the last row. The foot stays a Tab stop, Escape on it goes back to the box, and Edit keeps every arrow for itself, Escape ending it (docs/UX-SPEC.md §3, §8). The table hands its edges back to the layout through `panelKeys`' `onEdge` (`src/lib/panel-keys.ts`).
+
+## Amendment (2026-10-15): the page's ends are stops
+
+↑ on the header and ↓ past the table's last control do nothing, where they went round the page before; a toolbar's ← and → still go round its one row (Sean found the jump from the foot to the header jarring; "No wrapping at the edges" above). The decision's "round from the box to the header" is replaced by this.
+
+## Amendment (2026-10-15): the shortcuts map opens on a click alone
+
+Neither the keyboard reaching its icon nor a resting mouse opens the map any more (Sean, 2026-10-15): a click, Enter, or Space does, and Escape or a second click closes it (docs/UX-SPEC.md §10). The decision's line on reaching the icon with the keyboard is replaced by this.

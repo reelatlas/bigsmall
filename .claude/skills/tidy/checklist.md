@@ -5,7 +5,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 ## Tokens and values
 
 - Colors, radii, shadows, fonts, and durations come only from token utilities (`bg-surface`, `rounded-nested`, `shadow-sm`, `font-numeric`, `duration-fast`). `pnpm lint` runs the token guard; it is never silenced.
-- No `style=` in components (only the gallery's swatches paint `var(--token)`). Search: `style=` in `apps/web/src`.
+- No `style=` in components (only the gallery's swatches paint `var(--token)`, and the sketchbook's tiles set their grid and the art's corner from its tuning). Search: `style=` in `apps/web/src`.
 - No arbitrary value that stands in for a scale step or a token. Search: `-\[` in `.tsx` and `.astro` files, then judge each: structure is allowed (`grid-cols-[auto_1fr]`, `transition-[border-color,box-shadow]`), values are not.
 - A delay is a named constant in `src/lib/timing.ts`, never a number of milliseconds.
 - A look no token expresses is a finding for Sean (reuse token X, or add token Y to every theme), never a raw value.
@@ -22,7 +22,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 ## Components and variants
 
 - Markup repeated in two places is a component in `src/components/`, or a prop or variant of one that exists. Extend before adding; never fork.
-- A component defined inside a page, a lab, or a feature file that the product uses moves to `src/components/`. Search: `^function [A-Z]` and `^export function [A-Z]` outside `src/components/`. Lab-only tools under `src/pages/dev/_<lab>/` stay there.
+- A component defined inside a page or a lab that the product uses, or one a second feature needs, moves to `src/components/`; a feature's own parts stay in `features/<name>/`. Search: `^function [A-Z]` and `^export function [A-Z]` outside `src/components/`. Lab-only tools under `src/pages/dev/_<lab>/` stay there.
 - Every component in `src/components/` has an inventory row in `DESIGN-SYSTEM.md` and a gallery sample (`src/pages/dev/gallery.astro` and its islands in `src/pages/dev/_gallery/`) in the states that ship.
 - Component rules (`DESIGN-SYSTEM.md`, "Component rules"): tokens only, keyboard-operable with visible focus, a name, 44 px targets, 320 px and 400 % zoom, reduced motion, what it branches on as a prop, ARIA written on the element, a labelled container with a role.
 - A prop, option, or variant that no caller uses anymore is dead code (below).
@@ -46,7 +46,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - Every keyboard shortcut agrees everywhere it is named: the handler, `src/lib/shortcuts.ts` (the map), `UX-SPEC.md` §8's key table and §10's map table, the controls' tooltips and `aria-keyshortcuts`, and `header.spec.ts`. A shortcut kept but left out of the map (Alt+↑ ↓ in Units) says so in §8.
 - The page's planes stop at their ends (ADR 0014): nothing wraps from the header to the table or back; a toolbar's ← and → go round their one row.
 - No conversion math in the UI; core imports nothing from the DOM, the framework, or `apps/web` (ADR 0003).
-- Anything the user edits lives in the reducer's state and its one history.
+- Anything the user edits in the converter lives in the reducer's state and its one history; settings are preferences, outside it (ADR 0018).
 
 ## Accessibility
 

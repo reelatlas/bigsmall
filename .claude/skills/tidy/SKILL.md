@@ -14,7 +14,7 @@ Requested scope: `$ARGUMENTS`
 
 - **Empty**: everything since the last tidy. The base is the newest commit with the `(tidy)` scope (`git log --grep='(tidy)' -1 --format=%H`), or the `v0.1.0` tag if there is none. List what changed: `git diff --stat <base>..HEAD`, plus the working tree.
 - **An area** (a feature, a lab, a component, a doc, or a path such as `apps/web/src/features/converter`): that area, and everything that imports it or documents it.
-- **`full`**: the whole system: `packages/core/src`, `apps/web/src`, `apps/web/e2e`, `apps/web/test`, `docs`, `CLAUDE.md`.
+- **`full`**: the whole system: `packages/core/src` and `packages/core/test`, `apps/web/src`, `apps/web/e2e`, `apps/web/test`, `docs`, `CLAUDE.md`, `README.md`, and `.claude/skills/`.
 
 Say the scope in one line before starting, so Sean can correct it.
 
@@ -63,7 +63,7 @@ The system's own docs are the yardstick, so read them before judging anything: `
 | Sean's feedback and what changed for it                  | `docs/research/findings-0-first-pass.md`, a section per pass; this pass as "Tidy pass, …"                                                         |
 | Plans, explorations, milestones                          | `docs/PLAN.md`                                                                                                                                    |
 | Where things stand                                       | `CLAUDE.md`'s "Current status", short, and its "Pick up here" list: trials with their reverting commits, questions open with Sean, the next build |
-| A rule that keeps coming back                            | Promoted from `LEARNINGS.md` into `CLAUDE.md` or an ADR, linked back                                                                              |
+| A rule that keeps coming back                            | Promoted from `LEARNINGS.md` into `CLAUDE.md`, an ADR, or the doc where the rule lives, linked back                                               |
 
 Docs point to each other rather than repeating: a rule lives in one file and the others link to it.
 

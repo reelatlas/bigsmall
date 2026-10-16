@@ -1,6 +1,6 @@
 # Learnings
 
-Append-only log of gotchas, workarounds, and best practices discovered while building bigsmall. Newest at the bottom. Each entry has a date, what happened, and the rule we take from it. When a rule becomes permanent, promote it into `CLAUDE.md` or an ADR and link back here.
+Append-only log of gotchas, workarounds, and best practices discovered while building bigsmall. Newest at the bottom. Each entry has a date, what happened, and the rule we take from it. When a rule becomes permanent, promote it into `CLAUDE.md`, an ADR, or the doc where the rule lives, and link back here.
 
 Format:
 
@@ -14,7 +14,7 @@ Format:
 
 ## Index by topic
 
-Entries are cited by their titles, which stay as written; this index finds them. A note under an entry says what became of it: **Promoted** (the rule now lives in the doc named), **See also** (a related entry), **Superseded** or **Retired** (no longer how things are, kept for the history), **Since then** or **Came back** (what changed after).
+Entries are cited by their titles, which stay as written; this index finds them. A note under an entry says what became of it: **Promoted** (the rule now lives in the doc named), **See also** (a related entry), **Superseded** or **Retired** (no longer how things are, kept for the history), **Since then** or **Came back** (what changed after), **Correction** (what it got wrong, found later).
 
 - **Environment, tooling, CI, hosting:** Fresh Windows machine has git but nothing else; Bash tool commands over ~8 KB fail on this machine; pnpm 12 blocks dependency install scripts until approved; TypeScript 7 drops the JavaScript compiler API; ESLint 10 and the JSX accessibility plugin; Claude desktop preview launcher on Windows; Backslash escapes in files written through tool calls; A lint rule can guard class strings without a plugin; An action's major tag can lag its newest release; CI runs on a named Ubuntu image; String.replace reads `$` patterns in the replacement text; Vite wraps every dynamic import in a preload helper; A build fails when a shell sits inside its output folder; pnpm's release-age policy holds back a package published today; Astro template comments ship in the page; astro check's deprecation hints come from preact/compat's types; Vercel picks pnpm from the lockfile, and only up to 10; A page kept out of search names no canonical address; Vercel hides plain GitHub checks behind "Show All Checks"; Umami behind a proxy: point it at the proxy, and keep the URL's query out.
 - **Testing:** A browser test found a real handoff bug; A dev server reused by Playwright can serve stale modules; The dev server can serve a file caught between two writes; Playwright cannot check a visually hidden radio; A scrolling code block fails axe only where the font is wide; The browser pane's "type" inserts text; key handlers need key presses; A layout test tuned to one machine's font failed on CI's; A new island's classes can miss the dev server's CSS; A test that reads a duration's text fails against the build; getByRole's name matches part of a name; A browser test that counts registry data reads the count from core; Waiting on animations: a cancelled one has settled; Safari scrolls to the top as a list is swapped; The build writes 400ms as .4s; A color read right after a change catches the transition's first frame; The gallery's axe run outgrows the default timeout on CI; An animation read after a step can already be over; A test that passes on the build can fail on CI's dev server.
@@ -348,6 +348,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** The calculator first kept its own entry in component state. Undo after sending its number then had two candidates, the send in the converter's history and the last key in the calculator's, and either choice surprised in some order of events.
 **Rule.** Anything the user edits in the converter lives in the reducer's state and in its one history, chunked by the same typing rules; panels are views of that state. Undo then means the last thing done, wherever it was done.
+**Since then.** Settings (ADR 0018) stay out of the history; the rule holds for the conversion and the calculator.
 **Promoted** to docs/ARCHITECTURE.md, "State and URLs".
 
 ## 2026-10-06 — Vite wraps every dynamic import in a preload helper
@@ -536,6 +537,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** A browser test typed a 13-digit number into one of two boxes and expected it to keep its largest size once the chip gave up its name. It passed on Windows and failed on CI: the numbers use the system's font (`--type-numeric` is a system stack in most themes), and Linux's digits are wider, so 13 of them no longer fit. The production gate held the deploy back, as it should.
 **Rule.** A test of how text fits never hard-codes a count tuned on one machine. Check the rule across a sweep instead (the chip test types 1 to 20 digits and checks that the name never stays while the number shrinks, and that it gives way sooner in a narrower box), or pick lengths far from any edge, with room for fonts a fifth wider or narrower.
+**Promoted** to CLAUDE.md, "Working habits" (measure, never count), and docs/TESTING.md.
 
 ## 2026-10-07 — A new island's classes can miss the dev server's CSS
 
@@ -570,7 +572,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** The table layout keeps where its cursor is in component state, as an index. Undo, clear all, or a send from the calculator changes what the table shows from outside the component, and the index would then point at a different row of a different list, tinted for no reason.
 **Rule.** Tie a cursor to the view it was set in (here a key for the start, the matches, or one category's units) and treat it as resting whenever the view has changed. Code that moves the view on purpose and wants the cursor somewhere (choosing a category puts it on the first unit) sets the cursor with the view it is about to show.
-**Since** the same day choosing a category highlights no unit (Sean), so nothing sets a cursor for a view about to show; the cursor rests after every change of view.
+**Since then.** The same day, choosing a category came to highlight no unit (Sean), so nothing sets a cursor for a view about to show; the cursor rests after every change of view.
 
 ## 2026-10-07 — Arrow keys through radios that apply would each be an undo step
 
@@ -717,6 +719,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** The glide and the flash read their lengths from the theme (`--motion-slow`, `--highlight-fade`) with `parseFloat`, which drops the unit. The themes say `400ms`, so on the dev server it worked; the build's CSS minifier rewrites times in their shortest form, `.4s` and `1.2s`, so on the live site the glide ran for 0.4 ms and the flash for 1.2 ms: each started and was gone the next frame. Sean saw it on a phone and a desktop, two rounds running; frozen frames on the dev server looked right. A probe that sampled every frame after a real click, on the built site, found it at once (the animations' count fell to 0 a frame after they began).
 **Rule.** Read a CSS time with its unit (`lib/css-time.ts`), never `parseFloat` alone. Check motion against the built site (`pnpm build`, then `astro preview`), in real time, sampling each frame; and assert an animation's `getTiming().duration`, not only that one exists.
+**Promoted** to CLAUDE.md, "Working habits" (verify on the built site), and the tidy skill's step 6.
 
 ## 2026-10-15 — A glide's leavers go first and its arrivals last
 
@@ -726,7 +729,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 ## 2026-10-15 — A shared edge puts an inset focus ring off centre
 
 **What happened.** The segmented control drew one line between segments by giving each a right edge and only the first a left one. Its focus ring is an outline inset by the edge's width, so on the first segment it lay over the edge on all four sides, but on every later one it sat inside on the left, beside the neighbour's edge: Sean saw that side twice as thick, moving along with the arrows.
-**Then.** Overlapping two drawn edges to fix it made seams thicker on a screen scaled to 125 % or 150 % (Windows' usual): the two copies of a seam rounded to different device pixels. Seen only at a fractional scale (`deviceScaleFactor: 1.25` in Playwright), enlarged without smoothing.
+**Since then.** Overlapping two drawn edges to fix it made seams thicker on a screen scaled to 125 % or 150 % (Windows' usual): the two copies of a seam rounded to different device pixels. Seen only at a fractional scale (`deviceScaleFactor: 1.25` in Playwright), enlarged without smoothing.
 **Rule.** Draw each seam once: every joined piece has its whole edge and overlaps the one before by its width, its own left edge transparent over its neighbour's line, its fill kept inside its edge (`bg-clip-padding`). Make the focus highlight the piece's own edge in the focus color, lifted over its neighbours (`relative z-10`), not an outline over it, so rest and focus are the same width by construction. Check a middle and a last piece, at 1, 1.25, and 1.5.
 
 ## 2026-10-15 — Moving an element drops the focus inside it

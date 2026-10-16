@@ -10,6 +10,8 @@ export const pressure: Category = {
     'barometric pressure',
     'blood pressure',
     'water pressure',
+    'boost',
+    'boost pressure',
   ],
   baseUnit: 'pascal',
   tier: 'basic',

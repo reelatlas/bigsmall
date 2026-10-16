@@ -13,6 +13,7 @@ Milestone 1 (2026-10-06): all eight primary categories ship their basic tier, 54
 Alias decisions so far (each one changes the ranking, and so which row Enter takes; see docs/UX-SPEC.md §4 and §5):
 
 - `kilo`/`kilos` → kilogram, `cc` → milliliter, `kph`/`kmh` → kilometer per hour: colloquial, so they count as exact matches.
+- The car words with Force and Torque (2026-10-15): `ci` → cubic inch, beside `cid`; the Volume category answers to `displacement`, `engine displacement`, and `engine size`, and Pressure to `boost` and `boost pressure`, beside `tire pressure`. Torque has `lug nut torque` and `bolt torque`, Power `engine power`.
 - `oz` is also an alias of fluid ounce on purpose: it makes "oz" ambiguous, so the list shows both ounces, each with its category, and the choice is visible before Enter.
 - No alias claims `ton` or `mpg`: typing either offers every ton (short, long, metric) or both mpgs, the visitor's everyday one first (2026-10-08). No lowercase `b` for bit (it would collide with byte's `B` inside the category).
 - `mbar` and `millibar` → hectopascal, the same size, an alias rather than a second row; `food calories` and `large calories` → kilocalorie, while `cal` and `calories` are the small calorie, the standard (Sean, 2026-10-08).

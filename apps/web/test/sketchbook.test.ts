@@ -12,6 +12,8 @@ import {
   scanFrame,
   scrambleFrame,
   scrambleOrder,
+  SLATS,
+  slatsClip,
 } from '../src/features/sketchbook/frames';
 import {
   deckOf,
@@ -174,5 +176,16 @@ describe('the stepped changes', () => {
       'polygon(evenodd, 0% 0%, 0% 0%, 25% 0%, 25% 25%, 0% 25%, 0% 0%, 0% 0%)',
     );
     expect(drawnClip(0.25)).toBe('inset(0 0 75% 0)');
+  });
+
+  it('open blinds from shut to whole with one count of points, so the change animates', () => {
+    const points = (clip: string) => clip.split(',').length;
+    expect(points(slatsClip(0))).toBe(points(slatsClip(1)));
+    const open = slatsClip(1);
+    for (let slat = 1; slat < SLATS; slat++) {
+      const edge = `${Number(((slat / SLATS) * 100).toFixed(3))}%`;
+      // Each slat open reaches the next one's top: no gap between them.
+      expect(open.split(`100% ${edge}`).length - 1).toBe(2);
+    }
   });
 });

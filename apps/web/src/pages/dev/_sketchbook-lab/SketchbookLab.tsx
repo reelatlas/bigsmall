@@ -126,6 +126,11 @@ const EFFECT_LABELS: Readonly<Record<SketchEffect | 'mixed', string>> = {
   scramble: 'Scramble: lands block by block, like the name’s letters',
   flap: 'Flap: folds like a split-flap board’s card',
   scan: 'Scan: draws in line by line, a bright line leading',
+  dive: 'Dive: zooms into the small one, the next grows out of it',
+  blinds: 'Blinds: the next shows through slats that open',
+  doors: 'Doors: swings open down the middle',
+  drop: 'Drop: falls away, the next drops in and bounces',
+  squash: 'Squash: squashes flat, the next springs up',
   flip: 'Flip: turns over sideways, like a card',
   tumble: 'Tumble: turns over top to bottom',
   pop: 'Pop: shrinks away, the next grows in',
@@ -238,13 +243,15 @@ function FamilySheet({
   const sketches = SKETCHES.filter((sketch) => sketch.family === family.id);
   const ids = sketches.map((sketch) => sketch.id);
   const count = ids.filter((each) => set.includes(each)).length;
+  const started = [...new Set(sketches.map((sketch) => sketch.round))];
+  const rounds = `${started.length > 1 ? 'rounds' : 'round'} ${started.join(' and ')}`;
   return (
     <section aria-labelledby={id} className="grid gap-3">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h3 id={id} className={HEADING}>
           {family.name}{' '}
           <span className="font-body text-sm font-normal text-ink-muted">
-            round {family.round} · {count} of {ids.length} in the rotation
+            {rounds} · {count} of {ids.length} in the rotation
           </span>
         </h3>
         <div className="flex gap-2">
@@ -561,7 +568,7 @@ export function SketchbookLab() {
           </h2>
           <p className="text-sm text-ink-muted" data-rotation-count>
             {tuning.set.length} of {SKETCHES.length} in the rotation. Round 1 is the logo canvas’s
-            first round; round 2 was drawn for the sketchbook.
+            first round; rounds 2 and 3 were drawn for the sketchbook.
           </p>
         </div>
         {FAMILIES.map((family) => (

@@ -20,22 +20,27 @@ export type FamilyId =
   | 'outdoors'
   | 'seasons'
   | 'geometry'
+  | 'math'
   | 'kin';
 
 export interface Family {
   id: FamilyId;
   name: string;
-  /** The logo canvas's round it came from (Sean chose R6 from round 1 on 2026-10-15). */
-  round: 1 | 2;
+  /** The round it began in: the logo canvas's first (Sean chose R6 from it), or a later one drawn for the sketchbook. */
+  round: Round;
   /** What the family is, for the lab's sheet. */
   blurb: string;
 }
+
+/** The rounds of sketches: the logo canvas's, then two drawn for the sketchbook (2026-10-15). */
+export type Round = 1 | 2 | 3;
 
 export interface Sketch {
   id: string;
   /** What a screen reader says for its tile. */
   name: string;
   family: FamilyId;
+  round: Round;
 }
 
 export const FAMILIES: readonly Family[] = [
@@ -49,15 +54,25 @@ export const FAMILIES: readonly Family[] = [
   { id: 'outdoors', name: 'Outdoors', round: 2, blurb: 'Big and small, outside.' },
   { id: 'seasons', name: 'Seasons', round: 2, blurb: 'One for each time of year.' },
   { id: 'geometry', name: 'Geometry', round: 2, blurb: 'Patterns from big to small.' },
+  { id: 'math', name: 'Math', round: 3, blurb: 'Calculus and friends, on a chalkboard.' },
   { id: 'kin', name: 'Kin', round: 2, blurb: 'The mark’s own family.' },
 ];
 
-/** A family's sketches, numbered from its letter in the order given: r1, r2 … */
-const family = (id: FamilyId, letter: string, names: readonly string[]): Sketch[] =>
-  names.map((name, index) => ({ id: `${letter}${index + 1}`, name, family: id }));
+/**
+ * A round's sketches in a family, numbered from its letter in the order given, from `first`: r1,
+ * r2 … , then a later round's on from where the family left off.
+ */
+const family = (
+  id: FamilyId,
+  letter: string,
+  round: Round,
+  names: readonly string[],
+  first = 1,
+): Sketch[] =>
+  names.map((name, index) => ({ id: `${letter}${first + index}`, name, family: id, round }));
 
 export const SKETCHES: readonly Sketch[] = [
-  ...family('refined', 'r', [
+  ...family('refined', 'r', 1, [
     'Side by side',
     'On a line',
     'Ring and dot',
@@ -65,8 +80,8 @@ export const SKETCHES: readonly Sketch[] = [
     'Orbit',
     'In front',
   ]),
-  ...family('abstract', 'a', ['Two squares', 'Ratio', 'Zoom', 'Ramp', 'Every size', 'Nested']),
-  ...family('bold', 'b', [
+  ...family('abstract', 'a', 1, ['Two squares', 'Ratio', 'Zoom', 'Ramp', 'Every size', 'Nested']),
+  ...family('bold', 'b', 1, [
     'Big b, small s',
     'Equals',
     'Quarter and dot',
@@ -74,7 +89,7 @@ export const SKETCHES: readonly Sketch[] = [
     'Small inside big',
     'Poster',
   ]),
-  ...family('unique', 'u', [
+  ...family('unique', 'u', 1, [
     'Nesting dolls',
     'Balance',
     'Lens',
@@ -82,7 +97,7 @@ export const SKETCHES: readonly Sketch[] = [
     'Measuring cups',
     'Seed and tree',
   ]),
-  ...family('fun', 'f', [
+  ...family('fun', 'f', 1, [
     'Buddies',
     'Snowman',
     'Planet and moon',
@@ -90,7 +105,7 @@ export const SKETCHES: readonly Sketch[] = [
     'Peas in a pod',
     'Bounce',
   ]),
-  ...family('measures', 'm', [
+  ...family('measures', 'm', 2, [
     'Hour and minute',
     'Ruler',
     'Cup and teaspoon',
@@ -98,7 +113,7 @@ export const SKETCHES: readonly Sketch[] = [
     'Gauge',
     'Tape measure',
   ]),
-  ...family('creatures', 'c', [
+  ...family('creatures', 'c', 2, [
     'Cat and kitten',
     'Whale and minnow',
     'Duck and duckling',
@@ -106,7 +121,7 @@ export const SKETCHES: readonly Sketch[] = [
     'Elephant and mouse',
     'Hen and chick',
   ]),
-  ...family('outdoors', 'o', [
+  ...family('outdoors', 'o', 2, [
     'Sun and moon',
     'Mountain and pebble',
     'Balloons',
@@ -114,8 +129,8 @@ export const SKETCHES: readonly Sketch[] = [
     'Leaf and ladybug',
     'Pines',
   ]),
-  ...family('seasons', 's', ['Pumpkins', 'Gifts', 'Hearts', 'Eggs', 'Ice cream', 'Snowflakes']),
-  ...family('geometry', 'g', [
+  ...family('seasons', 's', 2, ['Pumpkins', 'Gifts', 'Hearts', 'Eggs', 'Ice cream', 'Snowflakes']),
+  ...family('geometry', 'g', 2, [
     'Golden spiral',
     'Halftone',
     'Thick to thin',
@@ -123,7 +138,29 @@ export const SKETCHES: readonly Sketch[] = [
     'Tunnel',
     'One small',
   ]),
-  ...family('kin', 'k', ['Squares in front', 'Three in front', 'Night', 'Line', 'Eclipse', 'Mint']),
+  ...family('kin', 'k', 2, [
+    'Squares in front',
+    'Three in front',
+    'Night',
+    'Line',
+    'Eclipse',
+    'Mint',
+  ]),
+  ...family('abstract', 'a', 3, ['Venn', 'Ripples', 'Morse'], 7),
+  ...family('fun', 'f', 3, ['Robots', 'Dice', 'UFO and cow'], 7),
+  ...family('measures', 'm', 3, ['Thermometer', 'Hourglass', 'Protractor'], 7),
+  ...family('creatures', 'c', 3, ['Frog and tadpole', 'Owl and owlet', 'Penguin and chick'], 7),
+  ...family('outdoors', 'o', 3, ['Oak and acorn', 'Mushrooms', 'Cactus'], 7),
+  ...family('seasons', 's', 3, ['Watermelon', 'Umbrella', 'Autumn leaves'], 7),
+  ...family('geometry', 'g', 3, ['Hexagons', 'Cubes', 'Packed circles'], 7),
+  ...family('math', 'x', 3, [
+    'Area under a curve',
+    'Riemann sum',
+    'Tangent',
+    'Infinity and epsilon',
+    'Sierpinski',
+    'Limit',
+  ]),
 ];
 
 export const SKETCH_BY_ID: ReadonlyMap<string, Sketch> = new Map(
@@ -153,13 +190,19 @@ export const START: readonly string[] = [
 /**
  * How a tile changes from one sketch to the next. The first four echo the name at play (Sean,
  * 2026-10-15): Glitch, Scramble, and Scan step frame by frame like its split-flap letters
- * (frames.ts), and Flap folds like a split-flap board's card. The rest move.
+ * (frames.ts), and Flap folds like a split-flap board's card. The rest move, Doors on pieces of
+ * the tile like Flap.
  */
 export const SKETCH_EFFECTS = [
   'glitch',
   'scramble',
   'flap',
   'scan',
+  'dive',
+  'blinds',
+  'doors',
+  'drop',
+  'squash',
   'flip',
   'tumble',
   'pop',

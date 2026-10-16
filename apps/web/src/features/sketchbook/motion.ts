@@ -9,6 +9,7 @@ import {
   scanFrame,
   scrambleFrame,
   scrambleOrder,
+  slatsClip,
 } from './frames';
 import {
   deckOf,
@@ -84,7 +85,7 @@ interface TileState {
   idle: number | undefined;
 }
 
-type Moving = Exclude<SketchEffect, 'glitch' | 'scramble' | 'scan' | 'flap'>;
+type Moving = Exclude<SketchEffect, 'glitch' | 'scramble' | 'scan' | 'flap' | 'doors'>;
 
 /** A moving change, layer by layer: the sketch showing (front) leaves, the next (back) arrives. */
 interface Moves {
@@ -194,6 +195,68 @@ function moves(effect: Moving, size: number, at: Point): Moves {
         back: [{ opacity: 0 }, { opacity: 1 }],
         clip: false,
       };
+    case 'dive': {
+      // Into the small one, which sits low and to the right in most sketches; the next grows
+      // out of it.
+      const into = { transformOrigin: '70% 70%' };
+      return {
+        front: [
+          { ...into, transform: 'scale(1)', opacity: 1 },
+          { ...into, offset: 0.6, transform: 'scale(3)', opacity: 0 },
+          { ...into, transform: 'scale(3)', opacity: 0 },
+        ],
+        back: [
+          { ...into, transform: 'scale(0.15)', opacity: 0 },
+          { ...into, offset: 0.3, transform: 'scale(0.3)', opacity: 1 },
+          { ...into, transform: 'scale(1)', opacity: 1 },
+        ],
+        clip: true,
+      };
+    }
+    case 'blinds':
+      return {
+        front: [{ opacity: 1 }, { opacity: 1 }],
+        back: [
+          { clipPath: slatsClip(0), opacity: 1 },
+          { clipPath: slatsClip(1), opacity: 1 },
+        ],
+        clip: false,
+      };
+    case 'drop':
+      return {
+        front: [
+          { transform: 'translateY(0)' },
+          { offset: 0.4, transform: 'translateY(110%)' },
+          { transform: 'translateY(110%)' },
+        ],
+        back: [
+          { transform: 'translateY(-110%)', opacity: 1 },
+          { offset: 0.3, transform: 'translateY(-110%)', opacity: 1 },
+          { offset: 0.72, transform: 'translateY(0)', opacity: 1 },
+          { offset: 0.86, transform: 'translateY(-8%)', opacity: 1 },
+          { transform: 'translateY(0)', opacity: 1 },
+        ],
+        clip: true,
+      };
+    case 'squash': {
+      // Flat on its base, as a cartoon squashes, and back up past its height before it settles.
+      const base = { transformOrigin: '50% 100%' };
+      return {
+        front: [
+          { ...base, transform: 'scale(1, 1)' },
+          { ...base, offset: 0.4, transform: 'scale(1.25, 0)' },
+          { ...base, transform: 'scale(1.25, 0)' },
+        ],
+        back: [
+          { ...base, transform: 'scale(1.25, 0)', opacity: 1 },
+          { ...base, offset: 0.4, transform: 'scale(1.25, 0)', opacity: 1 },
+          { ...base, offset: 0.7, transform: 'scale(0.88, 1.12)', opacity: 1 },
+          { ...base, offset: 0.86, transform: 'scale(1.04, 0.96)', opacity: 1 },
+          { ...base, transform: 'scale(1, 1)', opacity: 1 },
+        ],
+        clip: false,
+      };
+    }
   }
 }
 
@@ -270,6 +333,33 @@ function flap(
       ],
       options,
     ),
+  ];
+}
+
+/**
+ * Doors: the sketch showing splits down the middle and its halves swing open toward the viewer,
+ * each on its outer edge, darkening as they turn, with the next sketch behind them.
+ */
+function doors(
+  layers: Layers,
+  from: string,
+  size: number,
+  options: KeyframeAnimationOptions,
+): Animation[] {
+  const [left, right] = layers.pieces;
+  if (!left || !right) return [];
+  show(left, from);
+  show(right, from);
+  const swung = (degrees: number) => `perspective(${size * 4}px) rotateY(${degrees}deg)`;
+  const leaf = (clipPath: string, transformOrigin: string, degrees: number) => [
+    { clipPath, transformOrigin, transform: swung(0), opacity: 1, filter: 'brightness(1)' },
+    { clipPath, transformOrigin, transform: swung(degrees), opacity: 1, filter: 'brightness(0.6)' },
+  ];
+  return [
+    layers.front.animate([{ opacity: 0 }, { opacity: 0 }], options),
+    layers.back.animate([{ opacity: 1 }, { opacity: 1 }], options),
+    left.animate(leaf('inset(0 50% 0 0)', '0% 50%', -90), options),
+    right.animate(leaf('inset(0 0 0 50%)', '100% 50%', 90), options),
   ];
 }
 
@@ -512,6 +602,7 @@ export function play(
       };
       let animations: Animation[];
       if (effect === 'flap') animations = flap(layers, own, id, size, options);
+      else if (effect === 'doors') animations = doors(layers, own, size, options);
       else {
         const motion = moves(effect as Moving, size, at);
         if (motion.clip) tile.style.overflow = 'hidden';

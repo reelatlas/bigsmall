@@ -160,3 +160,20 @@ export function blocksClip(blocks: readonly number[]): string {
   }
   return `polygon(evenodd, ${points.join(', ')})`;
 }
+
+/** Slats Blinds opens the next sketch through. */
+export const SLATS = 6;
+
+/**
+ * Blinds open by `open` (0 to 1) as a clip-path: each slat shown from its top down, every one a
+ * loop from the corner as in blocksClip, so shut and open have the same points and the change
+ * between them animates.
+ */
+export function slatsClip(open: number): string {
+  const points = ['0% 0%'];
+  for (let slat = 0; slat < SLATS; slat++) {
+    const [top, bottom] = [pct(slat / SLATS), pct((slat + open) / SLATS)];
+    points.push(`0% ${top}`, `100% ${top}`, `100% ${bottom}`, `0% ${bottom}`, `0% ${top}`, '0% 0%');
+  }
+  return `polygon(evenodd, ${points.join(', ')})`;
+}

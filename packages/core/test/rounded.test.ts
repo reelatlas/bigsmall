@@ -121,6 +121,18 @@ describe('formatFraction', () => {
     expect(fraction(-1_043_262.45, eighths, 'down')?.text).toBe('-1,043,263');
   });
 
+  it('marks a large whole number exact when only float noise separates it', () => {
+    // 12,345 miles is 65,181,600 feet exactly; doubles land at 65,181,599.99999999.
+    expect(fraction(65_181_599.99999999, eighths)).toEqual({ text: '65,181,600', approx: false });
+    expect(fraction(1_481_481_468.0000002, eighths)).toEqual({
+      text: '1,481,481,468',
+      approx: false,
+    });
+    // A part that is really there still marks it.
+    expect(fraction(65_181_600.25, eighths)?.approx).toBe(true);
+    expect(fraction(1e14 + 0.5, eighths)?.approx).toBe(true);
+  });
+
   it('leaves a value with no size chosen, or past where places mean anything, to its digits', () => {
     expect(fraction(0.5, sizes())).toBeNull();
     expect(fraction(2e15, eighths)).toBeNull();

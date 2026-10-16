@@ -28,6 +28,14 @@ export interface Fraction {
 /** Below this, a difference is float noise: 2.4999999999999996 is 2 1/2. */
 const NOISE = 1e-9;
 
+/**
+ * Float noise grows with a value, a few steps of a double past a million: 12,345 miles in feet
+ * lands at 65,181,599.99999999, which is 65,181,600 exactly.
+ */
+function noiseAt(value: number): number {
+  return Math.max(NOISE, Math.abs(value) * 1e-15);
+}
+
 /** Past this, a value's fraction is only its whole number: an eighth is noise beside a million. */
 const FRACTION_LIMIT = 1e6;
 
@@ -125,7 +133,7 @@ export function formatFraction(
       text:
         (whole < 0 ? minusSign(locale) : '') +
         new Intl.NumberFormat(locale).format(Math.abs(whole)),
-      approx: Math.abs(value - whole) > NOISE,
+      approx: Math.abs(value - whole) > noiseAt(value),
     };
   }
   const base = Math.floor(value);
@@ -160,6 +168,6 @@ export function formatFraction(
     .join(' ');
   return {
     text: (count < 0 ? minusSign(locale) : '') + text,
-    approx: Math.abs(value - count / pick.d) > NOISE,
+    approx: Math.abs(value - count / pick.d) > noiseAt(value),
   };
 }

@@ -25,7 +25,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 - **Tokens, Tailwind, color:** Native popups cannot join the design language; An inset ring is painted under the children; a border is not; A hover token equal to its surface hides every hover; Unlayered theme tokens beat a layered reduced-motion override; A control's edge and a divider need different colors; Merging recipes can undo a fix; Dim text with the muted ink, never with opacity; A see-through color is a mix, worked out once in the bridge.
 - **Motion:** A background tab pauses requestAnimationFrame; An animation that reveals rests revealed; A view transition takes no clicks; A glide on a decelerating curve reads as a jump; A glide's leavers go first and its arrivals last; Fast frames stay under the flash threshold by area; A filter is drawn before the clip-path.
 - **Engine, input, values:** Reference sites use Copyscape; Floating-point realities in the engine tests; Aliases outrank prefixes, by design; Undo chunks need a clock, and the reducer should own it; A number too large to hold is still a number; Text the user typed is re-read with the separators it was typed with; Arithmetic and unit names share characters; One undo history for everything the user does in the converter; A half-typed number parses as a unit query; A symbol made only of a mark folds to nothing; Snap a scaled value before rounding it up or down; A copied number pastes as a number: a plain hyphen, and buttons unseen but there.
-- **Settings and state:** Export settings from their own keys; Remember what was changed, not every setting.
+- **Settings and state:** Export settings from their own keys; Remember what was changed, not every setting; A saved choice from a list drops what the list gains later.
 
 ---
 
@@ -819,3 +819,8 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** Glitch's colored edges are drop-shadows on clipped slices, and a clip is applied after the filter, so a shadow reaching past the slice's box was cut off; its bands are also holes in the picture, which one clip-path cannot list as separate shapes.
 **Rule.** Let a clip reach past the element's sides when a filter should show there (`inset(20% -10% 70% -10%)`, a polygon from -10% to 110%). Cut holes, or join separate shapes, in one `polygon(evenodd, …)`: each extra loop joined to the outline along a line it travels back on, which the even-odd rule leaves out.
+
+## 2026-10-15 — A saved choice from a list drops what the list gains later
+
+**What happened.** The sketchbook lab saved its rotation as the sketches in it. Round 3 added 27 sketches to the catalog, and Sean's saved rotation, from before, left every one of them out, so his Copy settings shipped without them unless caught.
+**Rule.** Save a choice from a growing list as what was left out, so whatever joins the list later joins the choice; write it out the same way in anything copied back as code.

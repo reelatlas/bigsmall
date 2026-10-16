@@ -231,7 +231,7 @@ export type SketchEasing = (typeof SKETCH_EASINGS)[number];
  */
 export const SPRING_EASING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 
-/** The order the tiles change in on Shuffle. */
+/** The order the tiles change in on Flip. */
 export const WAVES = ['diagonal', 'rows', 'center', 'random'] as const;
 export type Wave = (typeof WAVES)[number];
 
@@ -244,7 +244,7 @@ export interface SketchbookTuning {
   wave: Wave;
   /** Hovering keeps a tile changing until the pointer leaves; off, a hover changes it once. */
   cycle: boolean;
-  /** The grid shuffles once as the page opens. */
+  /** The grid flips once as the page opens. */
   intro: boolean;
   /** The sketches come shuffled, or in the catalog's order, family by family. */
   order: 'shuffled' | 'catalog';
@@ -263,7 +263,10 @@ export interface SketchbookSettings {
   tuning: SketchbookTuning;
 }
 
-/** The settings Sean tuned in the lab and shipped on the About page (2026-10-15). */
+/**
+ * The settings Sean tuned in the lab and shipped on the About page (v2, 2026-10-15), every sketch
+ * in the rotation, so one added later joins it.
+ */
 export const SKETCHBOOK_TUNING: SketchbookTuning = {
   effect: 'mixed',
   easing: 'ease',
@@ -337,7 +340,7 @@ export function draw(
 }
 
 /**
- * When each tile starts in a shuffle, in waves: tiles with the same rank start together, a wave
+ * When each tile starts in a flip, in waves: tiles with the same rank start together, a wave
  * step apart. Diagonal sweeps from the top left corner, rows read like a page, center ripples
  * out from the middle, and random starts them in any order.
  */

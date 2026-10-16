@@ -58,6 +58,12 @@ export const PAGE_MAIN = 'mx-auto max-w-4xl px-4 py-8 sm:py-12';
 export const LINK =
   'inline-flex min-h-11 items-center font-medium underline decoration-accent decoration-2 underline-offset-4';
 
+// A link out of the way, the footer's (Sean, 2026-10-15): muted ink and no underline at rest, and
+// on hover or keyboard focus a link's ink and accent underline, faded in. It stands alone, so no
+// text around it needs telling apart from it (docs/DESIGN-SYSTEM.md, "Links").
+export const QUIET_LINK =
+  'inline-flex min-h-11 items-center text-ink-muted underline decoration-transparent decoration-2 underline-offset-4 transition-[color,text-decoration-color] hover:text-ink hover:decoration-accent focus-visible:text-ink focus-visible:decoration-accent';
+
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,
 // and `data-open` while open; the shell takes SHELL, its own resting style beside its one use

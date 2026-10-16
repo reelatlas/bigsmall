@@ -130,3 +130,18 @@ test('reduced motion zeroes the motion tokens in every theme', async ({ page }) 
     }
   }
 });
+
+test('the footer links to the About page, quietly until hovered or focused', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/');
+  const about = page.getByRole('contentinfo').getByRole('link', { name: 'About' });
+  await expect(about).toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
+  if (isMobile) return;
+  await about.hover();
+  await expect(about).not.toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
+  await page.mouse.move(0, 0);
+  await about.focus();
+  await expect(about).not.toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
+});

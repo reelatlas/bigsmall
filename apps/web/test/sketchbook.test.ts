@@ -1,5 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { MOODS, nextMood, particles } from '../src/features/sketchbook/burst';
+import { BURST_TIMING } from '../src/lib/timing';
 import {
   bandClip,
   blockClip,
@@ -186,6 +188,34 @@ describe('the stepped changes', () => {
       const edge = `${Number(((slat / SLATS) * 100).toFixed(3))}%`;
       // Each slat open reaches the next one's top: no gap between them.
       expect(open.split(`100% ${edge}`).length - 1).toBe(2);
+    }
+  });
+});
+
+describe('the Flip button’s particles', () => {
+  it('drift in each mood within their sizes and lengths, starting within the spread', () => {
+    const random = seeded();
+    for (const mood of MOODS) {
+      const made = particles(mood, random);
+      expect(made.length).toBeGreaterThan(0);
+      for (const particle of made) {
+        expect(particle.x).toBeGreaterThanOrEqual(0);
+        expect(particle.x).toBeLessThanOrEqual(1);
+        expect(particle.delay).toBeLessThanOrEqual(BURST_TIMING.spreadMs);
+        expect(particle.duration).toBeGreaterThanOrEqual(BURST_TIMING[mood].leastMs);
+        expect(particle.duration).toBeLessThanOrEqual(BURST_TIMING[mood].mostMs);
+        expect(particle.size).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('never take the same mood twice in a row', () => {
+    const random = seeded();
+    let last = nextMood(undefined, random);
+    for (let press = 0; press < 30; press++) {
+      const mood = nextMood(last, random);
+      expect(mood).not.toBe(last);
+      last = mood;
     }
   });
 });

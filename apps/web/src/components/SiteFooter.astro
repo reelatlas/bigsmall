@@ -1,23 +1,20 @@
 ---
-import { LINK } from '../lib/recipes';
+import { QUIET_LINK } from '../lib/recipes';
 
 /*
- * The footer every page shares (docs/UX-SPEC.md §1, Sean, 2026-10-15): one quiet link, to the
- * About page, or, on the About page, back to the converter, on the left edge of the page's
- * content like the header and the converter. Feedback and more may join it later. The address
- * ends in a slash, as the build writes the page and its canonical address.
+ * The footer under every page but the About page (docs/UX-SPEC.md §1, Sean, 2026-10-15): one
+ * quiet link to it, on the left edge of the page's content like the header, out of the way until
+ * hovered or focused. On the About page the name in the header leads home, so it has none.
+ * Feedback and more may join it later. The address ends in a slash, as the build writes the page
+ * and its canonical address.
  */
 const onAbout = Astro.url.pathname.replace(/\/+$/, '') === '/about';
 ---
 
-<footer class="mx-auto flex max-w-4xl px-4 pb-8 text-sm">
-  {onAbout ? (
-    <a href="/" class={LINK}>
-      Converter
-    </a>
-  ) : (
-    <a href="/about/" class={LINK}>
+{!onAbout && (
+  <footer class="mx-auto flex max-w-4xl px-4 pb-8 text-sm">
+    <a href="/about/" class={QUIET_LINK}>
       About
     </a>
-  )}
-</footer>
+  </footer>
+)}

@@ -27,11 +27,11 @@ import {
 /**
  * The sketchbook at play (docs/UX-SPEC.md §1, the About page). Hovering a tile with a mouse
  * changes it to the next sketch, and keeps changing it while the mouse stays; a click, a tap,
- * Enter, or Space changes it at once; Shuffle changes every tile in a wave. A change runs between
+ * Enter, or Space changes it at once; Flip changes every tile in a wave. A change runs between
  * the tile's layers: the sketch showing (front), the one arriving (back), and pieces the stepped
  * effects and the flap cut a tile into. The moving effects and the flap run on the Web Animations
  * API; the stepped ones draw a frame every frameMs, planned in frames.ts. Under reduced motion
- * nothing changes by itself: a press cross-fades, and Shuffle changes every tile at once.
+ * nothing changes by itself: a press cross-fades, and Flip changes every tile at once.
  */
 
 /** Where a sketch's symbol is on the page (SketchSprite.astro). */
@@ -45,11 +45,11 @@ export interface Point {
 
 const MIDDLE: Point = { x: 0.5, y: 0.5 };
 
-/** Controls besides the pointer and the keys, for Shuffle and /dev/sketchbook-lab. */
+/** Controls besides the pointer and the keys, for Flip and /dev/sketchbook-lab. */
 export interface SketchbookPlayer {
   /** Changes a tile now, from a point in it, cutting short a change under way. */
   next(tile: HTMLElement, at?: Point): Promise<void>;
-  /** Changes every tile, in a wave. */
+  /** Flip: changes every tile, in a wave, and says what they brought. */
   shuffle(): void;
   /** Plays every tile as if hovered. */
   pin(on: boolean): void;
@@ -366,7 +366,7 @@ function doors(
 /**
  * Plays the tiles in `grid` (each a [data-sketch-tile] holding its layers) by the settings in
  * `live`, read at every change, so the lab's changes apply at once. `announce` says a pressed
- * tile's new sketch, or that the grid shuffled. The grid is marked `data-playing` while it plays,
+ * tile's new sketch, or what a flip brought. The grid is marked `data-playing` while it plays,
  * which the browser tests wait for.
  */
 export function play(
@@ -713,16 +713,38 @@ export function play(
     });
   };
 
-  function shuffle() {
+  /**
+   * Flip: every tile changes, in waves; then a press hears the sketches it brought, by name. The
+   * shuffle as the page opens says nothing.
+   */
+  function shuffle(say = true) {
     const all = tiles();
     const { tuning, timing } = live.current;
     const ranks = waveRanks(tuning.wave, all.length, tuning.columns, random);
     const step = still() ? 0 : timing.waveMs;
-    all.forEach((tile, index) => {
-      cancel(stateOf(tile).timer);
-      later(() => void change(tile, MIDDLE, true).then(() => resume(tile)), ranks[index]! * step);
-    });
-    announce('Shuffled');
+    const landed = all.map(
+      (tile, index) =>
+        new Promise<void>((done) => {
+          cancel(stateOf(tile).timer);
+          later(
+            () =>
+              void change(tile, MIDDLE, true).then(() => {
+                resume(tile);
+                done();
+              }),
+            ranks[index]! * step,
+          );
+        }),
+    );
+    if (!say) return;
+    void Promise.all(landed).then(() =>
+      announce(
+        all
+          .map((tile) => SKETCH_BY_ID.get(tile.dataset['sketch'] ?? '')?.name)
+          .filter(Boolean)
+          .join(', '),
+      ),
+    );
   }
 
   /**
@@ -769,13 +791,13 @@ export function play(
   idleAll();
   // Read when it is due, not now: the lab's saved settings arrive after the play starts.
   later(() => {
-    if (live.current.tuning.intro && !still()) shuffle();
+    if (live.current.tuning.intro && !still()) shuffle(false);
   }, live.current.timing.firstMs);
   grid.dataset['playing'] = '';
 
   return {
     next: (tile, at = MIDDLE) => change(tile, at, true),
-    shuffle,
+    shuffle: () => shuffle(),
     pin(on) {
       pinned = on;
       const { firstMs, waveMs } = live.current.timing;

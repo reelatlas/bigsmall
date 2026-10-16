@@ -3,6 +3,7 @@ import {
   SKETCH_BY_ID,
   SKETCH_EFFECTS,
   SKETCHBOOK_TUNING,
+  SKETCHES,
   type SketchbookTuning,
 } from '../src/features/sketchbook/sketches';
 import { SKETCHBOOK_TIMING } from '../src/lib/timing';
@@ -18,12 +19,13 @@ const shown = (page: Page) =>
   tiles(page).evaluateAll((all) => all.map((tile) => (tile as HTMLElement).dataset['sketch']));
 
 /**
- * Opens the lab with these settings saved, without the shuffle as it opens or the tiles changing
- * by themselves unless asked, so only what a test does changes a tile; then waits for the play.
+ * Opens the lab with these settings saved as the lab saves them (its rotation as the sketches left
+ * out), without the flip as it opens or the tiles changing by themselves unless asked, so only
+ * what a test does changes a tile; then waits for the play.
  */
 async function openLab(
   page: Page,
-  tuning: Partial<SketchbookTuning> = {},
+  { set, ...tuning }: Partial<SketchbookTuning> = {},
   timing: Partial<Record<keyof typeof SKETCHBOOK_TIMING, number>> = {},
 ) {
   await page.addInitScript(
@@ -31,8 +33,10 @@ async function openLab(
       localStorage.setItem('bigsmall:sketchbook-lab', JSON.stringify(saved));
     },
     {
+      version: 2,
       tuning: { intro: false, ...tuning },
       timing: { idleMinMs: 0, idleMaxMs: 0, ...timing },
+      out: set ? SKETCHES.map(({ id }) => id).filter((id) => !set.includes(id)) : [],
     },
   );
   await page.goto('/dev/sketchbook-lab');
@@ -143,10 +147,10 @@ test('every effect lands on the next sketch and leaves the tile at rest', async 
   }
 });
 
-test('Shuffle changes every tile, and no two show the same sketch', async ({ page }) => {
+test('Flip changes every tile, and no two show the same sketch', async ({ page }) => {
   await openLab(page);
   const before = await shown(page);
-  await page.getByRole('button', { name: 'Shuffle', exact: true }).first().click();
+  await page.getByRole('button', { name: 'Flip', exact: true }).first().click();
   await expect
     .poll(async () => (await shown(page)).every((id, index) => id !== before[index]))
     .toBe(true);
@@ -210,15 +214,42 @@ test('the lab copies its settings as code', async ({ page, context, isMobile }) 
   expect(copied).toContain('set: SKETCHES.map(({ id }) => id),');
 });
 
-test('the About page plays the sketchbook as shipped, reached from the footer and back', async ({
+test('the About page plays the sketchbook as shipped, from the footer, its name leading home', async ({
   page,
 }) => {
   await page.goto('/');
+  // On the converter's own page the name is a heading alone.
+  await expect(page.getByRole('link', { name: 'bigsmall' })).toHaveCount(0);
   await page.getByRole('contentinfo').getByRole('link', { name: 'About' }).click();
   await expect(page).toHaveURL(/\/about\/?$/);
   await page.locator('[data-playing]').waitFor();
   await expect(tiles(page)).toHaveCount(SKETCHBOOK_TUNING.columns * SKETCHBOOK_TUNING.rows);
-  await expect(page.getByRole('button', { name: 'Shuffle', exact: true })).toBeVisible();
-  await page.getByRole('contentinfo').getByRole('link', { name: 'Converter' }).click();
+  await expect(page.getByRole('button', { name: 'Flip', exact: true })).toBeVisible();
+  // No footer here: the name in the header leads home.
+  await expect(page.getByRole('contentinfo')).toHaveCount(0);
+  await page.getByRole('link', { name: 'bigsmall' }).click();
   await expect(page).toHaveURL(/\/$/);
+});
+
+test('Flip answers a press with particles in the button, and with a flash under reduced motion', async ({
+  page,
+}) => {
+  await openLab(page);
+  const flip = page.getByRole('button', { name: 'Flip', exact: true });
+  const particles = flip.locator('[data-burst] > *');
+  await flip.click();
+  await expect(particles.first()).toBeAttached();
+  // A press while they play adds to them.
+  const count = await particles.count();
+  await flip.click();
+  await expect.poll(() => particles.count()).toBeGreaterThan(count);
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(particles).toHaveCount(0);
+  await recordAnimations(page);
+  await flip.click();
+  await expect(particles).toHaveCount(0);
+  expect(await startedAnimations(page, 'button:has([data-burst])', 'backgroundColor')).not.toEqual(
+    [],
+  );
 });

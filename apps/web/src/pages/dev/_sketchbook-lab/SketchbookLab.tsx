@@ -22,7 +22,7 @@ import { useIsHydrated } from '../../../lib/hydrated';
 import { CARD, CHECKBOX, cx } from '../../../lib/recipes';
 import { FRAME_MS, SKETCHBOOK_TIMING } from '../../../lib/timing';
 import { CHECK, FIELD, HEADING, Panel, SELECT, Slider } from '../_lab/controls';
-import { SHIPPED } from './presets';
+import { PRESETS, SHIPPED } from './presets';
 
 // Development page: tunes the sketchbook at play (pages/dev/sketchbook-lab.astro). Settings apply
 // live and persist in this browser; none of this ships to the converter.
@@ -34,23 +34,48 @@ type TimingKey = keyof Timing;
 const DEFAULTS: SketchbookSettings = { timing: SKETCHBOOK_TIMING, tuning: SKETCHBOOK_TUNING };
 
 /** Saved settings over the defaults, so a setting added since keeps its default. */
+/**
+ * What the lab keeps in this browser: the settings, with the rotation kept as the sketches left
+ * out of it, so a sketch added to the catalog since joins it (version 2). A save from before kept
+ * the sketches in it, which left out every one added later: its rotation is dropped for all.
+ */
+interface Saved {
+  version?: number;
+  timing?: Partial<SketchbookSettings['timing']>;
+  tuning?: Partial<SketchbookTuning>;
+  out?: string[];
+}
+
+/** Saved settings over the defaults, so a setting added since keeps its default. */
 function load(): SketchbookSettings | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const saved = JSON.parse(raw) as Partial<SketchbookSettings>;
+    const saved = JSON.parse(raw) as Saved;
+    const out = new Set(saved.version === 2 ? (saved.out ?? []) : []);
     return {
       timing: { ...DEFAULTS.timing, ...saved.timing },
-      tuning: { ...DEFAULTS.tuning, ...saved.tuning },
+      tuning: {
+        ...DEFAULTS.tuning,
+        ...saved.tuning,
+        set: SKETCHES.map(({ id }) => id).filter((id) => !out.has(id)),
+      },
     };
   } catch {
     return null;
   }
 }
 
-function save(settings: SketchbookSettings): void {
+function save({ timing, tuning }: SketchbookSettings): void {
+  const { set, ...rest } = tuning;
+  const saved: Saved = {
+    version: 2,
+    timing,
+    tuning: rest,
+    out: SKETCHES.map(({ id }) => id).filter((id) => !set.includes(id)),
+  };
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
   } catch {
     // Storage blocked (a private window): the settings last until the page reloads.
   }
@@ -62,14 +87,15 @@ const literal = (value: unknown) => (typeof value === 'string' ? `'${value}'` : 
 /**
  * The settings as code, to paste over the defaults in lib/timing.ts and
  * features/sketchbook/sketches.ts. Every setting is listed from the shipped objects' own keys, so
- * one added later cannot be left out; the set is every sketch, or the ones chosen.
+ * one added later cannot be left out; the set is every sketch but those left out, so one added
+ * later joins it.
  */
 function snippet({ timing, tuning }: SketchbookSettings): string {
-  const chosen = SKETCHES.filter(({ id }) => tuning.set.includes(id));
+  const out = SKETCHES.filter(({ id }) => !tuning.set.includes(id)).map(({ id }) => `'${id}'`);
   const set =
-    chosen.length === SKETCHES.length
+    out.length === 0
       ? 'SKETCHES.map(({ id }) => id)'
-      : `[${chosen.map(({ id }) => `'${id}'`).join(', ')}]`;
+      : `SKETCHES.map(({ id }) => id).filter((id) => ![${out.join(', ')}].includes(id))`;
   const keys = (Object.keys(SKETCHBOOK_TUNING) as (keyof SketchbookTuning)[]).filter(
     (key) => key !== 'set',
   );
@@ -312,6 +338,12 @@ export function SketchbookLab() {
 
   const setSettings = (update: (current: SketchbookSettings) => SketchbookSettings) =>
     setEdited((current) => update(current ?? saved ?? DEFAULTS));
+  const presetId = useId();
+  const [preset, setPreset] = useState(PRESETS[0]?.id ?? '');
+  const loadPreset = () => {
+    const found = PRESETS.find((each) => each.id === preset);
+    if (found) setSettings(() => structuredClone(found.settings));
+  };
 
   // A new grid (more tiles, or the play restarted) takes the play's switches again.
   useEffect(() => {
@@ -346,7 +378,7 @@ export function SketchbookLab() {
       {reduced && (
         <p className={cx(CARD, 'mt-4 p-4 text-sm')}>
           This system asks for reduced motion, so nothing changes by itself, here or on the site: a
-          press cross-fades, and Shuffle changes every tile at once.
+          press cross-fades, and Flip changes every tile at once.
         </p>
       )}
       <div className="mt-8">
@@ -373,8 +405,8 @@ export function SketchbookLab() {
             onChange={setStill}
           />
           <p className="text-xs text-ink-muted">
-            Reduced motion: hovering does nothing, a press cross-fades, and Shuffle changes every
-            tile at once.
+            Reduced motion: hovering does nothing, a press cross-fades, and Flip changes every tile
+            at once.
           </p>
           <Toggle
             label="Keep changing while hovered"
@@ -382,7 +414,7 @@ export function SketchbookLab() {
             onChange={(on) => setTuning('cycle', on)}
           />
           <Toggle
-            label="Shuffle as the page opens"
+            label="Flip as the page opens"
             checked={tuning.intro}
             onChange={(on) => setTuning('intro', on)}
           />
@@ -442,7 +474,7 @@ export function SketchbookLab() {
           ))}
         </Panel>
 
-        <Panel title="Shuffle and order">
+        <Panel title="Flip and order">
           <Choice
             label="Wave"
             value={tuning.wave}
@@ -458,7 +490,7 @@ export function SketchbookLab() {
             max={300}
             step={5}
             unit=" ms"
-            hint="How far apart the waves of tiles start in a shuffle."
+            hint="How far apart the waves of tiles start in a flip."
             onChange={(value) => setTiming('waveMs', value)}
           />
           <Choice
@@ -491,7 +523,7 @@ export function SketchbookLab() {
             onChange={(value) => setTiming('idleMaxMs', value)}
           />
           <Button variant="secondary" onClick={() => player?.shuffle()}>
-            Shuffle
+            Flip them all
           </Button>
         </Panel>
 
@@ -551,9 +583,31 @@ export function SketchbookLab() {
             <Button variant="secondary" onClick={() => setSettings(() => DEFAULTS)}>
               Reset to shipped ({SHIPPED})
             </Button>
+            <div className="grid min-w-0 gap-1 text-sm">
+              <label htmlFor={presetId}>Earlier version</label>
+              <div className="flex gap-2">
+                <select
+                  id={presetId}
+                  value={preset}
+                  onChange={(event) => setPreset(event.currentTarget.value)}
+                  className={SELECT}
+                >
+                  {PRESETS.map((each) => (
+                    <option key={each.id} value={each.id}>
+                      {each.label}
+                    </option>
+                  ))}
+                </select>
+                <Button variant="secondary" onClick={loadPreset}>
+                  Load
+                </Button>
+              </div>
+            </div>
           </div>
           <p className="text-sm text-ink-muted">
-            Paste the copied settings in chat, or over the defaults in the two files they name.
+            Paste the copied settings in chat, or over the defaults in the two files they name. An
+            earlier version loads the settings that shipped then, to compare, or to copy and send
+            back as the defaults.
           </p>
           <pre className="rounded-md bg-surface-raised p-4 font-numeric text-xs wrap-break-word whitespace-pre-wrap">
             {code}

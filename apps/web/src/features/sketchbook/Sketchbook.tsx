@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Button } from '../../components/Button';
-import { ShuffleIcon } from '../../components/icons';
 import { SKETCHBOOK_TIMING } from '../../lib/timing';
+import { FlipButton } from './FlipButton';
 import { play, sketchHref, type SketchbookPlayer } from './motion';
 import {
   SKETCH_BY_ID,
@@ -29,7 +28,7 @@ interface SketchbookProps {
 
 /**
  * The sketchbook (docs/UX-SPEC.md §1, the About page): the logo sketches in a grid, each tile a
- * button that changes to another sketch, with Shuffle under them. The page sets the art once
+ * button that changes to another sketch, with Flip under them. The page sets the art once
  * with SketchSprite.astro, and motion.ts plays it once the island runs. The first render shows
  * the server's sketches, START's order, so hydration changes nothing.
  */
@@ -102,10 +101,7 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
           </button>
         ))}
       </div>
-      <Button variant="secondary" onClick={() => player.current?.shuffle()}>
-        <ShuffleIcon />
-        Shuffle
-      </Button>
+      <FlipButton onFlip={() => player.current?.shuffle()} />
       <p role="status" className="sr-only">
         {said}
       </p>

@@ -44,7 +44,7 @@ export const WORDMARK_TIMING = {
 
 /**
  * The sketchbook at play (docs/UX-SPEC.md §1, the About page), as Sean tuned it in
- * /dev/sketchbook-lab (2026-10-15): how soon a hovered tile first changes, how long each sketch
+ * /dev/sketchbook-lab (v2, 2026-10-15): how soon a hovered tile first changes, how long each sketch
  * shows while it stays hovered, how long a change takes, how often a stepped change (Glitch,
  * Scramble, Scan) shows a new frame, as the name's Flip does for its letters, how far apart the
  * tiles start in a shuffle, and how long each tile waits after a change before it changes by
@@ -53,11 +53,11 @@ export const WORDMARK_TIMING = {
 export const SKETCHBOOK_TIMING = {
   firstMs: 40,
   holdMs: 900,
-  swapMs: 420,
+  swapMs: 480,
   frameMs: 24,
   waveMs: 60,
-  idleMinMs: 1600,
-  idleMaxMs: 2250,
+  idleMinMs: 2250,
+  idleMaxMs: 5800,
 } as const;
 
 /**
@@ -66,3 +66,14 @@ export const SKETCHBOOK_TIMING = {
  * a second, whatever the lab sets (WCAG 2.3.1).
  */
 export const SKETCH_MIN_GAP_MS = 1000 / 3;
+
+/**
+ * The sketchbook's Flip button, pressed (features/sketchbook/burst.ts): how long its particles
+ * last, the shortest and the longest of each mood, and the spread of their starts after a press.
+ */
+export const BURST_TIMING = {
+  bubbles: { leastMs: 1300, mostMs: 2000 },
+  feathers: { leastMs: 1800, mostMs: 2600 },
+  sparkles: { leastMs: 600, mostMs: 1000 },
+  spreadMs: 600,
+} as const;

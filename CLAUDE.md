@@ -16,8 +16,8 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, fifty-second and fifty-third passes):
-   - The sketchbook is live on `/about` with his tuning (v1), reached from the footer, 93 sketches in three rounds and 17 effects (the fifty-third pass); it is tuned in `/dev/sketchbook-lab`.
+1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, fifty-second to fifty-fourth passes):
+   - The sketchbook is live on `/about` with his tuning (v2), reached from the footer's quiet About link, the name leading home from it; 93 sketches in three rounds, 17 effects, and Flip with its particles (the fifty-third and fifty-fourth passes); tuned in `/dev/sketchbook-lab`. His v2 paste left out round 3, which was kept in: confirm.
    - R6 is the mark, live as a trial (`1fa40fa` reverts it); its small circle's mint is the one color in it that is not a token.
    - Feedback: undecided; the fiftieth pass lists the ways (a prefilled email, a form service, a function of ours), each wanting `hello@bigsmall.work` first.
    - Umami, counting since 2026-10-15: his own visit in Realtime, two devices as two visitors with the right countries, his own visits left out (`docs/DEPLOYMENT.md`, "Analytics"; an iPhone opt-out link to offer).

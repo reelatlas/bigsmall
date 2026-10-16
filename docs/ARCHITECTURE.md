@@ -133,23 +133,24 @@ The converter state lives in the island and serializes to the URL (format in doc
 - `pnpm dev` runs the Astro dev server; `pnpm build` writes a static site to `apps/web/dist`; `pnpm preview` serves that build.
 - Core ships as TypeScript source (`exports` points at `src/index.ts`); Vite compiles it with the app. No build step for core.
 - `scripts/bundle-size.mjs` measures what the converter page ships, gzipped; `pnpm bundle:check` enforces the budgets (docs/PLAN.md §9).
+- `scripts/seo-check.mjs` holds every page in the built sitemap to the SEO contract, and every page left out of it to `noindex` (`pnpm seo:check`, docs/SEO.md §1).
 - Hosting is Vercel, with `bigsmall.work` as the main domain (ADR 0008). The Vercel project is `apps/web` with its Astro preset, and `apps/web/vercel.json` adds the headers; setup, releases, and rollbacks are in docs/DEPLOYMENT.md. The build is a static site, so any static host can serve it.
 - A few kilobytes of code load with the page and run nothing until needed (the wordmark's motion). `import()` is only for code far larger than the preload helper Vite wraps it in (about 0.8 KB gzipped), and a new chunk must show up in `pnpm bundle`.
 
 ## How to extend
 
-| Want to…          | Do this                                                                                                                                                                                                                     |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add a unit        | Edit `packages/core/src/units/<category>.ts`, cite the source, add a golden row. See docs/UNITS-CATALOG.md §6                                                                                                               |
-| Add a category    | Follow docs/UNITS-CATALOG.md §6, which lists every file a new category touches                                                                                                                                              |
-| Add a component   | Create it in `src/components/`, tokens only, keyboard and label checked, add it to the gallery. See docs/DESIGN-SYSTEM.md                                                                                                   |
-| Add a feature     | Create `src/features/<name>/`, compose components, import core only through `@bigsmall/core`                                                                                                                                |
-| Add a shortcut    | Handle the key in code, add it to `src/lib/shortcuts.ts`, and describe it in docs/UX-SPEC.md §8                                                                                                                             |
-| Add a header menu | Reuse the shell controller: markup with `data-shell` and `data-shell-toggle` like ThemePicker, placed in `HeaderMenus.astro`, its trigger carrying `data-tool` so the header's toolbar reaches it (ADR 0014); no new script |
-| Add a UI delay    | A named constant in `src/lib/timing.ts`; never a literal number of milliseconds                                                                                                                                             |
-| Add a theme       | Follow docs/THEMING.md. The contract test fails until every token exists and every pair passes contrast                                                                                                                     |
-| Add a page        | `src/pages/<route>.astro` using `Base.astro` and `PageHeader`; a `/dev` page uses `DevPage.astro`. Islands only where there is real interaction                                                                             |
-| Change behavior   | Update docs/UX-SPEC.md in the same change                                                                                                                                                                                   |
+| Want to…          | Do this                                                                                                                                                                                                                                |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add a unit        | Edit `packages/core/src/units/<category>.ts`, cite the source, add a golden row. See docs/UNITS-CATALOG.md §6                                                                                                                          |
+| Add a category    | Follow docs/UNITS-CATALOG.md §6, which lists every file a new category touches                                                                                                                                                         |
+| Add a component   | Create it in `src/components/`, tokens only, keyboard and label checked, add it to the gallery. See docs/DESIGN-SYSTEM.md                                                                                                              |
+| Add a feature     | Create `src/features/<name>/`, compose components, import core only through `@bigsmall/core`                                                                                                                                           |
+| Add a shortcut    | Handle the key in code, add it to `src/lib/shortcuts.ts`, and describe it in docs/UX-SPEC.md §8                                                                                                                                        |
+| Add a header menu | Reuse the shell controller: markup with `data-shell` and `data-shell-toggle` like ThemePicker, placed in `HeaderMenus.astro`, its trigger carrying `data-tool` so the header's toolbar reaches it (ADR 0014); no new script            |
+| Add a UI delay    | A named constant in `src/lib/timing.ts`; never a literal number of milliseconds                                                                                                                                                        |
+| Add a theme       | Follow docs/THEMING.md. The contract test fails until every token exists and every pair passes contrast                                                                                                                                |
+| Add a page        | `src/pages/<route>.astro` using `Base.astro` and `PageHeader`; a `/dev` page uses `DevPage.astro`. Islands only where there is real interaction. A title and a description of its own; `pnpm check` holds it to docs/SEO.md's contract |
+| Change behavior   | Update docs/UX-SPEC.md in the same change                                                                                                                                                                                              |
 
 ## Conventions
 

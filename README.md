@@ -42,5 +42,6 @@ pnpm dev
 | [docs/TESTING.md](docs/TESTING.md)             | The test layers, what each covers, and the commands                             |
 | [docs/LEARNINGS.md](docs/LEARNINGS.md)         | Dated log of gotchas and practices found while building                         |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)       | Hosting, domains, CI's checks, and analytics                                    |
+| [docs/SEO.md](docs/SEO.md)                     | How pages are found in search: the contract, the conventions, the plan          |
 | [docs/decisions/](docs/decisions/README.md)    | Architecture Decision Records (ADRs)                                            |
 | [docs/research/](docs/research/)               | Lab write-ups, the retired labs index, feedback logs, the usability test script |

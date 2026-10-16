@@ -33,6 +33,7 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: pnpm bundle:check
+      - run: pnpm seo:check
 
   e2e:
     name: Browser and accessibility checks

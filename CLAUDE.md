@@ -1,6 +1,6 @@
 # CLAUDE.md — working conventions for bigsmall
 
-Read this first in every session, "Pick up here" above all. Then `docs/PLAN.md` for context, `docs/LEARNINGS.md`'s topic index for known gotchas (and the entries touching your files), `docs/ARCHITECTURE.md` before touching code, and `docs/DEPLOYMENT.md` before anything about hosting or domains.
+Read this first in every session, "Pick up here" above all. Then `docs/PLAN.md` for context, `docs/LEARNINGS.md`'s topic index for known gotchas (and the entries touching your files), `docs/ARCHITECTURE.md` before touching code, `docs/DEPLOYMENT.md` before anything about hosting or domains, and `docs/SEO.md` before adding a page.
 
 ## The project in one paragraph
 
@@ -35,7 +35,7 @@ Kept current at every save and tidy (the `save` skill); history goes in the find
 4. **No one-off components.** Check `apps/web/src/components` first. Extend rather than fork. Every component appears in `/dev/gallery`.
 5. **TSX for interaction, Astro for structure.** Anything the user interacts with is a TSX component written against the React API (imports from `'react'`), which runs on Preact through `preact/compat` (ADR 0007): work that must happen before the next key goes in a layout effect, and the first client render matches the server's. Astro files only scaffold pages and static content. Exceptions: the header menus (theme picker, keyboard shortcuts map) are plain HTML driven by the inline script in `Base.astro`, so they work before any bundle loads and add none (ADR 0002, re-examination), and so are the page's toolbars and the arrows between its planes (ADR 0014); and the wordmark at play is an Astro `<script>` (`lib/wordmark-motion.ts`) that loads with the page and runs only once the heading is hovered or tapped.
 6. **Accessibility is a requirement.** Keyboard-operable, visible focus, labelled, 44 px targets, works at 320 px and 400 % zoom, respects reduced motion. Every theme passes the contrast test. Playwright runs axe on every page, the converter in every theme, and a keyboard walk checks that every Tab stop shows focus.
-7. **Budgets are tests.** Lint, format, types, unit tests, build, the bundle budget, and the browser suite all gate CI. Lighthouse budgets join at milestone 5.
+7. **Budgets are tests.** Lint, format, types, unit tests, build, the bundle budget, the SEO contract (`docs/SEO.md`), and the browser suite all gate CI. Lighthouse budgets join at milestone 5.
 8. **Behavior is specified before it is built.** A UI behavior change updates `docs/UX-SPEC.md` in the same change.
 9. **Decisions are recorded.** Anything you would explain twice becomes an ADR in `docs/decisions/`.
 10. **Learnings are logged.** A gotcha, workaround, or best practice found during work gets a dated entry in `docs/LEARNINGS.md` in the same change.
@@ -60,7 +60,7 @@ pnpm e2e            # Playwright + axe (first time: pnpm --filter @bigsmall/web 
 pnpm lint
 pnpm format         # or format:check
 pnpm typecheck      # tsc for core, astro check for web
-pnpm check          # lint + format check + typecheck + test + build + bundle check: CI's verify job
+pnpm check          # lint + format check + typecheck + test + build + bundle check + SEO contract: CI's verify job
 pnpm --filter @bigsmall/web brand   # redraw the icons and the link preview image from the Daylight tokens
 ```
 
@@ -69,7 +69,7 @@ pnpm --filter @bigsmall/web brand   # redraw the icons and the link preview imag
 - **Add a unit:** `packages/core/src/units/<category>.ts` with `source` and `exact`; add the aliases people type; add a golden row in `packages/core/test/golden/`; run `pnpm test`. Details in `docs/UNITS-CATALOG.md` §6.
 - **Add a component:** `docs/DESIGN-SYSTEM.md` "Adding a component".
 - **Add a theme:** `docs/THEMING.md` "Authoring a theme".
-- **Add a page:** `apps/web/src/pages/`, use `layouts/Base.astro` with `components/PageHeader.astro` (a `/dev` page uses `layouts/DevPage.astro`, which also keeps it out of search), islands only where there is real interaction.
+- **Add a page:** `apps/web/src/pages/`, use `layouts/Base.astro` with `components/PageHeader.astro` (a `/dev` page uses `layouts/DevPage.astro`, which also keeps it out of search), islands only where there is real interaction; a title and a description of its own, and the rest of `docs/SEO.md`'s contract, which `pnpm check` holds every page in the sitemap to.
 - **Add a keyboard shortcut:** handle the key in code, add it to `apps/web/src/lib/shortcuts.ts` (the shortcuts map renders from it), and describe it in `docs/UX-SPEC.md` §8.
 - **Add a header menu:** reuse the shell controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`) and the shell recipes in `src/lib/recipes.ts`, and place it in `components/HeaderMenus.astro`; its trigger carries `data-tool`, so the header's toolbar reaches it (ADR 0014). No new script.
 - **Add a UI delay:** a named constant in `apps/web/src/lib/timing.ts`, never a literal number of milliseconds.

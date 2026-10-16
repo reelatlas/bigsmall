@@ -61,6 +61,11 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - Digit groups that may wrap use U+202F; special characters are named constants (`MINUS`, `DIGIT_GROUP`, `NO_VALUE`), never Unicode escapes.
 - Strings Sean has approved stay exactly as approved; rewording one is a finding for Sean.
 
+## SEO
+
+- Every page in the sitemap meets docs/SEO.md's contract (`pnpm seo:check`, part of `pnpm check`), and every page left out of it asks not to be indexed.
+- What was added since the last tidy follows docs/SEO.md §2: a page's own title and description, its text ours, a category's pairs in the pairs' list once pair pages exist, a moved page's old address redirected.
+
 ## Dead code and stale bits
 
 - Unused exports: for each export in scope, search its name across `apps/web` and `packages`; one hit (its own definition) means dead, unless it is core's public API (`packages/core/src/index.ts`).

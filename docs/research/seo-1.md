@@ -1,6 +1,6 @@
 # SEO 1: where bigsmall stands in search, how ranking works, and what to do next
 
-Written 2026-10-15 for Sean, who asked what has been done for search, whether the metadata is right, how ranking in Google actually works, whether to advertise, and what else to try (the fifty-seventh pass in docs/research/findings-0-first-pass.md). The site's setup was checked on the live site the same day; Google's and others' claims come from their own pages, listed under Sources, as of October 2026. Where a point is our judgement rather than a source's, it says so.
+The contract, the conventions, and the plan it led to live in docs/SEO.md (2026-10-15). Written 2026-10-15 for Sean, who asked what has been done for search, whether the metadata is right, how ranking in Google actually works, whether to advertise, and what else to try (the fifty-seventh pass in docs/research/findings-0-first-pass.md). The site's setup was checked on the live site the same day; Google's and others' claims come from their own pages, listed under Sources, as of October 2026. Where a point is our judgement rather than a source's, it says so.
 
 ## The short version
 

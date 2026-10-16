@@ -47,7 +47,7 @@ Directions Sean wants to explore after the MVP is shared; none is designed or sc
 - **Choosing the sort (Sean, 2026-10-07).** Let people pick how units are ordered in the list and the table: by size across systems (mm, cm, in, ft…), by system (today's default, ADR 0011), alphabetically, or favorites first. To work out: where the choice lives (the table's heading, settings), whether the list and the table share it, and that a chosen sort is remembered.
 - **Saved settings and templates (Sean, 2026-10-07).** Every setting is remembered by default, as the theme is: built 2026-10-15 for Units and Display (ADR 0018, docs/UX-SPEC.md §11); multiples would join them once they exist. Later, maybe: templates, named sets of settings to switch between (a construction set with fractional inches, say).
 - **Many more categories and units.** The catalog's plan (docs/UNITS-CATALOG.md §3's advanced groups; fuel economy, energy, pressure, power, and angle shipped on 2026-10-08) and more formulas, each category's data loaded on demand against its own budget (§9), every unit cited (ADR 0020).
-- **Search visibility (SEO).** The pair pages already planned for launch (one static page per popular unit pair), plus the technical basics (canonical domain, sitemap, robots, titles and descriptions, structured data, social cards) and Google Search Console and Bing Webmaster Tools.
+- **Search visibility (SEO).** The pair pages already planned for launch (one static page per popular unit pair), plus the technical basics (canonical domain, sitemap, robots, titles and descriptions, structured data, social cards) and Google Search Console and Bing Webmaster Tools. The contract every page meets, the conventions for what is added, and the plan: docs/SEO.md (2026-10-15).
 - **Analytics and monitoring.** Cookieless traffic analytics and product events: Umami Cloud, built and on 2026-10-15 (ADR 0019). Still to come: real-user speed (Core Web Vitals, not from Umami's performance option, which sends on every URL change), search performance (Google Search Console), and optionally errors and uptime; each script counted against the budget.
 - **The formulas on the About page (Sean, 2026-10-15).** Every factor and formula the converter calculates with, shown on the About page so anyone, by hand or with an AI, can check that they are sound: by category, each unit's definition, its factor to the base unit or its formula (temperature's offsets, fuel economy's reciprocals), and the standard it was checked against, collapsed by default, with one control to show or hide them all. No polished structure needed. After the accuracy audit (§11), whose verdicts it shows. To work out: generated at build time from `@bigsmall/core`'s own unit data, so the page can never drift from the math (static HTML, a `<details>` per category, a script only for show and hide all); how a formula reads (`1 ft = 0.3048 m, exact`; `°F = °C × 9/5 + 32`); where it sits under the sketchbook.
 
@@ -206,22 +206,23 @@ WCAG 2.2 AA throughout. Specifically:
 
 ## 12. Documentation system
 
-| Doc                        | Purpose                                                      | Updated when                   |
-| -------------------------- | ------------------------------------------------------------ | ------------------------------ |
-| `CLAUDE.md`                | Conventions and rules for every working session              | Rules change                   |
-| `docs/PLAN.md`             | Vision, scope, architecture, milestones                      | Scope or plan changes          |
-| `docs/UX-SPEC.md`          | Exact UI behavior                                            | Before any behavior change     |
-| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources                      | Units or categories change     |
-| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend                | Structure changes              |
-| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                              | Tokens or components change    |
-| `docs/THEMING.md`          | How to author and QA a theme                                 | Theming mechanism changes      |
-| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates                | Test approach changes          |
-| `docs/DEPLOYMENT.md`       | How the site is built and served; setup, releases, rollbacks | Hosting or domains change      |
-| `docs/decisions/NNNN-*.md` | Why we chose what we chose                                   | A decision is made or reversed |
-| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices                      | Something is learned           |
-| `docs/research/`           | Usability test scripts, feedback rounds, findings            | A test or feedback round runs  |
-| `docs/research/labs/`      | The retired labs index, with each lab's screenshots          | A lab retires                  |
-| `.claude/skills/`          | The working routines: tidy, save (a handoff), ship           | A routine changes              |
+| Doc                        | Purpose                                                      | Updated when                            |
+| -------------------------- | ------------------------------------------------------------ | --------------------------------------- |
+| `CLAUDE.md`                | Conventions and rules for every working session              | Rules change                            |
+| `docs/PLAN.md`             | Vision, scope, architecture, milestones                      | Scope or plan changes                   |
+| `docs/UX-SPEC.md`          | Exact UI behavior                                            | Before any behavior change              |
+| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources                      | Units or categories change              |
+| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend                | Structure changes                       |
+| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                              | Tokens or components change             |
+| `docs/THEMING.md`          | How to author and QA a theme                                 | Theming mechanism changes               |
+| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates                | Test approach changes                   |
+| `docs/DEPLOYMENT.md`       | How the site is built and served; setup, releases, rollbacks | Hosting or domains change               |
+| `docs/SEO.md`              | The SEO contract every page meets, the conventions, the plan | A page, a category, or the plan changes |
+| `docs/decisions/NNNN-*.md` | Why we chose what we chose                                   | A decision is made or reversed          |
+| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices                      | Something is learned                    |
+| `docs/research/`           | Usability test scripts, feedback rounds, findings            | A test or feedback round runs           |
+| `docs/research/labs/`      | The retired labs index, with each lab's screenshots          | A lab retires                           |
+| `.claude/skills/`          | The working routines: tidy, save (a handoff), ship           | A routine changes                       |
 
 Rule of thumb: if a future session would have to rediscover it, write it down.
 

@@ -19,7 +19,8 @@
     "format:check": "prettier --check .",
     "bundle": "node scripts/bundle-size.mjs",
     "bundle:check": "node scripts/bundle-size.mjs --check",
-    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build && pnpm bundle:check"
+    "seo:check": "node scripts/seo-check.mjs",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build && pnpm bundle:check && pnpm seo:check"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

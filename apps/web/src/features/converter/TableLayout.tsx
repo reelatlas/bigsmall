@@ -112,7 +112,7 @@ export interface TableLayoutProps {
   table: TableView;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
-  /** Id of the converter's hint, which describes the field. */
+  /** Id of the converter's intro, which describes the field. */
   describedBy: string;
   /**
    * The side panel open, one at a time (the calculator, Units, or Display): between the box and

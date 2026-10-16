@@ -26,7 +26,7 @@ export interface ValueFieldProps {
   locale: string | undefined;
   unit: Unit | null;
   placeholder: string;
-  /** Id of the hint that describes the field. */
+  /** Id of the text that describes the field (the converter's intro). */
   describedBy: string;
   /**
    * The combobox's popup, the list under the field: whether it shows, the ids of what it controls

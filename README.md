@@ -1,6 +1,6 @@
 # bigsmall
 
-An efficient unit converter. Type a number, a unit, or both into one box and see it in every unit of its category at once, in a table that is also where units are picked. Live at [bigsmall.work](https://bigsmall.work).
+A unit converter. Type a number, unit, or both to compare all at once. Live at [bigsmall.work](https://bigsmall.work).
 
 **Status:** milestones 0 to 2 are done, and milestone 3, the complete converter, is under way. Where things stand: [CLAUDE.md](CLAUDE.md), "Current status"; the milestones: [docs/PLAN.md](docs/PLAN.md) §13.
 

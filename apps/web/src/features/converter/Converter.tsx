@@ -21,6 +21,7 @@ import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { pressedByTouch } from '../../lib/modality';
 import { isApplePlatform } from '../../lib/platform';
+import { INTRO } from '../../lib/site';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { glide } from './glide';
@@ -59,11 +60,8 @@ const SIDE_OPENED = {
   display: 'Display opened',
 } as const;
 
-/** The hint over the toolbar (docs/UX-SPEC.md §1). */
-const HINT = 'Type a number, unit, or both to compare all at once.';
-
 /**
- * The converter island (ADR 0012, ADR 0013, ADR 0018, docs/UX-SPEC.md §1): the hint; the
+ * The converter island (ADR 0012, ADR 0013, ADR 0018, docs/UX-SPEC.md §1): the intro; the
  * toolbar's buttons, the calculator, Units, and Display after the category menu and undo, redo,
  * and clear all at its right end, which TableLayout sets in a row; the box and its table, with the
  * side panel open, one at a time (the calculator §8, Units, or Display), between them or beside
@@ -88,7 +86,7 @@ export function Converter() {
   const displayToggleId = useId();
   // Tooltips name the platform's keys; until hydration they read as on the server (Ctrl).
   const apple = hydrated && isApplePlatform();
-  const hintId = useId();
+  const introId = useId();
   const calcMessageId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const { copied, copy, markCopied, pointerProps } = useCopied<Confirmable>();
@@ -322,14 +320,15 @@ export function Converter() {
       data-hydrated={hydrated ? '' : undefined}
     >
       {/*
-        The hint has a line of its own, and the toolbar the next one, over the box it acts on, so
-        what to do and the tools to do it with read apart (docs/UX-SPEC.md §1). 8 px over the
-        toolbar, as the toolbar sits over the box: nothing in it shows an edge under the hint, the
+        The intro, what bigsmall does, has a line of its own, and the toolbar the next one, over
+        the box it acts on, so what to do and the tools to do it with read apart (docs/UX-SPEC.md
+        §1); it describes the box to screen readers too. 8 px over the toolbar, as the toolbar sits
+        over the box: nothing in it shows an edge under the intro, the
         menu's text and the icons' glyphs each inset in their buttons (docs/DESIGN-SYSTEM.md,
         "Space by what shows").
       */}
-      <p id={hintId} className="mb-2 text-sm text-ink-muted">
-        {HINT}
+      <p id={introId} className="mb-2 text-sm text-ink-muted">
+        {INTRO}
       </p>
 
       <TableLayout
@@ -435,7 +434,7 @@ export function Converter() {
         table={table}
         env={env}
         dispatch={dispatch}
-        describedBy={hintId}
+        describedBy={introId}
         side={sidePanel}
         sideId={sideId}
         sideTypes={side === 'units' || side === 'display'}

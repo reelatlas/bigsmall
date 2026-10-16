@@ -992,7 +992,7 @@ test('the box’s × clears its text and keeps the unit, one step undo brings ba
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
 });
 
-test('the hint has a line of its own; the toolbar under it leads with the menu, the calculator, Units, and Display, which wrap under the other tools on a phone', async ({
+test('the intro has a line of its own; the toolbar under it leads with the menu, the calculator, Units, and Display, which wrap under the other tools on a phone', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -1000,7 +1000,7 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   await ready(page);
   const words = 'Type a number, unit, or both to compare all at once.';
   const geometry = async () => ({
-    hint: (await page.getByText(words).boundingBox())!,
+    intro: (await page.getByText(words).boundingBox())!,
     toolbar: (await page.getByRole('toolbar', { name: 'Tools' }).boundingBox())!,
     calculator: (await calculatorButton(page).boundingBox())!,
     units: (await settingsButton(page, 'Units').boundingBox())!,
@@ -1019,8 +1019,8 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     const wide = await geometry();
-    // 8 px under the hint, as the toolbar sits over the box.
-    expect(Math.round(wide.toolbar.y - (wide.hint.y + wide.hint.height)), theme.id).toBe(8);
+    // 8 px under the intro, as the toolbar sits over the box.
+    expect(Math.round(wide.toolbar.y - (wide.intro.y + wide.intro.height)), theme.id).toBe(8);
     expect(Math.abs(middle(wide.menu) - middle(wide.last)), theme.id).toBeLessThan(4);
     expect(wide.menu.x + wide.menu.width, theme.id).toBeLessThan(wide.calculator.x);
     expect(wide.calculator.x + wide.calculator.width, theme.id).toBeLessThanOrEqual(wide.units.x);
@@ -1041,8 +1041,8 @@ test('the hint has a line of its own; the toolbar under it leads with the menu, 
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     const narrow = await geometry();
-    // 8 px under the hint on a phone too.
-    expect(Math.round(narrow.toolbar.y - (narrow.hint.y + narrow.hint.height)), theme.id).toBe(8);
+    // 8 px under the intro on a phone too.
+    expect(Math.round(narrow.toolbar.y - (narrow.intro.y + narrow.intro.height)), theme.id).toBe(8);
     expect(Math.abs(narrow.undo.x - narrow.start.x), theme.id).toBeLessThanOrEqual(1);
     expect(narrow.menu.y, theme.id).toBeGreaterThanOrEqual(narrow.last.y + narrow.last.height);
     expect(Math.abs(middle(narrow.menu) - middle(narrow.display)), theme.id).toBeLessThan(4);

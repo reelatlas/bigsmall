@@ -88,7 +88,10 @@ function ico(images) {
 }
 
 writeFileSync(out('icon.svg'), `${mark(7)}\n`);
-const sizes = [16, 32];
+// favicon.ico: each size drawn on its own, so none is a smaller one stretched; 48 and 64 px for
+// screens with two or three pixels to the point, where Safari and Windows read it (Sean,
+// 2026-10-16: the 32 px one looked rough). Chrome, Edge, and Firefox draw icon.svg instead.
+const sizes = [16, 32, 48, 64];
 const images = [];
 for (const size of sizes) images.push({ size, data: await png(mark(7), size, size) });
 writeFileSync(out('favicon.ico'), ico(images));
@@ -113,5 +116,5 @@ writeFileSync(out('og.png'), await page.screenshot({ type: 'png' }));
 
 await browser.close();
 console.log(
-  'Wrote icon.svg, favicon.ico, apple-touch-icon.png, icon-192.png, icon-512.png, and og.png to apps/web/public.',
+  'Wrote icon.svg, favicon.ico (16 to 64 px), apple-touch-icon.png, icon-192.png, icon-512.png, and og.png to apps/web/public.',
 );

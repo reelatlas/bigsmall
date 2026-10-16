@@ -137,7 +137,7 @@ export const areaUnits: readonly Unit[] = [
     symbol: 'yd²',
     aliases: ['sq yd', 'sqyd', 'sq. yd.', 'yard squared', 'yards squared'],
     system: 'imperial',
-    tier: 'advanced',
+    tier: 'basic',
     factor: 0.83612736,
     exact: true,
     source: YARD_POUND,

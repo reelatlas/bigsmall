@@ -33,13 +33,17 @@ describe('search: idle lists', () => {
       'yard',
       'mile',
       'nanometer',
+      'micrometer',
       'millimeter',
       'centimeter',
       'meter',
       'kilometer',
+      'nautical-mile',
+      'light-year',
     ]);
     expect(ids(search('', { category: 'length', system: 'metric' }))).toEqual([
       'nanometer',
+      'micrometer',
       'millimeter',
       'centimeter',
       'meter',
@@ -48,6 +52,8 @@ describe('search: idle lists', () => {
       'foot',
       'yard',
       'mile',
+      'nautical-mile',
+      'light-year',
     ]);
     expect(ids(search('', { category: 'volume', system: 'us' }))).toEqual([
       'us-teaspoon',
@@ -57,8 +63,11 @@ describe('search: idle lists', () => {
       'us-pint',
       'us-quart',
       'us-gallon',
+      'cubic-foot',
+      'cubic-yard',
       'milliliter',
       'liter',
+      'cubic-meter',
       // The UK's own measures are everyday too, of neither main system for a US visitor.
       'imperial-fluid-ounce',
       'imperial-pint',
@@ -72,6 +81,7 @@ describe('search: idle lists', () => {
       'square-kilometer',
       'square-inch',
       'square-foot',
+      'square-yard',
       'acre',
       'square-mile',
     ]);
@@ -93,9 +103,11 @@ describe('search: idle lists', () => {
       'stone',
       'microgram',
       'milligram',
+      'carat',
       'gram',
       'kilogram',
       'tonne',
+      'troy-ounce',
       'short-ton',
     ]);
     expect(ids(search('', { category: 'mass', system: 'us' }))).toEqual([
@@ -104,9 +116,11 @@ describe('search: idle lists', () => {
       'short-ton',
       'microgram',
       'milligram',
+      'carat',
       'gram',
       'kilogram',
       'tonne',
+      'troy-ounce',
       'stone',
     ]);
   });
@@ -142,17 +156,17 @@ describe('search: idle lists', () => {
       'yard',
       'mile',
       'nanometer',
+      'micrometer',
       'millimeter',
       'centimeter',
       'meter',
       'kilometer',
-      'micrometer',
+      'nautical-mile',
+      'light-year',
       'mil',
       'fathom',
       'furlong',
-      'nautical-mile',
       'astronomical-unit',
-      'light-year',
       'parsec',
     ]);
     // A UK visitor's own measures first; the US ones are everyday units of neither main system.
@@ -160,8 +174,11 @@ describe('search: idle lists', () => {
       'imperial-fluid-ounce',
       'imperial-pint',
       'imperial-gallon',
+      'cubic-foot',
+      'cubic-yard',
       'milliliter',
       'liter',
+      'cubic-meter',
       'us-teaspoon',
       'us-tablespoon',
       'us-fluid-ounce',
@@ -170,10 +187,7 @@ describe('search: idle lists', () => {
       'us-quart',
       'us-gallon',
       'cubic-inch',
-      'cubic-foot',
       'oil-barrel',
-      'cubic-yard',
-      'cubic-meter',
     ]);
   });
 
@@ -186,7 +200,8 @@ describe('search: idle lists', () => {
     expect(group('imperial-pint', 'imperial')).toBe('own');
     expect(group('knot', 'metric')).toBe('neither');
     expect(group('nanometer', 'metric')).toBe('own');
-    expect(group('micrometer', 'metric')).toBe('specialist');
+    expect(group('micrometer', 'metric')).toBe('own');
+    expect(group('mil', 'metric')).toBe('specialist');
   });
 
   it('orders the newer categories by the same rule', () => {
@@ -194,20 +209,20 @@ describe('search: idle lists', () => {
       'inch-of-mercury',
       'pound-per-square-inch',
       'pascal',
+      'hectopascal',
       'millimeter-of-mercury',
       'kilopascal',
       'bar',
       'atmosphere',
-      'hectopascal',
       'megapascal',
     ]);
     expect(ids(search('', { category: 'power', system: 'metric', tier: 'all' }))).toEqual([
       'watt',
+      'metric-horsepower',
       'kilowatt',
       'megawatt',
-      'horsepower',
       'btu-per-hour',
-      'metric-horsepower',
+      'horsepower',
       'ton-of-refrigeration',
       'gigawatt',
     ]);

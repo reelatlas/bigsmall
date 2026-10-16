@@ -35,7 +35,7 @@ test('a fresh visit shows symbols and names, two places, and the specialist unit
   await expect(row(page, 'liter')).toContainText('0.47');
   // Symbol and name since 2026-10-15 (Sean); symbols alone until then.
   await expect(row(page, 'liter').locator('[data-name]')).toBeVisible();
-  await expect(row(page, 'cubic-meter')).toHaveCount(0);
+  await expect(row(page, 'oil-barrel')).toHaveCount(0);
   await expect(hiddenToggle(page)).toContainText(String(SPECIALIST));
 
   await settingsButton(page, 'Units').click();
@@ -350,11 +350,8 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   await ready(page);
   // A specialist unit shown on its own, from Hidden.
   await hiddenToggle(page).click();
-  await page
-    .getByRole('group', { name: 'Hidden, Specialty' })
-    .getByLabel(/micrometers/)
-    .click();
-  await expect(row(page, 'micrometer')).toBeVisible();
+  await page.getByRole('group', { name: 'Hidden, Specialty' }).getByLabel(/mils$/).click();
+  await expect(row(page, 'mil')).toBeVisible();
   await settingsButton(page, 'Units').click();
   const units = settingsPanel(page, 'Units');
   const specialty = units.getByRole('checkbox', { name: 'Specialty' });
@@ -369,7 +366,7 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   await expect(specialty).toBeChecked();
   await specialty.click();
   await expect(specialty).not.toBeChecked();
-  await expect(row(page, 'micrometer')).toHaveCount(0);
+  await expect(row(page, 'mil')).toHaveCount(0);
   await expect(page.locator('[data-section="specialist"]')).toHaveCount(0);
   await expect(units.getByRole('radio', { name: /^Custom/ })).toBeChecked();
 });
@@ -566,7 +563,9 @@ test('settings are remembered in this browser: what shows, Custom, the order, an
 test('search leaves hidden units out and offers them; taking one unhides it', async ({ page }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
-  await box(page).fill('2 cubic');
+  // Cubic inches are specialist: the cubic foot, yard, and meter, which also start "cubic", are
+  // everyday since 2026-10-16.
+  await box(page).fill('2 cubic in');
   await expect(page.getByText('Only hidden units match')).toBeVisible();
   await page.getByRole('button', { name: 'Show them' }).click();
   const hidden = page.getByRole('listbox', { name: 'Only hidden units match' });
@@ -746,9 +745,9 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
   // The page takes clicks while it moves: a second unit checked straight after the first shows.
   await page
     .getByRole('group', { name: 'Hidden, Specialty' })
-    .getByLabel(/cubic feet/)
+    .getByLabel(/oil barrels/)
     .click();
-  await expect(row(page, 'cubic-foot')).toBeVisible();
+  await expect(row(page, 'oil-barrel')).toBeVisible();
 
   // Edit sends one to Hidden: Hidden flashes as it takes it.
   await table(page).getByRole('button', { name: 'Edit', exact: true }).click();

@@ -149,7 +149,7 @@ export const pressureUnits: readonly Unit[] = [
     symbol: 'hPa',
     aliases: ['millibar', 'millibars', 'mbar'],
     system: 'si',
-    tier: 'advanced',
+    tier: 'basic',
     factor: 100,
     exact: true,
     source: SI,

@@ -72,7 +72,7 @@ Checked on bigsmall.work on 2026-10-15:
 
 ## Where clicks still come from for a converter
 
-Google's own box handles plain conversions in length, mass, volume, temperature, speed, area, time, data, and fuel. Its AI answers appeared for about one keyword in six in a large late-2025 study, more on "how to" questions. Yet the incumbents still get most of their visits from search: unitconverters.net about 84 %, inchcalculator.com about 79 % (Similarweb's estimates, on desktop). What those visits search for points at openings (our judgement, from their top keywords):
+Google's own box converts most everyday kinds: its help page lists length, mass, volume, temperature, speed, area, time, data, and fuel, and its units table energy, pressure, power, force, frequency, data rates, and angles too (corrected 2026-10-15); not torque, pace, a temperature change, or cooking by ingredient, and it gives one answer, never a table. Its AI answers appeared for about one keyword in six in a large late-2025 study, more on "how to" questions. Yet the incumbents still get most of their visits from search: unitconverters.net about 84 %, inchcalculator.com about 79 % (Similarweb's estimates, on desktop). What those visits search for points at openings (our judgement, from their top keywords):
 
 - **specific values and tables**: "7 in cm", charts to print or keep;
 - **heights in feet and inches**: "5'10 in cm" (the feet-and-inches input in docs/PLAN.md §2);

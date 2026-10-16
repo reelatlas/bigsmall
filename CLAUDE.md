@@ -16,14 +16,14 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, the full tidy after the sketchbook): twelve questions from the tidy and the accuracy audit, numbered there, the recommendation first (the therm, ties below zero, a pause for the About page's tiles, the flicker limit between frames, the link home's height, the mark first on About, and smaller ones).
-   - SEO (`docs/research/seo-1.md`): Search Console and Bing Webmaster Tools on Sean's accounts (DNS at Porkbun; steps on his screen), and the quick wins on his go (structured data, a fuller description in his words, PNG icons).
-   - Categories (`docs/research/categories-1.md`): the order to add them, recommended data transfer rate, a temperature's difference, force and torque, pace, then cooking by ingredient.
-   - R6 is the mark, live as a trial (`1fa40fa` reverts it); its small circle's mint is the one color in it that is not a token.
-   - Feedback: undecided; the fiftieth pass lists the ways (a prefilled email, a form service, a function of ours), each wanting `hello@bigsmall.work` first.
-   - Umami, counting since 2026-10-15: his own visit in Realtime, two devices as two visitors with the right countries, his own visits left out (`docs/DEPLOYMENT.md`, "Analytics"; an iPhone opt-out link to offer).
-2. **Next, in order:** his answers built (the therm and the ties as `fix(core)` with golden rows; the accessibility ones); then the categories in his order, each factor checked blind as in the audit (`docs/research/accuracy-audit-1.md`, "Method"); then the formulas on the About page (`docs/PLAN.md` §2), built from core's data.
-3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages, planned from `docs/research/seo-1.md` (50 to 100 strong pages first, measured, then grown), in v1 on `bigsmall.work`; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
+1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, the fifty-eighth pass):
+   - The footer: at least at the window's bottom on a short page, in the flow otherwise; a trial on his yes.
+   - The link home at 44 px tall: nothing moves (4 px of padding taken back by negative margins); on his yes.
+   - The SEO plan's open decisions ("bigsmall SEO plan", https://claude.ai/artifact/7eXfYjEdTn4zKXXGLug3pT; `docs/SEO.md`): Search Console and Bing Webmaster Tools on his accounts (DNS at Porkbun, steps on his screen), the new description's wording, a one-line note that visits are counted anonymously, an ads test after launch or none.
+   - Trials: Pause beside Flip (`3fb2da3` reverts it); R6 as the mark (`1fa40fa` reverts it), its small circle's mint the one color in it that is not a token.
+   - Feedback: undecided; the fiftieth pass lists the ways, each wanting `hello@bigsmall.work` first. Umami: his own visit, two devices, his visits left out (`docs/DEPLOYMENT.md`, "Analytics").
+2. **Next, in order** (`docs/research/categories-1.md`): force and torque, two categories, each factor checked blind as in the audit; a temperature change; pace inside Speed, a lab first; data rate; cooking by ingredient, a lab first. Then the pair pages' shape in the spec and a lab, the first pairs chosen from demand (`docs/SEO.md` §3), and the formulas on the About page (`docs/PLAN.md` §2).
+3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages built and launched (`docs/SEO.md`), in v1 on `bigsmall.work`; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
 4. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).
 5. **Later.** The hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search); the five-person test once there is traction.
 

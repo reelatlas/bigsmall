@@ -17,7 +17,7 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
 1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, fiftieth pass):
-   - The sketchbook: tune it in `/dev/sketchbook-lab` (on the live site too) and choose its rotation, then paste Copy settings in chat. The spring curve, if chosen, becomes a motion token.
+   - The sketchbook: tune it in `/dev/sketchbook-lab` (on the live site too), Glitch, Scramble, Flap, and Scan among its effects (the fifty-first pass), and choose its rotation, then paste Copy settings in chat. The spring curve, if chosen, becomes a motion token.
    - R6 is the mark, live as a trial (`1fa40fa` reverts it); its small circle's mint is the one color in it that is not a token.
    - Feedback: undecided; the fiftieth pass lists the ways (a prefilled email, a form service, a function of ours), each wanting `hello@bigsmall.work` first.
    - Umami, counting since 2026-10-15: his own visit in Realtime, two devices as two visitors with the right countries, his own visits left out (`docs/DEPLOYMENT.md`, "Analytics"; an iPhone opt-out link to offer).

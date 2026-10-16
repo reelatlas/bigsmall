@@ -45,13 +45,22 @@ export const WORDMARK_TIMING = {
 /**
  * The sketchbook at play (docs/UX-SPEC.md §14, the About page), which /dev/sketchbook-lab tunes:
  * how soon a hovered tile first changes, how long each sketch shows while it stays hovered, how
- * long a change takes, how far apart the tiles start in a shuffle, and, above 0, how often a tile
- * changes by itself.
+ * long a change takes, how often a stepped change (Glitch, Scramble, Scan) shows a new frame, as
+ * the name's Flip does for its letters, how far apart the tiles start in a shuffle, and, above 0,
+ * how often a tile changes by itself.
  */
 export const SKETCHBOOK_TIMING = {
   firstMs: 150,
   holdMs: 900,
   swapMs: 560,
+  frameMs: 34,
   waveMs: 60,
   idleMs: 0,
 } as const;
+
+/**
+ * The least time from the start of one change of a tile to the start of its next while it plays
+ * by itself (hovered, pinned, or idle), so its whole picture never changes more than three times
+ * a second, whatever the lab sets (WCAG 2.3.1).
+ */
+export const SKETCH_MIN_GAP_MS = 1000 / 3;

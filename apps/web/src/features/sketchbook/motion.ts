@@ -1,9 +1,22 @@
+import { FRAME_MS, SKETCH_MIN_GAP_MS } from '../../lib/timing';
+import {
+  bandClip,
+  blockClip,
+  blocksClip,
+  cutClip,
+  drawnClip,
+  glitchFrame,
+  scanFrame,
+  scrambleFrame,
+  scrambleOrder,
+} from './frames';
 import {
   deckOf,
   draw,
   SKETCH_BY_ID,
   SKETCH_EFFECTS,
   SPRING_EASING,
+  STEPPED_EFFECTS,
   waveRanks,
   type SketchbookSettings,
   type SketchEasing,
@@ -13,10 +26,11 @@ import {
 /**
  * The sketchbook at play (docs/UX-SPEC.md §14, the About page). Hovering a tile with a mouse
  * changes it to the next sketch, and keeps changing it while the mouse stays; a click, a tap,
- * Enter, or Space changes it at once; Shuffle changes every tile in a wave. A change runs on the
- * Web Animations API between the tile's two layers, the sketch showing and the one arriving,
- * which then takes its place. Under reduced motion nothing changes by itself: a press
- * cross-fades, and Shuffle changes every tile at once.
+ * Enter, or Space changes it at once; Shuffle changes every tile in a wave. A change runs between
+ * the tile's layers: the sketch showing (front), the one arriving (back), and pieces the stepped
+ * effects and the flap cut a tile into. The moving effects and the flap run on the Web Animations
+ * API; the stepped ones draw a frame every frameMs, planned in frames.ts. Under reduced motion
+ * nothing changes by itself: a press cross-fades, and Shuffle changes every tile at once.
  */
 
 /** Where a sketch's symbol is on the page (SketchSprite.astro). */
@@ -45,27 +59,44 @@ export interface SketchbookPlayer {
   stop(): void;
 }
 
+/** A tile's layers: the sketch showing, the one arriving, and the pieces some effects need. */
+interface Layers {
+  front: SVGSVGElement;
+  back: SVGSVGElement;
+  pieces: SVGSVGElement[];
+}
+
+/** A change under way: run to its end at once, or dropped. */
+interface Run {
+  finish(): void;
+  cancel(): void;
+}
+
 interface TileState {
   hovered: boolean;
   /** Where the mouse is over the tile, for an iris that opens from it. */
   at: Point;
   timer: number | undefined;
-  running: Animation[];
+  run: Run | null;
   /** Settles when the change under way has. */
   done: Promise<void> | null;
+  /** When its last change started, so it never plays faster than SKETCH_MIN_GAP_MS. */
+  changedAt: number;
 }
 
-/** A change, layer by layer: the sketch showing (front) leaves, the next (back) arrives. */
-interface Frames {
+type Moving = Exclude<SketchEffect, 'glitch' | 'scramble' | 'scan' | 'flap'>;
+
+/** A moving change, layer by layer: the sketch showing (front) leaves, the next (back) arrives. */
+interface Moves {
   front: Keyframe[];
   back: Keyframe[];
   /** The tile clips the layers to its corners while they move (a slide). */
   clip: boolean;
 }
 
-/** How each effect moves the layers; `size` is the tile's width in px. */
-export function frames(effect: SketchEffect, size: number, at: Point): Frames {
-  const turn = (axis: 'rotateX' | 'rotateY'): Frames => {
+/** How each moving effect moves the layers; `size` is the tile's width in px. */
+function moves(effect: Moving, size: number, at: Point): Moves {
+  const turn = (axis: 'rotateX' | 'rotateY'): Moves => {
     // Depth in proportion to the tile, so a flip looks the same at every size.
     const angle = (degrees: number) => `perspective(${size * 4}px) ${axis}(${degrees}deg)`;
     return {
@@ -173,11 +204,80 @@ function easingOf(easing: SketchEasing, tile: HTMLElement): string {
   return getComputedStyle(tile).getPropertyValue(token).trim() || 'linear';
 }
 
+/** Shows a sketch on a layer. */
+const show = (layer: SVGSVGElement, id: string) =>
+  layer.querySelector('use')?.setAttribute('href', sketchHref(id));
+
+/** A layer's edges split into the theme's accent and art colors, `size` px wide at full strength. */
+const split = (strength: number, size: number) => {
+  const offset = Math.max(1, strength * size * 0.03);
+  return `drop-shadow(${-offset}px 0 var(--accent)) drop-shadow(${offset}px 0 var(--art-1))`;
+};
+
 /**
- * Plays the tiles in `grid` (each a [data-sketch-tile] holding a front and a back layer) by the
- * settings in `live`, read at every change, so the lab's changes apply at once. `announce` says a
- * pressed tile's new sketch, or that the grid shuffled. The grid is marked `data-playing` while
- * it plays, which the browser tests wait for.
+ * Flap, like a split-flap board's card: the top half of the sketch showing falls toward the
+ * viewer, uncovering the next one's top, and the next one's bottom half falls after it, each
+ * darkening as it turns from the light.
+ */
+function flap(
+  layers: Layers,
+  from: string,
+  to: string,
+  size: number,
+  options: KeyframeAnimationOptions,
+): Animation[] {
+  const [falling, landing] = layers.pieces;
+  if (!falling || !landing) return [];
+  show(falling, from);
+  show(landing, to);
+  const turned = (degrees: number) => `perspective(${size * 4}px) rotateX(${degrees}deg)`;
+  const top = 'inset(0 0 50% 0)';
+  const bottom = 'inset(50% 0 0 0)';
+  return [
+    layers.back.animate(
+      [
+        { clipPath: top, opacity: 1 },
+        { clipPath: top, opacity: 1 },
+      ],
+      options,
+    ),
+    layers.front.animate([{ clipPath: bottom }, { clipPath: bottom }], options),
+    falling.animate(
+      [
+        { clipPath: top, opacity: 1, transform: turned(0), filter: 'brightness(1)' },
+        {
+          offset: 0.5,
+          clipPath: top,
+          opacity: 1,
+          transform: turned(-90),
+          filter: 'brightness(0.6)',
+        },
+        { clipPath: top, opacity: 0, transform: turned(-90), filter: 'brightness(0.6)' },
+      ],
+      options,
+    ),
+    landing.animate(
+      [
+        { clipPath: bottom, opacity: 1, transform: turned(90), filter: 'brightness(0.6)' },
+        {
+          offset: 0.5,
+          clipPath: bottom,
+          opacity: 1,
+          transform: turned(90),
+          filter: 'brightness(0.6)',
+        },
+        { clipPath: bottom, opacity: 1, transform: turned(0), filter: 'brightness(1)' },
+      ],
+      options,
+    ),
+  ];
+}
+
+/**
+ * Plays the tiles in `grid` (each a [data-sketch-tile] holding its layers) by the settings in
+ * `live`, read at every change, so the lab's changes apply at once. `announce` says a pressed
+ * tile's new sketch, or that the grid shuffled. The grid is marked `data-playing` while it plays,
+ * which the browser tests wait for.
  */
 export function play(
   grid: HTMLElement,
@@ -199,10 +299,27 @@ export function play(
   const stateOf = (tile: HTMLElement): TileState => {
     let state = states.get(tile);
     if (!state) {
-      state = { hovered: false, at: MIDDLE, timer: undefined, running: [], done: null };
+      state = {
+        hovered: false,
+        at: MIDDLE,
+        timer: undefined,
+        run: null,
+        done: null,
+        changedAt: -Infinity,
+      };
       states.set(tile, state);
     }
     return state;
+  };
+  const layersOf = (tile: HTMLElement): Layers | null => {
+    const front = tile.querySelector<SVGSVGElement>('[data-layer="front"]');
+    const back = tile.querySelector<SVGSVGElement>('[data-layer="back"]');
+    if (!front || !back) return null;
+    return {
+      front,
+      back,
+      pieces: [...tile.querySelectorAll<SVGSVGElement>('[data-layer="piece"]')],
+    };
   };
   const later = (run: () => void, ms: number): number => {
     const id = window.setTimeout(() => {
@@ -226,13 +343,139 @@ export function play(
       ),
     );
 
+  /** A sketch from the rotation other than `not`, for a frame that flips through. */
+  const another = (not: string) => {
+    const { set } = live.current.tuning;
+    const others = set.filter((id) => id !== not);
+    return others[Math.floor(random() * others.length)] ?? not;
+  };
+
   const effectFor = (): SketchEffect => {
     const { effect } = live.current.tuning;
     if (still()) return 'fade';
     if (effect !== 'mixed') return effect;
     const choices = SKETCH_EFFECTS.filter((each) => each !== 'fade' && each !== lastEffect);
-    lastEffect = choices[Math.floor(random() * choices.length)] ?? 'flip';
+    lastEffect = choices[Math.floor(random() * choices.length)] ?? 'glitch';
     return lastEffect;
+  };
+
+  /** One frame of Glitch: the picture showing cut into shifted bands, its edges split. */
+  const glitch = (
+    layers: Layers,
+    from: string,
+    to: string,
+    k: number,
+    count: number,
+    size: number,
+  ) => {
+    const arriving = k >= count / 2;
+    const base = arriving ? layers.back : layers.front;
+    const sketch = arriving ? to : from;
+    if (arriving) {
+      layers.front.style.opacity = '0';
+      layers.back.style.opacity = '1';
+    }
+    const { bands, fringe } = glitchFrame(k, count, live.current.tuning.strength, random);
+    const edges = fringe > 0.05 ? split(fringe, size) : '';
+    base.style.clipPath = cutClip(bands);
+    base.style.filter = edges;
+    layers.pieces.forEach((piece, index) => {
+      const band = bands[index];
+      if (!band) {
+        piece.style.opacity = '0';
+        return;
+      }
+      show(piece, band.other ? another(sketch) : sketch);
+      piece.style.opacity = '1';
+      piece.style.clipPath = bandClip(band);
+      piece.style.transform = `translateX(${band.shift * size}px)`;
+      piece.style.filter = edges;
+    });
+  };
+
+  /** One frame of Scramble: the blocks landed so far, and the next few flipping through others. */
+  const scramble = (layers: Layers, to: string, order: readonly number[], progress: number) => {
+    const { landed, flipping } = scrambleFrame(order, progress);
+    layers.back.style.opacity = '1';
+    layers.back.style.clipPath = blocksClip(landed);
+    layers.pieces.forEach((piece, index) => {
+      const block = flipping[index];
+      if (block === undefined) {
+        piece.style.opacity = '0';
+        return;
+      }
+      show(piece, another(to));
+      piece.style.opacity = '1';
+      piece.style.clipPath = blockClip(block);
+    });
+  };
+
+  /** One frame of Scan: the next sketch drawn down to a row, the row under it bright. */
+  const scan = (layers: Layers, to: string, progress: number, size: number) => {
+    const { drawn, row } = scanFrame(progress, random);
+    layers.back.style.opacity = '1';
+    layers.back.style.clipPath = drawnClip(drawn);
+    const [beam] = layers.pieces;
+    if (!beam) return;
+    if (!row) {
+      beam.style.opacity = '0';
+      return;
+    }
+    show(beam, to);
+    beam.style.opacity = '1';
+    beam.style.clipPath = bandClip(row);
+    beam.style.transform = `translateX(${row.shift * size}px)`;
+    beam.style.filter = 'brightness(1.5) saturate(1.3)';
+  };
+
+  /** A stepped change, a frame every frameMs, the first at once, until swapMs has passed. */
+  const stepped = (
+    effect: SketchEffect,
+    layers: Layers,
+    from: string,
+    to: string,
+    size: number,
+  ): { run: Run; ended: Promise<boolean> } => {
+    const { swapMs, frameMs } = live.current.timing;
+    const pace = Math.max(FRAME_MS, frameMs);
+    const count = Math.max(2, Math.round(swapMs / pace));
+    const order = scrambleOrder(random);
+    const drawFrame = (k: number, progress: number) => {
+      if (effect === 'glitch') glitch(layers, from, to, k, count, size);
+      else if (effect === 'scramble') scramble(layers, to, order, progress);
+      else scan(layers, to, progress, size);
+    };
+    let resolve: (arrived: boolean) => void = () => {};
+    const ended = new Promise<boolean>((settled) => {
+      resolve = settled;
+    });
+    let start = 0;
+    let drawn = -1;
+    let frame = 0;
+    let over = false;
+    const end = (arrived: boolean) => {
+      if (over) return;
+      over = true;
+      cancelAnimationFrame(frame);
+      resolve(arrived);
+    };
+    const tick = (now: number) => {
+      start ||= now;
+      const elapsed = now - start;
+      if (elapsed >= swapMs) {
+        end(true);
+        return;
+      }
+      const k = Math.min(count - 1, Math.floor(elapsed / pace));
+      if (k !== drawn) {
+        drawn = k;
+        drawFrame(k, elapsed / swapMs);
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    drawFrame(0, 0);
+    frame = requestAnimationFrame(tick);
+    return { run: { finish: () => end(true), cancel: () => end(false) }, ended };
   };
 
   /**
@@ -242,48 +485,79 @@ export function play(
   async function change(tile: HTMLElement, at: Point, cut: boolean): Promise<void> {
     const state = stateOf(tile);
     if (state.done) {
-      if (cut) for (const animation of state.running) animation.finish();
+      if (cut) state.run?.finish();
       await state.done;
     }
     const { timing, tuning } = live.current;
     deck = deck.filter((id) => tuning.set.includes(id));
     const own = tile.dataset['sketch'];
     const id = draw(deck, () => deckOf(tuning.set, tuning.order, random), showing(), own);
-    const front = tile.querySelector<SVGSVGElement>('[data-layer="front"]');
-    const back = tile.querySelector<SVGSVGElement>('[data-layer="back"]');
-    if (!id || id === own || !front || !back) return;
+    const layers = layersOf(tile);
+    if (!id || !own || id === own || !layers) return;
 
-    back.querySelector('use')?.setAttribute('href', sketchHref(id));
+    show(layers.back, id);
     tile.dataset['next'] = id;
-    const motion = frames(effectFor(), tile.getBoundingClientRect().width, at);
-    const options: KeyframeAnimationOptions = {
-      duration: timing.swapMs,
-      easing: easingOf(tuning.easing, tile),
-      fill: 'forwards',
-    };
-    if (motion.clip) tile.style.overflow = 'hidden';
-    state.running = [front.animate(motion.front, options), back.animate(motion.back, options)];
+    state.changedAt = performance.now();
+    const effect = effectFor();
+    const size = tile.getBoundingClientRect().width;
+    let ended: Promise<boolean>;
+    if (STEPPED_EFFECTS.has(effect)) {
+      const steps = stepped(effect, layers, own, id, size);
+      state.run = steps.run;
+      ended = steps.ended;
+    } else {
+      const options: KeyframeAnimationOptions = {
+        duration: timing.swapMs,
+        easing: easingOf(tuning.easing, tile),
+        fill: 'forwards',
+      };
+      let animations: Animation[];
+      if (effect === 'flap') animations = flap(layers, own, id, size, options);
+      else {
+        const motion = moves(effect as Moving, size, at);
+        if (motion.clip) tile.style.overflow = 'hidden';
+        animations = [
+          layers.front.animate(motion.front, options),
+          layers.back.animate(motion.back, options),
+        ];
+      }
+      state.run = {
+        finish: () => animations.forEach((animation) => animation.finish()),
+        cancel: () => animations.forEach((animation) => animation.cancel()),
+      };
+      ended = Promise.all(animations.map((animation) => animation.finished)).then(
+        () => true,
+        // Cancelled: the page is going, or the lab stopped the play.
+        () => false,
+      );
+    }
 
-    // In one task, so no frame shows between: the front takes the new sketch, the layers go back.
+    // In one task, so no frame shows between: the front takes the new sketch, every layer goes
+    // back to rest.
     const settle = (arrived: boolean) => {
       if (arrived) {
-        front.querySelector('use')?.setAttribute('href', sketchHref(id));
+        show(layers.front, id);
         tile.dataset['sketch'] = id;
         tile.setAttribute('aria-label', SKETCH_BY_ID.get(id)?.name ?? id);
       }
       delete tile.dataset['next'];
-      for (const animation of state.running) animation.cancel();
-      state.running = [];
+      for (const layer of [layers.front, layers.back, ...layers.pieces]) {
+        for (const animation of layer.getAnimations()) animation.cancel();
+        layer.removeAttribute('style');
+      }
       tile.style.overflow = '';
+      state.run = null;
       state.done = null;
     };
-    state.done = Promise.all(state.running.map((animation) => animation.finished)).then(
-      () => settle(true),
-      // Cancelled: the page is going, or the lab stopped the play.
-      () => settle(false),
-    );
+    state.done = ended.then(settle);
     return state.done;
   }
+
+  /** The pause before a playing tile's next change: Hold, never so short it plays too fast to be safe. */
+  const rest = () => {
+    const { holdMs, swapMs } = live.current.timing;
+    return Math.max(holdMs, SKETCH_MIN_GAP_MS - swapMs);
+  };
 
   /** While hovered, or pinned, the next change after `ms`, and on after each. */
   function cycle(tile: HTMLElement, ms: number) {
@@ -292,18 +566,14 @@ export function play(
     state.timer = later(async () => {
       if (still() || !(state.hovered || pinned)) return;
       await change(tile, state.at, false);
-      if (pinned || (state.hovered && live.current.tuning.cycle)) {
-        cycle(tile, live.current.timing.holdMs);
-      }
+      if (pinned || (state.hovered && live.current.tuning.cycle)) cycle(tile, rest());
     }, ms);
   }
 
   /** After a press, a hovered or pinned tile carries on changing. */
   const resume = (tile: HTMLElement) => {
     const state = stateOf(tile);
-    if (pinned || (state.hovered && live.current.tuning.cycle)) {
-      cycle(tile, live.current.timing.holdMs);
-    }
+    if (pinned || (state.hovered && live.current.tuning.cycle)) cycle(tile, rest());
   };
 
   const tileAt = (target: EventTarget | null) =>
@@ -364,14 +634,18 @@ export function play(
     announce('Shuffled');
   }
 
-  /** Above 0, a tile nobody is hovering changes by itself every idleMs. */
+  /** Above 0, a tile nobody is hovering, and not changed of late, changes by itself every idleMs. */
   function idleLoop() {
     cancel(idle);
     const ms = live.current.timing.idleMs;
     if (ms <= 0) return;
     idle = later(() => {
       if (!still() && !document.hidden) {
-        const free = tiles().filter((tile) => !stateOf(tile).hovered && !stateOf(tile).done);
+        const now = performance.now();
+        const free = tiles().filter((tile) => {
+          const state = stateOf(tile);
+          return !state.hovered && !state.done && now - state.changedAt >= SKETCH_MIN_GAP_MS;
+        });
         const tile = free[Math.floor(random() * free.length)];
         if (tile) void change(tile, MIDDLE, false);
       }
@@ -421,7 +695,7 @@ export function play(
       reduced.removeEventListener('change', onReduced);
       for (const id of timers) window.clearTimeout(id);
       timers.clear();
-      for (const tile of tiles()) for (const animation of stateOf(tile).running) animation.cancel();
+      for (const tile of tiles()) stateOf(tile).run?.cancel();
       delete grid.dataset['playing'];
     },
   };

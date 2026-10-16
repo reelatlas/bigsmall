@@ -20,7 +20,7 @@ import {
 import { useCopied } from '../../../lib/copied';
 import { useIsHydrated } from '../../../lib/hydrated';
 import { CARD, CHECKBOX, cx } from '../../../lib/recipes';
-import { SKETCHBOOK_TIMING } from '../../../lib/timing';
+import { FRAME_MS, SKETCHBOOK_TIMING } from '../../../lib/timing';
 import { CHECK, FIELD, HEADING, Panel, SELECT, Slider } from '../_lab/controls';
 
 // Development page: tunes the sketchbook at play (pages/dev/sketchbook-lab.astro). Settings apply
@@ -108,7 +108,7 @@ const TIMING_SLIDERS: ReadonlyArray<{
     min: 100,
     max: 4000,
     step: 50,
-    hint: 'While hovered, how long each sketch shows before the next change.',
+    hint: 'While hovered, how long each sketch shows before the next change; never so short that a tile changes more than three times a second.',
   },
   {
     key: 'firstMs',
@@ -121,6 +121,10 @@ const TIMING_SLIDERS: ReadonlyArray<{
 ];
 
 const EFFECT_LABELS: Readonly<Record<SketchEffect | 'mixed', string>> = {
+  glitch: 'Glitch: slices jump and the edges split, out and in',
+  scramble: 'Scramble: lands block by block, like the name’s letters',
+  flap: 'Flap: folds like a split-flap board’s card',
+  scan: 'Scan: draws in line by line, a bright line leading',
   flip: 'Flip: turns over sideways, like a card',
   tumble: 'Tumble: turns over top to bottom',
   pop: 'Pop: shrinks away, the next grows in',
@@ -390,8 +394,29 @@ export function SketchbookLab() {
             value={tuning.easing}
             choices={SKETCH_EASINGS}
             labels={EASING_LABELS}
-            hint="The spring is the one curve no theme has yet: it would become a motion token."
+            hint="For Flap and the moving effects; Glitch, Scramble, and Scan step evenly, frame by frame. The spring is the one curve no theme has yet: it would become a motion token."
             onChange={(value) => setTuning('easing', value)}
+          />
+          <Slider
+            label="Frame"
+            value={timing.frameMs}
+            shipped={SKETCHBOOK_TIMING.frameMs}
+            min={Math.ceil(FRAME_MS)}
+            max={200}
+            step={1}
+            unit=" ms"
+            hint="How often Glitch, Scramble, and Scan show a new frame, as the name’s Flip does for its letters."
+            onChange={(value) => setTiming('frameMs', value)}
+          />
+          <Slider
+            label="Glitch strength"
+            value={tuning.strength}
+            shipped={SKETCHBOOK_TUNING.strength}
+            min={0}
+            max={1}
+            step={0.05}
+            hint="How far a glitch shifts its slices and splits its edges."
+            onChange={(value) => setTuning('strength', value)}
           />
           {TIMING_SLIDERS.map(({ key, label, min, max, step, hint }) => (
             <Slider

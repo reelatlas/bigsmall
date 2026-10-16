@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import {
   SKETCH_BY_ID,
+  SKETCH_EFFECTS,
   SKETCHBOOK_TUNING,
   type SketchbookTuning,
 } from '../src/features/sketchbook/sketches';
@@ -84,6 +85,31 @@ test('a click, a tap, Enter, and Space change a tile at once, its name following
   }
 });
 
+test('every effect lands on the next sketch and leaves the tile at rest', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'one viewport is enough');
+  await openLab(page);
+  const tile = tiles(page).first();
+  for (const effect of SKETCH_EFFECTS) {
+    await page.getByLabel('Effect', { exact: true }).selectOption(effect);
+    await tile.focus();
+    const was = await sketchOf(tile);
+    await page.keyboard.press('Enter');
+    await expect(tile, effect).not.toHaveAttribute('data-sketch', was!);
+    await expect(tile, effect).not.toHaveAttribute('data-next');
+    // Every layer back at rest: no style of the change's, no animation left running.
+    const layers = await tile.evaluate((element) =>
+      [...element.querySelectorAll('svg')].map(
+        (layer) =>
+          `${layer.getAttribute('style') ?? ''}${layer.getAnimations().length ? ' animating' : ''}`,
+      ),
+    );
+    expect(layers, effect).toEqual(layers.map(() => ''));
+  }
+});
+
 test('Shuffle changes every tile, and no two show the same sketch', async ({ page }) => {
   await openLab(page);
   const before = await shown(page);
@@ -147,6 +173,6 @@ test('the lab copies its settings as code', async ({ page, context, isMobile }) 
   for (const key of Object.keys(SKETCHBOOK_TIMING)) expect(copied, key).toContain(`  ${key}: `);
   expect(copied).toContain('export const SKETCHBOOK_TUNING');
   for (const key of Object.keys(SKETCHBOOK_TUNING)) expect(copied, key).toContain(`  ${key}: `);
-  expect(copied).toContain("effect: 'flip',");
+  expect(copied).toContain("effect: 'glitch',");
   expect(copied).toContain('set: SKETCHES.map(({ id }) => id),');
 });

@@ -11,6 +11,12 @@ import {
   type SketchbookSettings,
 } from './sketches';
 
+/**
+ * A tile's layers, bottom to top: the sketch showing, the one arriving, and four pieces the
+ * stepped effects and the flap cut a tile into (motion.ts); all but the first rest unseen.
+ */
+const LAYERS = ['front', 'back', 'piece', 'piece', 'piece', 'piece'] as const;
+
 /** The settings the sketchbook plays by on the site. */
 const SHIPPED: SketchbookSettings = { timing: SKETCHBOOK_TIMING, tuning: SKETCHBOOK_TUNING };
 
@@ -77,9 +83,9 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
             className="relative block aspect-square w-full"
             style={{ borderRadius: TILE_CORNER }}
           >
-            {(['front', 'back'] as const).map((layer) => (
+            {LAYERS.map((layer, at) => (
               <svg
-                key={layer}
+                key={at}
                 viewBox="0 0 32 32"
                 aria-hidden="true"
                 focusable="false"

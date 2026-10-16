@@ -150,8 +150,16 @@ export const START: readonly string[] = [
   'o5',
 ];
 
-/** How a tile changes from one sketch to the next. */
+/**
+ * How a tile changes from one sketch to the next. The first four echo the name at play (Sean,
+ * 2026-10-15): Glitch, Scramble, and Scan step frame by frame like its split-flap letters
+ * (frames.ts), and Flap folds like a split-flap board's card. The rest move.
+ */
 export const SKETCH_EFFECTS = [
+  'glitch',
+  'scramble',
+  'flap',
+  'scan',
   'flip',
   'tumble',
   'pop',
@@ -163,9 +171,13 @@ export const SKETCH_EFFECTS = [
 ] as const;
 export type SketchEffect = (typeof SKETCH_EFFECTS)[number];
 
+/** The effects that step frame by frame, at frameMs, rather than move on a curve. */
+export const STEPPED_EFFECTS: ReadonlySet<SketchEffect> = new Set(['glitch', 'scramble', 'scan']);
+
 /**
- * The curve a change follows: the theme's own (`--motion-ease`), its glide (`--motion-glide`),
- * or a spring that overshoots and settles (SPRING_EASING).
+ * The curve a moving change or a flap follows: the theme's own (`--motion-ease`), its glide
+ * (`--motion-glide`), or a spring that overshoots and settles (SPRING_EASING). The stepped
+ * effects keep their frames' even pace.
  */
 export const SKETCH_EASINGS = ['ease', 'glide', 'spring'] as const;
 export type SketchEasing = (typeof SKETCH_EASINGS)[number];
@@ -184,6 +196,8 @@ export interface SketchbookTuning {
   /** One effect for every change, or a different one each time. */
   effect: SketchEffect | 'mixed';
   easing: SketchEasing;
+  /** How far a glitch shifts its slices and splits its edges, 0 to 1. */
+  strength: number;
   wave: Wave;
   /** Hovering keeps a tile changing until the pointer leaves; off, a hover changes it once. */
   cycle: boolean;
@@ -207,8 +221,9 @@ export interface SketchbookSettings {
 }
 
 export const SKETCHBOOK_TUNING: SketchbookTuning = {
-  effect: 'flip',
+  effect: 'glitch',
   easing: 'spring',
+  strength: 0.6,
   wave: 'diagonal',
   cycle: true,
   intro: true,

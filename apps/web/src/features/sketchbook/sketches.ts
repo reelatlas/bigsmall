@@ -267,7 +267,7 @@ export interface SketchbookSettings {
 }
 
 /**
- * The settings Sean tuned in the lab and shipped on the About page (v2, 2026-10-15), every sketch
+ * The settings Sean tuned in the lab and shipped on the About page (v3, 2026-10-15), every sketch
  * in the rotation, so one added later joins it.
  */
 export const SKETCHBOOK_TUNING: SketchbookTuning = {

@@ -16,6 +16,35 @@ import { ChevronDownIcon } from './icons';
 /** The trigger before a category is chosen: the control's own name, as a select shows its field's. */
 const EMPTY_LABEL = 'Category';
 
+/**
+ * Open, the shell is as wide as two closed menus (`w-2/1`, over MENU_SHELL's `inset-x-0`), its
+ * top row spanning them, so every category is in view at once (Sean, 2026-10-16).
+ */
+const OPEN_SHELL = 'group-data-open:right-auto group-data-open:w-2/1';
+
+/**
+ * The choices in two columns that run down the first and on into the second, so ↑ and ↓ follow
+ * reading order; the rows come from the count (an inline style). Each column is as wide as the
+ * menu closed, the 4 px inset and the 8 px between them making up the two choices' gutters, so a
+ * count keeps the room the chevron takes. Held to the window's height, the list scrolls inside,
+ * never the page behind it.
+ */
+const COLUMNS = 'grid auto-cols-fr grid-flow-col gap-x-2 overflow-y-auto overscroll-contain p-1';
+
+/** The room kept between the open list and the window's bottom edge, in CSS pixels: a step of 8. */
+const WINDOW_GAP = 8;
+
+/** However short the window, the open list shows this many rows; the page scrolls to the rest. */
+const FEWEST_ROWS = 4;
+
+/** Scrolls the list alone, never the page, so the item is in its view, as little as it takes. */
+function revealIn(list: HTMLElement, item: HTMLElement) {
+  const shown = list.getBoundingClientRect();
+  const at = item.getBoundingClientRect();
+  if (at.top < shown.top) list.scrollTop -= shown.top - at.top;
+  else if (at.bottom > shown.bottom) list.scrollTop += at.bottom - shown.bottom;
+}
+
 export interface CategoryMenuProps {
   categories: readonly Category[];
   /** The category chosen, or null before one is. */
@@ -34,10 +63,12 @@ export interface CategoryMenuProps {
 /**
  * The converter's category menu (docs/UX-SPEC.md §1), built from the same recipes as the theme
  * menu: at rest a ghost, the name and its chevron with no edge or fill; open, a card around the
- * trigger and its choices, the same size. Its trigger shows the category's name, and the menu is as
- * wide as the widest, so the toolbar keeps it on its line until there is truly no room; open, its
- * trigger reads "Category" over the list, and its counts are bare numbers in the room the chevron
- * takes. The choices are native radios. ↑ and ↓ move through them without choosing, since a new
+ * trigger and its choices in two columns, each as wide as the menu, held to the window's height.
+ * Its trigger shows the category's name, and the menu is as wide as the widest, so the toolbar
+ * keeps it on its line until there is truly no room; open, its trigger reads "Category" over the
+ * list, and its counts are bare numbers in the room the chevron takes. The choices are native
+ * radios, down the first column and on into the second. ↑ and ↓ move through them without
+ * choosing, since a new
  * category takes the unit out of the box and each choice is a step to undo; Enter, a click, or a
  * tap chooses, and Escape, a click outside, or focus leaving closes it unchanged; ← and → close it
  * unchanged and move along the toolbar, as from the trigger (Sean, 2026-10-15). While a unit is
@@ -51,6 +82,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
   const [reached, setReached] = useState<CategoryId | null>(value);
   const rootRef = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   /** Opened by a click or a tap, not by Enter or Space (a click with no pointer, detail 0). */
   const openedByPointer = useRef(false);
   const chosenName = categories.find((category) => category.id === value)?.name;
@@ -63,18 +95,33 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
     if (rootRef.current?.contains(document.activeElement)) trigger.current?.focus();
   };
 
-  // Opening moves focus onto the chosen category, or the first, as the theme menu does, without
-  // moving the page: a click or a tap leaves it where it was, even with the choice below the
-  // window's edge, and from the keyboard the choice comes into view, as little as it takes (Sean,
-  // 2026-10-16: the page jumped to a category low in the list).
+  // Opening holds the list to the window, measured: from its top to the window's bottom, less the
+  // gap, and never fewer than FEWEST_ROWS rows, again whenever the window resizes. Then focus goes
+  // onto the chosen category, or the first, as the theme menu does, and the choice into the list's
+  // view, without moving the page: a click or a tap leaves the page where it was, and from the
+  // keyboard the choice comes into view, as little as it takes (Sean, 2026-10-16: the page jumped
+  // to a category low in the list).
   useLayoutEffect(() => {
-    if (!open) return;
-    const root = rootRef.current;
+    const list = listRef.current;
+    if (!open || !list) return;
+    const fit = () => {
+      const style = getComputedStyle(list);
+      const inset = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+      const row = list.querySelector('label')?.offsetHeight ?? 0;
+      const room = window.innerHeight - list.getBoundingClientRect().top - WINDOW_GAP;
+      list.style.maxHeight = `${Math.max(room, FEWEST_ROWS * row + inset)}px`;
+    };
+    fit();
     const choice =
-      root?.querySelector<HTMLInputElement>('input:checked') ??
-      root?.querySelector<HTMLInputElement>('input');
+      list.querySelector<HTMLInputElement>('input:checked') ??
+      list.querySelector<HTMLInputElement>('input');
     choice?.focus({ preventScroll: true });
-    if (!openedByPointer.current) choice?.scrollIntoView({ block: 'nearest' });
+    // The radio is visually hidden; the choice people see is its label.
+    const label = choice?.closest('label');
+    if (label && openedByPointer.current) revealIn(list, label);
+    else label?.scrollIntoView({ block: 'nearest' });
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
   }, [open]);
 
   // While open: a click outside closes it; Enter chooses the choice reached and Escape closes it
@@ -143,7 +190,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           </span>
         ))}
       </span>
-      <div className={MENU_SHELL}>
+      <div className={cx(MENU_SHELL, OPEN_SHELL)}>
         <button
           ref={trigger}
           type="button"
@@ -173,43 +220,49 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           </span>
           <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />
         </button>
-        <fieldset id={menuId} className={cx(SHELL_PANEL, 'p-1')}>
+        <fieldset id={menuId} className={SHELL_PANEL}>
           <legend className="sr-only">Category</legend>
-          {categories.map((category) => {
-            const count = counts?.[category.id];
-            return (
-              // A pointer's pick chooses at once. Not on click: the arrows check radios with a
-              // click of their own (docs/LEARNINGS.md, "Radios fire change on every arrow key").
-              // A tap ends on the choice: the menu has closed by then, and the browser's mouse
-              // events and click after it would land on what it uncovered, the box, bringing a
-              // touch screen's keyboard up (docs/LEARNINGS.md, "A tap's click lands on what it
-              // uncovered").
-              <label
-                key={category.id}
-                onPointerUp={() => choose(category.id)}
-                onTouchEnd={(event) => event.preventDefault()}
-                className={cx(MENU_OPTION, 'justify-between gap-2')}
-              >
-                <input
-                  type="radio"
-                  name={groupName}
-                  value={category.id}
-                  checked={category.id === reached}
-                  onChange={() => setReached(category.id)}
-                  className="sr-only"
-                />
-                {category.name}
-                {/* A bare number, as the matches' group headers show it ("Weight 2"); the word
-                    stays for screen readers. */}
-                {count !== undefined && count > 0 && (
-                  <span className="font-numeric text-xs text-ink-muted">
-                    {count}
-                    <span className="sr-only"> {count === 1 ? 'match' : 'matches'}</span>
-                  </span>
-                )}
-              </label>
-            );
-          })}
+          <div
+            ref={listRef}
+            className={COLUMNS}
+            style={{ gridTemplateRows: `repeat(${Math.ceil(categories.length / 2)}, auto)` }}
+          >
+            {categories.map((category) => {
+              const count = counts?.[category.id];
+              return (
+                // A pointer's pick chooses at once. Not on click: the arrows check radios with a
+                // click of their own (docs/LEARNINGS.md, "Radios fire change on every arrow
+                // key"). A tap ends on the choice: the menu has closed by then, and the browser's
+                // mouse events and click after it would land on what it uncovered, the box,
+                // bringing a touch screen's keyboard up (docs/LEARNINGS.md, "A tap's click lands
+                // on what it uncovered").
+                <label
+                  key={category.id}
+                  onPointerUp={() => choose(category.id)}
+                  onTouchEnd={(event) => event.preventDefault()}
+                  className={cx(MENU_OPTION, 'justify-between gap-2')}
+                >
+                  <input
+                    type="radio"
+                    name={groupName}
+                    value={category.id}
+                    checked={category.id === reached}
+                    onChange={() => setReached(category.id)}
+                    className="sr-only"
+                  />
+                  {category.name}
+                  {/* A bare number, as the matches' group headers show it ("Weight 2"); the word
+                      stays for screen readers. */}
+                  {count !== undefined && count > 0 && (
+                    <span className="font-numeric text-xs text-ink-muted">
+                      {count}
+                      <span className="sr-only"> {count === 1 ? 'match' : 'matches'}</span>
+                    </span>
+                  )}
+                </label>
+              );
+            })}
+          </div>
         </fieldset>
       </div>
     </div>

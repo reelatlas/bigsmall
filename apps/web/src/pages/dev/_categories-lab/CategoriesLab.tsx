@@ -6,7 +6,7 @@ import {
   type CategoryId,
   type Unit,
 } from '@bigsmall/core';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import { CategoryMenu } from '../../../components/CategoryMenu';
 import {
   ConversionTable,
@@ -634,151 +634,6 @@ const PARTS: readonly Part[] = [
   },
 ];
 
-// The category menu, open: as long as its list (today), held to a height and scrolling inside, or
-// in two columns with every category in view (Sean, 2026-10-16).
-
-type MenuLayout = 'grows' | 'scrolls' | 'columns';
-
-/** The open menu's card, drawn still as the category menu draws it open (MENU_SHELL, open). */
-const OPEN_CARD =
-  'w-fit overflow-hidden rounded-md bg-surface shadow-md outline-2 -outline-offset-2 outline-accent';
-
-/** The open menu's top row: "Category", muted, its chevron turned over (MENU_TRIGGER, open). */
-const OPEN_TOP = 'my-0.5 flex h-11 items-center gap-2 px-3 text-sm text-ink-muted';
-
-/** A choice, drawn still as the menu's are (MENU_OPTION); the chosen one in the accent's tint. */
-const CHOICE =
-  'focus-ring-within-inset flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm whitespace-nowrap text-ink';
-
-/** How each layout holds its choices. Two columns run down the first, then the second. */
-const MENU_LIST: Record<MenuLayout, string> = {
-  grows: 'grid border-t border-line p-1',
-  scrolls: 'grid max-h-84 overflow-y-auto border-t border-line p-1',
-  columns: 'grid grid-flow-col grid-rows-8 gap-x-1 border-t border-line p-1',
-};
-
-function OpenMenuMock({
-  layout,
-  categories,
-  chosen,
-}: {
-  layout: MenuLayout;
-  categories: readonly Category[];
-  chosen: CategoryId;
-}) {
-  const list = useRef<HTMLFieldSetElement>(null);
-  // Held to a height, the list scrolls itself, never the page, to show the chosen category.
-  useEffect(() => {
-    const element = list.current;
-    const choice = element?.querySelector<HTMLElement>('[data-chosen]');
-    if (layout !== 'scrolls' || !element || !choice) return;
-    element.scrollTop = choice.offsetTop - element.clientHeight / 2;
-  }, [layout]);
-  return (
-    <div className={OPEN_CARD}>
-      <div className={OPEN_TOP}>
-        Category
-        <ChevronDownIcon width="16" height="16" className="ml-auto shrink-0 rotate-180" />
-      </div>
-      <fieldset ref={list} className={MENU_LIST[layout]}>
-        <legend className="sr-only">Category, a mock-up</legend>
-        {categories.map((category) => (
-          <label
-            key={category.id}
-            data-chosen={category.id === chosen ? '' : undefined}
-            className={cx(CHOICE, 'has-checked:bg-accent-soft')}
-          >
-            <input
-              type="radio"
-              name={`menu-${layout}`}
-              value={category.id}
-              defaultChecked={category.id === chosen}
-              className="sr-only"
-            />
-            {category.name}
-          </label>
-        ))}
-      </fieldset>
-    </div>
-  );
-}
-
-const MENU_MOCKS: ReadonlyArray<{ layout: MenuLayout; caption: string }> = [
-  {
-    layout: 'grows',
-    caption:
-      'A, today: as long as its list. Fifteen categories run past a phone’s window, so reaching Angle takes the page’s scroll.',
-  },
-  {
-    layout: 'scrolls',
-    caption:
-      'B: held to a height, the list scrolling inside it, the chosen category scrolled into view; the row cut off at its edge says there is more.',
-  },
-  {
-    layout: 'columns',
-    caption:
-      'C: two columns, every category in view at once, about 400 px tall, short enough for a phone.',
-  },
-];
-
-/** The category menu's three layouts, open, with what each costs and the recommendation. */
-function MenuLayouts({ categories }: { categories: readonly Category[] }) {
-  // The menu lists the categories the engine has; the lab's proposed ones stay in their mocks.
-  const real = categories.filter(
-    (category) => category.id !== TEMPERATURE_CHANGE.id && category.id !== COOKING.id,
-  );
-  return (
-    <section aria-labelledby="part-menu" className="grid gap-6">
-      <div className="grid max-w-prose gap-2">
-        <h2 id="part-menu" className="font-display text-xl font-semibold">
-          <span className={cx(NEW_TAG, 'mr-2 align-middle')}>New</span>
-          The category menu, open
-        </h2>
-        <p className="text-sm text-ink-muted">
-          Sean’s question (2026-10-16): should the open menu be a fixed size with a scroll, or a
-          wider surface with two columns, as the keyboard shortcuts map is wide?
-        </p>
-        <ul className="grid list-disc gap-1 pl-5 text-sm">
-          <li>
-            Best practice: show every choice at once when they fit. People scan a list they can see
-            faster than one they scroll, and a scrolling list hides that there is more. When they
-            cannot fit, hold the list to the window and scroll inside it, the chosen one in view, as
-            a native select and Material’s menus do.
-          </li>
-          <li>
-            Many short names suit columns: fifteen categories in two are eight rows, about the
-            height of the box and the toolbar together.
-          </li>
-          <li>
-            My recommendation: C, with B built in for a window too short even for two columns. ↑ and
-            ↓ go down a column and on to the next, in reading order; ← and → still leave the menu
-            along the toolbar, as you chose on 2026-10-15. Past twenty categories or so, three
-            columns where there is room, or groups (everyday, mechanics).
-          </li>
-        </ul>
-      </div>
-      <div className="flex flex-wrap items-start gap-x-8 gap-y-10">
-        {MENU_MOCKS.map(({ layout, caption }) => (
-          <figure key={layout} className="m-0 grid max-w-xs gap-3">
-            <figcaption className="text-sm text-ink-muted">{caption}</figcaption>
-            <OpenMenuMock layout={layout} categories={real} chosen="torque" />
-          </figure>
-        ))}
-      </div>
-      <div className="grid max-w-prose gap-2">
-        <h3 className={GROUP_TITLE}>To decide</h3>
-        <ol className="grid list-decimal gap-1 pl-5 text-sm">
-          <li>Two columns (C) with B for a short window, or held and scrolling (B) alone.</li>
-          <li>
-            In two columns, down the first column then the second, as here, or across the rows as
-            the start’s tiles run.
-          </li>
-        </ol>
-      </div>
-    </section>
-  );
-}
-
 type Width = 'wide' | 'phone';
 
 const WIDTHS = [
@@ -803,8 +658,9 @@ export function CategoriesLab() {
       <p className="max-w-prose rounded-md border border-line bg-surface p-3 text-sm">
         <span className={cx(NEW_TAG, 'mr-2')}>New</span>
         In this round (2026-10-16): Pace B, a section of its own; Temperature change D, inside
-        Temperature; Cooking D, two pills in the box; and the category menu, open, three ways, at
-        the foot. Each is marked New; each part says how it reads, with a recommendation.
+        Temperature; and Cooking D, two pills in the box. Each is marked New; each part says how it
+        reads, with a recommendation. The open category menu's three ways were decided (two columns,
+        scrolling in a short window) and built.
       </p>
       {PARTS.map((part) => (
         <section key={part.id} aria-labelledby={`part-${part.id}`} className="grid gap-6">
@@ -834,7 +690,6 @@ export function CategoriesLab() {
           </div>
         </section>
       ))}
-      <MenuLayouts categories={categories} />
     </div>
   );
 }

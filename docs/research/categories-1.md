@@ -40,6 +40,10 @@ Then, cheap once the first are in: **frequency** (Hz to GHz), **angular speed** 
 - **Time zones.** Daylight-saving rules; another product.
 - **The specialist long tail** (heat, fluids, electricity, magnetism, radiation): cheap one by one, but each adds a tile to the start and a line to the category menu. They wait for a way to hold twenty or more categories (the start's tiles, the menu; "every category at once", docs/PLAN.md §2), which is Sean's design call when it comes.
 
+## The category menu, open (2026-10-16)
+
+With Force and Torque the open menu ran past a phone's window. The categories lab's round 2b showed it three ways (screenshot: `docs/research/labs/categories-lab/1-menu-open-three-ways.png`; the mocks lived in `apps/web/src/pages/dev/_categories-lab/` until the commit that built the answer): A, as long as its list; B, held to a height and scrolling inside; C, two columns. Sean chose C with B as its fallback, down the first column and then the second (the sixty-third pass); built the same day (docs/UX-SPEC.md §1), and the lab's section removed. Past twenty categories or so: three columns where there is room, or groups (docs/PLAN.md §2, "Grouping categories").
+
 ## Each category, when built
 
 docs/UNITS-CATALOG.md §6: sourced factors, checked blind as in the audit; the aliases people type; golden rows; the category in the start's tiles and the menu; its data loaded on demand against its budget (docs/PLAN.md §9); and, with the pair pages, its most searched pairs (docs/SEO.md §2).

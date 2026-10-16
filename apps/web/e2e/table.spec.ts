@@ -193,18 +193,32 @@ test('a typed unit lists matches from every category, grouped, without values', 
   await expect(page.getByRole('region', { name: 'Volume' })).toBeVisible();
 });
 
-test('the category menu keeps its width open, its counts fitting beside the names, in every theme', async ({
+test('open, the category menu is two columns as wide as the menu, down the first and on into the second, its counts fitting beside the names, in every theme', async ({
   page,
 }) => {
+  // The narrowest window the site supports, where the two columns have the least room.
+  await page.setViewportSize({ width: 320, height: 800 });
   await page.goto('/');
   await ready(page);
   await box(page).fill('250 p');
   const shell = page.locator('[data-tool="category"]').locator('xpath=..');
+  const toolbar = page.getByRole('toolbar', { name: 'Tools' });
+  const rows = Math.ceil(categories.length / 2);
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     const closed = (await shell.boundingBox())!.width;
     await menu(page).click();
-    expect((await shell.boundingBox())!.width, theme.id).toBe(closed);
+    const open = (await shell.boundingBox())!;
+    expect(Math.abs(open.width - 2 * closed), theme.id).toBeLessThanOrEqual(1);
+    // Inside the toolbar's width, so the page never scrolls sideways.
+    const bar = (await toolbar.boundingBox())!;
+    expect(open.x + open.width, theme.id).toBeLessThanOrEqual(bar.x + bar.width);
+    const lefts = await shell
+      .locator('label')
+      .evaluateAll((labels) => labels.map((label) => Math.round(label.getBoundingClientRect().x)));
+    expect(new Set(lefts).size, theme.id).toBe(2);
+    expect(new Set(lefts.slice(0, rows)), theme.id).toEqual(new Set([lefts[0]]));
+    expect(Math.min(...lefts.slice(rows)), theme.id).toBeGreaterThan(lefts[0]!);
     const overflowing = await shell
       .locator('label')
       .evaluateAll((labels) =>
@@ -264,6 +278,56 @@ test('opening the category menu leaves the page where it was; the keyboard bring
     .getByRole('group', { name: 'Category' })
     .locator('label', { hasText: 'Torque' });
   await expect(label).toBeInViewport();
+});
+
+test('in a short window the open category menu scrolls inside, the chosen category in view and the page still', async ({
+  page,
+}) => {
+  // Angle, the last in the list, chosen.
+  await page.goto('/?a=degree&v=90');
+  await ready(page);
+  const group = page.getByRole('group', { name: 'Category' });
+  const list = group.locator(':scope > div');
+  // A window with room under the list's top for five and a half of its rows, measured open.
+  await menu(page).click();
+  const top = (await list.boundingBox())!.y;
+  const row = (await group.locator('label').first().boundingBox())!.height;
+  await page.keyboard.press('Escape');
+  const width = page.viewportSize()?.width ?? 1280;
+  await page.setViewportSize({ width, height: Math.round(top + 5.5 * row) });
+
+  await menu(page).click();
+  await expect(page.getByRole('radio', { name: 'Angle' })).toBeFocused();
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+  expect(await list.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+  // The list ends inside the window, and scrolls to show Angle.
+  const card = (await page.locator('[data-tool="category"]').locator('xpath=..').boundingBox())!;
+  expect(card.y + card.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+  await expect(group.locator('label', { hasText: 'Angle' })).toBeInViewport({ ratio: 1 });
+});
+
+test('the open category menu: ↓ runs down the first column and on into the second, ↑ back', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/?a=byte&v=1');
+  await ready(page);
+  await menu(page).press('Enter');
+  const data = page.getByRole('radio', { name: 'Data' });
+  const fuel = page.getByRole('radio', { name: 'Fuel economy' });
+  await expect(data).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(fuel).toBeFocused();
+  // Fuel economy heads the second column, level with Length at the first's head.
+  const label = (name: string) =>
+    page.getByRole('group', { name: 'Category' }).locator('label', { hasText: name });
+  const first = (await label('Length').boundingBox())!;
+  const second = (await label('Fuel economy').boundingBox())!;
+  expect(second.x).toBeGreaterThan(first.x + first.width / 2);
+  expect(Math.abs(second.y - first.y)).toBeLessThan(1);
+  await page.keyboard.press('ArrowUp');
+  await expect(data).toBeFocused();
 });
 
 test('the category menu: the arrows move without choosing, Enter chooses, Escape closes', async ({

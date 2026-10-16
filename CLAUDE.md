@@ -16,10 +16,14 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Waiting on Sean** (the sixty-second pass in `docs/research/findings-0-first-pass.md`):
-   1. The categories lab (`/dev/categories-lab`, this round's mocks marked New): pace with its systems or in a Pace section; a temperature change inside Temperature or a category of its own; cooking with two pills, weight first; and the open category menu: two columns with scrolling as a fallback, or held and scrolling. Then the first to build.
-   2. His notes on how the formulas show on About, to come.
-   3. Search Console and Bing at his screen, a text record at Porkbun (`docs/SEO.md` §3), once he is happy with the rest.
+1. **After the compaction, in order** (`docs/research/findings-0-first-pass.md`, the sixty-third pass, saved before a compaction; each plan there is ready to build):
+   1. The category menu in two columns, scrolling inside a short window.
+   2. Every formula reworked: the lines his, the stats line, Show all as a caret disclosure, "The sketchbook" heading, the centered column, no comma in the counts; no inner scroll (pushback), sticky tools shown as an option.
+   3. "Standard" and "specialty" in prose, as the UI says them.
+   4. Pace, a section inside Speed (B).
+   5. A temperature change, a section inside Temperature (D).
+   6. Cooking (D): an ADR first, then the ingredients' data and the two pills.
+      Then Search Console and Bing at Sean's screen, a text record at Porkbun (`docs/SEO.md` §3).
 2. **Open with Sean:** the SEO plan's other decisions ("bigsmall SEO plan", https://claude.ai/artifact/7eXfYjEdTn4zKXXGLug3pT). Trials: R6 as the mark (`1fa40fa`). Feedback undecided (the fiftieth pass); Umami's checks (`docs/DEPLOYMENT.md`, "Analytics").
 3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages built and launched (`docs/SEO.md`), in v1 on `bigsmall.work`; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
 4. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).

@@ -607,7 +607,7 @@ const PARTS: readonly Part[] = [
     ],
     mocks: TEMPERATURE,
     questions: [
-      'Inside Temperature as a section (D), or a category of its own (B), found by typing “5 °C change”, “5 °C warmer”, or “temperature difference”; categories have no modes (ADR 0016).',
+      'Inside Temperature as a section (D), or a category of its own (B), found by typing “5 °C change”, “5 °C warmer”, or “temperature difference”. ADR 0016 retired basic and advanced modes, not sections, so D fits it.',
       'The line under Temperature’s table that leads to it: yes or no.',
       'A rise written “+9.00” and a drop “−9.00”, or the bare number, as here.',
     ],

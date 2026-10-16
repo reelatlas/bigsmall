@@ -24,6 +24,7 @@ Every page in the sitemap meets these, and `pnpm check` fails when one does not 
 - **Speed and accessibility** are part of ranking as tie-breakers: the bundle budget (`docs/PLAN.md` §9), axe on every page, and Lighthouse's SEO score of 100 at milestone 5.
 - **Icons.** `pnpm --filter @bigsmall/web brand` draws them from the tokens: the ICO and SVG, the 180 px touch icon, and the 192 and 512 px PNGs (search results' favicon, the logo in structured data, the installed app later).
 - **A rename or a move.** A page that moves keeps its old address as a permanent redirect (`apps/web/vercel.json`), so what it earned in search follows it.
+- **Shown to Sean first** (Sean, 2026-10-15). Any change to what search engines or link previews show, a title, a description, the preview card, structured data, an icon, or the sitemap and robots rules, is shown to him in chat, exact text before and after, and ships only on his yes. The contract check stays automatic; a change it forces, such as a new page's title, is shown the same way.
 
 ## 3. The plan
 
@@ -31,7 +32,7 @@ The detail, with sources, is docs/research/seo-1.md. In order:
 
 1. **Measure from now (Sean).** Google Search Console and Bing Webmaster Tools, each verified by a DNS record at Porkbun, the sitemap submitted (`https://bigsmall.work/sitemap-index.xml`); recorded in `docs/DEPLOYMENT.md` once done.
 2. **The pair pages' shape, in the spec before any are built** (milestone 5, in v1): the address (`/cm-to-inches`), the title and description patterns, the `h1`, the converter opened on the pair, a table of the values people search, the exact factor with its source and a worked example, the pitfalls (the two gallons, the two ounces), links to the reverse pair, related pairs, and the category, and the text written for each. Pages generated from one list, so each meets the contract by construction.
-3. **The first 50 to 100 pairs from real demand**, where Google's own converter box answers poorly: search volumes (Keyword Planner), Umami's "Unit chosen" counts once there are enough, and the categories Sean adds next (force and torque among them).
+3. **The first 50 to 100 pairs from real demand**, where Google's own converter box answers poorly, and for the kinds it covers too, since a table, fractions, and the cited factor beat its one answer; new categories lean to the useful and less common, torque first (Sean, 2026-10-15): search volumes (Keyword Planner), Umami's "Unit chosen" counts once there are enough, and the categories Sean adds next (force and torque among them).
 4. **Launch, then measure for 8 to 12 weeks** in Search Console; grow the pages that earn impressions, merge the ones that do not; then Show HN, a few community posts, and resource pages.
 5. **Not now:** ongoing ads (a capped test at most), bought links, separate pages per value ("7 cm to inches" is a row of "cm to inches"), `llms.txt`.
 

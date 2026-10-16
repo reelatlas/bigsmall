@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Button } from '../../components/Button';
+import { cx } from '../../lib/recipes';
 import { burst, type Mood } from './burst';
 
 /**
@@ -10,16 +11,19 @@ import { burst, type Mood } from './burst';
 export function FlipButton({
   particles,
   onFlip,
+  className,
 }: {
   /** A mood of particles, or any, a new one each press (SketchbookTuning). */
   particles: Mood | 'any';
   onFlip: () => void;
+  /** Its size where it sits (the sketchbook gives it the width beside Pause). */
+  className?: string;
 }) {
   const layer = useRef<HTMLSpanElement>(null);
   return (
     <Button
       variant="secondary"
-      className="relative min-w-28 overflow-hidden"
+      className={cx('relative overflow-hidden', className)}
       onClick={(event) => {
         const button = event.currentTarget;
         const box = button.getBoundingClientRect();

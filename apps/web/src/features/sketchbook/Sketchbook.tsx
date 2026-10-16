@@ -101,16 +101,26 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
           </button>
         ))}
       </div>
-      {/* Flip stays centered under the tiles, Pause beside it on the right. */}
-      <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <div className="col-start-2">
-          <FlipButton particles={settings.tuning.particles} onFlip={() => player.current?.flip()} />
-        </div>
-        {/* Under reduced motion nothing changes by itself, so there is nothing to pause. */}
+      {/* Flip and Pause under the middle tile, together as wide as one tile: Pause its 44 px,
+          Flip the rest, 4 px apart as a toolbar's buttons are (Sean, 2026-10-16). Where a narrow
+          window makes a tile smaller than the two need, they keep their size, centered under it. */}
+      <div
+        className="flex min-w-max gap-1"
+        style={{
+          width: `min(calc(var(--spacing) * ${tile}), calc((100% - ${columns - 1} * var(--spacing) * ${gap}) / ${columns}))`,
+        }}
+      >
+        <FlipButton
+          className="flex-1"
+          particles={settings.tuning.particles}
+          onFlip={() => player.current?.flip()}
+        />
+        {/* Under reduced motion nothing changes by itself, so there is nothing to pause: Flip
+            takes the whole width. */}
         <Button
           variant="ghost"
           square
-          className="justify-self-start motion-reduce:hidden"
+          className="motion-reduce:hidden"
           aria-label={paused ? 'Play' : 'Pause'}
           title={paused ? 'Play' : 'Pause'}
           onClick={() => {

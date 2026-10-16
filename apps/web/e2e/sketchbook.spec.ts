@@ -304,6 +304,22 @@ test('Flip answers a press with particles in the button, and with a flash under 
   ]);
 });
 
+test('Flip and Pause sit under the middle tile, together as wide as it', async ({ page }) => {
+  await page.goto('/about/');
+  await page.locator('[data-playing]').waitFor();
+  const middle = await tiles(page)
+    .nth(Math.floor(SKETCHBOOK_TUNING.columns / 2))
+    .boundingBox();
+  const flip = await page.getByRole('button', { name: 'Flip', exact: true }).boundingBox();
+  const pause = await page.getByRole('button', { name: 'Pause', exact: true }).boundingBox();
+  if (!middle || !flip || !pause) throw new Error('the tile or a button has no box');
+  expect(Math.abs(flip.x - middle.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(pause.x + pause.width - (middle.x + middle.width))).toBeLessThanOrEqual(1);
+  // Pause keeps its 44 px; the two sit 4 px apart, as a toolbar's buttons do.
+  expect(pause.width).toBeCloseTo(44, 0);
+  expect(pause.x - (flip.x + flip.width)).toBeCloseTo(4, 0);
+});
+
 test('Pause holds the tiles from changing by themselves until Play', async ({ page }) => {
   await openLab(page, {}, { idleMinMs: 300, idleMaxMs: 500 });
   await page.getByRole('button', { name: 'Pause', exact: true }).click();

@@ -22,11 +22,12 @@ export type CategoryId =
   | 'angle';
 
 /**
- * Everyday (basic) or specialist (advanced). Specialist units are listed after every everyday
- * one, and rank after them among equal matches; the web's Specialty switch shows or hides them
- * (ADR 0016, ADR 0018).
+ * Standard or specialty, the words the screen uses, so code, docs, and screen share one
+ * vocabulary (Sean, 2026-10-16; basic and advanced until then). Specialty units are listed after
+ * every standard one, and rank after them among equal matches; the web's Specialty switch shows or
+ * hides them (ADR 0016, ADR 0018).
  */
-export type Tier = 'basic' | 'advanced';
+export type Tier = 'standard' | 'specialty';
 
 /**
  * Which measurement system a unit belongs to.
@@ -36,8 +37,12 @@ export type Tier = 'basic' | 'advanced';
  */
 export type UnitSystem = 'si' | 'metric' | 'imperial' | 'us' | 'uk' | 'other';
 
+/**
+ * A category's field, for grouping categories once there are many (docs/PLAN.md §2): the common
+ * ones people convert every day, then the fields. Not a tier.
+ */
 export type CategoryGroup =
-  | 'everyday'
+  | 'common'
   | 'mechanics'
   | 'fluids'
   | 'heat'
@@ -48,9 +53,9 @@ export type CategoryGroup =
 
 export interface Category {
   id: CategoryId;
-  /** Display name, in everyday language ("Weight", not "Mass"). */
+  /** Display name, in the words people use ("Weight", not "Mass"). */
   name: string;
-  /** Everyday words people type that mean this category ("distance", "how far"). */
+  /** Words people type that mean this category ("distance", "how far"). */
   aliases: readonly string[];
   /** Unit every other unit in the category converts through. Must be linear with factor 1. */
   baseUnit: string;

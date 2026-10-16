@@ -17,7 +17,7 @@ import {
  * What shows has two layers. The system switches set every category. A unit chosen on its own in
  * a table is an exception, shown or hidden against its switch, until its system's switch changes,
  * which is final for that system, or a preset, which sets exactly its set; Show custom hidden
- * units, or the table, also clears it (Sean, 2026-10-15: with Specialty unchecked, no specialist
+ * units, or the table, also clears it (Sean, 2026-10-15: with Specialty unchecked, no specialty
  * unit shows). The unit in the box always shows, whatever the settings say (the caller's to
  * apply).
  */
@@ -27,7 +27,7 @@ import {
 // means the same thing in every category.
 
 /** A section of the table: `standard` holds a category with no regional system (time, data, angle). */
-export type SectionKey = 'metric' | 'us' | 'uk' | 'other' | 'standard' | 'specialist';
+export type SectionKey = 'metric' | 'us' | 'uk' | 'other' | 'standard' | 'specialty';
 
 /**
  * Only headings take the parentheses; units keep their names and symbols. Specialty, for the units
@@ -39,17 +39,17 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
   uk: 'UK (imperial)',
   other: 'Other',
   standard: 'Standard',
-  specialist: 'Specialty',
+  specialty: 'Specialty',
 };
 
 /**
  * The system switches, in their order: the regional systems, Other (a regional category's
- * everyday units that belong to none of them, the knot and the atmosphere), and Specialty. Every
- * heading the table shows has its row in Units but Standard, which is the whole everyday list of a
+ * standard units that belong to none of them, the knot and the atmosphere), and Specialty. Every
+ * heading the table shows has its row in Units but Standard, which is the whole standard list of a
  * category with no regional system (time, data, angle): a switch would only empty its table
  * (Sean, 2026-10-15: Other had none until then, always showing, after the last regional system).
  */
-export const SYSTEM_KEYS: readonly SectionKey[] = ['metric', 'us', 'uk', 'other', 'specialist'];
+export const SYSTEM_KEYS: readonly SectionKey[] = ['metric', 'us', 'uk', 'other', 'specialty'];
 
 const REGIONAL: ReadonlySet<UnitSystem> = new Set(['us', 'imperial', 'uk']);
 const regional = new Map<CategoryId, boolean>();
@@ -73,10 +73,10 @@ function ownSection(preference: UnitPreference): SectionKey {
 
 /**
  * The section a unit belongs to, for this visitor. The shared inch, foot, and pound sit with
- * US (customary), or with UK (imperial) for a UK visitor; every specialist unit is Specialty.
+ * US (customary), or with UK (imperial) for a UK visitor; every specialty unit is Specialty's.
  */
 export function sectionOf(unit: Unit, preference: UnitPreference): SectionKey {
-  if (unit.tier !== 'basic') return 'specialist';
+  if (unit.tier === 'specialty') return 'specialty';
   if (!categoryIsRegional(unit.category)) return 'standard';
   if (unit.system === 'si' || unit.system === 'metric') return 'metric';
   if (unit.system === 'us') return 'us';
@@ -103,7 +103,7 @@ export function defaultOrder(preference: UnitPreference): readonly SectionKey[] 
 
 /**
  * Rows in their sections, every section headed, even a section of one, in `order`: Standard first
- * (it is a category's only everyday section), then the systems as ordered, Other among them. Rows
+ * (it is a category's only standard section), then the systems as ordered, Other among them. Rows
  * keep the listed order within their section.
  */
 export function sectionsOf<T extends { unit: Unit }>(
@@ -136,7 +136,7 @@ export interface ViewRule {
 
 /** A fresh visit's: every system but Specialty, the Standard preset. */
 export const FRESH_RULE: ViewRule = {
-  shown: new Set(SYSTEM_KEYS.filter((key) => key !== 'specialist')),
+  shown: new Set(SYSTEM_KEYS.filter((key) => key !== 'specialty')),
   overrides: new Map(),
 };
 
@@ -156,7 +156,7 @@ export function presetKeys(
   preference: UnitPreference,
 ): ReadonlySet<SectionKey> {
   if (preset === 'all') return new Set(SYSTEM_KEYS);
-  if (preset === 'standard') return new Set(SYSTEM_KEYS.filter((key) => key !== 'specialist'));
+  if (preset === 'standard') return new Set(SYSTEM_KEYS.filter((key) => key !== 'specialty'));
   // The visitor's own system, and the units no region owns (the knot, the atmosphere).
   return new Set([ownSection(preference), 'other']);
 }
@@ -235,7 +235,7 @@ export function withChoice(
 
 /**
  * One system switched on or off, in every category, and final for it: its units chosen on their
- * own go back to the switch, so unchecking Specialty hides every specialist unit. Other systems'
+ * own go back to the switch, so unchecking Specialty hides every specialty unit. Other systems'
  * exceptions stay.
  */
 export function withSystem(
@@ -408,10 +408,11 @@ interface StoredRule {
  * Settings as stored: plain JSON, versioned, so a later shape can read or drop an older one.
  * Display keeps only what differs from a fresh visit's (since version 2), so a default changed
  * later reaches everyone who never chose otherwise; version 1, a day old, kept all of it. Version
- * 3 knows Other's switch.
+ * 3 knows Other's switch. Version 4 keys Specialty's switch `specialty`, the screen's word, where
+ * earlier versions stored `specialist` (Sean, 2026-10-16: one vocabulary in code and on screen).
  */
 export interface StoredSettings {
-  v: 3;
+  v: 4;
   rule: StoredRule;
   kept: StoredRule | null;
   custom: boolean;
@@ -434,7 +435,7 @@ export function storedOf(settings: Settings): StoredSettings {
   if (!sameSizes(display.fractions, fresh.fractions)) changed.fractions = [...display.fractions];
   if (display.rounding !== fresh.rounding) changed.rounding = display.rounding;
   return {
-    v: 3,
+    v: 4,
     rule: storedRule(settings.rule),
     kept: settings.kept && storedRule(settings.kept),
     custom: settings.custom,
@@ -446,13 +447,21 @@ export function storedOf(settings: Settings): StoredSettings {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
+/** The versions settingsFrom reads. */
+const VERSIONS: readonly unknown[] = [1, 2, 3, 4];
+
+/** A system's key as stored, read as today's: before version 4, Specialty's was `specialist`. */
+const keyOf = (key: unknown): unknown => (key === 'specialist' ? 'specialty' : key);
+
 /** A stored rule read back: unknown systems and units, gone since it was saved, are left out. */
 function ruleFrom(value: unknown): ViewRule | null {
   if (!isRecord(value) || !Array.isArray(value.shown) || !Array.isArray(value.overrides)) {
     return null;
   }
   const shown = new Set(
-    value.shown.filter((key): key is SectionKey => SYSTEM_KEYS.includes(key as SectionKey)),
+    value.shown
+      .map(keyOf)
+      .filter((key): key is SectionKey => SYSTEM_KEYS.includes(key as SectionKey)),
   );
   const overrides = new Map<string, boolean>();
   for (const entry of value.overrides) {
@@ -473,16 +482,17 @@ function oneOf<T>(value: unknown, allowed: readonly T[], fallback: T): T {
  * falls back to a fresh visit's, and anything that is not settings at all reads as none. Version
  * 1 stored every display setting, so its names cannot tell a choice from the old default, symbols
  * alone: they take today's. Before version 3 Other had no switch and always showed: it comes back
- * on, placed after the last regional system, where it stood.
+ * on, placed after the last regional system, where it stood. Before version 4 Specialty's key was
+ * `specialist`: it reads as `specialty`, so nobody's choices are lost.
  */
 export function settingsFrom(value: unknown): Settings | null {
-  if (!isRecord(value) || (value.v !== 1 && value.v !== 2 && value.v !== 3)) return null;
-  const before3 = value.v !== 3;
+  if (!isRecord(value) || !VERSIONS.includes(value.v)) return null;
+  const before3 = value.v === 1 || value.v === 2;
   const withOther = (rule: ViewRule | null): ViewRule | null =>
     rule && before3 ? { ...rule, shown: new Set([...rule.shown, 'other']) } : rule;
   const rule = withOther(ruleFrom(value.rule));
   if (!rule) return null;
-  let stored = Array.isArray(value.order) ? (value.order as unknown[]) : null;
+  let stored = Array.isArray(value.order) ? (value.order as unknown[]).map(keyOf) : null;
   if (stored && before3 && !stored.includes('other')) {
     const after = Math.max(...(['metric', 'us', 'uk'] as const).map((key) => stored!.indexOf(key)));
     stored = [...stored.slice(0, after + 1), 'other', ...stored.slice(after + 1)];

@@ -69,7 +69,7 @@ describe('functional units (reciprocal)', () => {
   const meta = {
     category: 'speed',
     system: 'metric',
-    tier: 'basic',
+    tier: 'standard',
     exact: true,
     source: 'test',
   } as const;
@@ -125,7 +125,7 @@ describe('errors', () => {
       symbol: 'K',
       aliases: [],
       system: 'si',
-      tier: 'basic',
+      tier: 'standard',
       factor: 1,
       offset: 0,
       exact: true,

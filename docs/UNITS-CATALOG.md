@@ -1,25 +1,25 @@
 # Units catalog
 
-v0.4, 2026-10-15. Taxonomy, tiers, special-logic units, and verification sources. The code in `packages/core/src/units/` is the source of truth; this file explains the structure and the policies.
+v0.5, 2026-10-16. Taxonomy, tiers, special-logic units, and verification sources. The code in `packages/core/src/units/` is the source of truth; this file explains the structure and the policies.
 
 ## 0. Implementation status
 
-Milestone 1 (2026-10-06): all eight primary categories ship their basic tier, 54 units, every one cited and covered by a golden test row. Base units: meter, kilogram, liter, kelvin, square meter, meter per second, second, byte.
+Milestone 1 (2026-10-06): all eight primary categories ship their standard tier, 54 units, every one cited and covered by a golden test row. Base units: meter, kilogram, liter, kelvin, square meter, meter per second, second, byte.
 
-2026-10-08: Energy, Pressure, Power, and Angle join, 35 units with their specialist ones, every one cited and covered by a golden row (base units: joule, pascal, watt, radian). Fuel economy follows the same day, 5 units (base: kilometer per liter), its reciprocal units saying "Undefined for 0" where they have no value. With the modes dropped, the table lists every unit, the specialist ones after all the everyday ones (ADR 0016). The first eight categories gain their specialist units the same day, 36 more (nanometers to parsecs, micrograms to long tons, cubic meters and imperial measures to oil barrels, Rankine, square yards, nanoseconds, binary prefixes and bits), and Speed the speed of light.
+2026-10-08: Energy, Pressure, Power, and Angle join, 35 units with their specialty ones, every one cited and covered by a golden row (base units: joule, pascal, watt, radian). Fuel economy follows the same day, 5 units (base: kilometer per liter), its reciprocal units saying "Undefined for 0" where they have no value. With the modes dropped, the table lists every unit, the specialty ones after all the standard ones (ADR 0016). The first eight categories gain their specialty units the same day, 36 more (nanometers to parsecs, micrograms to long tons, cubic meters and imperial measures to oil barrels, Rankine, square yards, nanoseconds, binary prefixes and bits), and Speed the speed of light.
 
 2026-10-15: Force and Torque join, the first of the mechanics group (Sean's pick, docs/research/categories-1.md), 14 units, every one cited to NIST SP 811 Appendix B.8 or the SI Brochure, checked blind by the accuracy audit's method and covered by golden rows (base units: newton, newton meter). With them search ranks an exact match typed in its own case first (§5).
 
 Alias decisions so far (each one changes the ranking, and so which row Enter takes; see docs/UX-SPEC.md §4 and §5):
 
 - `kilo`/`kilos` → kilogram, `cc` → milliliter, `kph`/`kmh` → kilometer per hour: colloquial, so they count as exact matches.
-- Everyday, not specialist (Sean, 2026-10-16): nanometers and micrograms, standard metric; then µm, the nautical mile, the light-year, the carat, the troy ounce, m³, ft³, yd³, yd², MJ, GJ, the therm, hPa, PS, and BTU/h, the units people meet on bills, in forecasts, on spec sheets, and in the news (the sixty-first pass in docs/research/findings-0-first-pass.md). The tiers are re-weighed in a later pass (docs/PLAN.md §2, "Everyday or specialist").
+- Standard, not specialty (Sean, 2026-10-16): nanometers and micrograms, standard metric; then µm, the nautical mile, the light-year, the carat, the troy ounce, m³, ft³, yd³, yd², MJ, GJ, the therm, hPa, PS, and BTU/h, the units people meet on bills, in forecasts, on spec sheets, and in the news (the sixty-first pass in docs/research/findings-0-first-pass.md). The tiers are re-weighed in a later pass (docs/PLAN.md §2, "Standard or specialty").
 - The car words with Force and Torque (2026-10-15): `ci` → cubic inch, beside `cid`; the Volume category answers to `displacement`, `engine displacement`, and `engine size`, and Pressure to `boost` and `boost pressure`, beside `tire pressure`. Torque has `lug nut torque` and `bolt torque`, Power `engine power`.
 - `oz` is also an alias of fluid ounce on purpose: it makes "oz" ambiguous, so the list shows both ounces, each with its category, and the choice is visible before Enter.
-- No alias claims `ton` or `mpg`: typing either offers every ton (short, long, metric) or both mpgs, the visitor's everyday one first (2026-10-08). No lowercase `b` for bit (it would collide with byte's `B` inside the category).
+- No alias claims `ton` or `mpg`: typing either offers every ton (short, long, metric) or both mpgs, the visitor's own one first (2026-10-08). No lowercase `b` for bit (it would collide with byte's `B` inside the category).
 - `mbar` and `millibar` → hectopascal, the same size, an alias rather than a second row; `food calories` and `large calories` → kilocalorie, while `cal` and `calories` are the small calorie, the standard (Sean, 2026-10-08).
-- `gr` is the grain's symbol, and grams answer to `g`; typing `gr` offers grains, then grams (Sean, 2026-10-08). `c` is Celsius's alias and the speed of light's symbol; the everyday unit leads.
-- Unit `note` fields carry the definition for anything with a variant or a common mix-up, and since 2026-10-08 for the specialist and newer units that need one (the atmosphere, the mercury columns, the calories, the BTU and the therm, the horsepowers, the UK measures, the tons): bit and byte; the decimal data prefixes (kB, MB, GB, TB); tonne, ounce, and stone; knot; kelvin; month and year; and the US liquid family (teaspoon, tablespoon, fluid ounce, cup, pint, quart, gallon). The UI does not show notes yet (docs/UX-SPEC.md §14).
+- `gr` is the grain's symbol, and grams answer to `g`; typing `gr` offers grains, then grams (Sean, 2026-10-08). `c` is Celsius's alias and the speed of light's symbol; the standard unit leads.
+- Unit `note` fields carry the definition for anything with a variant or a common mix-up, and since 2026-10-08 for the specialty and newer units that need one (the atmosphere, the mercury columns, the calories, the BTU and the therm, the horsepowers, the UK measures, the tons): bit and byte; the decimal data prefixes (kB, MB, GB, TB); tonne, ounce, and stone; knot; kelvin; month and year; and the US liquid family (teaspoon, tablespoon, fluid ounce, cup, pint, quart, gallon). The UI does not show notes yet (docs/UX-SPEC.md §14).
 
 ## 1. Coverage research
 
@@ -28,7 +28,7 @@ Checked 2026-10-06 for coverage, which quantity types people expect. Since 2026-
 - **unitconverters.net** groups roughly 80 converters into Common, Engineering, Heat, Fluids, Light, Electricity, Magnetism, Radiology, and Other.
 - **onlineconversion.com** lists about 30 categories and highlights a popular set: Fractions, Length, Temperature, Speed, Volume, Weight, Cooking, Area, Fuel Economy, Currency.
 
-Takeaway: the "popular" set on both sites is small and stable. That is our basic tier. The long tail is large, specialized, and rarely used. That is our advanced tier, loaded on demand.
+Takeaway: the "popular" set on both sites is small and stable. That is our standard tier. The long tail is large, specialized, and rarely used. That is our specialty tier, loaded on demand.
 
 ## 2. Verification sources
 
@@ -47,18 +47,18 @@ Every unit record carries `source` and `exact`. Exact factors are written as the
 
 ## 3. Taxonomy
 
-Two tiers at two levels:
+Two tiers, standard and specialty, at two levels. The words are the screen's, Standard and Specialty as Settings' Units says them, and the code says the same: `tier: 'standard' | 'specialty'` on every unit and category, and `specialty` as the Specialty section's key, renamed from `basic`, `advanced`, and `specialist` on 2026-10-16 so code, docs, and screen share one vocabulary, saved settings read over (Sean, 2026-10-16). Keys stay apart from labels (the web's `SECTION_LABEL`), so a later change of word is a label's, not a stored key's. A category's `group` (common, mechanics, digital, and the rest below) is its field, for grouping categories (docs/PLAN.md §2), not a tier.
 
-- **Category tier.** Every category the engine has is listed on the start and in the category menu (ADR 0016). The advanced groups below are planned for loading on demand (milestone 3); how a long list of categories is divided is decided when they arrive.
-- **Unit tier.** Every unit is listed in its category's table, basic and advanced alike (ADR 0016). The tier places it: basic units are listed by system, advanced ones after them all, each group smallest to largest (ADR 0011); and among equal matches, or exact ones, basic comes first. A unit everyday in one region is basic (the UK fluid ounce, pint, and gallon; the US short ton). The tier is kept with care on every unit: Settings' Specialty switch shows or hides the advanced ones (ADR 0018). An advanced unit is one someone converts for a trade, a hobby, or the news; retired units, units that depend on conditions, a second name for a unit already listed (an alias instead), and curiosities stay out.
+- **Category tier.** Every category the engine has is listed on the start and in the category menu (ADR 0016). The specialty groups below are planned for loading on demand (milestone 3); how a long list of categories is divided is decided when they arrive.
+- **Unit tier.** Every unit is listed in its category's table, standard and specialty alike (ADR 0016). The tier places it: standard units are listed by system, specialty ones after them all, each group smallest to largest (ADR 0011); and among equal matches, or exact ones, standard comes first. A unit in everyday use in one region is standard (the UK fluid ounce, pint, and gallon; the US short ton). The tier is kept with care on every unit: Settings' Specialty switch shows or hides the specialty ones (ADR 0018). A specialty unit is one someone converts for a trade, a hobby, or the news; retired units, units that depend on conditions, a second name for a unit already listed (an alias instead), and curiosities stay out.
 
-### Group: everyday (basic categories)
+### Group: common (standard categories)
 
 The categories that ship are marked ★: the first eight since milestone 1, and Fuel economy, Energy, Pressure, Power, and Angle since 2026-10-08 (Force and Torque, since 2026-10-15, under mechanics below).
 
-The ★ rows ship with exactly these basic units, and the advanced column is what shipped (2026-10-08), with what was left out after "not:".
+The ★ rows ship with exactly these standard units, and the specialty column is what shipped (2026-10-08), with what was left out after "not:".
 
-| Category      | ★   | Basic units                                                                         | Advanced units (examples)                                                                                                                                     |
+| Category      | ★   | Standard units                                                                      | Specialty units (examples)                                                                                                                                    |
 | ------------- | --- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Length        | ★   | nm, µm, mm, cm, m, km, in, ft, yd, mi, nautical mile, light-year                    | mil (thou), fathom, furlong, au, parsec; not: chain, ångström (its Å folds to "a" in search), US survey foot (retired), pica and point (typography)           |
 | Weight (mass) | ★   | µg, mg, carat, g, kg, t (metric ton), oz, troy oz, lb, st, short ton                | grain, long ton; not: slug, dalton, hundredweight                                                                                                             |
@@ -75,38 +75,38 @@ The ★ rows ship with exactly these basic units, and the advanced column is wha
 | Angle         | ★   | °, rad, grad                                                                        | arcminute, arcsecond, revolution; not: NATO mil                                                                                                               |
 | Cooking       |     | (a lens over Volume and Weight, not a separate category)                            | ingredient-aware conversions later                                                                                                                            |
 
-### Group: mechanics (advanced)
+### Group: mechanics (specialty)
 
 Force and Torque ship (2026-10-15) with these units, listed on the start and in the menu like every category; the rest of the group waits.
 
-| Category | ★   | Basic units         | Advanced units                                      |
+| Category | ★   | Standard units      | Specialty units                                     |
 | -------- | --- | ------------------- | --------------------------------------------------- |
 | Force    | ★   | N, kN, lbf, kgf     | dyn, ozf, kip; not: poundal, ton-force, tonne-force |
 | Torque   | ★   | N·m, lbf·ft, lbf·in | kgf·m, kgf·cm, N·cm, ozf·in; not: dyn·cm, kN·m      |
 
 Still to come: Acceleration, Density, Angular velocity, Angular acceleration, Moment of inertia, Specific volume.
 
-### Group: fluids (advanced)
+### Group: fluids (specialty)
 
 Volumetric flow, Mass flow, Dynamic viscosity, Kinematic viscosity, Surface tension, Concentration (molar, mass).
 
-### Group: heat (advanced)
+### Group: heat (specialty)
 
 Temperature interval, Thermal conductivity, Specific heat capacity, Heat flux, Heat transfer coefficient, Thermal resistance, Thermal expansion.
 
-### Group: electromagnetism (advanced)
+### Group: electromagnetism (specialty)
 
 Charge, Current, Voltage, Resistance, Conductance, Capacitance, Inductance, Resistivity, Magnetic flux, Magnetic flux density, Magnetic field strength.
 
-### Group: light (advanced)
+### Group: light (specialty)
 
 Luminance, Luminous intensity, Illuminance, Frequency and wavelength.
 
-### Group: radiation (advanced)
+### Group: radiation (specialty)
 
 Activity, Absorbed dose, Equivalent dose, Exposure.
 
-### Group: digital (advanced)
+### Group: digital (specialty)
 
 Data transfer rate, Image resolution (dpi/ppi), Typography (pt, px at an assumed 96 dpi, pica).
 
@@ -125,26 +125,26 @@ Currency (live rates), Clothing and shoe sizes (lookup tables), Sound (logarithm
 | Time: month, year           | No single definition                                                                   | Mean Gregorian: 1 year = 365.2425 d, 1 month = year/12; definition in the unit note                                                                                                                                                            |
 | Calorie                     | `cal` (thermochemical, 4.184 J) vs food Calorie (= kcal)                               | Two units. Search folds case, so `Cal` cannot differ from `cal`: `cal` and `calories` are the small calorie; `kcal`, `food calories`, and `large calories` the kilocalorie; each note says which is which                                      |
 | Horsepower                  | Mechanical (745.6999 W) vs metric PS (735.49875 W)                                     | Two units; `hp` and `bhp` are mechanical, `PS` and `cv` metric                                                                                                                                                                                 |
-| Ton                         | Short (US), long (UK), metric                                                          | Three units; no alias claims `ton`, so typing it offers all three, the visitor's everyday ton first: the short ton in the US, the tonne elsewhere, the long ton being a specialist unit                                                        |
-| Gallon, pint, quart, fl oz  | US vs imperial                                                                         | Two units each (the UK fluid ounce, pint, and gallon since 2026-10-08, marked `(UK)`, everyday units); the plain word (`gallon`, `pint`) names the US unit and the UK one is offered beside it                                                 |
-| Cup                         | US customary 236.588 mL, US legal 240 mL, metric 250 mL                                | US customary default; others advanced                                                                                                                                                                                                          |
+| Ton                         | Short (US), long (UK), metric                                                          | Three units; no alias claims `ton`, so typing it offers all three, the visitor's own ton first: the short ton in the US, the tonne elsewhere, the long ton being a specialty unit                                                              |
+| Gallon, pint, quart, fl oz  | US vs imperial                                                                         | Two units each (the UK fluid ounce, pint, and gallon since 2026-10-08, marked `(UK)`, standard units); the plain word (`gallon`, `pint`) names the US unit and the UK one is offered beside it                                                 |
+| Cup                         | US customary 236.588 mL, US legal 240 mL, metric 250 mL                                | US customary default; others specialty                                                                                                                                                                                                         |
 | Typography px               | Depends on dpi                                                                         | Assume 96 dpi; state it                                                                                                                                                                                                                        |
 | Mach                        | Depends on conditions                                                                  | Standard sea level 340.29 m/s; state it                                                                                                                                                                                                        |
 | mmHg, inHg                  | A mercury column depends on its density and on gravity                                 | Conventional: 13 595.1 kg/m³ under gₙ = 9.80665 m/s², as NIST SP 811 lists them                                                                                                                                                                |
 | BTU, therm                  | Several definitions (International Table, thermochemical, 59 °F; the EC and US therms) | The International Table BTU; the therm of gas bills, 100,000 of them (Sean, 2026-10-15; the US legal therm, 0.024 % smaller, before)                                                                                                           |
 | mpg                         | A US and an imperial gallon                                                            | Two units, `mpg (US)` and `mpg (UK)`; no alias claims `mpg`, so typing it offers both, the visitor's own first                                                                                                                                 |
 | Millibar                    | The same size as the hectopascal                                                       | An alias of the hectopascal, not a second row                                                                                                                                                                                                  |
-| Torque and energy           | Both a force times a length: N·m and J; lbf·ft and ft·lbf                              | Two categories. `ft-lb` names Torque's pound-foot (everyday) and Energy's foot-pound (specialist), so typing it offers both, torque first; their notes point to each other                                                                     |
+| Torque and energy           | Both a force times a length: N·m and J; lbf·ft and ft·lbf                              | Two categories. `ft-lb` names Torque's pound-foot (standard) and Energy's foot-pound (specialty), so typing it offers both, torque first; their notes point to each other                                                                      |
 | Pound-force, kilogram-force | The pound and the kilogram are masses; a force is their weight under standard gravity  | Units of their own under gₙ = 9.80665 m/s² (`lbf`, `kgf`, its alias `kp`); `lb` and `kg` stay the masses                                                                                                                                       |
 | Degree sign                 | `°` alone is an angle; before C or F it belongs to the scale                           | Folded away only before a letter (`normalize.ts`), so `45°` finds the degree and `F` or `°F` Fahrenheit; search also indexes each scale's symbol with its sign (`compactKeyWithDegree`), so a typed `°` offers °C, °F, and °R after the degree |
 
 ## 5. Aliases and disambiguation
 
-Each unit lists the aliases people actually type: symbols with and without case (`ml`, `mL`), spellings (`litre`, `liter`), plurals, abbreviations (`tbsp`, `tbs`), and regional names. Category aliases cover everyday words (`distance`, `how far`, `fluids`, `liquid`, `temp`, `hot`, `storage`).
+Each unit lists the aliases people actually type: symbols with and without case (`ml`, `mL`), spellings (`litre`, `liter`), plurals, abbreviations (`tbsp`, `tbs`), and regional names. Category aliases cover the words people use (`distance`, `how far`, `fluids`, `liquid`, `temp`, `hot`, `storage`).
 
 An alias is added only when people really type it to mean that unit. It counts as an exact match, so it outranks every prefix match in other categories (`kilo` puts kilogram above kilometer, docs/UX-SPEC.md §4). An alias that makes a symbol ambiguous is deliberate (`oz` on fluid ounce), and the list then shows each unit with its category.
 
-Ambiguity watchlist (exact matches across categories or variants): `c` (Celsius's alias, the speed of light's symbol; the everyday unit leads), `nm` and `Nm` (the nanometer's symbol, the newton meter's alias) and `kn` and `kN` (the knot's symbol, the kilonewton's): the current category's leads, then a key written as typed, its case included, so each spelling names its own unit (Sean, 2026-10-16: `500 nm` is nanometers), `ft-lb` (Torque's pound-foot and Energy's foot-pound), `m`, `oz`, `ton`, `gal`, `pt`, `qt`, `cup`, `cal`, `hp`, `mpg`, `kB`, `lb` (mass vs force), `mi`, `min`, `s`, `gr` (the grain's symbol, which some write for grams), `degrees` (the Temperature category's word and the angle's unit), and `′` `″` (arcminute and arcsecond, which planned feet-and-inches entry may write for feet and inches). Nothing commits until Enter or a pick, and for these the list shows every candidate with its category, so the choice is visible before committing.
+Ambiguity watchlist (exact matches across categories or variants): `c` (Celsius's alias, the speed of light's symbol; the standard unit leads), `nm` and `Nm` (the nanometer's symbol, the newton meter's alias) and `kn` and `kN` (the knot's symbol, the kilonewton's): the current category's leads, then a key written as typed, its case included, so each spelling names its own unit (Sean, 2026-10-16: `500 nm` is nanometers), `ft-lb` (Torque's pound-foot and Energy's foot-pound), `m`, `oz`, `ton`, `gal`, `pt`, `qt`, `cup`, `cal`, `hp`, `mpg`, `kB`, `lb` (mass vs force), `mi`, `min`, `s`, `gr` (the grain's symbol, which some write for grams), `degrees` (the Temperature category's word and the angle's unit), and `′` `″` (arcminute and arcsecond, which planned feet-and-inches entry may write for feet and inches). Nothing commits until Enter or a pick, and for these the list shows every candidate with its category, so the choice is visible before committing.
 
 No-match queries are the best signal for missing aliases. Log them (locally in dev, via analytics later) and review before each release.
 

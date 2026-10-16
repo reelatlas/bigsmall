@@ -25,7 +25,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 - **Tokens, Tailwind, color:** Native popups cannot join the design language; An inset ring is painted under the children; a border is not; A hover token equal to its surface hides every hover; Unlayered theme tokens beat a layered reduced-motion override; A control's edge and a divider need different colors; Merging recipes can undo a fix; Dim text with the muted ink, never with opacity; A see-through color is a mix, worked out once in the bridge; Twice a box's width is a fraction: `w-2/1`.
 - **Motion:** A background tab pauses requestAnimationFrame; An animation that reveals rests revealed; A view transition takes no clicks; A glide on a decelerating curve reads as a jump; A glide's leavers go first and its arrivals last; Fast frames stay under the flash threshold by area; A filter is drawn before the clip-path.
 - **Engine, input, values:** Reference sites use Copyscape; Floating-point realities in the engine tests; Aliases outrank prefixes, by design; Undo chunks need a clock, and the reducer should own it; A number too large to hold is still a number; Text the user typed is re-read with the separators it was typed with; Arithmetic and unit names share characters; One undo history for everything the user does in the converter; A half-typed number parses as a unit query; A symbol made only of a mark folds to nothing; Snap a scaled value before rounding it up or down; A copied number pastes as a number: a plain hyphen, and buttons unseen but there; Intl writes numbers a parser of ASCII cannot read back; An alias in a new category can take a symbol from an old one.
-- **Settings and state:** Export settings from their own keys; Remember what was changed, not every setting; A saved choice from a list drops what the list gains later.
+- **Settings and state:** Export settings from their own keys; Remember what was changed, not every setting; A saved choice from a list drops what the list gains later; One idea, one name, in code, docs, and on screen.
 
 ---
 
@@ -860,3 +860,8 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** The category menu, open, is two closed menus wide: 200% of its placeholder's width. The token guard rejects a percentage in an arbitrary value (`w-[200%]`), rightly, since most are one-off sizes.
 **Rule.** Tailwind v4 takes any fraction as a width, above one too: `w-2/1` is `width: 200%`, a size relative to the box it sits in, which the guard allows. Check the built CSS for the class when using one for the first time.
+
+## 2026-10-16 — One idea, one name, in code, docs, and on screen
+
+**What happened.** A unit's tier was `basic` or `advanced` in the code, its section `specialist`, "everyday" or "specialist" in the docs, and Standard or Specialty on screen: three vocabularies for one idea, each change a translation (Sean: "absolutely no confusion on how we store it"). The section's key is stored in visitors' saved settings, so renaming it needed care.
+**Rule.** Name a concept in code by the word the screen shows, and say it the same way in the docs. Keep keys apart from labels (a label map such as `SECTION_LABEL`), so a later change of word is a label's. When a stored key is renamed, bump the stored version and read the old key as the new one, with a test that loads each older version: nobody's choices are lost. Keep dated records (the findings log, these entries, ADRs) as written.

@@ -46,8 +46,8 @@ function proposedCategory(id: string, name: string): Category {
     name,
     aliases: [],
     baseUnit: '',
-    tier: 'basic',
-    group: 'everyday',
+    tier: 'standard',
+    group: 'common',
   };
 }
 
@@ -87,7 +87,7 @@ function proposedUnit(
     symbol,
     aliases: [],
     system: 'si',
-    tier: 'basic',
+    tier: 'standard',
     exact: true,
     source: 'A mock-up (/dev/categories-lab)',
     kind: 'linear',

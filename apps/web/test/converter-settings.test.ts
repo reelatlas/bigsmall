@@ -83,8 +83,8 @@ describe('settings: what shows', () => {
         'us',
       ),
     ).toBe(true);
-    // Specialty unchecked hides every specialist unit, one shown on its own too; US's choice stays.
-    const off = withSystem(both, 'specialist', false, 'us');
+    // Specialty unchecked hides every specialty unit, one shown on its own too; US's choice stays.
+    const off = withSystem(both, 'specialty', false, 'us');
     expect(shows(unit('mil'), off, 'us')).toBe(false);
     expect(off.overrides.get('inch')).toBe(false);
     expect(presetRule(presetKeys('all', 'us')).overrides.size).toBe(0);
@@ -107,10 +107,10 @@ describe('settings: what shows', () => {
   });
 
   it('reads a system as all, some, or none of its units, units chosen on their own counted', () => {
-    expect(systemState(FRESH_RULE, 'specialist', 'us')).toBe('none');
+    expect(systemState(FRESH_RULE, 'specialty', 'us')).toBe('none');
     expect(systemState(FRESH_RULE, 'us', 'us')).toBe('all');
     const mil = withChoice(FRESH_RULE, [unit('mil')], true, 'us');
-    expect(systemState(mil, 'specialist', 'us')).toBe('some');
+    expect(systemState(mil, 'specialty', 'us')).toBe('some');
     expect(systemState(mil, 'us', 'us')).toBe('all');
     // Custom lights while a unit is chosen on its own.
     const on = (rule: typeof FRESH_RULE) => ({ ...FRESH_SETTINGS, rule });
@@ -120,19 +120,19 @@ describe('settings: what shows', () => {
   });
 
   it("orders the sections as set: the visitor's own first on a fresh visit, Standard first, Other a system like the rest", () => {
-    expect(defaultOrder('us')).toEqual(['us', 'metric', 'uk', 'other', 'specialist']);
-    expect(defaultOrder('metric')).toEqual(['metric', 'us', 'uk', 'other', 'specialist']);
-    const moved = withOrder(FRESH_SETTINGS, 'specialist', 0, 'us');
-    expect(orderOf(moved, 'us')).toEqual(['specialist', 'us', 'metric', 'uk', 'other']);
+    expect(defaultOrder('us')).toEqual(['us', 'metric', 'uk', 'other', 'specialty']);
+    expect(defaultOrder('metric')).toEqual(['metric', 'us', 'uk', 'other', 'specialty']);
+    const moved = withOrder(FRESH_SETTINGS, 'specialty', 0, 'us');
+    expect(orderOf(moved, 'us')).toEqual(['specialty', 'us', 'metric', 'uk', 'other']);
     expect(orderChanged(moved, 'us')).toBe(true);
-    expect(orderChanged(withOrder(moved, 'specialist', 9, 'us'), 'us')).toBe(false);
+    expect(orderChanged(withOrder(moved, 'specialty', 9, 'us'), 'us')).toBe(false);
     for (const category of ['speed', 'pressure', 'time'] as const) {
       const rows = unitsIn(category).map((each) => ({ unit: each }));
       const present = new Set(rows.map((row) => sectionOf(row.unit, 'us')));
       // Other where it is set, as any system: here between UK and Specialty.
-      const order = ['uk', 'other', 'specialist', 'metric', 'us'] as const;
+      const order = ['uk', 'other', 'specialty', 'metric', 'us'] as const;
       expect(sectionsOf(rows, 'us', order).map((section) => section.key)).toEqual(
-        ['standard', 'uk', 'other', 'specialist', 'metric', 'us'].filter((key) =>
+        ['standard', 'uk', 'other', 'specialty', 'metric', 'us'].filter((key) =>
           present.has(key as never),
         ),
       );
@@ -180,7 +180,7 @@ describe('settings: what shows', () => {
     expect(Object.keys(stored.display).sort()).toEqual(['format', 'fractions', 'places']);
     const back = settingsFrom(stored)!;
     expect(back.custom).toBe(true);
-    expect(back.order).toEqual(['uk', 'us', 'metric', 'other', 'specialist']);
+    expect(back.order).toEqual(['uk', 'us', 'metric', 'other', 'specialty']);
     expect(shows(unit('inch'), back.rule, 'us')).toBe(false);
     expect([...back.rule.shown].sort()).toEqual([...settings.rule.shown].sort());
     expect(back.display).toEqual(settings.display);
@@ -219,10 +219,23 @@ describe('settings: what shows', () => {
       order: ['specialist', 'uk', 'us', 'metric'],
     })!;
     expect(older.rule.shown.has('other')).toBe(true);
-    expect(older.order).toEqual(['specialist', 'uk', 'us', 'metric', 'other']);
+    expect(older.order).toEqual(['specialty', 'uk', 'us', 'metric', 'other']);
+    // Before version 4 Specialty's key was "specialist": switched on, kept aside, or ordered, it
+    // reads as "specialty", so nobody's choices are lost (Sean, 2026-10-16).
+    const before4 = settingsFrom({
+      v: 3,
+      rule: { shown: ['metric', 'other', 'specialist'], overrides: [] },
+      kept: { shown: ['us', 'specialist'], overrides: [] },
+      custom: true,
+      order: ['specialist', 'metric', 'us', 'uk', 'other'],
+    })!;
+    expect([...before4.rule.shown].sort()).toEqual(['metric', 'other', 'specialty']);
+    expect([...before4.kept!.shown].sort()).toEqual(['specialty', 'us']);
+    expect(before4.order).toEqual(['specialty', 'metric', 'us', 'uk', 'other']);
+    expect(storedOf(before4).v).toBe(4);
     expect(settingsFrom(null)).toBeNull();
     expect(settingsFrom({ v: 2 })).toBeNull();
-    expect(settingsFrom({ v: 4, rule: { shown: [], overrides: [] } })).toBeNull();
+    expect(settingsFrom({ v: 5, rule: { shown: [], overrides: [] } })).toBeNull();
   });
 });
 

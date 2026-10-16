@@ -25,9 +25,9 @@ import { THEMES } from '../src/lib/themes';
 // are in the US: their own units come first (ADR 0011).
 
 const table = (page: Page) => page.getByRole('region', { name: 'Volume' });
-const SPECIALIST = unitsIn('volume').filter((unit) => unit.tier !== 'basic').length;
+const SPECIALTY = unitsIn('volume').filter((unit) => unit.tier === 'specialty').length;
 
-test('a fresh visit shows symbols and names, two places, and the specialist units hidden', async ({
+test('a fresh visit shows symbols and names, two places, and the specialty units hidden', async ({
   page,
 }) => {
   await page.goto('/?a=us-cup&v=2');
@@ -36,7 +36,7 @@ test('a fresh visit shows symbols and names, two places, and the specialist unit
   // Symbol and name since 2026-10-15 (Sean); symbols alone until then.
   await expect(row(page, 'liter').locator('[data-name]')).toBeVisible();
   await expect(row(page, 'oil-barrel')).toHaveCount(0);
-  await expect(hiddenToggle(page)).toContainText(String(SPECIALIST));
+  await expect(hiddenToggle(page)).toContainText(String(SPECIALTY));
 
   await settingsButton(page, 'Units').click();
   await expect(
@@ -164,7 +164,7 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
     .getByLabel(/cubic inches/)
     .click();
   await expect(row(page, 'cubic-inch')).toBeVisible();
-  await expect(hiddenToggle(page)).toContainText(String(SPECIALIST - 1));
+  await expect(hiddenToggle(page)).toContainText(String(SPECIALTY - 1));
   // A press lands while units glide, but Playwright waits for a still target, then scrolls it into
   // view a different way on each retry, moving the page this test measures.
   await settled(page);
@@ -234,7 +234,7 @@ test('Edit lists units as Hidden does and takes the keys: the arrows move, Enter
   await expect(line(/tablespoons/)).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(line(/fluid ounces/)).toBeFocused();
-  await expect(hiddenToggle(page)).toContainText(String(SPECIALIST + 2));
+  await expect(hiddenToggle(page)).toContainText(String(SPECIALTY + 2));
   // Escape ends Edit, focus on the button that reads Edit again.
   await page.keyboard.press('Escape');
   await expect(edit).toBeFocused();
@@ -348,7 +348,7 @@ test('with a system unchecked none of its units shows: its switch is final, and 
 }) => {
   await page.goto('/?a=foot&v=6.3');
   await ready(page);
-  // A specialist unit shown on its own, from Hidden.
+  // A specialty unit shown on its own, from Hidden.
   await hiddenToggle(page).click();
   await page.getByRole('group', { name: 'Hidden, Specialty' }).getByLabel(/mils$/).click();
   await expect(row(page, 'mil')).toBeVisible();
@@ -360,14 +360,14 @@ test('with a system unchecked none of its units shows: its switch is final, and 
     .toBe(true);
   // No preset is lit while a unit departs from it.
   await expect(units.getByRole('radio', { name: 'Standard' })).not.toBeChecked();
-  // A press on the dash shows every specialist unit; the next hides every one, the unit shown on
+  // A press on the dash shows every specialty unit; the next hides every one, the unit shown on
   // its own too; changed by hand, the set stays the visitor's own, Custom lit.
   await specialty.click();
   await expect(specialty).toBeChecked();
   await specialty.click();
   await expect(specialty).not.toBeChecked();
   await expect(row(page, 'mil')).toHaveCount(0);
-  await expect(page.locator('[data-section="specialist"]')).toHaveCount(0);
+  await expect(page.locator('[data-section="specialty"]')).toHaveCount(0);
   await expect(units.getByRole('radio', { name: /^Custom/ })).toBeChecked();
 });
 
@@ -563,8 +563,8 @@ test('settings are remembered in this browser: what shows, Custom, the order, an
 test('search leaves hidden units out and offers them; taking one unhides it', async ({ page }) => {
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
-  // Cubic inches are specialist: the cubic foot, yard, and meter, which also start "cubic", are
-  // everyday since 2026-10-16.
+  // Cubic inches are specialty: the cubic foot, yard, and meter, which also start "cubic", are
+  // standard since 2026-10-16.
   await box(page).fill('2 cubic in');
   await expect(page.getByText('Only hidden units match')).toBeVisible();
   await page.getByRole('button', { name: 'Show them' }).click();

@@ -68,7 +68,7 @@ describe('search: idle lists', () => {
       'milliliter',
       'liter',
       'cubic-meter',
-      // The UK's own measures are everyday too, of neither main system for a US visitor.
+      // The UK's own measures are standard too, of neither main system for a US visitor.
       'imperial-fluid-ounce',
       'imperial-pint',
       'imperial-gallon',
@@ -125,7 +125,7 @@ describe('search: idle lists', () => {
     ]);
   });
 
-  it('keeps temperature in its everyday order, the visitor’s own scale first; metric with no preference', () => {
+  it('keeps temperature in the catalog’s order, the visitor’s own scale first; metric with no preference', () => {
     expect(ids(search('', { category: 'temperature' }))).toEqual([
       'celsius',
       'fahrenheit',
@@ -149,7 +149,7 @@ describe('search: idle lists', () => {
     expect(ids(search('', { category: 'length' }))[0]).toBe('nanometer');
   });
 
-  it('lists the specialist units after every everyday one, smallest to largest', () => {
+  it('lists the specialty units after every standard one, smallest to largest', () => {
     expect(ids(search('', { category: 'length', system: 'us', tier: 'all' }))).toEqual([
       'inch',
       'foot',
@@ -169,7 +169,7 @@ describe('search: idle lists', () => {
       'astronomical-unit',
       'parsec',
     ]);
-    // A UK visitor's own measures first; the US ones are everyday units of neither main system.
+    // A UK visitor's own measures first; the US ones are standard units of neither main system.
     expect(ids(search('', { category: 'volume', system: 'imperial', tier: 'all' }))).toEqual([
       'imperial-fluid-ounce',
       'imperial-pint',
@@ -201,7 +201,7 @@ describe('search: idle lists', () => {
     expect(group('knot', 'metric')).toBe('neither');
     expect(group('nanometer', 'metric')).toBe('own');
     expect(group('micrometer', 'metric')).toBe('own');
-    expect(group('mil', 'metric')).toBe('specialist');
+    expect(group('mil', 'metric')).toBe('specialty');
   });
 
   it('orders the newer categories by the same rule', () => {
@@ -259,7 +259,7 @@ describe('search: idle lists', () => {
       'kilogram-force-centimeter',
       'kilogram-force-meter',
     ]);
-    // Angles have no customary system: degrees and radians, the gradian, then the specialist ones.
+    // Angles have no customary system: degrees and radians, the gradian, then the specialty ones.
     expect(ids(search('', { category: 'angle', system: 'us', tier: 'all' }))).toEqual([
       'degree',
       'radian',
@@ -460,10 +460,10 @@ describe('search: case', () => {
     expect(resolveExact('c', { prefer: 'speed' })?.id).toBe('speed-of-light');
   });
 
-  it('keys both written as typed still put the everyday unit first', () => {
+  it('keys both written as typed still put the standard unit first', () => {
     expect(ids(search('c', { tier: 'all' })).slice(0, 2)).toEqual(['celsius', 'speed-of-light']);
     expect(resolveExact('c')?.id).toBe('celsius');
-    // A torque wrench's "ft-lb" is torque; Energy's foot-pound, a specialist unit, follows it.
+    // A torque wrench's "ft-lb" is torque; Energy's foot-pound, a specialty unit, follows it.
     expect(ids(search('ft-lb', { tier: 'all' }))).toEqual(['pound-foot', 'foot-pound']);
     expect(resolveExact('ft-lb')?.id).toBe('pound-foot');
     expect(resolveExact('oz')).toBeNull();
@@ -510,16 +510,16 @@ describe('resolveExact', () => {
     ]);
   });
 
-  it('leaves "ton" to the visitor’s everyday ton, offering every one', () => {
+  it('leaves "ton" to the visitor’s own ton, offering every one', () => {
     expect(resolveExact('ton')).toBeNull();
     expect(ids(search('ton', { system: 'us', tier: 'all' }))[0]).toBe('short-ton');
-    // The long ton is a specialist unit; the UK weighs in tonnes.
+    // The long ton is a specialty unit; the UK weighs in tonnes.
     expect(ids(search('ton', { system: 'imperial', tier: 'all' }))[0]).toBe('tonne');
     expect(ids(search('ton', { system: 'imperial', tier: 'all' }))).toContain('long-ton');
     expect(ids(search('ton', { system: 'metric', tier: 'all' }))[0]).toBe('tonne');
   });
 
-  it('puts an everyday unit before a specialist one among exact matches', () => {
+  it('puts a standard unit before a specialty one among exact matches', () => {
     expect(resolveExact('c')?.id).toBe('celsius');
     expect(ids(search('c', { tier: 'all' })).slice(0, 2)).toEqual(['celsius', 'speed-of-light']);
     expect(resolveExact('speed of light')?.id).toBe('speed-of-light');

@@ -289,7 +289,7 @@ export interface TableOptions extends NumberEnv {
 /** Every system switched on and no unit chosen on its own: every unit shows. */
 const SHOW_ALL: ViewRule = { shown: new Set(SYSTEM_KEYS), overrides: new Map() };
 
-/** Every unit and category, specialist ones too: the table has no basic and advanced modes (docs/UX-SPEC.md §3). */
+/** Every unit and category, specialty ones too: the table has no standard and specialty modes (docs/UX-SPEC.md §3). */
 const EVERY_TIER = 'all';
 
 /** What the table shows under the box: the matches while a unit is typed, else the category's units, else the start. */

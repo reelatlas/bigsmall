@@ -16,24 +16,24 @@ const OTHER: Record<UnitPreference, readonly UnitSystem[]> = {
 };
 
 /**
- * The unit's group in the list: 0 for an everyday unit of the visitor's own system, 1 of the
- * other main one, 2 of neither (knots), and 3 for every specialist unit, whatever its system.
+ * The unit's group in the list: 0 for a standard unit of the visitor's own system, 1 of the
+ * other main one, 2 of neither (knots), and 3 for every specialty unit, whatever its system.
  */
 function listGroup(unit: Unit, preference: UnitPreference): number {
-  if (unit.tier !== 'basic') return 3;
+  if (unit.tier !== 'standard') return 3;
   if (OWN[preference].includes(unit.system)) return 0;
   if (OTHER[preference].includes(unit.system)) return 1;
   return 2;
 }
 
 /**
- * A unit's group in the listed order: an everyday unit of the visitor's own system, of the other
- * main one, or of neither, or a specialist unit of any system. The table's headings are the web's
+ * A unit's group in the listed order: a standard unit of the visitor's own system, of the other
+ * main one, or of neither, or a specialty unit of any system. The table's headings are the web's
  * (`sectionOf` in apps/web's settings.ts).
  */
-export type ListGroup = 'own' | 'other' | 'neither' | 'specialist';
+export type ListGroup = 'own' | 'other' | 'neither' | 'specialty';
 
-const LIST_GROUPS: readonly ListGroup[] = ['own', 'other', 'neither', 'specialist'];
+const LIST_GROUPS: readonly ListGroup[] = ['own', 'other', 'neither', 'specialty'];
 
 /** The group `orderUnits` lists the unit in for a visitor of this preference. */
 export function unitListGroup(unit: Unit, preference: UnitPreference = 'metric'): ListGroup {
@@ -42,11 +42,11 @@ export function unitListGroup(unit: Unit, preference: UnitPreference = 'metric')
 
 /**
  * The order a category's units are listed in with nothing typed (docs/UX-SPEC.md §3, ADR 0011,
- * ADR 0016): the everyday units of the visitor's own system first, then of the other main system,
- * then of neither, then the specialist units of every system, each group smallest to largest;
+ * ADR 0016): the standard units of the visitor's own system first, then of the other main system,
+ * then of neither, then the specialty units of every system, each group smallest to largest;
  * units of one size keep the catalog's order, most common first. Size orders
  * only units with a plain factor: where a unit has an offset (temperature) or is a reciprocal
- * (fuel economy), the catalog's everyday order stands, the visitor's own everyday unit first.
+ * (fuel economy), the catalog's order stands, the visitor's own standard unit first.
  * With no preference, metric leads, as the international default.
  */
 export function orderUnits(units: readonly Unit[], preference: UnitPreference = 'metric'): Unit[] {
@@ -57,6 +57,6 @@ export function orderUnits(units: readonly Unit[], preference: UnitPreference = 
       .sort((a, b) => a.group - b.group || a.unit.factor - b.unit.factor || a.index - b.index)
       .map(({ unit }) => unit);
   }
-  const everyday = units.find((unit) => listGroup(unit, preference) === 0);
-  return everyday ? [everyday, ...units.filter((unit) => unit !== everyday)] : [...units];
+  const own = units.find((unit) => listGroup(unit, preference) === 0);
+  return own ? [own, ...units.filter((unit) => unit !== own)] : [...units];
 }

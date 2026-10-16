@@ -1,4 +1,4 @@
-/** Which family of everyday units a user most likely expects. */
+/** Which family of units a visitor most likely expects. */
 export type UnitPreference = 'us' | 'imperial' | 'metric';
 
 export interface RegionDefaults {

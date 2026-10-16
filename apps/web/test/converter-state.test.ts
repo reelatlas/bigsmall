@@ -145,7 +145,7 @@ describe('selectTable', () => {
   it('lists every unit of the category in the listed order, the box’s own marked', () => {
     const t = table(ml());
     expect(t.category).toBe('volume');
-    // The visitor's own everyday units first, smallest first; specialist ones come last.
+    // The visitor's own standard units first, smallest first; specialty ones come last.
     expect(t.rows.map((row) => row.id).slice(0, 4)).toEqual([
       'us-teaspoon',
       'us-tablespoon',

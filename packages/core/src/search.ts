@@ -11,7 +11,7 @@ import { categories, units } from './units';
  * 1 exact symbol (case-sensitive) · 2 exact symbol/name/plural/alias (case-insensitive)
  * 3 prefix of name or alias · 4 prefix of symbol · 5 substring of name or alias · 6 one-typo fuzzy
  * Categories use only 2 (exact name or alias) and 3 (prefix of the name): a category row appears
- * when the query is visibly the start of the category word, or an everyday word for it, never
+ * when the query is visibly the start of the category word, or a word people use for it, never
  * from the middle of an alias.
  */
 export type MatchClass = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -38,7 +38,7 @@ export type SearchResult = UnitMatch | CategoryMatch;
 export interface SearchOptions {
   /** Restrict unit results to one category (the box already holds a unit of it). */
   category?: CategoryId | null;
-  /** 'basic' hides advanced units unless nothing basic matches. Default 'basic'. */
+  /** 'standard' hides specialty units unless nothing standard matches. Default 'standard'. */
   tier?: Tier | 'all';
   /**
    * Preferred unit family: it orders a category's units listed with nothing typed (order.ts) and
@@ -57,8 +57,8 @@ export interface SearchOptions {
 export interface SearchResponse {
   results: SearchResult[];
   /**
-   * True when a search for basic units showed advanced ones because nothing basic matched. Nothing
-   * reads it: the converter asks for every tier, and leaves specialist units out by Settings'
+   * True when a search for standard units showed specialty ones because nothing standard matched.
+   * Nothing reads it: the converter asks for every tier, and leaves specialty units out by Settings'
    * Specialty switch instead (ADR 0018).
    */
   escalated: boolean;
@@ -180,9 +180,9 @@ function categoryOf(result: SearchResult): CategoryId {
   return result.kind === 'unit' ? result.unit.category : result.category.id;
 }
 
-/** 0 for an everyday unit or a category, 1 for a specialist unit. */
+/** 0 for a standard unit or a category, 1 for a specialty unit. */
 function tierRank(result: SearchResult): number {
-  return result.kind === 'unit' && result.unit.tier !== 'basic' ? 1 : 0;
+  return result.kind === 'unit' && result.unit.tier !== 'standard' ? 1 : 0;
 }
 
 function compareRanked(a: Ranked, b: Ranked, options: SearchOptions): number {
@@ -190,7 +190,7 @@ function compareRanked(a: Ranked, b: Ranked, options: SearchOptions): number {
   const rb = b.result;
   // Among exact matches, the current category's comes first: in Torque, "nm" is the newton
   // meter. Then a key written as typed, its case included: symbols are case-sensitive, so "nm" is
-  // the nanometer and "Nm" the newton meter (Sean, 2026-10-16). Then an everyday unit, whichever
+  // the nanometer and "Nm" the newton meter (Sean, 2026-10-16). Then a standard unit, whichever
   // key it matched: "c" is Celsius's alias and the speed of light's symbol, and Celsius leads.
   if (ra.matchClass <= 2 && rb.matchClass <= 2) {
     if (options.prefer) {
@@ -211,7 +211,7 @@ function compareRanked(a: Ranked, b: Ranked, options: SearchOptions): number {
     if (preferred !== 0) return preferred;
   }
   if (ra.kind === 'unit' && rb.kind === 'unit') {
-    // Everyday before specialist, then the visitor's own family, as the table lists them (order.ts).
+    // Standard before specialty, then the visitor's own family, as the table lists them (order.ts).
     const tier = tierRank(ra) - tierRank(rb);
     if (tier !== 0) return tier;
     const preference = options.system;
@@ -222,19 +222,19 @@ function compareRanked(a: Ranked, b: Ranked, options: SearchOptions): number {
 }
 
 function idleResults(options: SearchOptions): SearchResponse {
-  const tierMode = options.tier ?? 'basic';
+  const tierMode = options.tier ?? 'standard';
   const results: SearchResult[] = [];
   if (options.category) {
     const listed = units.filter(
       (unit) =>
-        unit.category === options.category && (tierMode !== 'basic' || unit.tier === 'basic'),
+        unit.category === options.category && (tierMode !== 'standard' || unit.tier === 'standard'),
     );
     for (const unit of orderUnits(listed, options.system)) {
       results.push({ kind: 'unit', unit, matchClass: 0, matchedKey: unit.name, field: 'name' });
     }
   } else {
     for (const category of categories) {
-      if (tierMode === 'basic' && category.tier !== 'basic') continue;
+      if (tierMode === 'standard' && category.tier !== 'standard') continue;
       results.push({ kind: 'category', category, matchClass: 0, matchedKey: category.name });
     }
   }
@@ -299,12 +299,12 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
 
   let unitResults = [...bestUnit.values()];
   let escalated = false;
-  if ((options.tier ?? 'basic') === 'basic') {
-    const basic = unitResults.filter(
-      (r) => r.result.kind === 'unit' && r.result.unit.tier === 'basic',
+  if ((options.tier ?? 'standard') === 'standard') {
+    const standard = unitResults.filter(
+      (r) => r.result.kind === 'unit' && r.result.unit.tier === 'standard',
     );
-    if (basic.length === 0 && unitResults.length > 0) escalated = true;
-    else unitResults = basic;
+    if (standard.length === 0 && unitResults.length > 0) escalated = true;
+    else unitResults = standard;
   }
 
   const ranked = [...bestCategory.values(), ...unitResults].sort((a, b) =>
@@ -320,11 +320,11 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
 /**
  * The single unit a query names exactly, or null when it names none or more than one.
  * "ml" → milliliter. "oz" → null (weight ounce and fluid ounce both match) unless the category
- * is locked. Advanced units count: typing an exact name is explicit intent. The preferred
+ * is locked. Specialty units count: typing an exact name is explicit intent. The preferred
  * category's exact match is meant over another's (in Torque, "nm" is the newton meter); then a
  * key written as typed, its case included, over one that matches only with case folded ("nm" is
- * the nanometer, "Nm" the newton meter). Where an everyday unit and a specialist one both match
- * exactly, the everyday one is meant: "c" is Celsius, not the speed of light.
+ * the nanometer, "Nm" the newton meter). Where a standard unit and a specialty one both match
+ * exactly, the standard one is meant: "c" is Celsius, not the speed of light.
  */
 export function resolveExact(text: string, options: SearchOptions = {}): Unit | null {
   const { results } = search(text, { ...options, tier: 'all', limit: 100 });
@@ -334,8 +334,8 @@ export function resolveExact(text: string, options: SearchOptions = {}): Unit | 
   const raw = toQuery(text).raw;
   const typed = found.filter((r) => r.matchedKey === raw);
   const meant = typed.length > 0 ? typed : found;
-  const everyday = meant.filter((r) => r.unit.tier === 'basic');
-  const named = everyday.length > 0 ? everyday : meant;
+  const standard = meant.filter((r) => r.unit.tier === 'standard');
+  const named = standard.length > 0 ? standard : meant;
   return named.length === 1 ? named[0]!.unit : null;
 }
 

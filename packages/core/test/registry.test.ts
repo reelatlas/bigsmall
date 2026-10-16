@@ -3,7 +3,7 @@ import { categories, compactKey, getUnit, units, unitsIn } from '../src/index';
 
 /** Data-integrity rules every unit and category must satisfy. Fails fast when a new entry is malformed. */
 describe('registry integrity', () => {
-  it('registers the everyday categories in display order', () => {
+  it('registers every category in display order', () => {
     expect(categories.map((c) => c.id)).toEqual([
       'length',
       'mass',
@@ -41,9 +41,10 @@ describe('registry integrity', () => {
       expect(base?.category).toBe(c.id);
       expect(base?.kind).toBe('linear');
       if (base?.kind === 'linear') expect(base.factor).toBe(1);
-      expect(unitsIn(c.id).filter((u) => u.tier === 'basic').length, c.id).toBeGreaterThanOrEqual(
-        3,
-      );
+      expect(
+        unitsIn(c.id).filter((u) => u.tier === 'standard').length,
+        c.id,
+      ).toBeGreaterThanOrEqual(3);
     }
   });
 

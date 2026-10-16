@@ -16,13 +16,13 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, fifty-second to fifty-fifth passes):
+1. **Open with Sean** (`docs/research/findings-0-first-pass.md`, the fifty-sixth pass, saved before a compaction): he asked for "a full playbook" after the compaction, read as the full tidy (`/tidy full`): confirm in one line, then run it.
    - The sketchbook is live on `/about` with his tuning (v2), reached from the footer's quiet About link, the name leading home from it; 93 sketches in three rounds, 17 effects, and Flip with its particles in nine moods (the fifty-third to fifty-fifth passes); tuned in `/dev/sketchbook-lab`. Every sketch, effect, and mood stays (Sean, 2026-10-15).
    - R6 is the mark, live as a trial (`1fa40fa` reverts it); its small circle's mint is the one color in it that is not a token.
    - Feedback: undecided; the fiftieth pass lists the ways (a prefilled email, a form service, a function of ours), each wanting `hello@bigsmall.work` first.
    - Umami, counting since 2026-10-15: his own visit in Realtime, two devices as two visitors with the right countries, his own visits left out (`docs/DEPLOYMENT.md`, "Analytics"; an iPhone opt-out link to offer).
-2. **Next, toward v1** (`docs/PLAN.md` §13): the SEO pair pages, in v1 on `bigsmall.work`, the domain for good (Sean, 2026-10-15): plan them, then build; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
-3. **Then the accuracy audit** of every conversion and calculation (`docs/PLAN.md` §11), after the rest of this list (Sean, 2026-10-15).
+2. **Next, in order** (the fifty-sixth pass): the full tidy; then the accuracy audit of every conversion and formula (`docs/PLAN.md` §11), moved up by Sean to follow it; then categories to add, with unitconverters.net as coverage research only (ADR 0004; `docs/UNITS-CATALOG.md` §1 and §3), a shortlist brought to Sean.
+3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages, in v1 on `bigsmall.work`, the domain for good (Sean, 2026-10-15): plan them, then build; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
 4. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).
 5. **Later.** The hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search); the five-person test once there is traction.
 

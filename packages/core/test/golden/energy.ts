@@ -50,8 +50,15 @@ export const energy: GoldenRow[] = [
     value: 1,
     from: 'therm',
     to: 'joule',
-    expected: 1.054804e8,
-    source: `${SP811}: therm (U.S.) = 1.054804E+08 J (exact)`,
+    expected: 105505585.262,
+    source: 'Derived: US EIA, therm = 100,000 Btu; Btu_IT = 1,055.05585262 J (SP 811 footnote 9)',
+  },
+  {
+    value: 1,
+    from: 'therm',
+    to: 'british-thermal-unit',
+    expected: 100000,
+    source: 'US EIA Glossary: therm = 100,000 Btu',
   },
   {
     value: 1,

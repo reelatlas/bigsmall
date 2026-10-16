@@ -15,7 +15,8 @@ const WATT_HOUR =
 const CALORIE = 'NIST SP 811 (2008) Appendix B.8: calorie, thermochemical = 4.184 J (exact)';
 const BTU =
   'NIST SP 811 (2008) Appendix B.8: British thermal unit, International Table = 1.055056E+03 J; exact from cal_IT = 4.1868 J, 1 lb = 453.59237 g, 1 °F = 5/9 K';
-const THERM = 'NIST SP 811 (2008) Appendix B.8: therm (U.S.) = 1.054804E+08 J (exact)';
+const THERM =
+  'US EIA Glossary: therm = 100,000 Btu; with the International Table Btu (NIST SP 811 (2008) Appendix B.8, footnote 9: 1,055.05585262 J), 105,505,585.262 J (exact)';
 const FOOT_POUND =
   'NIST SP 811 (2008) Appendix B.8: foot pound-force = 1.355818 J; exact from 1 ft = 0.3048 m, 1 lb = 0.45359237 kg, gₙ = 9.80665 m/s²';
 const ELECTRONVOLT =
@@ -189,10 +190,10 @@ export const energyUnits: readonly Unit[] = [
     aliases: ['us therm', 'us therms', 'therm (us)'],
     system: 'us',
     tier: 'advanced',
-    factor: 1.054804e8,
+    factor: 100_000 * BTU_IT,
     exact: true,
     source: THERM,
-    note: 'The US therm, about 100,000 BTU: the unit of US natural gas bills.',
+    note: 'The therm of gas bills: 100,000 BTU. The US legal therm, in some tariffs, is 0.024 % smaller.',
   },
   {
     kind: 'linear',

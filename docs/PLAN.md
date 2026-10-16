@@ -64,6 +64,15 @@ Real improvements the tidy found and left, each small enough to pick up cold:
 - **Gallery samples still missing:** the calculator showing "Too large", and the matches with no match and with only hidden matches.
 - **Tests still missing:** the focus walk past the first ten stops (Units, Display, the calculator, Edit, Hidden, the Move menu); Ctrl/⌘+C with text selected in the box; blocked storage (settings last for the visit); the Other switch in a browser; the shortcuts map's rows; tapping the wordmark; settings kept out of the URL and the undo history.
 - **UX-SPEC §14.** Mostly built or decided items now; keep the planned ones there and let the built ones live in their sections.
+- **The labs' shared controls** (the tidy after the sketchbook, 2026-10-15). `SketchbookLab.tsx`'s `Toggle` and `Choice`, the Settings panel both labs repeat (Earlier version, Load, Reset, Copy settings), `literal()`, and the small class lists both write (a hint, a note) into `src/pages/dev/_lab/controls.tsx`, the wordmark lab then using them for its own markup; then give the selects and checkboxes a shipped mark, as `Slider` has.
+- **The wordmark lab's saved settings** load through a setState in an effect, the pattern the compiler's lint stops elsewhere; `SketchbookLab.tsx` shows the fix (`useIsHydrated` and `useMemo`; docs/LEARNINGS.md, "The compiler's lint stops a setState in an effect").
+- **One name for the shipped settings.** `Sketchbook.tsx`'s `SHIPPED` (the settings) and `presets.ts`'s `SHIPPED` (the version, "v3") share a name, and `SketchbookLab.tsx`'s `DEFAULTS` is the first again.
+- **The lab's preview of reduced motion** stills the tiles but not Flip's particles: `burst.ts` reads only the system's setting.
+- **Long names in every theme.** The test that long names are never cut (`table.spec.ts`) runs in Daylight only, though Theorem's names are serif: loop `THEMES`, and mark the list's symbol and name (`data-symbol`, `data-name`) for its selectors. With it, a sweep of widths per theme around where names give way, not only 1280 and 320 px (5 to 10 s more).
+- **The lab's saved-settings migration** (version 1 to 2, `load()` in `SketchbookLab.tsx`) is untested.
+- **A budget for the About page.** `scripts/bundle-size.mjs` measures only the converter's page; the sketchbook island and its 93 inline sketches ship unmeasured. Measure once, then Sean sets the budget (§9).
+- **The matches' line and the table's foot** sit 6 and 4 px under what is above them (`mt-1.5`, `mt-1`), and the even-spacing test measures only section headings: measure both in every theme, then pick one.
+- **One home each.** DESIGN-SYSTEM's sketchbook bullets repeat UX-SPEC §1's effects, moods, and waits: keep how it is built there and link the spec for what it does. CLAUDE.md's Recipes and ARCHITECTURE's "How to extend" repeat seven recipes: one links to the other. And the status lines of ADRs 0002, 0011, 0014, and 0015 have grown long.
 
 ### Out of scope
 

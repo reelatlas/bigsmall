@@ -875,6 +875,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** Cooking's box holds two pills beside the number. Without wrapping, the pills took a phone's whole row and the number vanished; with each pill wrapping on its own, a long ingredient took a third line, because a flex row decides its lines from each item's full width before anything shrinks.
 **Rule.** Keep the number's room with a minimum width and let the row wrap; put the pills in one group that wraps as a whole, and let the one that may be cut short (the ingredient's name, `min-w-0` and `truncate`) shrink inside the group, so the box is two lines at most. Fit what may give way by measurement (`useFieldFit`, which now also hides the unit chip's name when the ingredient's would be cut), each time from the same starting state, so the answer never flips.
+**Later the same day.** The browser's own wrap judged by the number's minimum width and both pills' full names, so on a desktop the box wrapped even with "123", where one line fit once the unit's name gave way (Sean). The wrap is now the fit's last step, measured: one line, the name, the sizes, and only then `data-wrap`, which the row's classes follow; the row is never `flex-wrap` on its own. A refit on resize reads the width alone, since the fit itself changes the row's height.
 
 ## 2026-10-16 — A stuck header closed where it sticks throws the page past its section
 

@@ -19,22 +19,34 @@ function fitsAt(element: HTMLElement, text: FitText, step: number): boolean {
   return element.scrollWidth <= element.clientWidth;
 }
 
-/** The largest step at which the text fits, left on its element; the last when none does. */
-function largestFit(text: FitText): number {
+/**
+ * The largest step at which the text fits, left on its element; null, the text left at the last
+ * step, when none does.
+ */
+function largestFitting(text: FitText): number | null {
   const element = text.ref.current;
-  if (!element) return 0;
-  const last = text.steps.length - 1;
-  for (let step = 0; step < last; step += 1) {
+  if (!element) return null;
+  for (let step = 0; step < text.steps.length; step += 1) {
     if (fitsAt(element, text, step)) return step;
   }
-  fitsAt(element, text, last);
-  return last;
+  return null;
+}
+
+/** The largest step at which the text fits, left on its element; the last when none does. */
+function largestFit(text: FitText): number {
+  return largestFitting(text) ?? Math.max(0, text.steps.length - 1);
+}
+
+/** Whether an element's text shows whole on its one line, not cut short; true with no element. */
+function whole(element: HTMLElement | null | undefined): boolean {
+  return !element || element.scrollWidth <= element.clientWidth;
 }
 
 /**
- * Runs `fit` before paint after every render, and again whenever `observed` resizes or the theme
- * changes, so text shrinks as it grows, takes the room back when its box widens, and fits each
- * theme's fonts, which change what fits without resizing anything.
+ * Runs `fit` before paint after every render, and again whenever `observed` changes width or the
+ * theme changes, so text shrinks as it grows, takes the room back when its box widens, and fits
+ * each theme's fonts, which change what fits without resizing anything. A change of height alone
+ * is left out: every fit here is a matter of width, and a field's row grows taller as it wraps.
  */
 function useRefit(fit: () => void, observed: RefObject<HTMLElement | null>) {
   useLayoutEffect(fit);
@@ -42,7 +54,12 @@ function useRefit(fit: () => void, observed: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const element = observed.current;
     if (!element || typeof ResizeObserver === 'undefined') return;
-    const resizes = new ResizeObserver(fit);
+    let width = -1;
+    const resizes = new ResizeObserver(([entry]) => {
+      if (!entry || entry.contentRect.width === width) return;
+      width = entry.contentRect.width;
+      fit();
+    });
     resizes.observe(element);
     const themes = new MutationObserver(fit);
     themes.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -75,31 +92,52 @@ export function useFitStep(
   return step;
 }
 
-/** How a field's row fits: whether the chip shows its symbol alone, and the text's step. */
+/**
+ * How a field's row fits: whether the chip shows its symbol alone, the text's step, and, in a row
+ * with a second pill, whether the pills take a line of their own under the text.
+ */
 export interface FieldFit {
   compact: boolean;
   step: number;
+  wrap: boolean;
 }
 
 /**
- * Measures a field's row: with the chip's name shown, does the text fit at its largest size, and
- * a second pill's name, if any, whole (Cooking's ingredient, ADR 0021)? If not, the name is
- * hidden and the text takes the largest step that fits without it. Leaves the name and the text as
- * chosen; measured from the name shown each time, so the answer never flips back and forth.
+ * Measures a field's row, always from one line with the chip's name shown, so the answer never
+ * flips back and forth: there, does the text fit at its largest size, and a second pill's name
+ * (Cooking's ingredient, ADR 0021) whole? If not, the name is hidden and the text takes the
+ * largest step that fits without it. With a second pill the row stays one line only while the
+ * text fits at some step with that pill whole; otherwise the pills take a line of their own under
+ * the text (`data-wrap` on the row), the chip's name shown there wherever both pills fit whole.
+ * Leaves the row, the name, and the text as chosen.
  */
 function fitField(
   nameRef: RefObject<HTMLElement | null>,
   text: FitText,
   otherRef?: RefObject<HTMLElement | null>,
+  rowRef?: RefObject<HTMLElement | null>,
 ): FieldFit {
   const name = nameRef.current;
-  if (name) name.hidden = false;
   const element = text.ref.current;
   const other = otherRef?.current;
-  const otherWhole = !other || other.scrollWidth <= other.clientWidth;
-  if (!element || (fitsAt(element, text, 0) && otherWhole)) return { compact: false, step: 0 };
+  // Only a row with a second pill ever wraps.
+  const row = other ? rowRef?.current : null;
+  if (name) name.hidden = false;
+  row?.removeAttribute('data-wrap');
+  if (!element || (fitsAt(element, text, 0) && whole(other))) {
+    return { compact: false, step: 0, wrap: false };
+  }
   if (name) name.hidden = true;
-  return { compact: name !== null, step: largestFit(text) };
+  const compact = name !== null;
+  if (!row) return { compact, step: largestFit(text), wrap: false };
+  const step = whole(other) ? largestFitting(text) : null;
+  if (step !== null) return { compact, step, wrap: false };
+  row.setAttribute('data-wrap', '');
+  if (name) name.hidden = false;
+  const wrapped = largestFit(text);
+  if (whole(other)) return { compact: false, step: wrapped, wrap: true };
+  if (name) name.hidden = true;
+  return { compact, step: wrapped, wrap: true };
 }
 
 /**
@@ -107,9 +145,10 @@ function fitField(
  * field's text steps down, so the name stays while the row has room for it and the text at its
  * largest size, in a field of any width. `text` is the field's text layer on its ladder; `name`
  * is the chip's name, which the measurement hides and shows itself as useFitStep writes classes
- * (the chip renders it with the same `hidden`); `row` is the element whose resizes refit the
- * field, one whose size the fit never changes; `other` a second pill's name, which the chip's
- * name gives way to as well where it would be cut short.
+ * (the chip renders it with the same `hidden`); `row` is the row, whose changes of width refit
+ * the field; `other` a second pill's name, which the chip's name gives way to as well where it
+ * would be cut short, and beside which the row may wrap, the measurement setting `data-wrap` on
+ * the row as the field renders it.
  */
 export function useFieldFit(
   row: RefObject<HTMLElement | null>,
@@ -117,14 +156,16 @@ export function useFieldFit(
   text: FitText,
   other?: RefObject<HTMLElement | null>,
 ): FieldFit {
-  const [fit, setFit] = useState<FieldFit>({ compact: false, step: 0 });
+  const [fit, setFit] = useState<FieldFit>({ compact: false, step: 0, wrap: false });
 
   const refit = useCallback(() => {
-    const next = fitField(name, text, other);
+    const next = fitField(name, text, other, row);
     setFit((current) =>
-      current.compact === next.compact && current.step === next.step ? current : next,
+      current.compact === next.compact && current.step === next.step && current.wrap === next.wrap
+        ? current
+        : next,
     );
-  }, [name, text, other]);
+  }, [name, text, other, row]);
 
   useRefit(refit, row);
   return fit;

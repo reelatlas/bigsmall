@@ -1298,6 +1298,48 @@ test('Cooking: "2 cups flour" takes the cup and the flour, two pills, Weight the
   await expect(menu(page)).toHaveText(/Volume/);
 });
 
+test('Cooking’s box keeps one line where it can, fitted as with one pill: the unit’s symbol, then the sizes, then a line of their own', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the widths are set here');
+  // The row's state, as the fit leaves it.
+  const fit = () =>
+    page.evaluate(() => {
+      const input = document.querySelector<HTMLInputElement>('input[role="combobox"]')!;
+      const row = input.parentElement!.parentElement!;
+      const name = row.querySelector<HTMLElement>('[aria-label^="Unit:"] span span:last-child');
+      return {
+        wrapped: row.hasAttribute('data-wrap'),
+        named: !name?.hidden,
+        size: parseFloat(getComputedStyle(input).fontSize),
+        height: Math.round(row.getBoundingClientRect().height),
+      };
+    });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  // A short number and both names on one line (Sean, 2026-10-16: "123" wrapped on a desktop).
+  await page.goto('/?a=us-fluid-ounce&v=123&i=all-purpose-flour');
+  await ready(page);
+  const full = await fit();
+  expect(full).toMatchObject({ wrapped: false, named: true, height: 60 });
+  // A long one: the unit's symbol alone, the number a size or more down, still one line.
+  await box(page).fill('6.6666666711111111111');
+  await expect.poll(fit).toMatchObject({ wrapped: false, named: false, height: 60 });
+  expect((await fit()).size).toBeLessThan(full.size);
+  // At a phone's width the pills take a line of their own under the number.
+  await page.setViewportSize({ width: 320, height: 640 });
+  await expect.poll(async () => (await fit()).wrapped).toBe(true);
+  await expect(page.getByRole('button', { name: 'Ingredient: all-purpose flour' })).toBeVisible();
+  // Empty, the number keeps its placeholder's room.
+  await box(page).fill('');
+  const placeholder = await page.evaluate(() => {
+    const layer = document.querySelector('input[role="combobox"]')!
+      .nextElementSibling as HTMLElement;
+    return { text: layer.textContent, whole: layer.scrollWidth <= layer.clientWidth };
+  });
+  expect(placeholder).toEqual({ text: 'Number', whole: true });
+});
+
 test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, Enter takes one, a link keeps it', async ({
   page,
   isMobile,

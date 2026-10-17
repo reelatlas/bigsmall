@@ -80,15 +80,21 @@ const TEXT_LAYER =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 
 /**
- * The row with two pills, Cooking's unit and ingredient (ADR 0021): as FIELD_ROW, 60 px on one line
- * where the pills fit beside the number, and where they do not, the pills together on a second
- * line at its right end, the ingredient's name cut short before a third, so the number keeps its
- * room. The browser's own fit decides, in any box.
+ * The row, FIELD_ROW, which with Cooking's two pills (ADR 0021) wraps where the fit says so
+ * (`data-wrap`, useFieldFit), never by the browser's own wrapping: the number and its clear on
+ * the first line, the pills together on a line of their own at its right end.
  */
-const TWO_PILL_ROW =
-  'flex min-h-15 flex-wrap items-center justify-end gap-x-2 gap-y-1 py-2 pr-2 pl-4';
-/** The number's room in a row with two pills: the pills wrap before it narrows past it. */
-const TWO_PILL_NUMBER = 'min-w-32';
+const ROW = cx(
+  FIELD_ROW,
+  'group/row data-wrap:h-auto data-wrap:min-h-15 data-wrap:flex-wrap data-wrap:gap-y-1 data-wrap:py-2',
+);
+
+/** The number's room, its clear's height on a line of its own. */
+const NUMBER = 'relative min-w-0 flex-1 self-stretch group-data-wrap/row:min-h-11';
+
+/** The two pills, one group, the whole second line where the row wraps. */
+const PILLS =
+  'flex min-w-0 items-center gap-2 group-data-wrap/row:basis-full group-data-wrap/row:justify-end';
 
 /**
  * The converter's field (docs/DESIGN-SYSTEM.md, "Fields"): a combobox input over a text layer, its
@@ -150,8 +156,8 @@ export function ValueField({
       <label htmlFor={inputId} className="sr-only">
         {label}
       </label>
-      <div ref={rowRef} className={ingredient ? TWO_PILL_ROW : FIELD_ROW}>
-        <div className={cx('relative min-w-0 flex-1 self-stretch', ingredient && TWO_PILL_NUMBER)}>
+      <div ref={rowRef} data-wrap={fit.wrap ? '' : undefined} className={ROW}>
+        <div className={NUMBER}>
           <input
             ref={inputRef}
             id={inputId}
@@ -181,6 +187,9 @@ export function ValueField({
           />
           <div ref={textLayerRef} aria-hidden="true" className={cx(TEXT_LAYER, sizeClass)}>
             <NumberText text={text} parsed={parsed} running={runningValue(parsed, locale)} />
+            {/* Empty, the placeholder's room, unseen, so the fit keeps it whole: the number is
+                never squeezed out beside the pills. */}
+            {text === '' && <span className="invisible">{placeholder}</span>}
           </div>
         </div>
         {text !== '' && (
@@ -213,9 +222,9 @@ export function ValueField({
           );
           if (!ingredient) return unitChip;
           // Cooking's second pill, after the unit's, each removable (ADR 0021); the two wrap as
-          // one, the ingredient's giving way.
+          // one, the ingredient's name cut short only where their own line is too narrow.
           return (
-            <div className="flex min-w-0 items-center gap-2">
+            <div className={PILLS}>
               {unitChip}
               <UnitChip
                 ingredient={ingredient}

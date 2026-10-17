@@ -472,14 +472,12 @@ function cookingListed(ingredient: Ingredient, inBox: Unit | null, system: UnitP
 
 /**
  * The line under Cooking's table (ADR 0021; docs/research/cooking-2.md): how the cup is filled and
- * what it weighs, so a visitor measures the same way, and where the rest is. The weighings behind
- * the figure, their spread and count, stay on the About page (Sean, 2026-10-17: the essentials
- * only). "All-purpose flour: spooned and leveled, 1 cup ≈ 127 g. Fill cups the same way for the
- * values marked ≈ to hold; the sources are on the About page."
+ * what it weighs, nothing more (Sean, 2026-10-17: that the cup must be filled that way is implied,
+ * and the About page keeps the weighings). "All-purpose flour: spooned and leveled, 1 cup ≈ 127 g."
  */
 function cookingNote(ingredient: Ingredient): string {
   const name = ingredient.name.charAt(0).toUpperCase() + ingredient.name.slice(1);
-  return `${name}: ${ingredient.method}, 1 cup ≈ ${ingredient.gramsPerCup} g. Fill cups the same way for the values marked ≈ to hold; the sources are on the About page.`;
+  return `${name}: ${ingredient.method}, 1 cup ≈ ${ingredient.gramsPerCup} g.`;
 }
 
 /**

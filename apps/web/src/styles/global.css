@@ -118,6 +118,58 @@
   }
 }
 
+/*
+ * The sketchbook's grid (features/sketchbook/Sketchbook.tsx sets the measures): its tiles on
+ * whole pixels. A track from a division (a third of the width) lands on a fraction, which puts a
+ * tile's edges between device pixels and its moving layers a hair off their rest when a change
+ * settles (Sean's iPhone, 2026-10-16; docs/LEARNINGS.md). The tracks round down to the pixel and
+ * the grid starts at a whole-pixel inset rather than centering on a half; a browser without
+ * round() keeps the plain grid. --sketch-track is also the Flip row's width under the middle tile.
+ */
+@layer components {
+  .sketchbook {
+    --sketch-track: min(
+      var(--sketch-tile),
+      calc((100% - (var(--sketch-columns) - 1) * var(--sketch-gap)) / var(--sketch-columns))
+    );
+  }
+
+  .sketchbook-grid {
+    grid-template-columns: repeat(var(--sketch-columns), minmax(0, var(--sketch-tile)));
+    gap: var(--sketch-gap);
+    justify-content: center;
+  }
+
+  @supports (width: round(down, 1.5px, 1px)) {
+    .sketchbook {
+      --sketch-track: round(
+        down,
+        min(
+          var(--sketch-tile),
+          calc((100% - (var(--sketch-columns) - 1) * var(--sketch-gap)) / var(--sketch-columns))
+        ),
+        1px
+      );
+    }
+
+    .sketchbook-grid {
+      grid-template-columns: repeat(var(--sketch-columns), var(--sketch-track));
+      justify-content: start;
+      padding-inline-start: round(
+        down,
+        calc(
+          (
+              100% - var(--sketch-columns) * var(--sketch-track) - (var(--sketch-columns) - 1) *
+                var(--sketch-gap)
+            ) /
+            2
+        ),
+        1px
+      );
+    }
+  }
+}
+
 @layer base {
   html {
     background: var(--canvas);

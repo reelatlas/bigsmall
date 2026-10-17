@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { Button } from '../../components/Button';
 import { PauseIcon, PlayIcon } from '../../components/icons';
-import { cx } from '../../lib/recipes';
+import { cx, PAGE_BLEED } from '../../lib/recipes';
 import { SKETCHBOOK_TIMING } from '../../lib/timing';
 import { FlipButton } from './FlipButton';
 import { play, sketchHref, type SketchbookPlayer } from './motion';
@@ -63,17 +63,22 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
 
   const { columns, rows, tile, gap, set } = settings.tuning;
   const ids = startingSketches(set, columns * rows);
+  // The grid's measures, which the stylesheet turns into tracks on whole pixels (global.css, "The
+  // sketchbook's grid") and the Flip row reads for its width under the middle tile.
+  const measures = {
+    '--sketch-columns': columns,
+    '--sketch-tile': `calc(var(--spacing) * ${tile})`,
+    '--sketch-gap': `calc(var(--spacing) * ${gap})`,
+  } as CSSProperties;
   return (
-    <div className="grid justify-items-center gap-6">
+    // Bled to the page's edge and clipped there: a change's pieces (Glitch's bands) reach past a
+    // tile, and past a phone's edge they let the page pan sideways (Sean's iPhone, 2026-10-16).
+    <div className={cx(PAGE_BLEED, 'sketchbook grid justify-items-center gap-6')} style={measures}>
       <div
         ref={grid}
         role="group"
         aria-label="Logo sketches"
-        className="grid w-full justify-center"
-        style={{
-          gridTemplateColumns: `repeat(${columns}, minmax(0, calc(var(--spacing) * ${tile})))`,
-          gap: `calc(var(--spacing) * ${gap})`,
-        }}
+        className="sketchbook-grid grid w-full"
       >
         {ids.map((id, index) => (
           <button
@@ -104,12 +109,7 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
       {/* Flip and Pause under the middle tile, together as wide as one tile: Pause its 44 px,
           Flip the rest, 4 px apart as a toolbar's buttons are (Sean, 2026-10-16). Where a narrow
           window makes a tile smaller than the two need, they keep their size, centered under it. */}
-      <div
-        className="flex min-w-max gap-1"
-        style={{
-          width: `min(calc(var(--spacing) * ${tile}), calc((100% - ${columns - 1} * var(--spacing) * ${gap}) / ${columns}))`,
-        }}
-      >
+      <div className="flex min-w-max gap-1" style={{ width: 'var(--sketch-track)' }}>
         <FlipButton
           className="flex-1"
           particles={settings.tuning.particles}

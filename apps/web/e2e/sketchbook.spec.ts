@@ -353,3 +353,29 @@ test('under reduced motion there is nothing to pause', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Flip', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeHidden();
 });
+
+test('the tiles sit on whole pixels at any width, their edges on device pixels', async ({
+  page,
+}) => {
+  // A third of a width lands on a fraction; the grid rounds its tracks and its inset (global.css,
+  // "The sketchbook's grid"), so a settling layer never lands a hair off its rest.
+  for (const width of [320, 360, 375, 390, 393, 412, 768, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/about/');
+    await page.locator('[data-playing]').waitFor();
+    const edges = await tiles(page).evaluateAll((all) =>
+      all.map((tile) => {
+        const rect = tile.getBoundingClientRect();
+        return [rect.left, rect.width];
+      }),
+    );
+    expect(edges).toHaveLength(3);
+    for (const [left, tileWidth] of edges) {
+      expect(left! - Math.round(left!), `${width}px: left ${left}`).toBeCloseTo(0, 6);
+      expect(tileWidth! - Math.round(tileWidth!), `${width}px: width ${tileWidth}`).toBeCloseTo(
+        0,
+        6,
+      );
+    }
+  }
+});

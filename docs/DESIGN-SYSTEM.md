@@ -316,6 +316,7 @@ The About page's easter egg (docs/UX-SPEC.md §1, "About", since 2026-10-15): th
 - **Artwork, not interface.** Like the brand assets, each sketch keeps colors of its own, which the token guard does not reach and no theme changes: a tile reads as itself on any canvas.
 - **Set once, shown by id.** `SketchSprite.astro` puts every file on the page as a symbol, and a tile shows one through `<use>`, so a change swaps a reference and loads nothing.
 - **Safe on a page.** A file holds no ids, links, styles, or scripts, which could clash with the page or load something; `test/sketchbook.test.ts` checks every file against those rules and the catalog against the folder. Three sketches (B1, B6, U4) set letters in the system's fonts.
+- **On whole pixels, clipped at the page's edge.** The grid's tracks round down to the pixel and the row starts at a whole-pixel inset (`global.css`, "The sketchbook's grid": a third of a width lands between device pixels, and a layer settling there shows it), and the sketchbook bleeds to the page's edge and clips there (`PAGE_BLEED`), so a change's pieces never let a phone pan sideways (Sean's iPhone, 2026-10-16).
 - **Adding one.** Draw it on the tile, add its file and its line in `sketches.ts`, and look at it in the lab's sheet at 88, 32, and 16 px.
 
 ## Adding a component

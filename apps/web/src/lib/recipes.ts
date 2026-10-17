@@ -65,6 +65,14 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
  */
 export const PAGE_COLUMN = 'mx-auto w-full max-w-4xl px-4';
 
+/**
+ * A block in the column that may paint past it (the sketchbook's changes): bled to the page's
+ * edge, the column's gutter taken back as its own padding, and clipped there with clip, never
+ * hidden, which would make a scroll container. Focus rings inside the gutter stay whole, and a
+ * phone never pans sideways to what a change paints (docs/LEARNINGS.md, 2026-10-16).
+ */
+export const PAGE_BLEED = '-mx-4 px-4 overflow-x-clip';
+
 /** A page's main column (the converter, About, and 404). */
 export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8 sm:py-12');
 

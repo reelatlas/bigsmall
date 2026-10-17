@@ -217,17 +217,16 @@ export type SketchEffect = (typeof SKETCH_EFFECTS)[number];
 export const STEPPED_EFFECTS: ReadonlySet<SketchEffect> = new Set(['glitch', 'scramble', 'scan']);
 
 /**
- * The changes that reach past the tile: Glitch's bands, shifted across the gap and into the next
- * tile; Blur's halo; Flip's and Tumble's near edge swinging toward the viewer; Flap's halves
- * falling; Squash's bounce above its base. The tile lets them out while they run
- * (`data-unclipped` and `data-reach`, Sketchbook.tsx) and clips every other change. A trial in two steps
- * (Sean, 2026-10-17: the reach gave the tiles dimension, Glitch's most of all): the turns and
- * Squash first, whole layers under a transform; then Glitch and Blur, since the slivers an iPhone
- * kept in the gap were Glitch's bands left outside as a change ended, and the bands now come back
- * inside before it ends (frames.ts, `envelope`). His phone judges; a sliver puts Glitch back in.
+ * The changes that reach past the tile: Blur's halo, Flip's and Tumble's near edge swinging toward
+ * the viewer, Flap's halves falling, and Squash's bounce above its base, each a whole layer under a
+ * transform or a filter, into the gap and never over a neighbor at the shipped sizes. The tile lets
+ * them out while they run (`data-unclipped` and `data-reach`, Sketchbook.tsx) and clips every other
+ * change, Glitch above all: its bands, clip-path pieces shifted across the gap, left slivers in the
+ * gap on Sean's iPhone whenever they were let out, with the envelope bringing them back inside
+ * before a change ends (frames.ts) or without it. Settled (Sean, 2026-10-17): the reach gives the
+ * tiles dimension, and sliced pieces moved by hand stay in.
  */
 export const REACHING_EFFECTS: ReadonlySet<SketchEffect> = new Set([
-  'glitch',
   'blur',
   'flip',
   'tumble',

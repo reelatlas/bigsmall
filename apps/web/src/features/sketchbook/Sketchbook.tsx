@@ -84,7 +84,7 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
           <button
             // A tile keeps its place; which sketch it shows is the play's. It clips to its own
             // corners (clip, not hidden, which would make a scroll container) until a change
-            // that reaches past it starts (Glitch, Blur, the turns, Flap, Squash): then it lets
+            // that reaches past it starts (Blur, the turns, Flap, Squash): then it lets
             // the change out (`data-unclipped`) and stands over its neighbors (`data-reach`),
             // both set by motion.ts with every layer flat, the clip taken back only when a
             // clipped change starts, never at a settle. Its focus ring, an outline, is outside

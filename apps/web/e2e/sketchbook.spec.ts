@@ -577,12 +577,12 @@ test('under reduced motion there is nothing to pause', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeHidden();
 });
 
-test('Glitch’s bands reach past the tile while it runs, its last frame is the settled picture, and nothing is left past the tiles (trial)', async ({
+test('a change stays inside its tile: Glitch paints nothing past the tiles, and its last frame is the settled one', async ({
   page,
 }) => {
-  // A phone's width, where the bands reach across the gap into the next tile, which an iPhone once
-  // kept as slivers (Sean, 2026-10-17). The clock is the test's, so every frame of the change is
-  // seen, in order.
+  // A phone's width, where the bands reached across the gap into the next tile and an iPhone kept
+  // slivers of them whenever they were let out (Sean, 2026-10-17). The clock is the test's, so
+  // every frame of the change is seen, in order.
   await page.setViewportSize({ width: 390, height: 800 });
   await page.clock.install();
   await openLab(page, { effect: 'glitch' });
@@ -611,7 +611,6 @@ test('Glitch’s bands reach past the tile while it runs, its last frame is the 
   let last = '';
   let lastFrame: Buffer | null = null;
   let frames = 0;
-  let reach = 0;
   for (let elapsed = 0; elapsed <= swapMs + 2 * 16; elapsed += 16) {
     const { next, styles } = await signature();
     if (!next) break;
@@ -619,13 +618,11 @@ test('Glitch’s bands reach past the tile while it runs, its last frame is the 
       last = styles;
       lastFrame = await shot();
       frames++;
-      reach = Math.max(reach, await PIXELS.outside(page, lastFrame, boxes, canvas));
+      expect(await PIXELS.outside(page, lastFrame, boxes, canvas), `frame ${frames}`).toBe(0);
     }
     await page.clock.runFor(16);
   }
   expect(frames).toBeGreaterThan(4);
-  // The bands reach past the tile while the change runs, and nothing of them stays.
-  expect(reach).toBeGreaterThan(0);
   await expect(tile).not.toHaveAttribute('data-next');
   const settled = await shot();
   expect(await PIXELS.outside(page, settled, boxes, canvas)).toBe(0);
@@ -687,7 +684,7 @@ test('Blur, the turns, and Squash reach past the tile into the gap, over no neig
       for (const animation of element.getAnimations({ subtree: true })) animation.finish();
     });
   const STEPS = 12;
-  // The reaching changes on the Web Animations API (Glitch steps on its own clock, tested above),
+  // The reaching changes, all on the Web Animations API (the stepped ones stay clipped, Glitch
   // then three clipped ones.
   const effects: SketchEffect[] = [
     ...[...REACHING_EFFECTS].filter((effect) => !STEPPED_EFFECTS.has(effect)),

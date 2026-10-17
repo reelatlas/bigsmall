@@ -39,16 +39,18 @@ import {
  * draw a frame every frameMs, planned in frames.ts. Under reduced motion nothing changes by
  * itself: a press cross-fades, and Flip changes every tile at once.
  *
- * A change that reaches past its tile (REACHING_EFFECTS: Glitch's bands, Blur's halo, the turns,
- * Flap, Squash) has the tile's clip lifted while it runs, by two marks on the tile (Sketchbook.tsx):
+ * A change that reaches past its tile (REACHING_EFFECTS: Blur's halo, the turns, Flap, Squash)
+ * has the tile's clip lifted while it runs, by two marks on the tile (Sketchbook.tsx):
  * `data-unclipped` lifts the clip, set before the change's first frame and left until a clipped
  * change starts on the tile, since a change of overflow re-rasterizes the picture's edges and a
  * settle must paint nothing new (docs/LEARNINGS.md, 2026-10-17); `data-reach` lifts the tile over
  * its neighbors, set with it and cleared as the change settles, which costs nothing. The tile
- * clips every other change, which would leave it otherwise (Slide, Drop, Dive, Doors). Where two pieces meet (a band and its hole, Scan's beam and the part drawn,
- * Scramble's blocks, Flap's halves) the edges sit on the device's pixels and the piece on top
- * reaches one past (the tile's `Grain`, frames.ts), since two edges antialiased on the same
- * fractional pixel leave a seam of what lies under (docs/LEARNINGS.md, 2026-10-17).
+ * clips every other change: Glitch's bands, which left slivers on an iPhone whenever they were let
+ * out, and the changes that move the whole picture out (Slide, Drop, Dive, Doors). Where two
+ * pieces meet (a band and its hole, Scan's beam and the part drawn, Scramble's blocks, Flap's
+ * halves) the edges sit on the device's pixels and the piece on top reaches one past (the tile's
+ * `Grain`, frames.ts), since two edges antialiased on the same fractional pixel leave a seam of
+ * what lies under (docs/LEARNINGS.md, 2026-10-17).
  */
 
 /** Where a sketch's symbol is on the page (SketchSprite.astro). */

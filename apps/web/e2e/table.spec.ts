@@ -1653,7 +1653,7 @@ test.describe('in a German locale', () => {
   });
 });
 
-test('the box and the section names stay at the window’s top while a long table scrolls, where the window is tall enough (trial)', async ({
+test('the toolbar and the box stay at the window’s top as one block while a long table scrolls, one toolbar line where it has wrapped, the section names under them (trial)', async ({
   page,
 }) => {
   const boxRect = () =>
@@ -1661,12 +1661,21 @@ test('the box and the section names stay at the window’s top while a long tabl
       const rect = document.querySelector('[data-plane="box"]')!.getBoundingClientRect();
       return { top: Math.round(rect.top), bottom: Math.round(rect.bottom) };
     });
-  // The name of the section being read sits a pixel under the stuck box's lower edge, the strip
+  // The toolbar's leading line (the category menu first) is what sits at the window's top when
+  // the head is stuck: on one line it is the toolbar's top; where the toolbar has wrapped (a
+  // phone), the line above it, undo, redo, and clear all, is held above the window.
+  const leadingTop = () =>
+    page.evaluate(() =>
+      Math.round(
+        document.querySelector('[data-plane="tools"] > :first-child')!.getBoundingClientRect().top,
+      ),
+    );
+  // The name of the section being read sits a pixel under the stuck head's lower edge, the strip
   // of canvas as deep as the gap to the table (the hairline tuck): the lowest name at or above
-  // that edge, since the one before it is pushed up behind the box.
+  // that edge, since the one before it is pushed up behind the head.
   const nameUnderBox = () =>
     page.evaluate(() => {
-      const cell = document.querySelector('[data-plane="box"]')!;
+      const cell = document.querySelector('[data-head]')!;
       const box = cell.getBoundingClientRect();
       const strip = parseFloat(getComputedStyle(cell, '::after').height) || 0;
       const edge = Math.round(box.bottom + strip);
@@ -1691,15 +1700,19 @@ test('the box and the section names stay at the window’s top while a long tabl
   await ready(page);
   await page.getByRole('button', { name: 'Ingredient: all-purpose flour' }).click();
   await expect(matches(page)).toBeVisible();
-  // Deep in a long kind (Dairy and eggs), its name stuck: its third row at the window's top, with
-  // enough of the kind left under the box for the name to stay rather than be pushed up.
+  // Deep in the list, the first row of a long kind (Dairy and eggs, six rows) at the window's
+  // top: its name stuck under the head, with the whole kind under it, so the name stays rather
+  // than being pushed up by the next kind's, however tall the head (two toolbar lines on a phone).
   await page
-    .getByRole('option', { name: /^sour cream/ })
+    .getByRole('option', { name: /^milk/ })
     .evaluate((option) => option.scrollIntoView({ block: 'start' }));
-  await expect.poll(async () => (await boxRect()).top).toBe(0);
+  await expect.poll(leadingTop).toBe(0);
+  // The box whole under the toolbar's line, the category menu in reach above it.
+  expect((await boxRect()).top).toBeGreaterThan(0);
+  await expect(menu(page)).toBeInViewport();
   const list = await nameUnderBox();
   expect(list.first).toBe(list.boxBottom - 1);
-  await expect(page.locator('[data-plane="box"][data-stuck]')).toHaveCount(1);
+  await expect(page.locator('[data-head][data-stuck]')).toHaveCount(1);
   await expectNoA11yViolations(page);
   // A pick from deep in the list: the table's top comes out from under the box, never behind it.
   const honey = page.getByRole('option', { name: /^honey/ });
@@ -1707,20 +1720,20 @@ test('the box and the section names stay at the window’s top while a long tabl
   await honey.click();
   await expect(page.getByRole('button', { name: 'Ingredient: honey' })).toBeVisible();
   await expect.poll(async () => (await boxRect()).top).toBeGreaterThanOrEqual(0);
-  expect(await tableTop()).toBeGreaterThanOrEqual((await boxRect()).bottom - 1);
+  expect(await tableTop()).toBeGreaterThanOrEqual((await nameUnderBox()).boxBottom - 1);
 
   // Length's table in a window tall enough: its section names the same way; then a window too
-  // short for the box, a name, and three rows together, where nothing sticks.
+  // short for what sticks, a name, and three rows together, where nothing sticks.
   await page.goto('/?a=meter&v=1');
   await ready(page);
   const width = page.viewportSize()!.width;
   await page.setViewportSize({ width, height: 520 });
   await row(page, 'centimeter').evaluate((line) => line.scrollIntoView({ block: 'start' }));
-  await expect.poll(async () => (await boxRect()).top).toBe(0);
+  await expect.poll(leadingTop).toBe(0);
   const table = await nameUnderBox();
   expect(table.first).toBe(table.boxBottom - 1);
   await page.setViewportSize({ width, height: 200 });
   await page.evaluate(() => scrollTo(0, 500));
   await expect.poll(async () => (await boxRect()).top).toBeLessThan(0);
-  await expect(page.locator('[data-plane="box"][data-stuck]')).toHaveCount(0);
+  await expect(page.locator('[data-head][data-stuck]')).toHaveCount(0);
 });

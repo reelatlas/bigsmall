@@ -43,8 +43,23 @@ import type { ConverterEnv } from './useConverter';
  */
 const TABLE_GRID =
   'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_auto_1fr] md:gap-x-4';
-/** The toolbar's cell, as wide as the box. */
-const TABLE_TOOLS_CELL = 'max-w-xl md:col-start-1 md:row-start-1';
+/**
+ * The head of the table: the toolbar and the box as one block (Sean, 2026-10-17: the category in
+ * view and changeable while a long table scrolls), a subgrid over the grid's first two rows from
+ * md, so the side panel's top still sits on the box's. Stuck to the window's top while the table
+ * scrolls where the window is tall enough (`data-stick` on the layout, measured below; a trial):
+ * the canvas behind it, and a strip of canvas under it as deep as the gap to the table
+ * (`after:h-2`, the rows cell's `mt-2`), cover the rows passing under; the strip's lower edge is a
+ * rule only while the head is stuck (`data-stuck`). Drawn by a pseudo-element, so the head keeps
+ * its own size. Where the toolbar has wrapped onto two lines, the head sticks with the line above
+ * its leading one, undo, redo, and clear all, above the window (`style.top`, measured), so one
+ * toolbar line stays with the box. Over a section's name (STUCK_HEADING, 5) and under an open
+ * shell (SHELL, 20).
+ */
+const TABLE_HEAD_CELL =
+  'relative z-10 max-w-xl bg-canvas group-data-stick/stick:sticky after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid';
+/** The toolbar's row in the head. */
+const TABLE_TOOLS_CELL = 'md:row-start-1';
 /**
  * The toolbar row (Sean, 2026-10-10 and 15): the category menu, the calculator, Units, and
  * Display at its left, the menu's edge on the box's, with no dividers between them; undo, redo,
@@ -63,16 +78,8 @@ const TABLE_LEADING = 'flex items-center gap-1';
  * hovered) lines up with the box and the table, its glyph inside the column as their text is.
  */
 const TABLE_TOOLS = 'flex shrink-0 items-center gap-1';
-/**
- * The box's cell, stuck to the window's top while the table scrolls where the window is tall enough
- * (`data-stick` on the layout, measured below; a trial, Sean, 2026-10-17): the canvas behind it,
- * and a strip of canvas under it as deep as the gap to the table (`after:h-2`, the rows cell's
- * `mt-2`), cover the rows passing under; the strip's lower edge is a rule only while the box is
- * stuck (`data-stuck`). Drawn by a pseudo-element, so the cell keeps the box's own size. Over a
- * section's name (STUCK_HEADING, 5) and under an open shell (SHELL, 20).
- */
-const TABLE_BOX_CELL =
-  'relative z-10 max-w-xl bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-start-2';
+/** The box's row in the head. */
+const TABLE_BOX_CELL = 'md:row-start-2';
 /**
  * 8 px under the box, its popup, as the toolbar sits 8 px over it; a container, so the categories
  * go four across once it has the room. Under an open side panel (below md) the panel's own 16 px
@@ -185,7 +192,9 @@ export function TableLayout({
     selected.category === 'cooking';
   const table: TableView = choosing ? ingredientList(selected, box.ingredient) : selected;
   const rootRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
+  const leadingRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
   const placeRef = useRef<HTMLDivElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
@@ -240,36 +249,45 @@ export function TableLayout({
   const [hiddenOpen, setHiddenOpen] = useState(false);
 
   /**
-   * The box and the section names stay at the window's top while the table scrolls (a trial,
-   * Sean, 2026-10-17; docs/UX-SPEC.md §1). The box's measured height says where a name sticks
-   * under it, a pixel under the box's edge (docs/LEARNINGS.md, "Stacked sticky headers"), and
-   * nothing sticks where the window is shorter than the box, a name, and three rows together (a
-   * phone on its side, 400% zoom), so the table stays usable. Measured, never counted.
+   * The head, the toolbar and the box, stays at the window's top while the table scrolls, the
+   * section names under it (a trial, Sean, 2026-10-17; docs/UX-SPEC.md §1). Measured, never
+   * counted: the head's height says where a name sticks under it, a pixel under the strip's edge
+   * (docs/LEARNINGS.md, "Stacked sticky headers"); where the toolbar has wrapped onto two lines,
+   * the line above its leading one (undo, redo, clear all) sticks above the window, so one toolbar
+   * line stays with the box; and nothing sticks where the window is shorter than what would show,
+   * a name, and three rows together (a phone on its side, 400% zoom), so the table stays usable.
    */
-  const [stick, setStick] = useState({ top: 0, gap: 0, on: false });
+  const [stick, setStick] = useState({ height: 0, hidden: 0, gap: 0, on: false });
   const [stuck, setStuck] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
-    const cell = fieldRef.current;
-    if (!cell || typeof ResizeObserver === 'undefined') return;
+    const head = headRef.current;
+    if (!head || typeof ResizeObserver === 'undefined') return;
     const measure = () => {
-      const box = cell.getBoundingClientRect().height;
+      const height = head.getBoundingClientRect().height;
+      // The toolbar's lines above its leading one: where the leading group starts below the
+      // toolbar's top, the toolbar has wrapped, and that much of the head sticks above the window.
+      const toolbar = toolsRef.current?.getBoundingClientRect().top;
+      const leading = leadingRef.current?.getBoundingClientRect().top;
+      const hidden = toolbar !== undefined && leading !== undefined ? leading - toolbar : 0;
       const place = placeRef.current;
-      // The gap between the box and the table, which the stuck box's strip covers.
+      // The gap between the box and the table, which the stuck head's strip covers.
       const gap = place ? parseFloat(getComputedStyle(place).marginTop) || 0 : 0;
       const heading =
         place?.querySelector('[data-section], [role="group"] > *')?.getBoundingClientRect()
           .height ?? 0;
       const row =
         place?.querySelector('[data-row], [role="option"]')?.getBoundingClientRect().height ?? 0;
-      const on = window.innerHeight >= box + gap + heading + 3 * row;
+      const on = window.innerHeight >= height - hidden + gap + heading + 3 * row;
       setStick((now) =>
-        now.top === box && now.gap === gap && now.on === on ? now : { top: box, gap, on },
+        now.height === height && now.hidden === hidden && now.gap === gap && now.on === on
+          ? now
+          : { height, hidden, gap, on },
       );
     };
     measure();
     const resizes = new ResizeObserver(measure);
-    resizes.observe(cell);
+    resizes.observe(head);
     window.addEventListener('resize', measure);
     return () => {
       resizes.disconnect();
@@ -295,17 +313,19 @@ export function TableLayout({
     return () => window.removeEventListener('resize', measure);
   }, [hasSide]);
   /**
-   * The box sticks while the table is what scrolls under it, and lets go while Edit is on, Hidden
+   * The head sticks while the table is what scrolls under it, and lets go while Edit is on, Hidden
    * is open, or a settings panel sits between the box and the table: their rows' 16 px checkboxes
-   * would pass under the stuck box within a target's safe space of the field (axe's target-size),
+   * would pass under the stuck head within a target's safe space of the field (axe's target-size),
    * and none of those is reading the table.
    */
   const sticking = stick.on && !editing && !hiddenOpen && !sideBelow;
-  // A section's name sticks a pixel under the strip's lower edge (the box, then its gap).
-  const stickTop = sticking ? stick.top + stick.gap - 1 : undefined;
-  // The rule under the box only while it is stuck: a pixel set 2 px over the cell's top edge leaves
-  // the window exactly then (at 1 px it would touch the window's edge, which still counts as
-  // intersecting).
+  // What the stuck head shows: its height less the toolbar lines held above the window.
+  const shown = stick.height - stick.hidden;
+  // A section's name sticks a pixel under the strip's lower edge (what shows, then its gap).
+  const stickTop = sticking ? shown + stick.gap - 1 : undefined;
+  // The rule under the head only while it is stuck: a pixel set 2 px over the edge that sticks at
+  // the window's top leaves the window exactly then (at 1 px it would touch the window's edge,
+  // which still counts as intersecting).
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || typeof IntersectionObserver === 'undefined') return;
@@ -563,9 +583,9 @@ export function TableLayout({
     const place = placeRef.current;
     if (!field || !place) return;
     field.scrollIntoView({ block: 'nearest' });
-    // Under a stuck box, the table's own top comes out from behind it; measured, since a browser's
-    // "nearest" with a scroll margin landed it 35 px short.
-    const behind = place.getBoundingClientRect().top - (sticking ? stick.top + stick.gap : 0);
+    // Under a stuck head, the table's own top comes out from behind it; measured, since a
+    // browser's "nearest" with a scroll margin landed it 35 px short.
+    const behind = place.getBoundingClientRect().top - (sticking ? shown + stick.gap : 0);
     if (behind < 0) window.scrollBy(0, behind);
   });
 
@@ -852,111 +872,120 @@ export function TableLayout({
       }}
     >
       <div className={TABLE_GRID}>
-        <div className={TABLE_TOOLS_CELL}>
-          {/* The converter's toolbar, the page's second plane (ADR 0014): first reached at the menu. */}
-          <div
-            ref={toolsRef}
-            role="toolbar"
-            aria-label="Tools"
-            className={TABLE_TOOLS_ROW}
-            data-plane="tools"
-            data-default-tool="category"
-          >
-            <div className={TABLE_LEADING}>
-              <CategoryMenu
-                categories={table.categories}
-                value={chosen}
-                counts={table.kind === 'matches' ? table.counts : undefined}
-                tool="category"
-                onChoose={(category) => {
-                  chooseCategory(category);
-                  // After a tap focus stays with the menu, so no keyboard comes up (ADR 0015).
-                  if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
-                }}
-              />
-              {leadingTools}
-            </div>
-            <div className={TABLE_TOOLS}>{tools}</div>
-          </div>
-        </div>
         <div
-          ref={fieldRef}
-          className={TABLE_BOX_CELL}
-          data-plane="box"
+          ref={headRef}
+          className={TABLE_HEAD_CELL}
+          data-head
           data-stuck={stuck ? '' : undefined}
-          onFocus={(event: FocusEvent<HTMLDivElement>) => {
-            if (event.target === inputRef.current) tappedIn.current = pressedByTouch();
-          }}
+          // The toolbar's wrapped line held above the window while stuck; 0 on one line.
+          style={{ top: sticking ? -stick.hidden : undefined }}
         >
           <div
             ref={sentinelRef}
             aria-hidden="true"
-            className="pointer-events-none absolute -top-0.5 h-px w-px"
+            className="pointer-events-none absolute h-px w-px"
+            style={{ top: stick.hidden - 2 }}
           />
-          <ValueField
-            inputRef={inputRef}
-            label="Value"
-            text={box.text}
-            parsed={box.parsed}
-            locale={env.locale}
-            unit={box.unit}
-            ingredient={box.ingredient}
-            // What the field takes, never a value it might be mistaken for.
-            placeholder={box.unit ? 'Number' : 'Number or unit'}
-            describedBy={describedBy}
-            popup={{
-              expanded: rowCount > 0,
-              controls,
-              activeId: browsing ? itemId(at) : undefined,
-              kind: table.kind === 'units' ? 'grid' : 'listbox',
+          <div className={TABLE_TOOLS_CELL}>
+            {/* The converter's toolbar, the page's second plane (ADR 0014): first reached at the menu. */}
+            <div
+              ref={toolsRef}
+              role="toolbar"
+              aria-label="Tools"
+              className={TABLE_TOOLS_ROW}
+              data-plane="tools"
+              data-default-tool="category"
+            >
+              <div ref={leadingRef} className={TABLE_LEADING}>
+                <CategoryMenu
+                  categories={table.categories}
+                  value={chosen}
+                  counts={table.kind === 'matches' ? table.counts : undefined}
+                  tool="category"
+                  onChoose={(category) => {
+                    chooseCategory(category);
+                    // After a tap focus stays with the menu, so no keyboard comes up (ADR 0015).
+                    if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+                  }}
+                />
+                {leadingTools}
+              </div>
+              <div className={TABLE_TOOLS}>{tools}</div>
+            </div>
+          </div>
+          <div
+            ref={fieldRef}
+            className={TABLE_BOX_CELL}
+            data-plane="box"
+            onFocus={(event: FocusEvent<HTMLDivElement>) => {
+              if (event.target === inputRef.current) tappedIn.current = pressedByTouch();
             }}
-            symbolOnly={display.names === 'symbol'}
-            // With a unit in the chip the box takes a number alone, so a phone brings up its
-            // number pad; with none, letters type a unit ("2 cups"), and the chip's × brings
-            // them back (Sean, 2026-10-15).
-            numberPad={box.unit !== null && !SIGNED.has(box.unit.category)}
-            onChange={onChange}
-            onKeyDown={onKeyDown}
-            // The field's ×: its text goes and its unit stays, one undoable step, the caret back
-            // in the field after a click; after a tap focus stays where it was (ADR 0015).
-            onClear={() => {
-              dispatch({ type: 'replace', text: '' });
-              setPosition(null);
-              if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
-            }}
-            // The chip is a readout here, and part of the box: clicking or tapping it puts the
-            // caret in the field, where the arrows reach the units. Its × takes the unit out and
-            // keeps the category's table, the caret back in the field after a click, not a tap.
-            onChipOpen={() => inputRef.current?.focus({ preventScroll: true })}
-            onChipRemove={() => {
-              dispatch({ type: 'unlock' });
-              setPosition(null);
-              if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
-            }}
-            // The ingredient's pill: its body opens every ingredient in the table's place, the
-            // cursor on the one in the box, and closes them again (a trial, Sean, 2026-10-16); the
-            // caret goes into the field after a click, not a tap, as the chip's does. Its × takes
-            // the ingredient out, leaving a weight or a volume (ADR 0021).
-            ingredientOpen={choosing}
-            onIngredientOpen={() => {
-              const current = box.ingredient?.id ?? null;
-              if (choosing || !current) setChoosingFor(null);
-              else {
-                holdScroll.current = true;
-                setChoosingFor(current);
-                setCursor({
-                  view: 'matches',
-                  position: ingredients.findIndex((each) => each.id === current),
-                });
-              }
-              if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
-            }}
-            onIngredientRemove={() => {
-              dispatch({ type: 'removeIngredient' });
-              setPosition(null);
-              if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
-            }}
-          />
+          >
+            <ValueField
+              inputRef={inputRef}
+              label="Value"
+              text={box.text}
+              parsed={box.parsed}
+              locale={env.locale}
+              unit={box.unit}
+              ingredient={box.ingredient}
+              // What the field takes, never a value it might be mistaken for.
+              placeholder={box.unit ? 'Number' : 'Number or unit'}
+              describedBy={describedBy}
+              popup={{
+                expanded: rowCount > 0,
+                controls,
+                activeId: browsing ? itemId(at) : undefined,
+                kind: table.kind === 'units' ? 'grid' : 'listbox',
+              }}
+              symbolOnly={display.names === 'symbol'}
+              // With a unit in the chip the box takes a number alone, so a phone brings up its
+              // number pad; with none, letters type a unit ("2 cups"), and the chip's × brings
+              // them back (Sean, 2026-10-15).
+              numberPad={box.unit !== null && !SIGNED.has(box.unit.category)}
+              onChange={onChange}
+              onKeyDown={onKeyDown}
+              // The field's ×: its text goes and its unit stays, one undoable step, the caret back
+              // in the field after a click; after a tap focus stays where it was (ADR 0015).
+              onClear={() => {
+                dispatch({ type: 'replace', text: '' });
+                setPosition(null);
+                if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+              }}
+              // The chip is a readout here, and part of the box: clicking or tapping it puts the
+              // caret in the field, where the arrows reach the units. Its × takes the unit out and
+              // keeps the category's table, the caret back in the field after a click, not a tap.
+              onChipOpen={() => inputRef.current?.focus({ preventScroll: true })}
+              onChipRemove={() => {
+                dispatch({ type: 'unlock' });
+                setPosition(null);
+                if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+              }}
+              // The ingredient's pill: its body opens every ingredient in the table's place, the
+              // cursor on the one in the box, and closes them again (a trial, Sean, 2026-10-16); the
+              // caret goes into the field after a click, not a tap, as the chip's does. Its × takes
+              // the ingredient out, leaving a weight or a volume (ADR 0021).
+              ingredientOpen={choosing}
+              onIngredientOpen={() => {
+                const current = box.ingredient?.id ?? null;
+                if (choosing || !current) setChoosingFor(null);
+                else {
+                  holdScroll.current = true;
+                  setChoosingFor(current);
+                  setCursor({
+                    view: 'matches',
+                    position: ingredients.findIndex((each) => each.id === current),
+                  });
+                }
+                if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+              }}
+              onIngredientRemove={() => {
+                dispatch({ type: 'removeIngredient' });
+                setPosition(null);
+                if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+              }}
+            />
+          </div>
         </div>
         {side && (
           <div ref={sideRef} id={sideId} className={TABLE_SIDE_CELL}>

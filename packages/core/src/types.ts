@@ -148,6 +148,11 @@ export interface CupSource {
   grams: number | readonly [number, number];
   /** What else the source says that its figure rests on ("510 cups", "4 g a teaspoon"). */
   detail?: string;
+  /**
+   * The standard deviation the source reports across its own measurements, where it reports one
+   * (USDA's measured cups): the yardstick a figure is checked against (docs/RESEARCH.md §2.7).
+   */
+  sd?: number;
 }
 
 /**

@@ -132,6 +132,21 @@ describe('cupFigure, the rule (docs/research/cooking-2.md)', () => {
     expect(cupBasis(ingredient('baking-powder'))).toBe('measured-cups');
     expect(cupBasis(ingredient('all-purpose-flour'))).toBe('median');
   });
+
+  it('lands within two of USDA’s own cup-to-cup deviations wherever USDA weighed the cup', () => {
+    // The anchor check (docs/RESEARCH.md §2.7): a new source cannot carry a figure past USDA's
+    // measured cups unnoticed; a figure that must sit further is named and explained first.
+    let checked = 0;
+    for (const each of ingredients) {
+      const cups = each.sources.find((source) => source.by === MEASURED_CUPS);
+      if (!cups?.sd || each.byDensity) continue;
+      const grams =
+        typeof cups.grams === 'number' ? cups.grams : (cups.grams[0] + cups.grams[1]) / 2;
+      expect(Math.abs(each.gramsPerCup - grams), each.id).toBeLessThanOrEqual(2 * cups.sd);
+      checked += 1;
+    }
+    expect(checked).toBeGreaterThanOrEqual(20);
+  });
 });
 
 describe('convertWith', () => {

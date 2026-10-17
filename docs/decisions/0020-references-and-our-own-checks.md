@@ -1,7 +1,7 @@
 # 0020 — Other converters as references; every number checked on our own
 
 Date: 2026-10-15
-Status: accepted; supersedes 0004
+Status: accepted; supersedes 0004; extended by 0022 (facts no standard defines)
 
 ## Context
 

@@ -28,9 +28,11 @@ def ts(value):
     return json.dumps(value, ensure_ascii=False)
 
 
-def source(by, grams, detail):
+def source(by, grams, detail, sd=None):
     figure_ = f'[{grams[0]}, {grams[1]}]' if isinstance(grams, tuple) else f'{grams}'
     parts = [f'by: {ts(by)}', f'grams: {figure_}'] + ([f'detail: {ts(detail)}'] if detail else [])
+    if sd is not None:
+        parts.append(f'sd: {sd}')
     return '{ ' + ', '.join(parts) + ' }'
 
 

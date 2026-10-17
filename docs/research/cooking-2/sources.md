@@ -8,7 +8,7 @@ Spooned and leveled; median of 6; spread 120 to 136 g.
 
 Counted:
 
-- USDA's measured cups (1969): 126 g, 510 cups
+- USDA's measured cups (1969): 126 g, 510 cups, cups varying by 2.8 g (one standard deviation)
 - King Arthur Baking: 120 g
 - Rose Levy Beranbaum: 121 g
 - Food Network Kitchen: 125 to 130 g
@@ -29,7 +29,7 @@ Spooned and leveled; median of 5; spread 118 to 136 g.
 
 Counted:
 
-- USDA's measured cups (1969): 123 g, 40 cups
+- USDA's measured cups (1969): 123 g, 40 cups, cups varying by 3.5 g (one standard deviation)
 - King Arthur Baking: 120 g
 - Rose Levy Beranbaum: 129 g
 - Zojirushi: 118 g, fluffed
@@ -51,7 +51,7 @@ Stirred, spooned, and leveled; USDA's cups, 2 weighings; spread 113 to 120 g.
 
 Counted:
 
-- USDA's measured cups (1969): 120 g, 45 cups
+- USDA's measured cups (1969): 120 g, 45 cups, cups varying by 3.3 g (one standard deviation)
 - King Arthur Baking: 113 g, its Premium 100%
 
 Set aside:
@@ -70,7 +70,7 @@ Spooned and leveled, unsifted; USDA's cups, 2 weighings; spread 111 to 113 g.
 
 Counted:
 
-- USDA's measured cups (1969): 111 g, 300 cups
+- USDA's measured cups (1969): 111 g, 300 cups, cups varying by 2.4 g (one standard deviation)
 - Rose Levy Beranbaum: 113 g
 
 Set aside:
@@ -103,7 +103,7 @@ Spooned or poured, and leveled; median of 6; spread 188 to 202 g.
 
 Counted:
 
-- USDA's measured cups (1969): 196 g, 81 cups
+- USDA's measured cups (1969): 196 g, 81 cups, cups varying by 7.6 g (one standard deviation)
 - King Arthur Baking: 198 g
 - America's Test Kitchen: 198 g, dipped, which a free-flowing sugar does not mind
 - Rose Levy Beranbaum: 200 g
@@ -120,7 +120,7 @@ Firmly packed; median of 5; spread 181 to 217 g.
 
 Counted:
 
-- USDA's measured cups (1969): 211 g, 118 cups
+- USDA's measured cups (1969): 211 g, 118 cups, cups varying by 22.5 g (one standard deviation)
 - King Arthur Baking: 213 g
 - Rose Levy Beranbaum: 217 g, light brown
 - America's Test Kitchen: 198 g
@@ -136,7 +136,7 @@ Spooned and leveled, unsifted; median of 4; spread 112 to 121 g.
 
 Counted:
 
-- USDA's measured cups (1969): 113 g, 40 cups
+- USDA's measured cups (1969): 113 g, 40 cups, cups varying by 5.4 g (one standard deviation)
 - King Arthur Baking: 113 g
 - Rose Levy Beranbaum: 112 to 114 g
 - Domino Sugar: 121 g, 3¾ cups a pound
@@ -238,7 +238,7 @@ Spooned and leveled; median of 3; spread 236 to 238 g.
 
 Counted:
 
-- USDA's measured cups (1969): 236 g, 32 cups
+- USDA's measured cups (1969): 236 g, 32 cups, cups varying by 9.4 g (one standard deviation)
 - America's Test Kitchen: 236 g
 - Danish food composition table: 238 g, about 18% fat, 1996, read in FAO/INFOODS
 
@@ -253,7 +253,7 @@ Spooned and leveled; USDA's cups, 2 weighings; spread 244 to 245 g.
 
 Counted:
 
-- USDA's measured cups (1969): 245 g, 11 cups
+- USDA's measured cups (1969): 245 g, 11 cups, cups varying by 4.6 g (one standard deviation)
 - Danish food composition table: 244 g, 1996, read in FAO/INFOODS
 
 Set aside:
@@ -271,7 +271,7 @@ Counted:
 - America's Test Kitchen: 113 g, 8 oz to 2 cups
 - USDA Food Buying Guide: 113 g, a pound to about 4 cups
 - USDA FoodData Central, Foundation Foods: 105 g, 2014 samples
-- USDA's measured cups (1969): 98 g, 20 cups
+- USDA's measured cups (1969): 98 g, 20 cups, cups varying by 11.4 g (one standard deviation)
 
 Set aside:
 
@@ -339,7 +339,7 @@ Spooned and leveled; median of 3; spread 84 to 86 g.
 
 Counted:
 
-- USDA's measured cups (1969): 86 g, 14 cups
+- USDA's measured cups (1969): 86 g, 14 cups, cups varying by 8.9 g (one standard deviation)
 - King Arthur Baking: 84 g
 - Milk Street: 85 g, measured several times, averaged
 
@@ -354,7 +354,7 @@ Spooned and leveled; USDA's cups, 2 weighings; spread 112 to 125 g.
 
 Counted:
 
-- USDA's measured cups (1969): 125 g, 15 cups
+- USDA's measured cups (1969): 125 g, 15 cups, cups varying by 4.7 g (one standard deviation)
 - King Arthur Baking: 112 g
 
 Set aside:
@@ -386,7 +386,7 @@ Spooned and leveled; USDA's cups, 2 weighings; spread 177 to 192 g.
 
 Counted:
 
-- USDA's measured cups (1969): 177 g, 27 cups, double-acting (sodium aluminum sulfate and phosphate)
+- USDA's measured cups (1969): 177 g, 27 cups, double-acting (sodium aluminum sulfate and phosphate), cups varying by 4.3 g (one standard deviation)
 - King Arthur Baking: 192 g, 4 g a teaspoon
 
 Set aside:
@@ -402,7 +402,7 @@ Spooned and leveled; median of 3; spread 288 to 293 g.
 
 Counted:
 
-- USDA's measured cups (1969): 292 g, 27 cups
+- USDA's measured cups (1969): 292 g, 27 cups, cups varying by 3.0 g (one standard deviation)
 - USDA FoodData Central, Foundation Foods: 293 g, 6.1 g a teaspoon, 2018 samples
 - King Arthur Baking: 288 g, 18 g a tablespoon
 
@@ -421,7 +421,7 @@ Counted:
 - Red Star: 149 g, a 7 g packet, about 2¼ teaspoons
 - Fleischmann's: 151 g, a ¼ oz packet, about 2¼ teaspoons
 - USDA Food Buying Guide: 146 g
-- USDA's measured cups (1969): 142 g, 22 cups
+- USDA's measured cups (1969): 142 g, 22 cups, cups varying by 4.9 g (one standard deviation)
 
 Set aside:
 
@@ -436,7 +436,7 @@ Counted:
 
 - America's Test Kitchen: 85 g
 - King Arthur Baking: 89 g
-- USDA's measured cups (1969): 75 g, 80 cups
+- USDA's measured cups (1969): 75 g, 80 cups, cups varying by 5.5 g (one standard deviation)
 
 Set aside:
 
@@ -451,7 +451,7 @@ Poured and leveled, uncooked; median of 3; spread 192 to 198 g.
 
 Counted:
 
-- USDA's measured cups (1969): 192 g, 28 cups
+- USDA's measured cups (1969): 192 g, 28 cups, cups varying by 11.2 g (one standard deviation)
 - King Arthur Baking: 198 g
 - FAO/INFOODS: 194 g, measured by its compiler
 
@@ -466,7 +466,7 @@ Poured and leveled; median of 4; spread 164 to 170 g.
 
 Counted:
 
-- USDA's measured cups (1969): 167 g, 12 cups
+- USDA's measured cups (1969): 167 g, 12 cups, cups varying by 2.9 g (one standard deviation)
 - King Arthur Baking: 170 g
 - America's Test Kitchen: 170 g
 - Milk Street: 164 g, measured several times, averaged
@@ -482,7 +482,7 @@ Chopped, then measured; median of 4; spread 112 to 120 g.
 
 Counted:
 
-- USDA's measured cups (1969): 120 g, 13 cups
+- USDA's measured cups (1969): 120 g, 13 cups, cups varying by 5.2 g (one standard deviation)
 - America's Test Kitchen: 119 g
 - King Arthur Baking: 113 g
 - Milk Street: 112 g, measured several times, averaged
@@ -501,7 +501,7 @@ Counted:
 - Milk Street: 114 g, measured several times, averaged
 - King Arthur Baking: 114 g, diced
 - America's Test Kitchen: 119 g
-- USDA's measured cups (1969): 108 g, 20 cups
+- USDA's measured cups (1969): 108 g, 20 cups, cups varying by 4.9 g (one standard deviation)
 - USDA Food Buying Guide: 121 g
 
 Set aside:

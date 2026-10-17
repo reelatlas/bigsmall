@@ -34,7 +34,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled',
     range: [120, 136],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 126, detail: '510 cups' },
+      { by: "USDA's measured cups (1969)", grams: 126, detail: '510 cups', sd: 2.8 },
       { by: 'King Arthur Baking', grams: 120 },
       { by: 'Rose Levy Beranbaum', grams: 121 },
       { by: 'Food Network Kitchen', grams: [125, 130] },
@@ -52,7 +52,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled',
     range: [118, 136],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 123, detail: '40 cups' },
+      { by: "USDA's measured cups (1969)", grams: 123, detail: '40 cups', sd: 3.5 },
       { by: 'King Arthur Baking', grams: 120 },
       { by: 'Rose Levy Beranbaum', grams: 129 },
       { by: 'Zojirushi', grams: 118, detail: 'fluffed' },
@@ -69,7 +69,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'stirred, spooned, and leveled',
     range: [113, 120],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 120, detail: '45 cups' },
+      { by: "USDA's measured cups (1969)", grams: 120, detail: '45 cups', sd: 3.3 },
       { by: 'King Arthur Baking', grams: 113, detail: 'its Premium 100%' },
     ],
     note: "Dipped and swept, a cup holds about 156 g (America's Test Kitchen).",
@@ -83,7 +83,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled, unsifted',
     range: [111, 113],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 111, detail: '300 cups' },
+      { by: "USDA's measured cups (1969)", grams: 111, detail: '300 cups', sd: 2.4 },
       { by: 'Rose Levy Beranbaum', grams: 113 },
     ],
     note: "Sifted first, a cup holds 99 to 100 g (USDA's 1969 cups, Rose Levy Beranbaum); dipped, 119 g (USDA). King Arthur's own unbleached cake flour is heavier, 120 g. USDA's SR Legacy gives 137 g, above even a dipped cup.",
@@ -109,7 +109,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned or poured, and leveled',
     range: [188, 202],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 196, detail: '81 cups' },
+      { by: "USDA's measured cups (1969)", grams: 196, detail: '81 cups', sd: 7.6 },
       { by: 'King Arthur Baking', grams: 198 },
       {
         by: "America's Test Kitchen",
@@ -131,7 +131,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'firmly packed',
     range: [181, 217],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 211, detail: '118 cups' },
+      { by: "USDA's measured cups (1969)", grams: 211, detail: '118 cups', sd: 22.5 },
       { by: 'King Arthur Baking', grams: 213 },
       { by: 'Rose Levy Beranbaum', grams: 217, detail: 'light brown' },
       { by: "America's Test Kitchen", grams: 198 },
@@ -148,7 +148,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled, unsifted',
     range: [112, 121],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 113, detail: '40 cups' },
+      { by: "USDA's measured cups (1969)", grams: 113, detail: '40 cups', sd: 5.4 },
       { by: 'King Arthur Baking', grams: 113 },
       { by: 'Rose Levy Beranbaum', grams: [112, 114] },
       { by: 'Domino Sugar', grams: 121, detail: '3¾ cups a pound' },
@@ -273,7 +273,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled',
     range: [236, 238],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 236, detail: '32 cups' },
+      { by: "USDA's measured cups (1969)", grams: 236, detail: '32 cups', sd: 9.4 },
       { by: "America's Test Kitchen", grams: 236 },
       {
         by: 'Danish food composition table',
@@ -291,7 +291,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled',
     range: [244, 245],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 245, detail: '11 cups' },
+      { by: "USDA's measured cups (1969)", grams: 245, detail: '11 cups', sd: 4.6 },
       { by: 'Danish food composition table', grams: 244, detail: '1996, read in FAO/INFOODS' },
     ],
     note: "Greek yogurt is thicker; no source we found has weighed a cup of it (USDA's survey tables reuse plain yogurt's 245 g).",
@@ -309,7 +309,7 @@ export const ingredients: readonly Ingredient[] = [
       { by: "America's Test Kitchen", grams: 113, detail: '8 oz to 2 cups' },
       { by: 'USDA Food Buying Guide', grams: 113, detail: 'a pound to about 4 cups' },
       { by: 'USDA FoodData Central, Foundation Foods', grams: 105, detail: '2014 samples' },
-      { by: "USDA's measured cups (1969)", grams: 98, detail: '20 cups' },
+      { by: "USDA's measured cups (1969)", grams: 98, detail: '20 cups', sd: 11.4 },
     ],
     note: 'Recipes and packages count 4 oz of cheese to a cup (an 8 oz bag holds 2 cups); a cup filled lightly by hand weighs less.',
   },
@@ -406,7 +406,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled',
     range: [84, 86],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 86, detail: '14 cups' },
+      { by: "USDA's measured cups (1969)", grams: 86, detail: '14 cups', sd: 8.9 },
       { by: 'King Arthur Baking', grams: 84 },
       { by: 'Milk Street', grams: 85, detail: 'measured several times, averaged' },
     ],
@@ -421,7 +421,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled',
     range: [112, 125],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 125, detail: '15 cups' },
+      { by: "USDA's measured cups (1969)", grams: 125, detail: '15 cups', sd: 4.7 },
       { by: 'King Arthur Baking', grams: 112 },
     ],
   },
@@ -453,6 +453,7 @@ export const ingredients: readonly Ingredient[] = [
         by: "USDA's measured cups (1969)",
         grams: 177,
         detail: '27 cups, double-acting (sodium aluminum sulfate and phosphate)',
+        sd: 4.3,
       },
       { by: 'King Arthur Baking', grams: 192, detail: '4 g a teaspoon' },
     ],
@@ -467,7 +468,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'spooned and leveled',
     range: [288, 293],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 292, detail: '27 cups' },
+      { by: "USDA's measured cups (1969)", grams: 292, detail: '27 cups', sd: 3.0 },
       {
         by: 'USDA FoodData Central, Foundation Foods',
         grams: 293,
@@ -489,7 +490,7 @@ export const ingredients: readonly Ingredient[] = [
       { by: 'Red Star', grams: 149, detail: 'a 7 g packet, about 2¼ teaspoons' },
       { by: "Fleischmann's", grams: 151, detail: 'a ¼ oz packet, about 2¼ teaspoons' },
       { by: 'USDA Food Buying Guide', grams: 146 },
-      { by: "USDA's measured cups (1969)", grams: 142, detail: '22 cups' },
+      { by: "USDA's measured cups (1969)", grams: 142, detail: '22 cups', sd: 4.9 },
     ],
     note: "About 3 g a teaspoon. USDA's SR Legacy gives 4 g a teaspoon (192 g a cup), heavier than every other source. Instant yeast weighs about the same (King Arthur Baking: 144 to 149 g).",
   },
@@ -505,7 +506,7 @@ export const ingredients: readonly Ingredient[] = [
     sources: [
       { by: "America's Test Kitchen", grams: 85 },
       { by: 'King Arthur Baking', grams: 89 },
-      { by: "USDA's measured cups (1969)", grams: 75, detail: '80 cups' },
+      { by: "USDA's measured cups (1969)", grams: 75, detail: '80 cups', sd: 5.5 },
     ],
     note: "Oats vary with the flake and the brand. Quick oats run 73 to 96 g a cup by source (USDA's 1969 cups 73 g, America's Test Kitchen 96 g).",
   },
@@ -518,7 +519,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'poured and leveled, uncooked',
     range: [192, 198],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 192, detail: '28 cups' },
+      { by: "USDA's measured cups (1969)", grams: 192, detail: '28 cups', sd: 11.2 },
       { by: 'King Arthur Baking', grams: 198 },
       { by: 'FAO/INFOODS', grams: 194, detail: 'measured by its compiler' },
     ],
@@ -533,7 +534,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'poured and leveled',
     range: [164, 170],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 167, detail: '12 cups' },
+      { by: "USDA's measured cups (1969)", grams: 167, detail: '12 cups', sd: 2.9 },
       { by: 'King Arthur Baking', grams: 170 },
       { by: "America's Test Kitchen", grams: 170 },
       { by: 'Milk Street', grams: 164, detail: 'measured several times, averaged' },
@@ -549,7 +550,7 @@ export const ingredients: readonly Ingredient[] = [
     method: 'chopped, then measured',
     range: [112, 120],
     sources: [
-      { by: "USDA's measured cups (1969)", grams: 120, detail: '13 cups' },
+      { by: "USDA's measured cups (1969)", grams: 120, detail: '13 cups', sd: 5.2 },
       { by: "America's Test Kitchen", grams: 119 },
       { by: 'King Arthur Baking', grams: 113 },
       { by: 'Milk Street', grams: 112, detail: 'measured several times, averaged' },
@@ -568,7 +569,7 @@ export const ingredients: readonly Ingredient[] = [
       { by: 'Milk Street', grams: 114, detail: 'measured several times, averaged' },
       { by: 'King Arthur Baking', grams: 114, detail: 'diced' },
       { by: "America's Test Kitchen", grams: 119 },
-      { by: "USDA's measured cups (1969)", grams: 108, detail: '20 cups' },
+      { by: "USDA's measured cups (1969)", grams: 108, detail: '20 cups', sd: 4.9 },
       { by: 'USDA Food Buying Guide', grams: 121 },
     ],
     note: 'Whole pecans weigh 99 to 114 g a cup.',

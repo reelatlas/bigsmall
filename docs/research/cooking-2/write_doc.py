@@ -9,7 +9,7 @@ import re
 import sys
 
 sys.path.insert(0, sys.argv[1])
-from figures import FIGURES, U69, figure, spread  # noqa: E402
+from figures import FIGURES, U69, against_usda, figure, spread  # noqa: E402
 
 ROOT = pathlib.Path('C:/Users/seanr/Projects/bigsmall')
 NAMES = {}
@@ -38,7 +38,7 @@ def basis(entry):
     n = len(entry['counted'])
     if entry['basis'] == 'density':
         return 'by density'
-    if n < 3 and any(by == U69 for by, _, _ in entry['counted']):
+    if n < 3 and any(by == U69 for by, *_ in entry['counted']):
         return f"USDA's cups, {n} weighings"
     return '1 weighing' if n == 1 else f'median of {n}'
 
@@ -74,6 +74,7 @@ The standing rule, for these 34 ingredients and every one added or re-opened lat
 5. **A liquid by its density** times the cup, from physical references: NIST for water, the Codex standards for oils, dairy science for milk and cream, honey's density by its water, sugar-solution tables at the grade standards' Brix for maple syrup and molasses, a measured density of liquid egg. Each at the condition it is used: milk and cream, used cold, the middle of cold and room temperature; honey at the US average water; maple syrup at about 67 Brix. Cups filled by hand to the line weigh 1 to 7% less (a short fill, the meniscus, what clings): recorded, never setting a figure.
 6. **The spread** is the lowest and highest figure counted.
 7. **Checked, and tested.** Every figure counted was read on its page, by a third reviewer (`cooking-2/check.md`) or, for six found later, by us. Core's test recomputes each figure from its sources by this rule (`cupFigure`), so a figure cannot drift from them.
+8. **Checked against the anchor.** Where USDA's measured cups weighed the cup, the figure must lie within two of the standard deviations USDA reports for its own cups, or the difference is named and explained (below). Core's test holds every figure to it, so a new source cannot pull a figure past USDA's cups unnoticed.
 
 ## The figures
 
@@ -126,6 +127,10 @@ Within 3%: all-purpose flour 125 → 127 g, granulated sugar 200 → 198 g, sour
 A third reviewer checked all 192 citations (189 ingredient rows, 3 unit rows) against the sources themselves, not the reviewers' notes: page images of the scanned USDA and NBS reports, USDA's data files traced to their samples, and each live page (`cooking-2/check.md`, `cooking-2/check.csv`). 170 confirmed, 21 confirmed with a correction, 1 not reached, none wrong. The corrections: one rounding slip (heavy cream cold 238 g, not 239); America's Test Kitchen's chopped pecans (119 g; its 113 g was whole); two sample years (Foundation Foods' sugar 2006, cheddar 2014); seven fill methods (America's Test Kitchen dips; USDA's 1969 shortening and peanut butter were spooned; Milk Street's flour table averages charts); ten wordings (Foundation Foods' peanut butter one weighing; the molasses grade's 79 Brix a minimum; NBS's 331 g a worked example; seven notes). All are applied. Not reached: Atilgan and Unluturk (2008), behind a bot check and a paywall, confirmed only as Azahra and others quote it; not counted.
 
 The reviewers also found figures they did not cite. Screened by the rule, most are another method, a label, a repeat, another food, or a density for food tables. Six would count, and were read the same day: Gold Medal's "3⅓ cups a pound", spooned, for all-purpose and bread flour (counted); Beranbaum's spaetzle flour, 115 g for a cup less a tablespoon (counted, with her other two); King Arthur's baking soda, 3 g a half teaspoon (counted); Erik Jacobsen's "about 4 ounces", what spooning "usually" gives (not shown to be weighed); Allrecipes' 4.25 oz (the site refuses requests: not read); the Food Buying Guide's nut butters (one figure for every nut and seed butter, USDA's 1969 spooned cup).
+
+## Checked against USDA's cups
+
+{{anchor}}
 
 ## Sources considered and set aside
 
@@ -186,6 +191,31 @@ In `cooking-2/`: the decided figures and the rule (`figures.py`), which write th
 
 Weighing the six thin figures ourselves (above); the method as a choice beside the ingredient (dipped and swept for America's Test Kitchen's recipes, sifted for older ones); the metric cup (250 mL) for visitors outside the US; Greek yogurt, kosher salts by brand, instant yeast, quick oats, almond meal, and white whole wheat flour as their own ingredients, each once three weighings count.
 """
+# The anchor check: each figure the median decided, against USDA's cup, in USDA's own deviations.
+checks = []
+for ident, entry in FIGURES.items():
+    found = against_usda(ident)
+    if found is None or entry['basis'] == 'density' or len(entry['counted']) < 3:
+        continue
+    usda, sd, sds = found
+    checks.append((ident, figure(ident), usda, sd, sds))
+REASONS = {
+    'shredded-cheddar': "recipes and packages count 4 oz to a cup, and that convention is what the figure serves; a cup filled lightly by hand weighs what USDA weighed",
+    'rolled-oats': "today's flakes are thicker: every modern source weighs more than 1969's cups",
+    'active-dry-yeast': "the makers' own packets, 2¼ teaspoons to a quarter ounce, pull the figure above 1969's cups",
+    'chopped-pecans': "how fine the nuts are chopped moves the cup; four of five sources sit above USDA's",
+}
+within_one = sum(1 for check in checks if abs(check[4]) <= 1)
+rows = '\n'.join(
+    f"| {NAMES[ident]} | {grams} | {usda:g} | {sd:g} | {sds:+.1f} |" + (f" {REASONS[ident]} |" if abs(sds) > 1 else ' |')
+    for ident, grams, usda, sd, sds in checks
+)
+anchor = f"""USDA's measured cups (1969) are the anchor: the one source that says how many cups it weighed and how much they varied. For each figure the median decided (three or more weighings, USDA's among them), the table gives USDA's cup, the standard deviation USDA reports across its cups, and how many of those deviations our figure sits from USDA's. {within_one} of {len(checks)} lie within one deviation and all {len(checks)} within two: the figure of independent kitchens, decided by the rule, lands where USDA's own cups fall. The four between one and two deviations each have a reason, and core's test fails any figure that a new source would carry past two.
+
+| Ingredient | Ours | USDA's cup | USDA's deviation | Ours, in deviations | Where it is more than one |
+| --- | --- | --- | --- | --- | --- |
+{rows}"""
+doc = doc.replace('{anchor}', anchor)
 (ROOT / 'docs/research/cooking-2.md').write_bytes(doc.encode('utf-8'))
 
 # Every figure screened, by ingredient.
@@ -203,8 +233,9 @@ for ident, entry in FIGURES.items():
     parts.append(f"\n## {NAMES[ident][0].upper() + NAMES[ident][1:]}: {grams} g\n")
     parts.append(f"{entry['method'][0].upper() + entry['method'][1:]}; {reached}; spread {low} to {high} g.\n")
     parts.append('\nCounted:\n')
-    for by, g, detail in entry['counted']:
-        parts.append(f"- {by}: {grams_text(g)} g{', ' + detail if detail else ''}\n")
+    for by, g, detail, *rest in entry['counted']:
+        sd = f', cups varying by {rest[0]} g (one standard deviation)' if rest else ''
+        parts.append(f"- {by}: {grams_text(g)} g{', ' + detail if detail else ''}{sd}\n")
     if entry['aside']:
         parts.append('\nSet aside:\n')
         for by, g, why in entry['aside']:

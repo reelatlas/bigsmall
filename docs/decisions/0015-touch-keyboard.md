@@ -36,3 +36,7 @@ Behavior: docs/UX-SPEC.md §8, "On a touch screen".
 Sean asked for the number keys by default (2026-10-15). With a unit in the chip the box takes a number alone, so it carries `inputmode="decimal"` then, and a phone shows its decimal pad: digits and the decimal mark, no letters, no minus, no operators. With no unit it keeps `inputmode="text"`, since letters type a unit (`2 cups`), and so it does in Temperature and Angle, whose values go below zero as often as not. The chip's × brings the letters back; the calculator does the math. The field stays `type="text"`: a number field would drop what the parser reads (grouping, exponents, a unit after the number). The keyboard reads the mode when the field gains focus, so a change shows at the next tap.
 
 The box's × (docs/UX-SPEC.md §1) follows this decision's rule: a tap on it never brings the keyboard up. Its mousedown is prevented, so a keyboard already up stays up, to type the next number.
+
+## Amended 2026-10-17: the pills' presses keep focus
+
+A press on the box's pills and their × cancels mousedown, as the field's × has: focus stays where it was, a keyboard already up with it, until a choice is made (a tap on a row still puts it away, above); a browser that would give the pressed button focus does not. The caret's return after a pointer takes `preventScroll`, so a focus is never what moves the page. (The page jumping on Sean's iPhone when the pill was tapped, the sixty-seventh pass, turned out to be the table swapped under the box, not focus: docs/LEARNINGS.md, 2026-10-17, and docs/UX-SPEC.md §5.)

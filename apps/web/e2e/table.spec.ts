@@ -1386,10 +1386,17 @@ test('Cooking: the ingredient’s pill opens every ingredient under its kind, th
   await ready(page);
   const pill = page.getByRole('button', { name: 'Ingredient: all-purpose flour' });
   await expect(pill).toHaveAttribute('aria-expanded', 'false');
+  // Opening moves the page nowhere: not to the flour's row the cursor rests on, and not to the
+  // top, where a browser without scroll anchoring (WebKit, an iPhone) clamps the page while the
+  // table is swapped for the list; anchoring is turned off here so Chromium behaves like them.
+  await page.addStyleTag({ content: 'html { overflow-anchor: none }' });
+  await page.evaluate(() => scrollTo(0, 60));
+  await expect.poll(() => page.evaluate(() => Math.round(scrollY))).toBe(60);
   await pill.click();
   await expect(pill).toHaveAttribute('aria-expanded', 'true');
-  // Opening moves the page nowhere: the cursor rests on the flour without scrolling to its row.
-  expect(await page.evaluate(() => Math.round(scrollY))).toBe(0);
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => Math.round(scrollY))).toBe(60);
+  await page.evaluate(() => scrollTo(0, 0));
   const list = page.getByRole('listbox', { name: 'Matches' });
   const headings = await list
     .getByRole('group')
@@ -1459,7 +1466,7 @@ test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, E
     .click();
   const list = page.getByRole('listbox', { name: 'Matches' });
   await expect(list.getByRole('option').first()).toHaveText(/all-purpose flour/);
-  // Under their kinds' headings, in the kinds' order: Flours first.
+  // Under their kinds' headings, in the kinds' order: Flour first.
   const headings = await list
     .getByRole('group')
     .evaluateAll((groups) =>

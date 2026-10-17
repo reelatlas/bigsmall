@@ -114,7 +114,7 @@ export function Converter() {
    */
   const clearAll = () => {
     dispatch({ type: 'clear' });
-    if (!pressedByTouch()) inputRef.current?.focus();
+    if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
   };
 
   // Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes anywhere inside the converter,

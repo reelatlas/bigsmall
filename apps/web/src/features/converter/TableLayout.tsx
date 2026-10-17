@@ -151,7 +151,7 @@ export function TableLayout({
   box,
   table: selected,
   env,
-  dispatch,
+  dispatch: send,
   describedBy,
   side,
   sideId,
@@ -168,7 +168,7 @@ export function TableLayout({
    * (a trial, Sean, 2026-10-16): the box's popup lists them under their kinds, as it lists the
    * units, the one in the box marked. Taking one, typing, Escape, or the pill again closes it.
    */
-  const [choosingFor, setChoosingFor] = useState<string | null>(null);
+  const [choosingFor, setChoosingForState] = useState<string | null>(null);
   const choosing =
     choosingFor !== null &&
     choosingFor === box.ingredient?.id &&
@@ -180,6 +180,23 @@ export function TableLayout({
   const fieldRef = useRef<HTMLDivElement>(null);
   const placeRef = useRef<HTMLDivElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
+  /**
+   * The box's top before a change of the table, for the layout effect that keeps the page to it
+   * after (below): whatever the table is swapped for, the box stays where it was on the screen
+   * (docs/UX-SPEC.md §5). Every change goes through `dispatch` or the pill's open, which note it.
+   */
+  const anchored = useRef<number | null>(null);
+  const anchor = () => {
+    anchored.current = fieldRef.current?.getBoundingClientRect().top ?? null;
+  };
+  const dispatch = (action: HistoryAction) => {
+    anchor();
+    send(action);
+  };
+  const setChoosingFor = (value: string | null) => {
+    anchor();
+    setChoosingForState(value);
+  };
   /**
    * Where the cursor is, in the view it was set in, so a change from outside (undo, clear all, a
    * send from the calculator) brings it back to rest. A null position rests on the unit in the
@@ -433,6 +450,19 @@ export function TableLayout({
   }, [browsing, at, listId]);
   useEffect(() => {
     holdScroll.current = false;
+  });
+
+  // After a change of the table, the box back to where it was on the screen, before the page
+  // paints: where the virtual DOM removes the table before it inserts what replaces it, a browser
+  // that lays the page out in between clamps the scroll to the top and, without scroll anchoring
+  // (WebKit, an iPhone), leaves it there (docs/LEARNINGS.md, 2026-10-17). Chromium anchors by
+  // itself and finds nothing to do here.
+  useLayoutEffect(() => {
+    if (anchored.current === null) return;
+    const was = anchored.current;
+    anchored.current = null;
+    const now = fieldRef.current?.getBoundingClientRect().top;
+    if (now !== undefined && Math.abs(now - was) >= 1) window.scrollBy(0, now - was);
   });
 
   // After a pick that put the table where a list was (typed matches, Cooking's ingredients, the
@@ -743,7 +773,7 @@ export function TableLayout({
                 onChoose={(category) => {
                   chooseCategory(category);
                   // After a tap focus stays with the menu, so no keyboard comes up (ADR 0015).
-                  if (!pressedByTouch()) inputRef.current?.focus();
+                  if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
                 }}
               />
               {leadingTools}
@@ -788,16 +818,16 @@ export function TableLayout({
             onClear={() => {
               dispatch({ type: 'replace', text: '' });
               setPosition(null);
-              if (!pressedByTouch()) inputRef.current?.focus();
+              if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
             }}
             // The chip is a readout here, and part of the box: clicking or tapping it puts the
             // caret in the field, where the arrows reach the units. Its × takes the unit out and
             // keeps the category's table, the caret back in the field after a click, not a tap.
-            onChipOpen={() => inputRef.current?.focus()}
+            onChipOpen={() => inputRef.current?.focus({ preventScroll: true })}
             onChipRemove={() => {
               dispatch({ type: 'unlock' });
               setPosition(null);
-              if (!pressedByTouch()) inputRef.current?.focus();
+              if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
             }}
             // The ingredient's pill: its body opens every ingredient in the table's place, the
             // cursor on the one in the box, and closes them again (a trial, Sean, 2026-10-16); the
@@ -815,12 +845,12 @@ export function TableLayout({
                   position: ingredients.findIndex((each) => each.id === current),
                 });
               }
-              if (!pressedByTouch()) inputRef.current?.focus();
+              if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
             }}
             onIngredientRemove={() => {
               dispatch({ type: 'removeIngredient' });
               setPosition(null);
-              if (!pressedByTouch()) inputRef.current?.focus();
+              if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
             }}
           />
         </div>

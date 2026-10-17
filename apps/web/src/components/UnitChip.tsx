@@ -1,5 +1,5 @@
 import type { Ingredient, Unit } from '@bigsmall/core';
-import type { Ref } from 'react';
+import type { MouseEvent, Ref } from 'react';
 import { cx, unitSymbol } from '../lib/recipes';
 import { ChevronDownIcon, CloseIcon } from './icons';
 
@@ -61,6 +61,11 @@ export function UnitChip({
   // (docs/UX-SPEC.md §5). They stay clickable and visible to screen readers.
   const tabIndex = -1;
   const name = unit ? unit.plural : ingredient.name;
+  // A press moves focus nowhere: the caret stays in the field if it was there (a touch screen's
+  // keyboard with it, until a choice is made), and a browser that gives a pressed button focus
+  // never scrolls the page to center it, as WebKit does (docs/LEARNINGS.md, 2026-10-17). Cancelled
+  // on mousedown, as the field's × does: cancelling pointerdown swallows the tap itself in WebKit.
+  const keepFocus = (event: MouseEvent<HTMLButtonElement>) => event.preventDefault();
   return (
     // A unit's chip keeps its size; an ingredient's gives way, its name cut short.
     <span className={cx(CHIP, ingredient ? 'min-w-0' : 'shrink-0')}>
@@ -71,6 +76,7 @@ export function UnitChip({
         aria-label={unit ? `Unit: ${name}` : `Ingredient: ${name}`}
         aria-expanded={unit ? undefined : expanded}
         tabIndex={tabIndex}
+        onMouseDown={keepFocus}
         onClick={onOpen}
         className={cx('inline-flex min-w-0 rounded-l-nested', HOVER)}
       >
@@ -104,6 +110,7 @@ export function UnitChip({
         type="button"
         aria-label={`Remove ${name}`}
         tabIndex={tabIndex}
+        onMouseDown={keepFocus}
         onClick={onRemove}
         className={cx(
           'inline-flex w-11 items-center justify-center rounded-r-nested text-ink-muted hover:text-ink',

@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { COUNT, MOODS, nextMood, particles, SIZE } from '../src/features/sketchbook/burst';
-import { idleWaitMs, restMs } from '../src/features/sketchbook/motion';
+import { DOORS, doorFrames, idleWaitMs, restMs } from '../src/features/sketchbook/motion';
 import { BURST_TIMING, SKETCH_MIN_GAP_MS } from '../src/lib/timing';
 import {
   bandClip,
@@ -190,6 +190,21 @@ describe('the stepped changes', () => {
       const edge = `${Number(((slat / SLATS) * 100).toFixed(3))}%`;
       // Each slat open reaches the next one's top: no gap between them.
       expect(open.split(`100% ${edge}`).length - 1).toBe(2);
+    }
+  });
+});
+
+describe('Doors', () => {
+  it('swing each half open on its outer edge, ending hidden, its depth the tile’s own', () => {
+    for (const half of DOORS) {
+      const frames = doorFrames(half);
+      expect(frames[0]).toMatchObject({ transform: 'rotateY(0deg)', opacity: 1 });
+      // Hidden at the end whatever an engine draws edge-on: WebKit drew the right half, through a
+      // perspective() of its own, still half open there (docs/LEARNINGS.md).
+      expect(frames.at(-1)).toMatchObject({ transform: `rotateY(${half.degrees}deg)`, opacity: 0 });
+      expect(frames.some((frame) => String(frame.transform ?? '').includes('perspective'))).toBe(
+        false,
+      );
     }
   });
 });

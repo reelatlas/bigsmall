@@ -363,30 +363,58 @@ function flap(
   ];
 }
 
+/** Doors' two halves: the part each shows, its hinge, and which way it swings. */
+export const DOORS = [
+  { clipPath: 'inset(0 50% 0 0)', transformOrigin: '0% 50%', degrees: -90 },
+  { clipPath: 'inset(0 0 0 50%)', transformOrigin: '100% 50%', degrees: 90 },
+] as const;
+
+/**
+ * One of Doors' halves swinging open on its outer edge, darkening as it turns and fading over the
+ * second half of the swing, so it ends hidden whatever an engine draws edge-on. Its depth is the
+ * tile's (`perspective`, seen from the tile's middle), never a perspective() of its own: WebKit
+ * drew the half hinged on the right that way still half open at the end, so it vanished at once as
+ * the tile settled, a jump on the right (Sean, 2026-10-16, on an iPhone; docs/LEARNINGS.md).
+ */
+export function doorFrames({
+  clipPath,
+  transformOrigin,
+  degrees,
+}: (typeof DOORS)[number]): Keyframe[] {
+  return [
+    { clipPath, transformOrigin, transform: 'rotateY(0deg)', opacity: 1, filter: 'brightness(1)' },
+    { offset: 0.5, opacity: 1 },
+    {
+      clipPath,
+      transformOrigin,
+      transform: `rotateY(${degrees}deg)`,
+      opacity: 0,
+      filter: 'brightness(0.6)',
+    },
+  ];
+}
+
 /**
  * Doors: the sketch showing splits down the middle and its halves swing open toward the viewer,
- * each on its outer edge, darkening as they turn, with the next sketch behind them.
+ * with the next sketch behind them (doorFrames). The tile holds their depth and clips them to
+ * itself.
  */
 function doors(
+  tile: HTMLElement,
   layers: Layers,
   from: string,
   size: number,
   options: KeyframeAnimationOptions,
 ): Animation[] {
-  const [left, right] = layers.pieces;
-  if (!left || !right) return [];
-  show(left, from);
-  show(right, from);
-  const swung = (degrees: number) => `perspective(${size * 4}px) rotateY(${degrees}deg)`;
-  const leaf = (clipPath: string, transformOrigin: string, degrees: number) => [
-    { clipPath, transformOrigin, transform: swung(0), opacity: 1, filter: 'brightness(1)' },
-    { clipPath, transformOrigin, transform: swung(degrees), opacity: 1, filter: 'brightness(0.6)' },
-  ];
+  const halves = layers.pieces.slice(0, DOORS.length);
+  if (halves.length < DOORS.length) return [];
+  for (const half of halves) show(half, from);
+  tile.style.perspective = `${size * 4}px`;
+  tile.style.overflow = 'hidden';
   return [
     layers.front.animate([{ opacity: 0 }, { opacity: 0 }], options),
     layers.back.animate([{ opacity: 1 }, { opacity: 1 }], options),
-    left.animate(leaf('inset(0 50% 0 0)', '0% 50%', -90), options),
-    right.animate(leaf('inset(0 0 0 50%)', '100% 50%', 90), options),
+    ...halves.map((half, index) => half.animate(doorFrames(DOORS[index]!), options)),
   ];
 }
 
@@ -630,7 +658,7 @@ export function play(
       };
       let animations: Animation[];
       if (effect === 'flap') animations = flap(layers, own, id, size, options);
-      else if (effect === 'doors') animations = doors(layers, own, size, options);
+      else if (effect === 'doors') animations = doors(tile, layers, own, size, options);
       else {
         const motion = moves(effect as Moving, size, at);
         if (motion.clip) tile.style.overflow = 'hidden';
@@ -664,6 +692,7 @@ export function play(
         layer.removeAttribute('style');
       }
       tile.style.overflow = '';
+      tile.style.perspective = '';
       state.run = null;
       state.done = null;
       idleFor(tile);

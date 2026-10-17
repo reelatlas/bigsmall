@@ -1388,6 +1388,8 @@ test('Cooking: the ingredient’s pill opens every ingredient under its kind, th
   await expect(pill).toHaveAttribute('aria-expanded', 'false');
   await pill.click();
   await expect(pill).toHaveAttribute('aria-expanded', 'true');
+  // Opening moves the page nowhere: the cursor rests on the flour without scrolling to its row.
+  expect(await page.evaluate(() => Math.round(scrollY))).toBe(0);
   const list = page.getByRole('listbox', { name: 'Matches' });
   const headings = await list
     .getByRole('group')
@@ -1400,12 +1402,23 @@ test('Cooking: the ingredient’s pill opens every ingredient under its kind, th
   // The cursor starts on the one in the box.
   await expect(list.getByRole('option', { selected: true })).toHaveText(/all-purpose flour/);
   await expectNoA11yViolations(page);
-  await list.getByRole('option', { name: /^butter/ }).click();
-  await expect(page.getByRole('button', { name: 'Ingredient: butter' })).toBeVisible();
+  // One taken from deep in the list, the box scrolled off above: the box comes back into view.
+  const honey = list.getByRole('option', { name: /^honey/ });
+  await honey.evaluate((option) => option.scrollIntoView({ block: 'center' }));
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(300);
+  await honey.click();
+  await expect(page.getByRole('button', { name: 'Ingredient: honey' })).toBeVisible();
   await expect(box(page)).toHaveValue('2');
   await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
-  await expect(row(page, 'gram')).toContainText('≈ 454.00');
-  await expect(page).toHaveURL(/[?&]i=butter/);
+  await expect(row(page, 'gram')).toContainText('≈ 672.00');
+  await expect(page).toHaveURL(/[?&]i=honey/);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.querySelector('[data-plane="box"]')!.getBoundingClientRect().top,
+      ),
+    )
+    .toBeGreaterThanOrEqual(0);
 });
 
 test('Cooking: from the keys, the pill’s list moves with the arrows, Enter takes, Escape closes it unchanged', async ({

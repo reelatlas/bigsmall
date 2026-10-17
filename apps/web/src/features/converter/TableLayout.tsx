@@ -196,6 +196,13 @@ export function TableLayout({
   /** Set when typing elsewhere lands in the field: the caret goes after the text it added. */
   const caretToEnd = useRef(false);
   /**
+   * Set when the ingredient's pill opens its list: the cursor lands on the ingredient in the box
+   * without the page scrolling to its row, which would carry the box away (Sean, 2026-10-16).
+   */
+  const holdScroll = useRef(false);
+  /** Set when a pick puts the table where a list was: the box comes back into view. */
+  const showBox = useRef(false);
+  /**
    * Whether the caret came into the field with a tap, so a touch screen's keyboard is up: its
    * Enter, labelled Done, puts the keyboard away once it has done its job (ADR 0015).
    */
@@ -418,11 +425,25 @@ export function TableLayout({
     }
   });
 
-  // The row the arrows reach stays in view, as the page scrolls.
+  // The row the arrows reach stays in view, as the page scrolls; not the row the pill's list opens
+  // on, which the page would scroll to and leave the box behind.
   useEffect(() => {
-    if (browsing)
+    if (browsing && !holdScroll.current)
       document.getElementById(`${listId}-item-${at}`)?.scrollIntoView({ block: 'nearest' });
   }, [browsing, at, listId]);
+  useEffect(() => {
+    holdScroll.current = false;
+  });
+
+  // After a pick that put the table where a list was (typed matches, Cooking's ingredients, the
+  // category tiles), the box comes back into view where the list had scrolled it off (Sean,
+  // 2026-10-16): the list in the page is the box's listbox, and a listbox never leaves its box
+  // behind. A pick in the table itself keeps the page where it is: its rows stay put.
+  useLayoutEffect(() => {
+    if (!showBox.current) return;
+    showBox.current = false;
+    fieldRef.current?.scrollIntoView({ block: 'nearest' });
+  });
 
   /**
    * A category chosen: the box keeps its number and its units list with none chosen and none
@@ -490,12 +511,16 @@ export function TableLayout({
   const takeRow = (index: number) => {
     if (table.kind === 'start') {
       const category = table.categories[index];
-      if (category) chooseCategory(category.id);
+      if (!category) return;
+      showBox.current = true;
+      chooseCategory(category.id);
     } else if (table.kind === 'matches') {
       const match = table.rows[index];
       // A hidden unit taken from search leaves Hidden, as if checked there, so clearing the box
       // never hides it again (Sean, 2026-10-10).
       const hiddenMatch = revealed ? table.hidden[index - table.rows.length] : undefined;
+      if (!match && !hiddenMatch) return;
+      showBox.current = true;
       if (match?.kind === 'unit') take(match.unit.id, number);
       else if (match?.kind === 'ingredient') {
         takeIngredient(match.ingredient.id, match.unit?.id ?? null);
@@ -523,8 +548,9 @@ export function TableLayout({
    */
   const pick = (index: number) => {
     takeRow(index);
+    // The page moves only for a list replaced (the layout effect above), never for the caret.
     if (pressedByTouch()) inputRef.current?.blur();
-    else inputRef.current?.focus();
+    else inputRef.current?.focus({ preventScroll: true });
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -782,6 +808,7 @@ export function TableLayout({
               const current = box.ingredient?.id ?? null;
               if (choosing || !current) setChoosingFor(null);
               else {
+                holdScroll.current = true;
                 setChoosingFor(current);
                 setCursor({
                   view: 'matches',

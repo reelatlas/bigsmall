@@ -9,6 +9,7 @@ import {
   LIST_CARD,
   ROW_RULE,
   rowFill,
+  STUCK_HEADING,
   unitName,
   unitSymbol,
 } from '../lib/recipes';
@@ -83,6 +84,11 @@ export interface UnitMatchesProps {
    * shows (ADR 0014): back to the last match, or on to the first hidden match, else nowhere.
    */
   onLeave?: (step: 1 | -1) => void;
+  /**
+   * Where a group's heading sticks under the box while the list scrolls, in px from the window's
+   * top; none where nothing sticks (ConversionTable's `stickTop`).
+   */
+  stickTop?: number | undefined;
 }
 
 /** The columns of a match: the symbol, then the name, both left-aligned so they read down easily. */
@@ -113,6 +119,7 @@ export function UnitMatches({
   onReveal,
   symbolOnly,
   onLeave,
+  stickTop,
 }: UnitMatchesProps) {
   const groupId = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -175,7 +182,9 @@ export function UnitMatches({
                         GROUP_TITLE,
                         'col-span-2 flex items-baseline gap-1.5 px-2 pb-1',
                         groupIndex === 0 ? 'pt-1' : 'mt-1.5 border-t border-line pt-2',
+                        stickTop !== undefined && STUCK_HEADING,
                       )}
+                      style={stickTop !== undefined ? { top: stickTop } : undefined}
                     >
                       <span className="text-ink">{group.heading}</span>
                       {/* The group's name is its heading alone; each option says its category too. */}

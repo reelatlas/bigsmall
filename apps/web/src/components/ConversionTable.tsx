@@ -29,6 +29,7 @@ import {
   PANEL_TITLE,
   ROW_RULE,
   rowFill,
+  STUCK_HEADING,
   unitName,
   unitSymbol,
 } from '../lib/recipes';
@@ -133,6 +134,13 @@ export interface ConversionTableProps<T extends ConversionRow> {
    * from the box's rows (ADR 0014), so the layout puts focus back on them, or on the next plane.
    */
   onLeave?: (step: 1 | -1) => void;
+  /**
+   * Where a section's name sticks under the box while the table scrolls, in px from the window's
+   * top, so the section being read is always named; none where nothing sticks (the layout decides
+   * by the window's height, docs/UX-SPEC.md §1). The table's headings only: Edit's and Hidden's
+   * carry a checkbox, and scroll with their lists.
+   */
+  stickTop?: number | undefined;
 }
 
 /**
@@ -347,7 +355,11 @@ export function ConversionTable<T extends ConversionRow>({
   onEditing,
   onHiddenOpen,
   onLeave,
+  stickTop,
 }: ConversionTableProps<T>) {
+  // A section's name stuck under the box while the table scrolls, where the layout says so.
+  const stuck = stickTop !== undefined && STUCK_HEADING;
+  const stickStyle = stickTop !== undefined ? { top: stickTop } : undefined;
   const titleId = useId();
   const moveHintId = useId();
   const checkId = useId();
@@ -710,6 +722,8 @@ export function ConversionTable<T extends ConversionRow>({
     const marker =
       list === 'shown' ? { 'data-section': section.key } : { 'data-hidden-section': section.key };
     const spot = `section:${section.key}`;
+    // Not stuck: this heading carries a control, and stuck under the box its checkbox would sit a
+    // few pixels from the field (a target-size finding); Edit and Hidden scroll with their lists.
     return (
       <h3 className={edge} {...marker}>
         <label className={cx(PANEL_TITLE, CURSOR_ROW, 'flex items-center gap-2', CHOICE_FILL)}>
@@ -774,7 +788,8 @@ export function ConversionTable<T extends ConversionRow>({
         >
           <div
             role="row"
-            className={cx('col-span-7', sectionEdge(at, 'heading'))}
+            className={cx('col-span-7', sectionEdge(at, 'heading'), stuck)}
+            style={stickStyle}
             data-section={section.key}
           >
             <span role="columnheader" className={cx('block', HEADING)}>

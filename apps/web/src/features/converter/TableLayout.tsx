@@ -63,7 +63,16 @@ const TABLE_LEADING = 'flex items-center gap-1';
  * hovered) lines up with the box and the table, its glyph inside the column as their text is.
  */
 const TABLE_TOOLS = 'flex shrink-0 items-center gap-1';
-const TABLE_BOX_CELL = 'max-w-xl md:col-start-1 md:row-start-2';
+/**
+ * The box's cell, stuck to the window's top while the table scrolls where the window is tall enough
+ * (`data-stick` on the layout, measured below; a trial, Sean, 2026-10-17): the canvas behind it,
+ * and a strip of canvas under it as deep as the gap to the table (`after:h-2`, the rows cell's
+ * `mt-2`), cover the rows passing under; the strip's lower edge is a rule only while the box is
+ * stuck (`data-stuck`). Drawn by a pseudo-element, so the cell keeps the box's own size. Over a
+ * section's name (STUCK_HEADING, 5) and under an open shell (SHELL, 20).
+ */
+const TABLE_BOX_CELL =
+  'relative z-10 max-w-xl bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-start-2';
 /**
  * 8 px under the box, its popup, as the toolbar sits 8 px over it; a container, so the categories
  * go four across once it has the room. Under an open side panel (below md) the panel's own 16 px
@@ -77,7 +86,7 @@ const TABLE_ROWS_CELL = '@container mt-2 max-w-xl md:col-start-1 md:row-span-2 m
  * (`self-start`).
  */
 const TABLE_SIDE_CELL =
-  'my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-2 md:my-0 md:w-80 md:self-start';
+  'isolate my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-2 md:my-0 md:w-80 md:self-start';
 
 /**
  * Keys that type into the field from a control beside it (a toolbar's, the chip, a copy button):
@@ -197,6 +206,7 @@ export function TableLayout({
     anchor();
     setChoosingForState(value);
   };
+
   /**
    * Where the cursor is, in the view it was set in, so a change from outside (undo, clear all, a
    * send from the calculator) brings it back to rest. A null position rests on the unit in the
@@ -228,6 +238,83 @@ export function TableLayout({
   const [editingIn, setEditingIn] = useState<string | null>(null);
   const editing = table.kind === 'units' && editingIn === table.category;
   const [hiddenOpen, setHiddenOpen] = useState(false);
+
+  /**
+   * The box and the section names stay at the window's top while the table scrolls (a trial,
+   * Sean, 2026-10-17; docs/UX-SPEC.md §1). The box's measured height says where a name sticks
+   * under it, a pixel under the box's edge (docs/LEARNINGS.md, "Stacked sticky headers"), and
+   * nothing sticks where the window is shorter than the box, a name, and three rows together (a
+   * phone on its side, 400% zoom), so the table stays usable. Measured, never counted.
+   */
+  const [stick, setStick] = useState({ top: 0, gap: 0, on: false });
+  const [stuck, setStuck] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const cell = fieldRef.current;
+    if (!cell || typeof ResizeObserver === 'undefined') return;
+    const measure = () => {
+      const box = cell.getBoundingClientRect().height;
+      const place = placeRef.current;
+      // The gap between the box and the table, which the stuck box's strip covers.
+      const gap = place ? parseFloat(getComputedStyle(place).marginTop) || 0 : 0;
+      const heading =
+        place?.querySelector('[data-section], [role="group"] > *')?.getBoundingClientRect()
+          .height ?? 0;
+      const row =
+        place?.querySelector('[data-row], [role="option"]')?.getBoundingClientRect().height ?? 0;
+      const on = window.innerHeight >= box + gap + heading + 3 * row;
+      setStick((now) =>
+        now.top === box && now.gap === gap && now.on === on ? now : { top: box, gap, on },
+      );
+    };
+    measure();
+    const resizes = new ResizeObserver(measure);
+    resizes.observe(cell);
+    window.addEventListener('resize', measure);
+    return () => {
+      resizes.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+  // Whether a side panel sits between the box and the table (below md) rather than beside them:
+  // its rows' small checkboxes would pass under a stuck box. Measured from the layout.
+  const [sideBelow, setSideBelow] = useState(false);
+  const hasSide = !!side;
+  useLayoutEffect(() => {
+    const measure = () => {
+      const panel = sideRef.current;
+      const field = fieldRef.current;
+      setSideBelow(
+        !!panel &&
+          !!field &&
+          panel.getBoundingClientRect().top >= field.getBoundingClientRect().bottom - 1,
+      );
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [hasSide]);
+  /**
+   * The box sticks while the table is what scrolls under it, and lets go while Edit is on, Hidden
+   * is open, or a settings panel sits between the box and the table: their rows' 16 px checkboxes
+   * would pass under the stuck box within a target's safe space of the field (axe's target-size),
+   * and none of those is reading the table.
+   */
+  const sticking = stick.on && !editing && !hiddenOpen && !sideBelow;
+  // A section's name sticks a pixel under the strip's lower edge (the box, then its gap).
+  const stickTop = sticking ? stick.top + stick.gap - 1 : undefined;
+  // The rule under the box only while it is stuck: a pixel set 2 px over the cell's top edge leaves
+  // the window exactly then (at 1 px it would touch the window's edge, which still counts as
+  // intersecting).
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === 'undefined') return;
+    const watcher = new IntersectionObserver(([entry]) =>
+      setStuck(sticking && !!entry && !entry.isIntersecting),
+    );
+    watcher.observe(sentinel);
+    return () => watcher.disconnect();
+  }, [sticking]);
   /**
    * Edit ends, as Done ends it, when the box changes (typing in it, or typing from the table that
    * lands in it) or Escape is pressed there: back in the box, converting is the job again.
@@ -472,7 +559,14 @@ export function TableLayout({
   useLayoutEffect(() => {
     if (!showBox.current) return;
     showBox.current = false;
-    fieldRef.current?.scrollIntoView({ block: 'nearest' });
+    const field = fieldRef.current;
+    const place = placeRef.current;
+    if (!field || !place) return;
+    field.scrollIntoView({ block: 'nearest' });
+    // Under a stuck box, the table's own top comes out from behind it; measured, since a browser's
+    // "nearest" with a scroll margin landed it 35 px short.
+    const behind = place.getBoundingClientRect().top - (sticking ? stick.top + stick.gap : 0);
+    if (behind < 0) window.scrollBy(0, behind);
   });
 
   /**
@@ -709,6 +803,7 @@ export function TableLayout({
         onReveal={(show) => setRevealedFor(show ? table.query : null)}
         symbolOnly={display.names === 'symbol'}
         onLeave={leaveFoot}
+        stickTop={stickTop}
       />
     ) : (
       <ConversionTable<TableRow>
@@ -736,6 +831,7 @@ export function TableLayout({
         }}
         onHiddenOpen={setHiddenOpen}
         onLeave={leaveFoot}
+        stickTop={stickTop}
       />
     );
   // Under Cooking's table, the line saying what a cup of its ingredient weighs (ADR 0021).
@@ -748,6 +844,8 @@ export function TableLayout({
   return (
     <div
       ref={rootRef}
+      className="group/stick"
+      data-stick={sticking ? '' : undefined}
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
         const next = event.relatedTarget as Node | null;
         if (![fieldRef, placeRef].some((part) => part.current?.contains(next))) setPosition(null);
@@ -785,10 +883,16 @@ export function TableLayout({
           ref={fieldRef}
           className={TABLE_BOX_CELL}
           data-plane="box"
+          data-stuck={stuck ? '' : undefined}
           onFocus={(event: FocusEvent<HTMLDivElement>) => {
             if (event.target === inputRef.current) tappedIn.current = pressedByTouch();
           }}
         >
+          <div
+            ref={sentinelRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-0.5 h-px w-px"
+          />
           <ValueField
             inputRef={inputRef}
             label="Value"

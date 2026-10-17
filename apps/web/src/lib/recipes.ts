@@ -76,6 +76,14 @@ export const PAGE_BLEED = '-mx-4 px-4 overflow-x-clip';
 /** A page's main column (the converter, About, and 404). */
 export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8 sm:py-12');
 
+/**
+ * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; a trial, Sean,
+ * 2026-10-17), the canvas behind it. The stuck layers, lowest to highest: the rows (no z-index), a
+ * section's name (5), the box (10, `TABLE_BOX_CELL` in TableLayout), and an open shell over all
+ * of them (`SHELL`, 20). Its `top` is set in line, from the box's measured height.
+ */
+export const STUCK_HEADING = 'sticky z-5 bg-canvas';
+
 /** A section's heading on a page, centered over it: About's "The sketchbook" and "Every formula". */
 export const SECTION_HEADING = 'text-center font-display text-xl font-semibold';
 

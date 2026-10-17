@@ -1652,3 +1652,75 @@ test.describe('in a German locale', () => {
     await expect(box(page)).toHaveValue('1234,567890123456789');
   });
 });
+
+test('the box and the section names stay at the window’s top while a long table scrolls, where the window is tall enough (trial)', async ({
+  page,
+}) => {
+  const boxRect = () =>
+    page.evaluate(() => {
+      const rect = document.querySelector('[data-plane="box"]')!.getBoundingClientRect();
+      return { top: Math.round(rect.top), bottom: Math.round(rect.bottom) };
+    });
+  // The name of the section being read sits a pixel under the stuck box's lower edge, the strip
+  // of canvas as deep as the gap to the table (the hairline tuck): the lowest name at or above
+  // that edge, since the one before it is pushed up behind the box.
+  const nameUnderBox = () =>
+    page.evaluate(() => {
+      const cell = document.querySelector('[data-plane="box"]')!;
+      const box = cell.getBoundingClientRect();
+      const strip = parseFloat(getComputedStyle(cell, '::after').height) || 0;
+      const edge = Math.round(box.bottom + strip);
+      const tops = [
+        ...document.querySelectorAll(
+          '[role="grid"] [data-section], [role="listbox"] [role="group"] > :first-child',
+        ),
+      ]
+        .map((name) => Math.round(name.getBoundingClientRect().top))
+        .filter((top) => top <= edge);
+      return { first: Math.max(...tops), boxBottom: edge };
+    });
+  const tableTop = () =>
+    page.evaluate(() =>
+      Math.round(
+        document.querySelector('[role="grid"], [role="listbox"]')!.getBoundingClientRect().top,
+      ),
+    );
+
+  // Cooking's ingredients, a long list: the box stuck, the kind being read named under it.
+  await page.goto('/?a=us-cup&v=2&i=all-purpose-flour');
+  await ready(page);
+  await page.getByRole('button', { name: 'Ingredient: all-purpose flour' }).click();
+  await expect(matches(page)).toBeVisible();
+  // Deep in a long kind (Dairy and eggs), its name stuck: its third row at the window's top, with
+  // enough of the kind left under the box for the name to stay rather than be pushed up.
+  await page
+    .getByRole('option', { name: /^sour cream/ })
+    .evaluate((option) => option.scrollIntoView({ block: 'start' }));
+  await expect.poll(async () => (await boxRect()).top).toBe(0);
+  const list = await nameUnderBox();
+  expect(list.first).toBe(list.boxBottom - 1);
+  await expect(page.locator('[data-plane="box"][data-stuck]')).toHaveCount(1);
+  await expectNoA11yViolations(page);
+  // A pick from deep in the list: the table's top comes out from under the box, never behind it.
+  const honey = page.getByRole('option', { name: /^honey/ });
+  await honey.evaluate((option) => option.scrollIntoView({ block: 'center' }));
+  await honey.click();
+  await expect(page.getByRole('button', { name: 'Ingredient: honey' })).toBeVisible();
+  await expect.poll(async () => (await boxRect()).top).toBeGreaterThanOrEqual(0);
+  expect(await tableTop()).toBeGreaterThanOrEqual((await boxRect()).bottom - 1);
+
+  // Length's table in a window tall enough: its section names the same way; then a window too
+  // short for the box, a name, and three rows together, where nothing sticks.
+  await page.goto('/?a=meter&v=1');
+  await ready(page);
+  const width = page.viewportSize()!.width;
+  await page.setViewportSize({ width, height: 520 });
+  await row(page, 'centimeter').evaluate((line) => line.scrollIntoView({ block: 'start' }));
+  await expect.poll(async () => (await boxRect()).top).toBe(0);
+  const table = await nameUnderBox();
+  expect(table.first).toBe(table.boxBottom - 1);
+  await page.setViewportSize({ width, height: 200 });
+  await page.evaluate(() => scrollTo(0, 500));
+  await expect.poll(async () => (await boxRect()).top).toBeLessThan(0);
+  await expect(page.locator('[data-plane="box"][data-stuck]')).toHaveCount(0);
+});

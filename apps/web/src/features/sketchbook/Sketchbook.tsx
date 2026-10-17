@@ -83,9 +83,9 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
         {ids.map((id, index) => (
           <button
             // A tile keeps its place; which sketch it shows is the play's. It clips to its own
-            // corners (clip, not hidden, which would make a scroll container), so a change's
-            // pieces never paint past it; while a turn or Squash runs it lets the change reach
-            // past, over the gap and above its neighbors (`data-reach`, motion.ts: set and
+            // corners (clip, not hidden, which would make a scroll container); while a change
+            // that reaches past it runs (Glitch, Blur, the turns, Flap, Squash) it lets the
+            // change out, over the gap and above its neighbors (`data-reach`, motion.ts: set and
             // cleared with every layer flat). Its focus ring, an outline, is outside the clip.
             key={index}
             type="button"

@@ -39,11 +39,10 @@ import {
  * draw a frame every frameMs, planned in frames.ts. Under reduced motion nothing changes by
  * itself: a press cross-fades, and Flip changes every tile at once.
  *
- * A change stays inside its tile: the tile clips to its corners (Sketchbook.tsx), so Glitch's
- * shifted bands and Blur's halo never paint over the gap or a neighbor. The turns and Squash alone
- * reach past it while they run (REACHING_EFFECTS): `data-reach` on the tile lifts the clip, set
- * before their first frame and cleared as they settle, every layer flat at both, so the toggle
- * shows nothing. Where two pieces meet (a band and its hole, Scan's beam and the part drawn,
+ * A change that reaches past its tile (REACHING_EFFECTS: Glitch's bands, Blur's halo, the turns,
+ * Flap, Squash) has the tile's clip lifted while it runs: `data-reach` on the tile (Sketchbook.tsx),
+ * set before its first frame and cleared as it settles, every layer flat at both, so the toggle
+ * shows nothing; the tile clips every other change, which never leaves it anyway. Where two pieces meet (a band and its hole, Scan's beam and the part drawn,
  * Scramble's blocks, Flap's halves) the edges sit on the device's pixels and the piece on top
  * reaches one past (the tile's `Grain`, frames.ts), since two edges antialiased on the same
  * fractional pixel leave a seam of what lies under (docs/LEARNINGS.md, 2026-10-17).
@@ -690,7 +689,7 @@ export function play(
     show(layers.back, id);
     tile.dataset['next'] = id;
     const effect = effectFor();
-    // A turn or Squash reaches past the tile: the clip is lifted now, with every layer flat.
+    // A change that reaches past the tile: the clip is lifted now, with every layer flat.
     if (REACHING_EFFECTS.has(effect)) tile.dataset['reach'] = '';
     const box = tile.getBoundingClientRect();
     const size = box.width;

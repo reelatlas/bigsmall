@@ -23,6 +23,7 @@ Requested scope: `$ARGUMENTS`
 
 - A whole category, or a figure many conversions rest on: two reviewers in parallel, blind to each other and to our figures, each recording every figure found as a row: source, the figure as given, the figure in our unit, the condition the source states, the URL, the exact words, the date. One figure: one reviewer, then the checker in step 5.
 - Reviewers read the source itself: a scan from its page images where text extraction is unsure, a data file from the file traced to its samples, a live page fetched fresh.
+- Run them as agents from one brief, the orchestrator never gathering itself (`docs/RESEARCH.md` §4, "How the work is split"): the brief names the things and the condition, never a number, and the output's shape; each agent works in its own scratch folder; results are read from files.
 - Downloads in their own folders in the scratchpad, scripts in another, readers run with `python -I`; nothing personal in any request, header, or form.
 
 ## 3. Screen

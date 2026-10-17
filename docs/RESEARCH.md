@@ -49,6 +49,17 @@ What the `research` skill runs, for a new category or figure, and for re-opening
 7. **Document**, each in its home: the research doc (`docs/research/<topic>-N.md`: the rule as applied, the figures and how each was reached, what changed and why, the check, the sources considered and set aside, how to re-open), an ADR for a decision, `docs/UX-SPEC.md` where words on screen change, `docs/UNITS-CATALOG.md`, `docs/LEARNINGS.md`, the findings log. The About page shows the sources from the data.
 8. **Ship** on the gate.
 
+### How the work is split: an orchestrator and its agents
+
+The method runs as one orchestrator and a few agents, each with one job and none of the others' context (Cooking's figures ran this way on 2026-10-16). It is the first worked piece of the wider goal in `docs/PLAN.md` §2, "A planner and agents that build".
+
+- **The orchestrator** (the session) writes the brief: the facts in scope, the kind of each, the condition fixed, the output's shape (a findings file, and a CSV with a row per figure: source, the figure as given, the figure in our unit, the condition the source states, URL, exact words, date read), and the safety rules below. It never gathers itself, so it stays blind too; it screens, decides by the rule in the data file, and writes the code and the docs from it.
+- **Two reviewers**, in parallel, from the same brief, each in a scratch folder of its own, told nothing of the other or of our figures (the brief names the things and the condition, never a number), each ending with its own estimate and why, so the orchestrator sees where judgment diverged before the rule decides.
+- **One checker**, after the reconciliation, given only the citations as the docs will print them (`citations.json`), told to read each source itself and never the reviewers' notes, reporting row by row: confirmed, confirmed with a correction, could not reach, wrong (`check.csv`, `check.md`). Figures the reviewers found but did not cite go through the screen afterwards.
+- **Handoffs are files, not conversation**: each agent's result is read from its folder; the orchestrator keeps what the record needs in `docs/research/<topic>-N/` and drops the downloads.
+- **Safety, in every brief**: downloads in their own folders and scripts elsewhere, readers run with `python -I`; nothing personal (an email address, a name) in any request, header, or form; no bot check or paywall bypassed, a source behind one is "could not reach".
+- **Cost**: the checker alone took about 0.7 million tokens over 255 tool calls. A category's worth of figures earns a pair of reviewers and a checker; one figure takes one reviewer and the checker.
+
 ## 5. Re-opening a figure
 
 - **When:** a visitor reports a different figure (once the site takes feedback; the report is a lead, its source found and screened like any other); a new measurement appears (USDA's Foundation Foods releases are re-read by `usda_portions.py`); a product changes (a new grind, a new kind of leavener); a figure marked thin.

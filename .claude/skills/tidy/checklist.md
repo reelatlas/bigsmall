@@ -39,6 +39,12 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - A change to a shared component is checked at 320 px and wide, in the converter and in the gallery.
 - The server's page carries the converter's empty state, and the first client render matches the server's.
 
+## Patterns, not band-aids
+
+- A fix reaches for the platform's own mechanism first (sticky, a pseudo-element, scroll anchoring, a combobox's standard manners); where the platform lacks it, the smallest stand-in, scoped to one place and documented as a pattern in `docs/DESIGN-SYSTEM.md` with the standard it stands in for and when to retire it (the stuck-state sentinel until `scroll-state()` container queries reach WebKit; the by-hand scroll anchoring until Safari anchors). A stand-in that names no standard, or none that could be retired, is a finding (Sean, 2026-10-17).
+- No padding-and-negative-margin tricks where a pseudo-element keeps the geometry honest; no speculative fixes stacked on a symptom that was not measured; no numbers tuned to one machine. A workaround says so in its comment and in the docs rather than passing for the design.
+- A change made twice the same way becomes one recipe, component, hook, or effect; the third time it is a named pattern in the design system.
+
 ## Behavior and keys
 
 - Every behavior is in `docs/UX-SPEC.md`; code and spec agree. When they disagree, check the findings log, the ADRs, and the research doc behind the feature for which was intended; fix the doc if the code is right, and ask Sean if neither says.

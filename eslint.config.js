@@ -67,6 +67,8 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/playwright-report/**',
       '**/test-results/**',
+      // An agent's worktree (git keeps them out of status; the gate keeps them out of lint).
+      '.claude/worktrees/**',
     ],
   },
   js.configs.recommended,

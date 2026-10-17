@@ -1320,10 +1320,12 @@ test('Cooking’s box keeps one line where it can, fitted as with one pill: the 
   // A short number and both names on one line (Sean, 2026-10-16: "123" wrapped on a desktop).
   await page.goto('/?a=us-fluid-ounce&v=123&i=all-purpose-flour');
   await ready(page);
+  // Whether the unit's name shows beside it depends on the system's fonts, the themes' own.
   const full = await fit();
-  expect(full).toMatchObject({ wrapped: false, named: true, height: 60 });
-  // A long one: the unit's symbol alone, the number a size or more down, still one line.
-  await box(page).fill('6.6666666711111111111');
+  expect(full).toMatchObject({ wrapped: false, height: 60 });
+  // A longer one: too long for its full size beside both names, short enough for one line at a
+  // smaller size in any font: the unit's name gives way, the number steps down, still one line.
+  await box(page).fill('6.66666667111');
   await expect.poll(fit).toMatchObject({ wrapped: false, named: false, height: 60 });
   expect((await fit()).size).toBeLessThan(full.size);
   // At a phone's width the pills take a line of their own under the number.

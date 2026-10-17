@@ -1,39 +1,35 @@
 # Feedback 1 — how a visitor reaches us
 
-Built 2026-10-17 as a prototype lab, `/dev/feedback-lab` (`apps/web/src/pages/dev/_feedback-lab/`), for the fiftieth pass's open question (docs/research/findings-0-first-pass.md): Sean asked for "a trial lab, light, to get an idea of the functions and how it might look and the best way to display it". Live where the lab is; retired by `CLAUDE.md`'s "Retire a lab" recipe once the section ships.
+Built 2026-10-17 as a prototype lab, `/dev/feedback-lab` (`apps/web/src/pages/dev/_feedback-lab/`), for the fiftieth pass's open question (docs/research/findings-0-first-pass.md). Sean asked for "a trial lab, light, to get an idea of the functions and how it might look", then set its shape the same day (the sixty-ninth pass). Live where the lab is; retired by `CLAUDE.md`'s "Retire a lab" recipe once the section ships.
 
 ## The question
 
-bigsmall has no way to hear from a visitor. The About page was to hold "how to send feedback" (the forty-ninth pass), and the site's first rule, every number checked, wants a way for someone to say a figure looks wrong: such a report is a lead for re-opening a figure (docs/RESEARCH.md §5), worth nothing without its source. The site has no server and no database (ADR 0001), and its privacy line is to say that visits are counted anonymously and nothing else is kept.
+bigsmall has no way to hear from a visitor. The About page was to hold "how to send feedback" (the forty-ninth pass), and the site's first rule, every number checked, wants a way for someone to say a figure looks wrong: such a report is a lead for re-opening a figure (docs/RESEARCH.md §5). The site has no server and no database (ADR 0001), and its privacy line is to say that visits are counted anonymously and nothing else is kept.
 
-## The answers in the lab
+## The shape Sean set (2026-10-17)
 
-Each is built from the real components (`Button`, `SegmentedControl`, the lab controls' fields) with simple state of its own, side by side.
+Under a heading "Feedback": one strip of three kinds, Inaccuracy, Bug, Idea; "Your email"; a Message whose empty state gives an example for the kind chosen, in place of fields per kind; Send alone. Nothing under the fields. Send delivers the message to his inbox itself: opening the visitor's email app (a `mailto:` form, the lab's first answer) is out, "annoying for ten years now". The lab shows the form as it would sit on About and, beside it, what Send would deliver: a subject from the kind, the visitor's address as Reply to, the message, and the page it came from. In the lab nothing is sent.
 
-- **A. A form that opens the visitor's email app.** What it is about (a figure, an idea, a problem, one strip of segments); for a figure, the unit or ingredient and "your figure, and where it comes from"; a message, with a hint under it saying what helps for that kind; Send, which opens the visitor's own email app with the subject and body filled in (a `mailto:` address with `subject` and `body`), and Copy the address beside it. A line under the buttons says what Send does and that nothing is stored or sent from the page. The lab shows what arrives, the subject and the body, beside the form, so nothing need be sent to see it.
-- **B. The address alone.** The address, a line saying what a report of a figure needs, Copy the address, and a link that opens the email app with the body's skeleton.
-- **C. A form that posts to a service** (Formspree, Basin), described and not built: messages land in the inbox without an email app, at the cost of a third party holding them, spam to filter, and a line in the privacy note. The fallback if the email route proves to lose messages. A function of our own sending through an email service (Resend) is the same trade with more to run, and the first server in a site that has none.
+## How Send can deliver without the visitor's email app
 
-The address in every answer is `hello@bigsmall.work`, forwarded to Sean's inbox by Porkbun's free email forwarding, set up at his screen (the dashboard-steps practice); it does not exist yet. Sean's own address appears nowhere.
+A static site cannot send email itself; something must receive the fields and mail them.
 
-## What a report of a figure needs
+- **A form service** (Formspree is the best known; Web3Forms, Basin, Getform the same idea). The page posts the fields as JSON to the service's address; the service mails them to the inbox Sean configures, with the visitor's address as Reply to, filters spam (a honeypot field on our side too), and keeps a copy on its dashboard. No server of ours, no secret in the page (a form id is public by design), set up at his screen in minutes (an account, a form, its id into the site's config). Free tiers: Formspree 50 a month, Web3Forms 250, Basin 100. The privacy line gains one sentence: feedback goes through the service to our inbox.
+- **A function of our own** on Vercel, sending through an email service (Resend). Ours to run: the first server-side code on a site that has none (ADR 0001, an ADR to amend), an API key in Vercel's settings, a sending domain verified at Porkbun, and spam and rate limits to handle ourselves, which a stateless function cannot without storage or a captcha. The same trade with more to run.
 
-For docs/RESEARCH.md §5 a report is a lead: the unit or ingredient; the visitor's figure; where it comes from (a chart, a package, a book, a weighing of their own), so the source can be found and screened like any other. The form asks for exactly these, and the message hint says why.
+**Recommendation:** a form service, Formspree first, and the function only if the service proves too little (volume, or a dislike of the third party holding messages). Either way Sean's own address appears nowhere on the site; the service or the function holds it. The planned `hello@bigsmall.work` is then optional: a visible address for people who prefer email, forwarded by Porkbun, which can wait.
 
-## Recommendation
+## For the real build
 
-A, with B's copy of the address beside it. It needs no backend and no third party, keeps the privacy line as it is, and structures a report so it arrives usable; a visitor with no email app set up copies the address instead, which is B. C only if the friends' rounds show the email route losing messages.
-
-For the real build, not the lab:
-
-- Send as a link (an anchor with the `mailto:` address) rather than a button that navigates, so it works before the island loads; the design system's `Button` gains an `href` form (extend, never fork) or the link takes the primary button's recipe.
-- A way in from the converter later: "Report this figure" from Cooking's line under the table, carrying the ingredient and the conversion's URL into the form.
-- Where: at the foot of the About page, after the formulas, under a heading "Feedback" (`SECTION_HEADING`), the footer staying "About" (Sean, 2026-10-15: not "About · Feedback", which would overload it); a `#feedback` anchor for links.
-- The spec in docs/UX-SPEC.md §1, "About"; the smoke test's axe on the section in every theme; a browser test that the form composes the subject and body as the lab shows them.
+- The section at the foot of the About page, after the formulas, under "Feedback" (`SECTION_HEADING`), with a `#feedback` anchor; the footer stays "About" (Sean, 2026-10-15).
+- The form as the lab has it: the strip, Your email (`type="email"`, optional, so anyone can write), Message (required, the kind's example as its empty state), Send; after Send a line says it was sent, and the message clears; a failure says what to try (the address to write to).
+- The fields sent: the kind, the email, the message, the page's URL (`location.href`, so a report from the converter carries its conversion), and a honeypot the service drops.
+- An inaccuracy is a lead for docs/RESEARCH.md §5: the message asks, by its example, for the value seen, the one expected, and where the visitor's figure comes from.
+- The spec in docs/UX-SPEC.md §1, "About"; the smoke test's axe on the section in every theme; a browser test that Send posts the fields (the request intercepted) and shows the line after; the privacy line's sentence (docs/DEPLOYMENT.md, "Analytics", where the line is planned).
 
 ## Decisions for Sean
 
-1. The address: `hello@bigsmall.work`, and its forwarding set up at his screen.
-2. A with B's copy beside it (recommended), B alone, or A alone.
-3. The three kinds and their labels: "A figure", "An idea", "A problem".
-4. The place on About and the footer's wording.
+1. How Send delivers: a form service (recommended, Formspree), or a function of ours.
+2. The service's account and form, set up at his screen; the inbox it mails to.
+3. The privacy line's sentence about it.
+4. The kinds' labels, "Inaccuracy", "Bug", "Idea", and the examples in the Message's empty state.

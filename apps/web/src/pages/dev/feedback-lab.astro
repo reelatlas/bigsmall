@@ -3,18 +3,17 @@ import DevPage from '../../layouts/DevPage.astro';
 import { FeedbackLab } from './_feedback-lab/FeedbackLab';
 
 /*
- * The feedback section prototyped (docs/research/feedback-1.md): two ways a visitor could reach us
- * from the About page, side by side, built light on the real components for Sean to try. Retired
- * by CLAUDE.md's recipe once the section ships.
+ * The feedback section prototyped (docs/research/feedback-1.md) in the shape Sean set, built light
+ * on the real components for him to try, with what Send would deliver beside it. Retired by
+ * CLAUDE.md's recipe once the section ships.
  */
 ---
 
-<DevPage title="feedback lab" description="Try the ways a visitor could send feedback.">
+<DevPage title="feedback lab" description="Try the feedback section before it is built.">
   <Fragment slot="intro">
-    Feedback lab. Two ways a visitor could reach us from the About page: a form whose Send opens
-    their email app with the message filled in, and the address alone. Try each; what the form
-    composes shows under it, so nothing need be sent to see it. Neither stores anything here. The
-    address is the one planned and does not exist yet.
+    Feedback lab. The feedback section as it would sit on the About page: a heading, three kinds,
+    Your email, a Message with an example as its empty state, and Send. Press Send to see what it
+    would deliver; in the lab nothing is sent.
   </Fragment>
   <FeedbackLab client:load />
 </DevPage>

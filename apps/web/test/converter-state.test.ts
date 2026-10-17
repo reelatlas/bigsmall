@@ -471,7 +471,7 @@ describe('Cooking (ADR 0021)', () => {
     expect(row('gram')).toMatchObject({ text: '254', approx: true });
     expect(row('milliliter')).toMatchObject({ approx: false });
     expect(row('us-cup')).toMatchObject({ inBox: true, approx: false });
-    expect(table.note).toBe('All-purpose flour: spooned and leveled, 1 cup ≈ 127 g.');
+    expect(table.note).toBe('All-purpose flour: spooned and leveled');
     expect(table.announcement).toBe('2 cups of all-purpose flour in 10 units');
   });
 

@@ -83,16 +83,18 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
         {ids.map((id, index) => (
           <button
             // A tile keeps its place; which sketch it shows is the play's. It clips to its own
-            // corners (clip, not hidden, which would make a scroll container); while a change
-            // that reaches past it runs (Glitch, Blur, the turns, Flap, Squash) it lets the
-            // change out, over the gap and above its neighbors (`data-reach`, motion.ts: set and
-            // cleared with every layer flat). Its focus ring, an outline, is outside the clip.
+            // corners (clip, not hidden, which would make a scroll container) until a change
+            // that reaches past it starts (Glitch, Blur, the turns, Flap, Squash): then it lets
+            // the change out (`data-unclipped`) and stands over its neighbors (`data-reach`),
+            // both set by motion.ts with every layer flat, the clip taken back only when a
+            // clipped change starts, never at a settle. Its focus ring, an outline, is outside
+            // the clip.
             key={index}
             type="button"
             data-sketch-tile
             data-sketch={id}
             aria-label={SKETCH_BY_ID.get(id)?.name ?? id}
-            className="relative block aspect-square w-full overflow-clip data-reach:z-10 data-reach:overflow-visible"
+            className="relative block aspect-square w-full overflow-clip data-reach:z-10 data-unclipped:overflow-visible"
             style={{ borderRadius: TILE_CORNER }}
           >
             {LAYERS.map((layer, at) => (

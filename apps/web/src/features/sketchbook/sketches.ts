@@ -219,8 +219,8 @@ export const STEPPED_EFFECTS: ReadonlySet<SketchEffect> = new Set(['glitch', 'sc
 /**
  * The changes that reach past the tile: Glitch's bands, shifted across the gap and into the next
  * tile; Blur's halo; Flip's and Tumble's near edge swinging toward the viewer; Flap's halves
- * falling; Squash's bounce above its base. The tile lets them out while they run (`data-reach`,
- * Sketchbook.tsx) and clips every other change, which never leaves it anyway. A trial in two steps
+ * falling; Squash's bounce above its base. The tile lets them out while they run
+ * (`data-unclipped` and `data-reach`, Sketchbook.tsx) and clips every other change. A trial in two steps
  * (Sean, 2026-10-17: the reach gave the tiles dimension, Glitch's most of all): the turns and
  * Squash first, whole layers under a transform; then Glitch and Blur, since the slivers an iPhone
  * kept in the gap were Glitch's bands left outside as a change ended, and the bands now come back

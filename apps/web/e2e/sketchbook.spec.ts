@@ -706,13 +706,14 @@ test('Blur, the turns, and Squash reach past the tile into the gap, over no neig
     for (let step = 0; step <= STEPS; step++) {
       await seek((swapMs * step) / STEPS);
       const frame = await shot();
-      // A reaching tile, lifted over its neighbors, must leave them as they were. A clipped one
-      // cannot cross the gap to a neighbor (nothing outside the tile, below), while Chromium
-      // re-rasterizes a neighbor's art edges by a few levels as the tile composites (its own,
-      // docs/LEARNINGS.md 2026-10-17), so they are not compared to the pixel.
+      // A reaching tile, lifted over its neighbors, must leave them as they were: no pixel of
+      // theirs moved by more than 96 levels, since Chromium re-rasterizes a resting neighbor's
+      // art edges by up to about 70 levels while a sibling composites (the engine's own, measured
+      // 2026-10-17) and a change painted over a neighbor moves pixels by far more. A clipped one
+      // cannot cross the gap to a neighbor (nothing outside the tile, below).
       if (REACHING_EFFECTS.has(effect)) {
         expect(
-          await PIXELS.differingWhere(page, frame, before, neighbors, 'inside'),
+          await PIXELS.differingWhere(page, frame, before, neighbors, 'inside', 96),
           `${effect}, step ${step}: painted over a neighbor`,
         ).toBe(0);
       }

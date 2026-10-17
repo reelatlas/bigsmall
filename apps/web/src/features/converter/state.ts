@@ -168,15 +168,12 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
 
     case 'removeIngredient': {
       const unit = state.unit ? getUnit(state.unit) : undefined;
-      // A unit of that ingredient alone (a stick of butter) goes with it; without a unit, Cooking
-      // stays, to choose another.
+      // A unit of that ingredient alone (a stick of butter) goes with it. Cooking stays, its
+      // ingredients to choose from again, a weight or a volume waiting in the box: one pill's ×
+      // dropping the box into Volume was jarring (Sean, 2026-10-16). Only a unit of another
+      // category, or another category chosen, leaves Cooking.
       const keeps = unit !== undefined && !unit.ingredient;
-      return {
-        ...state,
-        ingredient: null,
-        unit: keeps ? state.unit : null,
-        category: keeps ? unit.category : 'cooking',
-      };
+      return { ...state, ingredient: null, unit: keeps ? state.unit : null, category: 'cooking' };
     }
 
     case 'chooseCategory': {

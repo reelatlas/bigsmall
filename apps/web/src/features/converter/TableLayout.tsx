@@ -294,14 +294,17 @@ export function TableLayout({
 
   /**
    * The Escape ladder's steps that change the conversion, one a call: a typed unit, back to the
-   * number; the number; the unit and the category, back to the start, as clear all does. False
-   * when there is nothing left to clear.
+   * number; the number; in Cooking the ingredient, back to its ingredients to choose from; the
+   * unit and the category, back to the start, as clear all does. False when there is nothing left
+   * to clear.
    */
   const clearStep = (): boolean => {
     if (table.kind === 'matches' && table.query !== '') dispatch({ type: 'replace', text: number });
     else if (box.text !== '') dispatch({ type: 'replace', text: '' });
+    // One pill a step, as Backspace and the pills' own × take them (Sean, 2026-10-16).
+    else if (box.ingredient) dispatch({ type: 'removeIngredient' });
     // Cooking's ingredients to choose from count as its table.
-    else if (box.unit || box.ingredient || table.kind !== 'start') dispatch({ type: 'clear' });
+    else if (box.unit || table.kind !== 'start') dispatch({ type: 'clear' });
     else return false;
     setPosition(null);
     return true;

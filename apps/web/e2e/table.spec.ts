@@ -1292,12 +1292,47 @@ test('Cooking: "2 cups flour" takes the cup and the flour, two pills, Weight the
   ).toBeVisible();
   await expect(page).toHaveURL(/[?&]i=all-purpose-flour/);
 
-  // Backspace in an empty box takes the last pill out first: the flour, leaving Volume.
+  // Backspace in an empty box takes the last pill out first: the flour. Cooking stays, its
+  // ingredients to choose from, the cups waiting; then the cups, still Cooking (Sean, 2026-10-16).
   await box(page).fill('');
   await box(page).press('Backspace');
   await expect(page.getByRole('button', { name: 'Remove all-purpose flour' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
-  await expect(menu(page)).toHaveText(/Volume/);
+  await expect(menu(page)).toHaveText(/Cooking/);
+  await expect(page.getByRole('listbox', { name: 'Matches' })).toBeVisible();
+  await box(page).press('Backspace');
+  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(menu(page)).toHaveText(/Cooking/);
+});
+
+test('in Cooking, Escape and the pills’ × take one pill a step and keep Cooking; the start comes after both', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'Escape needs a keyboard');
+  await page.goto('/?a=us-cup&v=2&i=all-purpose-flour');
+  await ready(page);
+  await box(page).click();
+  await box(page).press('Escape');
+  await expect(box(page)).toHaveValue('');
+  await expect(page.getByRole('button', { name: 'Remove all-purpose flour' })).toBeVisible();
+  await box(page).press('Escape');
+  await expect(page.getByRole('button', { name: 'Remove all-purpose flour' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
+  await expect(menu(page)).toHaveText(/Cooking/);
+  await expect(page.getByRole('listbox', { name: 'Matches' })).toBeVisible();
+  await box(page).press('Escape');
+  await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
+  await expect(menu(page)).toHaveText(/^Category$/);
+  await expect(tiles(page)).toBeVisible();
+  // The pill's × is the same step: the flour goes, Cooking and the cups stay.
+  await page.goto('/?a=us-cup&v=2&i=all-purpose-flour');
+  await ready(page);
+  await page.getByRole('button', { name: 'Remove all-purpose flour' }).click();
+  await expect(menu(page)).toHaveText(/Cooking/);
+  await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
+  await expect(box(page)).toHaveValue('2');
+  await expect(page.getByRole('listbox', { name: 'Matches' })).toBeVisible();
 });
 
 test('Cooking’s box keeps one line where it can, fitted as with one pill: the unit’s symbol, then the sizes, then a line of their own', async ({

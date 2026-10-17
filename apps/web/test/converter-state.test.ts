@@ -489,9 +489,12 @@ describe('Cooking (ADR 0021)', () => {
     });
   });
 
-  it('takes the ingredient out to Volume, the unit out to Cooking’s list', () => {
-    const volume = run(flour(), { type: 'removeIngredient' });
-    expect(volume).toMatchObject({ category: 'volume', unit: 'us-cup', ingredient: null });
+  it('takes a pill out and keeps Cooking: the ingredient to its list, the unit to dashes', () => {
+    const list = run(flour(), { type: 'removeIngredient' });
+    expect(list).toMatchObject({ category: 'cooking', unit: 'us-cup', ingredient: null });
+    expect(selectTable(list, options)).toMatchObject({ kind: 'matches', category: 'cooking' });
+    // Both out, one at a time: still Cooking, with nothing in the box.
+    expect(reduce(list, { type: 'unlock' })).toMatchObject({ category: 'cooking', unit: null });
     const waiting = run(flour(), { type: 'unlock' });
     expect(waiting).toMatchObject({ category: 'cooking', unit: null });
     expect(units(waiting).rows.every((row) => row.tone === 'empty')).toBe(true);

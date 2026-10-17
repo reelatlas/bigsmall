@@ -16,18 +16,13 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **After the compaction, in order** (`docs/research/findings-0-first-pass.md`, the sixty-fourth pass, saved before a compaction; each plan there is ready to build):
-   1. About: Show all and Copy all as text on the categories' left edge, Every formula's heading centered.
-   2. Cooking's box on one line, fit by measurement (the unit's symbol, then the number's sizes), the pills under the number only where a phone lacks the room.
-   3. "Decimal" and "Fraction" in Display.
-   4. The categories lab retired, on Sean's go (recommended).
-   5. An Ingredient menu in Cooking's toolbar, grouped by kind, and the no-ingredient list grouped the same: a trial, on Sean's go.
-   6. Cooking's figures from several sources (`docs/research/cooking-2.md`), checked blind, the sources on About.
-      Then Search Console and Bing at Sean's screen, a text record at Porkbun (`docs/SEO.md` §3).
-2. **Open with Sean:** the SEO plan's other decisions ("bigsmall SEO plan", https://claude.ai/artifact/7eXfYjEdTn4zKXXGLug3pT). Trials: R6 as the mark (`1fa40fa`). Feedback undecided (the fiftieth pass); Umami's checks (`docs/DEPLOYMENT.md`, "Analytics").
-3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages built and launched (`docs/SEO.md`), in v1 on `bigsmall.work`; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
-4. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).
-5. **Later.** The hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search); the five-person test once there is traction.
+1. **Resume here: Cooking's figures, mid-way** (the sixty-fourth pass, item 6; `docs/research/findings-0-first-pass.md`). Reconciled and written in the working tree, uncommitted, gate and all browser tests passing: core's ingredients (each with its method, spread, sources, and note), the note under Cooking's table, About's lines, the tests, `docs/research/cooking-2.md` and `cooking-2/`, ADR 0021 amended, UX-SPEC, UNITS-CATALOG, TESTING, the accuracy audit, cooking-1.md superseded. Waiting on the citation check: the third reviewer's `check.md` and `check.csv` in the session scratchpad's `cooking-2/check/` (if gone, rerun it from `cooking-2/figures.py`'s sources). Apply its corrections in `docs/research/cooking-2/figures.py`, regenerate with `write_ingredients.py` (then Prettier) and `write_doc.py` (its second argument the check's summary, for the "Checked" section), copy `check.md`/`check.csv` into `cooking-2/`, gate, commit (`feat(cooking): ...`), push, and record the outcome in the findings log.
+2. **Then, with Sean:** Search Console and Bing at his screen, a text record at Porkbun (`docs/SEO.md` §3). Everything else of the sixty-fourth pass is live (items 1 to 5, the sketchbook's Doors fix, no hairline between the sticky headers): he tries them on his iPhone, and says whether the sketchbook still snaps.
+   - **His verdict:** the ingredient's pill opening every ingredient in the table's place, a trial (`396484a`; revert to drop it, the grouped list stays). The toolbar menu was built first and measured: two toolbar lines on a desktop, overrun on a phone.
+3. **Open with Sean:** the SEO plan's other decisions ("bigsmall SEO plan", https://claude.ai/artifact/7eXfYjEdTn4zKXXGLug3pT). Trials: R6 as the mark (`1fa40fa`), the ingredient's pill (`396484a`). Feedback undecided (the fiftieth pass); Umami's checks (`docs/DEPLOYMENT.md`, "Analytics").
+4. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages built and launched (`docs/SEO.md`), in v1 on `bigsmall.work`; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
+5. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).
+6. **Later.** The hygiene backlog and the explorations in `docs/PLAN.md` §2 (favorites, multiples, pace, typing fractions and feet and inches, keeping the math, choosing the sort, templates of settings, every category at once, search); the five-person test once there is traction.
 
 ## Non-negotiables
 

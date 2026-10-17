@@ -82,13 +82,16 @@ export function Sketchbook({ settings = SHIPPED, onPlayer }: SketchbookProps) {
       >
         {ids.map((id, index) => (
           <button
-            // A tile keeps its place; which sketch it shows is the play's.
+            // A tile keeps its place; which sketch it shows is the play's. It clips to its own
+            // corners at all times (clip, not hidden, which would make a scroll container), so a
+            // change's pieces never paint past it and nothing toggles as a change starts or ends;
+            // its focus ring, an outline, is outside the clip (motion.ts).
             key={index}
             type="button"
             data-sketch-tile
             data-sketch={id}
             aria-label={SKETCH_BY_ID.get(id)?.name ?? id}
-            className="relative block aspect-square w-full"
+            className="relative block aspect-square w-full overflow-clip"
             style={{ borderRadius: TILE_CORNER }}
           >
             {LAYERS.map((layer, at) => (

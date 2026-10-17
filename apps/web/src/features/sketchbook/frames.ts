@@ -28,14 +28,22 @@ export interface GlitchFrame {
   fringe: number;
 }
 
-/** A glitch's strength at frame `k` of `count`: rising to the middle, where the picture changes, then settling. */
+/**
+ * A glitch's strength at frame `k` of `count`: nothing at the first frame and the last, rising to
+ * the middle, where the picture changes. The last frame is the new picture at rest, so the settle
+ * after it paints nothing new: a last frame still shifted a pixel or two, with a fringe, snapped
+ * (Sean, 2026-10-17). A change of two frames is a cut.
+ */
 export function envelope(k: number, count: number): number {
-  return Math.sin((Math.PI * (k + 0.5)) / count);
+  // Exactly 0 at the ends: sin(π) is not, and a hair of power would still cut bands.
+  if (k <= 0 || k >= count - 1) return 0;
+  return Math.sin((Math.PI * k) / (count - 1));
 }
 
 /**
  * One frame of a glitch: one to three bands, each in its own third of the tile so none overlap,
- * together at most FLICKER_SHARE of it, shifted as far as the envelope and `strength` allow.
+ * together at most FLICKER_SHARE of it, shifted as far as the envelope and `strength` allow; at no
+ * power, none, so the picture shows whole.
  */
 export function glitchFrame(
   k: number,
@@ -44,7 +52,7 @@ export function glitchFrame(
   random: () => number,
 ): GlitchFrame {
   const power = envelope(k, count) * strength;
-  const zones = 1 + Math.floor(random() * 3);
+  const zones = power > 0 ? 1 + Math.floor(random() * 3) : 0;
   const bands: Band[] = [];
   for (let zone = 0; zone < zones; zone++) {
     const height = (FLICKER_SHARE / zones) * (0.4 + 0.6 * random());
@@ -102,20 +110,106 @@ export function scanFrame(
 /** A fraction as a percentage, rounded so a clip-path stays short. */
 const pct = (fraction: number) => `${Number((fraction * 100).toFixed(3))}%`;
 
-/** A band of a tile as a clip-path, reaching past its sides so a split edge still shows. */
-export function bandClip({ top, height }: Pick<Band, 'top' | 'height'>): string {
-  return `inset(${pct(top)} -10% ${pct(1 - top - height)} -10%)`;
+/** A length in CSS px, rounded so a clip-path stays short. */
+const px = (length: number) => `${Number(length.toFixed(3))}px`;
+
+/**
+ * Where a tile's fractions fall as a clip-path's lengths, each edge measured from the side it is
+ * nearest: `top(f)` is the inset from the top to f of the height, `bottom(f)` the inset from the
+ * bottom up to it, and so across. `over` asks for the edge `over` device pixels further out.
+ *
+ * Two clips that meet on a fractional device pixel are each antialiased there, and between them a
+ * seam of what lies under shows: the canvas through Glitch's holes, the sketch leaving between
+ * Scan's drawn part and its beam. A piece reaching a device pixel past the edge it shares covers
+ * the seam, but where its own softened edge crosses a shape, the piece's ground tints the shape a
+ * quarter. So an edge from a tile's measured box (`grainOf`) sits on the device's pixel grid, where
+ * nothing is antialiased, and the piece on top reaches one device pixel past it, which still covers
+ * the seam when the grid moves under the tile (a page scrolled to a fraction of a pixel). `PLAIN`
+ * writes percentages, exact: for a clip that animates (Blinds) and for tests of a frame's shape
+ * (docs/LEARNINGS.md, 2026-10-17).
+ */
+export interface Grain {
+  top(fraction: number, over?: number): string;
+  bottom(fraction: number, over?: number): string;
+  left(fraction: number, over?: number): string;
+  right(fraction: number, over?: number): string;
+}
+
+/** A tile's box on the page, in CSS px, as getBoundingClientRect gives it. */
+export interface Box {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/** Fractions as percentages, every edge exact. */
+export const PLAIN: Grain = {
+  top: pct,
+  bottom: (fraction) => pct(1 - fraction),
+  left: pct,
+  right: (fraction) => pct(1 - fraction),
+};
+
+/**
+ * A tile's grain from its box and the screen's device pixels per CSS px: each edge on the device
+ * pixel nearest to where the fraction falls on the page, `over` device pixels further out.
+ */
+export function grainOf({ left, top, width, height }: Box, dpr: number): Grain {
+  // Where a fraction of a side lands, snapped to the page's device pixels, as CSS px from the
+  // side's start.
+  const snap = (start: number, fraction: number, size: number, over: number) =>
+    (Math.round((start + fraction * size) * dpr) + over) / dpr - start;
+  return {
+    top: (fraction, over = 0) => px(snap(top, fraction, height, -over)),
+    bottom: (fraction, over = 0) => px(height - snap(top, fraction, height, over)),
+    left: (fraction, over = 0) => px(snap(left, fraction, width, -over)),
+    right: (fraction, over = 0) => px(width - snap(left, fraction, width, over)),
+  };
+}
+
+/** How far a piece reaches past the edge it shares with another, in device pixels. */
+export const OVER = 1;
+
+/**
+ * A band of a tile as a clip-path, reaching past its sides so a split edge still shows, and
+ * `over` device pixels past its top and bottom, over the edges of the hole it fills.
+ */
+export function bandClip(
+  { top, height }: Pick<Band, 'top' | 'height'>,
+  grain: Grain = PLAIN,
+  over = 0,
+): string {
+  return `inset(${grain.top(top, over)} -10% ${grain.bottom(top + height, over)} -10%)`;
+}
+
+/**
+ * The top or bottom half of a tile as a clip-path (Flap), reaching `over` device pixels past the
+ * middle. Flap gives the reach to the front's bottom half, under every other layer: where two
+ * softened edges meet on a fraction of a pixel, the seam then shows the sketch leaving, never the
+ * canvas, and nothing of it shows otherwise. The back's half and the halves that turn keep the
+ * middle exact: a sliver of theirs past it would show as a line of the next sketch, or stay at a
+ * hinge.
+ */
+export function halfClip(half: 'top' | 'bottom', grain: Grain = PLAIN, over = 0): string {
+  return half === 'top'
+    ? `inset(0 0 ${grain.bottom(0.5, over)} 0)`
+    : `inset(${grain.top(0.5, over)} 0 0 0)`;
 }
 
 /**
  * The tile with its bands cut out, as a clip-path reaching past its sides: each band a loop of its
- * own, which the even-odd rule makes a hole, joined to the outline along its left side.
+ * own, which the even-odd rule makes a hole, joined to the outline along its left side. The holes
+ * are exact: the bands reach over their edges.
  */
-export function cutClip(bands: readonly Pick<Band, 'top' | 'height'>[]): string {
+export function cutClip(
+  bands: readonly Pick<Band, 'top' | 'height'>[],
+  grain: Grain = PLAIN,
+): string {
   const [left, right] = ['-10%', '110%'];
   const points = [`${left} -10%`, `${right} -10%`, `${right} 110%`, `${left} 110%`, `${left} -10%`];
   for (const { top, height } of bands) {
-    const [upper, lower] = [pct(top), pct(top + height)];
+    const [upper, lower] = [grain.top(top), grain.top(top + height)];
     points.push(
       `${left} ${upper}`,
       `${right} ${upper}`,
@@ -129,28 +223,37 @@ export function cutClip(bands: readonly Pick<Band, 'top' | 'height'>[]): string 
 }
 
 /** The top of a tile, down to `drawn` of its height, as a clip-path. */
-export const drawnClip = (drawn: number) => `inset(0 0 ${pct(1 - drawn)} 0)`;
+export const drawnClip = (drawn: number, grain: Grain = PLAIN) =>
+  `inset(0 0 ${grain.bottom(drawn)} 0)`;
 
-/** One block of the Scramble grid as a clip-path. */
-export function blockClip(block: number): string {
+/**
+ * One block of the Scramble grid as a clip-path, `over` device pixels past each side, over its
+ * neighbors' edges.
+ */
+export function blockClip(block: number, grain: Grain = PLAIN, over = 0): string {
   const size = 1 / BLOCKS;
   const x = (block % BLOCKS) * size;
   const y = Math.floor(block / BLOCKS) * size;
-  return `inset(${pct(y)} ${pct(1 - x - size)} ${pct(1 - y - size)} ${pct(x)})`;
+  return `inset(${grain.top(y, over)} ${grain.right(x + size, over)} ${grain.bottom(y + size, over)} ${grain.left(x, over)})`;
 }
 
 /**
  * Blocks of the Scramble grid as one clip-path: each a loop from the corner and back along the
  * same line, which the even-odd rule leaves out, so the blocks show and the lines do not.
  */
-export function blocksClip(blocks: readonly number[]): string {
+export function blocksClip(blocks: readonly number[], grain: Grain = PLAIN): string {
   if (blocks.length === 0) return 'inset(50%)';
   const size = 1 / BLOCKS;
   const points = ['0% 0%'];
   for (const block of blocks) {
     const x = (block % BLOCKS) * size;
     const y = Math.floor(block / BLOCKS) * size;
-    const [left, right, top, bottom] = [pct(x), pct(x + size), pct(y), pct(y + size)];
+    const [left, right, top, bottom] = [
+      grain.left(x),
+      grain.left(x + size),
+      grain.top(y),
+      grain.top(y + size),
+    ];
     points.push(
       `${left} ${top}`,
       `${right} ${top}`,

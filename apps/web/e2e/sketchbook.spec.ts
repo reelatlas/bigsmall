@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { bandClip, cutClip, grainOf, halfClip, OVER } from '../src/features/sketchbook/frames';
 import {
   SKETCH_BY_ID,
   SKETCH_EFFECTS,
@@ -50,6 +51,168 @@ const named = (tile: Locator) =>
     id: (element as HTMLElement).dataset['sketch'],
     name: element.getAttribute('aria-label'),
   }));
+
+/** A box in device pixels, as a screenshot taken at the device's scale has it. */
+interface DeviceRect {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+/**
+ * Pixel checks on screenshots, decoded in the page itself (an image on a canvas), so no pixel data
+ * crosses to the test. A pixel "differs" by more than `tolerance` of 255 in a channel: an
+ * antialiased seam shows a quarter of the canvas through, 50 or more on a dark tile.
+ */
+const PIXELS = {
+  /** Pixels outside every rect that are not the canvas color, exactly. */
+  async outside(
+    page: Page,
+    png: Buffer,
+    rects: DeviceRect[],
+    canvas: [number, number, number],
+  ): Promise<number> {
+    return page.evaluate(
+      ([b64, rects, canvas]) =>
+        new Promise<number>((resolve) => {
+          const image = new Image();
+          image.onload = () => {
+            const sheet = document.createElement('canvas');
+            sheet.width = image.naturalWidth;
+            sheet.height = image.naturalHeight;
+            const context = sheet.getContext('2d')!;
+            context.drawImage(image, 0, 0);
+            const { data } = context.getImageData(0, 0, sheet.width, sheet.height);
+            let count = 0;
+            for (let y = 0; y < sheet.height; y++) {
+              for (let x = 0; x < sheet.width; x++) {
+                if (rects.some((r) => x >= r.x0 && x < r.x1 && y >= r.y0 && y < r.y1)) continue;
+                const i = (y * sheet.width + x) * 4;
+                if (data[i] !== canvas[0] || data[i + 1] !== canvas[1] || data[i + 2] !== canvas[2])
+                  count++;
+              }
+            }
+            resolve(count);
+          };
+          image.src = `data:image/png;base64,${b64}`;
+        }),
+      [png.toString('base64'), rects, canvas] as const,
+    );
+  },
+  /** The color at a point, and the image's size. */
+  async at(page: Page, png: Buffer, x: number, y: number): Promise<[number, number, number]> {
+    return page.evaluate(
+      ([b64, x, y]) =>
+        new Promise<[number, number, number]>((resolve) => {
+          const image = new Image();
+          image.onload = () => {
+            const sheet = document.createElement('canvas');
+            sheet.width = image.naturalWidth;
+            sheet.height = image.naturalHeight;
+            const context = sheet.getContext('2d')!;
+            context.drawImage(image, 0, 0);
+            const { data } = context.getImageData(x, y, 1, 1);
+            resolve([data[0]!, data[1]!, data[2]!]);
+          };
+          image.src = `data:image/png;base64,${b64}`;
+        }),
+      [png.toString('base64'), x, y] as const,
+    );
+  },
+  /**
+   * Pixels differing between two screenshots of the same size by more than `tolerance`; with
+   * `rows`, the rows in which more than a quarter of the pixels differ instead: a seam runs the
+   * width of a tile, while a clipped layer draws a shape's antialiased edge a hair differently,
+   * single pixels along the edge.
+   */
+  async differing(page: Page, a: Buffer, b: Buffer, tolerance = 8, rows = false): Promise<number> {
+    return page.evaluate(
+      ([first, second, tolerance, rows]) =>
+        new Promise<number>((resolve) => {
+          const load = (b64: string) =>
+            new Promise<HTMLImageElement>((done) => {
+              const image = new Image();
+              image.onload = () => done(image);
+              image.src = `data:image/png;base64,${b64}`;
+            });
+          void Promise.all([load(first), load(second)]).then(([one, two]) => {
+            const read = (image: HTMLImageElement) => {
+              const sheet = document.createElement('canvas');
+              sheet.width = image.naturalWidth;
+              sheet.height = image.naturalHeight;
+              const context = sheet.getContext('2d')!;
+              context.drawImage(image, 0, 0);
+              return context.getImageData(0, 0, sheet.width, sheet.height).data;
+            };
+            const [p, q] = [read(one), read(two)];
+            if (p.length !== q.length) {
+              resolve(Number.POSITIVE_INFINITY);
+              return;
+            }
+            const width = one.naturalWidth;
+            let count = 0;
+            let seams = 0;
+            let inRow = 0;
+            for (let i = 0; i < p.length; i += 4) {
+              if (
+                Math.abs(p[i]! - q[i]!) > tolerance ||
+                Math.abs(p[i + 1]! - q[i + 1]!) > tolerance ||
+                Math.abs(p[i + 2]! - q[i + 2]!) > tolerance
+              ) {
+                count++;
+                inRow++;
+              }
+              if ((i / 4 + 1) % width === 0) {
+                if (inRow > width / 4) seams++;
+                inRow = 0;
+              }
+            }
+            resolve(rows ? seams : count);
+          });
+        }),
+      [a.toString('base64'), b.toString('base64'), tolerance, rows] as const,
+    );
+  },
+};
+
+/**
+ * Each tile's box in device pixels relative to the grid's screenshot, a device pixel wider on
+ * every side: at a scale that is not whole (a Pixel's 2.625) a tile's edge falls between device
+ * pixels, and the pixel it straddles is partly the tile's at rest.
+ */
+async function deviceBoxes(page: Page) {
+  return page.evaluate(() => {
+    const grid = document.querySelector('[data-playing]')!.getBoundingClientRect();
+    const scale = window.devicePixelRatio;
+    const boxes = [...document.querySelectorAll('[data-sketch-tile]')].map((tile) => {
+      const r = tile.getBoundingClientRect();
+      return { left: r.left, top: r.top, width: r.width, height: r.height };
+    });
+    const tiles = boxes.map((r) => ({
+      x0: Math.floor((r.left - grid.left) * scale) - 1,
+      y0: Math.floor((r.top - grid.top) * scale) - 1,
+      x1: Math.ceil((r.left + r.width - grid.left) * scale) + 1,
+      y1: Math.ceil((r.top + r.height - grid.top) * scale) + 1,
+    }));
+    return { scale, tiles, boxes };
+  });
+}
+
+/** The tile's layers styled as one frame of a change would style them, by layer index. */
+const styleLayers = (tile: Locator, plan: Record<number, Record<string, string>>) =>
+  tile.evaluate((element, plan) => {
+    const id = (element as HTMLElement).dataset['sketch'];
+    const layers = [...element.querySelectorAll('svg')];
+    for (const layer of layers) layer.removeAttribute('style');
+    for (const [index, style] of Object.entries(plan)) {
+      const layer = layers[Number(index)]!;
+      layer.querySelector('use')!.setAttribute('href', `#sketch-${id}`);
+      for (const [property, value] of Object.entries(style)) {
+        layer.style.setProperty(property, value);
+      }
+    }
+  }, plan);
 
 test('hovering a tile changes it once, as shipped, and again on the next hover', async ({
   page,
@@ -352,6 +515,84 @@ test('under reduced motion there is nothing to pause', async ({ page }) => {
   await page.locator('[data-playing]').waitFor();
   await expect(page.getByRole('button', { name: 'Flip', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeHidden();
+});
+
+test('a change stays inside its tile: Glitch paints nothing past the tiles, and its last frame is the settled one', async ({
+  page,
+}) => {
+  // A phone's width, where the bands reached across the gap into the next tile (Sean's iPhone,
+  // 2026-10-17). The clock is the test's, so every frame of the change is seen, in order.
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.clock.install();
+  await openLab(page, { effect: 'glitch' });
+  await page.clock.pauseAt(Date.now() + 1000);
+  const grid = page.locator('[data-playing]');
+  const { tiles: boxes } = await deviceBoxes(page);
+  const shot = () => grid.screenshot({ scale: 'device', animations: 'allow' });
+  const rest = await shot();
+  // The canvas, read from the gap between the first two tiles at rest.
+  const canvas = await PIXELS.at(
+    page,
+    rest,
+    Math.round((boxes[0]!.x1 + boxes[1]!.x0) / 2),
+    Math.round((boxes[1]!.y0 + boxes[1]!.y1) / 2),
+  );
+  expect(await PIXELS.outside(page, rest, boxes, canvas)).toBe(0);
+
+  const tile = tiles(page).nth(1);
+  const signature = () =>
+    tile.evaluate((element) => ({
+      next: (element as HTMLElement).dataset['next'] ?? null,
+      styles: [...element.querySelectorAll('svg')].map((l) => l.getAttribute('style')).join('|'),
+    }));
+  // A click with no pointer and no focus: no hover to queue a second change, no focus ring.
+  await tile.dispatchEvent('click');
+  let last = '';
+  let lastFrame: Buffer | null = null;
+  let frames = 0;
+  for (let elapsed = 0; elapsed <= swapMs + 2 * 16; elapsed += 16) {
+    const { next, styles } = await signature();
+    if (!next) break;
+    if (styles !== last) {
+      last = styles;
+      lastFrame = await shot();
+      frames++;
+      expect(await PIXELS.outside(page, lastFrame, boxes, canvas), `frame ${frames}`).toBe(0);
+    }
+    await page.clock.runFor(16);
+  }
+  expect(frames).toBeGreaterThan(4);
+  await expect(tile).not.toHaveAttribute('data-next');
+  const settled = await shot();
+  expect(await PIXELS.outside(page, settled, boxes, canvas)).toBe(0);
+  // The last frame drawn is the new picture at rest: the settle after it paints nothing new.
+  expect(await PIXELS.differing(page, lastFrame!, settled)).toBe(0);
+});
+
+test('a piece meets the edge it shares without a seam: a band over its hole, Flap’s halves', async ({
+  page,
+}) => {
+  await openLab(page);
+  const tile = tiles(page).nth(1);
+  const { scale, boxes } = await deviceBoxes(page);
+  const grain = grainOf(boxes[1]!, scale);
+  const shot = () => tile.screenshot({ scale: 'device', animations: 'allow' });
+  const rest = await shot();
+  // A frame built by hand as motion.ts builds one, every piece showing the tile's own sketch,
+  // unshifted: the picture should be the tile at rest, with no row of it changed. The band's top
+  // falls between device pixels at any size before the grain snaps it.
+  const band = { top: 0.303, height: 0.08 };
+  await styleLayers(tile, {
+    0: { 'clip-path': cutClip([band], grain) },
+    2: { opacity: '1', 'clip-path': bandClip(band, grain, OVER), transform: 'translateX(0px)' },
+  });
+  expect(await PIXELS.differing(page, await shot(), rest, 8, true), 'a band over its hole').toBe(0);
+  await styleLayers(tile, {
+    0: { 'clip-path': halfClip('bottom', grain, OVER) },
+    1: { opacity: '1', 'clip-path': halfClip('top', grain) },
+  });
+  expect(await PIXELS.differing(page, await shot(), rest, 8, true), 'Flap’s halves').toBe(0);
+  await styleLayers(tile, {});
 });
 
 test('the tiles sit on whole pixels at any width, their edges on device pixels', async ({

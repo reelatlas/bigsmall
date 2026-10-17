@@ -6,10 +6,14 @@ import {
   cutClip,
   drawnClip,
   glitchFrame,
+  grainOf,
+  halfClip,
+  OVER,
   scanFrame,
   scrambleFrame,
   scrambleOrder,
   slatsClip,
+  type Grain,
 } from './frames';
 import {
   deckOf,
@@ -33,6 +37,14 @@ import {
  * tile into. The moving effects, Flap, and Doors run on the Web Animations API; the stepped ones
  * draw a frame every frameMs, planned in frames.ts. Under reduced motion nothing changes by
  * itself: a press cross-fades, and Flip changes every tile at once.
+ *
+ * A change stays inside its tile: the tile clips to its corners at all times (Sketchbook.tsx), so
+ * Glitch's shifted bands, Blur's halo, and the perspective of a turn never paint over the gap or a
+ * neighbor, and nothing toggles at a change's start or end. Where two pieces meet (a band and its
+ * hole, Scan's beam and the part drawn, Scramble's blocks, Flap's halves) the edges sit on the
+ * device's pixels and the piece on top reaches one past (the tile's `Grain`, frames.ts), since two
+ * edges antialiased on the same fractional pixel leave a seam of what lies under
+ * (docs/LEARNINGS.md, 2026-10-17).
  */
 
 /** Where a sketch's symbol is on the page (SketchSprite.astro). */
@@ -118,8 +130,6 @@ type Moving = Exclude<SketchEffect, 'glitch' | 'scramble' | 'scan' | 'flap' | 'd
 interface Moves {
   front: Keyframe[];
   back: Keyframe[];
-  /** The tile clips the layers to its corners while they move (a slide). */
-  clip: boolean;
 }
 
 /** How each moving effect moves the layers; `size` is the tile's width in px. */
@@ -127,18 +137,24 @@ function moves(effect: Moving, size: number, at: Point): Moves {
   const turn = (axis: 'rotateX' | 'rotateY'): Moves => {
     // Depth in proportion to the tile, so a flip looks the same at every size.
     const angle = (degrees: number) => `perspective(${size * 4}px) ${axis}(${degrees}deg)`;
+    // The sketch showing turns edge-on, then the next turns in from edge-on. Each is hidden while
+    // it stands at 90°: WebKit draws a layer turned edge-on through its own perspective() as a slab
+    // a quarter of the tile wide, the next sketch standing in the middle of the one leaving for the
+    // first half of every flip (Sean's iPhone, 2026-10-17; docs/LEARNINGS.md). The step at 0.5
+    // changes nothing where edge-on is drawn as nothing.
     return {
       front: [
-        { transform: angle(0) },
-        { offset: 0.5, transform: angle(90) },
-        { transform: angle(90) },
+        { transform: angle(0), opacity: 1 },
+        { offset: 0.5, transform: angle(90), opacity: 1 },
+        { offset: 0.5, transform: angle(90), opacity: 0 },
+        { transform: angle(90), opacity: 0 },
       ],
       back: [
-        { transform: angle(-90), opacity: 1 },
+        { transform: angle(-90), opacity: 0 },
+        { offset: 0.5, transform: angle(-90), opacity: 0 },
         { offset: 0.5, transform: angle(-90), opacity: 1 },
         { transform: angle(0), opacity: 1 },
       ],
-      clip: false,
     };
   };
   switch (effect) {
@@ -158,7 +174,6 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { offset: 0.45, transform: 'scale(0.6)', opacity: 0 },
           { transform: 'scale(1)', opacity: 1 },
         ],
-        clip: false,
       };
     case 'slide':
       return {
@@ -167,7 +182,6 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { transform: 'translateY(100%)', opacity: 1 },
           { transform: 'translateY(0)', opacity: 1 },
         ],
-        clip: true,
       };
     case 'iris': {
       // Open far enough to cover the corner farthest from where it starts, in the tile's widths.
@@ -185,7 +199,6 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { clipPath: circle(0), opacity: 1 },
           { clipPath: circle(reach * 100 + 2), opacity: 1 },
         ],
-        clip: false,
       };
     }
     case 'blur': {
@@ -199,7 +212,6 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { opacity: 0, filter: blurred, transform: 'scale(0.92)' },
           { opacity: 1, filter: 'blur(0)', transform: 'scale(1)' },
         ],
-        clip: false,
       };
     }
     case 'spin':
@@ -214,13 +226,11 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { offset: 0.5, transform: 'rotate(-180deg) scale(0)', opacity: 1 },
           { transform: 'rotate(0deg) scale(1)', opacity: 1 },
         ],
-        clip: false,
       };
     case 'fade':
       return {
         front: [{ opacity: 1 }, { opacity: 0 }],
         back: [{ opacity: 0 }, { opacity: 1 }],
-        clip: false,
       };
     case 'dive': {
       // Into the small one, which sits low and to the right in most sketches; the next grows
@@ -237,7 +247,6 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { ...into, offset: 0.3, transform: 'scale(0.3)', opacity: 1 },
           { ...into, transform: 'scale(1)', opacity: 1 },
         ],
-        clip: true,
       };
     }
     case 'blinds':
@@ -247,7 +256,6 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { clipPath: slatsClip(0), opacity: 1 },
           { clipPath: slatsClip(1), opacity: 1 },
         ],
-        clip: false,
       };
     case 'drop':
       return {
@@ -263,7 +271,6 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { offset: 0.86, transform: 'translateY(-8%)', opacity: 1 },
           { transform: 'translateY(0)', opacity: 1 },
         ],
-        clip: true,
       };
     case 'squash': {
       // Flat on its base, as a cartoon squashes, and back up past its height before it settles.
@@ -281,7 +288,6 @@ function moves(effect: Moving, size: number, at: Point): Moves {
           { ...base, offset: 0.86, transform: 'scale(1.04, 0.96)', opacity: 1 },
           { ...base, transform: 'scale(1, 1)', opacity: 1 },
         ],
-        clip: false,
       };
     }
   }
@@ -307,13 +313,16 @@ const split = (strength: number, size: number) => {
 /**
  * Flap, like a split-flap board's card: the top half of the sketch showing falls toward the
  * viewer, uncovering the next one's top, and the next one's bottom half falls after it, each
- * darkening as it turns from the light.
+ * darkening as it turns from the light. The front's bottom half, under everything, reaches a
+ * device pixel over the middle, so a seam there can only show the sketch leaving; the back's half
+ * and the halves that turn keep the middle exact (halfClip).
  */
 function flap(
   layers: Layers,
   from: string,
   to: string,
   size: number,
+  grain: Grain,
   options: KeyframeAnimationOptions,
 ): Animation[] {
   const [falling, landing] = layers.pieces;
@@ -321,8 +330,9 @@ function flap(
   show(falling, from);
   show(landing, to);
   const turned = (degrees: number) => `perspective(${size * 4}px) rotateX(${degrees}deg)`;
-  const top = 'inset(0 0 50% 0)';
-  const bottom = 'inset(50% 0 0 0)';
+  const top = halfClip('top', grain);
+  const bottom = halfClip('bottom', grain);
+  const under = halfClip('bottom', grain, OVER);
   return [
     layers.back.animate(
       [
@@ -331,7 +341,9 @@ function flap(
       ],
       options,
     ),
-    layers.front.animate([{ clipPath: bottom }, { clipPath: bottom }], options),
+    layers.front.animate([{ clipPath: under }, { clipPath: under }], options),
+    // Each half is hidden while it stands edge-on, as a turn's layers are (moves): WebKit draws it
+    // there as a slab across the middle.
     falling.animate(
       [
         { clipPath: top, opacity: 1, transform: turned(0), filter: 'brightness(1)' },
@@ -342,13 +354,27 @@ function flap(
           transform: turned(-90),
           filter: 'brightness(0.6)',
         },
+        {
+          offset: 0.5,
+          clipPath: top,
+          opacity: 0,
+          transform: turned(-90),
+          filter: 'brightness(0.6)',
+        },
         { clipPath: top, opacity: 0, transform: turned(-90), filter: 'brightness(0.6)' },
       ],
       options,
     ),
     landing.animate(
       [
-        { clipPath: bottom, opacity: 1, transform: turned(90), filter: 'brightness(0.6)' },
+        { clipPath: bottom, opacity: 0, transform: turned(90), filter: 'brightness(0.6)' },
+        {
+          offset: 0.5,
+          clipPath: bottom,
+          opacity: 0,
+          transform: turned(90),
+          filter: 'brightness(0.6)',
+        },
         {
           offset: 0.5,
           clipPath: bottom,
@@ -396,8 +422,8 @@ export function doorFrames({
 
 /**
  * Doors: the sketch showing splits down the middle and its halves swing open toward the viewer,
- * with the next sketch behind them (doorFrames). The tile holds their depth and clips them to
- * itself.
+ * with the next sketch behind them (doorFrames). The tile holds their depth; neither half reaches
+ * past the middle, since the next sketch, whole, lies under them.
  */
 function doors(
   tile: HTMLElement,
@@ -410,7 +436,6 @@ function doors(
   if (halves.length < DOORS.length) return [];
   for (const half of halves) show(half, from);
   tile.style.perspective = `${size * 4}px`;
-  tile.style.overflow = 'hidden';
   return [
     layers.front.animate([{ opacity: 0 }, { opacity: 0 }], options),
     layers.back.animate([{ opacity: 1 }, { opacity: 1 }], options),
@@ -505,7 +530,10 @@ export function play(
     return lastEffect;
   };
 
-  /** One frame of Glitch: the picture showing cut into shifted bands, its edges split. */
+  /**
+   * One frame of Glitch: the picture showing cut into shifted bands, its edges split. Each band
+   * reaches a device pixel past its hole's edges, so no seam of canvas shows between them.
+   */
   const glitch = (
     layers: Layers,
     from: string,
@@ -513,6 +541,7 @@ export function play(
     k: number,
     count: number,
     size: number,
+    grain: Grain,
   ) => {
     const arriving = k >= count / 2;
     const base = arriving ? layers.back : layers.front;
@@ -523,7 +552,9 @@ export function play(
     }
     const { bands, fringe } = glitchFrame(k, count, live.current.tuning.strength, random);
     const edges = fringe > 0.05 ? split(fringe, size) : '';
-    base.style.clipPath = cutClip(bands);
+    // With nothing to cut (the first frame and the last), the picture shows whole, unclipped: the
+    // last frame is then the settled tile, and the settle paints nothing new.
+    base.style.clipPath = bands.length ? cutClip(bands, grain) : '';
     base.style.filter = edges;
     layers.pieces.forEach((piece, index) => {
       const band = bands[index];
@@ -533,17 +564,26 @@ export function play(
       }
       show(piece, band.other ? another(sketch) : sketch);
       piece.style.opacity = '1';
-      piece.style.clipPath = bandClip(band);
+      piece.style.clipPath = bandClip(band, grain, OVER);
       piece.style.transform = `translateX(${band.shift * size}px)`;
       piece.style.filter = edges;
     });
   };
 
-  /** One frame of Scramble: the blocks landed so far, and the next few flipping through others. */
-  const scramble = (layers: Layers, to: string, order: readonly number[], progress: number) => {
+  /**
+   * One frame of Scramble: the blocks landed so far, and the next few flipping through others,
+   * each a device pixel past its sides, over the landed blocks' edges.
+   */
+  const scramble = (
+    layers: Layers,
+    to: string,
+    order: readonly number[],
+    progress: number,
+    grain: Grain,
+  ) => {
     const { landed, flipping } = scrambleFrame(order, progress);
     layers.back.style.opacity = '1';
-    layers.back.style.clipPath = blocksClip(landed);
+    layers.back.style.clipPath = blocksClip(landed, grain);
     layers.pieces.forEach((piece, index) => {
       const block = flipping[index];
       if (block === undefined) {
@@ -552,15 +592,18 @@ export function play(
       }
       show(piece, another(to));
       piece.style.opacity = '1';
-      piece.style.clipPath = blockClip(block);
+      piece.style.clipPath = blockClip(block, grain, OVER);
     });
   };
 
-  /** One frame of Scan: the next sketch drawn down to a row, the row under it bright. */
-  const scan = (layers: Layers, to: string, progress: number, size: number) => {
+  /**
+   * One frame of Scan: the next sketch drawn down to a row, the row under it bright, reaching a
+   * device pixel over the drawn part's edge.
+   */
+  const scan = (layers: Layers, to: string, progress: number, size: number, grain: Grain) => {
     const { drawn, row } = scanFrame(progress, random);
     layers.back.style.opacity = '1';
-    layers.back.style.clipPath = drawnClip(drawn);
+    layers.back.style.clipPath = drawnClip(drawn, grain);
     const [beam] = layers.pieces;
     if (!beam) return;
     if (!row) {
@@ -569,7 +612,7 @@ export function play(
     }
     show(beam, to);
     beam.style.opacity = '1';
-    beam.style.clipPath = bandClip(row);
+    beam.style.clipPath = bandClip(row, grain, OVER);
     beam.style.transform = `translateX(${row.shift * size}px)`;
     beam.style.filter = 'brightness(1.5) saturate(1.3)';
   };
@@ -581,15 +624,16 @@ export function play(
     from: string,
     to: string,
     size: number,
+    grain: Grain,
   ): { run: Run; ended: Promise<boolean> } => {
     const { swapMs, frameMs } = live.current.timing;
     const pace = Math.max(FRAME_MS, frameMs);
     const count = Math.max(2, Math.round(swapMs / pace));
     const order = scrambleOrder(random);
     const drawFrame = (k: number, progress: number) => {
-      if (effect === 'glitch') glitch(layers, from, to, k, count, size);
-      else if (effect === 'scramble') scramble(layers, to, order, progress);
-      else scan(layers, to, progress, size);
+      if (effect === 'glitch') glitch(layers, from, to, k, count, size, grain);
+      else if (effect === 'scramble') scramble(layers, to, order, progress, grain);
+      else scan(layers, to, progress, size, grain);
     };
     let resolve: (arrived: boolean) => void = () => {};
     const ended = new Promise<boolean>((settled) => {
@@ -644,10 +688,13 @@ export function play(
     show(layers.back, id);
     tile.dataset['next'] = id;
     const effect = effectFor();
-    const size = tile.getBoundingClientRect().width;
+    const box = tile.getBoundingClientRect();
+    const size = box.width;
+    // Where the pieces' edges fall: on the screen's device pixels (frames.ts, Grain).
+    const grain = grainOf(box, window.devicePixelRatio || 1);
     let ended: Promise<boolean>;
     if (STEPPED_EFFECTS.has(effect)) {
-      const steps = stepped(effect, layers, own, id, size);
+      const steps = stepped(effect, layers, own, id, size, grain);
       state.run = steps.run;
       ended = steps.ended;
     } else {
@@ -657,11 +704,10 @@ export function play(
         fill: 'forwards',
       };
       let animations: Animation[];
-      if (effect === 'flap') animations = flap(layers, own, id, size, options);
+      if (effect === 'flap') animations = flap(layers, own, id, size, grain, options);
       else if (effect === 'doors') animations = doors(tile, layers, own, size, options);
       else {
         const motion = moves(effect as Moving, size, at);
-        if (motion.clip) tile.style.overflow = 'hidden';
         animations = [
           layers.front.animate(motion.front, options),
           layers.back.animate(motion.back, options),
@@ -691,7 +737,6 @@ export function play(
         for (const animation of layer.getAnimations()) animation.cancel();
         layer.removeAttribute('style');
       }
-      tile.style.overflow = '';
       tile.style.perspective = '';
       state.run = null;
       state.done = null;

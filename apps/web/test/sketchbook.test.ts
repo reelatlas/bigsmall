@@ -12,6 +12,9 @@ import {
   envelope,
   FLICKER_SHARE,
   glitchFrame,
+  grainOf,
+  halfClip,
+  OVER,
   scanFrame,
   scrambleFrame,
   scrambleOrder,
@@ -136,14 +139,21 @@ describe('the stepped changes', () => {
   });
 
   it('glitch hardest in the middle, where the picture changes, and not at all at no strength', () => {
-    expect(envelope(0, 16)).toBeLessThan(0.1);
-    expect(envelope(15, 16)).toBeLessThan(0.1);
     expect(envelope(8, 16)).toBeGreaterThan(0.99);
     const { bands, fringe } = glitchFrame(8, 16, 0, seeded());
     expect(fringe).toBe(0);
-    for (const band of bands) {
-      expect(Math.abs(band.shift)).toBe(0);
-      expect(band.other).toBe(false);
+    expect(bands).toEqual([]);
+  });
+
+  it('glitch not at all at its first frame and its last, so the settle after it paints nothing new', () => {
+    for (const count of [2, 3, 16, 20, 41]) {
+      expect(envelope(0, count), `${count}`).toBeCloseTo(0, 12);
+      expect(envelope(count - 1, count), `${count}`).toBeCloseTo(0, 12);
+      expect(glitchFrame(count - 1, count, 1, seeded()).bands).toEqual([]);
+      // Every frame between glitches; the middle hardest.
+      for (let k = 1; k < count - 1; k++) {
+        expect(envelope(k, count), `${k} of ${count}`).toBeGreaterThan(0);
+      }
     }
   });
 
@@ -180,6 +190,46 @@ describe('the stepped changes', () => {
       'polygon(evenodd, 0% 0%, 0% 0%, 25% 0%, 25% 25%, 0% 25%, 0% 0%, 0% 0%)',
     );
     expect(drawnClip(0.25)).toBe('inset(0 0 75% 0)');
+  });
+
+  it('put the pieces’ edges on device pixels, the piece on top reaching one past the edge it shares', () => {
+    // A 108 px tile at (17, 100) on a 3× screen: a band from 30.3% lands at 132.724 CSS px on the
+    // page, 398.17 device px, so its edge snaps to 398, 32.667 px into the tile.
+    const grain = grainOf({ left: 17, top: 100, width: 108, height: 108 }, 3);
+    const band = { top: 0.303, height: 0.08 };
+    expect(cutClip([band], grain)).toContain('-10% 32.667px, 110% 32.667px, 110% 41.333px');
+    // The band over its hole: one device pixel (a third of a CSS px) past each edge.
+    expect(bandClip(band, grain)).toBe('inset(32.667px -10% 66.667px -10%)');
+    expect(bandClip(band, grain, OVER)).toBe('inset(32.333px -10% 66.333px -10%)');
+    expect(drawnClip(0.303, grain)).toBe('inset(0 0 75.333px 0)');
+    expect(blockClip(5, grain, OVER)).toBe('inset(26.667px 53.667px 53.667px 26.667px)');
+    expect(blocksClip([5], grain)).toContain('27px 27px, 54px 27px, 54px 54px, 27px 54px');
+    // Flap: the front's bottom half, under everything, reaches over the middle; the back's top
+    // half, and the halves that turn, keep it exact.
+    expect(halfClip('bottom', grain, OVER)).toBe('inset(53.667px 0 0 0)');
+    expect(halfClip('bottom', grain)).toBe('inset(54px 0 0 0)');
+    expect(halfClip('top', grain)).toBe('inset(0 0 54px 0)');
+    // Every edge on a device pixel, at a scale that is not whole too, from a tile at a fraction.
+    const odd = { left: 16.4, top: 203.2, width: 103, height: 103 };
+    for (const dpr of [1, 1.25, 2, 2.625, 3]) {
+      const fine = grainOf(odd, dpr);
+      for (const fraction of [0, 0.303, 0.5, 0.75, 1]) {
+        const top = Number.parseFloat(fine.top(fraction));
+        const device = (odd.top + top) * dpr;
+        expect(Math.abs(device - Math.round(device)), `${dpr}× top ${fraction}`).toBeLessThan(0.01);
+        const left = Number.parseFloat(fine.left(fraction, OVER));
+        const past = (odd.left + left) * dpr;
+        expect(Math.abs(past - Math.round(past)), `${dpr}× left ${fraction}`).toBeLessThan(0.01);
+        // Over reaches one device pixel further out (the lengths are written to 3 decimals).
+        expect(
+          Number.parseFloat(fine.top(fraction)) - Number.parseFloat(fine.top(fraction, OVER)),
+        ).toBeCloseTo(1 / dpr, 2);
+      }
+    }
+    // Without a grain, percentages, exact: the frames' shapes.
+    expect(bandClip(band)).toBe('inset(30.3% -10% 61.7% -10%)');
+    expect(halfClip('top')).toBe('inset(0 0 50% 0)');
+    expect(halfClip('bottom')).toBe('inset(50% 0 0 0)');
   });
 
   it('open blinds from shut to whole with one count of points, so the change animates', () => {

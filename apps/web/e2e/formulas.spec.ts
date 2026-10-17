@@ -93,8 +93,11 @@ test('an open category’s name stays under the bar while its units scroll past,
     section
       .getByText(text, { exact: true })
       .evaluate((line) => line.scrollIntoView({ block: 'start' }));
-  // Stuck at the window's top, the bar ends at its own height.
-  const under = await hide.evaluate((button) => button.parentElement!.offsetHeight);
+  // Stuck at the window's top, the bar ends at its own height; the names stick a pixel under it,
+  // so no hairline of the page shows between the two.
+  const under = await hide.evaluate((button) =>
+    Math.round(button.parentElement!.getBoundingClientRect().height - 1),
+  );
   const length = section.locator('summary').first();
   const weight = section.locator('summary').filter({ hasText: /^\s*Weight/ });
 
@@ -116,8 +119,11 @@ test('a category closed from under the bar stays there, and so does the one bein
   const hide = section.getByRole('button', { name: 'Hide all' });
   const top = (locator: ReturnType<typeof section.locator>) =>
     locator.evaluate((element) => Math.round(element.getBoundingClientRect().top));
-  // Stuck at the window's top, the bar ends at its own height.
-  const under = await hide.evaluate((button) => button.parentElement!.offsetHeight);
+  // Stuck at the window's top, the bar ends at its own height; the names stick a pixel under it,
+  // so no hairline of the page shows between the two.
+  const under = await hide.evaluate((button) =>
+    Math.round(button.parentElement!.getBoundingClientRect().height - 1),
+  );
   const length = section.locator('summary').first();
   const weight = section.locator('summary').filter({ hasText: /^\s*Weight/ });
 

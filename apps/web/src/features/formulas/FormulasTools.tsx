@@ -63,10 +63,14 @@ export function FormulasTools({ listId, heading }: { listId: string; heading: st
   useLayoutEffect(() => {
     const bar = barRef.current;
     if (!bar || typeof ResizeObserver === 'undefined') return;
+    // A pixel under the bar, its rule over the overlap: each sticky layer is drawn on its own and
+    // rounded to the screen's pixels apart, so stacked edge to edge they can leave a hairline of
+    // the page between them at a zoom or a display scale that is not whole (Sean, 2026-10-16).
     const stick = () => {
+      const top = `${bar.getBoundingClientRect().height - 1}px`;
       for (const group of groupsOf(listId)) {
         const summary = group.querySelector('summary');
-        if (summary) summary.style.top = `${bar.offsetHeight}px`;
+        if (summary) summary.style.top = top;
       }
     };
     stick();

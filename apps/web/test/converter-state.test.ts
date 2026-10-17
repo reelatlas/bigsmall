@@ -472,7 +472,7 @@ describe('Cooking (ADR 0021)', () => {
     expect(row('milliliter')).toMatchObject({ approx: false });
     expect(row('us-cup')).toMatchObject({ inBox: true, approx: false });
     expect(table.note).toBe(
-      'All-purpose flour: 1 cup, spooned and leveled, is 127 g (120 to 136 g across 6 weighings). A US cup is 236.6 mL; values marked ≈ go through this weight, which moves with how an ingredient is packed.',
+      'All-purpose flour: spooned and leveled, 1 cup ≈ 127 g. Fill cups the same way for the values marked ≈ to hold; the sources are on the About page.',
     );
     expect(table.announcement).toBe('2 cups of all-purpose flour in 10 units');
   });

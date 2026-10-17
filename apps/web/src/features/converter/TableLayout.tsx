@@ -1,4 +1,4 @@
-import { formatClock, formatNumber, getUnit, type CategoryId } from '@bigsmall/core';
+import { formatClock, formatNumber, getUnit, ingredients, type CategoryId } from '@bigsmall/core';
 import {
   useEffect,
   useId,
@@ -24,6 +24,7 @@ import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
 import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
 import {
+  ingredientList,
   noMatchMessage,
   type BoxView,
   type HistoryAction,
@@ -148,7 +149,7 @@ export function TableLayout({
   onSettings,
   inputRef,
   box,
-  table,
+  table: selected,
   env,
   dispatch,
   describedBy,
@@ -162,6 +163,18 @@ export function TableLayout({
   const listId = useId();
   const hiddenListId = `${listId}-hidden`;
   const itemId = (index: number) => `${listId}-item-${index}`;
+  /**
+   * Cooking's ingredients, listed in the table's place while the ingredient's pill holds them open
+   * (a trial, Sean, 2026-10-16): the box's popup lists them under their kinds, as it lists the
+   * units, the one in the box marked. Taking one, typing, Escape, or the pill again closes it.
+   */
+  const [choosingFor, setChoosingFor] = useState<string | null>(null);
+  const choosing =
+    choosingFor !== null &&
+    choosingFor === box.ingredient?.id &&
+    selected.kind === 'units' &&
+    selected.category === 'cooking';
+  const table: TableView = choosing ? ingredientList(selected, box.ingredient) : selected;
   const rootRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
@@ -303,6 +316,7 @@ export function TableLayout({
     if (!input) return;
     const text = key === 'Backspace' ? input.value.slice(0, -1) : input.value + key;
     if (editing) endEdit();
+    setChoosingFor(null);
     caretToEnd.current = true;
     input.focus();
     dispatch({ type: 'input', text, at: performance.now() });
@@ -333,6 +347,7 @@ export function TableLayout({
         if ((target as Element).closest('[data-tool]')) return;
         event.preventDefault();
         input.focus();
+        setChoosingFor(null);
         setPosition(null);
         return;
       }
@@ -368,6 +383,9 @@ export function TableLayout({
       if (event.key === 'Escape') {
         if (editing) {
           endEdit();
+          event.preventDefault();
+        } else if (choosing) {
+          setChoosingFor(null);
           event.preventDefault();
         } else if (clearStep()) event.preventDefault();
         return;
@@ -445,6 +463,12 @@ export function TableLayout({
    * brought one ("2 cups flour"), the number as typed: Cooking's table.
    */
   const takeIngredient = (ingredient: string, unitId: string | null) => {
+    setChoosingFor(null);
+    // The one in the box, taken again from the list its pill opened: nothing changes, nothing to undo.
+    if (choosing && !unitId && ingredient === box.ingredient?.id) {
+      setPosition(null);
+      return;
+    }
     if (unitId) take(unitId, number, ingredient);
     else {
       dispatch({ type: 'useIngredient', ingredient, text: number });
@@ -502,6 +526,7 @@ export function TableLayout({
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (editing) endEdit();
+    setChoosingFor(null);
     dispatch({
       type: 'input',
       text: event.currentTarget.value,
@@ -580,7 +605,10 @@ export function TableLayout({
         // Escape already clears.
         event.preventDefault();
         if (editing) endEdit();
-        else if (browsing) {
+        else if (choosing) {
+          setChoosingFor(null);
+          setPosition(null);
+        } else if (browsing) {
           setPosition(null);
           inputRef.current?.scrollIntoView({ block: 'nearest' });
         } else if (!clearStep()) inputRef.current?.blur();
@@ -742,8 +770,23 @@ export function TableLayout({
               setPosition(null);
               if (!pressedByTouch()) inputRef.current?.focus();
             }}
-            // The ingredient's pill, the same: its body puts the caret in the field, its × takes
+            // The ingredient's pill: its body opens every ingredient in the table's place, the
+            // cursor on the one in the box, and closes them again (a trial, Sean, 2026-10-16); the
+            // caret goes into the field after a click, not a tap, as the chip's does. Its × takes
             // the ingredient out, leaving a weight or a volume (ADR 0021).
+            ingredientOpen={choosing}
+            onIngredientOpen={() => {
+              const current = box.ingredient?.id ?? null;
+              if (choosing || !current) setChoosingFor(null);
+              else {
+                setChoosingFor(current);
+                setCursor({
+                  view: 'matches',
+                  position: ingredients.findIndex((each) => each.id === current),
+                });
+              }
+              if (!pressedByTouch()) inputRef.current?.focus();
+            }}
             onIngredientRemove={() => {
               dispatch({ type: 'removeIngredient' });
               setPosition(null);

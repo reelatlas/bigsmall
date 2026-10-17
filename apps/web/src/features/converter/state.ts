@@ -419,7 +419,7 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   if (category === 'cooking') {
     return ingredient
       ? selectCooking(base, ingredient, unit, parsed, options)
-      : selectIngredients(base);
+      : ingredientList(base);
   }
   return selectUnits(base, category, unit, parsed, options);
 }
@@ -428,10 +428,11 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
 const KIND_NAME = new Map(INGREDIENT_KINDS.map((kind) => [kind.id, kind.name]));
 
 /**
- * Cooking with no ingredient yet: every ingredient, to choose from, under its kind's heading, in
- * the data's order, the kinds' (ADR 0021).
+ * Every ingredient, to choose from, under its kind's heading, in the data's order, the kinds'
+ * (ADR 0021): Cooking's list with no ingredient yet, and, with one, the list its pill opens (a
+ * trial, Sean, 2026-10-16), the one in the box marked as a unit in the box is.
  */
-function selectIngredients(base: ViewBase): MatchesView {
+export function ingredientList(base: ViewBase, current: Ingredient | null = null): MatchesView {
   const cooking = getCategory('cooking');
   const rows: MatchRow[] = cooking
     ? ingredients.map((ingredient) => ({
@@ -439,7 +440,7 @@ function selectIngredients(base: ViewBase): MatchesView {
         ingredient,
         unit: null,
         category: cooking,
-        inBox: false,
+        inBox: ingredient.id === current?.id,
         group: KIND_NAME.get(ingredient.kind) ?? cooking.name,
       }))
     : [];

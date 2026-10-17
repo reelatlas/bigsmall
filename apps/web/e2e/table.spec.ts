@@ -1340,6 +1340,58 @@ test('Cooking’s box keeps one line where it can, fitted as with one pill: the 
   expect(placeholder).toEqual({ text: 'Number', whole: true });
 });
 
+test('Cooking: the ingredient’s pill opens every ingredient under its kind, the one in the box marked; another keeps the amount and the cup', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-cup&v=2&i=all-purpose-flour');
+  await ready(page);
+  const pill = page.getByRole('button', { name: 'Ingredient: all-purpose flour' });
+  await expect(pill).toHaveAttribute('aria-expanded', 'false');
+  await pill.click();
+  await expect(pill).toHaveAttribute('aria-expanded', 'true');
+  const list = page.getByRole('listbox', { name: 'Matches' });
+  const headings = await list
+    .getByRole('group')
+    .evaluateAll((groups) =>
+      groups.map((group) =>
+        document.getElementById(group.getAttribute('aria-labelledby') ?? '')?.textContent?.trim(),
+      ),
+    );
+  expect(headings).toEqual(INGREDIENT_KINDS.map((kind) => kind.name));
+  // The cursor starts on the one in the box.
+  await expect(list.getByRole('option', { selected: true })).toHaveText(/all-purpose flour/);
+  await expectNoA11yViolations(page);
+  await list.getByRole('option', { name: /^butter/ }).click();
+  await expect(page.getByRole('button', { name: 'Ingredient: butter' })).toBeVisible();
+  await expect(box(page)).toHaveValue('2');
+  await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
+  await expect(row(page, 'gram')).toContainText('≈ 454.00');
+  await expect(page).toHaveURL(/[?&]i=butter/);
+});
+
+test('Cooking: from the keys, the pill’s list moves with the arrows, Enter takes, Escape closes it unchanged', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/?a=us-cup&v=2&i=all-purpose-flour');
+  await ready(page);
+  const list = page.getByRole('listbox', { name: 'Matches' });
+  await page.getByRole('button', { name: 'Ingredient: all-purpose flour' }).click();
+  // The caret in the box, the cursor on the flour: ↓ to bread flour, Enter takes it.
+  await box(page).press('ArrowDown');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Ingredient: bread flour' })).toBeVisible();
+  await expect(list).toHaveCount(0);
+  // Opened again, Escape closes it, nothing changed.
+  await page.getByRole('button', { name: 'Ingredient: bread flour' }).click();
+  await expect(list).toBeVisible();
+  await box(page).press('Escape');
+  await expect(list).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Ingredient: bread flour' })).toBeVisible();
+  await expect(box(page)).toHaveValue('2');
+});
+
 test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, Enter takes one, a link keeps it', async ({
   page,
   isMobile,

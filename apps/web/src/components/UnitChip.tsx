@@ -1,7 +1,7 @@
 import type { Ingredient, Unit } from '@bigsmall/core';
 import type { Ref } from 'react';
 import { cx, unitSymbol } from '../lib/recipes';
-import { CloseIcon } from './icons';
+import { ChevronDownIcon, CloseIcon } from './icons';
 
 interface ChipProps {
   /** Show the symbol only, when the field needs the room. The name stays in the labels. */
@@ -11,6 +11,8 @@ interface ChipProps {
    * lib/fit-step.ts). Compact hides it rather than leaving it out, so it can be measured.
    */
   nameRef?: Ref<HTMLSpanElement>;
+  /** An ingredient's chevron, which compact hides, for the field's fit to measure the same way. */
+  chevronRef?: Ref<HTMLSpanElement>;
   /**
    * Called when the user activates the chip's body: the caret goes into the field, whose keys and
    * table change the unit.
@@ -22,11 +24,15 @@ interface ChipProps {
 
 /**
  * A unit's chip, its symbol and then its name; or, Cooking's second pill (ADR 0021), an
- * ingredient's, its name alone, which gives way to the number by truncating where the box is
- * narrow, and never goes compact.
+ * ingredient's, its name, which gives way to the number by truncating where the box is narrow, and
+ * never goes compact, then a chevron: its body opens every ingredient to choose from, and
+ * `expanded` turns the chevron over while they show (a trial, Sean, 2026-10-16).
  */
 export type UnitChipProps = ChipProps &
-  ({ unit: Unit; ingredient?: undefined } | { ingredient: Ingredient; unit?: undefined });
+  (
+    | { unit: Unit; ingredient?: undefined; expanded?: undefined }
+    | { ingredient: Ingredient; unit?: undefined; expanded?: boolean }
+  );
 
 // The chip lives inside a field: its corners nest inside the field's (docs/DESIGN-SYSTEM.md, "Fields").
 const CHIP = 'inline-flex min-h-11 items-stretch rounded-nested bg-accent-soft text-ink';
@@ -41,7 +47,16 @@ const HOVER = 'transition-colors hover:bg-accent-soft-hover';
  * in the field (`onOpen`), whose table is the unit list. Collapsed, the symbol stands alone in the
  * ink color.
  */
-export function UnitChip({ unit, ingredient, compact, nameRef, onOpen, onRemove }: UnitChipProps) {
+export function UnitChip({
+  unit,
+  ingredient,
+  expanded = false,
+  compact,
+  nameRef,
+  chevronRef,
+  onOpen,
+  onRemove,
+}: UnitChipProps) {
   // Both buttons stay out of the Tab order: the field's own keys change and remove the unit
   // (docs/UX-SPEC.md §5). They stay clickable and visible to screen readers.
   const tabIndex = -1;
@@ -54,6 +69,7 @@ export function UnitChip({ unit, ingredient, compact, nameRef, onOpen, onRemove 
         // What it is, not a picker it would open: a press puts the caret in the box, whose keys
         // and table change the unit (the full tidy, 2026-10-15).
         aria-label={unit ? `Unit: ${name}` : `Ingredient: ${name}`}
+        aria-expanded={unit ? undefined : expanded}
         tabIndex={tabIndex}
         onClick={onOpen}
         className={cx('inline-flex min-w-0 rounded-l-nested', HOVER)}
@@ -69,6 +85,17 @@ export function UnitChip({ unit, ingredient, compact, nameRef, onOpen, onRemove 
           <span className={cx(BODY, 'min-w-0')}>
             <span ref={nameRef ?? null} className="truncate">
               {name}
+            </span>
+            {/* Gives way after the unit chip's name where the box lacks the room (useFieldFit). */}
+            <span ref={chevronRef ?? null} hidden={compact} className="shrink-0 self-center">
+              <ChevronDownIcon
+                width="16"
+                height="16"
+                className={cx(
+                  'block text-ink-muted transition-transform',
+                  expanded && 'rotate-180',
+                )}
+              />
             </span>
           </span>
         )}

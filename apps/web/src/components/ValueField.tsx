@@ -57,6 +57,8 @@ export interface ValueFieldProps {
   onChipOpen: () => void;
   /** The chip's × was clicked or tapped. */
   onChipRemove: () => void;
+  /** Whether the ingredient's pill holds every ingredient open in the table's place. */
+  ingredientOpen?: boolean;
   /** The ingredient's pill was clicked or tapped. */
   onIngredientOpen?: () => void;
   /** The ingredient's × was clicked or tapped. */
@@ -120,6 +122,7 @@ export function ValueField({
   onClear,
   onChipOpen,
   onChipRemove,
+  ingredientOpen = false,
   onIngredientOpen,
   onIngredientRemove,
 }: ValueFieldProps) {
@@ -130,6 +133,8 @@ export function ValueField({
   const ingredientNameRef = useRef<HTMLSpanElement>(null);
   /** No name to measure: with Symbol only the chip never shows one, so the number has its room. */
   const noName = useRef<HTMLSpanElement>(null);
+  /** The ingredient pill's chevron, which gives way after the unit chip's name (a trial). */
+  const chevronRef = useRef<HTMLSpanElement>(null);
   const inputId = `${useId()}-input`;
 
   // The row is measured, not counted: in any box, wide or narrow, the chip keeps its name while
@@ -138,7 +143,9 @@ export function ValueField({
     () => ({ ref: textLayerRef, base: TEXT_LAYER, steps: NUMBER_SIZES }),
     [],
   );
-  const fit = useFieldFit(rowRef, symbolOnly ? noName : chipNameRef, fitText, ingredientNameRef);
+  // What gives way, in order: the unit chip's name, then the ingredient pill's chevron.
+  const parts = useMemo(() => [symbolOnly ? noName : chipNameRef, chevronRef], [symbolOnly]);
+  const fit = useFieldFit(rowRef, parts, fitText, ingredientNameRef);
   const sizeClass = NUMBER_SIZES[fit.step];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
@@ -214,7 +221,7 @@ export function ValueField({
             // screen readers still reach both buttons.
             <UnitChip
               unit={unit}
-              compact={symbolOnly || fit.compact}
+              compact={symbolOnly || fit.gaveWay > 0}
               nameRef={chipNameRef}
               onOpen={onChipOpen}
               onRemove={onChipRemove}
@@ -228,8 +235,10 @@ export function ValueField({
               {unitChip}
               <UnitChip
                 ingredient={ingredient}
-                compact={false}
+                expanded={ingredientOpen}
+                compact={fit.gaveWay > 1}
                 nameRef={ingredientNameRef}
+                chevronRef={chevronRef}
                 onOpen={onIngredientOpen ?? onChipOpen}
                 onRemove={onIngredientRemove ?? onChipRemove}
               />

@@ -93,79 +93,94 @@ export function useFitStep(
 }
 
 /**
- * How a field's row fits: whether the chip shows its symbol alone, the text's step, and, in a row
- * with a second pill, whether the pills take a line of their own under the text.
+ * How a field's row fits: how many of the parts that give way have (the chip's name, then a second
+ * pill's chevron), the text's step, and, in a row with a second pill, whether the pills take a line
+ * of their own under the text.
  */
 export interface FieldFit {
-  compact: boolean;
+  gaveWay: number;
   step: number;
   wrap: boolean;
 }
 
 /**
- * Measures a field's row, always from one line with the chip's name shown, so the answer never
- * flips back and forth: there, does the text fit at its largest size, and a second pill's name
- * (Cooking's ingredient, ADR 0021) whole? If not, the name is hidden and the text takes the
- * largest step that fits without it. With a second pill the row stays one line only while the
- * text fits at some step with that pill whole; otherwise the pills take a line of their own under
- * the text (`data-wrap` on the row), the chip's name shown there wherever both pills fit whole.
- * Leaves the row, the name, and the text as chosen.
+ * Measures a field's row, always from one line with every part shown, so the answer never flips
+ * back and forth. There, does the text fit at its largest size, and a second pill's name (Cooking's
+ * ingredient, ADR 0021) whole? If not, the parts give way in their order, the chip's name first:
+ * with one pill, all of them, and the text takes the largest step that fits; with a second, one at
+ * a time, the row staying one line as soon as the text fits at some step with that pill whole.
+ * Where it fits at none, the pills take a line of their own under the text (`data-wrap` on the
+ * row), the parts back there as far as both pills fit whole. Leaves the row, the parts, and the
+ * text as chosen.
  */
 function fitField(
-  nameRef: RefObject<HTMLElement | null>,
+  partRefs: readonly RefObject<HTMLElement | null>[],
   text: FitText,
   otherRef?: RefObject<HTMLElement | null>,
   rowRef?: RefObject<HTMLElement | null>,
 ): FieldFit {
-  const name = nameRef.current;
   const element = text.ref.current;
   const other = otherRef?.current;
   // Only a row with a second pill ever wraps.
   const row = other ? rowRef?.current : null;
-  if (name) name.hidden = false;
+  const parts = partRefs.map((part) => part.current);
+  /** The first `count` parts hidden, the rest shown. */
+  const giveWay = (count: number) =>
+    parts.forEach((part, at) => {
+      if (part) part.hidden = at < count;
+    });
+  giveWay(0);
   row?.removeAttribute('data-wrap');
   if (!element || (fitsAt(element, text, 0) && whole(other))) {
-    return { compact: false, step: 0, wrap: false };
+    return { gaveWay: 0, step: 0, wrap: false };
   }
-  if (name) name.hidden = true;
-  const compact = name !== null;
-  if (!row) return { compact, step: largestFit(text), wrap: false };
-  const step = whole(other) ? largestFitting(text) : null;
-  if (step !== null) return { compact, step, wrap: false };
+  if (!row) {
+    giveWay(parts.length);
+    return { gaveWay: parts.length, step: largestFit(text), wrap: false };
+  }
+  for (let count = 1; count <= parts.length; count += 1) {
+    giveWay(count);
+    const step = whole(other) ? largestFitting(text) : null;
+    if (step !== null) return { gaveWay: count, step, wrap: false };
+  }
   row.setAttribute('data-wrap', '');
-  if (name) name.hidden = false;
-  const wrapped = largestFit(text);
-  if (whole(other)) return { compact: false, step: wrapped, wrap: true };
-  if (name) name.hidden = true;
-  return { compact, step: wrapped, wrap: true };
+  giveWay(0);
+  const step = largestFit(text);
+  for (let count = 0; count < parts.length; count += 1) {
+    giveWay(count);
+    if (whole(other)) return { gaveWay: count, step, wrap: true };
+  }
+  giveWay(parts.length);
+  return { gaveWay: parts.length, step, wrap: true };
 }
 
 /**
  * Fits a field's row (docs/DESIGN-SYSTEM.md, "Fields"): the chip's name gives way before the
  * field's text steps down, so the name stays while the row has room for it and the text at its
- * largest size, in a field of any width. `text` is the field's text layer on its ladder; `name`
- * is the chip's name, which the measurement hides and shows itself as useFitStep writes classes
- * (the chip renders it with the same `hidden`); `row` is the row, whose changes of width refit
- * the field; `other` a second pill's name, which the chip's name gives way to as well where it
- * would be cut short, and beside which the row may wrap, the measurement setting `data-wrap` on
- * the row as the field renders it.
+ * largest size, in a field of any width. `text` is the field's text layer on its ladder; `parts`
+ * are what gives way, in order (the chip's name, then a second pill's chevron), which the
+ * measurement hides and shows itself as useFitStep writes classes (the field renders them with
+ * the same `hidden`, the first `gaveWay` of them); `row` is the row, whose changes of width refit
+ * the field; `other` a second pill's name, which the parts give way to as well where it would be
+ * cut short, and beside which the row may wrap, the measurement setting `data-wrap` on the row as
+ * the field renders it. `parts` must keep its identity between renders.
  */
 export function useFieldFit(
   row: RefObject<HTMLElement | null>,
-  name: RefObject<HTMLElement | null>,
+  parts: readonly RefObject<HTMLElement | null>[],
   text: FitText,
   other?: RefObject<HTMLElement | null>,
 ): FieldFit {
-  const [fit, setFit] = useState<FieldFit>({ compact: false, step: 0, wrap: false });
+  const [fit, setFit] = useState<FieldFit>({ gaveWay: 0, step: 0, wrap: false });
 
   const refit = useCallback(() => {
-    const next = fitField(name, text, other, row);
+    const next = fitField(parts, text, other, row);
     setFit((current) =>
-      current.compact === next.compact && current.step === next.step && current.wrap === next.wrap
+      current.gaveWay === next.gaveWay && current.step === next.step && current.wrap === next.wrap
         ? current
         : next,
     );
-  }, [name, text, other, row]);
+  }, [parts, text, other, row]);
 
   useRefit(refit, row);
   return fit;

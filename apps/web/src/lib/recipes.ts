@@ -71,6 +71,12 @@ export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8 sm:py-12');
 /** A section's heading on a page, centered over it: About's "The sketchbook" and "Every formula". */
 export const SECTION_HEADING = 'text-center font-display text-xl font-semibold';
 
+/**
+ * A disclosure's row, its chevron 4 px in: Every formula's categories, and Show all over them,
+ * which takes their look so its chevron sits over theirs (Sean, 2026-10-16).
+ */
+export const DISCLOSURE = 'flex min-h-11 cursor-pointer items-center gap-3 px-1';
+
 // A link standing on its own line (docs/DESIGN-SYSTEM.md, "Links"): ink, underlined in the accent,
 // 44 px tall. The not-found page's way back.
 export const LINK =

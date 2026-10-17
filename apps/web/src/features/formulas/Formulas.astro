@@ -1,6 +1,6 @@
 ---
 import { ChevronDownIcon } from '../../components/icons';
-import { SECTION_HEADING } from '../../lib/recipes';
+import { DISCLOSURE, SECTION_HEADING } from '../../lib/recipes';
 import { FORMULAS_HEADING, formulaGroups, SIGNIFICANT } from './formulas';
 import { FormulasTools } from './FormulasTools';
 
@@ -10,8 +10,9 @@ import { FormulasTools } from './FormulasTools';
  * category's base unit, exact or measured, and the standard it was checked against. Drawn when the
  * site is built from core's own units (formulas.ts), so a check reads what the converter runs;
  * the categories open with their own summaries, and FormulasTools adds Show all and Copy all, in
- * a bar that stays at the window's top while the list scrolls past. In a centered column, its
- * heading and lines centered as the sketchbook is, its rows left-aligned to be scanned.
+ * a bar that stays at the window's top while the list scrolls past, and an open category's name
+ * stays under it while its units do. In a centered column, its heading and lines centered as the
+ * sketchbook is, its tools and rows on the column's left edge, to be scanned.
  */
 const groups = formulaGroups();
 // Units alone: Cooking lists ingredients, which are not units.
@@ -35,6 +36,15 @@ const MEASURED = `${TAG} bg-surface-raised text-ink-muted`;
 
 /** A number in the line of counts, in the ink beside its muted words, so the values stand out. */
 const STAT = 'font-numeric text-ink';
+
+/**
+ * A category's name, which stays under the bar while its units scroll past and gives way to the
+ * next one's (Sean, 2026-10-16): sticky, at the bar's height, which FormulasTools measures and
+ * sets. Square and opaque, as a bar over scrolling content must be (docs/LEARNINGS.md, "A sticky
+ * bar with rounded corners shows what scrolls under it"), its focus ring inside its edge, where
+ * the bar over it cannot cover it.
+ */
+const SUMMARY = `${DISCLOSURE} sticky list-none bg-canvas focus-ring-inset [&::-webkit-details-marker]:hidden`;
 ---
 
 <section class="mx-auto mt-16 max-w-2xl sm:mt-24" aria-labelledby="formulas">
@@ -52,7 +62,7 @@ const STAT = 'font-numeric text-ink';
   <div id={listId} class="@container">
     {groups.map(({ category, lines, summary, plain }) => (
       <details class="group border-t border-line first:border-t-0 last:border-b" data-plain={plain}>
-        <summary class="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-md px-1 [&::-webkit-details-marker]:hidden">
+        <summary class={SUMMARY}>
           <ChevronDownIcon
             width="16"
             height="16"

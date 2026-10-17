@@ -16,8 +16,14 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Next, with Sean:** Search Console and Bing at his screen, a text record at Porkbun (`docs/SEO.md` §3). The sixty-third pass is built and live (`docs/research/findings-0-first-pass.md`): Sean tries the menu, the formulas, Pace, a temperature change, and Cooking on his iPhone.
-   - **His go:** retiring the categories lab, now only Cooking's mocks (the "Retire a lab" recipe; screenshots 1 to 3 already in `docs/research/labs/categories-lab/`).
+1. **After the compaction, in order** (`docs/research/findings-0-first-pass.md`, the sixty-fourth pass, saved before a compaction; each plan there is ready to build):
+   1. About: Show all and Copy all as text on the categories' left edge, Every formula's heading centered.
+   2. Cooking's box on one line, fit by measurement (the unit's symbol, then the number's sizes), the pills under the number only where a phone lacks the room.
+   3. "Decimal" and "Fraction" in Display.
+   4. The categories lab retired, on Sean's go (recommended).
+   5. An Ingredient menu in Cooking's toolbar, grouped by kind, and the no-ingredient list grouped the same: a trial, on Sean's go.
+   6. Cooking's figures from several sources (`docs/research/cooking-2.md`), checked blind, the sources on About.
+      Then Search Console and Bing at Sean's screen, a text record at Porkbun (`docs/SEO.md` §3).
 2. **Open with Sean:** the SEO plan's other decisions ("bigsmall SEO plan", https://claude.ai/artifact/7eXfYjEdTn4zKXXGLug3pT). Trials: R6 as the mark (`1fa40fa`). Feedback undecided (the fiftieth pass); Umami's checks (`docs/DEPLOYMENT.md`, "Analytics").
 3. **Then, toward v1** (`docs/PLAN.md` §13): the SEO pair pages built and launched (`docs/SEO.md`), in v1 on `bigsmall.work`; Lighthouse budgets (milestone 5); the manual passes once, just before launch (`docs/TESTING.md`, "Before launch"): VoiceOver on Sean's iPhone and NVDA from a checklist to write, the keyboard and zoom passes scripted.
 4. **Friends** try the live site when they like; Sean relays their notes as they come (2026-10-15).

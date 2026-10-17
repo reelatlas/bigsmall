@@ -18,7 +18,7 @@ const LIGHT =
 const PACE_KM =
   'BIPM SI Brochure, 9th ed. (2019), Table 8: 1 min = 60 s; a pace of 1 min/km is 1000 m in 60 s, so m/s = (1000/60) ÷ min/km, exactly';
 const PACE_MI =
-  'International Yard and Pound Agreement (1959): 1 mi = 1609.344 m exactly; BIPM SI Brochure, Table 8: 1 min = 60 s; so m/s = (1609.344/60) ÷ min/mi, exactly';
+  'NIST SP 811 (2008) Appendix B.9: mile per minute = 2.68224E+01 m/s (exact), the 1959 mile in 60 s; so m/s = 26.8224 ÷ min/mi';
 
 export const speedUnits: readonly Unit[] = [
   {

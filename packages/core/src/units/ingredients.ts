@@ -13,8 +13,10 @@ import type { Ingredient, IngredientKind } from '../types';
  * each with its heading; the ingredients follow this order.
  */
 export const INGREDIENT_KINDS: readonly { id: IngredientKind; name: string }[] = [
-  { id: 'flour', name: 'Flours' },
-  { id: 'sugar', name: 'Sugars' },
+  // Named as a pantry names its shelves: mass nouns in the singular (Flour, Sugar, Dairy, Baking),
+  // count nouns and idioms in the plural (Fats and oils, Grains, Mix-ins) (Sean, 2026-10-17).
+  { id: 'flour', name: 'Flour' },
+  { id: 'sugar', name: 'Sugar' },
   { id: 'fat', name: 'Fats and oils' },
   { id: 'dairy', name: 'Dairy and eggs' },
   { id: 'liquid', name: 'Liquids and syrups' },

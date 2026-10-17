@@ -28,6 +28,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0020](0020-references-and-our-own-checks.md) | Other converters as references; every number checked on our own                          | accepted; supersedes 0004                       |
 | [0021](0021-cooking-by-ingredient.md)         | Cooking: an ingredient joins volume and weight                                           | accepted; amended 2026-10-16                    |
 | [0022](0022-facts-by-kind.md)                 | Facts by kind: defined by a standard, measured by a written rule, conventional by a body | accepted; extends 0020                          |
+| [0023](0023-toolbar-one-row.md)               | The toolbar is one row: a touch screen scrolls it, a pointer gets More                   | accepted                                        |
 
 ## Template
 

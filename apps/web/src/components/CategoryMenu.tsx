@@ -58,7 +58,18 @@ export interface CategoryMenuProps {
   onChoose: (id: CategoryId) => void;
   /** Its name as a control of the toolbar it sits in (`data-tool`, ADR 0014), if it is in one. */
   tool?: string;
+  /**
+   * The focus ring inside the trigger's edge: for a toolbar row that scrolls (ADR 0023), a scroll
+   * container, which would clip a ring around it.
+   */
+  ringInset?: boolean;
 }
+
+/**
+ * Open, the shell is a popover in the top layer (below): the browser's own styles for one set a
+ * margin, a border, a padding, and system colors, which the shell's own take back; nothing at rest.
+ */
+const POPOVER_RESET = 'm-0 border-0 p-0 text-ink';
 
 /**
  * The converter's category menu (docs/UX-SPEC.md §1), built from the same recipes as the theme
@@ -74,13 +85,21 @@ export interface CategoryMenuProps {
  * unchanged and move along the toolbar, as from the trigger (Sean, 2026-10-15). While a unit is
  * typed, each choice says how many of its units match.
  */
-export function CategoryMenu({ categories, value, counts, onChoose, tool }: CategoryMenuProps) {
+export function CategoryMenu({
+  categories,
+  value,
+  counts,
+  onChoose,
+  tool,
+  ringInset = false,
+}: CategoryMenuProps) {
   const menuId = useId();
   const groupName = useId();
   const [open, setOpen] = useState(false);
   /** The choice the arrows have reached while open: the chosen category until they move. */
   const [reached, setReached] = useState<CategoryId | null>(value);
   const rootRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   /** Opened by a click or a tap, not by Enter or Space (a click with no pointer, detail 0). */
@@ -122,6 +141,37 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
     else label?.scrollIntoView({ block: 'nearest' });
     window.addEventListener('resize', fit);
     return () => window.removeEventListener('resize', fit);
+  }, [open]);
+
+  // Open, the shell rises to the top layer as a popover, placed over its root, twice the menu's
+  // width as its classes say: inside a toolbar row that scrolls (ADR 0023) it would otherwise be
+  // clipped to the row, and in the top layer nothing covers it. Placed again as the page or the
+  // row scrolls and as the window resizes, so it stays over its trigger. A browser without
+  // popovers opens it in place, as before.
+  useLayoutEffect(() => {
+    const shell = shellRef.current;
+    const root = rootRef.current;
+    if (!open || !shell || !root || typeof shell.showPopover !== 'function') return;
+    const place = () => {
+      const at = root.getBoundingClientRect();
+      shell.style.position = 'fixed';
+      shell.style.top = `${at.top}px`;
+      shell.style.left = `${at.left}px`;
+      shell.style.right = 'auto';
+      shell.style.width = `${at.width * 2}px`;
+    };
+    place();
+    shell.setAttribute('popover', 'manual');
+    shell.showPopover();
+    window.addEventListener('resize', place);
+    document.addEventListener('scroll', place, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('resize', place);
+      document.removeEventListener('scroll', place, { capture: true });
+      if (shell.matches(':popover-open')) shell.hidePopover();
+      shell.removeAttribute('popover');
+      shell.removeAttribute('style');
+    };
   }, [open]);
 
   // While open: a click outside closes it; Enter chooses the choice reached and Escape closes it
@@ -190,7 +240,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
           </span>
         ))}
       </span>
-      <div className={cx(MENU_SHELL, OPEN_SHELL)}>
+      <div ref={shellRef} className={cx(MENU_SHELL, OPEN_SHELL, POPOVER_RESET)}>
         <button
           ref={trigger}
           type="button"
@@ -202,7 +252,7 @@ export function CategoryMenu({ categories, value, counts, onChoose, tool }: Cate
             setReached(value);
             setOpen((now) => !now);
           }}
-          className={MENU_TRIGGER}
+          className={cx(MENU_TRIGGER, ringInset && 'focus-ring-inset')}
         >
           {/* The category's name, the word "Category" kept for screen readers, as "Theme" is.
               Before a choice, and while open, the word shows, muted like the theme menu's label

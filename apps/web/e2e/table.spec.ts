@@ -16,6 +16,7 @@ import {
   row,
   setSettings,
   settingsButton,
+  settingsPanel,
   shortcutsButton,
   showEverything,
   unitCell,
@@ -1063,7 +1064,7 @@ test('the box’s × clears its text and keeps the unit, one step undo brings ba
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
 });
 
-test('the intro has a line of its own; the toolbar under it leads with the menu, the calculator, Units, and Display, which wrap under the other tools on a phone', async ({
+test('the intro has a line of its own; the toolbar under it is one row, which a touch screen scrolls and a pointer folds into More where it lacks room', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -1105,22 +1106,124 @@ test('the intro has a line of its own; the toolbar under it leads with the menu,
     expect(wide.menu.y + wide.menu.height, theme.id).toBeLessThanOrEqual(wide.field.y);
   }
 
-  // A phone has no room for both: undo, redo, and clear all keep the top line, and the menu, the
-  // calculator, Units, and Display take the next, both lines flush left over the box (Sean,
-  // 2026-10-15).
+  // A phone has no room for all seven, and the row never wraps (ADR 0023). With a pointer, the
+  // tools the row has no room for fold into More at its end, the right end's three here, More's
+  // edge on the column's; on a touch screen the row scrolls sideways instead, every tool on one
+  // line, a fade where more waits, and clear all's edge on the column's once scrolled to the end.
+  // Which it is follows the pointer, which each project emulates.
   await page.setViewportSize({ width: 375, height: 800 });
+  const coarse = await page.evaluate(() => matchMedia('(pointer: coarse)').matches);
+  const bar = page.getByRole('toolbar', { name: 'Tools' });
+  const rowOf = (name: string) => bar.getByRole('button', { name, exact: true });
+  const more = rowOf('More tools');
+  const reach = () => bar.evaluate((row) => row.parentElement?.dataset['reach'] ?? null);
   for (const theme of THEMES) {
     await applyTheme(page, theme);
-    const narrow = await geometry();
-    // 8 px under the intro on a phone too.
-    expect(Math.round(narrow.toolbar.y - (narrow.intro.y + narrow.intro.height)), theme.id).toBe(8);
-    expect(Math.abs(narrow.undo.x - narrow.start.x), theme.id).toBeLessThanOrEqual(1);
-    expect(narrow.menu.y, theme.id).toBeGreaterThanOrEqual(narrow.last.y + narrow.last.height);
-    expect(Math.abs(middle(narrow.menu) - middle(narrow.display)), theme.id).toBeLessThan(4);
-    expect(Math.abs(narrow.menu.x - narrow.start.x), theme.id).toBeLessThanOrEqual(3);
-    expect(narrow.menu.y + narrow.menu.height, theme.id).toBeLessThanOrEqual(narrow.field.y);
+    const intro = (await page.getByText(words).boundingBox())!;
+    const toolbar = (await bar.boundingBox())!;
+    const menuBox = (await menu(page).boundingBox())!;
+    const start = (await tiles(page).boundingBox())!;
+    // 8 px under the intro on a phone too, the menu's edge on the column's.
+    expect(Math.round(toolbar.y - (intro.y + intro.height)), theme.id).toBe(8);
+    expect(Math.abs(menuBox.x - start.x), theme.id).toBeLessThanOrEqual(3);
+    // One line: every control's middle on the menu's.
+    const middles = await bar.locator('[data-tool]').evaluateAll((all) =>
+      all.map((control) => {
+        const rect = control.getBoundingClientRect();
+        return rect.top + rect.height / 2;
+      }),
+    );
+    for (const each of middles) expect(Math.abs(each - middle(menuBox)), theme.id).toBeLessThan(4);
+    if (coarse) {
+      await expect(more, theme.id).toHaveCount(0);
+      for (const name of ['Undo', 'Redo', 'Clear all']) {
+        await expect(rowOf(name), theme.id).toHaveCount(1);
+      }
+      const scroll = await bar.evaluate((row) => ({
+        width: row.clientWidth,
+        content: row.scrollWidth,
+      }));
+      expect(scroll.content, theme.id).toBeGreaterThan(scroll.width);
+      expect(await reach(), theme.id).toBe('right');
+      await bar.evaluate((row) => {
+        row.scrollLeft = row.scrollWidth;
+      });
+      await expect.poll(reach, { message: theme.id }).toBe('left');
+      const last = (await rowOf('Clear all').boundingBox())!;
+      expect(Math.abs(last.x + last.width - (start.x + start.width)), theme.id).toBeLessThanOrEqual(
+        1,
+      );
+      await bar.evaluate((row) => {
+        row.scrollLeft = 0;
+      });
+    } else {
+      await expect(more, theme.id).toBeVisible();
+      for (const name of ['Undo', 'Redo', 'Clear all']) {
+        await expect(rowOf(name), theme.id).toHaveCount(0);
+      }
+      const last = (await more.boundingBox())!;
+      expect(Math.abs(last.x + last.width - (start.x + start.width)), theme.id).toBeLessThanOrEqual(
+        1,
+      );
+      // The page itself never scrolls sideways.
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+        theme.id,
+      ).toBe(true);
+    }
   }
   await expect(box(page)).toHaveAccessibleDescription(words);
+});
+
+test('More: a tool the row had no room for acts from the menu, with the keys, and hands focus back to More (ADR 0023)', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a touch screen scrolls the row instead');
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto('/?a=meter&v=1');
+  await ready(page);
+  const bar = page.getByRole('toolbar', { name: 'Tools' });
+  const more = bar.getByRole('button', { name: 'More tools' });
+  await expect(more).toHaveAttribute('aria-expanded', 'false');
+  // Enter on More opens it on the first item; ↑ and ↓ go round; Escape closes it back on More.
+  await more.focus();
+  await page.keyboard.press('Enter');
+  const items = page.getByRole('menuitem');
+  await expect(items).toHaveText(['Undo', 'Redo', 'Clear all']);
+  await expect(items.first()).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await expect(items.last()).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(items.first()).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(more).toBeFocused();
+  await expect(more).toHaveAttribute('aria-expanded', 'false');
+  // → from an item closes the menu and moves along the toolbar, round to the category menu.
+  await page.keyboard.press('Enter');
+  await expect(items.first()).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect(menu(page)).toBeFocused();
+  // Clear all from More clears the box, and does what clear all does: the caret goes into the box.
+  await more.click();
+  await page.getByRole('menuitem', { name: 'Clear all' }).click();
+  await expect(box(page)).toHaveValue('');
+  await expect(box(page)).toBeFocused();
+  await expectNoA11yViolations(page);
+  // At 320 px Display folds too; opened from More, its panel closes back onto More.
+  await page.setViewportSize({ width: 320, height: 800 });
+  await expect(settingsButton(page, 'Display')).toHaveCount(0);
+  await more.click();
+  await page.getByRole('menuitem', { name: 'Display' }).click();
+  await expect(settingsPanel(page, 'Display')).toBeVisible();
+  await settingsPanel(page, 'Display')
+    .getByRole('button', { name: /^Close/ })
+    .click();
+  await expect(more).toBeFocused();
+  // Wider again, every tool is back on the row and More is gone.
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(more).toHaveCount(0);
+  await expect(bar.getByRole('button', { name: 'Clear all', exact: true })).toBeVisible();
 });
 
 test('one copy button, laid over the active row’s end, copies what the row shows', async ({
@@ -1661,9 +1764,7 @@ test('the toolbar and the box stay at the window’s top as one block while a lo
       const rect = document.querySelector('[data-plane="box"]')!.getBoundingClientRect();
       return { top: Math.round(rect.top), bottom: Math.round(rect.bottom) };
     });
-  // The toolbar's leading line (the category menu first) is what sits at the window's top when
-  // the head is stuck: on one line it is the toolbar's top; where the toolbar has wrapped (a
-  // phone), the line above it, undo, redo, and clear all, is held above the window.
+  // The toolbar's row, the category menu first, sits at the window's top when the head is stuck.
   const leadingTop = () =>
     page.evaluate(() =>
       Math.round(

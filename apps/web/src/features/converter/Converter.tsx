@@ -15,7 +15,6 @@ import {
 import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
 import { copiedText } from '../../components/ConversionTable';
 import { NumberText, runningValue } from '../../components/NumberText';
-import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { track } from '../../lib/analytics';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
@@ -27,7 +26,7 @@ import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { glide } from './glide';
 import { DisplayPanel, UnitsPanel } from './SettingsPanels';
 import type { Settings } from './settings';
-import { TableLayout } from './TableLayout';
+import { TableLayout, type ToolbarTool } from './TableLayout';
 import { urlFor } from './url';
 import { useConverter } from './useConverter';
 
@@ -143,7 +142,16 @@ export function Converter() {
    * opened from its button, which closes back onto the button.
    */
   const returnTo = useRef<HTMLElement | null>(null);
-  const calculatorToggle = () => document.getElementById(calculatorToggleId);
+  /**
+   * A tool's button by its id, or, where the toolbar's row had no room for it and folded it into
+   * More (TableLayout, ADR 0023), the More trigger, so focus coming back to a tool lands on
+   * something shown.
+   */
+  const toolElement = (id: string): HTMLElement | null =>
+    document.getElementById(id) ??
+    sectionRef.current?.querySelector<HTMLElement>('[data-tool="more"]') ??
+    null;
+  const calculatorToggle = () => toolElement(calculatorToggleId);
 
   const openCalculator = (from: HTMLElement | null) => {
     returnTo.current = from;
@@ -162,7 +170,7 @@ export function Converter() {
       units: unitsToggleId,
       display: displayToggleId,
     };
-    const toggle = side ? document.getElementById(button[side]) : null;
+    const toggle = side ? toolElement(button[side]) : null;
     const focus = returnTo.current;
     setSide(null);
     (focus?.isConnected ? focus : toggle)?.focus();
@@ -208,7 +216,7 @@ export function Converter() {
   /** Closed from inside it (its × or Escape), focus goes back to its button. */
   const closeSettings = (key: 'units' | 'display') => {
     setSide(null);
-    document.getElementById(key === 'units' ? unitsToggleId : displayToggleId)?.focus();
+    toolElement(key === 'units' ? unitsToggleId : displayToggleId)?.focus();
   };
 
   /**
@@ -312,6 +320,89 @@ export function Converter() {
     );
   }
 
+  /**
+   * The toolbar's tools after the category menu, in the order they show (docs/UX-SPEC.md §1): the
+   * calculator, Units, and Display at the left, undo, redo, a rule, and clear all at the right end.
+   * The layout draws each as a button on the row or, where a pointer's row has no room for it, as
+   * an item of More (TableLayout, ADR 0023).
+   */
+  const tools: ToolbarTool[] = [
+    {
+      id: 'calculator',
+      group: 'leading',
+      label: 'Calculator',
+      icon: <CalculatorIcon />,
+      keys: 'Alt+C',
+      title: apple ? 'Calculator (⌥C)' : 'Calculator (Alt+C)',
+      expanded: calculatorOpen,
+      controls: calculatorOpen ? sideId : undefined,
+      on: calculatorOpen,
+      elementId: calculatorToggleId,
+      onPress: () => {
+        // Closed with the icon, focus stays on it, wherever the calculator was opened from.
+        const icon = calculatorToggle();
+        if (calculatorOpen) closeCalculator(icon);
+        else openCalculator(icon);
+      },
+    },
+    {
+      id: 'units',
+      group: 'leading',
+      label: 'Units',
+      icon: <ListArrowIcon />,
+      keys: 'Alt+V',
+      title: apple ? 'Units (⌥V)' : 'Units (Alt+V)',
+      expanded: side === 'units',
+      controls: side === 'units' ? sideId : undefined,
+      on: side === 'units',
+      elementId: unitsToggleId,
+      onPress: () => toggleSettings('units'),
+    },
+    {
+      id: 'display',
+      group: 'leading',
+      label: 'Display',
+      icon: <RulerIcon />,
+      keys: 'Alt+B',
+      title: apple ? 'Display (⌥B)' : 'Display (Alt+B)',
+      expanded: side === 'display',
+      controls: side === 'display' ? sideId : undefined,
+      on: side === 'display',
+      elementId: displayToggleId,
+      onPress: () => toggleSettings('display'),
+    },
+    {
+      id: 'undo',
+      group: 'end',
+      label: 'Undo',
+      icon: <UndoIcon />,
+      keys: 'Control+Z Meta+Z',
+      title: apple ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)',
+      disabled: !canUndo,
+      onPress: () => dispatch({ type: 'undo' }),
+    },
+    {
+      id: 'redo',
+      group: 'end',
+      label: 'Redo',
+      icon: <RedoIcon />,
+      keys: 'Control+Y Control+Shift+Z Meta+Shift+Z Meta+Y',
+      title: apple ? 'Redo (⇧⌘Z)' : 'Redo (Ctrl+Y)',
+      disabled: !canRedo,
+      onPress: () => dispatch({ type: 'redo' }),
+    },
+    {
+      id: 'clear',
+      group: 'end',
+      // Clearing is a different kind of step from undo and redo, so a rule sets it apart.
+      dividerBefore: true,
+      label: 'Clear all',
+      icon: <EraserIcon />,
+      disabled: isEmpty,
+      onPress: clearAll,
+    },
+  ];
+
   return (
     <section
       ref={sectionRef}
@@ -332,101 +423,7 @@ export function Converter() {
       </p>
 
       <TableLayout
-        leadingTools={
-          <>
-            <Button
-              variant="ghost"
-              square
-              id={calculatorToggleId}
-              data-tool="calculator"
-              aria-label="Calculator"
-              aria-keyshortcuts="Alt+C"
-              title={apple ? 'Calculator (⌥C)' : 'Calculator (Alt+C)'}
-              aria-expanded={calculatorOpen}
-              aria-controls={calculatorOpen ? sideId : undefined}
-              onClick={() => {
-                // Closed with the icon, focus stays on it, wherever the calculator was opened from.
-                const icon = calculatorToggle();
-                if (calculatorOpen) closeCalculator(icon);
-                else openCalculator(icon);
-              }}
-              on={calculatorOpen}
-            >
-              <CalculatorIcon />
-            </Button>
-            <Button
-              variant="ghost"
-              square
-              id={unitsToggleId}
-              data-tool="units"
-              aria-label="Units"
-              aria-keyshortcuts="Alt+V"
-              title={apple ? 'Units (⌥V)' : 'Units (Alt+V)'}
-              aria-expanded={side === 'units'}
-              aria-controls={side === 'units' ? sideId : undefined}
-              on={side === 'units'}
-              onClick={() => toggleSettings('units')}
-            >
-              <ListArrowIcon />
-            </Button>
-            <Button
-              variant="ghost"
-              square
-              id={displayToggleId}
-              data-tool="display"
-              aria-label="Display"
-              aria-keyshortcuts="Alt+B"
-              title={apple ? 'Display (⌥B)' : 'Display (Alt+B)'}
-              aria-expanded={side === 'display'}
-              aria-controls={side === 'display' ? sideId : undefined}
-              on={side === 'display'}
-              onClick={() => toggleSettings('display')}
-            >
-              <RulerIcon />
-            </Button>
-          </>
-        }
-        tools={
-          <>
-            <Button
-              variant="ghost"
-              square
-              data-tool="undo"
-              aria-label="Undo"
-              aria-keyshortcuts="Control+Z Meta+Z"
-              title={apple ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)'}
-              aria-disabled={!canUndo || undefined}
-              onClick={() => canUndo && dispatch({ type: 'undo' })}
-            >
-              <UndoIcon />
-            </Button>
-            <Button
-              variant="ghost"
-              square
-              data-tool="redo"
-              aria-label="Redo"
-              aria-keyshortcuts="Control+Y Control+Shift+Z Meta+Shift+Z Meta+Y"
-              title={apple ? 'Redo (⇧⌘Z)' : 'Redo (Ctrl+Y)'}
-              aria-disabled={!canRedo || undefined}
-              onClick={() => canRedo && dispatch({ type: 'redo' })}
-            >
-              <RedoIcon />
-            </Button>
-            {/* Clearing is a different kind of step from undo and redo, so a divider sets it apart. */}
-            <ToolbarDivider />
-            <Button
-              variant="ghost"
-              square
-              data-tool="clear"
-              aria-label="Clear all"
-              title="Clear all"
-              aria-disabled={isEmpty || undefined}
-              onClick={() => !isEmpty && clearAll()}
-            >
-              <EraserIcon />
-            </Button>
-          </>
-        }
+        tools={tools}
         settings={settings}
         onSettings={changeShown}
         inputRef={inputRef}

@@ -156,6 +156,21 @@ export const unitCell = (page: Page, unitId: string) =>
 export const settingsButton = (page: Page, name: 'Units' | 'Display') =>
   page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name, exact: true });
 
+/**
+ * Presses a tool of the converter's toolbar by its name, wherever the row has put it: its button
+ * on the row, or, where a pointer's row had no room for it, its item in More (ADR 0023).
+ */
+export async function pressTool(page: Page, name: string) {
+  const bar = page.getByRole('toolbar', { name: 'Tools' });
+  const button = bar.getByRole('button', { name, exact: true });
+  if (await button.count()) {
+    await button.click();
+    return;
+  }
+  await bar.getByRole('button', { name: 'More tools' }).click();
+  await page.getByRole('menuitem', { name, exact: true }).click();
+}
+
 /** A settings side panel, by its title. */
 export const settingsPanel = (page: Page, name: 'Units' | 'Display') =>
   page.getByRole('group', { name, exact: true });
@@ -184,7 +199,7 @@ export async function setSettings(page: Page, ...choices: string[]) {
   for (const choice of choices) {
     const name = UNITS_CHOICES.has(choice) ? 'Units' : 'Display';
     const panel = settingsPanel(page, name);
-    if (!(await panel.count())) await settingsButton(page, name).click();
+    if (!(await panel.count())) await pressTool(page, name);
     const button = panel.getByRole('button', { name: new RegExp(`^${choice}`) });
     if (await button.count()) await button.click();
     else

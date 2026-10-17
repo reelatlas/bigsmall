@@ -1,5 +1,6 @@
 import { formatClock, formatNumber, getUnit, ingredients, type CategoryId } from '@bigsmall/core';
 import {
+  Fragment,
   useEffect,
   useId,
   useLayoutEffect,
@@ -11,15 +12,20 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react';
+import { Button } from '../../components/Button';
 import { CategoryMenu } from '../../components/CategoryMenu';
 import { CategoryTiles } from '../../components/CategoryTiles';
 import { ConversionTable, type ConversionTableProps } from '../../components/ConversionTable';
+import { MoreMenu } from '../../components/MoreMenu';
+import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { UnitMatches } from '../../components/UnitMatches';
 import { ValueField } from '../../components/ValueField';
 import { track } from '../../lib/analytics';
 import { pressedByTouch } from '../../lib/modality';
+import { fitTools } from '../../lib/overflow';
 import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
+import { cx } from '../../lib/recipes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
 import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
@@ -51,33 +57,34 @@ const TABLE_GRID =
  * the canvas behind it, and a strip of canvas under it as deep as the gap to the table
  * (`after:h-2`, the rows cell's `mt-2`), cover the rows passing under; the strip's lower edge is a
  * rule only while the head is stuck (`data-stuck`). Drawn by a pseudo-element, so the head keeps
- * its own size. Where the toolbar has wrapped onto two lines, the head sticks with the line above
- * its leading one, undo, redo, and clear all, above the window (`style.top`, measured), so one
- * toolbar line stays with the box. Over a section's name (STUCK_HEADING, 5) and under an open
- * shell (SHELL, 20).
+ * its own size. Over a section's name (STUCK_HEADING, 5) and under an open shell (SHELL, 20).
  */
 const TABLE_HEAD_CELL =
-  'relative z-10 max-w-xl bg-canvas group-data-stick/stick:sticky after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid';
-/** The toolbar's row in the head. */
-const TABLE_TOOLS_CELL = 'md:row-start-1';
+  'relative z-10 max-w-xl bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid';
+/** The toolbar's row in the head, 8 px over the box. */
+const TABLE_TOOLS_CELL = 'relative mb-2 md:row-start-1';
 /**
- * The toolbar row (Sean, 2026-10-10 and 15): the category menu, the calculator, Units, and
- * Display at its left, the menu's edge on the box's, with no dividers between them; undo, redo,
- * and clear all at its right end. Where the row has no room for both, undo, redo, and clear all
- * keep the top line and the leading four wrap under it, both lines flush left over the box, on a
- * phone or a narrow window alike, with no breakpoint: the leading four come first in the markup,
- * `flex-wrap-reverse` stacks a wrapped row's first line at the bottom, and `justify-between` puts
- * the two groups at the ends of a shared line and a group alone on its line at its start. The
- * browser's own fit decides, in every theme.
+ * The fades at the toolbar's edges where more of a scrolling row waits (ADR 0023): canvas into
+ * nothing over a tool's width, each shown by `data-reach` on the cell, read from the row's scroll;
+ * over the tools, under an open shell.
  */
-const TABLE_TOOLS_ROW = 'mb-2 flex flex-wrap-reverse items-center justify-between gap-x-4 gap-y-2';
-const TABLE_LEADING = 'flex items-center gap-1';
+const TABLE_TOOLS_FADES =
+  'before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:z-10 before:w-11 before:bg-linear-to-r before:from-canvas before:opacity-0 before:transition-opacity data-[reach~=left]:before:opacity-100 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-11 after:bg-linear-to-l after:from-canvas after:opacity-0 after:transition-opacity data-[reach~=right]:after:opacity-100';
 /**
- * The right end's tools: their outer edges on the box's (the last button's at the row's right end,
- * or the first's at its left once they have a line of their own), so a filled one (switched on,
- * hovered) lines up with the box and the table, its glyph inside the column as their text is.
+ * The toolbar's one row (Sean, 2026-10-10, 15, and 17; ADR 0023): the category menu, the
+ * calculator, Units, and Display at its left, the menu's edge on the box's, with no dividers
+ * between them; undo, redo, a rule, and clear all at its right end, the last one's edge on the
+ * box's, so a filled one (switched on, hovered) lines up with the box and the table. It never
+ * wraps: where it lacks room, a touch screen scrolls it sideways (TABLE_TOOLS_SCROLLS), and a
+ * pointer gets More, the tools the row has no room for folded behind one icon (MoreMenu), measured
+ * below.
  */
-const TABLE_TOOLS = 'flex shrink-0 items-center gap-1';
+const TABLE_TOOLS_ROW = 'flex items-center gap-1';
+/** The row on a touch screen: a scroll container without a bar, the fades saying where more waits. */
+const TABLE_TOOLS_SCROLLS = 'scrollbar-none overflow-x-auto overscroll-x-contain';
+const TABLE_LEADING = 'flex shrink-0 items-center gap-1';
+/** The right end's tools, at the row's end while there is room, right after the leading ones otherwise. */
+const TABLE_TOOLS = 'ml-auto flex shrink-0 items-center gap-1';
 /** The box's row in the head. */
 const TABLE_BOX_CELL = 'md:row-start-2';
 /**
@@ -114,11 +121,38 @@ function viewKeyOf(view: TableView): string {
   return view.kind === 'units' ? `units:${view.category}` : view.kind;
 }
 
+/**
+ * A tool of the converter's toolbar, declared once and drawn by the layout as a ghost icon button
+ * on the row or, where a pointer's row has no room for it, as an item of More (ADR 0023).
+ */
+export interface ToolbarTool {
+  /** Its name as a control of the toolbar (`data-tool`, ADR 0014). */
+  id: string;
+  label: string;
+  icon: ReactNode;
+  /** The tooltip, with the shortcut where it has one; the label otherwise. */
+  title?: string;
+  /** Its keyboard shortcut, for assistive technology (`aria-keyshortcuts`). */
+  keys?: string;
+  onPress: () => void;
+  /** Can do nothing right now (`aria-disabled`, so it keeps its place in the row's order). */
+  disabled?: boolean;
+  /** For a toggle (the calculator, Units, Display): whether its panel is open, and the panel's id. */
+  expanded?: boolean;
+  controls?: string | undefined;
+  /** Switched on: the panel it opens is open. */
+  on?: boolean;
+  /** The element's id, which the host uses to put focus back on it. */
+  elementId?: string;
+  /** With the category menu at the row's left, or at its right end. */
+  group: 'leading' | 'end';
+  /** A thin rule before it, setting it apart (clear all from undo and redo). */
+  dividerBefore?: boolean;
+}
+
 export interface TableLayoutProps {
-  /** The tools after the category menu: the calculator, Units, and Display. */
-  leadingTools: ReactNode;
-  /** The toolbar's right end: undo, redo, and clear all. */
-  tools: ReactNode;
+  /** The toolbar's tools after the category menu, in the order they show. */
+  tools: readonly ToolbarTool[];
   /** What shows and how it looks (settings.ts). */
   settings: Settings;
   onSettings: (update: (settings: Settings) => Settings) => void;
@@ -159,7 +193,6 @@ export interface TableLayoutProps {
  * from browsing the table to an empty page.
  */
 export function TableLayout({
-  leadingTools,
   tools,
   settings,
   onSettings,
@@ -194,7 +227,6 @@ export function TableLayout({
   const rootRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
-  const leadingRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
   const placeRef = useRef<HTMLDivElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
@@ -252,12 +284,11 @@ export function TableLayout({
    * The head, the toolbar and the box, stays at the window's top while the table scrolls, the
    * section names under it (a trial, Sean, 2026-10-17; docs/UX-SPEC.md §1). Measured, never
    * counted: the head's height says where a name sticks under it, a pixel under the strip's edge
-   * (docs/LEARNINGS.md, "Stacked sticky headers"); where the toolbar has wrapped onto two lines,
-   * the line above its leading one (undo, redo, clear all) sticks above the window, so one toolbar
-   * line stays with the box; and nothing sticks where the window is shorter than what would show,
-   * a name, and three rows together (a phone on its side, 400% zoom), so the table stays usable.
+   * (docs/LEARNINGS.md, "Stacked sticky headers"), and nothing sticks where the window is shorter
+   * than the head, a name, and three rows together (a phone on its side, 400% zoom), so the table
+   * stays usable.
    */
-  const [stick, setStick] = useState({ height: 0, hidden: 0, gap: 0, on: false });
+  const [stick, setStick] = useState({ height: 0, gap: 0, on: false });
   const [stuck, setStuck] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -265,11 +296,6 @@ export function TableLayout({
     if (!head || typeof ResizeObserver === 'undefined') return;
     const measure = () => {
       const height = head.getBoundingClientRect().height;
-      // The toolbar's lines above its leading one: where the leading group starts below the
-      // toolbar's top, the toolbar has wrapped, and that much of the head sticks above the window.
-      const toolbar = toolsRef.current?.getBoundingClientRect().top;
-      const leading = leadingRef.current?.getBoundingClientRect().top;
-      const hidden = toolbar !== undefined && leading !== undefined ? leading - toolbar : 0;
       const place = placeRef.current;
       // The gap between the box and the table, which the stuck head's strip covers.
       const gap = place ? parseFloat(getComputedStyle(place).marginTop) || 0 : 0;
@@ -278,11 +304,9 @@ export function TableLayout({
           .height ?? 0;
       const row =
         place?.querySelector('[data-row], [role="option"]')?.getBoundingClientRect().height ?? 0;
-      const on = window.innerHeight >= height - hidden + gap + heading + 3 * row;
+      const on = window.innerHeight >= height + gap + heading + 3 * row;
       setStick((now) =>
-        now.height === height && now.hidden === hidden && now.gap === gap && now.on === on
-          ? now
-          : { height, hidden, gap, on },
+        now.height === height && now.gap === gap && now.on === on ? now : { height, gap, on },
       );
     };
     measure();
@@ -319,13 +343,11 @@ export function TableLayout({
    * and none of those is reading the table.
    */
   const sticking = stick.on && !editing && !hiddenOpen && !sideBelow;
-  // What the stuck head shows: its height less the toolbar lines held above the window.
-  const shown = stick.height - stick.hidden;
-  // A section's name sticks a pixel under the strip's lower edge (what shows, then its gap).
-  const stickTop = sticking ? shown + stick.gap - 1 : undefined;
-  // The rule under the head only while it is stuck: a pixel set 2 px over the edge that sticks at
-  // the window's top leaves the window exactly then (at 1 px it would touch the window's edge,
-  // which still counts as intersecting).
+  // A section's name sticks a pixel under the strip's lower edge (the head, then its gap).
+  const stickTop = sticking ? stick.height + stick.gap - 1 : undefined;
+  // The rule under the head only while it is stuck: a pixel set 2 px over the head's top edge
+  // leaves the window exactly then (at 1 px it would touch the window's edge, which still counts
+  // as intersecting).
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || typeof IntersectionObserver === 'undefined') return;
@@ -335,6 +357,109 @@ export function TableLayout({
     watcher.observe(sentinel);
     return () => watcher.disconnect();
   }, [sticking]);
+  /**
+   * The toolbar's one row never wraps (ADR 0023; docs/UX-SPEC.md §1). Where it lacks room, the
+   * pointer decides: a touch screen scrolls the row sideways, a fade at each edge where more
+   * waits; a mouse or trackpad gets More, the tools the row has no room for folded behind one icon
+   * at its end (MoreMenu). Which tools fit is measured, never counted: the row's width, the
+   * category menu's, and each tool's as rendered (lib/overflow.ts), kept once read, since a tool
+   * folded away cannot be measured again; More is a square like the tools, so until it has shown,
+   * the first tool stands in for its width.
+   */
+  const [coarse, setCoarse] = useState(false);
+  useLayoutEffect(() => {
+    const pointer = window.matchMedia('(pointer: coarse)');
+    const read = () => setCoarse(pointer.matches);
+    read();
+    pointer.addEventListener('change', read);
+    return () => pointer.removeEventListener('change', read);
+  }, []);
+  const [shownTools, setShownTools] = useState(tools.length);
+  const [, setResized] = useState(0);
+  const widths = useRef(new Map<string, number>());
+  useLayoutEffect(() => {
+    const row = toolsRef.current;
+    if (!row || typeof ResizeObserver === 'undefined') return;
+    const resizes = new ResizeObserver(() => setResized((count) => count + 1));
+    resizes.observe(row);
+    return () => resizes.disconnect();
+  }, []);
+  useLayoutEffect(() => {
+    const row = toolsRef.current;
+    if (!row) return;
+    // A thing's width on the row, margins included (the divider has them).
+    const widthOf = (element: HTMLElement) => {
+      const style = getComputedStyle(element);
+      return (
+        element.getBoundingClientRect().width +
+        (parseFloat(style.marginLeft) || 0) +
+        (parseFloat(style.marginRight) || 0)
+      );
+    };
+    for (const thing of row.querySelectorAll<HTMLElement>('[data-tool], [data-divider]')) {
+      widths.current.set(thing.dataset['tool'] ?? 'divider', widthOf(thing));
+    }
+    const read = (id: string) => widths.current.get(id);
+    const square = read(tools[0]?.id ?? '') ?? 0;
+    const dividerAt = tools.findIndex((tool) => tool.dividerBefore);
+    const fit = coarse
+      ? tools.length
+      : fitTools({
+          room: row.clientWidth,
+          fixed: read('category') ?? 0,
+          widths: tools.map((tool) => read(tool.id) ?? square),
+          gap: parseFloat(getComputedStyle(row).columnGap) || 0,
+          ...(dividerAt >= 0 && { divider: { before: dividerAt, width: read('divider') ?? 0 } }),
+          more: read('more') ?? square,
+        });
+    if (fit !== shownTools) setShownTools(fit);
+  });
+  // Where more of the scrolling row waits, for the fades: read as it scrolls and as it resizes.
+  const [reach, setReach] = useState('');
+  useLayoutEffect(() => {
+    const row = toolsRef.current;
+    if (!row || !coarse || typeof ResizeObserver === 'undefined') return;
+    const read = () => {
+      const most = row.scrollWidth - row.clientWidth;
+      const sides = [row.scrollLeft > 1 && 'left', row.scrollLeft < most - 1 && 'right'];
+      setReach(sides.filter(Boolean).join(' '));
+    };
+    read();
+    row.addEventListener('scroll', read, { passive: true });
+    const resizes = new ResizeObserver(read);
+    resizes.observe(row);
+    return () => {
+      row.removeEventListener('scroll', read);
+      resizes.disconnect();
+    };
+  }, [coarse]);
+  const shownList = tools.slice(0, shownTools);
+  const folded = tools.slice(shownTools);
+  const toolButton = (tool: ToolbarTool) => (
+    <Fragment key={tool.id}>
+      {tool.dividerBefore && <ToolbarDivider data-divider="" />}
+      <Button
+        variant="ghost"
+        square
+        id={tool.elementId}
+        data-tool={tool.id}
+        aria-label={tool.label}
+        aria-keyshortcuts={tool.keys}
+        title={tool.title ?? tool.label}
+        aria-expanded={tool.expanded}
+        aria-controls={tool.expanded ? tool.controls : undefined}
+        aria-disabled={tool.disabled || undefined}
+        on={tool.on ?? false}
+        // On a touch screen the row is a scroll container, which would clip the ring around a
+        // button at its edge, so the ring goes inside the button, as in a filled row.
+        className={cx(coarse && 'focus-ring-inset')}
+        onClick={() => !tool.disabled && tool.onPress()}
+      >
+        {tool.icon}
+      </Button>
+    </Fragment>
+  );
+
   /**
    * Edit ends, as Done ends it, when the box changes (typing in it, or typing from the table that
    * lands in it) or Escape is pressed there: back in the box, converting is the job again.
@@ -585,7 +710,7 @@ export function TableLayout({
     field.scrollIntoView({ block: 'nearest' });
     // Under a stuck head, the table's own top comes out from behind it; measured, since a
     // browser's "nearest" with a scroll margin landed it 35 px short.
-    const behind = place.getBoundingClientRect().top - (sticking ? shown + stick.gap : 0);
+    const behind = place.getBoundingClientRect().top - (sticking ? stick.height + stick.gap : 0);
     if (behind < 0) window.scrollBy(0, behind);
   });
 
@@ -877,40 +1002,56 @@ export function TableLayout({
           className={TABLE_HEAD_CELL}
           data-head
           data-stuck={stuck ? '' : undefined}
-          // The toolbar's wrapped line held above the window while stuck; 0 on one line.
-          style={{ top: sticking ? -stick.hidden : undefined }}
         >
           <div
             ref={sentinelRef}
             aria-hidden="true"
-            className="pointer-events-none absolute h-px w-px"
-            style={{ top: stick.hidden - 2 }}
+            className="pointer-events-none absolute -top-0.5 h-px w-px"
           />
-          <div className={TABLE_TOOLS_CELL}>
+          <div
+            className={cx(TABLE_TOOLS_CELL, coarse && TABLE_TOOLS_FADES)}
+            data-reach={coarse && reach ? reach : undefined}
+          >
             {/* The converter's toolbar, the page's second plane (ADR 0014): first reached at the menu. */}
             <div
               ref={toolsRef}
               role="toolbar"
               aria-label="Tools"
-              className={TABLE_TOOLS_ROW}
+              className={cx(TABLE_TOOLS_ROW, coarse && TABLE_TOOLS_SCROLLS)}
               data-plane="tools"
               data-default-tool="category"
             >
-              <div ref={leadingRef} className={TABLE_LEADING}>
+              <div className={TABLE_LEADING}>
                 <CategoryMenu
                   categories={table.categories}
                   value={chosen}
                   counts={table.kind === 'matches' ? table.counts : undefined}
                   tool="category"
+                  ringInset={coarse}
                   onChoose={(category) => {
                     chooseCategory(category);
                     // After a tap focus stays with the menu, so no keyboard comes up (ADR 0015).
                     if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
                   }}
                 />
-                {leadingTools}
+                {shownList.filter((tool) => tool.group === 'leading').map(toolButton)}
               </div>
-              <div className={TABLE_TOOLS}>{tools}</div>
+              <div className={TABLE_TOOLS}>
+                {shownList.filter((tool) => tool.group === 'end').map(toolButton)}
+                {folded.length > 0 && (
+                  <MoreMenu
+                    tool="more"
+                    items={folded.map((tool) => ({
+                      id: tool.id,
+                      label: tool.label,
+                      icon: tool.icon,
+                      onPress: tool.onPress,
+                      disabled: tool.disabled,
+                      keys: tool.keys,
+                    }))}
+                  />
+                )}
+              </div>
             </div>
           </div>
           <div

@@ -101,6 +101,17 @@
 }
 
 /*
+ * A row that scrolls sideways without a bar (the converter's toolbar on a touch screen, ADR
+ * 0023): the fade at each edge says where more waits, and a swipe is the way along it.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
  * A check that draws itself in, for a confirmation such as a reset done (docs/DESIGN-SYSTEM.md,
  * "Motion"). It rests fully drawn and animates from hidden, so reduced motion, which stops every
  * animation, shows it whole. 24 covers the check's path (about 20 units long).

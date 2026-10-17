@@ -4,6 +4,8 @@ import { Calculator, SendButton } from '../../../components/Calculator';
 import { CategoryMenu } from '../../../components/CategoryMenu';
 import { CategoryTiles } from '../../../components/CategoryTiles';
 import { ConversionTable } from '../../../components/ConversionTable';
+import { EraserIcon, RedoIcon, UndoIcon } from '../../../components/icons';
+import { MoreMenu, type MoreMenuItem } from '../../../components/MoreMenu';
 import { NumberText } from '../../../components/NumberText';
 import { UnitMatches } from '../../../components/UnitMatches';
 import { ValueField } from '../../../components/ValueField';
@@ -29,6 +31,13 @@ import type { ConverterEnv } from '../../../features/converter/useConverter';
 
 const ENV: ConverterEnv = { locale: 'en-US', separators: DEFAULT_SEPARATORS, system: 'us' };
 const noop = () => undefined;
+
+/** The tools More lists in the gallery: the toolbar's right end, redo with nothing to redo. */
+const FOLDED: readonly MoreMenuItem[] = [
+  { id: 'undo', label: 'Undo', icon: <UndoIcon />, onPress: noop },
+  { id: 'redo', label: 'Redo', icon: <RedoIcon />, onPress: noop, disabled: true },
+  { id: 'clear', label: 'Clear all', icon: <EraserIcon />, onPress: noop },
+];
 
 /** The field in a frozen state: what is typed, the unit in its chip, and an ingredient beside it. */
 function FieldSample({
@@ -178,6 +187,11 @@ function TableSamples() {
       <div className="flex flex-wrap gap-3">
         <CategoryMenu categories={start.categories} value={null} onChoose={noop} />
         <CategoryMenu categories={start.categories} value="volume" onChoose={noop} />
+      </div>
+      {/* More, closed and open: the tools a toolbar's row had no room for (ADR 0023). */}
+      <div className="flex min-h-44 justify-end gap-3">
+        <MoreMenu items={FOLDED} />
+        <MoreMenu items={FOLDED} openAtFirst />
       </div>
       {start.kind === 'start' && (
         <CategoryTiles

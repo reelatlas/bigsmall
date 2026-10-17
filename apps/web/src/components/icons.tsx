@@ -198,3 +198,14 @@ export function PlayIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** More: three dots in a row, the tools a toolbar's row has no room for behind them (MoreMenu). */
+export function MoreIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="6" cy="12" r="1" />
+      <circle cx="12" cy="12" r="1" />
+      <circle cx="18" cy="12" r="1" />
+    </Icon>
+  );
+}

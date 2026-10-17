@@ -23,9 +23,9 @@ type Kind = (typeof KINDS)[number]['value'];
 
 /** The Message's empty state: an example of the kind, so a visitor knows what helps. */
 const EXAMPLE: Record<Kind, string> = {
-  inaccuracy: 'For example: a cup of whole wheat flour shows 120 g, and my bag says 113 g.',
-  bug: 'For example: on my iPhone, tapping the ingredient pill scrolled the page to the top.',
-  idea: 'For example: let me type 5 ft 10 in and see it in centimeters.',
+  inaccuracy: 'A stone shows 6.35 kg, and the chart at my gym says 6.4.',
+  bug: 'On my iPad, picking kilobytes scrolls the table to the top.',
+  idea: 'Let me type 5 ft 10 in and see it in centimeters.',
 };
 
 interface Report {

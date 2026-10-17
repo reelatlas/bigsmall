@@ -8,6 +8,7 @@ export type CategoryId =
   | 'length'
   | 'mass'
   | 'volume'
+  | 'cooking'
   | 'temperature'
   | 'area'
   | 'speed'
@@ -61,6 +62,11 @@ export interface Category {
   baseUnit: string;
   tier: Tier;
   group: CategoryGroup;
+  /**
+   * A lens over other categories' units, with none of its own (Cooking, over Weight and Volume;
+   * ADR 0021): its base unit is one of theirs, and an ingredient converts across them.
+   */
+  over?: readonly CategoryId[];
 }
 
 interface UnitMeta {
@@ -86,6 +92,11 @@ interface UnitMeta {
    * them (order.ts), in a Pace section of its own on the web.
    */
   pace?: true;
+  /**
+   * A unit of one ingredient alone, as people count it (a stick of butter, a large egg; ADR 0021):
+   * listed only with that ingredient, and taking it brings the ingredient.
+   */
+  ingredient?: string;
 }
 
 /** base = value × factor. Nearly every unit. */
@@ -118,3 +129,28 @@ export interface FunctionalUnit extends UnitMeta {
 }
 
 export type Unit = LinearUnit | AffineUnit | ReciprocalUnit | FunctionalUnit;
+
+/**
+ * An ingredient, which joins volume and weight through its density (ADR 0021): how much one US
+ * customary cup of it weighs, as USDA FoodData Central measures it.
+ */
+export interface Ingredient {
+  /** Stable identifier used in URLs. Lowercase, ASCII, kebab-case. */
+  id: string;
+  /** As a recipe names it, lowercase ("all-purpose flour"). */
+  name: string;
+  /** Other names people type ("flour", "plain flour", "icing sugar"). */
+  aliases: readonly string[];
+  /** Grams in one US customary cup (236.5882365 mL). Measured, never exact. */
+  gramsPerCup: number;
+  /** USDA FoodData Central's id for the food (SR Legacy). */
+  fdcId: number;
+  /** The portion the weight was read from, as USDA words it ("1 cup, packed = 220 g"). */
+  portion: string;
+  /** The food as FoodData Central describes it, and the portion, for the citation (ADR 0020). */
+  source: string;
+  /** How it is measured, where USDA says or a recipe needs it ("packed", "unsifted"). */
+  measured?: string;
+  /** The unit a bare count of it means, by id: "2 eggs" is two large eggs. */
+  counted?: string;
+}

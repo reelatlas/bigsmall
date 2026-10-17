@@ -313,7 +313,7 @@ test('under the matches, Show them carries on from the last match, and lists the
   await expect(hide).toBeFocused();
   // They list under the line, as Hidden lists its units under the table's foot, not among the
   // matches over it (Sean, 2026-10-15).
-  const matches = page.getByRole('listbox', { name: 'Matching units' }).getByRole('option');
+  const matches = page.getByRole('listbox', { name: 'Matches' }).getByRole('option');
   const hidden = page
     .getByRole('listbox', { name: /hidden units? also match/ })
     .getByRole('option');

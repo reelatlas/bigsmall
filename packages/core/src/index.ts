@@ -29,6 +29,18 @@ export type { ListGroup } from './order';
 export { matchSpan } from './highlight';
 export type { TextSpan } from './highlight';
 export { formatClock, formatNumber } from './format';
+export {
+  ingredients,
+  getIngredient,
+  exactIngredient,
+  matchIngredients,
+  splitIngredient,
+  cookingUnits,
+  countedUnit,
+  convertWith,
+  crossesDensity,
+} from './cooking';
+export type { IngredientMatch } from './cooking';
 export type { FormatOptions } from './format';
 export { formatFraction, formatPlaces, fractionsOf, FRACTION_SIZES } from './rounded';
 export type { Fraction, FractionSize, Rounded, Rounding } from './rounded';

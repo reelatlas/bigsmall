@@ -1,4 +1,4 @@
-import type { Category, CategoryId, Unit } from '@bigsmall/core';
+import type { Category, CategoryId, Ingredient, Unit } from '@bigsmall/core';
 import { useId, useLayoutEffect, useRef } from 'react';
 import { panelKeys } from '../lib/panel-keys';
 import {
@@ -15,10 +15,27 @@ import {
 import { Button } from './Button';
 import { MatchedText } from './MatchedText';
 
-/** A match as the list shows it: a unit, or a category whose name matched, to open. */
+/**
+ * A match as the list shows it: a unit, a category whose name matched, to open, or an ingredient,
+ * under Cooking, with the unit typed before it when there was one (ADR 0021).
+ */
 export type UnitMatch =
   | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean }
-  | { kind: 'category'; category: Category };
+  | { kind: 'category'; category: Category }
+  | {
+      kind: 'ingredient';
+      ingredient: Ingredient;
+      unit: Unit | null;
+      category: Category;
+      inBox: boolean;
+    };
+
+/** A match's key among its siblings. */
+function matchKey(match: UnitMatch): string {
+  if (match.kind === 'unit') return match.unit.id;
+  if (match.kind === 'category') return `#${match.category.id}`;
+  return `${match.ingredient.id}:${match.unit?.id ?? ''}`;
+}
 
 /** A unit that matches but the settings hide: offered apart, with its category and section. */
 export interface HiddenUnitMatch {
@@ -131,7 +148,7 @@ export function UnitMatches({
       {(matches.length > 0 || hidden.length > 0) && (
         <div className={ROWS}>
           {matches.length > 0 && (
-            <div id={id} role="listbox" aria-label="Matching units" className={LIST}>
+            <div id={id} role="listbox" aria-label="Matches" className={LIST}>
               {groups.map((group, groupIndex) => {
                 const headerId = `${groupId}-${group.category.id}`;
                 const count = counts[group.category.id] ?? 0;
@@ -163,7 +180,7 @@ export function UnitMatches({
                       return (
                         // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field
                         <div
-                          key={match.kind === 'unit' ? match.unit.id : `#${match.category.id}`}
+                          key={matchKey(match)}
                           id={itemId(index)}
                           role="option"
                           tabIndex={-1}
@@ -173,7 +190,7 @@ export function UnitMatches({
                           className={cx(
                             CURSOR_ROW,
                             'col-span-2 grid grid-cols-subgrid items-center',
-                            rowFill(match.kind === 'unit' && match.inBox, index === cursor),
+                            rowFill(match.kind !== 'category' && match.inBox, index === cursor),
                           )}
                         >
                           {match.kind === 'unit' ? (
@@ -182,6 +199,25 @@ export function UnitMatches({
                               <span className="sr-only">
                                 , {match.category.name}
                                 {match.inBox && ', in the box'}
+                              </span>
+                            </>
+                          ) : match.kind === 'ingredient' ? (
+                            // An ingredient: its name, matched letters heavier, after the unit typed
+                            // before it, "cups of all-purpose flour"; alone, its name.
+                            <>
+                              <span className={unitSymbol()}>{match.unit?.symbol}</span>
+                              <span className="min-w-0 text-ink">
+                                {match.unit && (
+                                  <span className={unitName(!symbolOnly)}>
+                                    {match.unit.plural} of{' '}
+                                  </span>
+                                )}
+                                <MatchedText
+                                  text={match.ingredient.name}
+                                  query={query}
+                                  className="font-semibold"
+                                />
+                                <span className="sr-only">, {match.category.name}</span>
                               </span>
                             </>
                           ) : (

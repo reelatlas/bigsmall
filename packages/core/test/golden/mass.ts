@@ -143,4 +143,27 @@ export const mass: GoldenRow[] = [
     expected: 0.001,
     source: 'BIPM SI Brochure, 9th ed. (2019), Table 7: micro = 10⁻⁶, milli = 10⁻³',
   },
+  // An ingredient's own units (ADR 0021), weights as USDA FoodData Central measures them.
+  {
+    value: 1,
+    from: 'stick-of-butter',
+    to: 'gram',
+    expected: 113,
+    source: 'USDA FoodData Central 173410 (SR Legacy), Butter, salted: 1 stick = 113 g',
+  },
+  {
+    value: 2,
+    from: 'large-egg',
+    to: 'gram',
+    expected: 100,
+    source: 'USDA FoodData Central 171287 (SR Legacy), Egg, whole, raw, fresh: 1 large = 50 g',
+  },
+  {
+    value: 1,
+    from: 'packet-of-yeast',
+    to: 'gram',
+    expected: 7.2,
+    source:
+      "USDA FoodData Central 175043 (SR Legacy), yeast, baker's, active dry: 1 packet = 7.2 g",
+  },
 ];

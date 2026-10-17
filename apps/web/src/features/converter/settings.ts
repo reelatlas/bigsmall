@@ -28,11 +28,21 @@ import {
 
 /**
  * A section of the table: `standard` holds a category with no regional system (time, data, angle),
- * `pace` a category's paces (Speed's min/km and min/mi), apart from the speeds they equal, and
- * `change` the box's number as a change rather than a reading (Temperature's, state.ts).
+ * `pace` a category's paces (Speed's min/km and min/mi), apart from the speeds they equal,
+ * `change` the box's number as a change rather than a reading (Temperature's, state.ts), and
+ * `weight` and `volume` Cooking's two quantities (ADR 0021).
  */
 export type SectionKey =
-  'metric' | 'us' | 'uk' | 'other' | 'standard' | 'pace' | 'specialty' | 'change';
+  | 'metric'
+  | 'us'
+  | 'uk'
+  | 'other'
+  | 'standard'
+  | 'pace'
+  | 'specialty'
+  | 'change'
+  | 'weight'
+  | 'volume';
 
 /**
  * Only headings take the parentheses; units keep their names and symbols. Specialty, for the units
@@ -47,6 +57,8 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
   pace: 'Pace',
   specialty: 'Specialty',
   change: 'As a change',
+  weight: 'Weight',
+  volume: 'Volume',
 };
 
 /**

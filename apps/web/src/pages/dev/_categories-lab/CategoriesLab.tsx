@@ -39,27 +39,12 @@ import {
 const ENV: ConverterEnv = { locale: 'en-US', separators: DEFAULT_SEPARATORS, system: 'us' };
 const noop = () => undefined;
 
-/** A category the menu does not have yet, so a mock's menu can show it chosen. */
-function proposedCategory(id: string, name: string): Category {
-  return {
-    id: id as CategoryId,
-    name,
-    aliases: [],
-    baseUnit: '',
-    tier: 'standard',
-    group: 'common',
-  };
-}
+/** Cooking, built since (ADR 0021): the mocks below are its lab rounds, kept until the lab retires. */
+const COOKING = { id: 'cooking' as CategoryId };
 
-const COOKING = proposedCategory('cooking', 'Cooking');
-
-/** The menu's categories with the proposed ones where they would sit. */
+/** The menu's categories, as the converter lists them. */
 function menuCategories(): Category[] {
-  const view = selectTable(initialState, ENV);
-  return view.categories.flatMap((category) => {
-    if (category.id === 'volume') return [category, COOKING];
-    return [category];
-  });
+  return selectTable(initialState, ENV).categories;
 }
 
 /** A unit the engine has, for a chip. */

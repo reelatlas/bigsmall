@@ -1,6 +1,7 @@
 import type { Category, CategoryId, Unit } from '../types';
 import { angle, angleUnits } from './angle';
 import { area, areaUnits } from './area';
+import { cooking, ingredientUnits } from './cooking';
 import { data, dataUnits } from './data';
 import { energy, energyUnits } from './energy';
 import { force, forceUnits } from './force';
@@ -20,6 +21,7 @@ export const categories: readonly Category[] = [
   length,
   mass,
   volume,
+  cooking,
   temperature,
   area,
   speed,
@@ -39,6 +41,8 @@ export const units: readonly Unit[] = [
   ...lengthUnits,
   ...massUnits,
   ...volumeUnits,
+  // Cooking's ingredients' own units (a stick of butter), weights listed only with their ingredient.
+  ...ingredientUnits,
   ...temperatureUnits,
   ...areaUnits,
   ...speedUnits,

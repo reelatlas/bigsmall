@@ -13,6 +13,7 @@ describe('search: idle lists', () => {
       '#length',
       '#mass',
       '#volume',
+      '#cooking',
       '#temperature',
       '#area',
       '#speed',

@@ -14,7 +14,11 @@ import { FormulasTools } from './FormulasTools';
  * heading and lines centered as the sketchbook is, its rows left-aligned to be scanned.
  */
 const groups = formulaGroups();
-const units = groups.reduce((count, group) => count + group.lines.length, 0);
+// Units alone: Cooking lists ingredients, which are not units.
+const units = groups.reduce(
+  (count, group) => count + (group.category.over ? 0 : group.lines.length),
+  0,
+);
 const listId = 'formula-list';
 
 /**
@@ -46,7 +50,7 @@ const STAT = 'font-numeric text-ink';
   </p>
   <FormulasTools client:idle listId={listId} heading={FORMULAS_HEADING} />
   <div id={listId} class="@container">
-    {groups.map(({ category, base, lines, plain }) => (
+    {groups.map(({ category, lines, summary, plain }) => (
       <details class="group border-t border-line first:border-t-0 last:border-b" data-plain={plain}>
         <summary class="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-md px-1 [&::-webkit-details-marker]:hidden">
           <ChevronDownIcon
@@ -55,9 +59,7 @@ const STAT = 'font-numeric text-ink';
             className="shrink-0 -rotate-90 text-ink-muted transition-transform group-open:rotate-0"
           />
           <span class="font-medium">{category.name}</span>
-          <span class="text-sm text-ink-muted">
-            {lines.length} units in {base.plural}
-          </span>
+          <span class="text-sm text-ink-muted">{summary}</span>
         </summary>
         <ol class="mb-4 pl-8">
           {lines.map((line) => (

@@ -1,4 +1,4 @@
-import type { ParsedInput, Unit } from '@bigsmall/core';
+import type { Ingredient, ParsedInput, Unit } from '@bigsmall/core';
 import {
   useId,
   useLayoutEffect,
@@ -25,6 +25,8 @@ export interface ValueFieldProps {
   /** The locale the running value is formatted in. */
   locale: string | undefined;
   unit: Unit | null;
+  /** The ingredient beside the unit, Cooking's second pill (ADR 0021). */
+  ingredient?: Ingredient | null;
   placeholder: string;
   /** Id of the text that describes the field (the converter's intro). */
   describedBy: string;
@@ -55,6 +57,10 @@ export interface ValueFieldProps {
   onChipOpen: () => void;
   /** The chip's × was clicked or tapped. */
   onChipRemove: () => void;
+  /** The ingredient's pill was clicked or tapped. */
+  onIngredientOpen?: () => void;
+  /** The ingredient's × was clicked or tapped. */
+  onIngredientRemove?: () => void;
 }
 
 /**
@@ -74,6 +80,17 @@ const TEXT_LAYER =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 
 /**
+ * The row with two pills, Cooking's unit and ingredient (ADR 0021): as FIELD_ROW, 60 px on one line
+ * where the pills fit beside the number, and where they do not, the pills together on a second
+ * line at its right end, the ingredient's name cut short before a third, so the number keeps its
+ * room. The browser's own fit decides, in any box.
+ */
+const TWO_PILL_ROW =
+  'flex min-h-15 flex-wrap items-center justify-end gap-x-2 gap-y-1 py-2 pr-2 pl-4';
+/** The number's room in a row with two pills: the pills wrap before it narrows past it. */
+const TWO_PILL_NUMBER = 'min-w-32';
+
+/**
  * The converter's field (docs/DESIGN-SYSTEM.md, "Fields"): a combobox input over a text layer, its
  * clear while it holds text, and the unit chip, the row fitted by measurement, so the chip gives
  * up its name before the value steps down a size, in a box of any width. Its edge is a shell's at
@@ -86,6 +103,7 @@ export function ValueField({
   parsed,
   locale,
   unit,
+  ingredient = null,
   placeholder,
   describedBy,
   popup,
@@ -96,10 +114,14 @@ export function ValueField({
   onClear,
   onChipOpen,
   onChipRemove,
+  onIngredientOpen,
+  onIngredientRemove,
 }: ValueFieldProps) {
   const rowRef = useRef<HTMLDivElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
   const chipNameRef = useRef<HTMLSpanElement>(null);
+  /** The ingredient's name, which the unit chip's name gives way to where it would be cut short. */
+  const ingredientNameRef = useRef<HTMLSpanElement>(null);
   /** No name to measure: with Symbol only the chip never shows one, so the number has its room. */
   const noName = useRef<HTMLSpanElement>(null);
   const inputId = `${useId()}-input`;
@@ -110,7 +132,7 @@ export function ValueField({
     () => ({ ref: textLayerRef, base: TEXT_LAYER, steps: NUMBER_SIZES }),
     [],
   );
-  const fit = useFieldFit(rowRef, symbolOnly ? noName : chipNameRef, fitText);
+  const fit = useFieldFit(rowRef, symbolOnly ? noName : chipNameRef, fitText, ingredientNameRef);
   const sizeClass = NUMBER_SIZES[fit.step];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
@@ -128,8 +150,8 @@ export function ValueField({
       <label htmlFor={inputId} className="sr-only">
         {label}
       </label>
-      <div ref={rowRef} className={FIELD_ROW}>
-        <div className="relative min-w-0 flex-1 self-stretch">
+      <div ref={rowRef} className={ingredient ? TWO_PILL_ROW : FIELD_ROW}>
+        <div className={cx('relative min-w-0 flex-1 self-stretch', ingredient && TWO_PILL_NUMBER)}>
           <input
             ref={inputRef}
             id={inputId}
@@ -177,17 +199,34 @@ export function ValueField({
             <ClearIcon />
           </Button>
         )}
-        {unit && (
-          // Out of the Tab order: the field's own keys do what the chip does. Pointers and screen
-          // readers still reach both buttons.
-          <UnitChip
-            unit={unit}
-            compact={symbolOnly || fit.compact}
-            nameRef={chipNameRef}
-            onOpen={onChipOpen}
-            onRemove={onChipRemove}
-          />
-        )}
+        {(() => {
+          const unitChip = unit && (
+            // Out of the Tab order: the field's own keys do what the chip does. Pointers and
+            // screen readers still reach both buttons.
+            <UnitChip
+              unit={unit}
+              compact={symbolOnly || fit.compact}
+              nameRef={chipNameRef}
+              onOpen={onChipOpen}
+              onRemove={onChipRemove}
+            />
+          );
+          if (!ingredient) return unitChip;
+          // Cooking's second pill, after the unit's, each removable (ADR 0021); the two wrap as
+          // one, the ingredient's giving way.
+          return (
+            <div className="flex min-w-0 items-center gap-2">
+              {unitChip}
+              <UnitChip
+                ingredient={ingredient}
+                compact={false}
+                nameRef={ingredientNameRef}
+                onOpen={onIngredientOpen ?? onChipOpen}
+                onRemove={onIngredientRemove ?? onChipRemove}
+              />
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

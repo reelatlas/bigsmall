@@ -427,3 +427,103 @@ describe('history', () => {
     expect(reduceWithHistory(h, { type: 'replace', text: '2' }).past).toEqual([]);
   });
 });
+
+describe('Cooking (ADR 0021)', () => {
+  const options = { ...EN, locale: 'en-US', system: 'us' as const };
+  const units = (state: ConverterState) => {
+    const shown = selectTable(state, options);
+    if (shown.kind !== 'units') throw new Error(`expected units, got ${shown.kind}`);
+    return shown;
+  };
+  const flour = (text = '2'): Action => ({
+    type: 'use',
+    unit: 'us-cup',
+    text,
+    ingredient: 'all-purpose-flour',
+  });
+
+  it('reads "2 cups flour" as one match, the cup and the flour, under Cooking first', () => {
+    const typed = selectTable(run(type('2 cups flour')), options);
+    if (typed.kind !== 'matches') throw new Error(typed.kind);
+    expect(typed.rows[0]).toMatchObject({
+      kind: 'ingredient',
+      ingredient: { id: 'all-purpose-flour' },
+      unit: { id: 'us-cup' },
+    });
+    // "2 eggs" counts eggs, a large egg each.
+    const eggs = selectTable(run(type('2 eggs')), options);
+    if (eggs.kind !== 'matches') throw new Error(eggs.kind);
+    expect(eggs.rows[0]).toMatchObject({ kind: 'ingredient', unit: { id: 'large-egg' } });
+  });
+
+  it('lists Weight, then Volume, the visitor’s own first, the weights measured (≈)', () => {
+    const state = run(flour());
+    expect(state).toMatchObject({ category: 'cooking', ingredient: 'all-purpose-flour' });
+    const table = units(state);
+    expect(table.sections.map((section) => section.label)).toEqual(['Weight', 'Volume']);
+    expect(table.sections[0]!.rows.map((row) => row.id)).toEqual([
+      'ounce',
+      'pound',
+      'gram',
+      'kilogram',
+    ]);
+    const row = (id: string) => table.rows.find((each) => each.id === id)!;
+    expect(row('gram')).toMatchObject({ text: '250', approx: true });
+    expect(row('milliliter')).toMatchObject({ approx: false });
+    expect(row('us-cup')).toMatchObject({ inBox: true, approx: false });
+    expect(table.note).toBe(
+      'All-purpose flour: 1 cup = 125 g (USDA FoodData Central 168894). A US cup is 236.6 mL; values marked ≈ go through this weight, which moves with how an ingredient is packed.',
+    );
+    expect(table.announcement).toBe('2 cups of all-purpose flour in 10 units');
+  });
+
+  it('keeps the ingredient for a weight or a volume, and lets it go for anything else', () => {
+    const grams = run(flour(), { type: 'use', unit: 'gram', text: '250' });
+    expect(grams).toMatchObject({ category: 'cooking', ingredient: 'all-purpose-flour' });
+    const meters = run(flour(), { type: 'use', unit: 'meter', text: '2' });
+    expect(meters).toMatchObject({ category: 'length', ingredient: null });
+    // Another category chosen leaves Cooking; Cooking chosen keeps the cup.
+    expect(run(flour(), { type: 'chooseCategory', category: 'volume' })).toMatchObject({
+      unit: 'us-cup',
+      ingredient: null,
+    });
+  });
+
+  it('takes the ingredient out to Volume, the unit out to Cooking’s list', () => {
+    const volume = run(flour(), { type: 'removeIngredient' });
+    expect(volume).toMatchObject({ category: 'volume', unit: 'us-cup', ingredient: null });
+    const waiting = run(flour(), { type: 'unlock' });
+    expect(waiting).toMatchObject({ category: 'cooking', unit: null });
+    expect(units(waiting).rows.every((row) => row.tone === 'empty')).toBe(true);
+    // A stick of butter brings butter, and goes with it.
+    const stick = run({ type: 'use', unit: 'stick-of-butter', text: '1' });
+    expect(stick).toMatchObject({ category: 'cooking', ingredient: 'butter' });
+    expect(
+      run({ type: 'use', unit: 'stick-of-butter', text: '1' }, { type: 'removeIngredient' }),
+    ).toMatchObject({
+      unit: null,
+      category: 'cooking',
+    });
+  });
+
+  it('lists every ingredient to choose from when Cooking has none, and a link brings one back', () => {
+    const list = selectTable(run({ type: 'chooseCategory', category: 'cooking' }), options);
+    expect(list).toMatchObject({ kind: 'matches', category: 'cooking', query: '' });
+    if (list.kind !== 'matches') throw new Error(list.kind);
+    expect(list.rows.length).toBe(list.counts.cooking);
+    const taken = run(
+      { type: 'chooseCategory', category: 'cooking' },
+      { type: 'useIngredient', ingredient: 'honey', text: '' },
+    );
+    expect(taken).toMatchObject({ category: 'cooking', ingredient: 'honey' });
+    const linked = run({
+      type: 'hydrate',
+      state: { text: '2', unit: 'us-cup', ingredient: 'all-purpose-flour' },
+    });
+    expect(linked).toMatchObject({ category: 'cooking', ingredient: 'all-purpose-flour' });
+    expect(run({ type: 'hydrate', state: { unit: 'meter', ingredient: 'honey' } })).toMatchObject({
+      category: 'length',
+      ingredient: null,
+    });
+  });
+});

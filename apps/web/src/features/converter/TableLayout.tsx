@@ -285,9 +285,10 @@ export function TableLayout({
    * when there is nothing left to clear.
    */
   const clearStep = (): boolean => {
-    if (table.kind === 'matches') dispatch({ type: 'replace', text: number });
+    if (table.kind === 'matches' && table.query !== '') dispatch({ type: 'replace', text: number });
     else if (box.text !== '') dispatch({ type: 'replace', text: '' });
-    else if (box.unit || table.kind === 'units') dispatch({ type: 'clear' });
+    // Cooking's ingredients to choose from count as its table.
+    else if (box.unit || box.ingredient || table.kind !== 'start') dispatch({ type: 'clear' });
     else return false;
     setPosition(null);
     return true;
@@ -427,12 +428,30 @@ export function TableLayout({
     );
 
   /** A unit taken into the box, with its new text; the category follows, and the cursor rests on its row. */
-  const take = (unitId: string, text: string) => {
-    dispatch({ type: 'use', unit: unitId, text });
+  const take = (unitId: string, text: string, ingredient?: string) => {
+    dispatch(
+      ingredient === undefined
+        ? { type: 'use', unit: unitId, text }
+        : { type: 'use', unit: unitId, text, ingredient },
+    );
     // Which units people convert in, counted as each is taken (ADR 0019).
     track('Unit chosen', { category: getUnit(unitId)?.category ?? '', unit: unitId });
     setPosition(null);
     caretToEnd.current = true;
+  };
+
+  /**
+   * An ingredient taken into the box (ADR 0021), with the unit typed before it when its match
+   * brought one ("2 cups flour"), the number as typed: Cooking's table.
+   */
+  const takeIngredient = (ingredient: string, unitId: string | null) => {
+    if (unitId) take(unitId, number, ingredient);
+    else {
+      dispatch({ type: 'useIngredient', ingredient, text: number });
+      setPosition(null);
+      caretToEnd.current = true;
+    }
+    track('Ingredient chosen', { ingredient });
   };
 
   /**
@@ -451,7 +470,9 @@ export function TableLayout({
       // never hides it again (Sean, 2026-10-10).
       const hiddenMatch = revealed ? table.hidden[index - table.rows.length] : undefined;
       if (match?.kind === 'unit') take(match.unit.id, number);
-      else if (match) chooseCategory(match.category.id);
+      else if (match?.kind === 'ingredient') {
+        takeIngredient(match.ingredient.id, match.unit?.id ?? null);
+      } else if (match) chooseCategory(match.category.id);
       else if (hiddenMatch) {
         choose([hiddenMatch], true);
         take(hiddenMatch.unit.id, number);
@@ -541,7 +562,10 @@ export function TableLayout({
         event.preventDefault();
         const worked = evaluatedText(box.text, env);
         if (browsing) takeRow(at);
-        else if (table.kind === 'matches') takeRow(0);
+        // A typed unit takes its best match; Cooking's ingredients, listed to choose from, are
+        // gone into, as a category's units are.
+        else if (table.kind === 'matches' && table.query !== '') takeRow(0);
+        else if (table.kind === 'matches') setPosition(0);
         else if (worked !== null) dispatch({ type: 'replace', text: worked });
         else if (box.unit) setPosition(null);
         else if (rowCount > 0) setPosition(0);
@@ -562,10 +586,11 @@ export function TableLayout({
         } else if (!clearStep()) inputRef.current?.blur();
         return;
       case 'Backspace':
-        // On an empty field, Backspace takes the unit out, as the chip's × does.
-        if (box.unit && event.currentTarget.value === '') {
+        // On an empty field, Backspace takes the last pill out, as its × does: the ingredient,
+        // then the unit.
+        if ((box.ingredient || box.unit) && event.currentTarget.value === '') {
           event.preventDefault();
-          dispatch({ type: 'unlock' });
+          dispatch(box.ingredient ? { type: 'removeIngredient' } : { type: 'unlock' });
           setPosition(null);
         }
         return;
@@ -626,6 +651,10 @@ export function TableLayout({
         onLeave={leaveFoot}
       />
     );
+  // Under Cooking's table, the line saying what a cup of its ingredient weighs (ADR 0021).
+  const note = table.kind === 'units' && table.note && (
+    <p className="mt-2 px-2 text-sm text-ink-muted">{table.note}</p>
+  );
 
   // The cursor shows only while focus is in the box or its table: moving to the toolbar, the
   // calculator, or off the page, the cursor rests again.
@@ -680,6 +709,7 @@ export function TableLayout({
             parsed={box.parsed}
             locale={env.locale}
             unit={box.unit}
+            ingredient={box.ingredient}
             // What the field takes, never a value it might be mistaken for.
             placeholder={box.unit ? 'Number' : 'Number or unit'}
             describedBy={describedBy}
@@ -712,6 +742,13 @@ export function TableLayout({
               setPosition(null);
               if (!pressedByTouch()) inputRef.current?.focus();
             }}
+            // The ingredient's pill, the same: its body puts the caret in the field, its × takes
+            // the ingredient out, leaving a weight or a volume (ADR 0021).
+            onIngredientRemove={() => {
+              dispatch({ type: 'removeIngredient' });
+              setPosition(null);
+              if (!pressedByTouch()) inputRef.current?.focus();
+            }}
           />
         </div>
         {side && (
@@ -721,6 +758,7 @@ export function TableLayout({
         )}
         <div ref={placeRef} className={TABLE_ROWS_CELL}>
           {place}
+          {note}
         </div>
       </div>
     </div>

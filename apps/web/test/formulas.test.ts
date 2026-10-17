@@ -1,4 +1,4 @@
-import { units } from '@bigsmall/core';
+import { ingredients, units } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import { formulaGroups, writtenFactor } from '../src/features/formulas/formulas';
 
@@ -6,8 +6,15 @@ describe('formulas', () => {
   const lines = formulaGroups().flatMap((group) => group.lines);
   const formula = (id: string) => lines.find((line) => line.id === id)?.formula;
 
-  it('lists every unit the engine has, once', () => {
-    expect(lines.map((line) => line.id).sort()).toEqual(units.map((unit) => unit.id).sort());
+  it('lists every unit the engine has, once, and under Cooking every ingredient', () => {
+    const unitLines = lines.filter((line) => !line.id.startsWith('ingredient:'));
+    expect(unitLines.map((line) => line.id).sort()).toEqual(units.map((unit) => unit.id).sort());
+    const cooking = formulaGroups().find((group) => group.category.id === 'cooking');
+    expect(cooking?.lines.map((line) => line.id)).toEqual(
+      ingredients.map((ingredient) => `ingredient:${ingredient.id}`),
+    );
+    expect(cooking?.summary).toBe(`${ingredients.length} ingredients by the cup`);
+    expect(formula('ingredient:brown-sugar')).toBe('1 cup packed = 220 g');
   });
 
   it('writes each kind of unit as its formula in the base unit', () => {

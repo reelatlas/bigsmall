@@ -1,10 +1,9 @@
-import type { Unit } from '@bigsmall/core';
+import type { Ingredient, Unit } from '@bigsmall/core';
 import type { Ref } from 'react';
 import { cx, unitSymbol } from '../lib/recipes';
 import { CloseIcon } from './icons';
 
-export interface UnitChipProps {
-  unit: Unit;
+interface ChipProps {
   /** Show the symbol only, when the field needs the room. The name stays in the labels. */
   compact: boolean;
   /**
@@ -21,8 +20,16 @@ export interface UnitChipProps {
   onRemove: () => void;
 }
 
+/**
+ * A unit's chip, its symbol and then its name; or, Cooking's second pill (ADR 0021), an
+ * ingredient's, its name alone, which gives way to the number by truncating where the box is
+ * narrow, and never goes compact.
+ */
+export type UnitChipProps = ChipProps &
+  ({ unit: Unit; ingredient?: undefined } | { ingredient: Ingredient; unit?: undefined });
+
 // The chip lives inside a field: its corners nest inside the field's (docs/DESIGN-SYSTEM.md, "Fields").
-const CHIP = 'inline-flex min-h-11 shrink-0 items-stretch rounded-nested bg-accent-soft text-ink';
+const CHIP = 'inline-flex min-h-11 items-stretch rounded-nested bg-accent-soft text-ink';
 // Baseline alignment keeps the name and the symbol on one line of type.
 const BODY = 'inline-flex items-baseline gap-2 self-center px-3';
 // Hover keeps the chip color and lightens it toward the surface, so it reads as the same chip
@@ -34,31 +41,41 @@ const HOVER = 'transition-colors hover:bg-accent-soft-hover';
  * in the field (`onOpen`), whose table is the unit list. Collapsed, the symbol stands alone in the
  * ink color.
  */
-export function UnitChip({ unit, compact, nameRef, onOpen, onRemove }: UnitChipProps) {
+export function UnitChip({ unit, ingredient, compact, nameRef, onOpen, onRemove }: UnitChipProps) {
   // Both buttons stay out of the Tab order: the field's own keys change and remove the unit
   // (docs/UX-SPEC.md §5). They stay clickable and visible to screen readers.
   const tabIndex = -1;
+  const name = unit ? unit.plural : ingredient.name;
   return (
-    <span className={CHIP}>
+    // A unit's chip keeps its size; an ingredient's gives way, its name cut short.
+    <span className={cx(CHIP, ingredient ? 'min-w-0' : 'shrink-0')}>
       <button
         type="button"
         // What it is, not a picker it would open: a press puts the caret in the box, whose keys
         // and table change the unit (the full tidy, 2026-10-15).
-        aria-label={`Unit: ${unit.plural}`}
+        aria-label={unit ? `Unit: ${name}` : `Ingredient: ${name}`}
         tabIndex={tabIndex}
         onClick={onOpen}
-        className={cx('inline-flex rounded-l-nested', HOVER)}
+        className={cx('inline-flex min-w-0 rounded-l-nested', HOVER)}
       >
-        <span className={BODY}>
-          <span className={unitSymbol(compact)}>{unit.symbol}</span>
-          <span ref={nameRef ?? null} hidden={compact}>
-            {unit.plural}
+        {unit ? (
+          <span className={BODY}>
+            <span className={unitSymbol(compact)}>{unit.symbol}</span>
+            <span ref={nameRef ?? null} hidden={compact}>
+              {name}
+            </span>
           </span>
-        </span>
+        ) : (
+          <span className={cx(BODY, 'min-w-0')}>
+            <span ref={nameRef ?? null} className="truncate">
+              {name}
+            </span>
+          </span>
+        )}
       </button>
       <button
         type="button"
-        aria-label={`Remove ${unit.plural}`}
+        aria-label={`Remove ${name}`}
         tabIndex={tabIndex}
         onClick={onRemove}
         className={cx(

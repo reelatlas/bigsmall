@@ -60,6 +60,11 @@ export interface ConversionRow {
    * places or fractions, its colon lined up as a decimal point is, and copies as it shows.
    */
   clock?: boolean;
+  /**
+   * Measured rather than exact: converted through an ingredient's density (Cooking, ADR 0021). It
+   * reads "≈" before its value, and "about" for screen readers.
+   */
+  approx?: boolean;
 }
 
 /** A section of rows under its name ("US (customary)"). */
@@ -259,12 +264,12 @@ function splitFraction(written: Rounded): { whole: string; part: string } {
   return { whole: (written.approx ? '≈ ' : '') + whole, part };
 }
 
-/** A value as written, "≈" ahead of one that rounds; the row's own text where nothing is. */
+/** A value as written, "≈" ahead of one that rounds or is measured; the row's own text where nothing is. */
 function writtenText(row: ConversionRow, written: Rounded | null): ReactNode {
   if (written) {
     return (
       <>
-        {written.approx && <span className="text-ink-muted">≈ </span>}
+        {(written.approx || row.approx) && <span className="text-ink-muted">≈ </span>}
         {written.text}
       </>
     );
@@ -436,13 +441,17 @@ export function ConversionTable<T extends ConversionRow>({
           <>
             <span className={cx(WHOLE_CELL, tone)}>
               <span aria-hidden="true" data-whole>
+                {row.approx && <span className="text-ink-muted">≈ </span>}
                 <FormattedNumber text={value.whole} />
               </span>
             </span>
             <span aria-hidden="true" className={cx(DECIMALS_CELL, tone)}>
               <FormattedNumber text={value.decimals} />
             </span>
-            <span className="sr-only">{value.text}</span>
+            <span className="sr-only">
+              {row.approx && 'about '}
+              {value.text}
+            </span>
           </>
         )}
         {both && (

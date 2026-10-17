@@ -10,6 +10,7 @@
  */
 export type AnalyticsEvent =
   | 'Unit chosen'
+  | 'Ingredient chosen'
   | 'Value copied'
   | 'URL copied'
   | 'Calculator opened'

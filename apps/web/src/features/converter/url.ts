@@ -1,16 +1,16 @@
-import { DEFAULT_SEPARATORS, getUnit, parse, type Separators } from '@bigsmall/core';
+import { DEFAULT_SEPARATORS, getIngredient, getUnit, parse, type Separators } from '@bigsmall/core';
 import type { ConverterState, Restorable } from './state';
 
 /**
  * The conversion in the URL, so links and bookmarks reproduce it (docs/UX-SPEC.md §11):
  *   ?a=milliliter&v=5
  * a: the box's unit id · v: the number as typed, in canonical form, so digits a double would round
- * come back whole (or arithmetic's value). Links from the two-box converter
+ * come back whole (or arithmetic's value) · i: Cooking's ingredient, by id (ADR 0021). Links from the two-box converter
  * (ADR 0013) may also carry b, the second box's unit, and s, which box held v; they open on the
  * box that held the number.
  */
 
-const PARAM = { unit: 'a', value: 'v', secondUnit: 'b', source: 's' } as const;
+const PARAM = { unit: 'a', value: 'v', ingredient: 'i', secondUnit: 'b', source: 's' } as const;
 
 /**
  * The state as URL parameters. The typed text is read with the user's separators, so "1.000" in
@@ -23,6 +23,7 @@ export function stateToParams(state: ConverterState, separators: Separators): UR
   if (state.unit) params.set(PARAM.unit, state.unit);
   const parsed = parse(state.text, separators);
   if (parsed.value !== undefined) params.set(PARAM.value, parsed.canonical ?? String(parsed.value));
+  if (state.ingredient) params.set(PARAM.ingredient, state.ingredient);
   return params;
 }
 
@@ -55,8 +56,14 @@ export function paramsToState(
   const parsed = rawValue === null ? undefined : parse(rawValue);
   const number =
     parsed?.value === undefined ? undefined : (parsed.canonical ?? String(parsed.value));
-  if (!unit && number === undefined) return null;
-  return { text: number === undefined ? '' : number.replace('.', separators.decimal), unit };
+  const named = params.get(PARAM.ingredient);
+  const ingredient = named && getIngredient(named) ? named : null;
+  if (!unit && number === undefined && !ingredient) return null;
+  return {
+    text: number === undefined ? '' : number.replace('.', separators.decimal),
+    unit,
+    ingredient,
+  };
 }
 
 function validUnit(id: string | null): string | null {

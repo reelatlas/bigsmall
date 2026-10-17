@@ -52,6 +52,11 @@ export interface SearchOptions {
   prefer?: CategoryId | null;
   /** Maximum results. Default 20. */
   limit?: number;
+  /**
+   * The ingredient in the box, by id (ADR 0021): its own units (a stick of butter) are listed with
+   * the rest; any other ingredient's are not. A typed query finds them all.
+   */
+  ingredient?: string | null;
 }
 
 export interface SearchResponse {
@@ -227,7 +232,9 @@ function idleResults(options: SearchOptions): SearchResponse {
   if (options.category) {
     const listed = units.filter(
       (unit) =>
-        unit.category === options.category && (tierMode !== 'standard' || unit.tier === 'standard'),
+        unit.category === options.category &&
+        (tierMode !== 'standard' || unit.tier === 'standard') &&
+        (!unit.ingredient || unit.ingredient === options.ingredient),
     );
     for (const unit of orderUnits(listed, options.system)) {
       results.push({ kind: 'unit', unit, matchClass: 0, matchedKey: unit.name, field: 'name' });

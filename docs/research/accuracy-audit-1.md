@@ -282,3 +282,7 @@ Speed's two paces (docs/UNITS-CATALOG.md §0) are reciprocal units, m/s = K ÷ p
 | minute per mile (min/mi) | 1609.344/60    | 16764/625 = 26.8224      | NIST SP 811 Appendix B.9: mile per minute = 2.682 24 E+01 m/s, exact; the 1959 mile | yes   | agrees  |
 
 Worked examples: 5:30 /km is 10.9090909091 km/h (120/11); 10 km/h is 6:00 /km; 6 min/mi is 10 mph; 8 min/mi is 4.97096953790 min/km (4:58); 5:30 /km is 8.85139200000 min/mi (8:51). The golden rows hold the first four. Noted: since its V4.01 update (June 2026) the SI Brochure's Table 8 is titled "Non-SI units"; core's sources name the table, not its title. The US survey mile would give 2 parts per million more; core uses the international mile, as everywhere (ADR 0016).
+
+## Added since: Cooking's densities (2026-10-16)
+
+Cooking (ADR 0021) converts across volume and weight through each ingredient's weight for a US cup, measured, not defined: 34 staples read from USDA FoodData Central's SR Legacy data and looked up again blind, every portion matching FoodData Central's API, and cross-checked against USDA's Home and Garden Bulletin No. 72. The table, the method, and where the sources differ (molasses, maple syrup, chopped walnuts, cake flour's wording, yeast) are in docs/research/cooking-1.md.

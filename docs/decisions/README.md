@@ -26,6 +26,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0018](0018-settings-as-they-stand.md)        | Settings as they stand: Units and Display, the visitor's own set and order, remembered | accepted; supersedes 0017                       |
 | [0019](0019-analytics.md)                     | Analytics: Umami Cloud, cookieless, through the site's own address                     | accepted                                        |
 | [0020](0020-references-and-our-own-checks.md) | Other converters as references; every number checked on our own                        | accepted; supersedes 0004                       |
+| [0021](0021-cooking-by-ingredient.md)         | Cooking: an ingredient joins volume and weight                                         | accepted                                        |
 
 ## Template
 

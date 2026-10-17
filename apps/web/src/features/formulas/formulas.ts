@@ -1,4 +1,12 @@
-import { categories, getUnit, unitsIn, type Category, type Unit } from '@bigsmall/core';
+import {
+  categories,
+  getUnit,
+  ingredients,
+  unitsIn,
+  type Category,
+  type Ingredient,
+  type Unit,
+} from '@bigsmall/core';
 
 /**
  * Every formula the converter uses, as the About page shows them (docs/UX-SPEC.md §1, "About";
@@ -24,6 +32,8 @@ export interface FormulaGroup {
   category: Category;
   base: Unit;
   lines: FormulaLine[];
+  /** What its summary says after the name: "17 units in meters", "34 ingredients by the cup". */
+  summary: string;
   /** The group's heading as plain text, for Copy all. */
   plain: string;
 }
@@ -82,11 +92,42 @@ export function formulaOf(unit: Unit, base: Unit): string {
   }
 }
 
-/** Every category's units with their formulas, in the catalog's order. */
+/**
+ * An ingredient's line under Cooking (ADR 0021): what USDA weighed of it, measured, never exact,
+ * with the food and portion it was read from.
+ */
+function ingredientLine(ingredient: Ingredient): FormulaLine {
+  return {
+    id: `ingredient:${ingredient.id}`,
+    name: ingredient.name,
+    symbol: '',
+    formula: ingredient.portion,
+    exact: false,
+    source: ingredient.source,
+    plain: `${ingredient.name}: ${ingredient.portion}, measured. Source: ${ingredient.source}`,
+  };
+}
+
+/**
+ * Every category's units with their formulas, in the catalog's order; Cooking, a lens with no
+ * units of its own, lists its ingredients' weights by the cup instead.
+ */
 export function formulaGroups(): FormulaGroup[] {
   return categories.flatMap((category) => {
     const base = getUnit(category.baseUnit);
     if (!base) return [];
+    if (category.over) {
+      const lines = ingredients.map(ingredientLine);
+      return [
+        {
+          category,
+          base,
+          lines,
+          summary: `${lines.length} ingredients by the cup`,
+          plain: `## ${category.name} (each ingredient by the US cup, 236.6 mL, as USDA FoodData Central weighs it)`,
+        },
+      ];
+    }
     const lines = unitsIn(category.id).map((unit): FormulaLine => {
       const formula = formulaOf(unit, base);
       const kind = unit.exact ? 'exact' : 'measured';
@@ -105,6 +146,7 @@ export function formulaGroups(): FormulaGroup[] {
         category,
         base,
         lines,
+        summary: `${lines.length} units in ${base.plural}`,
         plain: `## ${category.name} (base unit: ${base.name}, ${base.symbol})`,
       },
     ];

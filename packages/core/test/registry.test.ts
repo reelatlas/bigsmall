@@ -8,6 +8,7 @@ describe('registry integrity', () => {
       'length',
       'mass',
       'volume',
+      'cooking',
       'temperature',
       'area',
       'speed',
@@ -34,13 +35,20 @@ describe('registry integrity', () => {
     for (const u of units) expect(known.has(u.category), `${u.id} → ${u.category}`).toBe(true);
   });
 
-  it('every category has a linear base unit with factor 1 and at least three basic units', () => {
+  it('every category has a linear base unit with factor 1 and at least three standard units', () => {
     for (const c of categories) {
       const base = getUnit(c.baseUnit);
       expect(base, `${c.id} base ${c.baseUnit}`).toBeDefined();
-      expect(base?.category).toBe(c.id);
       expect(base?.kind).toBe('linear');
       if (base?.kind === 'linear') expect(base.factor).toBe(1);
+      // A lens (Cooking, ADR 0021) has no units of its own: its base is one of the categories it
+      // looks over.
+      if (c.over) {
+        expect(c.over, c.id).toContain(base?.category);
+        expect(unitsIn(c.id), c.id).toEqual([]);
+        continue;
+      }
+      expect(base?.category).toBe(c.id);
       expect(
         unitsIn(c.id).filter((u) => u.tier === 'standard').length,
         c.id,

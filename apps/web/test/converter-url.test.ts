@@ -38,13 +38,18 @@ describe('paramsToState', () => {
     expect(paramsToState(stateToParams(holding('2', 'foot'), EN))).toEqual({
       text: '2',
       unit: 'foot',
+      ingredient: null,
     });
   });
 
   it('keeps every digit typed, which a double would round', () => {
     const params = stateToParams(holding('123456789012345678', 'meter'), EN);
     expect(params.toString()).toBe('a=meter&v=123456789012345678');
-    expect(paramsToState(params)).toEqual({ text: '123456789012345678', unit: 'meter' });
+    expect(paramsToState(params)).toEqual({
+      text: '123456789012345678',
+      unit: 'meter',
+      ingredient: null,
+    });
   });
 
   it('writes arithmetic as its value', () => {
@@ -54,28 +59,43 @@ describe('paramsToState', () => {
   it("reads the number back in the visitor's own decimal mark", () => {
     const params = stateToParams(holding('1.234,567', 'meter'), DE);
     expect(params.toString()).toBe('a=meter&v=1234.567');
-    expect(paramsToState(params, DE)).toEqual({ text: '1234,567', unit: 'meter' });
-    expect(paramsToState(params, EN)).toEqual({ text: '1234.567', unit: 'meter' });
+    expect(paramsToState(params, DE)).toEqual({
+      text: '1234,567',
+      unit: 'meter',
+      ingredient: null,
+    });
+    expect(paramsToState(params, EN)).toEqual({
+      text: '1234.567',
+      unit: 'meter',
+      ingredient: null,
+    });
   });
 
   it('opens a two-box link on the box that held the number', () => {
     expect(paramsToState(new URLSearchParams('a=mile&b=kilometer&v=1&s=a'))).toEqual({
       text: '1',
       unit: 'mile',
+      ingredient: null,
     });
     expect(paramsToState(new URLSearchParams('a=meter&b=foot&v=2&s=b'))).toEqual({
       text: '2',
       unit: 'foot',
+      ingredient: null,
     });
     // The second box held the number with no unit of its own.
     expect(paramsToState(new URLSearchParams('a=meter&v=2&s=b'))).toEqual({
       text: '2',
       unit: null,
+      ingredient: null,
     });
   });
 
   it('drops an unknown unit', () => {
-    expect(paramsToState(new URLSearchParams('a=cubit&v=3'))).toEqual({ text: '3', unit: null });
+    expect(paramsToState(new URLSearchParams('a=cubit&v=3'))).toEqual({
+      text: '3',
+      unit: null,
+      ingredient: null,
+    });
   });
 
   it('returns null when nothing useful is present', () => {
@@ -83,10 +103,28 @@ describe('paramsToState', () => {
     expect(paramsToState(new URLSearchParams('x=1&a=nope'))).toBeNull();
   });
 
+  it('keeps the ingredient, Cooking’s, and drops an unknown one (ADR 0021)', () => {
+    const cooking = { ...holding('2', 'us-cup'), ingredient: 'all-purpose-flour' };
+    const params = stateToParams(cooking, EN);
+    expect(params.toString()).toBe('a=us-cup&v=2&i=all-purpose-flour');
+    expect(paramsToState(params)).toEqual({
+      text: '2',
+      unit: 'us-cup',
+      ingredient: 'all-purpose-flour',
+    });
+    expect(paramsToState(new URLSearchParams('i=butter'))).toEqual({
+      text: '',
+      unit: null,
+      ingredient: 'butter',
+    });
+    expect(paramsToState(new URLSearchParams('a=us-cup&i=moon-dust'))?.ingredient).toBeNull();
+  });
+
   it('ignores a bad value but keeps the unit', () => {
     expect(paramsToState(new URLSearchParams('a=meter&v=abc'))).toEqual({
       text: '',
       unit: 'meter',
+      ingredient: null,
     });
   });
 });

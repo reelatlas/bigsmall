@@ -1,14 +1,26 @@
 import {
   convert,
   convertChange,
+  convertWith,
+  cookingUnits,
+  countedUnit,
+  crossesDensity,
   formatClock,
   formatNumber,
   getCategory,
+  getIngredient,
   getUnit,
+  ingredients,
+  matchIngredients,
   parse,
+  resolveExact,
   search,
+  splitIngredient,
+  unitListGroup,
   type Category,
   type CategoryId,
+  type Ingredient,
+  type ListGroup,
   type ParsedInput,
   type Separators,
   type Unit,
@@ -50,6 +62,11 @@ export interface ConverterState {
    */
   category: CategoryId | null;
   /**
+   * The ingredient in the box, by id, beside its unit (ADR 0021): with one, the table is Cooking's,
+   * a weight and a volume converting through its density. Null outside Cooking.
+   */
+  ingredient: string | null;
+  /**
    * The calculator's scratch entry. It lives here, outside the conversion, so one history holds
    * everything: undo goes from a send back into the arithmetic that produced it.
    */
@@ -60,7 +77,7 @@ export interface ConverterState {
 export type TextTarget = 'box' | 'calc';
 
 /** The part of the state a URL or a later persistence layer restores, through the `hydrate` action. */
-export type Restorable = Partial<Pick<ConverterState, 'text' | 'unit'>>;
+export type Restorable = Partial<Pick<ConverterState, 'text' | 'unit' | 'ingredient'>>;
 
 export const EMPTY_CALC: CalculatorState = { text: '', fresh: false };
 
@@ -68,8 +85,12 @@ export const initialState: ConverterState = {
   text: '',
   unit: null,
   category: null,
+  ingredient: null,
   calc: EMPTY_CALC,
 };
+
+/** The categories Cooking looks over (ADR 0021): a unit of these keeps the box's ingredient. */
+const COOKING_OVER: ReadonlySet<CategoryId> = new Set(getCategory('cooking')?.over ?? []);
 
 export type Action =
   /** A keystroke or paste in the box. `at` is a monotonic time in ms; only gaps between inputs matter. */
@@ -80,8 +101,18 @@ export type Action =
   | { type: 'calcType'; text: string; fresh: boolean; at: number }
   /** = or C in the calculator: a whole new entry as one undoable step. */
   | { type: 'calcSet'; text: string; fresh: boolean }
-  /** A unit taken into the box, from a row or a match: the unit, and the box's new text (the row's value, or the number as typed). */
-  | { type: 'use'; unit: string; text: string }
+  /**
+   * A unit taken into the box, from a row or a match: the unit, and the box's new text (the row's
+   * value, or the number as typed); with the ingredient a match brought ("2 cups flour"), by id.
+   */
+  | { type: 'use'; unit: string; text: string; ingredient?: string | null }
+  /**
+   * An ingredient taken into the box (a match, or a choice in Cooking's list): Cooking, the box
+   * keeping a weight or a volume, and its new text, the number as typed.
+   */
+  | { type: 'useIngredient'; ingredient: string; text: string }
+  /** The ingredient taken out (its pill's ×, Backspace): a weight or a volume stays, in its own category. */
+  | { type: 'removeIngredient' }
   /**
    * A category chosen (its menu, a start tile, or a category match): the box keeps its number and
    * drops any query, and keeps its unit only if it is of that category, so a typed number is never
@@ -102,17 +133,64 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
     case 'use': {
       const unit = getUnit(action.unit);
       if (!unit) return state;
-      return { ...state, text: action.text, unit: unit.id, category: unit.category };
+      // A unit of one ingredient alone brings it; a weight or a volume keeps the box's ingredient,
+      // or takes the one its match came with; any other unit leaves Cooking.
+      const ingredient =
+        unit.ingredient ?? (action.ingredient === undefined ? state.ingredient : action.ingredient);
+      const cooks = ingredient !== null && COOKING_OVER.has(unit.category);
+      return {
+        ...state,
+        text: action.text,
+        unit: unit.id,
+        ingredient: cooks ? ingredient : null,
+        category: cooks ? 'cooking' : unit.category,
+      };
+    }
+
+    case 'useIngredient': {
+      if (!getIngredient(action.ingredient)) return state;
+      const unit = state.unit ? getUnit(state.unit) : undefined;
+      // The box keeps a weight or a volume; a unit of another ingredient alone, or of another
+      // category, goes.
+      const keeps =
+        unit !== undefined &&
+        COOKING_OVER.has(unit.category) &&
+        (!unit.ingredient || unit.ingredient === action.ingredient);
+      return {
+        ...state,
+        text: action.text,
+        ingredient: action.ingredient,
+        unit: keeps ? state.unit : null,
+        category: 'cooking',
+      };
+    }
+
+    case 'removeIngredient': {
+      const unit = state.unit ? getUnit(state.unit) : undefined;
+      // A unit of that ingredient alone (a stick of butter) goes with it; without a unit, Cooking
+      // stays, to choose another.
+      const keeps = unit !== undefined && !unit.ingredient;
+      return {
+        ...state,
+        ingredient: null,
+        unit: keeps ? state.unit : null,
+        category: keeps ? unit.category : 'cooking',
+      };
     }
 
     case 'chooseCategory': {
       const unit = state.unit ? getUnit(state.unit) : undefined;
+      // Choosing the category the box is already in, or Cooking over it, keeps its unit.
+      const over = getCategory(action.category)?.over ?? [];
+      const fits =
+        unit !== undefined && (unit.category === action.category || over.includes(unit.category));
       return {
         ...state,
         text: parse(state.text).valueText ?? '',
-        // Choosing the category the box is already in changes nothing about its unit.
-        unit: unit?.category === action.category ? state.unit : null,
+        unit: fits ? state.unit : null,
         category: action.category,
+        // Cooking keeps its ingredient; any other category leaves it.
+        ingredient: action.category === 'cooking' ? state.ingredient : null,
       };
     }
 
@@ -128,10 +206,17 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       return { ...initialState, calc: state.calc };
 
     case 'hydrate': {
-      // A URL holds a unit, not a category: the unit names it.
+      // A URL holds a unit and an ingredient, not a category: they name it.
       const next = { ...state, ...action.state };
       const unit = next.unit ? getUnit(next.unit) : undefined;
-      return { ...next, category: unit?.category ?? null };
+      const named = next.ingredient && getIngredient(next.ingredient) ? next.ingredient : null;
+      const ingredient = unit?.ingredient ?? named;
+      const cooks = ingredient !== null && (!unit || COOKING_OVER.has(unit.category));
+      return {
+        ...next,
+        ingredient: cooks ? ingredient : null,
+        category: cooks ? 'cooking' : (unit?.category ?? null),
+      };
     }
   }
 }
@@ -150,6 +235,8 @@ export interface NumberEnv {
 export interface BoxView {
   text: string;
   unit: Unit | null;
+  /** The ingredient beside the unit, Cooking's second pill (ADR 0021). */
+  ingredient: Ingredient | null;
   parsed: ParsedInput;
 }
 
@@ -157,6 +244,7 @@ export function selectBox(state: ConverterState, options: NumberEnv): BoxView {
   return {
     text: state.text,
     unit: state.unit ? (getUnit(state.unit) ?? null) : null,
+    ingredient: state.ingredient ? (getIngredient(state.ingredient) ?? null) : null,
     parsed: parse(state.text, options.separators),
   };
 }
@@ -218,12 +306,25 @@ export interface TableRow {
   inBox: boolean;
   /** A pace's value, in minutes and seconds (5:30), whatever the display's places or fractions. */
   clock: boolean;
+  /** Measured, not exact: converted through an ingredient's density (Cooking's ≈, ADR 0021). */
+  approx: boolean;
 }
 
 /** A match while a unit is typed: a unit, or a category whose name matched, to open. */
 export type MatchRow =
   | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean }
-  | { kind: 'category'; category: Category };
+  | { kind: 'category'; category: Category }
+  /**
+   * An ingredient, under Cooking (ADR 0021), with the unit typed before it when there was one
+   * ("2 cups flour": the cup), which taking it brings too.
+   */
+  | {
+      kind: 'ingredient';
+      ingredient: Ingredient;
+      unit: Unit | null;
+      category: Category;
+      inBox: boolean;
+    };
 
 interface TableViewBase {
   /** The categories the converter offers, in the start's tiles and in the category menu. */
@@ -252,6 +353,8 @@ export interface UnitsView extends TableViewBase {
   all: TableRow[];
   /** In place of the rows when the box's value has no answer: "Too large to convert". */
   message: string | null;
+  /** A line under the table: Cooking's, what a cup of its ingredient weighs and where that comes from. */
+  note: string | null;
 }
 
 /** While a unit is typed: matches from every category, under their category, without values. */
@@ -300,7 +403,9 @@ const EVERY_TIER = 'all';
 export function selectTable(state: ConverterState, options: TableOptions): TableView {
   const parsed = parse(state.text, options.separators);
   const unit = state.unit ? (getUnit(state.unit) ?? null) : null;
-  const category = unit?.category ?? state.category;
+  const ingredient = state.ingredient ? (getIngredient(state.ingredient) ?? null) : null;
+  // Cooking looks over the unit's own category.
+  const category = state.category === 'cooking' ? 'cooking' : (unit?.category ?? state.category);
   const base = {
     categories: search('', { tier: EVERY_TIER }).results.flatMap((result) =>
       result.kind === 'category' ? [result.category] : [],
@@ -308,7 +413,127 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   };
   if (typingUnit(parsed)) return selectMatches(base, parsed.query ?? '', unit, category, options);
   if (!category) return { ...base, kind: 'start', announcement: null };
+  if (category === 'cooking') {
+    return ingredient
+      ? selectCooking(base, ingredient, unit, parsed, options)
+      : selectIngredients(base);
+  }
   return selectUnits(base, category, unit, parsed, options);
+}
+
+/** Cooking with no ingredient yet: every ingredient, to choose from, in the data's order (ADR 0021). */
+function selectIngredients(base: ViewBase): MatchesView {
+  const cooking = getCategory('cooking');
+  const rows: MatchRow[] = cooking
+    ? ingredients.map((ingredient) => ({
+        kind: 'ingredient',
+        ingredient,
+        unit: null,
+        category: cooking,
+        inBox: false,
+      }))
+    : [];
+  return {
+    ...base,
+    kind: 'matches',
+    category: 'cooking',
+    query: '',
+    rows,
+    counts: { cooking: rows.length },
+    hidden: [],
+    announcement: `${rows.length} ingredients to choose from`,
+  };
+}
+
+/** Rank of a unit's group for a visitor: their own system first (order.ts). */
+const GROUP_RANK: Record<ListGroup, number> = { own: 0, other: 1, neither: 2, specialty: 3 };
+
+/** Cooking's units for an ingredient, Weight's then Volume's, each the visitor's own system first. */
+function cookingListed(ingredient: Ingredient, inBox: Unit | null, system: UnitPreference): Unit[] {
+  const listed = cookingUnits(ingredient);
+  // A weight or a volume Cooking does not list (a pint) stays listed while it is in the box.
+  if (inBox && !listed.some((each) => each.id === inBox.id)) listed.push(inBox);
+  return (['mass', 'volume'] as const).flatMap((quantity) =>
+    listed
+      .filter((each) => each.category === quantity)
+      .map((each, index) => ({ each, index, rank: GROUP_RANK[unitListGroup(each, system)] }))
+      .sort((a, b) => a.rank - b.rank || a.index - b.index)
+      .map(({ each }) => each),
+  );
+}
+
+/**
+ * The line under Cooking's table: what USDA weighed of the ingredient, and how the rows use it
+ * (ADR 0021). "All-purpose flour: 1 cup = 125 g (USDA FoodData Central 168894)."
+ */
+function cookingNote(ingredient: Ingredient): string {
+  const name = ingredient.name.charAt(0).toUpperCase() + ingredient.name.slice(1);
+  return `${name}: ${ingredient.portion} (USDA FoodData Central ${ingredient.fdcId}). A US cup is 236.6 mL; values marked ≈ go through this weight, which moves with how an ingredient is packed.`;
+}
+
+/**
+ * Cooking with an ingredient (ADR 0021): Weight's units, then Volume's, each the visitor's own
+ * system first, as the settings show them; across the two, values go through the ingredient's
+ * density, marked ≈; under them, the line saying what was weighed.
+ */
+function selectCooking(
+  shared: ViewBase,
+  ingredient: Ingredient,
+  unit: Unit | null,
+  parsed: ParsedInput,
+  options: TableOptions,
+): UnitsView {
+  const base = { ...shared, kind: 'units', category: 'cooking' } as const;
+  const rule = options.rule ?? SHOW_ALL;
+  const note = cookingNote(ingredient);
+  const listed = cookingListed(ingredient, unit, options.system);
+  const isShown = (row: TableRow) => row.inBox || shows(row.unit, rule, options.system);
+  const sectioned = (rows: TableRow[]): Section<TableRow>[] =>
+    (['mass', 'volume'] as const).flatMap((quantity) => {
+      const inIt = rows.filter((row) => row.unit.category === quantity);
+      if (inIt.length === 0) return [];
+      const key = quantity === 'mass' ? ('weight' as const) : ('volume' as const);
+      return [{ key, label: SECTION_LABEL[key], rows: inIt }];
+    });
+
+  const problem = parsed.outOfRange ?? parsed.invalid;
+  if (unit && problem) {
+    return {
+      ...base,
+      rows: [],
+      sections: [],
+      hidden: [],
+      all: [],
+      message: NO_ANSWER_MESSAGES[problem].long,
+      note,
+      announcement: NO_ANSWER_MESSAGES[problem].long,
+    };
+  }
+
+  const value = unit ? parsed.value : undefined;
+  const all = listed.map((target) =>
+    unit && value !== undefined
+      ? valueRow(target, unit, value, options.locale, (amount, from, to) =>
+          safeWith(amount, from, to, ingredient),
+        )
+      : emptyRow(target, unit),
+  );
+  const sections = sectioned(all.filter(isShown));
+  const rows = sections.flatMap((section) => section.rows);
+  const of = `of ${ingredient.name}`;
+  return {
+    ...base,
+    rows,
+    sections,
+    hidden: sectioned(all.filter((row) => !isShown(row))),
+    all,
+    message: null,
+    note,
+    announcement:
+      unit && value !== undefined
+        ? `${spokenAmount(parsed, unit, options.locale)} ${of} in ${rows.length} units`
+        : `${rows.length} units ${of}`,
+  };
 }
 
 /** What every view of the table carries. */
@@ -355,6 +580,7 @@ function selectUnits(
       hidden: [],
       all: [],
       message: NO_ANSWER_MESSAGES[problem].long,
+      note: null,
       announcement:
         problem === 'large' || problem === 'small'
           ? `${from} is too ${problem} to convert`
@@ -395,6 +621,7 @@ function selectUnits(
       ...base,
       ...withChange(view),
       message: null,
+      note: null,
       announcement: `${view.rows.length} units of ${kind}`,
     };
   }
@@ -406,6 +633,7 @@ function selectUnits(
     ...base,
     ...withChange(view),
     message: null,
+    note: null,
     announcement: `${from} in ${view.rows.length} units of ${kind}`,
   };
 }
@@ -438,6 +666,7 @@ function changeRow(
     tone: problem ? 'message' : 'value',
     inBox: false,
     clock: false,
+    approx: false,
   };
 }
 
@@ -459,8 +688,17 @@ function changeLabel(parsed: ParsedInput, unit: Unit | null, locale: string | un
 /** The no-break space between an amount and its symbol. */
 const NO_BREAK = String.fromCharCode(0x00a0);
 
-function valueRow(target: Unit, from: Unit, value: number, locale: string | undefined): TableRow {
-  const converted = target.id === from.id ? value : safeConvert(value, from, target);
+/** How a row converts the box's value into its unit: convert, or Cooking's through a density. */
+type Converter = (value: number, from: Unit, to: Unit) => number | undefined;
+
+function valueRow(
+  target: Unit,
+  from: Unit,
+  value: number,
+  locale: string | undefined,
+  converter: Converter = safeConvert,
+): TableRow {
+  const converted = target.id === from.id ? value : converter(value, from, target);
   const text =
     converted === undefined
       ? ''
@@ -482,6 +720,8 @@ function valueRow(target: Unit, from: Unit, value: number, locale: string | unde
     tone: problem ? 'message' : 'value',
     inBox: target.id === from.id,
     clock: target.pace === true,
+    // Converted through an ingredient's density: measured, not exact (Cooking's ≈).
+    approx: converter !== safeConvert && target.id !== from.id && crossesDensity(from, target),
   };
 }
 
@@ -496,6 +736,7 @@ function emptyRow(target: Unit, inBox: Unit | null): TableRow {
     tone: 'empty',
     inBox: target.id === inBox?.id,
     clock: target.pace === true,
+    approx: false,
   };
 }
 
@@ -532,15 +773,20 @@ function selectMatches(
     }
     return [{ kind: 'unit', unit: result.unit, category, inBox }];
   });
+  // Ingredients under Cooking (ADR 0021): one the query ends with first, with the unit typed
+  // before it ("2 cups flour"), then those whose names match, the group placed by its best match.
+  const cooked = ingredientMatches(query, current, results[0]?.matchClass, options);
+  if (cooked.first) ranked.unshift(...cooked.rows);
+  else ranked.push(...cooked.rows);
   const order: CategoryId[] = [];
   for (const row of ranked) if (!order.includes(row.category.id)) order.push(row.category.id);
   const rows = order.flatMap((id) => [
     ...ranked.filter((row) => row.category.id === id && row.kind === 'category'),
-    ...ranked.filter((row) => row.category.id === id && row.kind === 'unit'),
+    ...ranked.filter((row) => row.category.id === id && row.kind !== 'category'),
   ]);
   const counts: Partial<Record<CategoryId, number>> = {};
   for (const row of rows) {
-    counts[row.category.id] = (counts[row.category.id] ?? 0) + (row.kind === 'unit' ? 1 : 0);
+    counts[row.category.id] = (counts[row.category.id] ?? 0) + (row.kind === 'category' ? 0 : 1);
   }
   const announcement =
     rows.length > 0
@@ -558,6 +804,75 @@ function selectMatches(
     hidden,
     announcement,
   };
+}
+
+/**
+ * The ingredients a typed query offers, under Cooking (ADR 0021): first the one it ends with, named
+ * exactly, with the unit typed before it ("2 cups flour": cups of all-purpose flour) or the unit a
+ * bare count of it means ("2 eggs"), then those whose names match. `first` when the group leads:
+ * the query ends with an ingredient, the converter is in Cooking, or an ingredient matches better
+ * than any unit ("oil" before the oil barrel; "o" leaves the units first).
+ */
+function ingredientMatches(
+  query: string,
+  current: CategoryId | null,
+  bestUnit: number | undefined,
+  options: TableOptions,
+): { rows: MatchRow[]; first: boolean } {
+  const cooking = getCategory('cooking');
+  if (!cooking) return { rows: [], first: false };
+  const rows: MatchRow[] = [];
+  const split = splitIngredient(query);
+  if (split) {
+    const unit = cookedUnit(split.unit, split.ingredient, options);
+    if (split.unit === '' || unit) {
+      rows.push({
+        kind: 'ingredient',
+        ingredient: split.ingredient,
+        unit,
+        category: cooking,
+        inBox: false,
+      });
+    }
+  }
+  const matched = matchIngredients(query);
+  for (const match of matched) {
+    if (
+      rows.some((row) => row.kind === 'ingredient' && row.ingredient.id === match.ingredient.id)
+    ) {
+      continue;
+    }
+    rows.push({
+      kind: 'ingredient',
+      ingredient: match.ingredient,
+      unit: null,
+      category: cooking,
+      inBox: false,
+    });
+  }
+  const best = rows.length > 0 && split ? 0 : (matched[0]?.matchClass ?? Infinity);
+  return { rows, first: current === 'cooking' || best < (bestUnit ?? Infinity) };
+}
+
+/**
+ * The unit typed before an ingredient ("cups" in "2 cups flour"): a weight, a volume, or the
+ * ingredient's own unit, named exactly, else the best such match; none typed, the unit a bare
+ * count of it means ("2 eggs"). Null when the words name no such unit.
+ */
+function cookedUnit(text: string, ingredient: Ingredient, options: TableOptions): Unit | null {
+  if (text === '') return countedUnit(ingredient) ?? null;
+  const fits = (unit: Unit) =>
+    COOKING_OVER.has(unit.category) && (!unit.ingredient || unit.ingredient === ingredient.id);
+  const exact = resolveExact(text, { system: options.system, ingredient: ingredient.id });
+  if (exact && fits(exact)) return exact;
+  const best = search(text, {
+    system: options.system,
+    tier: EVERY_TIER,
+    limit: MATCH_LIMIT,
+  }).results.find(
+    (result) => result.kind === 'unit' && result.matchClass <= 3 && fits(result.unit),
+  );
+  return best?.kind === 'unit' ? best.unit : null;
 }
 
 /**
@@ -583,6 +898,15 @@ function typingUnit(parsed: ParsedInput): boolean {
 function safeConvert(value: number, from: Unit, to: Unit): number | undefined {
   try {
     return convert(value, from, to);
+  } catch {
+    return undefined;
+  }
+}
+
+/** convertWith, as safely: Cooking's rows through an ingredient's density. */
+function safeWith(value: number, from: Unit, to: Unit, ingredient: Ingredient): number | undefined {
+  try {
+    return convertWith(value, from, to, ingredient);
   } catch {
     return undefined;
   }
@@ -658,6 +982,7 @@ function sameState(a: ConverterState, b: ConverterState): boolean {
     a.text === b.text &&
     a.unit === b.unit &&
     a.category === b.category &&
+    a.ingredient === b.ingredient &&
     a.calc.text === b.calc.text &&
     a.calc.fresh === b.calc.fresh
   );
@@ -759,6 +1084,8 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
       return commit(history, present, null, []);
     case 'replace':
     case 'use':
+    case 'useIngredient':
+    case 'removeIngredient':
     case 'chooseCategory':
     case 'unlock':
     case 'clear':

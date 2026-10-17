@@ -1,4 +1,4 @@
-import { DEFAULT_SEPARATORS, getUnit, parse } from '@bigsmall/core';
+import { DEFAULT_SEPARATORS, getIngredient, getUnit, parse } from '@bigsmall/core';
 import { useId, useRef } from 'react';
 import { Calculator, SendButton } from '../../../components/Calculator';
 import { CategoryMenu } from '../../../components/CategoryMenu';
@@ -30,8 +30,18 @@ import type { ConverterEnv } from '../../../features/converter/useConverter';
 const ENV: ConverterEnv = { locale: 'en-US', separators: DEFAULT_SEPARATORS, system: 'us' };
 const noop = () => undefined;
 
-/** The field in a frozen state: what is typed, and the unit in its chip. */
-function FieldSample({ label, text, unitId }: { label: string; text: string; unitId: string }) {
+/** The field in a frozen state: what is typed, the unit in its chip, and an ingredient beside it. */
+function FieldSample({
+  label,
+  text,
+  unitId,
+  ingredientId,
+}: {
+  label: string;
+  text: string;
+  unitId: string;
+  ingredientId?: string;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const hint = useId();
   const list = useId();
@@ -43,6 +53,7 @@ function FieldSample({ label, text, unitId }: { label: string; text: string; uni
       parsed={parse(text)}
       locale={ENV.locale}
       unit={getUnit(unitId) ?? null}
+      ingredient={ingredientId ? (getIngredient(ingredientId) ?? null) : null}
       placeholder="Number"
       describedBy={hint}
       popup={{ expanded: false, controls: list, activeId: undefined, kind: 'grid' }}
@@ -228,6 +239,17 @@ function TableSamples() {
         itemId={itemIds('edit')}
       />
       <TableSample view={tooLarge} title="Length" itemId={itemIds('message')} />
+      {/* Cooking: Weight, then Volume, the weights measured through the flour's density (≈). */}
+      <TableSample
+        view={tableOf({
+          text: '2',
+          unit: 'us-cup',
+          ingredient: 'all-purpose-flour',
+          category: 'cooking',
+        })}
+        title="Cooking, all-purpose flour"
+        itemId={itemIds('cooking')}
+      />
       {matches.kind === 'matches' && (
         <UnitMatches
           id={`${id}-matches`}
@@ -258,6 +280,22 @@ export function FieldSamples({ theme }: { theme: string }) {
       <FieldSample label={`${theme} arithmetic sample`} text="12×3" unitId="liter" />
       {/* Empty, its placeholder saying what it takes. */}
       <FieldSample label={`${theme} empty sample`} text="" unitId="" />
+      {/* Cooking's two pills, the unit and the ingredient (ADR 0021), and on a phone, where they
+          take a line of their own under the number. */}
+      <FieldSample
+        label={`${theme} cooking sample`}
+        text="2"
+        unitId="us-cup"
+        ingredientId="all-purpose-flour"
+      />
+      <div className="max-w-80">
+        <FieldSample
+          label={`${theme} cooking phone sample`}
+          text="250"
+          unitId="us-cup"
+          ingredientId="brown-sugar"
+        />
+      </div>
       <CalculatorSample />
       <TableSamples />
     </div>

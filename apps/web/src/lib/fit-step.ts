@@ -82,15 +82,22 @@ export interface FieldFit {
 }
 
 /**
- * Measures a field's row: with the chip's name shown, does the text fit at its largest size? If
- * not, the name is hidden and the text takes the largest step that fits without it. Leaves the
- * name and the text as chosen.
+ * Measures a field's row: with the chip's name shown, does the text fit at its largest size, and
+ * a second pill's name, if any, whole (Cooking's ingredient, ADR 0021)? If not, the name is
+ * hidden and the text takes the largest step that fits without it. Leaves the name and the text as
+ * chosen; measured from the name shown each time, so the answer never flips back and forth.
  */
-function fitField(nameRef: RefObject<HTMLElement | null>, text: FitText): FieldFit {
+function fitField(
+  nameRef: RefObject<HTMLElement | null>,
+  text: FitText,
+  otherRef?: RefObject<HTMLElement | null>,
+): FieldFit {
   const name = nameRef.current;
   if (name) name.hidden = false;
   const element = text.ref.current;
-  if (!element || fitsAt(element, text, 0)) return { compact: false, step: 0 };
+  const other = otherRef?.current;
+  const otherWhole = !other || other.scrollWidth <= other.clientWidth;
+  if (!element || (fitsAt(element, text, 0) && otherWhole)) return { compact: false, step: 0 };
   if (name) name.hidden = true;
   return { compact: name !== null, step: largestFit(text) };
 }
@@ -101,21 +108,23 @@ function fitField(nameRef: RefObject<HTMLElement | null>, text: FitText): FieldF
  * largest size, in a field of any width. `text` is the field's text layer on its ladder; `name`
  * is the chip's name, which the measurement hides and shows itself as useFitStep writes classes
  * (the chip renders it with the same `hidden`); `row` is the element whose resizes refit the
- * field, one whose size the fit never changes.
+ * field, one whose size the fit never changes; `other` a second pill's name, which the chip's
+ * name gives way to as well where it would be cut short.
  */
 export function useFieldFit(
   row: RefObject<HTMLElement | null>,
   name: RefObject<HTMLElement | null>,
   text: FitText,
+  other?: RefObject<HTMLElement | null>,
 ): FieldFit {
   const [fit, setFit] = useState<FieldFit>({ compact: false, step: 0 });
 
   const refit = useCallback(() => {
-    const next = fitField(name, text);
+    const next = fitField(name, text, other);
     setFit((current) =>
       current.compact === next.compact && current.step === next.step ? current : next,
     );
-  }, [name, text]);
+  }, [name, text, other]);
 
   useRefit(refit, row);
   return fit;

@@ -28,7 +28,7 @@ import {
 // US: their own units come first (ADR 0011).
 
 const tiles = (page: Page) => page.getByRole('listbox', { name: 'Categories' });
-const matches = (page: Page) => page.getByRole('listbox', { name: 'Matching units' });
+const matches = (page: Page) => page.getByRole('listbox', { name: 'Matches' });
 const VOLUME_UNITS = unitsIn('volume').length;
 /** What a fresh visit lists: every unit but the specialty ones, the Standard preset (ADR 0018). */
 const VOLUME_STANDARD = unitsIn('volume').filter((unit) => unit.tier === 'standard').length;
@@ -100,7 +100,8 @@ test('keyboard: the start’s categories are a grid the arrows move through', as
   await box(page).press('ArrowRight');
   await expectCursor(page, 'Volume');
   await box(page).press('ArrowDown');
-  await expectCursor(page, 'Time');
+  // The tile under Volume, four on in the list.
+  await expectCursor(page, categories[6]!.name);
   await box(page).press('ArrowUp');
   await box(page).press('ArrowUp');
   await expectCursor(page, null);
@@ -311,23 +312,27 @@ test('the open category menu: ↓ runs down the first column and on into the sec
   isMobile,
 }) => {
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
-  await page.goto('/?a=byte&v=1');
+  // The first column's last category and the second's first, from the list itself.
+  const rows = Math.ceil(categories.length / 2);
+  const foot = categories[rows - 1]!;
+  const head = categories[rows]!;
+  await page.goto(`/?a=${unitsIn(foot.id)[0]!.id}&v=1`);
   await ready(page);
   await menu(page).press('Enter');
-  const data = page.getByRole('radio', { name: 'Data' });
-  const fuel = page.getByRole('radio', { name: 'Fuel economy' });
-  await expect(data).toBeFocused();
+  const last = page.getByRole('radio', { name: foot.name, exact: true });
+  const next = page.getByRole('radio', { name: head.name, exact: true });
+  await expect(last).toBeFocused();
   await page.keyboard.press('ArrowDown');
-  await expect(fuel).toBeFocused();
-  // Fuel economy heads the second column, level with Length at the first's head.
+  await expect(next).toBeFocused();
+  // It heads the second column, level with the first's head.
   const label = (name: string) =>
     page.getByRole('group', { name: 'Category' }).locator('label', { hasText: name });
-  const first = (await label('Length').boundingBox())!;
-  const second = (await label('Fuel economy').boundingBox())!;
+  const first = (await label(categories[0]!.name).boundingBox())!;
+  const second = (await label(head.name).boundingBox())!;
   expect(second.x).toBeGreaterThan(first.x + first.width / 2);
   expect(Math.abs(second.y - first.y)).toBeLessThan(1);
   await page.keyboard.press('ArrowUp');
-  await expect(data).toBeFocused();
+  await expect(last).toBeFocused();
 });
 
 test('the category menu: the arrows move without choosing, Enter chooses, Escape closes', async ({
@@ -343,7 +348,8 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
   await expect(page.getByRole('radio', { name: 'Volume' })).toBeFocused();
   // Open, the trigger heads the list with the word "Category"; the list's fill marks the choice.
   await expect(menu(page)).toHaveText('Category');
-  // Moving through the choices changes nothing until one is chosen.
+  // Moving through the choices changes nothing until one is chosen: past Cooking to Temperature.
+  await page.keyboard.press('ArrowDown');
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('radio', { name: 'Temperature' })).toBeChecked();
   await expect(page.getByRole('button', { name: 'Remove milliliters' })).toBeVisible();
@@ -354,6 +360,7 @@ test('the category menu: the arrows move without choosing, Enter chooses, Escape
 
   // Enter chooses: the number stays and the unit goes.
   await menu(page).press('Enter');
+  await page.keyboard.press('ArrowDown');
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
   await expect(menu(page)).toHaveText(/Temperature/);
@@ -1256,6 +1263,72 @@ test('a temperature is said as a change too, after the readings: 5 °C warmer is
   await box(page).fill('-25');
   await expect(page.locator('[data-section="change"]')).toHaveText('As a change: -25 °F');
   await expect(row(page, 'celsius-change')).toContainText('-13.89');
+});
+
+test('Cooking: "2 cups flour" takes the cup and the flour, two pills, Weight then Volume, the weights measured', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('2 cups flour');
+  await expect(page.getByRole('option').first()).toHaveText(/cups of all-purpose flour/);
+  await box(page).press('Enter');
+  // Two pills in the box (ADR 0021), each removable.
+  await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove all-purpose flour' })).toBeVisible();
+  await expect(box(page)).toHaveValue('2');
+  await expect(menu(page)).toHaveText(/Cooking/);
+  const sections = await page
+    .locator('[data-section]')
+    .evaluateAll((all) => all.map((section) => section.textContent?.trim()));
+  expect(sections).toEqual(['Weight', 'Volume']);
+  // A weight goes through the flour's density, said "about"; a volume stays exact.
+  await expect(row(page, 'gram')).toContainText('≈ 250.00');
+  await expect(row(page, 'gram')).toContainText('about 250.00');
+  await expect(row(page, 'us-tablespoon')).toContainText('32.00');
+  await expect(row(page, 'us-tablespoon')).not.toContainText('≈');
+  await expect(page.getByText('All-purpose flour: 1 cup = 125 g')).toBeVisible();
+  await expect(page).toHaveURL(/[?&]i=all-purpose-flour/);
+
+  // Backspace in an empty box takes the last pill out first: the flour, leaving Volume.
+  await box(page).fill('');
+  await box(page).press('Backspace');
+  await expect(page.getByRole('button', { name: 'Remove all-purpose flour' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
+  await expect(menu(page)).toHaveText(/Volume/);
+});
+
+test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, Enter takes one, a link keeps it', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('250');
+  await menu(page).click();
+  await page
+    .getByRole('group', { name: 'Category' })
+    .locator('label', { hasText: 'Cooking' })
+    .click();
+  const list = page.getByRole('listbox', { name: 'Matches' });
+  await expect(list.getByRole('option').first()).toHaveText(/all-purpose flour/);
+  await expectNoA11yViolations(page);
+  // Enter goes into the list rather than taking for you; Enter again takes what the cursor is on.
+  await box(page).press('Enter');
+  await expect(list.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
+  await box(page).press('ArrowDown');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove bread flour' })).toBeVisible();
+  await expect(box(page)).toHaveValue('250');
+  // No unit yet: every row waits with a dash, the note already there.
+  await expect(row(page, 'gram')).toContainText('—');
+  await expect(page.getByText('Bread flour: 1 cup = 137 g')).toBeVisible();
+  await expectNoA11yViolations(page);
+  await page.reload();
+  await ready(page);
+  await expect(page.getByRole('button', { name: 'Remove bread flour' })).toBeVisible();
+  await expect(menu(page)).toHaveText(/Cooking/);
 });
 
 test('Copy URL copies the current conversion and confirms with a check', async ({

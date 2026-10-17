@@ -1,4 +1,4 @@
-import { categories, units } from '@bigsmall/core';
+import { categories, ingredients, units } from '@bigsmall/core';
 import { expect, test } from '@playwright/test';
 
 // Every formula on the About page (docs/UX-SPEC.md §1, "About"): folded by category, Show all and
@@ -11,7 +11,8 @@ test('the About page lists every formula, folded; Show all opens them, Hide all 
   const section = page.getByRole('region', { name: 'Every formula' });
   const groups = section.locator('details');
   await expect(groups).toHaveCount(categories.length);
-  await expect(section.locator('li[data-plain]')).toHaveCount(units.length);
+  // Every unit, and under Cooking every ingredient by the cup.
+  await expect(section.locator('li[data-plain]')).toHaveCount(units.length + ingredients.length);
   await expect(section.locator('details[open]')).toHaveCount(0);
   const toggle = section.getByRole('button', { name: 'Show all' });
   await toggle.click();
@@ -72,5 +73,7 @@ test('Copy all puts every formula on the clipboard as plain text', async ({ page
   expect(copied).toContain('bigsmall: every conversion factor and formula');
   expect(copied).toContain('## Length (base unit: meter, m)');
   expect(copied).toContain('- mile (mi): 1 mi = 1609.344 m, exact. Source:');
-  expect(copied.split('\n').filter((line) => line.startsWith('- '))).toHaveLength(units.length);
+  expect(copied.split('\n').filter((line) => line.startsWith('- '))).toHaveLength(
+    units.length + ingredients.length,
+  );
 });

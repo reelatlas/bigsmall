@@ -211,10 +211,12 @@ test('open, the category menu is two columns as wide as the menu, down the first
     const closed = (await shell.boundingBox())!.width;
     await menu(page).click();
     const open = (await shell.boundingBox())!;
-    expect(Math.abs(open.width - 2 * closed), theme.id).toBeLessThanOrEqual(1);
-    // Inside the toolbar's width, so the page never scrolls sideways.
+    // Twice the closed menu, but never past the toolbar's right edge (a phone with wider fonts),
+    // so the page never scrolls sideways: the two columns then share the toolbar's width.
     const bar = (await toolbar.boundingBox())!;
-    expect(open.x + open.width, theme.id).toBeLessThanOrEqual(bar.x + bar.width);
+    const wanted = Math.min(2 * closed, bar.x + bar.width - open.x);
+    expect(Math.abs(open.width - wanted), theme.id).toBeLessThanOrEqual(1);
+    expect(open.x + open.width, theme.id).toBeLessThanOrEqual(bar.x + bar.width + 1);
     const lefts = await shell
       .locator('label')
       .evaluateAll((labels) => labels.map((label) => Math.round(label.getBoundingClientRect().x)));

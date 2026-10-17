@@ -143,22 +143,26 @@ export function CategoryMenu({
     return () => window.removeEventListener('resize', fit);
   }, [open]);
 
-  // Open, the shell rises to the top layer as a popover, placed over its root, twice the menu's
-  // width as its classes say: inside a toolbar row that scrolls (ADR 0023) it would otherwise be
-  // clipped to the row, and in the top layer nothing covers it. Placed again as the page or the
-  // row scrolls and as the window resizes, so it stays over its trigger. A browser without
-  // popovers opens it in place, as before.
+  // Open, the shell rises to the top layer as a popover, placed over its root: inside a toolbar
+  // row that scrolls (ADR 0023) it would otherwise be clipped to the row, and in the top layer
+  // nothing covers it. Twice the menu's width, as its classes say, but never past the toolbar's
+  // right edge, so it never leaves the page (a phone with wider fonts): the two columns then
+  // share the toolbar's width. Placed again as the page or the row scrolls and as the window
+  // resizes, so it stays over its trigger. A browser without popovers opens it in place, as before.
   useLayoutEffect(() => {
     const shell = shellRef.current;
     const root = rootRef.current;
     if (!open || !shell || !root || typeof shell.showPopover !== 'function') return;
     const place = () => {
       const at = root.getBoundingClientRect();
+      const bar = root.closest('[role="toolbar"]')?.getBoundingClientRect();
+      const left = bar ? Math.max(at.left, bar.left) : at.left;
+      const width = bar ? Math.min(at.width * 2, bar.right - left) : at.width * 2;
       shell.style.position = 'fixed';
       shell.style.top = `${at.top}px`;
-      shell.style.left = `${at.left}px`;
+      shell.style.left = `${left}px`;
       shell.style.right = 'auto';
-      shell.style.width = `${at.width * 2}px`;
+      shell.style.width = `${width}px`;
     };
     place();
     shell.setAttribute('popover', 'manual');

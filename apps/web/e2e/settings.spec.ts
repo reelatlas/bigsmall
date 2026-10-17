@@ -142,12 +142,12 @@ test('Units and Display open beside the table, one side panel at a time with the
   await expectNoA11yViolations(page);
 
   // A reset done shows its check and says so, and the panel stays open to show what changed.
-  await setSettings(page, 'Fractions');
+  await setSettings(page, 'Fraction');
   await settingsButton(page, 'Display').click();
   await display.getByRole('button', { name: 'Reset display' }).click();
   await expect(display).toBeVisible();
   await expect(display.getByRole('status')).toHaveText('Display reset');
-  await expect(display.locator('label', { hasText: /^Decimals$/ }).locator('input')).toBeChecked();
+  await expect(display.locator('label', { hasText: /^Decimal$/ }).locator('input')).toBeChecked();
 });
 
 test('the Hidden list brings a unit back into its section; Edit sends one to Hidden, which stays below it, Done in its place, and Done folds Hidden', async ({
@@ -543,7 +543,7 @@ test('settings are remembered in this browser: what shows, Custom, the order, an
   await units.getByRole('checkbox', { name: 'UK (imperial)' }).click();
   await units.getByRole('button', { name: 'Move Metric' }).click();
   await units.getByRole('button', { name: 'Move up' }).click();
-  await setSettings(page, 'Fractions');
+  await setSettings(page, 'Fraction');
   await expect(row(page, 'us-teaspoon')).toContainText('96');
   await page.reload();
   await ready(page);
@@ -614,7 +614,7 @@ test('fractions, both, and rounding write the values and never move the columns'
         [...cell.children].map((child) => Math.round(child.getBoundingClientRect().right)),
       );
 
-  await setSettings(page, 'Fractions');
+  await setSettings(page, 'Fraction');
   await expect(row(page, 'foot')).toContainText('6 1/4');
   const fractionEdges = await edges();
   await setSettings(page, 'Up');

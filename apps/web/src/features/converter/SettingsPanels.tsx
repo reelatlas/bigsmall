@@ -297,13 +297,14 @@ export function DisplayPanel({
         onChange={(names) => setDisplay({ names })}
       />
       {/* The format and the names read for themselves, their legends for screen readers alone
-          (Sean, 2026-10-15). */}
+          (Sean, 2026-10-15); each format named in the singular, as each way of writing names is
+          (Sean, 2026-10-16). */}
       <Choices<Display['format']>
         legend="Format"
         hideLegend
         options={[
-          { value: 'decimal', label: 'Decimals' },
-          { value: 'fraction', label: 'Fractions' },
+          { value: 'decimal', label: 'Decimal' },
+          { value: 'fraction', label: 'Fraction' },
           { value: 'both', label: 'Both' },
         ]}
         value={display.format}

@@ -232,7 +232,7 @@ export function copiedText(
   return (written?.text ?? row.text).replaceAll(MINUS, '-');
 }
 
-/** A value as the display writes it first: its fraction with Fractions, else its decimal. */
+/** A value as the display writes it first: its fraction with Fraction, else its decimal. */
 function firstWritten(value: number, display: TableDisplay, locale: string | undefined) {
   if (display.format === 'fraction') {
     return formatFraction(value, { sizes: display.fractions, rounding: display.rounding, locale });

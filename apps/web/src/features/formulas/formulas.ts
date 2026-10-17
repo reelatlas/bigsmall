@@ -1,9 +1,11 @@
 import {
   categories,
+  cupBasis,
   getUnit,
   ingredients,
   unitsIn,
   type Category,
+  type CupSource,
   type Ingredient,
   type Unit,
 } from '@bigsmall/core';
@@ -93,18 +95,45 @@ export function formulaOf(unit: Unit, base: Unit): string {
 }
 
 /**
- * An ingredient's line under Cooking (ADR 0021): what USDA weighed of it, measured, never exact,
- * with the food and portion it was read from.
+ * An ingredient's line under Cooking (ADR 0021): what a cup of it weighs, filled as US recipes
+ * mean, measured, never exact; under it how it is filled, the spread across the sources weighed,
+ * and each source's figure (docs/research/cooking-2.md).
  */
+/** A source's figure as the About page lists it: "King Arthur Baking: 120 g". */
+function sourceText(source: CupSource): string {
+  const { grams, detail } = source;
+  const figure = typeof grams === 'number' ? `${grams}` : `${grams[0]} to ${grams[1]}`;
+  return `${source.by}: ${figure} g${detail ? `, ${detail}` : ''}`;
+}
+
+/** How the figure was reached, said before its sources (docs/research/cooking-2.md). */
+function basisText(ingredient: Ingredient): string {
+  const [low, high] = ingredient.range;
+  const span = low === high ? `${low} g` : `${low} to ${high} g`;
+  const count = ingredient.sources.length;
+  switch (cupBasis(ingredient)) {
+    case 'density':
+      return `by density, ${span}`;
+    case 'measured-cups':
+      return `${count} weighings, ${span}; with fewer than 3, USDA's measured cups decide`;
+    case 'median':
+      return count === 1 ? '1 weighing' : `the middle of ${count} weighings, ${span}`;
+  }
+}
+
 function ingredientLine(ingredient: Ingredient): FormulaLine {
+  const formula = `1 cup = ${ingredient.gramsPerCup} g`;
+  const method = ingredient.method.charAt(0).toUpperCase() + ingredient.method.slice(1);
+  const sources = ingredient.sources.map(sourceText).join('; ');
+  const source = `${method}; ${basisText(ingredient)}: ${sources}.${ingredient.note ? ` ${ingredient.note}` : ''}`;
   return {
     id: `ingredient:${ingredient.id}`,
     name: ingredient.name,
     symbol: '',
-    formula: ingredient.portion,
+    formula,
     exact: false,
-    source: ingredient.source,
-    plain: `${ingredient.name}: ${ingredient.portion}, measured. Source: ${ingredient.source}`,
+    source,
+    plain: `${ingredient.name}: ${formula}, measured. Source: ${source}`,
   };
 }
 
@@ -124,7 +153,7 @@ export function formulaGroups(): FormulaGroup[] {
           base,
           lines,
           summary: `${lines.length} ingredients by the cup`,
-          plain: `## ${category.name} (each ingredient by the US cup, 236.6 mL, as USDA FoodData Central weighs it)`,
+          plain: `## ${category.name} (each ingredient by the US cup, 236.6 mL, filled as US recipes mean it; the middle of the weighings, a liquid by its density)`,
         },
       ];
     }

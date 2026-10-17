@@ -286,3 +286,5 @@ Worked examples: 5:30 /km is 10.9090909091 km/h (120/11); 10 km/h is 6:00 /km; 6
 ## Added since: Cooking's densities (2026-10-16)
 
 Cooking (ADR 0021) converts across volume and weight through each ingredient's weight for a US cup, measured, not defined: 34 staples read from USDA FoodData Central's SR Legacy data and looked up again blind, every portion matching FoodData Central's API, and cross-checked against USDA's Home and Garden Bulletin No. 72. The table, the method, and where the sources differ (molasses, maple syrup, chopped walnuts, cake flour's wording, yeast) are in docs/research/cooking-1.md.
+
+**Replaced the same day** (the sixty-fourth and sixty-fifth passes): each ingredient's figure is now decided by one written rule from the weighings that count, gathered by two blind reviews and each checked against its page: their median, or with fewer than three USDA's measured cups; a liquid by its density (docs/research/cooking-2.md). SR Legacy is recorded, not counted; eleven figures moved by more than 3% (cake flour 137 → 111 g, active dry yeast 192 → 148 g, baking powder 221 → 177 g among them).

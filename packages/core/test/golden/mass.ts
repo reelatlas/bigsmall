@@ -143,27 +143,34 @@ export const mass: GoldenRow[] = [
     expected: 0.001,
     source: 'BIPM SI Brochure, 9th ed. (2019), Table 7: micro = 10⁻⁶, milli = 10⁻³',
   },
-  // An ingredient's own units (ADR 0021), weights as USDA FoodData Central measures them.
+  // An ingredient's own units (ADR 0021; docs/research/cooking-2.md).
+  {
+    value: 4,
+    from: 'stick-of-butter',
+    to: 'pound',
+    expected: 1,
+    source: "A US stick of butter is a quarter pound by its wrapper's net weight (4 oz)",
+  },
   {
     value: 1,
     from: 'stick-of-butter',
     to: 'gram',
-    expected: 113,
-    source: 'USDA FoodData Central 173410 (SR Legacy), Butter, salted: 1 stick = 113 g',
+    expected: 113.3980925,
+    source: 'A quarter pound: 0.25 × 453.59237 g (NIST SP 811 Appendix B.8)',
   },
   {
     value: 2,
     from: 'large-egg',
     to: 'gram',
     expected: 100,
-    source: 'USDA FoodData Central 171287 (SR Legacy), Egg, whole, raw, fresh: 1 large = 50 g',
+    source:
+      'A US large egg out of its shell weighs 50 g (King Arthur Baking; the FDA reference amount)',
   },
   {
-    value: 1,
+    value: 4,
     from: 'packet-of-yeast',
-    to: 'gram',
-    expected: 7.2,
-    source:
-      "USDA FoodData Central 175043 (SR Legacy), yeast, baker's, active dry: 1 packet = 7.2 g",
+    to: 'ounce',
+    expected: 1,
+    source: "A US packet of yeast is a quarter ounce by its label's net weight (Red Star: 0.25 oz)",
   },
 ];

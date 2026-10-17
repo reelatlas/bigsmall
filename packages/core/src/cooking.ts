@@ -1,7 +1,7 @@
 import { ConversionError, convert } from './convert';
 import { compactKey } from './normalize';
 import type { MatchClass } from './search';
-import type { Ingredient, Unit } from './types';
+import type { CupSource, Ingredient, Unit } from './types';
 import { getUnit, units } from './units';
 import { COOKING_UNITS } from './units/cooking';
 import { INGREDIENT_KINDS, ingredients } from './units/ingredients';
@@ -107,6 +107,52 @@ export function countedUnit(ingredient: Ingredient): Unit | undefined {
   return ingredient.counted ? getUnit(ingredient.counted) : undefined;
 }
 
+/** The source whose figure decides a cup when fewer than three weighings count. */
+export const MEASURED_CUPS = "USDA's measured cups (1969)";
+
+/**
+ * How an ingredient's cup is decided (docs/research/cooking-2.md, "How a figure is decided"): a
+ * liquid's by its density; three weighings or more by their median; fewer, by USDA's measured
+ * cups where they weighed it, or else the median of what there is.
+ */
+export type CupBasis = 'density' | 'median' | 'measured-cups';
+
+export function cupBasis(ingredient: Ingredient): CupBasis {
+  if (ingredient.byDensity) return 'density';
+  const few = ingredient.sources.length < 3;
+  return few && ingredient.sources.some((source) => source.by === MEASURED_CUPS)
+    ? 'measured-cups'
+    : 'median';
+}
+
+/** A source's figure for the median: a range counts at its middle. */
+function middleOf(grams: CupSource['grams']): number {
+  return typeof grams === 'number' ? grams : (grams[0] + grams[1]) / 2;
+}
+
+/** Rounded to the gram, a half to the even gram (ISO 80000-1). */
+function toGram(value: number): number {
+  const floor = Math.floor(value);
+  if (value - floor !== 0.5) return Math.round(value);
+  return floor % 2 === 0 ? floor : floor + 1;
+}
+
+/**
+ * The rule's figure for a cup from the weighings that count (cooking-2.md): their median, rounded
+ * to the gram; with fewer than three, USDA's measured cups' figure where they weighed it. A
+ * weighing joins the figure by joining `sources`, and this says what the figure becomes.
+ */
+export function cupFigure(sources: readonly CupSource[]): number {
+  if (sources.length < 3) {
+    const cups = sources.find((source) => source.by === MEASURED_CUPS);
+    if (cups) return toGram(middleOf(cups.grams));
+  }
+  const values = sources.map((source) => middleOf(source.grams)).sort((a, b) => a - b);
+  const half = Math.floor(values.length / 2);
+  const median = values.length % 2 ? values[half]! : (values[half - 1]! + values[half]!) / 2;
+  return toGram(median);
+}
+
 /** Grams in a milliliter of the ingredient: its cup's weight over the US cup's volume. */
 function density(ingredient: Ingredient): number {
   return ingredient.gramsPerCup / convert(1, 'us-cup', 'milliliter');
@@ -135,7 +181,7 @@ function fromGrams(grams: number, unit: Unit, ingredient: Ingredient): number {
 /**
  * Convert an amount of an ingredient between any of Weight's and Volume's units: within one
  * quantity as convert does, exactly; across them through the ingredient's density, a measured
- * figure (ADR 0021). 2 cups of all-purpose flour is 250 g.
+ * figure (ADR 0021). 2 cups of all-purpose flour is 254 g.
  */
 export function convertWith(
   value: number,

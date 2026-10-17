@@ -468,11 +468,11 @@ describe('Cooking (ADR 0021)', () => {
       'kilogram',
     ]);
     const row = (id: string) => table.rows.find((each) => each.id === id)!;
-    expect(row('gram')).toMatchObject({ text: '250', approx: true });
+    expect(row('gram')).toMatchObject({ text: '254', approx: true });
     expect(row('milliliter')).toMatchObject({ approx: false });
     expect(row('us-cup')).toMatchObject({ inBox: true, approx: false });
     expect(table.note).toBe(
-      'All-purpose flour: 1 cup = 125 g (USDA FoodData Central 168894). A US cup is 236.6 mL; values marked ≈ go through this weight, which moves with how an ingredient is packed.',
+      'All-purpose flour: 1 cup, spooned and leveled, is 127 g (120 to 136 g across 6 weighings). A US cup is 236.6 mL; values marked ≈ go through this weight, which moves with how an ingredient is packed.',
     );
     expect(table.announcement).toBe('2 cups of all-purpose flour in 10 units');
   });

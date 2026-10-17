@@ -1,0 +1,427 @@
+# FNDDS 2021-2023: FoodData_Central_survey_food_csv_2024-10-31.zip
+
+## all-purpose-flour
+
+## bread-flour
+
+## whole-wheat-flour
+
+## cake-flour
+
+## almond-flour
+
+## granulated-sugar
+- 2710258 Sugar, white, granulated or lump
+     1 teaspoon 22000 = 4.2 g -> 201.6 g/cup
+     1 cup 10205 = 200 g -> 200.0 g/cup
+     Guideline amount per fl oz of beverage 63480 = 1.4 g -> 11.2 g/cup
+- 2710259 Sugar, white, confectioner's, powdered
+     1 teaspoon 22000 = 2.5 g -> 120.0 g/cup
+     1 cup 10205 = 120 g -> 120.0 g/cup
+
+## brown-sugar
+- 2710260 Sugar, brown
+     1 teaspoon, NFS 22001 = 4.6 g -> 220.8 g/cup
+     Guideline amount per fl oz of beverage 63480 = 1.4 g -> 11.2 g/cup
+     1 cup, NFS 10010 = 220 g -> 220.0 g/cup
+
+## powdered-sugar
+- 2710259 Sugar, white, confectioner's, powdered
+     1 teaspoon 22000 = 2.5 g -> 120.0 g/cup
+     1 cup 10205 = 120 g -> 120.0 g/cup
+
+## butter
+- 2705393 Buttermilk
+     1 cup 10205 = 244 g -> 244.0 g/cup
+     1 fl oz 30000 = 30.5 g -> 244.0 g/cup
+- 2710154 Butter, NFS
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+     1 cup 10205 = 224 g -> 224.0 g/cup
+- 2710155 Butter, stick
+     1 cup 10205 = 224 g -> 224.0 g/cup
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+- 2710156 Butter, tub
+     1 cup 10205 = 224 g -> 224.0 g/cup
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+- 2710157 Butter, light
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+     1 cup 10205 = 224 g -> 224.0 g/cup
+- 2710161 Butter replacement, liquid
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+     1 cup 10205 = 224 g -> 224.0 g/cup
+- 2710163 Butter replacement, powder
+     1 cup 10205 = 100 g -> 100.0 g/cup
+     1 tablespoon 21000 = 5 g -> 80.0 g/cup
+
+## vegetable-oil
+- 2710180 Vegetable oil, NFS
+     1 cup 10205 = 224 g -> 224.0 g/cup
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+- 2710188 Canola oil
+     1 cup 10205 = 224 g -> 224.0 g/cup
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+
+## olive-oil
+- 2710186 Olive oil
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+     1 cup 10205 = 224 g -> 224.0 g/cup
+- 2710221 Mayonnaise, reduced fat,  with olive oil
+     1 tablespoon 21000 = 13.8 g -> 220.8 g/cup
+     1 cup 10205 = 220 g -> 220.0 g/cup
+
+## shortening
+- 2710167 Shortening, NS as to vegetable or animal
+     1 tablespoon 21000 = 12 g -> 192.0 g/cup
+     1 cup 10205 = 192 g -> 192.0 g/cup
+
+## milk
+- 2705385 Milk, whole
+     Guideline amount per fl oz of beverage 63480 = 2.5 g -> 20.0 g/cup
+     Guideline amount per cup of hot cereal 63546 = 61 g -> 61.0 g/cup
+     1 cup 10205 = 244 g -> 244.0 g/cup
+     1 fl oz 30000 = 30.5 g -> 244.0 g/cup
+- 2705467 Chocolate milk, whole
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+     1 cup 10205 = 248 g -> 248.0 g/cup
+- 2705496 Strawberry milk, whole
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+     1 cup 10205 = 248 g -> 248.0 g/cup
+
+## heavy-cream
+- 2705597 Cream, heavy
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     Guideline amount per fl oz of beverage 63480 = 2.5 g -> 20.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+
+## sour-cream
+- 2705614 Sour cream, regular
+     1 tablespoon 21000 = 15 g -> 240.0 g/cup
+     1 cup 10205 = 240 g -> 240.0 g/cup
+- 2705615 Sour cream, light
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     1 tablespoon 21000 = 15 g -> 240.0 g/cup
+- 2705616 Sour cream, fat free
+     1 tablespoon 21000 = 15 g -> 240.0 g/cup
+     1 cup 10205 = 240 g -> 240.0 g/cup
+- 2705617 Sour cream, imitation
+     1 tablespoon 21000 = 15 g -> 240.0 g/cup
+     1 cup 10205 = 240 g -> 240.0 g/cup
+- 2708511 Taco or tostada salad with meat and sour cream
+     1 cup 10205 = 122 g -> 122.0 g/cup
+- 2708512 Taco or tostada salad with chicken and sour cream
+     1 cup 10205 = 122 g -> 122.0 g/cup
+- 2708513 Taco or tostada salad, meatless with sour cream
+     1 cup 10205 = 122 g -> 122.0 g/cup
+- 2709424 Potato chips, sour cream and onion flavored
+     1 cup 10205 = 25 g -> 25.0 g/cup
+- 2709429 Potato chips, ruffled, sour cream and onion flavored
+     1 cup 10205 = 32 g -> 32.0 g/cup
+- 2709519 Potato, baked, peel not eaten, with sour cream
+     1 cup 10205 = 160 g -> 160.0 g/cup
+- 2709526 Potato, baked, peel eaten, with sour cream
+     1 cup 10205 = 160 g -> 160.0 g/cup
+- 2709819 Cucumber salad, made with sour cream dressing
+     1 cup 10205 = 133 g -> 133.0 g/cup
+
+## yogurt
+- 2705417 Yogurt, NS as to type of milk, plain
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705418 Yogurt, whole milk, plain
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705419 Yogurt, low fat milk, plain
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705420 Yogurt, nonfat milk, plain
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705421 Yogurt, Greek, NS as to type of milk, plain
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705422 Yogurt, Greek, whole milk, plain
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705423 Yogurt, Greek, low fat milk, plain
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705424 Yogurt, Greek, nonfat milk, plain
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705426 Yogurt, whole milk, fruit
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705430 Yogurt, Greek, whole milk, fruit
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705434 Yogurt, whole milk, flavors other than fruit
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705438 Yogurt, Greek, whole milk, flavors other than fruit
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2705464 Baby Toddler yogurt, plain
+     1 tablespoon 21000 = 15 g -> 240.0 g/cup
+
+## shredded-cheddar
+- 2705709 Cheese, Cheddar
+     1 cup, cubed 10310 = 132 g -> 132.0 g/cup
+     1 cup, melted 10120 = 244 g -> 244.0 g/cup
+     1 cup, shredded 10159 = 113 g -> 113.0 g/cup
+     1 cup, diced 10066 = 132 g -> 132.0 g/cup
+     1 cup, NFS 10010 = 113 g -> 113.0 g/cup
+- 2705710 Cheese, Cheddar, reduced fat
+     1 cup, shredded 10159 = 113 g -> 113.0 g/cup
+     1 cup, melted 10120 = 244 g -> 244.0 g/cup
+     1 cup, diced 10066 = 132 g -> 132.0 g/cup
+     1 cup, cubed 10310 = 132 g -> 132.0 g/cup
+     1 cup, NFS 10010 = 113 g -> 113.0 g/cup
+- 2705711 Cheese, Cheddar, nonfat or fat free
+     1 cup, diced 10066 = 140 g -> 140.0 g/cup
+     1 cup, melted 10120 = 244 g -> 244.0 g/cup
+     1 cup, NFS 10010 = 113 g -> 113.0 g/cup
+     1 cup, shredded 10159 = 113 g -> 113.0 g/cup
+     1 cup, cubed 10310 = 132 g -> 132.0 g/cup
+- 2705739 Cheese, Cheddar, reduced sodium
+     1 cup, shredded 10159 = 113 g -> 113.0 g/cup
+     1 cup, diced 10066 = 132 g -> 132.0 g/cup
+     1 cup, melted 10120 = 244 g -> 244.0 g/cup
+     1 cup, NFS 10010 = 113 g -> 113.0 g/cup
+- 2705768 Cheese spread, American or Cheddar cheese base, reduced fat
+     1 cup, shredded 10159 = 113 g -> 113.0 g/cup
+     1 cup, NFS 10010 = 113 g -> 113.0 g/cup
+     1 cup, melted 10120 = 244 g -> 244.0 g/cup
+     1 cup, diced 10066 = 140 g -> 140.0 g/cup
+- 2705773 Cheese spread, American or Cheddar cheese base
+     1 cup 10205 = 244 g -> 244.0 g/cup
+     1 cup, diced 10066 = 140 g -> 140.0 g/cup
+
+## water
+- 2709270 Watermelon, raw
+     1 cup 10205 = 155 g -> 155.0 g/cup
+- 2709333 Watermelon juice, 100%
+     1 fl oz (no ice) 30001 = 30 g -> 240.0 g/cup
+     1 fl oz (with ice) 30009 = 23 g -> 184.0 g/cup
+     1 fl oz (NFS) 30008 = 30 g -> 240.0 g/cup
+- 2709639 Watercress, raw
+     1 cup 10205 = 34 g -> 34.0 g/cup
+- 2709640 Watercress, cooked
+     1 cup 10205 = 142 g -> 142.0 g/cup
+- 2710003 Water Chesnut
+     1 cup 10205 = 158 g -> 158.0 g/cup
+- 2710538 Water, tonic
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+     1 can (12 fl oz) 60501 = 360 g -> 2880.0 g/cup
+     1 bottle (16.9 fl oz or 500 ml) 64090 = 507 g -> 4056.0 g/cup
+- 2710539 Water, carbonated, plain
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+     1 can (12 fl oz) 60501 = 360 g -> 2880.0 g/cup
+     1 bottle (16.9 fl oz or 500 ml) 64090 = 507 g -> 4056.0 g/cup
+- 2710540 Water, carbonated, flavored
+     1 bottle (16.9 fl oz or 500 ml) 64090 = 507 g -> 4056.0 g/cup
+     1 can (12 fl oz) 60501 = 360 g -> 2880.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+- 2710706 Water, NFS
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+- 2710707 Water, tap
+     1 cup ice 10343 = 110 g -> 110.0 g/cup
+     1 bottle (16.9 fl oz) filled with tap water 64217 = 507 g -> 4056.0 g/cup
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     1 bottle (24 fl oz) filled with tap water 64218 = 720 g -> 5760.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+- 2710708 Water, bottled, plain
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+     1 bottle (8 fl oz) 63387 = 240 g -> 1920.0 g/cup
+     1 bottle (16.9 fl oz or 500 ml) 64090 = 507 g -> 4056.0 g/cup
+     1 bottle (20 fl oz) 63999 = 600 g -> 4800.0 g/cup
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     1 bottle (12 fl oz) 60422 = 360 g -> 2880.0 g/cup
+- 2710709 Water, non-carbonated, flavored
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     1 bottle (8 fl oz) 63387 = 240 g -> 1920.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+     1 bottle (16.9 fl oz or 500 ml) 64090 = 507 g -> 4056.0 g/cup
+     1 bottle (12 fl oz) 60422 = 360 g -> 2880.0 g/cup
+- 2710710 Water beverage, fruit flavored
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+- 2710711 Water, enhanced, regular
+     1 bottle (20 fl oz) 63999 = 600 g -> 4800.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+     1 cup 10205 = 240 g -> 240.0 g/cup
+- 2710712 Water, enhanced, diet
+     1 bottle (20 fl oz) 63999 = 600 g -> 4800.0 g/cup
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+- 2710713 Water, baby
+     1 cup 10205 = 240 g -> 240.0 g/cup
+     1 fl oz 30000 = 30 g -> 240.0 g/cup
+
+## honey
+- 2709241 Honeydew melon, raw
+     1 cup 10205 = 155 g -> 155.0 g/cup
+- 2710086 Honey mustard dip
+     1 tablespoon 21000 = 15 g -> 240.0 g/cup
+- 2710179 Honey butter
+     1 cup 10205 = 224 g -> 224.0 g/cup
+     1 tablespoon 21000 = 14 g -> 224.0 g/cup
+- 2710202 Honey mustard dressing
+     1 tablespoon 21000 = 15.6 g -> 249.6 g/cup
+     1 cup 10205 = 250 g -> 250.0 g/cup
+- 2710223 Honey mustard dressing, light
+     1 tablespoon 21000 = 15 g -> 240.0 g/cup
+     1 cup 10205 = 240 g -> 240.0 g/cup
+- 2710233 Honey mustard dressing, fat free
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+     1 cup 10205 = 256 g -> 256.0 g/cup
+- 2710281 Honey
+     1 tablespoon 21000 = 20 g -> 320.0 g/cup
+     Guideline amount per fl oz of beverage 63480 = 2.4 g -> 19.2 g/cup
+     1 cup 10205 = 320 g -> 320.0 g/cup
+
+## maple-syrup
+
+## molasses
+- 2710283 Molasses
+     1 tablespoon 21000 = 20 g -> 320.0 g/cup
+     1 cup 10205 = 320 g -> 320.0 g/cup
+
+## cocoa-powder
+- 2705483 Hot chocolate / cocoa, dry mix, made with water
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+     1 cup 10205 = 248 g -> 248.0 g/cup
+- 2705484 Hot chocolate / cocoa, dry mix, made with whole or reduced fat (2%) milk
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+     1 cup 10205 = 248 g -> 248.0 g/cup
+- 2705485 Hot chocolate / cocoa, dry mix, made with lowfat (1%) or fat free (skim) milk
+     1 cup 10205 = 248 g -> 248.0 g/cup
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+- 2705486 Hot chocolate / cocoa, dry mix , made with non-dairy milk
+     1 cup 10205 = 248 g -> 248.0 g/cup
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+- 2705487 Hot chocolate / cocoa, dry mix, made with water, with whipped cream
+     1 cup 10205 = 248 g -> 248.0 g/cup
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+- 2705488 Hot chocolate / cocoa, dry mix, reduced sugar, made with water
+     1 cup 10205 = 248 g -> 248.0 g/cup
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+- 2705489 Hot chocolate / cocoa, dry mix, reduced sugar, made with whole or reduced fat (2%) milk
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+     1 cup 10205 = 248 g -> 248.0 g/cup
+- 2705492 Hot chocolate / cocoa, dry mix, reduced sugar, made with lowfat (1%) or fat free (skim) milk
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+     1 cup 10205 = 248 g -> 248.0 g/cup
+- 2705494 Hot chocolate / cocoa, dry mix, reduced sugar, made with non-dairy milk
+     1 fl oz 30000 = 31 g -> 248.0 g/cup
+     1 cup 10205 = 248 g -> 248.0 g/cup
+- 2705587 Cocoa powder, not reconstituted
+     Guideline amount per fl oz of beverage 63480 = 0.6 g -> 4.8 g/cup
+     1 tablespoon 21000 = 5 g -> 80.0 g/cup
+
+## rolled-oats
+- 2705441 Yogurt, Greek, with oats
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2708362 Buckwheat groats
+     1 cup, dry, yields 10074 = 500 g -> 500.0 g/cup
+     1 cup, cooked 10043 = 170 g -> 170.0 g/cup
+- 2708467 Cereal, frosted oats with marshmallows
+     1 cup 10205 = 35 g -> 35.0 g/cup
+- 2708489 Oats, raw
+     1 cup 10205 = 80 g -> 80.0 g/cup
+- 2708492 Baby Toddler cereal, oatmeal, dry
+     1 tablespoon 21000 = 3.8 g -> 60.8 g/cup
+
+## white-rice
+
+## cornstarch
+
+## baking-soda
+
+## baking-powder
+
+## table-salt
+
+## active-dry-yeast
+- 2710005 Yeast
+     1 tablespoon 21000 = 12 g -> 192.0 g/cup
+- 2710006 Yeast extract spread
+     1 teaspoon 22000 = 6 g -> 288.0 g/cup
+
+## chocolate-chips
+- 2710333 Chocolate chips
+     1 cup 10205 = 225 g -> 225.0 g/cup
+
+## chopped-walnuts
+- 2707531 Walnuts, excluding honey roasted
+     1 cup 10205 = 120 g -> 120.0 g/cup
+- 2707532 Walnuts, honey roasted
+     1 cup 10205 = 120 g -> 120.0 g/cup
+
+## chopped-pecans
+- 2707521 Pecans, NFS
+     1 cup 10205 = 100 g -> 100.0 g/cup
+- 2707522 Pecans, unroasted
+     1 cup 10205 = 100 g -> 100.0 g/cup
+- 2707523 Pecans, salted
+     1 cup 10205 = 100 g -> 100.0 g/cup
+- 2707524 Pecans, unsalted
+     1 cup 10205 = 100 g -> 100.0 g/cup
+- 2707525 Pecans, honey roasted
+     1 cup 10205 = 100 g -> 100.0 g/cup
+
+## peanut-butter
+- 2707537 Peanut butter
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+- 2707538 Peanut butter, lower sodium
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+- 2707539 Peanut butter, lower sodium and lower sugar
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+- 2707540 Peanut butter, lower sugar
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+- 2707541 Peanut butter, reduced fat
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+- 2707542 Peanut butter, vitamin and mineral fortified
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+- 2707543 Peanut butter and jelly
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+- 2707544 Peanut butter and chocolate spread
+     1 tablespoon 21000 = 16 g -> 256.0 g/cup
+- 2707881 Cake or cupcake, peanut butter
+     1 cup 10205 = 100 g -> 100.0 g/cup
+- 2708009 Pie, peanut butter cream
+     1 cup 10205 = 250 g -> 250.0 g/cup
+- 2708172 Crackers, sandwich, peanut butter filled
+     1 cup, NFS 10010 = 70 g -> 70.0 g/cup
+- 2708173 Crackers, sandwich, peanut butter filled (Ritz)
+     1 cup, NFS 10010 = 70 g -> 70.0 g/cup
+- 2708174 Crackers, sandwich, reduced fat, peanut butter filled
+     1 cup, NFS 10010 = 70 g -> 70.0 g/cup
+- 2708175 Crackers, whole grain, sandwich, peanut butter filled
+     1 cup, NFS 10010 = 70 g -> 70.0 g/cup
+- 2708266 Pretzels, hard, peanut butter filled
+     1 cup 10205 = 96 g -> 96.0 g/cup
+- 2708485 Cereal, other, peanut butter
+     1 cup 10205 = 40 g -> 40.0 g/cup
+- 2710347 Chocolate candy, peanut butter filled
+     1 cup 10205 = 160 g -> 160.0 g/cup
+
+## eggs
+- 2707152 Egg, whole, raw
+     1 cup 10205 = 245 g -> 245.0 g/cup
+- 2707153 Egg, whole, cooked, NS as to cooking method
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707154 Egg, whole, boiled or poached
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707155 Egg, whole, fried, NS as to fat
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707156 Egg, whole, fried no added fat
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707157 Egg, whole, fried with margarine
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707158 Egg, whole, fried with oil
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707159 Egg, whole, fried with butter
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707160 Egg, whole, fried with animal fat or meat drippings
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707161 Egg, whole, fried with cooking spray
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707162 Egg, whole, fried, NS as to fat type
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707163 Egg, whole, fried, from fast food / restaurant
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707164 Egg, whole, baked, NS as to fat
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707165 Egg, whole, baked, no added fat
+     1 cup 10205 = 135 g -> 135.0 g/cup
+- 2707166 Egg, whole, baked, fat added
+     1 cup 10205 = 135 g -> 135.0 g/cup

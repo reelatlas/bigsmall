@@ -1283,11 +1283,13 @@ test('Cooking: "2 cups flour" takes the cup and the flour, two pills, Weight the
     .evaluateAll((all) => all.map((section) => section.textContent?.trim()));
   expect(sections).toEqual(['Weight', 'Volume']);
   // A weight goes through the flour's density, said "about"; a volume stays exact.
-  await expect(row(page, 'gram')).toContainText('≈ 250.00');
-  await expect(row(page, 'gram')).toContainText('about 250.00');
+  await expect(row(page, 'gram')).toContainText('≈ 254.00');
+  await expect(row(page, 'gram')).toContainText('about 254.00');
   await expect(row(page, 'us-tablespoon')).toContainText('32.00');
   await expect(row(page, 'us-tablespoon')).not.toContainText('≈');
-  await expect(page.getByText('All-purpose flour: 1 cup = 125 g')).toBeVisible();
+  await expect(
+    page.getByText('All-purpose flour: 1 cup, spooned and leveled, is 127 g'),
+  ).toBeVisible();
   await expect(page).toHaveURL(/[?&]i=all-purpose-flour/);
 
   // Backspace in an empty box takes the last pill out first: the flour, leaving Volume.
@@ -1428,7 +1430,7 @@ test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, E
   await expect(box(page)).toHaveValue('250');
   // No unit yet: every row waits with a dash, the note already there.
   await expect(row(page, 'gram')).toContainText('—');
-  await expect(page.getByText('Bread flour: 1 cup = 137 g')).toBeVisible();
+  await expect(page.getByText('Bread flour: 1 cup, spooned and leveled, is 123 g')).toBeVisible();
   await expectNoA11yViolations(page);
   await page.reload();
   await ready(page);

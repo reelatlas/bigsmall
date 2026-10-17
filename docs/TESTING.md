@@ -49,7 +49,7 @@ Adding a unit means adding at least one row that exercises it; a test fails when
 
 ## Parser
 
-`packages/core/test/cooking.test.ts` holds Cooking (ADR 0021): every ingredient's id, keys, and FoodData Central citation; a cup of each weighing what USDA weighs it; conversions across volume and weight both ways, and exact within one; reading the ingredient a query ends with; ranking ingredient matches; the units Cooking lists.
+`packages/core/test/cooking.test.ts` holds Cooking (ADR 0021): every ingredient's id, keys, method, and sources, each once with its figure, and their spread; each figure the rule's from its sources (`cupFigure`: the median, or with fewer than three USDA's measured cups), a liquid's within its density's references; the rule itself (odd and even counts, a half to the even gram, fewer than three); a cup of each weighing its figure; conversions across volume and weight both ways, and exact within one; reading the ingredient a query ends with; ranking ingredient matches; the units Cooking lists.
 
 `packages/core/test/parse.test.ts` holds the number grammar and the arithmetic. `/` and `-` belong to arithmetic and to unit symbols alike, so each new operator gets a test beside a unit that uses the same character (`5 km/h` is 5 and `km/h`; `5 -ft` is 5 and `-ft`).
 

@@ -1,5 +1,7 @@
 # Cooking 1: ingredients and their densities
 
+> Superseded 2026-10-16 by `cooking-2.md`, which weighs several sources for each figure; this file stays as the record of USDA FoodData Central's SR Legacy figures, Cooking's first.
+
 2026-10-16. The data behind Cooking (ADR 0021): each ingredient's weight for a US cup, as USDA FoodData Central measures it, and how it was checked (ADR 0020). The code is `packages/core/src/units/ingredients.ts`; this file is its provenance.
 
 ## Method

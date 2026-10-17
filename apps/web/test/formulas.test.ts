@@ -14,7 +14,7 @@ describe('formulas', () => {
       ingredients.map((ingredient) => `ingredient:${ingredient.id}`),
     );
     expect(cooking?.summary).toBe(`${ingredients.length} ingredients by the cup`);
-    expect(formula('ingredient:brown-sugar')).toBe('1 cup packed = 220 g');
+    expect(formula('ingredient:brown-sugar')).toBe('1 cup = 211 g');
   });
 
   it('writes each kind of unit as its formula in the base unit', () => {

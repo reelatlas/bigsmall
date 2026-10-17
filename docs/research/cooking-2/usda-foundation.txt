@@ -1,0 +1,288 @@
+# Foundation Foods 2026-04: FoodData_Central_foundation_food_csv_2026-04-30.zip
+
+## all-purpose-flour
+
+## bread-flour
+
+## whole-wheat-flour
+
+## cake-flour
+
+## almond-flour
+
+## granulated-sugar
+- 334196 Albertsons Granulated Sugar, Granulated white (CA2) - NFY040Y31
+    1.0 teaspoon = 4 g -> 192.0 g/cup
+    1.0 cup = 188 g -> 188.0 g/cup
+- 334201 C&H Granulated White Sugar (OK1) - NFY040Y38
+    1.0 teaspoon = 3.9 g -> 187.2 g/cup
+- 334202 C&H, Sugar, Granulated, White (CA2) - NFY040Y35
+    1.0 teaspoon = 3.7 g -> 177.6 g/cup
+    1.0 cup = 176 g -> 176.0 g/cup
+- 334203 Dixie Crystals, Sugar, Granulated, White (NC1) - NFY040Y2Y
+    1.0 teaspoon = 4.4 g -> 211.2 g/cup
+    1.0 cup = 194 g -> 194.0 g/cup
+- 334208 Domino Sugar - Premium Pure Cane, Granulated white (CT1) - NFY040Y2W
+    1.0 teaspoon = 4 g -> 192.0 g/cup
+    1.0 cup = 196 g -> 196.0 g/cup
+- 334209 C&H, Sugar, Granulated, White (CO2) - NFY040Y32
+    1.0 teaspoon = 3.8 g -> 182.4 g/cup
+    1.0 cup = 175 g -> 175.0 g/cup
+- 334210 Domino Sugar - Premium Pure Cane, Granulated white (IN1) - NFY040Y3H
+    1.0 teaspoon = 3.7 g -> 177.6 g/cup
+- 334215 Domino Sugar - Premium Pure Cane, Granulated white (FL1) - NFY040Y6K
+    1.0 teaspoon = 4.1 g -> 196.8 g/cup
+- 334216 C&H, Sugar, Granulated white (MO1) - NFY040Y30
+    1.0 teaspoon = 4.4 g -> 211.2 g/cup
+    1.0 cup = 192 g -> 192.0 g/cup
+- 334217 Domino Sugar - Premium Pure Cane, Granulated white (NY1) - NFY040Y3B
+    1.0 teaspoon = 4.2 g -> 201.6 g/cup
+    1.0 cup = 200 g -> 200.0 g/cup
+- 334222 Safeway Fine Granulated Sugar, Granulated white (CO2) - NFY040Y2Z
+    1.0 cup = 192 g -> 192.0 g/cup
+    1.0 teaspoon = 3.7 g -> 177.6 g/cup
+- 334223 Kroger Sugar, Granulated white (IN1) - NFY040Y3G
+    1.0 cup = 186 g -> 186.0 g/cup
+    1.0 teaspoon = 4 g -> 192.0 g/cup
+- 334228 Domino Sugar - Premium Pure Cane, Granulated white (AL 1) - NFY040Y3E
+    1.0 teaspoon = 4.1 g -> 196.8 g/cup
+- 334229 C&H, Sugar, Granulated, White (CA1) - NFY040Y3D
+    1.0 teaspoon = 4.1 g -> 196.8 g/cup
+    1.0 cup = 192 g -> 192.0 g/cup
+- 334230 Domino Sugar - Premium Pure Cane, Granulated white (MI1) - NFY040Y2X
+    1.0 teaspoon = 4.1 g -> 196.8 g/cup
+    1.0 cup = 196 g -> 196.0 g/cup
+- 334236 Best Choice Sugar, Granulated white (MO1) - NFY040Y33
+    1.0 teaspoon = 3.9 g -> 187.2 g/cup
+    1.0 cup = 184 g -> 184.0 g/cup
+- 334241 Safeway Fine Granulated Sugar, Granulated white (CA1) - NFY040Y3A
+    1.0 teaspoon = 3.7 g -> 177.6 g/cup
+- 334242 Kroger Sugar, Granulated white (MI1) - NFY040Y36
+    1.0 teaspoon = 3.7 g -> 177.6 g/cup
+    1.0 cup = 187 g -> 187.0 g/cup
+- 334243 Safeway Fine Granulated Sugar, Granulated white (CA1) - NFY040Y39
+    1.0 teaspoon = 3.8 g -> 182.4 g/cup
+    1.0 cup = 180 g -> 180.0 g/cup
+- 334247 Sugars, granulated
+    1.0 teaspoon = 4 g -> 192.0 g/cup
+    1.0 cup = 188 g -> 188.0 g/cup
+- 746784 Sugars, granulated
+    1.0 teaspoon = 4 g -> 192.0 g/cup
+    1.0 cup = 188 g -> 188.0 g/cup
+
+## brown-sugar
+
+## powdered-sugar
+
+## butter
+
+## vegetable-oil
+
+## olive-oil
+
+## shortening
+
+## milk
+- 322561 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 227 g -> 227.0 g/cup
+    1.0 cup = 244 g -> 244.0 g/cup
+    1.0 fl oz = 30.5 g -> 244.0 g/cup
+    1.0 tablespoon = 15 g -> 240.0 g/cup
+- 322567 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 219 g -> 219.0 g/cup
+- 322589 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 228 g -> 228.0 g/cup
+- 322613 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 225 g -> 225.0 g/cup
+- 322629 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 231 g -> 231.0 g/cup
+- 322648 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 224 g -> 224.0 g/cup
+- 322667 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 228 g -> 228.0 g/cup
+- 322690 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 222 g -> 222.0 g/cup
+- 322697 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 234 g -> 234.0 g/cup
+- 322703 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 225 g -> 225.0 g/cup
+- 322709 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 229 g -> 229.0 g/cup
+- 322716 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 232 g -> 232.0 g/cup
+- 322722 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 229 g -> 229.0 g/cup
+- 322728 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 224 g -> 224.0 g/cup
+- 322735 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 228 g -> 228.0 g/cup
+- 322741 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 253 g -> 253.0 g/cup
+- 322764 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 226 g -> 226.0 g/cup
+- 322770 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 221 g -> 221.0 g/cup
+- 322794 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 232 g -> 232.0 g/cup
+- 322815 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 229 g -> 229.0 g/cup
+- 322837 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 224 g -> 224.0 g/cup
+- 322843 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 230 g -> 230.0 g/cup
+- 322852 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 228 g -> 228.0 g/cup
+- 322872 MILK, WHOLE (WAVE 22E)
+    1.0 cup = 229 g -> 229.0 g/cup
+- 322892 Milk, whole, 3.25% milkfat, with added vitamin D
+    1.0 cup = 229 g -> 229.0 g/cup
+    1.0 fl oz = 30.5 g -> 244.0 g/cup
+    1.0 tablespoon = 15 g -> 240.0 g/cup
+- 746782 Milk, whole, 3.25% milkfat, with added vitamin D
+    1.0 cup = 249 g -> 249.0 g/cup
+
+## heavy-cream
+
+## sour-cream
+
+## yogurt
+
+## shredded-cheddar
+- 327967 Cheddar cheese, sliced, CRACKER BARREL (AL1) - NFY120D3O
+    1.0 cup diced = 132 g -> 132.0 g/cup
+- 328211 Cheese, cheddar, natural shredded sharp, store brand, GREAT VALUE (CA1) NFY120WOU
+    1.0 cup = 97.7 g -> 97.7 g/cup
+- 328213 Cheese, cheddar, natural shredded sharp, store brand, GREAT VALUE (NE1) NFY120WOY
+    1.0 cup = 96.3 g -> 96.3 g/cup
+- 328228 Cheese, cheddar, natural shredded mild, KRAFT (NE1) NFY120WEI
+    1.0 cup = 114 g -> 114.0 g/cup
+- 328230 Cheese, cheddar, natural shredded mild, KRAFT (NC1) NFY120WEW
+    1.0 cup = 96.7 g -> 96.7 g/cup
+- 328232 Cheese, cheddar, natural shredded mild, KRAFT (KY1) NFY120WEK
+    1.0 cup = 108 g -> 108.0 g/cup
+- 328249 Cheese, cheddar, natural shredded sharp, KRAFT (GA1) NFY120WMW
+    1.0 cup = 99.6 g -> 99.6 g/cup
+- 328251 Cheese, cheddar, natural shredded sharp, KRAFT (IN1) NFY120WN0
+    1.0 cup = 112 g -> 112.0 g/cup
+- 328254 Cheese, cheddar, natural shredded sharp, KRAFT (AZ1) NFY120WN4
+    1.0 cup = 111 g -> 111.0 g/cup
+- 328268 Cheese, cheddar, natural shredded sharp, store brand, MY ESSENTIALS (NC1) NFY120WO3
+    1.0 cup = 112 g -> 112.0 g/cup
+- 328270 Cheese, cheddar, natural shredded sharp, store brand, ESSENTIAL EVERYDAY (PA1) NFY120WOP
+    1.0 cup = 110 g -> 110.0 g/cup
+- 328271 Cheese, cheddar, natural shredded sharp, store brand, FOOD CLUB (AZ1) NFY120WOT
+    1.0 cup = 115 g -> 115.0 g/cup
+- 328272 Cheese, cheddar, natural shredded sharp, store brand, PUBLIX (GA1) NFY120WOH
+    1.0 cup = 120 g -> 120.0 g/cup
+- 328287 Cheese, cheddar, natural shredded sharp, store brand, KROGER (CA2) NFY120WNZ
+    1.0 cup = 109 g -> 109.0 g/cup
+- 328288 Cheese, cheddar, natural shredded sharp, store brand, KROGER (KY1) NFY120WP2
+    1.0 cup = 115 g -> 115.0 g/cup
+- 328289 Cheese, cheddar, natural shredded sharp, store brand, KROGER (TX1) NFY120WO8
+    1.0 cup = 103 g -> 103.0 g/cup
+- 328306 Cheese, cheddar, natural shredded sharp, KRAFT (NC1) NFY120WNC
+    1.0 cup = 97.3 g -> 97.3 g/cup
+- 328309 Cheese, cheddar, natural shredded sharp, KRAFT (KY1) NFY120WNN
+    1.0 cup = 98.1 g -> 98.1 g/cup
+- 328310 Cheese, cheddar, natural shredded sharp, KRAFT (NE1) NFY120WNV
+    1.0 cup = 103 g -> 103.0 g/cup
+- 328327 Cheese, cheddar, natural shredded mild, KRAFT (IA) NFY120WEE
+    1.0 cup = 121 g -> 121.0 g/cup
+- 328332 Cheese, cheddar, natural shredded mild, KRAFT (PA1) NFY120WEO
+    1.0 cup = 95.8 g -> 95.8 g/cup
+- 328336 Cheese, cheddar, natural shredded mild, store brand, ESSENTIAL EVERYDAY  (PA1) NFY120WFF
+    1.0 cup = 96.4 g -> 96.4 g/cup
+- 328337 Cheese, cheddar, natural shredded mild, store brand, LAURA LYNN (GA1) NFY120WGN
+    1.0 cup = 91 g -> 91.0 g/cup
+- 328341 Cheese, cheddar, natural shredded mild, store brand, FAREWAY  (IA) NFY120WFJ
+    1.0 cup = 94.5 g -> 94.5 g/cup
+- 328345 Cheese, cheddar, natural shredded sharp, KRAFT (TX1) NFY120WMS
+    1.0 cup = 105 g -> 105.0 g/cup
+- 328346 Cheese, cheddar, natural shredded sharp, KRAFT (PA1) NFY120WNR
+    1.0 cup = 102 g -> 102.0 g/cup
+- 328347 Cheese, cheddar, natural shredded sharp, KRAFT (CA1) NFY120WN8
+    1.0 cup = 102 g -> 102.0 g/cup
+- 328348 Cheese, cheddar, natural shredded sharp, KRAFT (IA) NFY120WNJ
+    1.0 cup = 116 g -> 116.0 g/cup
+- 328352 Cheese, cheddar, natural shredded sharp, store brand, SHOP RITE (NJ1) NFY120WOC
+    1.0 cup = 125 g -> 125.0 g/cup
+- 328353 Cheese, cheddar, natural shredded sharp, store brand, FAREWAY (IA) NFY120WOF
+    1.0 cup = 120 g -> 120.0 g/cup
+- 328355 Cheese, cheddar, natural shredded sharp, store brand, SCHNUCKS (IN1) NFY120WOL
+    1.0 cup = 103 g -> 103.0 g/cup
+- 328359 Cheese, cheddar, natural shredded mild, KRAFT (GA1) NFY120WES
+    1.0 cup = 97.6 g -> 97.6 g/cup
+- 328360 Cheese, cheddar, natural shredded mild, KRAFT (IN1) NFY120WEA
+    1.0 cup = 99.3 g -> 99.3 g/cup
+- 328377 Cheese, cheddar, natural shredded mild, store brand, GREAT VALUE (NE1) NFY120WFE
+    1.0 cup = 105 g -> 105.0 g/cup
+- 328379 Cheese, cheddar, natural shredded mild, store brand, GREAT VALUE (CA1) NFY120WGB
+    1.0 cup = 104 g -> 104.0 g/cup
+- 328381 Cheese, cheddar, natural shredded mild, store brand, GREAT VALUE (KY1) NFY120WG7
+    1.0 cup = 99.2 g -> 99.2 g/cup
+- 328395 Cheese, cheddar, natural shredded mild, store brand, WEGMANS (NJ1) NFY120WF0
+    1.0 cup = 104 g -> 104.0 g/cup
+- 328399 Cheese, cheddar, natural shredded mild, store brand, SCHNUCKS (IN1) NFY120WF6
+    1.0 cup = 98.2 g -> 98.2 g/cup
+- 328400 Cheese, cheddar, natural shredded mild, store brand, MY ESSENTIALS (NC1) NFY120WGJ
+    1.0 cup = 98.8 g -> 98.8 g/cup
+- 328401 Cheese, cheddar, natural shredded mild, store brand, FOOD CLUB (AZ1) NFY120WF4
+    1.0 cup = 106 g -> 106.0 g/cup
+- 328414 Cheese, cheddar, natural shredded mild, store brand, KROGER (CA2) NFY120WFA
+    1.0 cup = 94.6 g -> 94.6 g/cup
+- 328416 Cheese, cheddar, natural shredded mild, store brand, KROGER (TX1) NFY120WGF
+    1.0 cup = 97.5 g -> 97.5 g/cup
+- 328545 Cheese, cheddar, mild, block/chunk, store brand, FOOD LION   (NC1) NFY120XCW
+    1.0 cup melted = 244 g -> 244.0 g/cup
+- 328637 Cheese, cheddar
+    1.0 cup shredded = 105 g -> 105.0 g/cup
+
+## water
+
+## honey
+
+## maple-syrup
+
+## molasses
+
+## cocoa-powder
+
+## rolled-oats
+
+## white-rice
+
+## cornstarch
+
+## baking-soda
+
+## baking-powder
+
+## table-salt
+- 321505 Salt, table, iodized
+    1.0 teaspoon = 6.1 g -> 292.8 g/cup
+- 746775 Salt, table, iodized
+    1.0 teaspoon = 6.1 g -> 292.8 g/cup
+
+## active-dry-yeast
+
+## chocolate-chips
+
+## chopped-walnuts
+
+## chopped-pecans
+
+## peanut-butter
+- 324734 Peanut butter, creamy, JIF (CA1) - NFY120BY4
+    1.0 cup = 258 g -> 258.0 g/cup
+    2.0 tablespoon = 32 g -> 256.0 g/cup
+- 324855 Peanut butter, creamy, SKIPPY (NC1) - NFY120BWO
+    2.0 tablespoon = 32 g -> 256.0 g/cup
+    1.0 cup = 258 g -> 258.0 g/cup
+- 324860 Peanut butter, smooth style, with salt
+    2.0 tablespoon = 32 g -> 256.0 g/cup
+    1.0 cup = 258 g -> 258.0 g/cup
+
+## eggs
+- 329490 Egg, whole, dried
+    1.0 cup sifted = 85 g -> 85.0 g/cup
+    1.0 tablespoon = 5 g -> 80.0 g/cup

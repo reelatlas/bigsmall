@@ -131,16 +131,29 @@ export interface FunctionalUnit extends UnitMeta {
 export type Unit = LinearUnit | AffineUnit | ReciprocalUnit | FunctionalUnit;
 
 /**
- * An ingredient, which joins volume and weight through its density (ADR 0021): how much one US
- * customary cup of it weighs, as USDA FoodData Central measures it.
- */
-/**
  * What kind of ingredient it is (ADR 0021): the heading it is listed under where ingredients are
  * chosen, in the order of INGREDIENT_KINDS.
  */
 export type IngredientKind =
   'flour' | 'sugar' | 'fat' | 'dairy' | 'liquid' | 'baking' | 'grain' | 'mix-in';
 
+/**
+ * A source's figure for one US cup of an ingredient (docs/research/cooking-2.md): a weighing that
+ * counts toward the ingredient's figure or, for a liquid, a reference for its density.
+ */
+export interface CupSource {
+  /** Who weighed it, or the reference ("USDA's measured cups (1969)", "King Arthur Baking"). */
+  by: string;
+  /** Grams in one cup filled the ingredient's way; [low, high] where the source gives a range. */
+  grams: number | readonly [number, number];
+  /** What else the source says that its figure rests on ("510 cups", "4 g a teaspoon"). */
+  detail?: string;
+}
+
+/**
+ * An ingredient, which joins volume and weight through its density (ADR 0021): how much one US
+ * customary cup of it weighs, filled the way US recipes mean it.
+ */
 export interface Ingredient {
   /** Stable identifier used in URLs. Lowercase, ASCII, kebab-case. */
   id: string;
@@ -150,16 +163,26 @@ export interface Ingredient {
   kind: IngredientKind;
   /** Other names people type ("flour", "plain flour", "icing sugar"). */
   aliases: readonly string[];
-  /** Grams in one US customary cup (236.5882365 mL). Measured, never exact. */
+  /**
+   * Grams in one US customary cup (236.5882365 mL), filled as US recipes mean (`method`), by
+   * docs/research/cooking-2.md's rule: the median of `sources`, rounded to the gram (a half to
+   * the even gram); with fewer than three, USDA's measured cups' figure where they weighed it. A
+   * liquid's is its density times the cup, within its references. Measured, never exact.
+   */
   gramsPerCup: number;
-  /** USDA FoodData Central's id for the food (SR Legacy). */
-  fdcId: number;
-  /** The portion the weight was read from, as USDA words it ("1 cup, packed = 220 g"). */
-  portion: string;
-  /** The food as FoodData Central describes it, and the portion, for the citation (ADR 0020). */
-  source: string;
-  /** How it is measured, where USDA says or a recipe needs it ("packed", "unsifted"). */
-  measured?: string;
+  /** How the cup is filled for that weight ("spooned and leveled", "packed", "poured to the line"). */
+  method: string;
+  /** The lowest and highest of `sources`, in grams. */
+  range: readonly [number, number];
+  /** A liquid's weight comes from its density times the cup, not from cups weighed by hand. */
+  byDensity?: true;
+  /**
+   * The weighings that count toward the figure, each source once (ADR 0020, ADR 0021); for a
+   * liquid, its density's references. Those set aside, and why, are in cooking-2.md.
+   */
+  sources: readonly CupSource[];
+  /** Where another way of filling the cup, or a caveat, matters ("Sifted first, 95 g"). */
+  note?: string;
   /** The unit a bare count of it means, by id: "2 eggs" is two large eggs. */
   counted?: string;
 }

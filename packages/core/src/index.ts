@@ -40,8 +40,11 @@ export {
   countedUnit,
   convertWith,
   crossesDensity,
+  cupBasis,
+  cupFigure,
+  MEASURED_CUPS,
 } from './cooking';
-export type { IngredientMatch } from './cooking';
+export type { CupBasis, IngredientMatch } from './cooking';
 export type { FormatOptions } from './format';
 export { formatFraction, formatPlaces, fractionsOf, FRACTION_SIZES } from './rounded';
 export type { Fraction, FractionSize, Rounded, Rounding } from './rounded';

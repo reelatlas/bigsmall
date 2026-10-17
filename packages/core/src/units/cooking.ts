@@ -39,7 +39,8 @@ export const COOKING_UNITS: readonly string[] = [
 
 /**
  * An ingredient's own units, as recipes count it: weights of Weight, each listed only with its
- * ingredient (`ingredient`), measured as USDA FoodData Central weighs them.
+ * ingredient (`ingredient`): a stick of butter and a packet of yeast by their packages' net weights,
+ * exact; a large egg as the sources weigh one (docs/research/cooking-2.md).
  */
 export const ingredientUnits: readonly Unit[] = [
   {
@@ -52,10 +53,12 @@ export const ingredientUnits: readonly Unit[] = [
     aliases: ['sticks', 'butter stick'],
     system: 'us',
     tier: 'standard',
-    factor: 0.113,
-    exact: false,
-    source: 'USDA FoodData Central 173410 (SR Legacy): Butter, salted; 1 stick = 113 g',
-    note: 'A US stick of butter: half a cup, 113 g.',
+    // A quarter pound.
+    factor: 0.25 * 0.45359237,
+    exact: true,
+    source:
+      "A quarter pound by its wrapper's net weight, half a cup by its markings: America's Test Kitchen, King Arthur Baking (4 oz, 113 g); Land O Lakes (32 tablespoons a pound)",
+    note: 'A US stick of butter: a quarter pound, 113.4 g, half a cup.',
     ingredient: 'butter',
   },
   {
@@ -70,7 +73,8 @@ export const ingredientUnits: readonly Unit[] = [
     tier: 'standard',
     factor: 0.05,
     exact: false,
-    source: 'USDA FoodData Central 171287 (SR Legacy): Egg, whole, raw, fresh; 1 large = 50 g',
+    source:
+      'King Arthur Baking, Rose Levy Beranbaum, USDA FoodData Central (SR Legacy): 50 g out of the shell; the FDA reference amount for an egg, 21 CFR 101.12(b): 50 g',
     note: 'A US large egg out of its shell, 50 g.',
     ingredient: 'eggs',
   },
@@ -84,11 +88,12 @@ export const ingredientUnits: readonly Unit[] = [
     aliases: ['packets', 'yeast packet'],
     system: 'us',
     tier: 'standard',
-    factor: 0.0072,
-    exact: false,
+    // A quarter ounce.
+    factor: 0.25 * 0.028349523125,
+    exact: true,
     source:
-      "USDA FoodData Central 175043 (SR Legacy): Leavening agents, yeast, baker's, active dry; 1 packet = 7.2 g",
-    note: 'A US packet of active dry yeast, 7.2 g.',
+      "A quarter ounce by its label's net weight, about 2¼ teaspoons: Red Star (0.25 oz, 7 g), Fleischmann's",
+    note: 'A US packet of active dry yeast: a quarter ounce, 7.09 g, about 2¼ teaspoons.',
     ingredient: 'active-dry-yeast',
   },
 ];

@@ -6,11 +6,14 @@ import {
   cookingUnits,
   countedUnit,
   crossesDensity,
+  cupBasis,
+  cupFigure,
   getIngredient,
   getUnit,
   INGREDIENT_KINDS,
   ingredients,
   matchIngredients,
+  MEASURED_CUPS,
   search,
   splitIngredient,
 } from '../src/index';
@@ -25,13 +28,30 @@ const ingredient = (id: string) => {
 };
 
 describe('ingredients', () => {
-  it('have unique, URL-safe ids, a weight per cup, and cite FoodData Central', () => {
+  it('have unique, URL-safe ids, and a weight per cup their sources decide by the rule', () => {
     const ids = ingredients.map((each) => each.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const each of ingredients) {
       expect(each.id, each.id).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
       expect(Number.isFinite(each.gramsPerCup) && each.gramsPerCup > 0, each.id).toBe(true);
-      expect(each.source, each.id).toContain(`USDA FoodData Central ${each.fdcId} (SR Legacy)`);
+      expect(each.method.length, each.id).toBeGreaterThan(0);
+      // docs/research/cooking-2.md: each source once, with its figure; the spread is theirs.
+      expect(each.sources.length, each.id).toBeGreaterThanOrEqual(1);
+      expect(new Set(each.sources.map((source) => source.by)).size, each.id).toBe(
+        each.sources.length,
+      );
+      const ends = each.sources.flatMap((source) =>
+        typeof source.grams === 'number' ? [source.grams] : [...source.grams],
+      );
+      for (const grams of ends) expect(Number.isInteger(grams) && grams > 0, each.id).toBe(true);
+      expect(each.range, each.id).toEqual([Math.min(...ends), Math.max(...ends)]);
+      // The figure: a liquid's within its density's references; any other, the rule's.
+      const [low, high] = each.range;
+      if (each.byDensity) {
+        expect(low <= each.gramsPerCup && each.gramsPerCup <= high, each.id).toBe(true);
+      } else {
+        expect(each.gramsPerCup, each.id).toBe(cupFigure(each.sources));
+      }
       if (each.counted) expect(getUnit(each.counted)?.ingredient, each.id).toBe(each.id);
     }
   });
@@ -58,7 +78,7 @@ describe('ingredients', () => {
     }
   });
 
-  it('weigh a cup as USDA weighs it, every one', () => {
+  it('weigh a cup as their estimate says, every one', () => {
     for (const each of ingredients) {
       expect(convertWith(1, 'us-cup', 'gram', each), each.id).toBeCloseTo(each.gramsPerCup, 9);
     }
@@ -80,15 +100,54 @@ describe('ingredients', () => {
   });
 });
 
+describe('cupFigure, the rule (docs/research/cooking-2.md)', () => {
+  const cups = (grams: number) => ({ by: MEASURED_CUPS, grams });
+  const kitchen = (by: string, grams: number | readonly [number, number]) => ({ by, grams });
+
+  it('takes the median of three or more, a range at its middle', () => {
+    expect(cupFigure([cups(126), kitchen('a', 120), kitchen('b', 128)])).toBe(126);
+    // Even: the middle two's mean, 126 and 127.5.
+    expect(
+      cupFigure([cups(126), kitchen('a', 120), kitchen('b', 136), kitchen('c', [125, 130])]),
+    ).toBe(127);
+  });
+
+  it('rounds a half to the even gram', () => {
+    expect(
+      cupFigure([kitchen('a', 164), kitchen('b', 167), kitchen('c', 170), kitchen('d', 170)]),
+    ).toBe(168);
+    expect(
+      cupFigure([kitchen('a', 176), kitchen('b', 184), kitchen('c', 187), kitchen('d', 190)]),
+    ).toBe(186);
+  });
+
+  it('with fewer than three, takes USDA’s measured cups where they weighed it', () => {
+    expect(cupFigure([cups(177), kitchen('King Arthur Baking', 192)])).toBe(177);
+    expect(cupFigure([kitchen('a', 239), kitchen('b', 240)])).toBe(240);
+    expect(cupFigure([kitchen('King Arthur Baking', 96)])).toBe(96);
+  });
+
+  it('says how each ingredient’s figure was reached', () => {
+    expect(cupBasis(ingredient('milk'))).toBe('density');
+    expect(cupBasis(ingredient('baking-powder'))).toBe('measured-cups');
+    expect(cupBasis(ingredient('all-purpose-flour'))).toBe('median');
+  });
+});
+
 describe('convertWith', () => {
   it('crosses volume and weight through the density, both ways', () => {
-    expect(convertWith(2, 'us-cup', 'gram', 'all-purpose-flour')).toBeCloseTo(250, 9);
-    expect(convertWith(250, 'gram', 'us-cup', 'all-purpose-flour')).toBeCloseTo(2, 12);
-    // A tablespoon of butter: 227/16 g, USDA's own tablespoon 14.2 g.
+    expect(convertWith(2, 'us-cup', 'gram', 'all-purpose-flour')).toBeCloseTo(254, 9);
+    expect(convertWith(254, 'gram', 'us-cup', 'all-purpose-flour')).toBeCloseTo(2, 12);
+    // A tablespoon of butter: 227/16 g, about 14.2 g.
     expect(convertWith(1, 'us-tablespoon', 'gram', 'butter')).toBeCloseTo(227 / 16, 9);
-    expect(convertWith(1, 'stick-of-butter', 'us-cup', 'butter')).toBeCloseTo(113 / 227, 9);
+    // A stick, a quarter pound, through butter's cup: about half a cup.
+    expect(convertWith(1, 'stick-of-butter', 'us-cup', 'butter')).toBeCloseTo(
+      (0.25 * 453.59237) / 227,
+      9,
+    );
     expect(convertWith(3, 'large-egg', 'us-cup', 'eggs')).toBeCloseTo(150 / 243, 9);
-    expect(convertWith(1, 'us-teaspoon', 'gram', 'baking-soda')).toBeCloseTo(4.6, 9);
+    // A teaspoon of baking soda: 240/48 g, 5 g.
+    expect(convertWith(1, 'us-teaspoon', 'gram', 'baking-soda')).toBeCloseTo(240 / 48, 9);
   });
 
   it('converts within one quantity exactly, as convert does, whatever the ingredient', () => {

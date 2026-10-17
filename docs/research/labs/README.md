@@ -4,6 +4,26 @@ A prototype lab answers a design question with a few working answers, built from
 
 Newest first.
 
+## Categories lab, `/dev/categories-lab` (2026-10-15 to 16)
+
+**Explored.** Three categories bigsmall did not have yet, and the open category menu, mocked with the real box, table, and menus in frozen states, the values worked out by hand, wide or at a phone's width: pace (A, min/km and min/mi with their systems; B, a Pace section of their own under the speeds); a temperature change (A, as today, a reading; B, Temperature change, a category of its own; C, in B, an oven's 25 °F lower; D, Sean's idea, inside Temperature, the reading and then the same number as a change); cooking by ingredient (A, "2 cups flour" with the ingredient in a menu beside the category, weight first; B, the same by system; C, an ingredient's own unit, "1 stick butter"; D, Sean's idea, two pills in the box, the unit and the ingredient); and the open menu three ways (A, as long as its list; B, held to a height and scrolling; C, two columns).
+
+**Decided.** Everything built on 2026-10-16 (the sixty-third pass): the menu in two columns, B its fallback in a short window (docs/UX-SPEC.md §1); Pace, B, inside Speed; a temperature change, D, "As a change" after the readings; Cooking, D, weight first, then volume (ADR 0021). The working detail is in `docs/research/categories-1.md`.
+
+**Left out, and why.**
+
+- Paces with their systems (A): a pace reads the other way, smaller being faster, so among the speeds it breaks their size order; a section of its own keeps both readable.
+- A temperature change as a category of its own (B, C): one more place to look for what is a way of reading a temperature; inside Temperature, the reading and the change sit together.
+- Cooking by system (B): weight and volume are what a recipe crosses between, so they head the table. An ingredient's own unit as the way in (C): the stick of butter, the large egg, and the packet of yeast joined D as units listed with their ingredient.
+- The ingredient in a menu beside the category (A): D's second pill says the whole question in the box. A's menu comes back as the Ingredient menu, for choosing without typing, the pill still the readout (the sixty-fourth pass, a trial).
+- The menu as long as its list (A): it ran past a phone's window.
+
+**Learned** (docs/LEARNINGS.md, 2026-10-15 and 16): a list held to the window scrolls itself, never the page; one reciprocal unit takes a category's size order away; flex items wrap before they shrink.
+
+**Screenshots** (`categories-lab/`): 1 the menu open three ways; 2 pace, A and B; 3 a temperature change, A to D; 4 cooking, A to D, the lab's last state.
+
+**Last commit.** `7f86070`, in `apps/web/src/pages/dev/_categories-lab/` and `apps/web/src/pages/dev/categories-lab.astro`. Research: `docs/research/categories-1.md`.
+
 ## Settings lab, `/dev/organization-lab` (2026-10-10 to 15)
 
 **Explored.** How to section the table and control what it shows, then how results look, in rounds: jobs (Cooking, Cubic, Trade), by system, six filters, options E to I, single units chosen in Settings (Together) or in the table (Separate), compact pills against segmented controls; then Sean's model, one Settings button in the action bar with the table's sections, a Hidden list, and Edit, plus Display (names, copy buttons, decimals, fractions, or both, rounding). Its last round (2026-10-15) mocked Settings' shape on the converter's own parts (A, one dropdown; B, Filter and Display, a dropdown each; C, a side panel like the calculator, between the box and the table or a sheet from the bottom on a phone) and four ways to show a unit moving between shown and hidden (none, a highlight, a glide, both), with sliders for their lengths.

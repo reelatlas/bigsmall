@@ -32,5 +32,5 @@ The densities are measured, not defined: a cup of flour scooped from the bag wei
 
 - The converter's state gains an ingredient beside the unit; undo, the URL, the box's pills, the matches, and the category menu learn it.
 - Core gains ingredients and a conversion through density, tested in golden rows; the About page's formulas list each ingredient's grams per cup with its source.
-- The categories lab's Cooking mocks retire once this ships, and with them the lab (`docs/research/labs/README.md`).
+- The categories lab's Cooking mocks retire once this ships, and with them the lab (`docs/research/labs/README.md`): retired 2026-10-16.
 - Later, and not decided here: the metric cup and spoons, weights rounded to the gram for cooking, more ingredients, an oven's gas marks and fan settings beside Temperature (`docs/PLAN.md` §2, "Categories with a second value").

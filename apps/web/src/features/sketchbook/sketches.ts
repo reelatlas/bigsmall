@@ -217,6 +217,20 @@ export type SketchEffect = (typeof SKETCH_EFFECTS)[number];
 export const STEPPED_EFFECTS: ReadonlySet<SketchEffect> = new Set(['glitch', 'scramble', 'scan']);
 
 /**
+ * The changes that reach past the tile as a card would: Flip's and Tumble's near edge swinging
+ * toward the viewer, Flap's halves falling, and Squash's bounce above its base. The tile lets them
+ * out while they run (`data-reach`, Sketchbook.tsx), into the gap and never over a neighbor at the
+ * shipped sizes; every other change stays clipped, Glitch's bands most of all, which an iPhone left
+ * as slivers in the gap. A trial (Sean, 2026-10-17): the reach gave the tiles dimension.
+ */
+export const REACHING_EFFECTS: ReadonlySet<SketchEffect> = new Set([
+  'flip',
+  'tumble',
+  'flap',
+  'squash',
+]);
+
+/**
  * The curve a moving change or a flap follows: the theme's own (`--motion-ease`), its glide
  * (`--motion-glide`), or a spring that overshoots and settles (SPRING_EASING). The stepped
  * effects keep their frames' even pace.

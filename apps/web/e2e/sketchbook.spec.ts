@@ -1,11 +1,13 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { bandClip, cutClip, grainOf, halfClip, OVER } from '../src/features/sketchbook/frames';
 import {
+  REACHING_EFFECTS,
   SKETCH_BY_ID,
   SKETCH_EFFECTS,
   SKETCHBOOK_TUNING,
   SKETCHES,
   type SketchbookTuning,
+  type SketchEffect,
 } from '../src/features/sketchbook/sketches';
 import { SKETCHBOOK_TIMING } from '../src/lib/timing';
 import { MARGIN_MS, recordAnimations, startedAnimations, themeTime } from './support';
@@ -172,6 +174,63 @@ const PIXELS = {
           });
         }),
       [a.toString('base64'), b.toString('base64'), tolerance, rows] as const,
+    );
+  },
+  /**
+   * Pixels differing between two screenshots of the same size by more than `tolerance`, counted
+   * only inside the rects, or only outside them all: what a change painted over a neighbor, or
+   * past every tile.
+   */
+  async differingWhere(
+    page: Page,
+    a: Buffer,
+    b: Buffer,
+    rects: DeviceRect[],
+    where: 'inside' | 'outside',
+    tolerance = 8,
+  ): Promise<number> {
+    return page.evaluate(
+      ([first, second, rects, where, tolerance]) =>
+        new Promise<number>((resolve) => {
+          const load = (b64: string) =>
+            new Promise<HTMLImageElement>((done) => {
+              const image = new Image();
+              image.onload = () => done(image);
+              image.src = `data:image/png;base64,${b64}`;
+            });
+          void Promise.all([load(first), load(second)]).then(([one, two]) => {
+            const read = (image: HTMLImageElement) => {
+              const sheet = document.createElement('canvas');
+              sheet.width = image.naturalWidth;
+              sheet.height = image.naturalHeight;
+              const context = sheet.getContext('2d')!;
+              context.drawImage(image, 0, 0);
+              return context.getImageData(0, 0, sheet.width, sheet.height).data;
+            };
+            const [p, q] = [read(one), read(two)];
+            if (p.length !== q.length) {
+              resolve(Number.POSITIVE_INFINITY);
+              return;
+            }
+            const width = one.naturalWidth;
+            let count = 0;
+            for (let i = 0; i < p.length; i += 4) {
+              const x = (i / 4) % width;
+              const y = Math.floor(i / 4 / width);
+              const inside = rects.some((r) => x >= r.x0 && x < r.x1 && y >= r.y0 && y < r.y1);
+              if (inside !== (where === 'inside')) continue;
+              if (
+                Math.abs(p[i]! - q[i]!) > tolerance ||
+                Math.abs(p[i + 1]! - q[i + 1]!) > tolerance ||
+                Math.abs(p[i + 2]! - q[i + 2]!) > tolerance
+              ) {
+                count++;
+              }
+            }
+            resolve(count);
+          });
+        }),
+      [a.toString('base64'), b.toString('base64'), rects, where, tolerance] as const,
     );
   },
 };
@@ -567,6 +626,98 @@ test('a change stays inside its tile: Glitch paints nothing past the tiles, and 
   expect(await PIXELS.outside(page, settled, boxes, canvas)).toBe(0);
   // The last frame drawn is the new picture at rest: the settle after it paints nothing new.
   expect(await PIXELS.differing(page, lastFrame!, settled)).toBe(0);
+});
+
+test('the turns and Squash reach past the tile into the gap, over no neighbor, and leave nothing behind; the rest stay inside (trial)', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'one viewport is enough');
+  // A phone's width, the gap at its narrowest. The screenshot takes in a quarter of a tile above
+  // and below the row, where Squash's bounce and a turn's near edge reach; the rest of the page
+  // there (the Flip row) holds still, so a pixel changed from the picture before the change is
+  // the change's own.
+  await page.setViewportSize({ width: 390, height: 800 });
+  await openLab(page);
+  const {
+    scale,
+    region,
+    tiles: boxes,
+  } = await page.evaluate(() => {
+    const grid = document.querySelector('[data-playing]')!.getBoundingClientRect();
+    const scale = window.devicePixelRatio;
+    const margin = grid.height / 4;
+    const region = {
+      x: grid.left,
+      y: grid.top - margin,
+      width: grid.width,
+      height: grid.height + 2 * margin,
+    };
+    const tiles = [...document.querySelectorAll('[data-sketch-tile]')].map((tile) => {
+      const r = tile.getBoundingClientRect();
+      return {
+        x0: Math.floor((r.left - region.x) * scale) - 1,
+        y0: Math.floor((r.top - region.y) * scale) - 1,
+        x1: Math.ceil((r.right - region.x) * scale) + 1,
+        y1: Math.ceil((r.bottom - region.y) * scale) + 1,
+      };
+    });
+    return { scale, region, tiles };
+  });
+  expect(scale).toBeGreaterThan(0);
+  const shot = () => page.screenshot({ clip: region, scale: 'device', animations: 'allow' });
+  const tile = tiles(page).nth(1);
+  const neighbors = [boxes[0]!, boxes[2]!];
+  // The change's animations held still and stepped through, so every frame is seen, in order.
+  const hold = () =>
+    tile.evaluate((element) => {
+      for (const animation of element.getAnimations({ subtree: true })) animation.pause();
+    });
+  const seek = (at: number) =>
+    tile.evaluate((element, at) => {
+      for (const animation of element.getAnimations({ subtree: true })) animation.currentTime = at;
+    }, at);
+  const release = () =>
+    tile.evaluate((element) => {
+      for (const animation of element.getAnimations({ subtree: true })) animation.finish();
+    });
+  const STEPS = 12;
+  const effects: SketchEffect[] = [...REACHING_EFFECTS, 'blur', 'doors', 'slide'];
+  for (const effect of effects) {
+    await page.getByLabel('Effect', { exact: true }).selectOption(effect);
+    const before = await shot();
+    // A click with no pointer and no focus: no hover to queue a second change, no focus ring.
+    await tile.dispatchEvent('click');
+    await expect(tile).toHaveAttribute('data-next', /./);
+    await hold();
+    let reach = 0;
+    for (let step = 0; step <= STEPS; step++) {
+      await seek((swapMs * step) / STEPS);
+      const frame = await shot();
+      // A reaching tile, lifted over its neighbors, must leave them as they were. A clipped one
+      // cannot cross the gap to a neighbor (nothing outside the tile, below), while Chromium
+      // re-rasterizes a neighbor's art edges by a few levels as the tile composites (its own,
+      // docs/LEARNINGS.md 2026-10-17), so they are not compared to the pixel.
+      if (REACHING_EFFECTS.has(effect)) {
+        expect(
+          await PIXELS.differingWhere(page, frame, before, neighbors, 'inside'),
+          `${effect}, step ${step}: painted over a neighbor`,
+        ).toBe(0);
+      }
+      reach = Math.max(reach, await PIXELS.differingWhere(page, frame, before, boxes, 'outside'));
+    }
+    await release();
+    await expect(tile).not.toHaveAttribute('data-next');
+    expect(
+      await PIXELS.differingWhere(page, await shot(), before, boxes, 'outside'),
+      `${effect}: something left past the tiles once settled`,
+    ).toBe(0);
+    if (REACHING_EFFECTS.has(effect)) {
+      expect(reach, `${effect} reaches past its tile`).toBeGreaterThan(0);
+    } else {
+      expect(reach, `${effect} stays inside its tile`).toBe(0);
+    }
+  }
 });
 
 test('a piece meets the edge it shares without a seam: a band over its hole, Flap’s halves', async ({

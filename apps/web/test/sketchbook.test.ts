@@ -26,10 +26,13 @@ import {
   draw,
   FAMILIES,
   inOrder,
+  REACHING_EFFECTS,
   SKETCH_BY_ID,
+  SKETCH_EFFECTS,
   SKETCHES,
   START,
   startingSketches,
+  STEPPED_EFFECTS,
   waveRanks,
 } from '../src/features/sketchbook/sketches';
 
@@ -292,6 +295,17 @@ describe('the Flip button’s particles', () => {
       const mood = nextMood(last, random);
       expect(mood).not.toBe(last);
       last = mood;
+    }
+  });
+});
+
+describe('the changes that reach past the tile', () => {
+  it('are moving ones, never a stepped one or the fade reduced motion plays', () => {
+    expect(REACHING_EFFECTS.size).toBeGreaterThan(0);
+    for (const effect of REACHING_EFFECTS) {
+      expect(SKETCH_EFFECTS).toContain(effect);
+      expect(STEPPED_EFFECTS.has(effect), effect).toBe(false);
+      expect(effect).not.toBe('fade');
     }
   });
 });

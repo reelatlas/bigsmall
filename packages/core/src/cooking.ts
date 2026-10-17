@@ -4,14 +4,14 @@ import type { MatchClass } from './search';
 import type { Ingredient, Unit } from './types';
 import { getUnit, units } from './units';
 import { COOKING_UNITS } from './units/cooking';
-import { ingredients } from './units/ingredients';
+import { INGREDIENT_KINDS, ingredients } from './units/ingredients';
 
 /**
  * Cooking (ADR 0021): an ingredient joins volume and weight through its density, how much a US
  * customary cup of it weighs (`units/ingredients.ts`). Pure, as the rest of core.
  */
 
-export { ingredients };
+export { INGREDIENT_KINDS, ingredients };
 
 const byId: ReadonlyMap<string, Ingredient> = new Map(ingredients.map((each) => [each.id, each]));
 

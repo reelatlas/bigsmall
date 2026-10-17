@@ -30,6 +30,7 @@ export { matchSpan } from './highlight';
 export type { TextSpan } from './highlight';
 export { formatClock, formatNumber } from './format';
 export {
+  INGREDIENT_KINDS,
   ingredients,
   getIngredient,
   exactIngredient,

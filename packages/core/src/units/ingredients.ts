@@ -1,4 +1,4 @@
-import type { Ingredient } from '../types';
+import type { Ingredient, IngredientKind } from '../types';
 
 /**
  * The ingredients Cooking converts through (ADR 0021): the baking staples to start, each with the
@@ -13,11 +13,27 @@ function fdc(id: number, food: string, portion: string): string {
   return `USDA FoodData Central ${id} (SR Legacy): ${food}; ${portion}`;
 }
 
+/**
+ * The kinds, in the order Cooking lists them (its list with no ingredient, and its Ingredient menu),
+ * each with its heading; the ingredients follow this order.
+ */
+export const INGREDIENT_KINDS: readonly { id: IngredientKind; name: string }[] = [
+  { id: 'flour', name: 'Flours' },
+  { id: 'sugar', name: 'Sugars' },
+  { id: 'fat', name: 'Fats and oils' },
+  { id: 'dairy', name: 'Dairy and eggs' },
+  { id: 'liquid', name: 'Liquids and syrups' },
+  { id: 'baking', name: 'Baking' },
+  { id: 'grain', name: 'Grains' },
+  { id: 'mix-in', name: 'Mix-ins and spreads' },
+];
+
 export const ingredients: readonly Ingredient[] = [
   // Flours
   {
     id: 'all-purpose-flour',
     name: 'all-purpose flour',
+    kind: 'flour',
     aliases: ['flour', 'ap flour', 'all purpose flour', 'plain flour', 'white flour'],
     gramsPerCup: 125,
     fdcId: 168894,
@@ -27,6 +43,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'bread-flour',
     name: 'bread flour',
+    kind: 'flour',
     aliases: ['strong flour', 'strong white flour'],
     gramsPerCup: 137,
     fdcId: 168896,
@@ -36,6 +53,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'whole-wheat-flour',
     name: 'whole wheat flour',
+    kind: 'flour',
     aliases: ['whole-wheat flour', 'wholewheat flour', 'wholemeal flour', 'whole wheat'],
     gramsPerCup: 120,
     fdcId: 168893,
@@ -45,6 +63,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'cake-flour',
     name: 'cake flour',
+    kind: 'flour',
     aliases: [],
     gramsPerCup: 137,
     fdcId: 169723,
@@ -55,6 +74,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'almond-flour',
     name: 'almond flour',
+    kind: 'flour',
     aliases: ['ground almonds', 'almond meal'],
     gramsPerCup: 95,
     fdcId: 170567,
@@ -66,6 +86,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'granulated-sugar',
     name: 'granulated sugar',
+    kind: 'sugar',
     aliases: ['sugar', 'white sugar', 'granulated'],
     gramsPerCup: 200,
     fdcId: 169655,
@@ -75,6 +96,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'brown-sugar',
     name: 'brown sugar',
+    kind: 'sugar',
     aliases: ['packed brown sugar', 'light brown sugar', 'dark brown sugar'],
     gramsPerCup: 220,
     fdcId: 168833,
@@ -85,6 +107,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'powdered-sugar',
     name: 'powdered sugar',
+    kind: 'sugar',
     aliases: ['icing sugar', "confectioners' sugar", 'confectioners sugar'],
     gramsPerCup: 120,
     fdcId: 169656,
@@ -96,6 +119,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'butter',
     name: 'butter',
+    kind: 'fat',
     aliases: ['salted butter', 'unsalted butter'],
     gramsPerCup: 227,
     fdcId: 173410,
@@ -105,6 +129,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'vegetable-oil',
     name: 'vegetable oil',
+    kind: 'fat',
     aliases: ['oil', 'canola oil', 'rapeseed oil'],
     gramsPerCup: 218,
     fdcId: 172336,
@@ -114,6 +139,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'olive-oil',
     name: 'olive oil',
+    kind: 'fat',
     aliases: ['extra virgin olive oil'],
     gramsPerCup: 216,
     fdcId: 171413,
@@ -123,16 +149,18 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'shortening',
     name: 'shortening',
+    kind: 'fat',
     aliases: ['vegetable shortening'],
     gramsPerCup: 205,
     fdcId: 173584,
     portion: '1 cup = 205 g',
     source: fdc(173584, 'Shortening, vegetable, household, composite', '1 cup = 205 g'),
   },
-  // Dairy
+  // Dairy and eggs
   {
     id: 'milk',
     name: 'milk',
+    kind: 'dairy',
     aliases: ['whole milk'],
     gramsPerCup: 244,
     fdcId: 171265,
@@ -142,6 +170,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'heavy-cream',
     name: 'heavy cream',
+    kind: 'dairy',
     aliases: ['cream', 'heavy whipping cream', 'whipping cream', 'double cream'],
     gramsPerCup: 238,
     fdcId: 170859,
@@ -156,6 +185,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'sour-cream',
     name: 'sour cream',
+    kind: 'dairy',
     aliases: [],
     gramsPerCup: 230,
     fdcId: 171257,
@@ -165,6 +195,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'yogurt',
     name: 'yogurt',
+    kind: 'dairy',
     aliases: ['plain yogurt', 'yoghurt'],
     gramsPerCup: 245,
     fdcId: 171284,
@@ -174,6 +205,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'shredded-cheddar',
     name: 'shredded cheddar',
+    kind: 'dairy',
     aliases: ['cheddar', 'shredded cheese', 'grated cheddar', 'cheese'],
     gramsPerCup: 113,
     fdcId: 173414,
@@ -181,10 +213,23 @@ export const ingredients: readonly Ingredient[] = [
     source: fdc(173414, 'Cheese, cheddar', '1 cup, shredded = 113 g'),
     measured: 'shredded',
   },
+  {
+    id: 'eggs',
+    name: 'eggs',
+    kind: 'dairy',
+    aliases: ['egg', 'whole eggs', 'beaten eggs'],
+    gramsPerCup: 243,
+    fdcId: 171287,
+    portion: '1 cup (4.86 large eggs) = 243 g',
+    source: fdc(171287, 'Egg, whole, raw, fresh', '1 cup (4.86 large eggs) = 243 g'),
+    measured: 'beaten',
+    counted: 'large-egg',
+  },
   // Liquids and syrups
   {
     id: 'water',
     name: 'water',
+    kind: 'liquid',
     aliases: [],
     gramsPerCup: 237,
     fdcId: 173647,
@@ -194,6 +239,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'honey',
     name: 'honey',
+    kind: 'liquid',
     aliases: [],
     gramsPerCup: 339,
     fdcId: 169640,
@@ -203,6 +249,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'maple-syrup',
     name: 'maple syrup',
+    kind: 'liquid',
     aliases: [],
     gramsPerCup: 315,
     fdcId: 169661,
@@ -212,16 +259,18 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'molasses',
     name: 'molasses',
+    kind: 'liquid',
     aliases: ['treacle'],
     gramsPerCup: 337,
     fdcId: 168820,
     portion: '1 cup = 337 g',
     source: fdc(168820, 'Molasses', '1 cup = 337 g'),
   },
-  // Dry goods
+  // Baking
   {
     id: 'cocoa-powder',
     name: 'cocoa powder',
+    kind: 'baking',
     aliases: ['cocoa', 'unsweetened cocoa'],
     gramsPerCup: 86,
     fdcId: 169593,
@@ -229,27 +278,9 @@ export const ingredients: readonly Ingredient[] = [
     source: fdc(169593, 'Cocoa, dry powder, unsweetened', '1 cup = 86 g'),
   },
   {
-    id: 'rolled-oats',
-    name: 'rolled oats',
-    aliases: ['oats', 'old-fashioned oats', 'quick oats'],
-    gramsPerCup: 81,
-    fdcId: 173904,
-    portion: '1 cup = 81 g',
-    source: fdc(173904, 'Cereals, oats, regular and quick, not fortified, dry', '1 cup = 81 g'),
-  },
-  {
-    id: 'white-rice',
-    name: 'white rice',
-    aliases: ['rice', 'long-grain rice', 'uncooked rice'],
-    gramsPerCup: 185,
-    fdcId: 168877,
-    portion: '1 cup = 185 g',
-    source: fdc(168877, 'Rice, white, long-grain, regular, raw, enriched', '1 cup = 185 g'),
-    measured: 'uncooked',
-  },
-  {
     id: 'cornstarch',
     name: 'cornstarch',
+    kind: 'baking',
     aliases: ['corn starch', 'cornflour'],
     gramsPerCup: 128,
     fdcId: 169698,
@@ -259,6 +290,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'baking-soda',
     name: 'baking soda',
+    kind: 'baking',
     aliases: ['bicarbonate of soda', 'bicarb', 'sodium bicarbonate'],
     gramsPerCup: 4.6 * 48,
     fdcId: 175040,
@@ -268,6 +300,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'baking-powder',
     name: 'baking powder',
+    kind: 'baking',
     aliases: [],
     gramsPerCup: 4.6 * 48,
     fdcId: 172803,
@@ -281,6 +314,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'table-salt',
     name: 'table salt',
+    kind: 'baking',
     aliases: ['salt', 'fine salt'],
     gramsPerCup: 292,
     fdcId: 173468,
@@ -290,6 +324,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'active-dry-yeast',
     name: 'active dry yeast',
+    kind: 'baking',
     aliases: ['yeast', 'dry yeast'],
     gramsPerCup: 4 * 48,
     fdcId: 175043,
@@ -300,10 +335,33 @@ export const ingredients: readonly Ingredient[] = [
       '1 tsp = 4 g, 48 tsp to the cup',
     ),
   },
+  // Grains
+  {
+    id: 'rolled-oats',
+    name: 'rolled oats',
+    kind: 'grain',
+    aliases: ['oats', 'old-fashioned oats', 'quick oats'],
+    gramsPerCup: 81,
+    fdcId: 173904,
+    portion: '1 cup = 81 g',
+    source: fdc(173904, 'Cereals, oats, regular and quick, not fortified, dry', '1 cup = 81 g'),
+  },
+  {
+    id: 'white-rice',
+    name: 'white rice',
+    kind: 'grain',
+    aliases: ['rice', 'long-grain rice', 'uncooked rice'],
+    gramsPerCup: 185,
+    fdcId: 168877,
+    portion: '1 cup = 185 g',
+    source: fdc(168877, 'Rice, white, long-grain, regular, raw, enriched', '1 cup = 185 g'),
+    measured: 'uncooked',
+  },
   // Mix-ins and spreads
   {
     id: 'chocolate-chips',
     name: 'chocolate chips',
+    kind: 'mix-in',
     aliases: ['semisweet chocolate chips', 'chocolate chip', 'choc chips'],
     gramsPerCup: 168,
     fdcId: 167976,
@@ -313,6 +371,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'chopped-walnuts',
     name: 'chopped walnuts',
+    kind: 'mix-in',
     aliases: ['walnuts', 'walnut'],
     gramsPerCup: 117,
     fdcId: 170187,
@@ -323,6 +382,7 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'chopped-pecans',
     name: 'chopped pecans',
+    kind: 'mix-in',
     aliases: ['pecans', 'pecan'],
     gramsPerCup: 109,
     fdcId: 170182,
@@ -333,21 +393,11 @@ export const ingredients: readonly Ingredient[] = [
   {
     id: 'peanut-butter',
     name: 'peanut butter',
+    kind: 'mix-in',
     aliases: ['smooth peanut butter', 'creamy peanut butter'],
     gramsPerCup: 258,
     fdcId: 174266,
     portion: '1 cup = 258 g',
     source: fdc(174266, 'Peanut butter, smooth style, with salt', '1 cup = 258 g'),
-  },
-  {
-    id: 'eggs',
-    name: 'eggs',
-    aliases: ['egg', 'whole eggs', 'beaten eggs'],
-    gramsPerCup: 243,
-    fdcId: 171287,
-    portion: '1 cup (4.86 large eggs) = 243 g',
-    source: fdc(171287, 'Egg, whole, raw, fresh', '1 cup (4.86 large eggs) = 243 g'),
-    measured: 'beaten',
-    counted: 'large-egg',
   },
 ];

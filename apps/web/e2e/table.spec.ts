@@ -1,4 +1,4 @@
-import { categories, unitsIn } from '@bigsmall/core';
+import { categories, INGREDIENT_KINDS, unitsIn } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { ANNOUNCE_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
@@ -1355,6 +1355,15 @@ test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, E
     .click();
   const list = page.getByRole('listbox', { name: 'Matches' });
   await expect(list.getByRole('option').first()).toHaveText(/all-purpose flour/);
+  // Under their kinds' headings, in the kinds' order: Flours first.
+  const headings = await list
+    .getByRole('group')
+    .evaluateAll((groups) =>
+      groups.map((group) =>
+        document.getElementById(group.getAttribute('aria-labelledby') ?? '')?.textContent?.trim(),
+      ),
+    );
+  expect(headings).toEqual(INGREDIENT_KINDS.map((kind) => kind.name));
   await expectNoA11yViolations(page);
   // Enter goes into the list rather than taking for you; Enter again takes what the cursor is on.
   await box(page).press('Enter');

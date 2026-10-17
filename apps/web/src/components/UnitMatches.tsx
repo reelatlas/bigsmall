@@ -17,7 +17,8 @@ import { MatchedText } from './MatchedText';
 
 /**
  * A match as the list shows it: a unit, a category whose name matched, to open, or an ingredient,
- * under Cooking, with the unit typed before it when there was one (ADR 0021).
+ * under Cooking, with the unit typed before it when there was one (ADR 0021), or, in Cooking's
+ * list with no ingredient, under its kind's heading (`group`).
  */
 export type UnitMatch =
   | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean }
@@ -28,7 +29,13 @@ export type UnitMatch =
       unit: Unit | null;
       category: Category;
       inBox: boolean;
+      group?: string | undefined;
     };
+
+/** The heading a match is listed under: its kind's, where it has one, else its category's. */
+function headingOf(match: UnitMatch): string {
+  return (match.kind === 'ingredient' && match.group) || match.category.name;
+}
 
 /** A match's key among its siblings. */
 function matchKey(match: UnitMatch): string {
@@ -119,11 +126,12 @@ export function UnitMatches({
     card.addEventListener('keydown', onKeyDown);
     return () => card.removeEventListener('keydown', onKeyDown);
   });
-  const groups: { category: Category; first: number; items: UnitMatch[] }[] = [];
+  const groups: { category: Category; heading: string; first: number; items: UnitMatch[] }[] = [];
   matches.forEach((match, index) => {
     const last = groups[groups.length - 1];
-    if (last?.category.id === match.category.id) last.items.push(match);
-    else groups.push({ category: match.category, first: index, items: [match] });
+    const heading = headingOf(match);
+    if (last?.heading === heading) last.items.push(match);
+    else groups.push({ category: match.category, heading, first: index, items: [match] });
   });
 
   /** The line's words, which name the hidden matches' list. */
@@ -150,11 +158,13 @@ export function UnitMatches({
           {matches.length > 0 && (
             <div id={id} role="listbox" aria-label="Matches" className={LIST}>
               {groups.map((group, groupIndex) => {
-                const headerId = `${groupId}-${group.category.id}`;
-                const count = counts[group.category.id] ?? 0;
+                const headerId = `${groupId}-${groupIndex}`;
+                // A kind's heading lists, so it counts nothing: a category's counts its matches.
+                const count =
+                  group.heading === group.category.name ? (counts[group.category.id] ?? 0) : 0;
                 return (
                   <div
-                    key={group.category.id}
+                    key={group.heading}
                     role="group"
                     aria-labelledby={headerId}
                     className="col-span-2 grid grid-cols-subgrid gap-y-0.5"
@@ -167,8 +177,8 @@ export function UnitMatches({
                         groupIndex === 0 ? 'pt-1' : 'mt-1.5 border-t border-line pt-2',
                       )}
                     >
-                      <span className="text-ink">{group.category.name}</span>
-                      {/* The group's name is its category alone; each option says its category too. */}
+                      <span className="text-ink">{group.heading}</span>
+                      {/* The group's name is its heading alone; each option says its category too. */}
                       {count > 0 && (
                         <span aria-hidden="true" className={COUNT}>
                           {count}

@@ -10,6 +10,7 @@ import {
   getCategory,
   getIngredient,
   getUnit,
+  INGREDIENT_KINDS,
   ingredients,
   matchIngredients,
   parse,
@@ -316,7 +317,8 @@ export type MatchRow =
   | { kind: 'category'; category: Category }
   /**
    * An ingredient, under Cooking (ADR 0021), with the unit typed before it when there was one
-   * ("2 cups flour": the cup), which taking it brings too.
+   * ("2 cups flour": the cup), which taking it brings too; in Cooking's list with no ingredient,
+   * the heading of its kind it is listed under (`group`), in place of the category's.
    */
   | {
       kind: 'ingredient';
@@ -324,6 +326,7 @@ export type MatchRow =
       unit: Unit | null;
       category: Category;
       inBox: boolean;
+      group?: string;
     };
 
 interface TableViewBase {
@@ -421,7 +424,13 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   return selectUnits(base, category, unit, parsed, options);
 }
 
-/** Cooking with no ingredient yet: every ingredient, to choose from, in the data's order (ADR 0021). */
+/** Each kind's heading, by its id. */
+const KIND_NAME = new Map(INGREDIENT_KINDS.map((kind) => [kind.id, kind.name]));
+
+/**
+ * Cooking with no ingredient yet: every ingredient, to choose from, under its kind's heading, in
+ * the data's order, the kinds' (ADR 0021).
+ */
 function selectIngredients(base: ViewBase): MatchesView {
   const cooking = getCategory('cooking');
   const rows: MatchRow[] = cooking
@@ -431,6 +440,7 @@ function selectIngredients(base: ViewBase): MatchesView {
         unit: null,
         category: cooking,
         inBox: false,
+        group: KIND_NAME.get(ingredient.kind) ?? cooking.name,
       }))
     : [];
   return {

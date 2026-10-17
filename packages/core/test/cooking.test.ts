@@ -8,6 +8,7 @@ import {
   crossesDensity,
   getIngredient,
   getUnit,
+  INGREDIENT_KINDS,
   ingredients,
   matchIngredients,
   search,
@@ -33,6 +34,14 @@ describe('ingredients', () => {
       expect(each.source, each.id).toContain(`USDA FoodData Central ${each.fdcId} (SR Legacy)`);
       if (each.counted) expect(getUnit(each.counted)?.ingredient, each.id).toBe(each.id);
     }
+  });
+
+  it('each have a kind, every kind some, the data in the kinds’ order', () => {
+    const order = INGREDIENT_KINDS.map((kind) => kind.id);
+    const at = ingredients.map((each) => order.indexOf(each.kind));
+    expect(at.every((index) => index >= 0)).toBe(true);
+    expect(at).toEqual([...at].sort((a, b) => a - b));
+    expect(new Set(at).size).toBe(order.length);
   });
 
   it('answer to their names and aliases, no two to the same', () => {

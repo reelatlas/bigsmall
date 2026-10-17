@@ -134,11 +134,20 @@ export type Unit = LinearUnit | AffineUnit | ReciprocalUnit | FunctionalUnit;
  * An ingredient, which joins volume and weight through its density (ADR 0021): how much one US
  * customary cup of it weighs, as USDA FoodData Central measures it.
  */
+/**
+ * What kind of ingredient it is (ADR 0021): the heading it is listed under where ingredients are
+ * chosen, in the order of INGREDIENT_KINDS.
+ */
+export type IngredientKind =
+  'flour' | 'sugar' | 'fat' | 'dairy' | 'liquid' | 'baking' | 'grain' | 'mix-in';
+
 export interface Ingredient {
   /** Stable identifier used in URLs. Lowercase, ASCII, kebab-case. */
   id: string;
   /** As a recipe names it, lowercase ("all-purpose flour"). */
   name: string;
+  /** Its kind, the heading it is listed under (INGREDIENT_KINDS). */
+  kind: IngredientKind;
   /** Other names people type ("flour", "plain flour", "icing sugar"). */
   aliases: readonly string[];
   /** Grams in one US customary cup (236.5882365 mL). Measured, never exact. */

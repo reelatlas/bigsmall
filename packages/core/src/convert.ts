@@ -1,7 +1,7 @@
 import type { Unit } from './types';
 import { getUnit } from './units';
 
-export type ConversionErrorCode = 'unknown-unit' | 'category-mismatch' | 'not-finite';
+export type ConversionErrorCode = 'unknown-unit' | 'category-mismatch' | 'not-finite' | 'no-scale';
 
 export class ConversionError extends Error {
   readonly code: ConversionErrorCode;
@@ -60,6 +60,35 @@ export function convert(value: number, from: Unit | string, to: Unit | string): 
   }
   if (source.id === target.id) return value;
   return fromBase(target, toBase(source, value));
+}
+
+/**
+ * Convert a change of `value`, a difference between two readings rather than a reading: by the
+ * scales' degree sizes alone, their zero points left out, so 5 °C warmer is 9 °F warmer, where a
+ * reading of 5 °C is 41 °F (Sean, 2026-10-16). The sign stays as given: −25 °F is −13.89 °C.
+ * Only units with a size of their own, a factor (temperature's are linear or affine); a reciprocal
+ * or functional unit has no change to convert, and throws.
+ */
+export function convertChange(value: number, from: Unit | string, to: Unit | string): number {
+  const source = resolve(from);
+  const target = resolve(to);
+  if (source.category !== target.category) {
+    throw new ConversionError(
+      `Cannot convert ${source.category} (${source.id}) to ${target.category} (${target.id})`,
+      'category-mismatch',
+    );
+  }
+  if (!Number.isFinite(value)) {
+    throw new ConversionError('Value must be a finite number', 'not-finite');
+  }
+  if (source.id === target.id) return value;
+  return (value * degree(source)) / degree(target);
+}
+
+/** A unit's size in its category's base unit, its zero point left out. */
+function degree(unit: Unit): number {
+  if (unit.kind === 'linear' || unit.kind === 'affine') return unit.factor;
+  throw new ConversionError(`${unit.id} has no size of its own to change by`, 'no-scale');
 }
 
 function resolve(ref: Unit | string): Unit {

@@ -28,9 +28,11 @@ import {
 
 /**
  * A section of the table: `standard` holds a category with no regional system (time, data, angle),
- * and `pace` a category's paces (Speed's min/km and min/mi), apart from the speeds they equal.
+ * `pace` a category's paces (Speed's min/km and min/mi), apart from the speeds they equal, and
+ * `change` the box's number as a change rather than a reading (Temperature's, state.ts).
  */
-export type SectionKey = 'metric' | 'us' | 'uk' | 'other' | 'standard' | 'pace' | 'specialty';
+export type SectionKey =
+  'metric' | 'us' | 'uk' | 'other' | 'standard' | 'pace' | 'specialty' | 'change';
 
 /**
  * Only headings take the parentheses; units keep their names and symbols. Specialty, for the units
@@ -44,6 +46,7 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
   standard: 'Standard',
   pace: 'Pace',
   specialty: 'Specialty',
+  change: 'As a change',
 };
 
 /**
@@ -95,6 +98,11 @@ export interface Section<T> {
   key: SectionKey;
   label: string;
   rows: T[];
+  /**
+   * The section repeats units listed above in another form (Temperature's As a change): it is left
+   * out of Edit, and its rows are never hidden on their own.
+   */
+  repeats?: true;
 }
 
 /**

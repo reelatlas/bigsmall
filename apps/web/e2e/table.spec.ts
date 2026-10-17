@@ -1229,6 +1229,35 @@ test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds
   await expect(box(page)).toHaveValue('8:51');
 });
 
+test('a temperature is said as a change too, after the readings: 5 °C warmer is 9 °F warmer', async ({
+  page,
+}) => {
+  await page.goto('/?a=celsius&v=5');
+  await ready(page);
+  await expect(page.locator('[data-section="change"]')).toHaveText(
+    'As a change: 5 °C warmer or cooler',
+  );
+  await expect(row(page, 'fahrenheit')).toContainText('41.00');
+  await expect(row(page, 'fahrenheit-change')).toContainText('9.00');
+  await expect(row(page, 'kelvin-change')).toContainText('5.00');
+  // Every scale but the box's own.
+  await expect(row(page, 'celsius-change')).toHaveCount(0);
+  // Edit lists the units, never their change again.
+  await page.getByRole('button', { name: 'Edit', exact: true }).click();
+  await expect(page.locator('label[data-unit="fahrenheit"]')).toHaveCount(1);
+  await expect(page.locator('label[data-unit="fahrenheit-change"]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Done', exact: true }).click();
+  // Taking a change row brings its scale, the same change said in it: 9 °F, and as a change 5 °C.
+  await unitCell(page, 'fahrenheit-change').click();
+  await expect(page.getByRole('button', { name: 'Remove Fahrenheit' })).toBeVisible();
+  await expect(box(page)).toHaveValue('9');
+  await expect(row(page, 'celsius-change')).toContainText('5.00');
+  // A negative change keeps its sign, and says its direction itself.
+  await box(page).fill('-25');
+  await expect(page.locator('[data-section="change"]')).toHaveText('As a change: -25 °F');
+  await expect(row(page, 'celsius-change')).toContainText('-13.89');
+});
+
 test('Copy URL copies the current conversion and confirms with a check', async ({
   page,
   context,

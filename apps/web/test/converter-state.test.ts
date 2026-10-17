@@ -190,6 +190,28 @@ describe('selectTable', () => {
     expect(treadmill.rows.find((each) => each.id === 'minute-per-kilometer')?.text).toBe('6:00');
   });
 
+  it('says a temperature as a change too, after the readings, every scale but the box’s own', () => {
+    const celsius = table({ type: 'use', unit: 'celsius', text: '5' });
+    const change = celsius.sections.at(-1)!;
+    expect(change).toMatchObject({ key: 'change', repeats: true });
+    expect(change.label).toBe('As a change: 5 °C warmer or cooler');
+    expect(change.rows.map((row) => [row.id, row.unit.id, row.text])).toEqual([
+      ['fahrenheit-change', 'fahrenheit', '9'],
+      ['kelvin-change', 'kelvin', '5'],
+      ['rankine-change', 'rankine', '9'],
+    ]);
+    // The readings stay readings: 5 °C reads 41 °F.
+    expect(celsius.rows.find((row) => row.id === 'fahrenheit')?.text).toBe('41');
+    // A negative change says its direction itself, its sign kept in every row.
+    const colder = table({ type: 'use', unit: 'fahrenheit', text: '-25' });
+    expect(colder.sections.at(-1)!.label).toBe('As a change: -25 °F');
+    expect(colder.rows.find((row) => row.id === 'celsius-change')?.text).toBe('-13.8889');
+    // No number yet: the section waits with dashes; other categories have none.
+    expect(table(ml('')).sections.some((section) => section.key === 'change')).toBe(false);
+    const waiting = table({ type: 'use', unit: 'kelvin', text: '' });
+    expect(waiting.sections.at(-1)!.label).toBe('As a change');
+  });
+
   it('names one unit in the singular', () => {
     expect(table(ml('1000')).rows.find((row) => row.id === 'liter')?.name).toBe('liter');
   });

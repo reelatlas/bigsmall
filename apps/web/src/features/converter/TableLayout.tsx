@@ -460,10 +460,11 @@ export function TableLayout({
       const row = table.rows[index];
       if (!row || row.tone === 'message') return;
       if (row.inBox) setPosition(null);
-      else if (row.value === null) take(row.id, number);
+      // Its unit: a change row's is its scale's (Temperature's As a change).
+      else if (row.value === null) take(row.unit.id, number);
       // A pace comes into the box as the row writes it, minutes and seconds (5:30).
-      else if (row.clock) take(row.id, formatClock(row.value, { locale: env.locale }));
-      else take(row.id, formatNumber(row.value, { locale: env.locale }));
+      else if (row.clock) take(row.unit.id, formatClock(row.value, { locale: env.locale }));
+      else take(row.unit.id, formatNumber(row.value, { locale: env.locale }));
     }
   };
 

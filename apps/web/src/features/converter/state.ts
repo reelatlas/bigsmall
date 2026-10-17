@@ -1,5 +1,6 @@
 import {
   convert,
+  convertChange,
   formatClock,
   formatNumber,
   getCategory,
@@ -361,12 +362,38 @@ function selectUnits(
     };
   }
 
+  /**
+   * A category of readings on scales with zero points (temperature's) says the box's number as a
+   * change too, in a section after the readings (Sean, 2026-10-16): every shown scale but the
+   * box's own, by their degree sizes alone, so 5 °C warmer is 9 °F warmer.
+   */
+  const withChange = (view: ReturnType<typeof arranged>) => {
+    if (!listed.some((each) => each.kind === 'affine')) return view;
+    const value = unit ? parsed.value : undefined;
+    const rows = view.rows
+      .filter((row) => row.unit.id !== unit?.id)
+      .map((row) => changeRow(row.unit, unit, value, options.locale));
+    if (rows.length === 0) return view;
+    const section = {
+      key: 'change' as const,
+      label: changeLabel(parsed, unit, options.locale),
+      rows,
+      repeats: true as const,
+    };
+    return {
+      ...view,
+      rows: [...view.rows, ...rows],
+      sections: [...view.sections, section],
+      all: [...view.all, ...rows],
+    };
+  };
+
   if (!unit || parsed.value === undefined) {
     // Nothing to convert yet: every unit, a dash for its value, so the table stays in place.
     const view = arranged(listed.map((target) => emptyRow(target, unit)));
     return {
       ...base,
-      ...view,
+      ...withChange(view),
       message: null,
       announcement: `${view.rows.length} units of ${kind}`,
     };
@@ -377,11 +404,60 @@ function selectUnits(
   const from = spokenAmount(parsed, unit, options.locale);
   return {
     ...base,
-    ...view,
+    ...withChange(view),
     message: null,
     announcement: `${from} in ${view.rows.length} units of ${kind}`,
   };
 }
+
+/**
+ * A scale's row in the change section: the box's number as a change in it, its id the scale's
+ * with "-change", so it is a row of its own (copied, pointed at) while taking it brings the scale.
+ */
+function changeRow(
+  target: Unit,
+  from: Unit | null,
+  value: number | undefined,
+  locale: string | undefined,
+): TableRow {
+  const id = `${target.id}-change`;
+  if (!from || value === undefined) return { ...emptyRow(target, null), id };
+  const converted = safeChange(value, from, target);
+  const text =
+    converted === undefined ? '' : formatNumber(converted, { precision: TABLE_PRECISION, locale });
+  const tooSmall = converted === 0 && value !== 0;
+  const shown = text && !tooSmall ? (converted ?? null) : null;
+  const problem: NoAnswer | null = shown !== null ? null : tooSmall ? 'small' : 'large';
+  return {
+    unit: target,
+    id,
+    name: unitName(target, shown ?? Number.NaN),
+    symbol: target.symbol,
+    value: shown,
+    text: problem ? NO_ANSWER_MESSAGES[problem].short : text,
+    tone: problem ? 'message' : 'value',
+    inBox: false,
+    clock: false,
+  };
+}
+
+/**
+ * The change section's heading, the box's amount said as a change: "As a change: 5 °C warmer or
+ * cooler"; a negative amount says its direction itself, "As a change: −25 °F".
+ */
+function changeLabel(parsed: ParsedInput, unit: Unit | null, locale: string | undefined): string {
+  const heading = SECTION_LABEL.change;
+  if (!unit || parsed.value === undefined) return heading;
+  const typed = parsed.expression
+    ? formatNumber(parsed.value, { locale })
+    : (parsed.valueText ?? '');
+  // A no-break space keeps the amount and its symbol on one line.
+  const amount = `${typed}${NO_BREAK}${unit.symbol}`;
+  return parsed.value < 0 ? `${heading}: ${amount}` : `${heading}: ${amount} warmer or cooler`;
+}
+
+/** The no-break space between an amount and its symbol. */
+const NO_BREAK = String.fromCharCode(0x00a0);
 
 function valueRow(target: Unit, from: Unit, value: number, locale: string | undefined): TableRow {
   const converted = target.id === from.id ? value : safeConvert(value, from, target);
@@ -507,6 +583,15 @@ function typingUnit(parsed: ParsedInput): boolean {
 function safeConvert(value: number, from: Unit, to: Unit): number | undefined {
   try {
     return convert(value, from, to);
+  } catch {
+    return undefined;
+  }
+}
+
+/** convertChange, as safely: a scale with no size of its own shows no value. */
+function safeChange(value: number, from: Unit, to: Unit): number | undefined {
+  try {
+    return convertChange(value, from, to);
   } catch {
     return undefined;
   }

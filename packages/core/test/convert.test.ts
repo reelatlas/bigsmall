@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ConversionError, convert, getCategory, units } from '../src/index';
+import { ConversionError, convert, convertChange, getCategory, units } from '../src/index';
 import type { AffineUnit, FunctionalUnit } from '../src/types';
 import { golden } from './golden/index';
 
@@ -142,5 +142,27 @@ describe('errors', () => {
   it('is the identity for same-unit conversion', () => {
     expect(convert(42.5, 'meter', 'meter')).toBe(42.5);
     expect(convert(-40, 'fahrenheit', 'fahrenheit')).toBe(-40);
+  });
+});
+
+describe('convertChange', () => {
+  // A change between two readings, not a reading (Sean, 2026-10-16): the scales' degree sizes alone,
+  // 1 °C and 1 K of change are 1 K, 1 °F and 1 °R are 5/9 K (NIST SP 811 Appendix B.8, exact).
+  it('converts a change by the scales’ degree sizes alone, its sign kept', () => {
+    expectClose(convertChange(5, 'celsius', 'fahrenheit'), 9);
+    expect(convertChange(5, 'celsius', 'kelvin')).toBe(5);
+    expectClose(convertChange(-25, 'fahrenheit', 'celsius'), -125 / 9);
+    expectClose(convertChange(9, 'rankine', 'kelvin'), 5);
+    expectClose(convertChange(1, 'fahrenheit', 'rankine'), 1);
+    expect(convertChange(0, 'celsius', 'fahrenheit')).toBe(0);
+    // A reading is another thing: 5 °C reads 41 °F.
+    expectClose(convert(5, 'celsius', 'fahrenheit'), 41);
+  });
+
+  it('has no change for a unit with no size of its own, nor across categories', () => {
+    expect(() => convertChange(5, 'liter-per-100-kilometers', 'kilometer-per-liter')).toThrow(
+      ConversionError,
+    );
+    expect(() => convertChange(5, 'celsius', 'meter')).toThrow(ConversionError);
   });
 });

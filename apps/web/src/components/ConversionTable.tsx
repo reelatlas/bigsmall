@@ -67,6 +67,8 @@ export interface RowSection<T extends ConversionRow> {
   key: string;
   label: string;
   rows: readonly T[];
+  /** Repeats units listed above in another form (Temperature's As a change): left out of Edit. */
+  repeats?: true | undefined;
 }
 
 /** How values and names show (docs/UX-SPEC.md §7): the converter's Display settings. */
@@ -582,6 +584,9 @@ export function ConversionTable<T extends ConversionRow>({
     </div>
   );
 
+  /** Edit's sections: the units themselves, never a section that repeats them (As a change). */
+  const editable = sections.filter((section) => !section.repeats);
+
   /**
    * Units moved from one list to the other by a checkbox. If focus was on it, it comes back to the
    * line that takes the moved one's place in its list (the next, or else the one before), so
@@ -591,7 +596,7 @@ export function ConversionTable<T extends ConversionRow>({
   const move = (list: List, rows: readonly T[], show: boolean, from: string) => {
     if (cardRef.current?.contains(document.activeElement)) {
       const leaving = new Set(rows.map((row) => row.id));
-      const groups = list === 'shown' ? sections : hidden;
+      const groups = list === 'shown' ? editable : hidden;
       const spots = groups.flatMap((section) => [
         `section:${section.key}`,
         ...section.rows.map((row) => row.id),
@@ -833,7 +838,7 @@ export function ConversionTable<T extends ConversionRow>({
   /** Edit: the shown units in their sections, as Hidden lists its own. */
   const shownList = (
     <div data-list="shown">
-      {sections.map((section, at) => (
+      {editable.map((section, at) => (
         <div key={section.key} role="group" aria-label={section.label}>
           {headedCheck(section, 'shown', sectionEdge(at, 'row'))}
           {section.rows.map((row) => line(row, 'shown'))}

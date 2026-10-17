@@ -30,8 +30,8 @@ import {
 } from '../../../lib/recipes';
 
 /*
- * Mock-ups of categories bigsmall does not have yet (docs/research/categories-1.md): a
- * temperature change and cooking by ingredient (pace, built on 2026-10-16, has left), drawn with the real box, table, and menus in
+ * Mock-ups of categories bigsmall does not have yet (docs/research/categories-1.md): cooking by
+ * ingredient (pace and a temperature change, built on 2026-10-16, have left), drawn with the real box, table, and menus in
  * frozen states, as the gallery draws them. Nothing converts: every value is worked out by hand
  * for the mock, and is checked against its standard when the category is built (ADR 0020).
  */
@@ -51,14 +51,12 @@ function proposedCategory(id: string, name: string): Category {
   };
 }
 
-const TEMPERATURE_CHANGE = proposedCategory('temperature-change', 'Temperature change');
 const COOKING = proposedCategory('cooking', 'Cooking');
 
 /** The menu's categories with the proposed ones where they would sit. */
 function menuCategories(): Category[] {
   const view = selectTable(initialState, ENV);
   return view.categories.flatMap((category) => {
-    if (category.id === 'temperature') return [category, TEMPERATURE_CHANGE];
     if (category.id === 'volume') return [category, COOKING];
     return [category];
   });
@@ -138,10 +136,6 @@ const NEW_TAG = 'rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium tex
 
 /** A menu not built yet, drawn still as the category menu's trigger is at rest (MENU_TRIGGER). */
 const STAND_IN = 'my-0.5 flex h-11 items-center gap-2 px-3 text-sm text-ink';
-
-/** A link's look in running text, for a proposed link that goes nowhere yet (LINK, inline). */
-const LINK_LOOK =
-  'font-medium text-ink underline decoration-accent decoration-2 underline-offset-4';
 
 /** The box drawn still, as the real one is at rest (ValueField's shell and row). */
 const BOX_STAND_IN = cx(
@@ -266,68 +260,6 @@ function MockView({
     </figure>
   );
 }
-
-// A temperature change: the same scales without their zero points.
-
-const TEMPERATURE: readonly Mock[] = [
-  {
-    caption: 'A, as today: a reading. 5 °C on a thermometer is 41 °F.',
-    category: 'temperature',
-    text: '5',
-    unit: unit('celsius'),
-    sections: [
-      { label: 'US (customary)', rows: [row('fahrenheit', '41.00')] },
-      { label: 'Metric', rows: [row('celsius', '5.00', true), row('kelvin', '278.15')] },
-    ],
-    note: (
-      <>
-        Proposed, under Temperature’s table: “Converting a change, like 5 °C warmer?{' '}
-        <span className={LINK_LOOK}>Temperature change</span>”
-      </>
-    ),
-  },
-  {
-    caption: 'B: Temperature change, a category of its own. 5 °C warmer is 9 °F warmer.',
-    category: TEMPERATURE_CHANGE.id,
-    text: '5',
-    unit: unit('celsius'),
-    sections: [
-      { label: 'US (customary)', rows: [row('fahrenheit', '9.00')] },
-      { label: 'Metric', rows: [row('celsius', '5.00', true), row('kelvin', '5.00')] },
-    ],
-    note: 'One degree Celsius of change is 1.8 °F and 1 K: the factors alone, no offsets.',
-  },
-  {
-    caption:
-      'C, in B: an oven 25 °F lower is 13.89 °C lower. Read as a thermometer, 25 °F is −3.89 °C.',
-    category: TEMPERATURE_CHANGE.id,
-    text: '25',
-    unit: unit('fahrenheit'),
-    sections: [
-      { label: 'US (customary)', rows: [row('fahrenheit', '25.00', true)] },
-      { label: 'Metric', rows: [row('celsius', '13.89'), row('kelvin', '13.89')] },
-    ],
-  },
-  {
-    caption: 'D, your idea: inside Temperature, the reading, then the same number as a change.',
-    fresh: true,
-    category: 'temperature',
-    text: '5',
-    unit: unit('celsius'),
-    sections: [
-      { label: 'US (customary)', rows: [row('fahrenheit', '41.00')] },
-      { label: 'Metric', rows: [row('celsius', '5.00', true), row('kelvin', '278.15')] },
-      {
-        label: 'As a change: 5 °C warmer or cooler',
-        rows: [
-          { ...row('fahrenheit', '9.00'), id: 'fahrenheit-change' },
-          { ...row('kelvin', '5.00'), id: 'kelvin-change' },
-        ],
-      },
-    ],
-    note: 'One table answers both: what 5 °C reads as, and what 5 °C warmer is. The cost: °F shows twice, so the heading has to carry it.',
-  },
-];
 
 // Cooking by ingredient: volume and weight together, through the ingredient's density.
 
@@ -471,24 +403,6 @@ const INGREDIENTS =
 
 const PARTS: readonly Part[] = [
   {
-    id: 'temperature-change',
-    title: 'A temperature change',
-    intro:
-      'Temperature converts a reading: 20 °C on a thermometer is 68 °F, through the scales’ zero points. A change has no zero point: a forecast’s “5 °C warmer” is 9 °F warmer, where reading 5 °C as a temperature gives 41 °F. Engineering converters keep it as its own kind (unitconverters.net’s Temperature Interval); Google’s converter has none.',
-    explain: [
-      'What it is: Temperature answers “what does 5 °C read as in °F?” (41 °F). A change answers “5 °C warmer is how much warmer in °F?” (9 °F), for a forecast, an oven, or a thermostat. Same number typed, two questions.',
-      'Inside Temperature (D, your idea): the table gives the reading, then the change, under its own heading. No new place to look; the cost is °F twice, so the heading must be clear.',
-      'As a category of its own (B and C): Temperature stays as it is, and a change is a choice in the menu, or typed (“5 °C change”, “5 °C warmer”). Cleaner tables; harder to find.',
-      'My recommendation: D, if its heading reads clearly to you on the phone; it answers the question where people already are.',
-    ],
-    mocks: TEMPERATURE,
-    questions: [
-      'Inside Temperature as a section (D), or a category of its own (B), found by typing “5 °C change”, “5 °C warmer”, or “temperature difference”. ADR 0016 retired basic and advanced modes, not sections, so D fits it.',
-      'The line under Temperature’s table that leads to it: yes or no.',
-      'A rise written “+9.00” and a drop “−9.00”, or the bare number, as here.',
-    ],
-  },
-  {
     id: 'cooking',
     title: 'Cooking by ingredient',
     intro:
@@ -533,9 +447,9 @@ export function CategoriesLab() {
       </fieldset>
       <p className="max-w-prose rounded-md border border-line bg-surface p-3 text-sm">
         <span className={cx(NEW_TAG, 'mr-2')}>New</span>
-        In this round (2026-10-16): Temperature change D, inside Temperature, and Cooking D, two
-        pills in the box, each marked New; each part says how it reads, with a recommendation. Pace
-        (B) and the open category menu were decided and built, and have left the lab.
+        In this round (2026-10-16): Cooking D, two pills in the box, marked New; the part says how
+        it reads, with a recommendation. Pace (B), a temperature change (D), and the open category
+        menu were decided and built, and have left the lab.
       </p>
       {PARTS.map((part) => (
         <section key={part.id} aria-labelledby={`part-${part.id}`} className="grid gap-6">

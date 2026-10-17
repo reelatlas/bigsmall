@@ -1178,6 +1178,57 @@ test('one copy button, laid over the active row’s end, copies what the row sho
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2.00');
 });
 
+test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds, which copy, move into the box, and link as written', async ({
+  page,
+  context,
+  isMobile,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('5:30 /km');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove minutes per kilometer' })).toBeVisible();
+  await expect(box(page)).toHaveValue('5:30');
+  await expect(row(page, 'kilometer-per-hour')).toContainText('10.91');
+  await expect(row(page, 'minute-per-mile')).toContainText('8:51');
+  // The paces in a section of their own, after the speeds' (Sean, 2026-10-16).
+  const sections = await page
+    .locator('[data-section]')
+    .evaluateAll((all) => all.map((section) => section.getAttribute('data-section')));
+  expect(sections.at(-1)).toBe('pace');
+  // The colon lines up with the decimal points, as a decimal point would.
+  const lineUp = await page.evaluate(() =>
+    ['kilometer-per-hour', 'minute-per-mile'].map((id) =>
+      Math.round(
+        document.querySelector(`[data-row="${id}"] [data-whole]`)!.getBoundingClientRect().right,
+      ),
+    ),
+  );
+  expect(Math.abs(lineUp[0]! - lineUp[1]!)).toBeLessThanOrEqual(1);
+  // The link keeps the minutes and seconds as typed.
+  await expect(page).toHaveURL(/[?&]v=5%3A30/);
+
+  if (!isMobile) {
+    await unitCell(page, 'minute-per-mile').hover();
+    await row(page, 'minute-per-mile')
+      .locator('[data-copy-cell]')
+      .getByRole('button', { name: /^Copy/ })
+      .click();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('8:51');
+  }
+
+  // A pace taken into the box comes as the row writes it, and a link brings it back.
+  await unitCell(page, 'minute-per-mile').click();
+  await expect(page.getByRole('button', { name: 'Remove minutes per mile' })).toBeVisible();
+  await expect(box(page)).toHaveValue('8:51');
+  await expect(row(page, 'minute-per-kilometer')).toContainText('5:30');
+  await expect(page).toHaveURL(/[?&]v=8%3A51/);
+  await page.reload();
+  await ready(page);
+  await expect(box(page)).toHaveValue('8:51');
+});
+
 test('Copy URL copies the current conversion and confirms with a check', async ({
   page,
   context,

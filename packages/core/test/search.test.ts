@@ -94,6 +94,13 @@ describe('search: idle lists', () => {
       'foot-per-second',
       'mile-per-hour',
       'knot',
+      // Paces after the speeds, apart, the visitor's own first.
+      'minute-per-kilometer',
+      'minute-per-mile',
+    ]);
+    expect(ids(search('', { category: 'speed', system: 'us' })).slice(-2)).toEqual([
+      'minute-per-mile',
+      'minute-per-kilometer',
     ]);
     // The stone is British and the short ton American: each with its own visitors' units, and
     // after metric for the other's.

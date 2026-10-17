@@ -165,6 +165,31 @@ describe('selectTable', () => {
     expect(cups.value).toBeCloseTo(1.056688209, 9);
   });
 
+  it('writes a pace in minutes and seconds, a clock its rows keep (Sean, 2026-10-16)', () => {
+    const pace = table({ type: 'use', unit: 'minute-per-kilometer', text: '5:30' });
+    const row = (id: string) => pace.rows.find((each) => each.id === id)!;
+    expect(row('minute-per-kilometer')).toMatchObject({ text: '5:30', clock: true, inBox: true });
+    expect(row('minute-per-mile')).toMatchObject({ text: '8:51', clock: true });
+    expect(row('kilometer-per-hour')).toMatchObject({ text: '10.9091', clock: false });
+    expect(row('minute-per-mile').value).toBeCloseTo(5.5 * 1.609344, 12);
+    // Paces in a section of their own, after the speeds' systems and before Specialty, the
+    // visitor's own first.
+    expect(pace.sections.map((section) => section.label)).toEqual([
+      'US (customary)',
+      'Metric',
+      'Other',
+      'Pace',
+      'Specialty',
+    ]);
+    expect(pace.sections[3]!.rows.map((each) => each.id)).toEqual([
+      'minute-per-mile',
+      'minute-per-kilometer',
+    ]);
+    // A treadmill's 10 km/h is 6:00 a kilometer.
+    const treadmill = table({ type: 'use', unit: 'kilometer-per-hour', text: '10' });
+    expect(treadmill.rows.find((each) => each.id === 'minute-per-kilometer')?.text).toBe('6:00');
+  });
+
   it('names one unit in the singular', () => {
     expect(table(ml('1000')).rows.find((row) => row.id === 'liter')?.name).toBe('liter');
   });

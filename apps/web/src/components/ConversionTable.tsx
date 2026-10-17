@@ -55,6 +55,11 @@ export interface ConversionRow {
   tone: 'value' | 'empty' | 'message';
   /** The unit in the box: marked in the accent's soft fill. */
   inBox: boolean;
+  /**
+   * A pace's value, its text minutes and seconds (5:30): it keeps that form whatever the display's
+   * places or fractions, its colon lined up as a decimal point is, and copies as it shows.
+   */
+  clock?: boolean;
 }
 
 /** A section of rows under its name ("US (customary)"). */
@@ -216,7 +221,7 @@ export function copiedText(
   locale: string | undefined,
 ): string | null {
   if (row.tone !== 'value') return null;
-  const written = row.value === null ? null : firstWritten(row.value, display, locale);
+  const written = row.value === null || row.clock ? null : firstWritten(row.value, display, locale);
   return (written?.text ?? row.text).replaceAll(MINUS, '-');
 }
 
@@ -280,12 +285,12 @@ function valueParts(
   mark: string,
 ): ValueParts {
   if (row.tone !== 'value') return { across: row.text };
-  const written = row.value === null ? null : firstWritten(row.value, display, locale);
-  if (display.format === 'fraction') return { across: writtenText(row, written) };
+  const written = row.value === null || row.clock ? null : firstWritten(row.value, display, locale);
+  if (display.format === 'fraction' && !row.clock) return { across: writtenText(row, written) };
   const text = written?.text ?? row.text;
   let at = text.indexOf(mark);
   if (at < 0) at = text.indexOf('E');
-  // A time's colon lines up as a decimal point does: a pace, 5:30 (mocked in /dev/categories-lab).
+  // A pace's colon lines up as a decimal point does: 5:30 over 10.91.
   if (at < 0) at = text.indexOf(':');
   if (at < 0) at = text.length;
   return { text, whole: text.slice(0, at), decimals: text.slice(at) };
@@ -395,7 +400,9 @@ export function ConversionTable<T extends ConversionRow>({
 
   const parts = (row: T, under: TableDisplay = display) => valueParts(row, under, locale, mark);
   const secondOf = (row: T, under: TableDisplay = display) =>
-    row.tone !== 'value' || row.value === null ? null : secondWritten(row.value, under, locale);
+    row.tone !== 'value' || row.value === null || row.clock
+      ? null
+      : secondWritten(row.value, under, locale);
   const second = (row: T, under: TableDisplay = display): ReactNode => {
     const fraction = secondOf(row, under);
     return fraction ? writtenText(row, fraction) : null;

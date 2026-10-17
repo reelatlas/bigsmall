@@ -27,7 +27,7 @@ export interface ParsedInput {
   /**
    * The number exactly as typed, when the text is one number rather than arithmetic: its digits in
    * canonical form, a period decimal, no grouping, and an E exponent ("1,000.50" is "1000.50"), so
-   * a URL can keep digits a double would round ("123456789012345678").
+   * a URL can keep digits a double would round ("123456789012345678"); a clock as typed ("5:30").
    */
   canonical?: string;
 }
@@ -79,6 +79,13 @@ const NUMBER = new RegExp(
   `(?:${DIGITS}(?:${SEPARATOR}${DIGITS})*|[.,]${DIGITS})(?:[eE][+${UNICODE_MINUS}-]?${DIGITS})?(?:[.,](?=$|${ENDS_A_NUMBER}))?`,
   'y',
 );
+/**
+ * A time written as a clock writes it, each part sixtieths of the one before: "5:30" is 5 and 30
+ * sixtieths, a pace's minutes and seconds ("5:30 /km") or an hour and a half ("1:30 h"), and
+ * "1:05:30" has three parts. Every part after the first is two digits under 60. Read before a
+ * plain number, so its digits are not taken for one.
+ */
+const CLOCK = /[0-9]+(?::[0-5][0-9]){1,2}(?![0-9])/y;
 const ANY_SEPARATOR = new RegExp(SEPARATOR, 'g');
 const TRAILING_MARK = /[.,]$/;
 const EXPONENT_MARK = /[eE]/;
@@ -134,7 +141,8 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
   const [only] = numbers;
   if (result.value !== undefined && !result.expression && only && numbers.length === 1) {
     const signs = scanned.tokens.filter((token) => token.kind === 'sign' && token.negative);
-    result.canonical = `${signs.length % 2 === 1 ? '-' : ''}${canonicalNumber(only.text, marked)}`;
+    const digits = only.text.includes(':') ? only.text : canonicalNumber(only.text, marked);
+    result.canonical = `${signs.length % 2 === 1 ? '-' : ''}${digits}`;
   }
 
   const rest = trimmed.slice(end).trim();
@@ -275,6 +283,9 @@ function skipSpace(text: string, from: number): number {
 }
 
 function numberAt(text: string, at: number): string | null {
+  CLOCK.lastIndex = at;
+  const clock = CLOCK.exec(text)?.[0];
+  if (clock) return clock;
   NUMBER.lastIndex = at;
   return NUMBER.exec(text)?.[0] ?? null;
 }
@@ -400,6 +411,10 @@ function evaluate(scanned: readonly Token[]): Evaluation {
 
 /** The number the text spells, which may be Infinity or a zero that underflowed; parse() judges the range. */
 function toNumber(text: string, separators: Separators): number {
+  if (text.includes(':')) {
+    // A clock: each part sixtieths of the one before ("5:30" is 5.5, "1:05:30" 1.0916…).
+    return text.split(':').reduce((value, part, at) => value + Number(part) / 60 ** at, 0);
+  }
   return Number(canonicalNumber(text, separators));
 }
 

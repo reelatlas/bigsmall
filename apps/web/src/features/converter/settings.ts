@@ -26,8 +26,11 @@ import {
 // Sections: the table's units by system, under fixed names, the same everywhere, so a switch
 // means the same thing in every category.
 
-/** A section of the table: `standard` holds a category with no regional system (time, data, angle). */
-export type SectionKey = 'metric' | 'us' | 'uk' | 'other' | 'standard' | 'specialty';
+/**
+ * A section of the table: `standard` holds a category with no regional system (time, data, angle),
+ * and `pace` a category's paces (Speed's min/km and min/mi), apart from the speeds they equal.
+ */
+export type SectionKey = 'metric' | 'us' | 'uk' | 'other' | 'standard' | 'pace' | 'specialty';
 
 /**
  * Only headings take the parentheses; units keep their names and symbols. Specialty, for the units
@@ -39,6 +42,7 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
   uk: 'UK (imperial)',
   other: 'Other',
   standard: 'Standard',
+  pace: 'Pace',
   specialty: 'Specialty',
 };
 
@@ -73,10 +77,12 @@ function ownSection(preference: UnitPreference): SectionKey {
 
 /**
  * The section a unit belongs to, for this visitor. The shared inch, foot, and pound sit with
- * US (customary), or with UK (imperial) for a UK visitor; every specialty unit is Specialty's.
+ * US (customary), or with UK (imperial) for a UK visitor; every specialty unit is Specialty's, and
+ * every standard pace Pace's (Sean, 2026-10-16).
  */
 export function sectionOf(unit: Unit, preference: UnitPreference): SectionKey {
   if (unit.tier === 'specialty') return 'specialty';
+  if (unit.pace) return 'pace';
   if (!categoryIsRegional(unit.category)) return 'standard';
   if (unit.system === 'si' || unit.system === 'metric') return 'metric';
   if (unit.system === 'us') return 'us';
@@ -103,15 +109,19 @@ export function defaultOrder(preference: UnitPreference): readonly SectionKey[] 
 
 /**
  * Rows in their sections, every section headed, even a section of one, in `order`: Standard first
- * (it is a category's only standard section), then the systems as ordered, Other among them. Rows
- * keep the listed order within their section.
+ * (it is a category's only standard section), then the systems as ordered, Other among them, with
+ * Pace after every one of them but Specialty, wherever Specialty is ordered. Rows keep the listed
+ * order within their section.
  */
 export function sectionsOf<T extends { unit: Unit }>(
   rows: readonly T[],
   preference: UnitPreference,
   order: readonly SectionKey[] = defaultOrder(preference),
 ): Section<T>[] {
-  const rank = (key: SectionKey) => (key === 'standard' ? -1 : order.indexOf(key));
+  const systems = order.filter((key) => key !== 'specialty').map((key) => order.indexOf(key));
+  const pace = Math.max(-1, ...systems) + 0.5;
+  const rank = (key: SectionKey) =>
+    key === 'standard' ? -1 : key === 'pace' ? pace : order.indexOf(key);
   const sections = new Map<SectionKey, Section<T>>();
   for (const row of rows) {
     const key = sectionOf(row.unit, preference);
@@ -205,10 +215,17 @@ export function systemState(
   return on ? 'all' : 'none';
 }
 
-/** What the switches alone show: Standard always. */
+/**
+ * The sections with no switch, which always show: Standard, a category's whole standard list, and
+ * Pace, standard rather than specialty (Sean, 2026-10-16; how a category's own sections are
+ * switched is a later exploration, docs/PLAN.md §2).
+ */
+const ALWAYS_SHOWN: ReadonlySet<SectionKey> = new Set(['standard', 'pace']);
+
+/** What the switches alone show: Standard and Pace always. */
 function bySystem(unit: Unit, shown: ReadonlySet<SectionKey>, preference: UnitPreference): boolean {
   const key = sectionOf(unit, preference);
-  return key === 'standard' || shown.has(key);
+  return ALWAYS_SHOWN.has(key) || shown.has(key);
 }
 
 /** Whether a unit shows: its exception, if it has one, else its switch. */

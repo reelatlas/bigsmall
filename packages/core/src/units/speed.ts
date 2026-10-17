@@ -3,7 +3,7 @@ import type { Category, Unit } from '../types';
 export const speed: Category = {
   id: 'speed',
   name: 'Speed',
-  aliases: ['velocity', 'how fast', 'fast', 'rate of travel'],
+  aliases: ['velocity', 'how fast', 'fast', 'rate of travel', 'pace', 'running pace'],
   baseUnit: 'meter-per-second',
   tier: 'standard',
   group: 'common',
@@ -15,6 +15,10 @@ const KNOT = 'NIST SP 811 (2008) Appendix B.8: 1 nautical mile = 1852 m; 1 kn = 
 const FPS = 'International Yard and Pound Agreement (1959): 1 ft = 0.3048 m exactly';
 const LIGHT =
   'BIPM SI Brochure, 9th ed. (2019), §2.2: the speed of light in vacuum c = 299 792 458 m/s, a defining constant (exact)';
+const PACE_KM =
+  'BIPM SI Brochure, 9th ed. (2019), Table 8: 1 min = 60 s; a pace of 1 min/km is 1000 m in 60 s, so m/s = (1000/60) ÷ min/km, exactly';
+const PACE_MI =
+  'International Yard and Pound Agreement (1959): 1 mi = 1609.344 m exactly; BIPM SI Brochure, Table 8: 1 min = 60 s; so m/s = (1609.344/60) ÷ min/mi, exactly';
 
 export const speedUnits: readonly Unit[] = [
   {
@@ -96,6 +100,61 @@ export const speedUnits: readonly Unit[] = [
     factor: 0.3048,
     exact: true,
     source: FPS,
+  },
+  // Paces: minutes per distance, the way runners give speed (Sean, 2026-10-16). A pace runs the
+  // other way, a smaller one faster, so it is a reciprocal unit, as L/100 km is in Fuel economy.
+  {
+    kind: 'reciprocal',
+    id: 'minute-per-kilometer',
+    category: 'speed',
+    name: 'minute per kilometer',
+    plural: 'minutes per kilometer',
+    symbol: 'min/km',
+    aliases: [
+      '/km',
+      'per km',
+      'min per km',
+      'mins/km',
+      'minutes per km',
+      'min/kilometer',
+      'minute per kilometre',
+      'minutes per kilometre',
+      'pace per km',
+      'km pace',
+    ],
+    system: 'si',
+    tier: 'standard',
+    factor: 1000 / 60,
+    pace: true,
+    exact: true,
+    source: PACE_KM,
+    note: 'A pace: the minutes and seconds one kilometer takes. A smaller pace is faster.',
+  },
+  {
+    kind: 'reciprocal',
+    id: 'minute-per-mile',
+    category: 'speed',
+    name: 'minute per mile',
+    plural: 'minutes per mile',
+    symbol: 'min/mi',
+    aliases: [
+      '/mi',
+      '/mile',
+      'per mile',
+      'min per mile',
+      'mins/mi',
+      'min/mile',
+      'minutes per mi',
+      'pace per mile',
+      'mile pace',
+    ],
+    system: 'imperial',
+    tier: 'standard',
+    factor: 1609.344 / 60,
+    pace: true,
+    exact: true,
+    source: PACE_MI,
+    note: 'A pace: the minutes and seconds one mile takes. A smaller pace is faster.',
   },
   {
     kind: 'linear',

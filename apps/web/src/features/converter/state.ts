@@ -1,5 +1,6 @@
 import {
   convert,
+  formatClock,
   formatNumber,
   getCategory,
   getUnit,
@@ -214,6 +215,8 @@ export interface TableRow {
   tone: 'value' | 'empty' | 'message';
   /** The unit in the box. */
   inBox: boolean;
+  /** A pace's value, in minutes and seconds (5:30), whatever the display's places or fractions. */
+  clock: boolean;
 }
 
 /** A match while a unit is typed: a unit, or a category whose name matched, to open. */
@@ -383,7 +386,11 @@ function selectUnits(
 function valueRow(target: Unit, from: Unit, value: number, locale: string | undefined): TableRow {
   const converted = target.id === from.id ? value : safeConvert(value, from, target);
   const text =
-    converted === undefined ? '' : formatNumber(converted, { precision: TABLE_PRECISION, locale });
+    converted === undefined
+      ? ''
+      : target.pace
+        ? formatClock(converted, { locale })
+        : formatNumber(converted, { precision: TABLE_PRECISION, locale });
   const tooSmall = converted === 0 && value !== 0;
   const shown = text && !tooSmall ? (converted ?? null) : null;
   // 0 in a reciprocal unit has no value in the others: 0 mpg is no distance at all, so no L/100 km.
@@ -398,6 +405,7 @@ function valueRow(target: Unit, from: Unit, value: number, locale: string | unde
     text: problem ? NO_ANSWER_MESSAGES[problem].short : text,
     tone: problem ? 'message' : 'value',
     inBox: target.id === from.id,
+    clock: target.pace === true,
   };
 }
 
@@ -411,6 +419,7 @@ function emptyRow(target: Unit, inBox: Unit | null): TableRow {
     text: NO_VALUE,
     tone: 'empty',
     inBox: target.id === inBox?.id,
+    clock: target.pace === true,
   };
 }
 
@@ -479,12 +488,14 @@ function selectMatches(
  * Whether typing has reached a unit: the text holds a query with a letter or a symbol in it,
  * beyond the characters numbers and sums are written with. The parser reads a half-typed number
  * as a query ("-" before "-5", "1e" before "1e5"), so those, and a lone "e" after a number, which
- * may be an exponent on its way, wait for the next key.
+ * may be an exponent on its way, wait for the next key, as does a colon on the way to a time ("5:"
+ * and "5:3" before "5:30").
  */
 function typingUnit(parsed: ParsedInput): boolean {
   const { query } = parsed;
   if (!query) return false;
   if (parsed.valueText !== undefined && /^[eE][-+−]?$/.test(query)) return false;
+  if (parsed.valueText !== undefined && /^:[0-5]?$/.test(query)) return false;
   return /[^\s\d.,+\-−*/×÷^()]/u.test(query);
 }
 

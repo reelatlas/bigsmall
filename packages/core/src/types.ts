@@ -80,6 +80,12 @@ interface UnitMeta {
   source: string;
   /** Short definition shown to users when the unit has a variant or convention worth stating. */
   note?: string;
+  /**
+   * A pace, time per distance (Sean, 2026-10-16): its value is in minutes, written in minutes and
+   * seconds (5:30, formatClock), and it is listed apart from the units it converts with, after
+   * them (order.ts), in a Pace section of its own on the web.
+   */
+  pace?: true;
 }
 
 /** base = value × factor. Nearly every unit. */

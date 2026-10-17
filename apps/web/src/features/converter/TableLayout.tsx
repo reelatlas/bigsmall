@@ -1,4 +1,4 @@
-import { formatNumber, getUnit, type CategoryId } from '@bigsmall/core';
+import { formatClock, formatNumber, getUnit, type CategoryId } from '@bigsmall/core';
 import {
   useEffect,
   useId,
@@ -460,8 +460,10 @@ export function TableLayout({
       const row = table.rows[index];
       if (!row || row.tone === 'message') return;
       if (row.inBox) setPosition(null);
-      else
-        take(row.id, row.value === null ? number : formatNumber(row.value, { locale: env.locale }));
+      else if (row.value === null) take(row.id, number);
+      // A pace comes into the box as the row writes it, minutes and seconds (5:30).
+      else if (row.clock) take(row.id, formatClock(row.value, { locale: env.locale }));
+      else take(row.id, formatNumber(row.value, { locale: env.locale }));
     }
   };
 

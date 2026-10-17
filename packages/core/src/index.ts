@@ -28,7 +28,7 @@ export { unitListGroup } from './order';
 export type { ListGroup } from './order';
 export { matchSpan } from './highlight';
 export type { TextSpan } from './highlight';
-export { formatNumber } from './format';
+export { formatClock, formatNumber } from './format';
 export type { FormatOptions } from './format';
 export { formatFraction, formatPlaces, fractionsOf, FRACTION_SIZES } from './rounded';
 export type { Fraction, FractionSize, Rounded, Rounding } from './rounded';

@@ -103,4 +103,40 @@ export const speed: GoldenRow[] = [
     expected: 1079252848.8,
     source: 'Derived: 299 792 458 m/s × 3.6',
   },
+  // Paces (Sean, 2026-10-16): a minute is 60 s (SI Brochure, Table 8), a mile 1609.344 m.
+  {
+    value: 5.5,
+    from: 'minute-per-kilometer',
+    to: 'kilometer-per-hour',
+    expected: 120 / 11,
+    source: 'Derived: 60 min/h ÷ 5.5 min/km (5:30 a kilometer)',
+  },
+  {
+    value: 10,
+    from: 'kilometer-per-hour',
+    to: 'minute-per-kilometer',
+    expected: 6,
+    source: 'Derived: 60 min/h ÷ 10 km/h',
+  },
+  {
+    value: 6,
+    from: 'minute-per-mile',
+    to: 'mile-per-hour',
+    expected: 10,
+    source: 'Derived: 60 min/h ÷ 6 min/mi',
+  },
+  {
+    value: 8,
+    from: 'minute-per-mile',
+    to: 'minute-per-kilometer',
+    expected: 8 / 1.609344,
+    source: 'Derived: 8 min/mi ÷ 1.609344 km/mi',
+  },
+  {
+    value: 1,
+    from: 'minute-per-kilometer',
+    to: 'meter-per-second',
+    expected: 1000 / 60,
+    source: 'Derived: 1000 m ÷ 60 s',
+  },
 ];

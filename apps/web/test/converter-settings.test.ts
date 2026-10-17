@@ -48,7 +48,14 @@ describe('settings: sections', () => {
     expect(labels('volume', 'imperial')[0]).toBe('UK (imperial)');
     expect(labels('volume', 'metric')[0]).toBe('Metric');
     // Other comes before Specialty; a category with no regions is Standard, never "Metric".
-    expect(labels('speed', 'us')).toEqual(['US (customary)', 'Metric', 'Other', 'Specialty']);
+    // Paces have a section of their own, after the systems and before Specialty.
+    expect(labels('speed', 'us')).toEqual([
+      'US (customary)',
+      'Metric',
+      'Other',
+      'Pace',
+      'Specialty',
+    ]);
     expect(labels('time', 'us')).toEqual(['Standard', 'Specialty']);
   });
 
@@ -129,10 +136,11 @@ describe('settings: what shows', () => {
     for (const category of ['speed', 'pressure', 'time'] as const) {
       const rows = unitsIn(category).map((each) => ({ unit: each }));
       const present = new Set(rows.map((row) => sectionOf(row.unit, 'us')));
-      // Other where it is set, as any system: here between UK and Specialty.
+      // Other where it is set, as any system: here between UK and Specialty. Pace after every
+      // system but Specialty, wherever Specialty is set: here last.
       const order = ['uk', 'other', 'specialty', 'metric', 'us'] as const;
       expect(sectionsOf(rows, 'us', order).map((section) => section.key)).toEqual(
-        ['standard', 'uk', 'other', 'specialty', 'metric', 'us'].filter((key) =>
+        ['standard', 'uk', 'other', 'specialty', 'metric', 'us', 'pace'].filter((key) =>
           present.has(key as never),
         ),
       );

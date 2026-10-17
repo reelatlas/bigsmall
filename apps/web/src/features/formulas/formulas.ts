@@ -41,6 +41,8 @@ export const SIGNIFICANT = 16;
 /** Factors people know by their exact form, written that way. */
 const NAMED: ReadonlyArray<readonly [number, string]> = [
   [5 / 9, '5/9'],
+  // A pace of a minute per kilometer: 1000 m in 60 s.
+  [1000 / 60, '50/3'],
   [Math.PI / 180, 'π/180'],
   [Math.PI / 200, 'π/200'],
   [Math.PI / 10_800, 'π/10800'],

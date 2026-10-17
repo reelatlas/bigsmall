@@ -20,7 +20,7 @@ test('the About page lists every formula, folded; Show all opens them, Hide all 
     'aria-expanded',
     'true',
   );
-  await expect(section.getByText('1 mi = 1609.344 m')).toBeVisible();
+  await expect(section.getByText('1 mi = 1609.344 m', { exact: true })).toBeVisible();
   // One category closed on its own: the button offers Show all again.
   await section.locator('summary').first().click();
   await expect(section.getByRole('button', { name: 'Show all' })).toBeVisible();

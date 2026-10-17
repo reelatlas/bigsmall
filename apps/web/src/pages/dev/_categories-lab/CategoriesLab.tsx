@@ -30,8 +30,8 @@ import {
 } from '../../../lib/recipes';
 
 /*
- * Mock-ups of categories bigsmall does not have yet (docs/research/categories-1.md): pace, a
- * temperature change, and cooking by ingredient, drawn with the real box, table, and menus in
+ * Mock-ups of categories bigsmall does not have yet (docs/research/categories-1.md): a
+ * temperature change and cooking by ingredient (pace, built on 2026-10-16, has left), drawn with the real box, table, and menus in
  * frozen states, as the gallery draws them. Nothing converts: every value is worked out by hand
  * for the mock, and is checked against its standard when the category is built (ADR 0020).
  */
@@ -267,113 +267,6 @@ function MockView({
   );
 }
 
-// Pace, inside Speed: minutes and seconds per distance, beside the speeds they equal.
-
-const MINUTE_PER_KILOMETER = proposedUnit(
-  'speed',
-  'minute-per-kilometer',
-  'min/km',
-  'minute per kilometer',
-  'minutes per kilometer',
-);
-
-const PACE: readonly Mock[] = [
-  {
-    caption: 'A: a runner types “5:30 /km”; the paces sit with their systems.',
-    category: 'speed',
-    text: '5:30',
-    unit: MINUTE_PER_KILOMETER,
-    sections: [
-      {
-        label: 'US (customary)',
-        rows: [
-          row('mile-per-hour', '6.78'),
-          row('foot-per-second', '9.94'),
-          { id: 'minute-per-mile', symbol: 'min/mi', name: 'minutes per mile', text: '8:51' },
-        ],
-      },
-      {
-        label: 'Metric',
-        rows: [
-          row('meter-per-second', '3.03'),
-          row('kilometer-per-hour', '10.91'),
-          {
-            id: 'minute-per-kilometer',
-            symbol: 'min/km',
-            name: 'minutes per kilometer',
-            text: '5:30',
-            inBox: true,
-          },
-        ],
-      },
-      { label: 'Other', rows: [row('knot', '5.89')] },
-    ],
-    note: 'Paces in minutes and seconds, to the second, beside the speeds they equal.',
-  },
-  {
-    caption: 'A, again: a treadmill says “10 km/h”, and the paces say what it means.',
-    category: 'speed',
-    text: '10',
-    unit: unit('kilometer-per-hour'),
-    sections: [
-      {
-        label: 'US (customary)',
-        rows: [
-          row('mile-per-hour', '6.21'),
-          row('foot-per-second', '9.11'),
-          { id: 'minute-per-mile', symbol: 'min/mi', name: 'minutes per mile', text: '9:39' },
-        ],
-      },
-      {
-        label: 'Metric',
-        rows: [
-          row('meter-per-second', '2.78'),
-          row('kilometer-per-hour', '10.00', true),
-          {
-            id: 'minute-per-kilometer',
-            symbol: 'min/km',
-            name: 'minutes per kilometer',
-            text: '6:00',
-          },
-        ],
-      },
-      { label: 'Other', rows: [row('knot', '5.40')] },
-    ],
-  },
-  {
-    caption: 'B: the same “5:30 /km”, the paces in a section of their own, under the speeds.',
-    fresh: true,
-    category: 'speed',
-    text: '5:30',
-    unit: MINUTE_PER_KILOMETER,
-    sections: [
-      {
-        label: 'US (customary)',
-        rows: [row('mile-per-hour', '6.78'), row('foot-per-second', '9.94')],
-      },
-      {
-        label: 'Metric',
-        rows: [row('meter-per-second', '3.03'), row('kilometer-per-hour', '10.91')],
-      },
-      { label: 'Other', rows: [row('knot', '5.89')] },
-      {
-        label: 'Pace',
-        rows: [
-          { id: 'minute-per-mile', symbol: 'min/mi', name: 'minutes per mile', text: '8:51' },
-          {
-            id: 'minute-per-kilometer',
-            symbol: 'min/km',
-            name: 'minutes per kilometer',
-            text: '5:30',
-            inBox: true,
-          },
-        ],
-      },
-    ],
-    note: 'Minutes and seconds never sit among decimals, and “Pace” says what they are.',
-  },
-];
-
 // A temperature change: the same scales without their zero points.
 
 const TEMPERATURE: readonly Mock[] = [
@@ -578,23 +471,6 @@ const INGREDIENTS =
 
 const PARTS: readonly Part[] = [
   {
-    id: 'pace',
-    title: 'Pace, inside Speed',
-    intro:
-      'Runners give speed as time per distance, 5:30 a kilometer. As units of Speed, the way L/100 km sits in Fuel economy, one table answers both a pace and a treadmill’s speed.',
-    explain: [
-      'How it reads: a pace is one more row in Speed. “5:30 min/km” sits beside 10.91 km/h, the same speed said the runner’s way, so a treadmill’s km/h and a race’s pace are one table apart.',
-      'Where it could confuse: paces run the other way (a smaller pace is faster), and minutes and seconds sit among decimals; the colon lines up with the decimal points, so the column still reads.',
-      'My recommendation: B, a Pace section under the speeds. The two kinds of number never mix, and its heading says what they are.',
-    ],
-    mocks: PACE,
-    questions: [
-      'Paces with their systems (A: min/km under Metric, min/mi under US), or in a Pace section of their own (B).',
-      'To the second for running (5:30); a swimmer’s pace per 100 m to the tenth (1:32.5), and a rower’s per 500 m: in Specialty, or later.',
-      'Typed “5:30 /km”, “5:30 min/km”, or “5:30/km”, it is a pace; “5:30” alone asks for a unit, as a number alone does today.',
-    ],
-  },
-  {
     id: 'temperature-change',
     title: 'A temperature change',
     intro:
@@ -657,10 +533,9 @@ export function CategoriesLab() {
       </fieldset>
       <p className="max-w-prose rounded-md border border-line bg-surface p-3 text-sm">
         <span className={cx(NEW_TAG, 'mr-2')}>New</span>
-        In this round (2026-10-16): Pace B, a section of its own; Temperature change D, inside
-        Temperature; and Cooking D, two pills in the box. Each is marked New; each part says how it
-        reads, with a recommendation. The open category menu's three ways were decided (two columns,
-        scrolling in a short window) and built.
+        In this round (2026-10-16): Temperature change D, inside Temperature, and Cooking D, two
+        pills in the box, each marked New; each part says how it reads, with a recommendation. Pace
+        (B) and the open category menu were decided and built, and have left the lab.
       </p>
       {PARTS.map((part) => (
         <section key={part.id} aria-labelledby={`part-${part.id}`} className="grid gap-6">

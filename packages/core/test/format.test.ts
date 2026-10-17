@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { compactKey, compactKeyWithDegree, formatNumber, normalizeKey } from '../src/index';
+import {
+  compactKey,
+  compactKeyWithDegree,
+  formatClock,
+  formatNumber,
+  normalizeKey,
+} from '../src/index';
 
 describe('formatNumber', () => {
   it('shows up to ten significant digits and trims trailing zeros', () => {
@@ -49,6 +55,31 @@ describe('formatNumber', () => {
     // A double holds about 16–17 significant digits; asking for more never invents digits.
     expect(formatNumber(1 / 3, { precision: 99 })).toMatch(/^0\.3{15,17}$/);
     expect(formatNumber(1234.5, { locale: 'not a locale' }).length).toBeGreaterThan(0);
+  });
+});
+
+describe('formatClock', () => {
+  it('writes minutes as minutes and seconds, to the nearest second', () => {
+    expect(formatClock(5.5, { locale: 'en-US' })).toBe('5:30');
+    expect(formatClock(6, { locale: 'en-US' })).toBe('6:00');
+    expect(formatClock(5.999, { locale: 'en-US' })).toBe('6:00');
+    expect(formatClock(8 / 1.609344, { locale: 'en-US' })).toBe('4:58');
+    // Under a second never reads 0:00, as a decimal under its places reads "< 0.01".
+    expect(formatClock(0.004, { locale: 'en-US' })).toBe('< 0:01');
+    expect(formatClock(-0.004, { locale: 'en-US' })).toBe('> -0:01');
+    expect(formatClock(0, { locale: 'en-US' })).toBe('0:00');
+  });
+
+  it('never carries minutes into hours, so what it writes reads back the same', () => {
+    expect(formatClock(65.5, { locale: 'en-US' })).toBe('65:30');
+    expect(formatClock(1500, { locale: 'en-US' })).toBe('1500:00');
+  });
+
+  it('keeps the sign and the locale’s digits, and leaves what no clock can count', () => {
+    expect(formatClock(-6, { locale: 'en-US' })).toBe('-6:00');
+    expect(formatClock(5.5, { locale: 'ar-EG' })).toBe('٥:٣٠');
+    expect(formatClock(Number.NaN)).toBe('');
+    expect(formatClock(1e300, { locale: 'en-US' })).toBe(formatNumber(1e300, { locale: 'en-US' }));
   });
 });
 

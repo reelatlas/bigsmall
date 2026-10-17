@@ -46,10 +46,27 @@ export function unitListGroup(unit: Unit, preference: UnitPreference = 'metric')
  * then of neither, then the specialty units of every system, each group smallest to largest;
  * units of one size keep the catalog's order, most common first. Size orders
  * only units with a plain factor: where a unit has an offset (temperature) or is a reciprocal
- * (fuel economy), the catalog's order stands, the visitor's own standard unit first.
- * With no preference, metric leads, as the international default.
+ * (fuel economy), the catalog's order stands, the visitor's own standard unit first. Paces come
+ * after the rest, the visitor's own first. With no preference, metric leads, as the international
+ * default.
  */
 export function orderUnits(units: readonly Unit[], preference: UnitPreference = 'metric'): Unit[] {
+  // Paces read the other way, a smaller one faster, and are listed apart, after the units they
+  // convert with (a Pace section of their own on the web), the visitor's own first.
+  const paces = units.filter((unit) => unit.pace);
+  if (paces.length > 0) {
+    const ranked = paces
+      .map((unit, index) => ({ unit, index, group: listGroup(unit, preference) }))
+      .sort((a, b) => a.group - b.group || a.index - b.index)
+      .map(({ unit }) => unit);
+    return [
+      ...orderUnits(
+        units.filter((unit) => !unit.pace),
+        preference,
+      ),
+      ...ranked,
+    ];
+  }
   const linear = units.filter((unit): unit is LinearUnit => unit.kind === 'linear');
   if (linear.length === units.length) {
     return linear

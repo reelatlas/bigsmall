@@ -46,6 +46,17 @@ const cases: Case[] = [
   { text: `1${NBSP}234,5`, separators: DE, value: 1234.5 },
   { text: '0', value: 0 },
   { text: '007', value: 7 },
+  // A time as a clock writes it, each part sixtieths of the one before (Sean, 2026-10-16).
+  { text: '5:30', value: 5.5, valueText: '5:30' },
+  { text: '5:30 /km', value: 5.5, query: '/km' },
+  { text: '5:30/km', value: 5.5, query: '/km' },
+  { text: '5:30 min/mi', value: 5.5, query: 'min/mi' },
+  { text: '1:30 h', value: 1.5, query: 'h' },
+  { text: '1:05:30', value: 1 + 5 / 60 + 30 / 3600 },
+  // Seconds are two digits under 60: anything else is no clock, and "5:" or "5:3" is on its way.
+  { text: '5:75 km', value: 5, query: ':75 km' },
+  { text: '5:3', value: 5, query: ':3' },
+  { text: '5:', value: 5, query: ':' },
 ];
 
 describe('parse', () => {
@@ -111,6 +122,8 @@ describe('parse', () => {
     expect(parse('1,000.50 km', EN).canonical).toBe('1000.50');
     expect(parse('1.000,5', DE).canonical).toBe('1000.5');
     expect(parse(`${MINUS}40 f`).canonical).toBe('-40');
+    // A clock as typed, so a link opens on the same minutes and seconds.
+    expect(parse('5:30 /km').canonical).toBe('5:30');
     expect(parse('.5').canonical).toBe('0.5');
     expect(parse('1.5e21').canonical).toBe('1.5E21');
     // Arithmetic, and no number, have none: a URL keeps their value instead.

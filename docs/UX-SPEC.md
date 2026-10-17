@@ -245,6 +245,7 @@ The theme menu and the shortcuts map are fluid shells driven by the inline scrip
 Planned work, and what became of each item: one built, decided, or dropped says so, and where it lives now.
 
 - **The About page and its sketchbook** (Sean, 2026-10-15), planned and tuned in `/dev/sketchbook-lab`, built the same day (§1, "About" and "Footer").
+- **Feedback** (Sean, 2026-10-15; the fiftieth pass), prototyped in `/dev/feedback-lab` (2026-10-17; docs/research/feedback-1.md): on the About page, a short form whose Send opens the visitor's own email app with the message filled in, or the address alone, each with a copy of the address; a report of a figure asks the unit or ingredient, the visitor's figure, and where it comes from, a lead for docs/RESEARCH.md §5. Waits on the address, `hello@bigsmall.work` forwarded by Porkbun, and Sean's choice among the lab's answers.
 
 **Owner's ideas, logged 2026-10-06**, all built: copy link (§7, now named Copy URL), the calculator (§8), and the wordmark at play with theme art (§1). Later, maybe: on phones, the native share sheet in place of Copy URL, and the calculator docked to the bottom of the screen.
 

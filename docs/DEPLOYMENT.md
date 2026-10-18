@@ -73,6 +73,19 @@ Umami Cloud counts visits (ADR 0019), in Sean's account on the free Hobby plan.
 - **Our own visits.** Once in each browser we use, on bigsmall.work: `localStorage.setItem('umami.disabled', 1)` in the console (any value disables it; `removeItem` turns counting back on).
 - **Limits.** Hobby: 100,000 events a month (each event, and each property on it, counts), one site, six months of history; past the limit Umami stops recording until the month resets. The $20 plan before that, or for a second site.
 
+## Feedback
+
+The feedback form on the About page (docs/UX-SPEC.md §1; ADR 0024) posts its fields as JSON to Formspark, a form service, which mails each message to Sean and keeps a copy in its dashboard (dashboard.formspark.io, the "bigsmall" form, id `je13qw0h9`, `FEEDBACK_FORM_ID` in `apps/web/src/lib/site.ts`). The id is public by design, as a form's address is; what guards it is set on Formspark's side, at Sean's screen:
+
+- **Notifications** to the inbox he reads; the visitor's email, when given, is the Reply-To.
+- **Automatic filter** on: every submission screened.
+- **Allowed domains**: `bigsmall.work` (its subdomains included), so a post from elsewhere is refused (403). To set once.
+- **Honeypot**: the page sends a hidden `_honeypot` field; a filled one is dropped. No challenge (captcha): Send stays one button. Spam words and the autoresponder: not used.
+- **Submissions**: 250 free in all, then a one-time bundle ($25 for 50,000, which never expire); when they run out the service answers 402 and the page says it could not send. The form's Analytics tab shows the count left.
+- **After a deploy that touches the form:** send one real message from bigsmall.work and see it arrive; the browser tests never reach the service.
+
+The site stores nothing of a message; the service holds it. The privacy line, when it lands, says so (docs/UX-SPEC.md §14).
+
 ## Changing the main domain
 
 A config change and a redirect flip (ADR 0008): set `site` in `apps/web/astro.config.mjs` to the new domain, make it the main domain in Vercel's Domains list, and redirect the old one to it with a 308. Search rankings follow permanent redirects, but slowly, so settle the domain before investing in search.

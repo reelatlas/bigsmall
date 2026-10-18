@@ -37,3 +37,11 @@ export const SITE = {
  * "Analytics"). Not a secret: it ships in every page. Empty, no tracker loads.
  */
 export const UMAMI_WEBSITE_ID: string = '0a3ff4d6-d066-4ed6-97ed-bfb93e047b61';
+
+/**
+ * The feedback form at Formspark (ADR 0024; docs/DEPLOYMENT.md, "Feedback"): the About page posts
+ * the form's fields to it, and it mails them to Sean. The id is public by design, as a form's
+ * address is; what guards it is on the service's side (allowed domains, a honeypot, its filter).
+ */
+export const FEEDBACK_FORM_ID = 'je13qw0h9';
+export const FEEDBACK_ENDPOINT = `https://submit-form.com/${FEEDBACK_FORM_ID}`;

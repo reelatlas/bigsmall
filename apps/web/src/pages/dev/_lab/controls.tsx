@@ -1,13 +1,13 @@
 import { useId, type ReactNode } from 'react';
-import { CARD, cx } from '../../../lib/recipes';
+import { CARD, cx, FIELD_STACK, TEXT_INPUT } from '../../../lib/recipes';
 
 // The controls the /dev labs share (docs/DESIGN-SYSTEM.md, "Tuning labs"): tools for tuning,
 // not design-system components, so they stay out of the gallery.
 
 /** Class lists the labs use more than once; the ones they share with the site are in lib/recipes.ts. */
 export const HEADING = 'font-display text-lg font-semibold';
-export const FIELD = 'grid gap-1 text-sm';
-export const INPUT = 'min-h-11 min-w-0 rounded-md border-2 border-edge bg-surface px-3 text-ink';
+export const FIELD = FIELD_STACK;
+export const INPUT = TEXT_INPUT;
 export const SELECT = cx(INPUT, 'w-full');
 export const CHECK = 'flex min-h-11 items-center gap-2 text-sm';
 

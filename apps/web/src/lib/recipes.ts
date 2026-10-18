@@ -197,6 +197,17 @@ export const MENU_OPTION = cx(
  */
 export const FIELD_ROW = 'flex h-15 items-center gap-2 pr-2 pl-4';
 
+/**
+ * A text field of a form (the feedback form's Your email and Message; the labs' controls take the
+ * same): its label over its input in a stack, the input 44 px with the fields' 2 px edge on the
+ * surface, a message 128 px tall with the row's vertical padding.
+ */
+export const FIELD_STACK = 'grid gap-1 text-sm';
+export const FIELD_LABEL = 'text-sm font-medium';
+export const TEXT_INPUT =
+  'min-h-11 min-w-0 rounded-md border-2 border-edge bg-surface px-3 text-ink';
+export const TEXT_AREA = cx(TEXT_INPUT, 'min-h-32 py-2');
+
 // Text
 
 /**

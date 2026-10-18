@@ -1,5 +1,6 @@
 ---
 import PageHeader from '../components/PageHeader.astro';
+import { Feedback } from '../features/feedback/Feedback';
 import Formulas from '../features/formulas/Formulas.astro';
 import SketchSprite from '../features/sketchbook/SketchSprite.astro';
 import { Sketchbook } from '../features/sketchbook/Sketchbook';
@@ -10,8 +11,8 @@ import { SITE } from '../lib/site';
 /*
  * The About page (docs/UX-SPEC.md §1), reached from the footer: the sketchbook, centered under its
  * heading (Sean, 2026-10-15 and 16), the logo sketches at play as tuned in /dev/sketchbook-lab;
- * then every formula the converter uses, with its source (Sean, 2026-10-16). The privacy line and
- * feedback may follow.
+ * then every formula the converter uses, with its source (Sean, 2026-10-16); then Feedback, the
+ * form that posts to the form service (ADR 0024, 2026-10-17). The privacy line may follow.
  */
 ---
 
@@ -29,5 +30,15 @@ import { SITE } from '../lib/site';
       <Sketchbook client:load />
     </section>
     <Formulas />
+    <section
+      id="feedback"
+      class="mx-auto mt-16 max-w-md sm:mt-24"
+      aria-labelledby="feedback-heading"
+    >
+      <h2 id="feedback-heading" class:list={[SECTION_HEADING, 'mb-6']}>
+        Feedback
+      </h2>
+      <Feedback client:visible />
+    </section>
   </main>
 </Base>

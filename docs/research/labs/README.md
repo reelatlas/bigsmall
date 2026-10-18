@@ -4,6 +4,20 @@ A prototype lab answers a design question with a few working answers, built from
 
 Newest first.
 
+## Feedback lab, `/dev/feedback-lab` (2026-10-17)
+
+**Explored.** How a visitor reaches us from the About page: first two answers side by side, a form whose Send opened the visitor's email app with the message filled in, and the address alone with a copy; then, on Sean's shape, one form: a strip of three kinds (Inaccuracy, Bug, Idea), Your email, a Message whose empty state gives an example for the kind, Send alone, with what Send would deliver shown beside it.
+
+**Decided.** The one form, built on the About page the same day (ADR 0024; docs/UX-SPEC.md §1, "About"): Send posts to Formspark, which mails the message; the examples from three categories; nothing under the fields.
+
+**Left out, and why.** The email-app form: a separate email window, which Sean found "annoying for ten years now". The address alone: nothing structured arrives. A function of our own sending through an account he controls: the first server on a site that has none, spam ours to handle; the upgrade path if the service proves too little. Web3Forms and Formspree: their free tiers guard a public key with a captcha or not at all.
+
+**Learned.** A honeypot is read from its field at the send, since a bot sets a value without the events a person's typing fires (docs/LEARNINGS.md, 2026-10-17).
+
+**Screenshots** (`feedback-lab/`): 1 the first lab's two answers, wide; 2 Sean's shape on a phone, empty; 3 after Send, with what arrives.
+
+**Last commit.** `a6dabdf`, in `apps/web/src/pages/dev/_feedback-lab/` and `apps/web/src/pages/dev/feedback-lab.astro`. Research: `docs/research/feedback-1.md`.
+
 ## Categories lab, `/dev/categories-lab` (2026-10-15 to 16)
 
 **Explored.** Three categories bigsmall did not have yet, and the open category menu, mocked with the real box, table, and menus in frozen states, the values worked out by hand, wide or at a phone's width: pace (A, min/km and min/mi with their systems; B, a Pace section of their own under the speeds); a temperature change (A, as today, a reading; B, Temperature change, a category of its own; C, in B, an oven's 25 °F lower; D, Sean's idea, inside Temperature, the reading and then the same number as a change); cooking by ingredient (A, "2 cups flour" with the ingredient in a menu beside the category, weight first; B, the same by system; C, an ingredient's own unit, "1 stick butter"; D, Sean's idea, two pills in the box, the unit and the ingredient); and the open menu three ways (A, as long as its list; B, held to a height and scrolling; C, two columns).

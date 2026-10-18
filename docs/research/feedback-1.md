@@ -1,5 +1,7 @@
 # Feedback 1 — how a visitor reaches us
 
+**Retired 2026-10-17.** The form is built on the About page (ADR 0024): Send posts to Formspark, chosen over Web3Forms and Formspree after a check of the three against their own pages (the seventy-first pass). The lab's last commit is `a6dabdf`; its entry is in `docs/research/labs/README.md`.
+
 Built 2026-10-17 as a prototype lab, `/dev/feedback-lab` (`apps/web/src/pages/dev/_feedback-lab/`), for the fiftieth pass's open question (docs/research/findings-0-first-pass.md). Sean asked for "a trial lab, light, to get an idea of the functions and how it might look", then set its shape the same day (the sixty-ninth pass) and asked how Send can deliver without a third party (the seventieth). Live where the lab is; retired by `CLAUDE.md`'s "Retire a lab" recipe once the section ships.
 
 ## The question

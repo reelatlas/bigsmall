@@ -121,6 +121,22 @@
 }
 
 /*
+ * The page's column centered with its left edge on a whole pixel. The room kept for the scrollbar
+ * (base styles), or an odd window, leaves an odd remainder, and auto margins split it into
+ * halves, so everything in the column, the sketchbook's tiles among it, would sit on a half pixel
+ * (docs/LEARNINGS.md, 2026-10-18). The start margin is the half rounded down and the end margin the
+ * rest; a browser without round() keeps the auto margins. The column's size is PAGE_COLUMN's
+ * (src/lib/recipes.ts).
+ */
+@utility mx-page {
+  margin-inline: auto;
+  margin-inline-start: max(
+    0px,
+    round(down, calc((100% - min(100%, var(--container-5xl))) / 2), 1px)
+  );
+}
+
+/*
  * A check that draws itself in, for a confirmation such as a reset done (docs/DESIGN-SYSTEM.md,
  * "Motion"). It rests fully drawn and animates from hidden, so reduced motion, which stops every
  * animation, shows it whole. 24 covers the check's path (about 20 units long).

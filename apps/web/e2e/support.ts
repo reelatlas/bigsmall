@@ -18,6 +18,20 @@ export async function ready(page: Page) {
 }
 
 /**
+ * Sets the window so the page's content is as wide as a `width` px window's with no classic
+ * scrollbar. The page keeps the scrollbar's room always (`scrollbar-gutter: stable`, global.css),
+ * 15 px where scrollbars are classic (CI's Linux, Windows, this headless Chromium too) and none
+ * where they overlay (phones, macOS); the design's widths are a phone's, the content's. After the
+ * page has loaded, since the room is the page's own style (docs/LEARNINGS.md, 2026-10-18).
+ */
+export async function windowOf(page: Page, width: number, height: number) {
+  const gutter = await page.evaluate(
+    () => document.documentElement.clientWidth - document.body.clientWidth,
+  );
+  await page.setViewportSize({ width: width + gutter, height });
+}
+
+/**
  * Theme tokens transition; axe must see the settled colors, not a frame in between. A transition
  * cancelled on the way (a list redrawn under it) has settled too: its promise rejects, so it is
  * waited on without failing.

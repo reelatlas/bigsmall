@@ -20,6 +20,7 @@ import {
   shortcutsButton,
   showEverything,
   unitCell,
+  windowOf,
 } from './support';
 
 // The converter (ADR 0012, ADR 0013, docs/UX-SPEC.md §1, §5, §7–§9, §11): one box, a category menu
@@ -899,7 +900,7 @@ test('the categories go four across once the column has the room, and fit in eve
     [543, 2],
     [544, 4],
   ] as const) {
-    await page.setViewportSize({ width, height: 800 });
+    await windowOf(page, width, 800);
     expect(await across(), `${width} px`).toBe(expected);
     for (const theme of THEMES) {
       await applyTheme(page, theme);
@@ -917,11 +918,12 @@ test('at 320 px the rows and the categories fit without scrolling sideways', asy
   await page.goto('/?a=kilometer-per-hour&v=100');
   await ready(page);
   await expect(row(page, 'mile-per-hour')).toBeVisible();
-  expect(await overflow()).toBe(0);
+  // Nothing past the window; the scrollbar's room leaves the content short of it, never over.
+  expect(await overflow()).toBeLessThanOrEqual(0);
   await page.goto('/');
   await ready(page);
   await expect(tiles(page)).toBeVisible();
-  expect(await overflow()).toBe(0);
+  expect(await overflow()).toBeLessThanOrEqual(0);
 });
 
 test('a line between sections sits evenly between their text, and the first heading clear of the top', async ({
@@ -1118,7 +1120,7 @@ test('the intro has a line of its own; the toolbar under it is one row, which a 
   // edge on the column's; on a touch screen the row scrolls sideways instead, every tool on one
   // line, a fade where more waits, and clear all's edge on the column's once scrolled to the end.
   // Which it is follows the pointer, which each project emulates.
-  await page.setViewportSize({ width: 375, height: 800 });
+  await windowOf(page, 375, 800);
   const coarse = await page.evaluate(() => matchMedia('(pointer: coarse)').matches);
   const bar = page.getByRole('toolbar', { name: 'Tools' });
   const rowOf = (name: string) => bar.getByRole('button', { name, exact: true });
@@ -1187,9 +1189,9 @@ test('More: a tool the row had no room for acts from the menu, with the keys, an
   isMobile,
 }) => {
   test.skip(isMobile, 'a touch screen scrolls the row instead');
-  await page.setViewportSize({ width: 375, height: 800 });
   await page.goto('/?a=meter&v=1');
   await ready(page);
+  await windowOf(page, 375, 800);
   const bar = page.getByRole('toolbar', { name: 'Tools' });
   const more = bar.getByRole('button', { name: 'More tools' });
   await expect(more).toHaveAttribute('aria-expanded', 'false');

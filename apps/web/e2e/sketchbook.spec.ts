@@ -761,7 +761,10 @@ test('the tiles sit on whole pixels at any width, their edges on device pixels',
 }) => {
   // A third of a width lands on a fraction; the grid rounds its tracks and its inset (global.css,
   // "The sketchbook's grid"), so a settling layer never lands a hair off its rest.
-  for (const width of [320, 360, 375, 390, 393, 412, 768, 1280]) {
+  // Real windows, the scrollbar's room and all: on a classic-scrollbar system a centered column
+  // would land on a half pixel where the remainder is odd, which the page column rounds away
+  // (global.css, `mx-page`).
+  for (const width of [320, 360, 375, 390, 393, 412, 768, 1280, 1281]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/about/');
     await page.locator('[data-playing]').waitFor();

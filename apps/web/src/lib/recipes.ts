@@ -64,9 +64,10 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
  * own, since in the body's column (Base.astro) side margins of auto would shrink it to its content.
  * Its size is the stock one above the converter's two tracks and their gutters (CONVERTER_GRID:
  * 576 + 16 + 320, and 16 each side; 896 until 2026-10-17, when the box gave up 48 px beside an
- * open panel).
+ * open panel). Centered with its left edge on a whole pixel (`mx-page`, global.css), since the
+ * scrollbar's room or an odd window would otherwise put the column on a half.
  */
-export const PAGE_COLUMN = 'mx-auto w-full max-w-5xl px-4';
+export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-4';
 
 /**
  * A block in the column that may paint past it (the sketchbook's changes): bled to the page's

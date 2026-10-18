@@ -11,6 +11,7 @@ import {
   settingsPanel,
   shortcutsButton,
   themeToggle,
+  windowOf,
 } from './support';
 
 // The header's menus (docs/UX-SPEC.md §10) and how the header wraps on narrow screens (§1).
@@ -105,13 +106,13 @@ test("the shortcuts button switches by the header's own width, where all of it f
   const header = page.locator('main > header');
   const headerWidth = () => header.evaluate((el) => el.getBoundingClientRect().width);
   // The page's 16 px gutters aside, a 600 px window leaves the header under 576 px, its container
-  // xl size: no shortcuts button.
-  await page.setViewportSize({ width: 600, height: 800 });
+  // xl size: no shortcuts button. The windows are sized by the content (windowOf).
+  await windowOf(page, 600, 800);
   expect(await headerWidth()).toBeLessThan(576);
   await expect(shortcutsButton(page)).toBeHidden();
   // From 576 px of header it shows (the line it shares, in every theme, is the width tests'
   // below), and the shortcuts map opens inside the window.
-  await page.setViewportSize({ width: 610, height: 800 });
+  await windowOf(page, 610, 800);
   expect(await headerWidth()).toBeGreaterThanOrEqual(576);
   await expect(shortcutsButton(page)).toBeVisible();
   await shortcutsButton(page).click();
@@ -220,9 +221,19 @@ for (const width of [320, 351, 352, 375, 400, 415, 416, 430, 520, 600, 610, 640]
       ? 'Copy URL and the theme menu share its line'
       : 'the theme menu alone shares its line';
   test(`at ${width} px the name keeps its art, and ${line}`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 800 });
     await page.goto('/');
     await ready(page);
+    await windowOf(page, width, 800);
+    // The toolbar refits to the new width a frame later: wait until nothing passes the window.
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          ),
+        { message: `${width}px` },
+      )
+      .toBeLessThanOrEqual(0);
     for (const theme of THEMES) {
       await applyTheme(page, theme);
       await expect(page.locator(`header [data-art="${theme.id}"]`), theme.id).toBeVisible();
@@ -240,7 +251,11 @@ for (const width of [320, 351, 352, 375, 400, 415, 416, 430, 520, 600, 610, 640]
           .getBoundingClientRect();
         const chevron = button.querySelector('svg')!.getBoundingClientRect();
         return {
-          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          // Sideways overflow alone: the scrollbar's room leaves the content short of the window.
+          overflow: Math.max(
+            0,
+            document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          ),
           ownLine: menus.top >= name.bottom,
           left: Math.round(menus.left - header.left),
           right: Math.round(header.right - menus.right),

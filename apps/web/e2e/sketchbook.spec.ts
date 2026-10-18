@@ -11,7 +11,13 @@ import {
   type SketchEffect,
 } from '../src/features/sketchbook/sketches';
 import { SKETCHBOOK_TIMING } from '../src/lib/timing';
-import { MARGIN_MS, recordAnimations, startedAnimations, themeTime } from './support';
+import {
+  MARGIN_MS,
+  recordAnimations,
+  sketchbookReady,
+  startedAnimations,
+  themeTime,
+} from './support';
 
 // The sketchbook (docs/UX-SPEC.md §1, the About page), played on the About page as shipped and on
 // /dev/sketchbook-lab, which tunes it.
@@ -45,7 +51,7 @@ async function openLab(
     },
   );
   await page.goto('/dev/sketchbook-lab');
-  await page.locator('[data-playing]').waitFor();
+  await sketchbookReady(page);
 }
 
 /** A tile's sketch and its name, read together so a change cannot land between them. */
@@ -500,7 +506,7 @@ test('the About page plays the sketchbook as shipped, from the footer, its name 
   await expect(page.getByRole('link', { name: 'bigsmall' })).toHaveCount(0);
   await page.getByRole('contentinfo').getByRole('link', { name: 'About' }).click();
   await expect(page).toHaveURL(/\/about\/?$/);
-  await page.locator('[data-playing]').waitFor();
+  await sketchbookReady(page);
   await expect(tiles(page)).toHaveCount(SKETCHBOOK_TUNING.columns * SKETCHBOOK_TUNING.rows);
   await expect(page.getByRole('button', { name: 'Flip', exact: true })).toBeVisible();
   // The footer here holds the privacy line and no link back: the name in the header leads home.
@@ -545,7 +551,7 @@ test('Flip answers a press with particles in the button, and with a flash under 
 
 test('Flip and Pause sit under the middle tile, together as wide as it', async ({ page }) => {
   await page.goto('/about/');
-  await page.locator('[data-playing]').waitFor();
+  await sketchbookReady(page);
   const middle = await tiles(page)
     .nth(Math.floor(SKETCHBOOK_TUNING.columns / 2))
     .boundingBox();
@@ -560,7 +566,8 @@ test('Flip and Pause sit under the middle tile, together as wide as it', async (
 });
 
 test('Pause holds the tiles from changing by themselves until Play', async ({ page }) => {
-  await openLab(page, {}, { idleMinMs: 300, idleMaxMs: 500 });
+  const idleMaxMs = 500;
+  await openLab(page, {}, { idleMinMs: 300, idleMaxMs });
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   const play = page.getByRole('button', { name: 'Play', exact: true });
   await expect(play).toBeVisible();
@@ -571,7 +578,7 @@ test('Pause holds the tiles from changing by themselves until Play', async ({ pa
     )
     .toBe(false);
   const held = await shown(page);
-  await page.waitForTimeout(2 * 500 + swapMs + MARGIN_MS);
+  await page.waitForTimeout(2 * idleMaxMs + swapMs + MARGIN_MS);
   expect(await shown(page)).toEqual(held);
   await play.click();
   await expect
@@ -582,7 +589,7 @@ test('Pause holds the tiles from changing by themselves until Play', async ({ pa
 test('under reduced motion there is nothing to pause', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/about/');
-  await page.locator('[data-playing]').waitFor();
+  await sketchbookReady(page);
   await expect(page.getByRole('button', { name: 'Flip', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeHidden();
 });
@@ -777,7 +784,7 @@ test('the tiles sit on whole pixels at any width, their edges on device pixels',
   for (const width of [320, 360, 375, 390, 393, 412, 768, 1280, 1281]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/about/');
-    await page.locator('[data-playing]').waitFor();
+    await sketchbookReady(page);
     const edges = await tiles(page).evaluateAll((all) =>
       all.map((tile) => {
         const rect = tile.getBoundingClientRect();

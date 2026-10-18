@@ -1,5 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { box, calculatorButton, calculatorPanel, menu, ready, row, unitCell } from './support';
+import {
+  box,
+  calculatorButton,
+  calculatorPanel,
+  copyCell,
+  menu,
+  ready,
+  row,
+  unitCell,
+} from './support';
 
 // A touch screen (docs/UX-SPEC.md §8, "On a touch screen", ADR 0015): the on-screen keyboard
 // comes up only from a tap in the box. A tap anywhere else never moves focus into it, a tap in the
@@ -135,9 +144,9 @@ test('a tapped row shows its copy button, which copies what the row shows', asyn
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
   await unitCell(page, 'liter').tap();
-  const copy = page.locator('[data-row="liter"] [data-copy-cell]');
+  const copy = copyCell(page, 'liter');
   await expect(copy).toHaveCSS('opacity', '1');
-  await expect(page.locator('[data-row="us-cup"] [data-copy-cell]')).toHaveCSS('opacity', '0');
+  await expect(copyCell(page, 'us-cup')).toHaveCSS('opacity', '0');
   await copy.getByRole('button', { name: /^Copy/ }).tap();
   await expect(copy.locator('[data-copied]')).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.47');

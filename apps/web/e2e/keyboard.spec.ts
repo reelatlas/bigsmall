@@ -1,6 +1,6 @@
 import { categories } from '@bigsmall/core';
 import { expect, test, type Page } from '@playwright/test';
-import { blur, box, menu, ready, shortcutsButton, themeToggle } from './support';
+import { blur, box, menu, ready, shortcutsButton, themeToggle, tokenColor } from './support';
 
 // The page's toolbars and planes (docs/UX-SPEC.md §8, §10, ADR 0014): each toolbar is one Tab
 // stop whose arrows move along it, and which keeps the control last used; ↑ and ↓ move between
@@ -175,14 +175,7 @@ test('the shortcuts map opens with Enter, never as the keyboard passes, and clos
   await expect(map).toBeVisible();
   expect(await ring()).toBe('none');
   // The fill eases in with the button's own transition, so wait for it to settle.
-  const soft = await shortcutsButton(page).evaluate((icon) => {
-    const probe = document.createElement('span');
-    probe.style.color = getComputedStyle(icon).getPropertyValue('--accent-soft');
-    document.body.append(probe);
-    const color = getComputedStyle(probe).color;
-    probe.remove();
-    return color;
-  });
+  const soft = await tokenColor(page, '--accent-soft');
   await expect
     .poll(() => shortcutsButton(page).evaluate((icon) => getComputedStyle(icon).backgroundColor))
     .toBe(soft);

@@ -147,10 +147,10 @@ export function UnitMatches({
   /** A unit's symbol and name, as every match writes them; the name for screen readers alone with Symbol only. */
   const unitText = (unit: Unit) => (
     <>
-      <span className={unitSymbol()}>
+      <span className={unitSymbol()} data-symbol>
         <MatchedText text={unit.symbol} query={query} className="text-ink" />
       </span>
-      <span className={unitName(!symbolOnly)}>
+      <span className={unitName(!symbolOnly)} data-name>
         <MatchedText text={unit.plural} query={query} className="font-semibold" />
       </span>
     </>
@@ -318,13 +318,13 @@ export function UnitMatches({
                       rowFill(false, index === cursor),
                     )}
                   >
-                    <span className={unitSymbol()}>
+                    <span className={unitSymbol()} data-symbol>
                       <MatchedText text={match.unit.symbol} query={query} className="text-ink" />
                     </span>
                     {/* Where the name and its category share no line, the category goes under
                         it: the name is never cut short. */}
                     <span className="flex min-w-0 flex-wrap items-baseline gap-x-2">
-                      <span className={unitName(!symbolOnly)}>
+                      <span className={unitName(!symbolOnly)} data-name>
                         <MatchedText
                           text={match.unit.plural}
                           query={query}

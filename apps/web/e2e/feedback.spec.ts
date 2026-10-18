@@ -1,12 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 import { EXAMPLES } from '../src/features/feedback/report';
 import { FEEDBACK_ENDPOINT } from '../src/lib/site';
-import { expectNoA11yViolations } from './support';
+import { aboutPanel, expectNoA11yViolations, islandReady } from './support';
 
 // The feedback form on the About page (docs/UX-SPEC.md §1, "About"; ADR 0024): the fields Send
 // posts to the form service, answered here by the test and never sent, and the lines after.
 
-const section = (page: Page) => page.locator('#feedback');
+const section = (page: Page) => aboutPanel(page, 'Feedback');
 const message = (page: Page) => page.getByLabel('Message');
 const send = (page: Page) => page.getByRole('button', { name: 'Send', exact: true });
 
@@ -14,10 +14,9 @@ const send = (page: Page) => page.getByRole('button', { name: 'Send', exact: tru
 async function openForm(page: Page) {
   await page.goto('/about');
   await section(page).scrollIntoViewIfNeeded();
-  // The island hydrates as it comes into view, and Astro drops its `ssr` mark once it has; a click
-  // before that moves the radio and nothing else. A visually hidden radio is reached through its
-  // visible label, as a person reaches it.
-  await expect(section(page).locator('astro-island')).not.toHaveAttribute('ssr');
+  // The island hydrates as it comes into view; a click before that moves the radio and nothing
+  // else. A visually hidden radio is reached through its visible label, as a person reaches it.
+  await islandReady(section(page).locator('astro-island'));
   await section(page).getByText('Bug', { exact: true }).click();
   await expect(message(page)).not.toHaveAttribute('placeholder', EXAMPLES.inaccuracy[0]!);
   expect(EXAMPLES.bug).toContain(await message(page).getAttribute('placeholder'));
@@ -97,4 +96,21 @@ test('a refusal from the service says what to try and keeps the message; the str
   );
   await expect(message(page)).toHaveValue(/5 ft 10 in/);
   await expectNoA11yViolations(page);
+});
+
+test('a kind’s segment is a 44 px tap on a touch screen, and for a mouse the 32 px strip it draws', async ({
+  page,
+  isMobile,
+}) => {
+  await openForm(page);
+  // The label is the target and the shape inside it is what shows: a finger gets 44 px through the
+  // label, a mouse the drawn strip alone, which clears the 24 px minimum (docs/LEARNINGS.md,
+  // 2026-10-18: a pointer 6 px off the strip was already on it).
+  const target = section(page).getByRole('radio', { name: 'Bug' }).locator('xpath=..');
+  const drawn = target.locator(':scope > span');
+  const label = (await target.boundingBox())!;
+  const strip = (await drawn.boundingBox())!;
+  expect(Math.round(strip.height)).toBe(32);
+  if (isMobile) expect(label.height).toBeGreaterThanOrEqual(44);
+  else expect(Math.round(label.height)).toBe(Math.round(strip.height));
 });

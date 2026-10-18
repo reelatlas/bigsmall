@@ -1,5 +1,7 @@
 import { categories, ingredients, units } from '@bigsmall/core';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
+import { THEMES } from '../src/lib/themes';
+import { aboutPanel, aboutTab, aboutTabs, applyTheme } from './support';
 
 // Every formula on the About page (docs/UX-SPEC.md §1, "About"): folded by category, Show all and
 // Hide all, and Copy all as plain text. Under its tab since 2026-10-18.
@@ -7,11 +9,8 @@ import { expect, test, type Page } from '@playwright/test';
 /** The About page with Every formula open: its hash opens the tab once the tabs hydrate. */
 async function openFormulas(page: Page) {
   await page.goto('/about/#formulas');
-  await expect(page.getByRole('tab', { name: 'Every formula' })).toHaveAttribute(
-    'aria-selected',
-    'true',
-  );
-  return page.getByRole('tabpanel', { name: 'Every formula' });
+  await expect(aboutTab(page, 'Every formula')).toHaveAttribute('aria-selected', 'true');
+  return aboutPanel(page, 'Every formula');
 }
 
 test('the About page lists every formula, folded; Show all opens them, Hide all closes them', async ({
@@ -76,16 +75,20 @@ test('the tools sit on the list’s left edge, Show all’s chevron over the cat
   page,
 }) => {
   const section = await openFormulas(page);
-  const left = (svg: ReturnType<typeof section.locator>) =>
-    svg.evaluate((icon) => icon.getBoundingClientRect().left);
-  const chevron = await left(section.getByRole('button', { name: 'Show all' }).locator('svg'));
-  const category = await left(section.locator('summary').first().locator('svg'));
-  expect(Math.abs(chevron - category)).toBeLessThanOrEqual(1);
-  // Its lines sit on the column's left edge with the tabs (centered under a heading until
-  // 2026-10-18).
-  const lead = await left(section.getByText('Each conversion in its category'));
-  const tabs = await left(page.getByRole('tablist', { name: 'About' }));
-  expect(Math.abs(lead - tabs)).toBeLessThanOrEqual(1);
+  const left = (locator: Locator) =>
+    locator.evaluate((element) => element.getBoundingClientRect().left);
+  // In every theme, whose fonts set the lines' own widths.
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const chevron = await left(section.getByRole('button', { name: 'Show all' }).locator('svg'));
+    const category = await left(section.locator('summary').first().locator('svg'));
+    expect(Math.abs(chevron - category), theme.id).toBeLessThanOrEqual(1);
+    // Its lines sit on the column's left edge with the tabs (centered under a heading until
+    // 2026-10-18).
+    const lead = await left(section.getByText('Each conversion in its category'));
+    const tabs = await left(aboutTabs(page));
+    expect(Math.abs(lead - tabs), theme.id).toBeLessThanOrEqual(1);
+  }
 });
 
 test('an open category’s name stays under the bar while its units scroll past, then the next one’s', async ({

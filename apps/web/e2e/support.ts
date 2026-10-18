@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { cssTime } from '../src/lib/css-time';
 import type { ThemeMeta } from '../src/lib/themes';
 
@@ -17,6 +17,11 @@ export async function ready(page: Page) {
   await page.locator('section[data-hydrated]').waitFor();
 }
 
+/** Waits for an Astro island to hydrate: Astro drops its `ssr` mark then (docs/LEARNINGS.md). */
+export async function islandReady(island: Locator) {
+  await expect(island).not.toHaveAttribute('ssr');
+}
+
 /**
  * Sets the window so the page's content is as wide as a `width` px window's with no classic
  * scrollbar. The page keeps the scrollbar's room always (`scrollbar-gutter: stable`, global.css),
@@ -29,6 +34,13 @@ export async function windowOf(page: Page, width: number, height: number) {
     () => document.documentElement.clientWidth - document.body.clientWidth,
   );
   await page.setViewportSize({ width: width + gutter, height });
+}
+
+/** How far the page runs past the window sideways: 0 where it fits, the scrollbar's room aside. */
+export async function sidewaysOverflow(page: Page) {
+  return page.evaluate(() =>
+    Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
+  );
 }
 
 /**
@@ -107,12 +119,27 @@ export async function themeTime(page: Page, name: string) {
   );
 }
 
+/** A theme token's color as painted (`--accent` as rgb), which a computed color is compared to. */
+export async function tokenColor(page: Page, name: string) {
+  return page.evaluate((token) => {
+    const probe = document.createElement('span');
+    probe.style.color = `var(${token})`;
+    document.body.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  }, name);
+}
+
 /** Runs axe on the page as it is and fails on any violation. */
 export async function expectNoA11yViolations(page: Page) {
   await settled(page);
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   expect(results.violations).toEqual([]);
 }
+
+/** The page's own header, under `main` (the dev server's toolbar draws headers of its own). */
+export const pageHeader = (page: Page) => page.locator('main > header');
 
 /** The header's theme menu trigger, whatever theme it names. */
 export const themeToggle = (page: Page) => page.getByRole('button', { name: /^Theme/ });
@@ -137,7 +164,9 @@ export async function applyTheme(page: Page, theme: Pick<ThemeMeta, 'id' | 'name
   }, theme);
 }
 
-/** The converter's box, the field named "Value" (exactly, so no other name containing it matches). */
+/**
+ * The converter's box, the field named "Value" (exactly, so no other name containing it matches).
+ */
 export const box = (page: Page) => page.getByRole('combobox', { name: 'Value', exact: true });
 
 /** The converter's category menu trigger, before a category is chosen or after. */
@@ -166,7 +195,20 @@ export const row = (page: Page, unitId: string) => page.locator(`[data-row="${un
 export const unitCell = (page: Page, unitId: string) =>
   row(page, unitId).getByRole('gridcell').first();
 
-/** A settings panel's button, Units or Display, in the converter's toolbar (not the dev toolbar's). */
+/** A row's copy cell, laid over its end, shown on the active row alone. */
+export const copyCell = (page: Page, unitId: string) =>
+  row(page, unitId).locator('[data-copy-cell]');
+
+/** The table's sections' ids in the order shown, from their `data-section` marks. */
+export async function sectionIds(page: Page) {
+  return page
+    .locator('[data-section]')
+    .evaluateAll((all) => all.map((each) => each.getAttribute('data-section')));
+}
+
+/**
+ * A settings panel's button, Units or Display, in the converter's toolbar (not the dev toolbar's).
+ */
 export const settingsButton = (page: Page, name: 'Units' | 'Display') =>
   page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name, exact: true });
 
@@ -235,4 +277,19 @@ export async function setSettings(page: Page, ...choices: string[]) {
  */
 export async function showEverything(page: Page) {
   await setSettings(page, 'All', 'Symbol and name', 'No limit');
+}
+
+/** The About page's row of tabs, Feedback and Every formula (docs/UX-SPEC.md §1, "About"). */
+export const aboutTabs = (page: Page) => page.getByRole('tablist', { name: 'About' });
+
+/** One of the About page's tabs, by its name, exactly. */
+export const aboutTab = (page: Page, name: string) => page.getByRole('tab', { name, exact: true });
+
+/** An About tab's panel, by the tab's name, exactly. */
+export const aboutPanel = (page: Page, name: string) =>
+  page.getByRole('tabpanel', { name, exact: true });
+
+/** Waits for the sketchbook to play: its grid carries `data-playing` once its island runs. */
+export async function sketchbookReady(page: Page) {
+  await page.locator('[data-playing]').waitFor();
 }

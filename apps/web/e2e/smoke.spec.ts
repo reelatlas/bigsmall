@@ -4,10 +4,13 @@ import {
   applyTheme,
   box,
   expectNoA11yViolations,
+  pageHeader,
   pickTheme,
   ready,
   row,
   settled,
+  sketchbookReady,
+  tokenColor,
   windowOf,
 } from './support';
 
@@ -64,8 +67,7 @@ test('the page keeps the scrollbar’s room, so a panel that brings one moves no
   expect(
     await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarGutter),
   ).toBe('stable');
-  const left = () =>
-    page.locator('main > header').evaluate((el) => el.getBoundingClientRect().left);
+  const left = () => pageHeader(page).evaluate((el) => el.getBoundingClientRect().left);
   const before = await left();
   await page.getByRole('button', { name: 'Calculator', exact: true }).click();
   await expect(page.getByRole('group', { name: 'Calculator' })).toBeVisible();
@@ -139,44 +141,60 @@ test('every Tab stop on the About page shows a visible focus indicator', async (
 }) => {
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
   await page.goto('/about/');
-  await page.locator('[data-playing]').waitFor();
+  await sketchbookReady(page);
   await walkTabStops(page);
 });
 
-/** Tabs through the page's first stops and fails on any that shows no focus indicator. */
+/**
+ * Tabs through every stop on the page, until focus comes round to the first again, and fails on
+ * any that shows no focus indicator.
+ */
 async function walkTabStops(page: Page) {
   const missing: string[] = [];
-  for (let stop = 0; stop < 10; stop += 1) {
+  // The accent as painted: a shell's edge takes it to show focus in its field or menu.
+  const accent = await tokenColor(page, '--accent');
+  const mark = 'data-first-stop';
+  let marked = false;
+  let round = false;
+  for (let press = 0; press < 80; press += 1) {
     await page.keyboard.press('Tab');
     // Shell edges fade in; read the indicator once transitions have finished.
     await settled(page);
     // A stop passes with its own outline, or with an accent edge on the shell it sits in
-    // (fields and the theme menu show focus that way). Astro's dev toolbar is not ours.
-    const result = await page.evaluate(() => {
-      const element = document.activeElement as HTMLElement | null;
-      if (!element || element === document.body) return null;
-      if (element.closest('astro-dev-toolbar')) return null;
-      const name =
-        element.getAttribute('aria-label') ?? element.textContent?.trim() ?? element.tagName;
-      const style = getComputedStyle(element);
-      if (style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) >= 2) {
-        return { ok: true, name };
-      }
-      const probe = document.createElement('span');
-      probe.style.color = 'var(--accent)';
-      document.body.append(probe);
-      const accent = getComputedStyle(probe).color;
-      probe.remove();
-      for (let node = element.parentElement; node; node = node.parentElement) {
-        const edge = getComputedStyle(node);
-        if (parseFloat(edge.borderTopWidth) >= 2 && edge.borderTopColor === accent) {
+    // (fields and the theme menu show focus that way). Astro's dev toolbar is not ours. The first
+    // stop is marked, so the walk knows when it has come round to it.
+    const result = await page.evaluate(
+      ([accent, mark, marked]) => {
+        const element = document.activeElement as HTMLElement | null;
+        if (!element || element === document.body) return null;
+        if (element.closest('astro-dev-toolbar')) return null;
+        if (element.hasAttribute(mark)) return 'round' as const;
+        if (!marked) element.setAttribute(mark, '');
+        const name =
+          element.getAttribute('aria-label') ?? element.textContent?.trim() ?? element.tagName;
+        const style = getComputedStyle(element);
+        if (style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) >= 2) {
           return { ok: true, name };
         }
-      }
-      return { ok: false, name };
-    });
-    if (result && !result.ok) missing.push(result.name);
+        for (let node = element.parentElement; node; node = node.parentElement) {
+          const edge = getComputedStyle(node);
+          if (parseFloat(edge.borderTopWidth) >= 2 && edge.borderTopColor === accent) {
+            return { ok: true, name };
+          }
+        }
+        return { ok: false, name };
+      },
+      [accent, mark, marked] as const,
+    );
+    if (result === null) continue;
+    if (result === 'round') {
+      round = true;
+      break;
+    }
+    marked = true;
+    if (!result.ok) missing.push(result.name);
   }
+  expect(round, 'the walk came round to the first stop').toBe(true);
   expect(missing).toEqual([]);
 }
 
@@ -259,4 +277,36 @@ test('the footer links to the About page, quietly until hovered or focused', asy
   await expect(about).toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
   await about.focus();
   await expect(about).not.toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
+});
+
+test('the privacy line’s links read as the text around them, until hovered or focused', async ({
+  page,
+  isMobile,
+}) => {
+  // About's footer holds the privacy line, its two names links in the line's own muted ink with no
+  // underline, until hovered or focused, when they take the ink and the accent underline
+  // (docs/UX-SPEC.md §1, "Footer"; `INLINE_LINK`).
+  await page.goto('/about/');
+  const footer = page.getByRole('contentinfo');
+  const muted = await footer
+    .getByText(/^Visits are counted/)
+    .evaluate((line) => getComputedStyle(line).color);
+  const ink = await tokenColor(page, '--ink');
+  const accent = await tokenColor(page, '--accent');
+  expect(muted).not.toBe(ink);
+  for (const name of ['Umami', 'Formspark']) {
+    const link = footer.getByRole('link', { name });
+    await expect(link, name).toHaveCSS('color', muted);
+    await expect(link, name).toHaveCSS('text-decoration-color', 'rgba(0, 0, 0, 0)');
+    if (isMobile) continue;
+    await link.hover();
+    await expect(link, name).toHaveCSS('color', ink);
+    await expect(link, name).toHaveCSS('text-decoration-color', accent);
+    // Once the hover has faded, focus brings both back.
+    await page.mouse.move(0, 0);
+    await expect(link, name).toHaveCSS('color', muted);
+    await link.focus();
+    await expect(link, name).toHaveCSS('color', ink);
+    await expect(link, name).toHaveCSS('text-decoration-color', accent);
+  }
 });

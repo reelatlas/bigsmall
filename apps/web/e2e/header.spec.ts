@@ -5,11 +5,13 @@ import {
   calculatorButton,
   expectNoA11yViolations,
   MARGIN_MS,
+  pageHeader,
   pickTheme,
   pressTool,
   ready,
   settingsPanel,
   shortcutsButton,
+  sidewaysOverflow,
   themeToggle,
   windowOf,
 } from './support';
@@ -103,7 +105,7 @@ test("the shortcuts button switches by the header's own width, where all of it f
   test.skip(isMobile, 'the shortcuts button is hidden on touch-first devices');
   await page.goto('/');
   // The page's own header: on the dev server, as on CI, Astro's dev toolbar draws headers too.
-  const header = page.locator('main > header');
+  const header = pageHeader(page);
   const headerWidth = () => header.evaluate((el) => el.getBoundingClientRect().width);
   // The page's 16 px gutters aside, a 600 px window leaves the header under 576 px, its container
   // xl size: no shortcuts button. The windows are sized by the content (windowOf).
@@ -225,22 +227,16 @@ for (const width of [320, 351, 352, 375, 400, 415, 416, 430, 520, 600, 610, 640]
     await ready(page);
     await windowOf(page, width, 800);
     // The toolbar refits to the new width a frame later: wait until nothing passes the window.
-    await expect
-      .poll(
-        () =>
-          page.evaluate(
-            () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-          ),
-        { message: `${width}px` },
-      )
-      .toBeLessThanOrEqual(0);
+    await expect.poll(() => sidewaysOverflow(page), { message: `${width}px` }).toBe(0);
     for (const theme of THEMES) {
       await applyTheme(page, theme);
       await expect(page.locator(`header [data-art="${theme.id}"]`), theme.id).toBeVisible();
-      const m = await page.evaluate(() => {
+      // Nothing passes the window sideways in this theme either.
+      await expect.poll(() => sidewaysOverflow(page), { message: theme.id }).toBe(0);
+      const m = await pageHeader(page).evaluate((own) => {
         const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
-        const header = box('main > header');
-        const name = box('main > header h1');
+        const header = own.getBoundingClientRect();
+        const name = own.querySelector('h1')!.getBoundingClientRect();
         const menus = box('[data-header-menus]');
         const copyUrl = box('[aria-label="Copy URL"]');
         const button = document.querySelector('[data-theme-name]')!.closest('button')!;
@@ -251,11 +247,6 @@ for (const width of [320, 351, 352, 375, 400, 415, 416, 430, 520, 600, 610, 640]
           .getBoundingClientRect();
         const chevron = button.querySelector('svg')!.getBoundingClientRect();
         return {
-          // Sideways overflow alone: the scrollbar's room leaves the content short of the window.
-          overflow: Math.max(
-            0,
-            document.documentElement.scrollWidth - document.documentElement.clientWidth,
-          ),
           ownLine: menus.top >= name.bottom,
           left: Math.round(menus.left - header.left),
           right: Math.round(header.right - menus.right),
@@ -266,7 +257,6 @@ for (const width of [320, 351, 352, 375, 400, 415, 416, 430, 520, 600, 610, 640]
           padRight: Math.round(trigger.right - chevron.right),
         };
       });
-      expect(m.overflow, theme.id).toBe(0);
       expect(m.ownLine, theme.id).toBe(ownLine);
       expect(m.copyShown, theme.id).toBe(copyShown);
       if (copyShown) expect(m.iconsFirst, theme.id).toBe(true);
@@ -319,8 +309,8 @@ test('the header ends where the box ends, with Units open too, which opens besid
 }) => {
   test.skip(isMobile, 'below md the side panel opens between the box and the table');
   const edges = () =>
-    page.evaluate(() => {
-      const header = document.querySelector('main > header')!.getBoundingClientRect();
+    pageHeader(page).evaluate((own) => {
+      const header = own.getBoundingClientRect();
       const box = document.querySelector('[data-head]')!.getBoundingClientRect();
       return {
         header: Math.round(header.right),

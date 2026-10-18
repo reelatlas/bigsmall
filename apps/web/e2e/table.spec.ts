@@ -8,17 +8,20 @@ import {
   box,
   calculatorButton,
   calculatorPanel,
+  copyCell,
   expectNoA11yViolations,
   hiddenToggle,
   MARGIN_MS,
   menu,
   ready,
   row,
+  sectionIds,
   setSettings,
   settingsButton,
   settingsPanel,
   shortcutsButton,
   showEverything,
+  sidewaysOverflow,
   unitCell,
   windowOf,
 } from './support';
@@ -910,20 +913,17 @@ test('the categories go four across once the column has the room, and fit in eve
 });
 
 test('at 320 px the rows and the categories fit without scrolling sideways', async ({ page }) => {
+  // A true 320 px window, the rule's own case (docs/LEARNINGS.md, 2026-10-18).
   await page.setViewportSize({ width: 320, height: 800 });
-  const overflow = () =>
-    page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
   await page.goto('/?a=kilometer-per-hour&v=100');
   await ready(page);
   await expect(row(page, 'mile-per-hour')).toBeVisible();
-  // Nothing past the window; the scrollbar's room leaves the content short of it, never over.
-  expect(await overflow()).toBeLessThanOrEqual(0);
+  // Nothing past the window.
+  expect(await sidewaysOverflow(page)).toBe(0);
   await page.goto('/');
   await ready(page);
   await expect(tiles(page)).toBeVisible();
-  expect(await overflow()).toBeLessThanOrEqual(0);
+  expect(await sidewaysOverflow(page)).toBe(0);
 });
 
 test('a line between sections sits evenly between their text, and the first heading clear of the top', async ({
@@ -1026,20 +1026,20 @@ test('a long name wraps in Edit, in Hidden, and among the hidden matches, never 
   };
   const card = page.locator('[data-table-card]');
   await card.getByRole('button', { name: 'Edit', exact: true }).click();
-  await expectWhole('[data-list="shown"] label[data-unit] > span:last-child', 'per 100 kilometers');
+  await expectWhole('[data-list="shown"] label[data-unit] [data-name]', 'per 100 kilometers');
   // Sent to Hidden, it wraps there too.
   await card.getByLabel(/miles per imperial gallon/).click();
   await card.getByRole('button', { name: 'Done', exact: true }).click();
   await hiddenToggle(page).click();
-  await expectWhole('[data-list="hidden"] label[data-unit] > span:last-child', 'imperial gallon');
+  await expectWhole('[data-list="hidden"] label[data-unit] [data-name]', 'imperial gallon');
   // Its symbol keeps one line, as the matches keep theirs.
-  const symbols = await names('[data-list="hidden"] label[data-unit] > span:first-of-type');
+  const symbols = await names('[data-list="hidden"] label[data-unit] [data-symbol]');
   expect(symbols.filter((symbol) => symbol.lines > 1)).toEqual([]);
   // And among the hidden matches its name brings up.
   await box(page).fill('5 miles per imperial');
   await page.getByRole('button', { name: 'Show them' }).click();
   await expectWhole(
-    '[role="listbox"][aria-labelledby] [role="option"] > span:last-child > span:first-child',
+    '[role="listbox"][aria-labelledby] [role="option"] [data-name]',
     'imperial gallon',
   );
   // The line's button keeps its words on one line, the line's own words wrapping beside it.
@@ -1175,10 +1175,7 @@ test('the intro has a line of its own; the toolbar under it is one row, which a 
         1,
       );
       // The page itself never scrolls sideways.
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
-        theme.id,
-      ).toBe(true);
+      expect(await sidewaysOverflow(page), theme.id).toBe(0);
     }
   }
   await expect(box(page)).toHaveAccessibleDescription(words);
@@ -1220,7 +1217,7 @@ test('More: a tool the row had no room for acts from the menu, with the keys, an
   await expect(box(page)).toBeFocused();
   await expectNoA11yViolations(page);
   // At 320 px Display folds too; opened from More, its panel closes back onto More.
-  await page.setViewportSize({ width: 320, height: 800 });
+  await windowOf(page, 320, 800);
   await expect(settingsButton(page, 'Display')).toHaveCount(0);
   await more.click();
   await page.getByRole('menuitem', { name: 'Display' }).click();
@@ -1243,7 +1240,6 @@ test('one copy button, laid over the active row’s end, copies what the row sho
   await page.goto('/?a=foot&v=2');
   await ready(page);
   await box(page).click();
-  const copyCell = (unitId: string) => row(page, unitId).locator('[data-copy-cell]');
   const shown = () =>
     page
       .locator('[data-copy-cell]')
@@ -1267,7 +1263,7 @@ test('one copy button, laid over the active row’s end, copies what the row sho
   // The mouse's row shows it instead, and it copies what the row shows, not the full value.
   await unitCell(page, 'meter').hover();
   await expect.poll(shown).toEqual(['meter']);
-  const copyMeter = copyCell('meter').getByRole('button', { name: /^Copy/ });
+  const copyMeter = copyCell(page, 'meter').getByRole('button', { name: /^Copy/ });
   await copyMeter.click();
   await expect(copyMeter.locator('[data-copied]')).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
@@ -1312,28 +1308,26 @@ test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds
   await expect(row(page, 'kilometer-per-hour')).toContainText('10.91');
   await expect(row(page, 'minute-per-mile')).toContainText('8:51');
   // The paces in a section of their own, after the speeds' (Sean, 2026-10-16).
-  const sections = await page
-    .locator('[data-section]')
-    .evaluateAll((all) => all.map((section) => section.getAttribute('data-section')));
-  expect(sections.at(-1)).toBe('pace');
-  // The colon lines up with the decimal points, as a decimal point would.
-  const lineUp = await page.evaluate(() =>
-    ['kilometer-per-hour', 'minute-per-mile'].map((id) =>
-      Math.round(
-        document.querySelector(`[data-row="${id}"] [data-whole]`)!.getBoundingClientRect().right,
+  expect((await sectionIds(page)).at(-1)).toBe('pace');
+  // The colon lines up with the decimal points, as a decimal point would, in every theme, whose
+  // number faces differ (monospace, serif).
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const lineUp = await page.evaluate(() =>
+      ['kilometer-per-hour', 'minute-per-mile'].map((id) =>
+        Math.round(
+          document.querySelector(`[data-row="${id}"] [data-whole]`)!.getBoundingClientRect().right,
+        ),
       ),
-    ),
-  );
-  expect(Math.abs(lineUp[0]! - lineUp[1]!)).toBeLessThanOrEqual(1);
+    );
+    expect(Math.abs(lineUp[0]! - lineUp[1]!), theme.id).toBeLessThanOrEqual(1);
+  }
   // The link keeps the minutes and seconds as typed.
   await expect(page).toHaveURL(/[?&]v=5%3A30/);
 
   if (!isMobile) {
     await unitCell(page, 'minute-per-mile').hover();
-    await row(page, 'minute-per-mile')
-      .locator('[data-copy-cell]')
-      .getByRole('button', { name: /^Copy/ })
-      .click();
+    await copyCell(page, 'minute-per-mile').getByRole('button', { name: /^Copy/ }).click();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('8:51');
   }
 
@@ -1390,10 +1384,7 @@ test('Cooking: "2 cups flour" takes the cup and the flour, two pills, Weight the
   await expect(page.getByRole('button', { name: 'Remove all-purpose flour' })).toBeVisible();
   await expect(box(page)).toHaveValue('2');
   await expect(menu(page)).toHaveText(/Cooking/);
-  const sections = await page
-    .locator('[data-section]')
-    .evaluateAll((all) => all.map((section) => section.textContent?.trim()));
-  expect(sections).toEqual(['Weight', 'Volume']);
+  expect(await sectionIds(page)).toEqual(['weight', 'volume']);
   // A weight goes through the flour's density, said "about"; a volume stays exact.
   await expect(row(page, 'gram')).toContainText('≈ 254.00');
   await expect(row(page, 'gram')).toContainText('about 254.00');
@@ -1452,40 +1443,51 @@ test('Cooking’s box keeps one line where it can, fitted as with one pill: the 
   isMobile,
 }) => {
   test.skip(isMobile, 'the widths are set here');
-  // The row's state, as the fit leaves it.
-  const fit = () =>
-    page.evaluate(() => {
-      const input = document.querySelector<HTMLInputElement>('input[role="combobox"]')!;
+  // The row's state, as the fit leaves it: the chip's name as a person sees it, shown or given way.
+  const name = page
+    .getByRole('button', { name: 'Unit: fluid ounces' })
+    .getByText('fluid ounces', { exact: true });
+  const fit = async () => ({
+    ...(await box(page).evaluate((input) => {
       const row = input.parentElement!.parentElement!;
-      const name = row.querySelector<HTMLElement>('[aria-label^="Unit:"] span span:last-child');
       return {
         wrapped: row.hasAttribute('data-wrap'),
-        named: !name?.hidden,
         size: parseFloat(getComputedStyle(input).fontSize),
         height: Math.round(row.getBoundingClientRect().height),
       };
-    });
-  await page.setViewportSize({ width: 1280, height: 800 });
-  // A short number and both names on one line (Sean, 2026-10-16: "123" wrapped on a desktop).
+    })),
+    named: await name.isVisible(),
+  });
   await page.goto('/?a=us-fluid-ounce&v=123&i=all-purpose-flour');
   await ready(page);
-  // Whether the unit's name shows beside it depends on the system's fonts, the themes' own.
-  const full = await fit();
-  expect(full).toMatchObject({ wrapped: false, height: 60 });
-  // A longer one: too long for its full size beside both names, short enough for one line at a
-  // smaller size in any font: the unit's name gives way, the number steps down, still one line.
-  await box(page).fill('6.66666667111');
-  await expect.poll(fit).toMatchObject({ wrapped: false, named: false, height: 60 });
-  expect((await fit()).size).toBeLessThan(full.size);
-  // At a phone's width the pills take a line of their own under the number.
-  await page.setViewportSize({ width: 320, height: 640 });
-  await expect.poll(async () => (await fit()).wrapped).toBe(true);
-  await expect(page.getByRole('button', { name: 'Ingredient: all-purpose flour' })).toBeVisible();
+  // In every theme, whose fonts set what fits beside the pills.
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    // A short number and both names on one line (Sean, 2026-10-16: "123" wrapped on a desktop).
+    // Whether the unit's name shows beside it depends on the system's fonts, the theme's own.
+    await box(page).fill('123');
+    await expect.poll(fit, { message: theme.id }).toMatchObject({ wrapped: false, height: 60 });
+    const full = await fit();
+    // A longer one: too long for its full size beside both names, short enough for one line at a
+    // smaller size in any font: the unit's name gives way, the number steps down, still one line.
+    await box(page).fill('6.66666667111');
+    await expect
+      .poll(fit, { message: theme.id })
+      .toMatchObject({ wrapped: false, named: false, height: 60 });
+    expect((await fit()).size, theme.id).toBeLessThan(full.size);
+    // At a phone's width the pills take a line of their own under the number.
+    await page.setViewportSize({ width: 320, height: 640 });
+    await expect.poll(async () => (await fit()).wrapped, { message: theme.id }).toBe(true);
+    await expect(
+      page.getByRole('button', { name: 'Ingredient: all-purpose flour' }),
+      theme.id,
+    ).toBeVisible();
+  }
   // Empty, the number keeps its placeholder's room.
   await box(page).fill('');
-  const placeholder = await page.evaluate(() => {
-    const layer = document.querySelector('input[role="combobox"]')!
-      .nextElementSibling as HTMLElement;
+  const placeholder = await box(page).evaluate((input) => {
+    const layer = input.nextElementSibling as HTMLElement;
     return { text: layer.textContent, whole: layer.scrollWidth <= layer.clientWidth };
   });
   expect(placeholder).toEqual({ text: 'Number', whole: true });
@@ -1506,7 +1508,7 @@ test('Cooking: the ingredient’s pill opens every ingredient under its kind, th
   await expect.poll(() => page.evaluate(() => Math.round(scrollY))).toBe(60);
   await pill.click();
   await expect(pill).toHaveAttribute('aria-expanded', 'true');
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(MARGIN_MS);
   expect(await page.evaluate(() => Math.round(scrollY))).toBe(60);
   await page.evaluate(() => scrollTo(0, 0));
   const list = page.getByRole('listbox', { name: 'Matches' });
@@ -1728,7 +1730,10 @@ test('a long number steps down a size and fits, or scrolls at the smallest; its 
   // A row's value in exponent form sets its marker as the box does, and reads whole.
   const marker = row(page, 'millimeter').locator('[data-marker]');
   await expect(marker).toHaveText('E');
-  expect(await marker.evaluate((el) => getComputedStyle(el).fontWeight)).toBe('600');
+  // At least semibold, as the matched letters are set.
+  expect(
+    await marker.evaluate((el) => Number(getComputedStyle(el).fontWeight)),
+  ).toBeGreaterThanOrEqual(600);
   await expect(unitCell(page, 'millimeter')).toHaveAccessibleName(/^1\.5E27 mm millimeters/);
 });
 

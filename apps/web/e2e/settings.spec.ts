@@ -10,6 +10,7 @@ import {
   ready,
   recordAnimations,
   row,
+  sectionIds,
   setSettings,
   settingsButton,
   settingsPanel,
@@ -17,6 +18,7 @@ import {
   startedAnimations,
   unitCell,
   themeTime,
+  tokenColor,
 } from './support';
 import { THEMES } from '../src/lib/themes';
 
@@ -39,16 +41,10 @@ test('a fresh visit shows symbols and names, two places, and the specialty units
   await expect(hiddenToggle(page)).toContainText(String(SPECIALTY));
 
   await settingsButton(page, 'Units').click();
-  await expect(
-    settingsPanel(page, 'Units')
-      .locator('label', { hasText: /^Standard$/ })
-      .locator('input'),
-  ).toBeChecked();
+  await expect(settingsPanel(page, 'Units').getByRole('radio', { name: 'Standard' })).toBeChecked();
   await settingsButton(page, 'Display').click();
   await expect(
-    settingsPanel(page, 'Display')
-      .locator('label', { hasText: /^Symbol and name$/ })
-      .locator('input'),
+    settingsPanel(page, 'Display').getByRole('radio', { name: 'Symbol and name' }),
   ).toBeChecked();
   await expectNoA11yViolations(page);
 
@@ -76,7 +72,7 @@ test('Alt+V and Alt+B open and close Units and Display from anywhere, focus comi
   await box(page).click();
   await page.keyboard.press('Alt+v');
   await expect(units).toBeVisible();
-  await expect(units.locator('label', { hasText: /^Standard$/ }).locator('input')).toBeFocused();
+  await expect(units.getByRole('radio', { name: 'Standard' })).toBeFocused();
   // One over the other: Display replaces Units, focus going into it.
   await page.keyboard.press('Alt+b');
   await expect(units).toHaveCount(0);
@@ -108,17 +104,10 @@ test('Units and Display open beside the table, one side panel at a time with the
   const calculator = calculatorPanel(page);
   // Opening moves focus in, onto its first choice, and its edge turns the accent.
   await settingsButton(page, 'Units').click();
-  await expect(units.locator('label', { hasText: /^Standard$/ }).locator('input')).toBeFocused();
+  await expect(units.getByRole('radio', { name: 'Standard' })).toBeFocused();
   const edge = () => units.evaluate((panel) => getComputedStyle(panel).borderTopColor);
   // The theme's accent as a computed color, for the edge to ease to.
-  const accent = await units.evaluate((panel) => {
-    const probe = document.createElement('span');
-    probe.style.color = getComputedStyle(panel).getPropertyValue('--accent');
-    panel.append(probe);
-    const color = getComputedStyle(probe).color;
-    probe.remove();
-    return color;
-  });
+  const accent = await tokenColor(page, '--accent');
   await expect.poll(edge).toBe(accent);
   await page.keyboard.press('Escape');
   await expect(units).toHaveCount(0);
@@ -147,7 +136,7 @@ test('Units and Display open beside the table, one side panel at a time with the
   await display.getByRole('button', { name: 'Reset display' }).click();
   await expect(display).toBeVisible();
   await expect(display.getByRole('status')).toHaveText('Display reset');
-  await expect(display.locator('label', { hasText: /^Decimal$/ }).locator('input')).toBeChecked();
+  await expect(display.getByRole('radio', { name: 'Decimal' })).toBeChecked();
 });
 
 test('the Hidden list brings a unit back into its section; Edit sends one to Hidden, which stays below it, Done in its place, and Done folds Hidden', async ({
@@ -422,10 +411,7 @@ test("the systems reorder in Units, by a handle's Move menu or a drag, and the t
   await ready(page);
   await settingsButton(page, 'Units').click();
   const units = settingsPanel(page, 'Units');
-  const sections = () =>
-    table(page)
-      .locator('[data-section]')
-      .evaluateAll((all) => all.map((each) => each.getAttribute('data-section')));
+  const sections = () => sectionIds(page);
   await expect.poll(sections).toEqual(['us', 'metric', 'uk']);
   // A press on a handle, with no drag, opens Move up and Move down.
   await units.getByRole('button', { name: 'Move Metric' }).click();
@@ -466,10 +452,7 @@ test("Alt and an arrow move a system's row; Escape closes its Move menu, the pan
   await ready(page);
   await settingsButton(page, 'Units').click();
   const units = settingsPanel(page, 'Units');
-  const sections = () =>
-    table(page)
-      .locator('[data-section]')
-      .evaluateAll((all) => all.map((each) => each.getAttribute('data-section')));
+  const sections = () => sectionIds(page);
   const uk = units.getByRole('checkbox', { name: 'UK (imperial)' });
   await uk.focus();
   await page.keyboard.press('Alt+ArrowUp');
@@ -557,13 +540,7 @@ test('settings are remembered in this browser: what shows, Custom, the order, an
   await ready(page);
   await expect(row(page, 'imperial-gallon')).toHaveCount(0);
   await expect(row(page, 'liter')).toContainText('1/2');
-  await expect
-    .poll(() =>
-      table(page)
-        .locator('[data-section]')
-        .evaluateAll((all) => all.map((each) => each.getAttribute('data-section'))),
-    )
-    .toEqual(['metric', 'us']);
+  await expect.poll(() => sectionIds(page)).toEqual(['metric', 'us']);
   await settingsButton(page, 'Units').click();
   await expect(settingsPanel(page, 'Units').getByRole('radio', { name: /^Custom/ })).toBeChecked();
 });
@@ -622,15 +599,20 @@ test('fractions, both, and rounding write the values and never move the columns'
         [...cell.children].map((child) => Math.round(child.getBoundingClientRect().right)),
       );
 
-  await setSettings(page, 'Fraction');
-  await expect(row(page, 'foot')).toContainText('6 1/4');
-  const fractionEdges = await edges();
-  await setSettings(page, 'Up');
-  await expect(row(page, 'foot')).toContainText('6 3/8');
-  expect(await edges()).toEqual(fractionEdges);
-  await setSettings(page, 'Down');
-  await expect(row(page, 'foot')).toContainText('6 1/4');
-  expect(await edges()).toEqual(fractionEdges);
+  // In every theme, whose figures differ in width (monospace, serif): the columns are sized for
+  // every rounding at once, so a change of rounding moves none of them.
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    await setSettings(page, 'Fraction', 'Nearest');
+    await expect(row(page, 'foot')).toContainText('6 1/4');
+    const fractionEdges = await edges();
+    await setSettings(page, 'Up');
+    await expect(row(page, 'foot')).toContainText('6 3/8');
+    expect(await edges(), theme.id).toEqual(fractionEdges);
+    await setSettings(page, 'Down');
+    await expect(row(page, 'foot')).toContainText('6 1/4');
+    expect(await edges(), theme.id).toEqual(fractionEdges);
+  }
 
   // Both: the decimal first, its fraction after it.
   await setSettings(page, 'Nearest', 'Both');

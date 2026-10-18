@@ -27,6 +27,7 @@ import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { glide } from './glide';
 import { DisplayPanel, UnitsPanel } from './SettingsPanels';
 import type { Settings } from './settings';
+import { TABLE_PRECISION } from './state';
 import { TableLayout, type ToolbarTool } from './TableLayout';
 import { urlFor } from './url';
 import { useConverter } from './useConverter';
@@ -264,7 +265,7 @@ export function Converter() {
    */
   const copyRow = (unitId: string) => {
     const row = table.kind === 'units' ? table.rows.find((each) => each.id === unitId) : undefined;
-    const text = row ? copiedText(row, settings.display, env.locale) : null;
+    const text = row ? copiedText(row, settings.display, env.locale, TABLE_PRECISION) : null;
     if (text === null) return;
     copy(text, `row-${unitId}`);
     // The pair someone needed: from the box's unit to the row's (ADR 0019).

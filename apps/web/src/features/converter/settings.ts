@@ -315,7 +315,7 @@ export interface Display {
   names: 'symbol' | 'both';
   /** Both writes the decimal, then its fraction, as Format lists them. */
   format: 'decimal' | 'fraction' | 'both';
-  /** Decimal places, or null for no limit: the table's six significant digits. */
+  /** Decimal places, or null for no limit: the table's six significant digits, rounded as chosen too. */
   places: 1 | 2 | 3 | null;
   /** The fraction sizes chosen, each on or off by itself. */
   fractions: ReadonlySet<FractionSize>;

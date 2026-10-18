@@ -32,6 +32,7 @@ import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from '.
 import {
   ingredientList,
   noMatchMessage,
+  TABLE_PRECISION,
   type BoxView,
   type HistoryAction,
   type TableRow,
@@ -965,6 +966,7 @@ export function TableLayout({
         every={sectionsOf(table.all, env.system, orderOf(settings, env.system))}
         message={table.message}
         display={display}
+        significant={TABLE_PRECISION}
         locale={env.locale}
         cursor={browsing ? at : -1}
         itemId={itemId}

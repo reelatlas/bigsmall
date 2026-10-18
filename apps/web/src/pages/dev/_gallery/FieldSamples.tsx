@@ -13,6 +13,7 @@ import { ValueField } from '../../../components/ValueField';
 import {
   initialState,
   selectTable,
+  TABLE_PRECISION,
   type ConverterState,
   type TableRow,
   type TableView,
@@ -142,6 +143,7 @@ function TableSample({
       every={sectionsOf(view.all, ENV.system)}
       message={view.message}
       display={display}
+      significant={TABLE_PRECISION}
       locale={ENV.locale}
       cursor={cursor}
       itemId={itemId}

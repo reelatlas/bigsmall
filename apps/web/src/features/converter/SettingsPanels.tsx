@@ -318,7 +318,6 @@ export function DisplayPanel({
           { value: 'down', label: 'Down' },
         ]}
         value={display.rounding}
-        disabled={display.format === 'decimal' && display.places === null}
         onChange={(rounding) => setDisplay({ rounding })}
       />
       {/* Which way first (Sean, 2026-10-15), then what to: decimals, then fractions, as Format

@@ -630,6 +630,28 @@ test('fractions, both, and rounding write the values and never move the columns'
   await expectNoA11yViolations(page);
 });
 
+test('No limit rounds its six significant digits as chosen too: Up and Down stay on', async ({
+  page,
+}) => {
+  // No limit is a cut like any other, at the sixth digit (docs/UX-SPEC.md §7; Sean, 2026-10-18:
+  // the modes were off with it until then).
+  await page.goto('/?a=meter&v=1');
+  await ready(page);
+  await setSettings(page, 'No limit');
+  await expect(row(page, 'yard')).toContainText('1.09361');
+  await expect(row(page, 'inch')).toContainText('39.3701');
+  await setSettings(page, 'Up');
+  await expect(row(page, 'yard')).toContainText('1.09362');
+  await expect(row(page, 'inch')).toContainText('39.3701');
+  await setSettings(page, 'Down');
+  await expect(row(page, 'yard')).toContainText('1.09361');
+  // Trailing zeros are never written, as the table's own text never writes them.
+  await expect(row(page, 'inch')).toContainText('39.37');
+  await expect(row(page, 'inch')).not.toContainText('39.370');
+  await setSettings(page, 'Nearest');
+  await expect(row(page, 'inch')).toContainText('39.3701');
+});
+
 test("where Both's fraction has no room beside the decimal, it sits under it, lined up on the point, and the row keeps its height", async ({
   page,
 }) => {

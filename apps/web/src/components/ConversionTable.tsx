@@ -1,6 +1,7 @@
 import {
   formatFraction,
   formatPlaces,
+  formatSignificant,
   localeSeparators,
   type FractionSize,
   type Rounded,
@@ -105,6 +106,8 @@ export interface ConversionTableProps<T extends ConversionRow> {
   /** In place of the rows when the value has no answer: "Too large to convert". */
   message: string | null;
   display: TableDisplay;
+  /** Significant digits a value is written to with no decimal limit: the table's six. */
+  significant: number;
   locale: string | undefined;
   /** The row the field's cursor is on, by index into the shown rows, or -1. */
   cursor: number;
@@ -234,20 +237,34 @@ export function copiedText(
   row: ConversionRow,
   display: TableDisplay,
   locale: string | undefined,
+  significant: number,
 ): string | null {
   if (row.tone !== 'value') return null;
-  const written = row.value === null || row.clock ? null : firstWritten(row.value, display, locale);
+  const written =
+    row.value === null || row.clock ? null : firstWritten(row.value, display, locale, significant);
   return (written?.text ?? row.text).replaceAll(MINUS, '-');
 }
 
-/** A value as the display writes it first: its fraction with Fraction, else its decimal. */
-function firstWritten(value: number, display: TableDisplay, locale: string | undefined) {
+/**
+ * A value as the display writes it first: its fraction with Fraction, else its decimal. With no
+ * limit, the row's own text is already the nearest six significant digits; Up and Down take the
+ * same cut their way (Sean, 2026-10-18: no limit is still a cut).
+ */
+function firstWritten(
+  value: number,
+  display: TableDisplay,
+  locale: string | undefined,
+  significant: number,
+) {
+  const { rounding } = display;
   if (display.format === 'fraction') {
-    return formatFraction(value, { sizes: display.fractions, rounding: display.rounding, locale });
+    return formatFraction(value, { sizes: display.fractions, rounding, locale });
   }
-  return display.places === null
-    ? null
-    : formatPlaces(value, { places: display.places, rounding: display.rounding, locale });
+  if (display.places !== null)
+    return formatPlaces(value, { places: display.places, rounding, locale });
+  if (rounding === 'nearest') return null;
+  const text = formatSignificant(value, { digits: significant, rounding, locale });
+  return text === null ? null : { text, approx: false };
 }
 
 /** Both's fraction, after the decimal. */
@@ -298,9 +315,11 @@ function valueParts(
   display: TableDisplay,
   locale: string | undefined,
   mark: string,
+  significant: number,
 ): ValueParts {
   if (row.tone !== 'value') return { across: row.text };
-  const written = row.value === null || row.clock ? null : firstWritten(row.value, display, locale);
+  const written =
+    row.value === null || row.clock ? null : firstWritten(row.value, display, locale, significant);
   if (display.format === 'fraction' && !row.clock) return { across: writtenText(row, written) };
   const text = written?.text ?? row.text;
   let at = text.indexOf(mark);
@@ -341,6 +360,7 @@ export function ConversionTable<T extends ConversionRow>({
   every,
   message,
   display,
+  significant,
   locale,
   cursor,
   itemId,
@@ -417,7 +437,8 @@ export function ConversionTable<T extends ConversionRow>({
     if (hiddenCount > before.hidden) flash(hiddenToggleRef.current);
   });
 
-  const parts = (row: T, under: TableDisplay = display) => valueParts(row, under, locale, mark);
+  const parts = (row: T, under: TableDisplay = display) =>
+    valueParts(row, under, locale, mark, significant);
   const secondOf = (row: T, under: TableDisplay = display) =>
     row.tone !== 'value' || row.value === null || row.clock
       ? null

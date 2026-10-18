@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   formatFraction,
   formatPlaces,
+  formatSignificant,
   fractionsOf,
   type FractionSize,
   type Rounding,
@@ -158,5 +159,52 @@ describe('formatFraction', () => {
   it('leaves a value with no size chosen, or past where places mean anything, to its digits', () => {
     expect(fraction(0.5, sizes())).toBeNull();
     expect(fraction(2e15, eighths)).toBeNull();
+  });
+});
+
+const significant = (value: number, rounding: Rounding = 'nearest', digits = 6) =>
+  formatSignificant(value, { digits, rounding, locale: 'en-US' });
+
+// No limit is the table's six significant digits, a cut like any other, so it rounds as chosen
+// (docs/UX-SPEC.md §7; Sean, 2026-10-18).
+describe('formatSignificant', () => {
+  it('writes a value to six significant digits, rounded to the nearest, up, or down', () => {
+    expect(significant(1 / 3)).toBe('0.333333');
+    expect(significant(1 / 3, 'up')).toBe('0.333334');
+    expect(significant(1 / 3, 'down')).toBe('0.333333');
+    expect(significant(2 / 3)).toBe('0.666667');
+    expect(significant(2 / 3, 'down')).toBe('0.666666');
+    expect(significant(1234567.89)).toBe('1,234,570');
+    expect(significant(1234567.89, 'up')).toBe('1,234,570');
+    expect(significant(1234567.89, 'down')).toBe('1,234,560');
+  });
+
+  it('goes toward larger values up and smaller down, below zero too, as ceiling and floor do', () => {
+    expect(significant(-2 / 3)).toBe('-0.666667');
+    expect(significant(-2 / 3, 'up')).toBe('-0.666666');
+    expect(significant(-2 / 3, 'down')).toBe('-0.666667');
+  });
+
+  it('leaves a value already at its digits alone in every direction, float noise and all', () => {
+    expect(significant(0.1, 'up')).toBe('0.1');
+    expect(significant(0.3048, 'up')).toBe('0.3048');
+    expect(significant(0.3048, 'down')).toBe('0.3048');
+    expect(significant(1609.344, 'down')).toBe('1,609.34');
+    expect(significant(1609.344, 'up')).toBe('1,609.35');
+  });
+
+  it('carries into the next digit, and takes the scientific form where the table does', () => {
+    expect(significant(9.999999, 'up')).toBe('10');
+    expect(significant(99999.95)).toBe('100,000');
+    expect(significant(1e20 / 3)).toBe('3.33333E19');
+    expect(significant(1e20 / 3, 'up')).toBe('3.33334E19');
+    expect(significant(0.000001 / 3, 'up')).toBe('3.33334E-7');
+  });
+
+  it('writes zero as zero, and nothing for what is not finite', () => {
+    expect(significant(0)).toBe('0');
+    expect(significant(-0, 'down')).toBe('0');
+    expect(significant(Number.POSITIVE_INFINITY)).toBeNull();
+    expect(significant(Number.NaN, 'up')).toBeNull();
   });
 });

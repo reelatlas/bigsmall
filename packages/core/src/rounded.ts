@@ -1,8 +1,10 @@
 /**
  * Values written to a chosen step (docs/UX-SPEC.md §7, ADR 0018): to a number of decimal places,
  * or as fractions in the sizes chosen, rounded to the nearest, up, or down. The table's own text,
- * six significant digits (formatNumber), is what a caller falls back to wherever these return null.
+ * six significant digits (formatNumber), is what a caller falls back to wherever these return null;
+ * formatSignificant writes that same cut rounded up or down, since no limit is still a cut.
  */
+import { formatNumber } from './format';
 
 /** Up is toward larger values and down toward smaller, below zero too, as ceiling and floor are. */
 export type Rounding = 'nearest' | 'up' | 'down';
@@ -96,6 +98,28 @@ export function formatPlaces(
   if (result === 0 && value !== 0)
     return belowStep(value, written.format(1 / scale), options.locale);
   return { text: written.format(Object.is(result, -0) ? 0 : result), approx: false };
+}
+
+/**
+ * A value to `digits` significant digits, rounded as chosen, written as the table's own text is
+ * (formatNumber: grouped, trailing zeros trimmed, scientific past its magnitudes). What No limit
+ * shows: no limit is still a cut, at the sixth digit, so Up and Down apply there too (Sean,
+ * 2026-10-18). Null for a value that is not finite.
+ */
+export function formatSignificant(
+  value: number,
+  options: { digits: number; rounding: Rounding; locale?: string | undefined },
+): string | null {
+  if (!Number.isFinite(value)) return null;
+  const { digits, rounding, locale } = options;
+  if (value === 0) return formatNumber(0, { precision: digits, locale });
+  // The exponent from the value's own scientific form, exact where a logarithm might not be.
+  const exponent = Number(value.toExponential().split('e')[1]);
+  const scale = 10 ** (digits - 1 - exponent);
+  const result = rounded(value * scale, rounding) / scale;
+  // At the ends of what a double holds the scale or the result overflows: the nearest digits then.
+  const written = Number.isFinite(scale) && Number.isFinite(result) && scale !== 0 ? result : value;
+  return formatNumber(written, { precision: digits, locale });
 }
 
 /**

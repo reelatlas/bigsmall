@@ -46,5 +46,11 @@ export {
 } from './cooking';
 export type { CupBasis, IngredientMatch } from './cooking';
 export type { FormatOptions } from './format';
-export { formatFraction, formatPlaces, fractionsOf, FRACTION_SIZES } from './rounded';
+export {
+  formatFraction,
+  formatPlaces,
+  formatSignificant,
+  fractionsOf,
+  FRACTION_SIZES,
+} from './rounded';
 export type { Fraction, FractionSize, Rounded, Rounding } from './rounded';

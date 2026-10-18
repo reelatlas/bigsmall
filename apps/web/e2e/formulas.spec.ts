@@ -1,14 +1,23 @@
 import { categories, ingredients, units } from '@bigsmall/core';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 // Every formula on the About page (docs/UX-SPEC.md §1, "About"): folded by category, Show all and
-// Hide all, and Copy all as plain text.
+// Hide all, and Copy all as plain text. Under its tab since 2026-10-18.
+
+/** The About page with Every formula open: its hash opens the tab once the tabs hydrate. */
+async function openFormulas(page: Page) {
+  await page.goto('/about/#formulas');
+  await expect(page.getByRole('tab', { name: 'Every formula' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  return page.getByRole('tabpanel', { name: 'Every formula' });
+}
 
 test('the About page lists every formula, folded; Show all opens them, Hide all closes them', async ({
   page,
 }) => {
-  await page.goto('/about/');
-  const section = page.getByRole('region', { name: 'Every formula' });
+  const section = await openFormulas(page);
   const groups = section.locator('details');
   await expect(groups).toHaveCount(categories.length);
   // Every unit, and under Cooking every ingredient by the cup.
@@ -30,12 +39,13 @@ test('the About page lists every formula, folded; Show all opens them, Hide all 
   await expect(section.locator('details[open]')).toHaveCount(0);
 });
 
-test('the About page heads the sketchbook and the formulas, and counts what the list holds', async ({
+test('the About page heads the sketchbook, titles the formulas by their tab, and counts what the list holds', async ({
   page,
 }) => {
-  await page.goto('/about/');
+  const section = await openFormulas(page);
   await expect(page.getByRole('heading', { name: 'The sketchbook', level: 2 })).toBeVisible();
-  const section = page.getByRole('region', { name: 'Every formula' });
+  // The tab is the title: no heading doubles it (Sean, 2026-10-18).
+  await expect(page.getByRole('heading', { name: 'Every formula' })).toHaveCount(0);
   await expect(section).toContainText(
     `${units.length} units · ${categories.length} categories · 16 digits in each factor`,
   );
@@ -48,8 +58,7 @@ test('the About page heads the sketchbook and the formulas, and counts what the 
 test('the bar with Hide all stays at the window’s top while the open list scrolls past', async ({
   page,
 }) => {
-  await page.goto('/about/');
-  const section = page.getByRole('region', { name: 'Every formula' });
+  const section = await openFormulas(page);
   await section.getByRole('button', { name: 'Show all' }).click();
   const hide = section.getByRole('button', { name: 'Hide all' });
   await expect(hide).toBeVisible();
@@ -66,25 +75,23 @@ test('the bar with Hide all stays at the window’s top while the open list scro
 test('the tools sit on the list’s left edge, Show all’s chevron over the categories’ own', async ({
   page,
 }) => {
-  await page.goto('/about/');
-  const section = page.getByRole('region', { name: 'Every formula' });
+  const section = await openFormulas(page);
   const left = (svg: ReturnType<typeof section.locator>) =>
     svg.evaluate((icon) => icon.getBoundingClientRect().left);
   const chevron = await left(section.getByRole('button', { name: 'Show all' }).locator('svg'));
   const category = await left(section.locator('summary').first().locator('svg'));
   expect(Math.abs(chevron - category)).toBeLessThanOrEqual(1);
-  // The heading and its lines stay centered over the column.
-  await expect(section.getByRole('heading', { name: 'Every formula' })).toHaveCSS(
-    'text-align',
-    'center',
-  );
+  // Its lines sit on the column's left edge with the tabs (centered under a heading until
+  // 2026-10-18).
+  const lead = await left(section.getByText('Each conversion in its category'));
+  const tabs = await left(page.getByRole('tablist', { name: 'About' }));
+  expect(Math.abs(lead - tabs)).toBeLessThanOrEqual(1);
 });
 
 test('an open category’s name stays under the bar while its units scroll past, then the next one’s', async ({
   page,
 }) => {
-  await page.goto('/about/');
-  const section = page.getByRole('region', { name: 'Every formula' });
+  const section = await openFormulas(page);
   await section.getByRole('button', { name: 'Show all' }).click();
   const hide = section.getByRole('button', { name: 'Hide all' });
   const top = (locator: ReturnType<typeof section.locator>) =>
@@ -113,8 +120,7 @@ test('an open category’s name stays under the bar while its units scroll past,
 test('a category closed from under the bar stays there, and so does the one being read on Hide all', async ({
   page,
 }) => {
-  await page.goto('/about/');
-  const section = page.getByRole('region', { name: 'Every formula' });
+  const section = await openFormulas(page);
   await section.getByRole('button', { name: 'Show all' }).click();
   const hide = section.getByRole('button', { name: 'Hide all' });
   const top = (locator: ReturnType<typeof section.locator>) =>
@@ -154,8 +160,7 @@ test('a category closed from under the bar stays there, and so does the one bein
 
 test('Copy all puts every formula on the clipboard as plain text', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/about/');
-  const section = page.getByRole('region', { name: 'Every formula' });
+  const section = await openFormulas(page);
   await section.getByRole('button', { name: 'Copy all as text' }).click();
   await expect(section.getByRole('button', { name: 'Copied' })).toBeVisible();
   const copied = await page.evaluate(() => navigator.clipboard.readText());

@@ -1,18 +1,18 @@
 ---
 import { ChevronDownIcon } from '../../components/icons';
-import { DISCLOSURE, SECTION_HEADING } from '../../lib/recipes';
+import { DISCLOSURE } from '../../lib/recipes';
 import { FORMULAS_HEADING, formulaGroups, SIGNIFICANT } from './formulas';
 import { FormulasTools } from './FormulasTools';
 
 /*
- * Every formula, on the About page under the sketchbook (docs/UX-SPEC.md §1, "About"; Sean,
- * 2026-10-15 and 16): each category folded, its units inside, each with what one of it is in the
+ * Every formula, under its tab on the About page (docs/UX-SPEC.md §1, "About"; Sean, 2026-10-15,
+ * 16, and 18, the tab its title): each category folded, its units inside, each with what one of it is in the
  * category's base unit, exact or measured, and the standard it was checked against. Drawn when the
  * site is built from core's own units (formulas.ts), so a check reads what the converter runs;
  * the categories open with their own summaries, and FormulasTools adds Show all and Copy all, in
  * a bar that stays at the window's top while the list scrolls past, and an open category's name
- * stays under it while its units do. In a centered column, its heading and lines centered as the
- * sketchbook is, its tools and rows on the column's left edge, to be scanned.
+ * stays under it while its units do. In the page's column, its lines, tools, and rows on the
+ * column's left edge, to be scanned (the lines centered under a heading until 2026-10-18).
  */
 const groups = formulaGroups();
 // Units alone: Cooking lists ingredients, which are not units.
@@ -47,14 +47,11 @@ const STAT = 'font-numeric text-ink';
 const SUMMARY = `${DISCLOSURE} sticky list-none bg-canvas focus-ring-inset [&::-webkit-details-marker]:hidden`;
 ---
 
-<section class="mx-auto mt-16 max-w-2xl sm:mt-24" aria-labelledby="formulas">
-  <h2 id="formulas" class={SECTION_HEADING}>
-    Every formula
-  </h2>
-  <p class="mt-2 text-center text-sm text-ink-muted">
+<div>
+  <p class="text-sm text-ink-muted">
     Each conversion in its category’s base unit and the source it was checked against.
   </p>
-  <p class="mt-1 text-center text-sm text-ink-muted">
+  <p class="mt-1 text-sm text-ink-muted">
     <span class={STAT}>{units}</span> units · <span class={STAT}>{groups.length}</span> categories ·{' '}
     <span class={STAT}>{SIGNIFICANT}</span> digits in each factor
   </p>
@@ -88,4 +85,4 @@ const SUMMARY = `${DISCLOSURE} sticky list-none bg-canvas focus-ring-inset [&::-
       </details>
     ))}
   </div>
-</section>
+</div>

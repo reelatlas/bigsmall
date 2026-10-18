@@ -7,6 +7,7 @@ import { ConversionTable } from '../../../components/ConversionTable';
 import { EraserIcon, RedoIcon, UndoIcon } from '../../../components/icons';
 import { MoreMenu, type MoreMenuItem } from '../../../components/MoreMenu';
 import { NumberText } from '../../../components/NumberText';
+import { Tabs } from '../../../components/Tabs';
 import { UnitMatches } from '../../../components/UnitMatches';
 import { ValueField } from '../../../components/ValueField';
 import {
@@ -193,6 +194,17 @@ function TableSamples() {
         <MoreMenu items={FOLDED} />
         <MoreMenu items={FOLDED} openAtFirst />
       </div>
+      {/* Tabs: a few views of one place, the tab their title (the About page). */}
+      <Tabs
+        label="Tabs sample"
+        linked={false}
+        tabs={[
+          { id: 'one', label: 'Feedback' },
+          { id: 'two', label: 'Every formula' },
+        ]}
+        one={<p className="text-sm text-ink-muted">The first view, open at rest.</p>}
+        two={<p className="text-sm text-ink-muted">The second view.</p>}
+      />
       {start.kind === 'start' && (
         <CategoryTiles
           id={`${id}-start`}

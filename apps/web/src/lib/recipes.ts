@@ -98,6 +98,12 @@ export const CONVERTER_GRID = 'md:grid md:grid-cols-box-and-side md:gap-x-4';
 export const IN_CONVERTER_GRID = 'md:col-span-2 md:grid md:grid-cols-subgrid';
 
 /**
+ * About's column: the header and the tabs under the sketchbook, 672 px (`2xl`) centered, the width
+ * the formulas' rows read well at (Sean, 2026-10-18). Full width up to its own, as PAGE_COLUMN.
+ */
+export const ABOUT_COLUMN = 'mx-auto w-full max-w-2xl';
+
+/**
  * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; a trial, Sean,
  * 2026-10-17), the canvas behind it. The stuck layers, lowest to highest: the rows (no z-index), a
  * section's name (5), the head, the toolbar and the box (10, `TABLE_HEAD_CELL` in TableLayout), and an open shell over all

@@ -18,6 +18,8 @@ export default defineConfig({
   },
   webServer: {
     command: `pnpm dev --host ${HOST} --port ${PORT}`,
+    // No dev toolbar over the page under test (astro.config.mjs reads it).
+    env: { ...process.env, BIGSMALL_E2E: '1' },
     url: `http://${HOST}:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

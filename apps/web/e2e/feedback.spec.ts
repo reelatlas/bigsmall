@@ -13,8 +13,10 @@ const send = (page: Page) => page.getByRole('button', { name: 'Send', exact: tru
 async function openForm(page: Page) {
   await page.goto('/about');
   await section(page).scrollIntoViewIfNeeded();
-  // The island loads as it comes into view; its strip changing the example proves it has. A
-  // visually hidden radio is reached through its visible label, as a person reaches it.
+  // The island hydrates as it comes into view, and Astro drops its `ssr` mark once it has; a click
+  // before that moves the radio and nothing else. A visually hidden radio is reached through its
+  // visible label, as a person reaches it.
+  await expect(section(page).locator('astro-island')).not.toHaveAttribute('ssr');
   await section(page).getByText('Bug', { exact: true }).click();
   await expect(message(page)).toHaveAttribute('placeholder', /iPad/);
 }
@@ -51,10 +53,11 @@ test('Send posts the kind, the email, the message, and the page as JSON, then sa
   expect(posted['message']).toBe('On my iPad, picking kilobytes scrolls the table to the top.');
   expect(posted['page']).toMatch(/\/about/);
   expect(posted['_email']).toEqual({ subject: 'bigsmall feedback: bug' });
-  // The honeypot, empty from a person; its field is in neither the page nor the accessibility tree.
+  // The honeypot, empty from a person; its field is in neither the page nor the accessibility
+  // tree, which a role query asks (a label query finds a hidden field too).
   expect(posted['_honeypot']).toBe('');
-  await expect(page.getByLabel('Leave this field empty')).toHaveCount(0);
   await expect(page.locator('input[name="_honeypot"]')).toBeHidden();
+  await expect(page.getByRole('textbox', { name: 'Leave this field empty' })).toHaveCount(0);
 });
 
 test('a refusal from the service says what to try and keeps the message; the strip changes the example', async ({

@@ -23,14 +23,14 @@ interface Props {
 }
 
 /**
- * The row: text tabs on a hairline, 24 px apart, each 44 px tall; muted at rest, ink under the
- * pointer, and the open one in ink with the links' 2 px accent line sitting on the hairline
- * (docs/DESIGN-SYSTEM.md, "Tabs"). No box: that is the segmented control's, for a setting's
- * values.
+ * The row: floating text tabs, 24 px apart, each 44 px tall, with no rule under the row (Sean,
+ * 2026-10-18: a hairline across the column was not needed); muted at rest, ink under the pointer,
+ * and the open one in ink with the links' 2 px accent line under it (docs/DESIGN-SYSTEM.md,
+ * "Tabs"). No box: that is the segmented control's, for a setting's values.
  */
-const LIST = 'flex flex-wrap gap-x-6 border-b border-line';
+const LIST = 'flex flex-wrap gap-x-6';
 const TAB =
-  'relative -mb-px min-h-11 px-1 font-medium text-ink-muted transition-colors hover:text-ink aria-selected:text-ink aria-selected:after:absolute aria-selected:after:inset-x-0 aria-selected:after:bottom-0 aria-selected:after:h-0.5 aria-selected:after:bg-accent';
+  'relative min-h-11 px-1 font-medium text-ink-muted transition-colors hover:text-ink aria-selected:text-ink aria-selected:after:absolute aria-selected:after:inset-x-0 aria-selected:after:bottom-0 aria-selected:after:h-0.5 aria-selected:after:bg-accent';
 const PANEL = 'pt-6';
 
 /** The tab the address names, if any. Read only once hydrated, so the first render is the server's. */

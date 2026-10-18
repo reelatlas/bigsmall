@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { EXAMPLES } from '../src/features/feedback/report';
 import { FEEDBACK_ENDPOINT } from '../src/lib/site';
 import { expectNoA11yViolations } from './support';
 
@@ -18,7 +19,8 @@ async function openForm(page: Page) {
   // visible label, as a person reaches it.
   await expect(section(page).locator('astro-island')).not.toHaveAttribute('ssr');
   await section(page).getByText('Bug', { exact: true }).click();
-  await expect(message(page)).toHaveAttribute('placeholder', /iPad/);
+  await expect(message(page)).not.toHaveAttribute('placeholder', EXAMPLES.inaccuracy[0]!);
+  expect(EXAMPLES.bug).toContain(await message(page).getAttribute('placeholder'));
 }
 
 /** Answers the form's post with `status`, keeping what was posted. */
@@ -78,10 +80,14 @@ test('a refusal from the service says what to try and keeps the message; the str
   await openForm(page);
   await answering(page, 403);
   // Each kind's example, from a different category; the message is required.
+  // Each kind draws one of its own five examples (the form opens on Inaccuracy's first).
+  const bugExample = await message(page).getAttribute('placeholder');
   await section(page).getByText('Inaccuracy', { exact: true }).click();
-  await expect(message(page)).toHaveAttribute('placeholder', /stone/);
+  await expect(message(page)).not.toHaveAttribute('placeholder', bugExample!);
+  expect(EXAMPLES.inaccuracy).toContain(await message(page).getAttribute('placeholder'));
   await section(page).getByText('Idea', { exact: true }).click();
-  await expect(message(page)).toHaveAttribute('placeholder', /5 ft 10 in/);
+  await expect(message(page)).not.toHaveAttribute('placeholder', bugExample!);
+  expect(EXAMPLES.idea).toContain(await message(page).getAttribute('placeholder'));
   await message(page).fill('Let me type 5 ft 10 in and see it in centimeters.');
   await message(page).press('Enter');
   await send(page).focus();

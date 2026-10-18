@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  EXAMPLE,
+  EXAMPLES,
+  exampleFor,
   feedbackBody,
   KINDS,
   sendFeedback,
@@ -42,9 +43,27 @@ describe('the fields Send posts', () => {
     expect(feedbackBody({ ...report, honeypot: 'http://spam' })._honeypot).toBe('http://spam');
   });
 
-  it('have an example for every kind, each from a different category', () => {
-    for (const { value } of KINDS) expect(EXAMPLE[value].length).toBeGreaterThan(20);
-    expect(new Set(Object.values(EXAMPLE)).size).toBe(KINDS.length);
+  it('have five examples for every kind, all different, each short enough for two lines on a phone', () => {
+    for (const { value } of KINDS) {
+      expect(EXAMPLES[value]).toHaveLength(5);
+      for (const example of EXAMPLES[value]) expect(example.length).toBeLessThanOrEqual(64);
+    }
+    const all = Object.values(EXAMPLES).flat();
+    expect(new Set(all).size).toBe(all.length);
+  });
+
+  it('draw an example of the kind at random, never the one showing while the kind has others', () => {
+    const drawn = [0, 0.2, 0.4, 0.6, 0.8, 0.999].map((at) =>
+      exampleFor('bug', undefined, () => at),
+    );
+    expect(new Set(drawn)).toEqual(new Set(EXAMPLES.bug));
+    for (const at of [0, 0.5, 0.999]) {
+      const next = exampleFor('idea', EXAMPLES.idea[2], () => at);
+      expect(EXAMPLES.idea).toContain(next);
+      expect(next).not.toBe(EXAMPLES.idea[2]);
+    }
+    // Switching kinds: the one showing is of another kind, so any of the new kind's may come.
+    expect(EXAMPLES.inaccuracy).toContain(exampleFor('inaccuracy', EXAMPLES.bug[0]));
   });
 });
 

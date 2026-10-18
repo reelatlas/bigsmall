@@ -2,7 +2,7 @@ import { useId, useRef, useState, type FormEvent } from 'react';
 import { Button } from '../../components/Button';
 import { SegmentedControl } from '../../components/SegmentedControl';
 import { FIELD_LABEL, FIELD_STACK, NO_ANSWER, TEXT_AREA, TEXT_INPUT } from '../../lib/recipes';
-import { EXAMPLE, KINDS, sendFeedback, type Kind, type Outcome } from './report';
+import { EXAMPLES, exampleFor, KINDS, sendFeedback, type Kind, type Outcome } from './report';
 
 /** What the lines after Send say: sent, or what to try. */
 const SAID: Record<Outcome, string> = {
@@ -13,8 +13,8 @@ const SAID: Record<Outcome, string> = {
 /**
  * The feedback form on the About page (docs/UX-SPEC.md §1, "About"; ADR 0024), in the shape Sean
  * set (2026-10-17): what it is about, one strip of three kinds; Your email, labelled optional, so anyone
- * can write, the address becoming the Reply-To; a Message whose empty state gives an example for
- * the kind chosen; and Send alone. Send posts the fields to the form service, which mails them to
+ * can write, the address becoming the Reply-To; a Message whose empty state gives one of the
+ * kind's examples, drawn afresh as a kind is picked (Sean, 2026-10-18); and Send alone. Send posts the fields to the form service, which mails them to
  * us; then a line says it was sent and the message clears, or says it could not and what to try.
  * Nothing under the fields otherwise. A hidden field no person sees, the honeypot, goes with the
  * post, and a bot that fills it is dropped by the service (docs/DEPLOYMENT.md, "Feedback"); it is
@@ -24,6 +24,8 @@ const SAID: Record<Outcome, string> = {
 export function Feedback() {
   const id = useId();
   const [kind, setKind] = useState<Kind>('inaccuracy');
+  // The kind's first example at load, so the first render is the server's; a draw on each pick.
+  const [example, setExample] = useState(EXAMPLES.inaccuracy[0]!);
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [outcome, setOutcome] = useState<Outcome | null>(null);
@@ -57,6 +59,7 @@ export function Feedback() {
           value={kind}
           onChange={(next) => {
             setKind(next);
+            setExample(exampleFor(next, example));
             setOutcome(null);
           }}
         />
@@ -82,7 +85,7 @@ export function Feedback() {
           rows={5}
           required
           value={message}
-          placeholder={EXAMPLE[kind]}
+          placeholder={example}
           onChange={(event) => setMessage(event.currentTarget.value)}
         />
       </label>

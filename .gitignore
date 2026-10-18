@@ -18,6 +18,9 @@ test-results/
 # env & secrets (never commit)
 .env
 .env.*
+
+# visitors' data (never commit): the form service's exports (docs/DEPLOYMENT.md, "Feedback")
+feedback-exports/
 !.env.example
 
 # editors & OS

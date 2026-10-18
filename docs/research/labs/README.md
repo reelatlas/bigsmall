@@ -4,6 +4,20 @@ A prototype lab answers a design question with a few working answers, built from
 
 Newest first.
 
+## Owner's page, `/dev/owner` (2026-10-18)
+
+**Explored.** Not a lab but a tool on the production origin, retired the same way: one switch that set `umami.disabled` in the browser's storage for bigsmall.work, the key Umami's tracker reads before it counts (ADR 0019), so Sean's own visits stayed out of the counts in each of his browsers and on his phone, where a console is out of reach. A line said whether this browser's visits were counted, read once the island had hydrated, since the server cannot know a browser's storage, and the button pressed it the other way; the setting held until the site's data was cleared.
+
+**Decided** (Sean, 2026-10-18). Retired the day it was built, once both his devices were set through it and Umami's history reset: no opt-out page unless a new browser or device needs one. A new device takes the console line in `docs/DEPLOYMENT.md` ("Our own visits"), where Umami's reset steps stay too, or the page comes back from the commit below.
+
+**Left out, and why.** A link to it from anywhere: the page was the owner's, unlinked and asking not to be indexed like every `/dev` page. A cookie or a query flag: the tracker reads the storage key alone.
+
+**Learned.** What a browser alone knows, its storage, is read as the island renders once hydrated (`useIsHydrated`, `src/lib/hydrated.ts`), never set from an effect, which the compiler's lint forbids; a press bumps a counter so the line reads the storage again. The first render is the server's and says it is reading.
+
+**Screenshots** (`owner/`): 1 the page with this browser's visits counted; 2 after one press, not counted, the button offering to count them again.
+
+**Last commit.** `d700951`, in `apps/web/src/pages/dev/owner.astro`, `apps/web/src/pages/dev/_owner/OwnVisits.tsx`, and `apps/web/e2e/owner.spec.ts`. Research: the eighty-sixth, eighty-eighth, and eighty-ninth passes in `docs/research/findings-0-first-pass.md`.
+
 ## Tidy lab, `/dev/tidy-lab` (2026-10-18)
 
 **Explored.** Three of the full tidy's calls, to see rather than read (the eighty-sixth and eighty-seventh passes in docs/research/findings-0-first-pass.md). How a side panel opens beside the box on a wide screen, three ways, each a stage the page column's width with a stand-in for the converter page, its own Units tool, and a measured line under it: the pair re-centering as then built (the column slides 168 px), the margin-first slide (the panel into the window's margin past the page column, the column sliding only by what the panel lacks), and a drawer fixed at the window's frame. The About page's vertical rhythm, every gap a band named by its class and measured, the converter page's beside it, and one section step for About's two section gaps on a control, 2, 3, or 4 times the frame. The formulas' exact and measured tags, today's pill against the shape token's corner, in every theme, with what extending the token guard means.

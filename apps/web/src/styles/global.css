@@ -50,6 +50,13 @@
    * step lives in one place (docs/DESIGN-SYSTEM.md, "The page's two ends mirror").
    */
   --spacing-frame: var(--page-frame);
+  /*
+   * A section's step on a page (mt-section): three times the frame, 48 px on a compact screen
+   * and 72 from sm, About's two section gaps (Sean, 2026-10-18; 48/80 and 64/96 until then). One
+   * token, so a page's rhythm is the frame, its triple between sections, and the spacing scale
+   * inside a section (docs/DESIGN-SYSTEM.md, "Sections step by the frame").
+   */
+  --spacing-section: calc(var(--page-frame) * 3);
 
   --font-display: var(--type-display);
   --font-body: var(--type-body);

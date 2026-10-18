@@ -30,14 +30,14 @@ const TABS = [
 >
   <main class={PAGE_MAIN}>
     <PageHeader class={CONTENT_COLUMN} />
-    <section class="mt-12 sm:mt-20" aria-labelledby="sketchbook">
+    <section class="mt-section" aria-labelledby="sketchbook">
       <h2 id="sketchbook" class:list={[SECTION_HEADING, 'mb-6 text-center']}>
         The sketchbook
       </h2>
       <SketchSprite />
       <Sketchbook client:load />
     </section>
-    <div class={cx(CONTENT_COLUMN, 'mt-16 sm:mt-24')}>
+    <div class={cx(CONTENT_COLUMN, 'mt-section')}>
       <Tabs client:load label="About" tabs={TABS}>
         <div slot="feedback" class="max-w-md">
           <Feedback client:visible />

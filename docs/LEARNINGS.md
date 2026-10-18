@@ -647,6 +647,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** Rounding 0.29 down to two places gave 0.28: 0.29 × 100 is 28.999999999999996 in binary, and `Math.floor` took it at its word. Converted values carry the same noise (a result that should be 2.5 can arrive as 2.4999999999999996), so an eighth could round down a step too.
 **Rule.** Before `Math.ceil` or `Math.floor` on a scaled value, snap it to 12 significant digits (`Number(x.toPrecision(12))`), which keeps every digit a converter shows and drops the float noise. Rounding to the nearest is unaffected, but goes through the same snap so the three agree.
+**Correction** (2026-10-18). Twelve digits were too few: a value from 1e10 at two places has more once scaled, and the snap threw its real digits away (1 light-year in km wrote 9,460,730,472,580.00 for .80; 1 parsec in km 30,856,775,814,900.00 for ,913.67), found answering Sean's question on rounding past 1e15. The scaled value is now rounded as it is, and only a difference within four of the double's steps (`ulpOf`) from the nearest 15-digit decimal is taken as that decimal: the noise cases (0.29, 1.005, 2.675, a converted 65,181,600) are still caught, and the digits stay.
 
 ## 2026-10-10 — The label lint cannot see a control passed through a prop
 

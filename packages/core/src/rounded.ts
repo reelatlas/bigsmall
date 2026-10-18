@@ -45,15 +45,30 @@ const FRACTION_LIMIT = 1e6;
 const PLACES_LIMIT = 1e15;
 
 /**
- * A scaled value snapped to 12 significant digits before rounding, so float noise (0.29 × 100 is
- * 28.999…) never rounds a value down a step. To the nearest, a tie rounds away from zero, below
- * zero as above it: −2.5 is −3, as 2.5 is 3 (Sean, 2026-10-15).
+ * A scaled value rounded as chosen: the number itself, except that a difference within a few of
+ * the double's steps from the nearest 15-digit decimal is taken as that decimal, since that is the
+ * noise a typed value or a conversion carries (0.29 × 100 arrives as 28.999999999999996, which is
+ * 29), so float noise never rounds a value down a step and a value's real digits stay: 1 light-year
+ * is 9,460,730,472,580.80 km, where a snap to 12 digits wrote .00 until 2026-10-18
+ * (docs/LEARNINGS.md, the correction). To the nearest, a tie rounds away from zero, below zero as
+ * above it: −2.5 is −3, as 2.5 is 3 (Sean, 2026-10-15).
  */
 function rounded(scaled: number, rounding: Rounding): number {
-  const value = Number(scaled.toPrecision(12));
+  const near = Number(scaled.toPrecision(15));
+  const value = Math.abs(scaled - near) <= 4 * ulpOf(scaled) ? near : scaled;
   if (rounding === 'up') return Math.ceil(value);
   if (rounding === 'down') return Math.floor(value);
   return Math.sign(value) * Math.round(Math.abs(value));
+}
+
+/** The step from a double to the next at `x`: what one bit of float noise is worth there. */
+function ulpOf(x: number): number {
+  const size = Math.abs(x);
+  if (size === 0 || !Number.isFinite(size)) return 0;
+  let exponent = Math.floor(Math.log2(size));
+  if (2 ** exponent > size) exponent -= 1;
+  else if (2 ** (exponent + 1) <= size) exponent += 1;
+  return 2 ** (exponent - 52);
 }
 
 function gcd(a: number, b: number): number {

@@ -38,6 +38,20 @@ describe('formatPlaces', () => {
   it('never rounds a value down a step for float noise', () => {
     // 0.29 × 100 is 28.999… in binary.
     expect(places(0.29, 2, 'down')).toBe('0.29');
+    // 12,345 miles in feet arrive as 65,181,599.99999999, which is 65,181,600 exactly.
+    expect(places(65181599.99999999, 2, 'down')).toBe('65,181,600.00');
+    // 2.675 is 2.67499999999999982 in binary: the tie as typed, away from zero.
+    expect(places(2.675, 2)).toBe('2.68');
+  });
+
+  it('keeps a large value’s real digits: the number itself rounds, float noise alone forgiven', () => {
+    // A snap to 12 significant digits wrote zeros in these places until 2026-10-18.
+    expect(places(9460730472580.8, 2)).toBe('9,460,730,472,580.80'); // 1 light-year in km
+    expect(places(30856775814913.67, 2)).toBe('30,856,775,814,913.67'); // 1 parsec in km
+    expect(places(12345678901.23, 2, 'down')).toBe('12,345,678,901.23');
+    expect(places(12345678901.23, 2, 'up')).toBe('12,345,678,901.23');
+    // Past 1e15 no hundredth exists (the double's step is 0.125 there): places give way.
+    expect(places(2e15, 2)).toBeNull();
   });
 
   it('rounds up toward larger values and down toward smaller, below zero too', () => {

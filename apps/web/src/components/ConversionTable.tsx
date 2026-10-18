@@ -248,7 +248,8 @@ export function copiedText(
 /**
  * A value as the display writes it first: its fraction with Fraction, else its decimal. With no
  * limit, the row's own text is already the nearest six significant digits; Up and Down take the
- * same cut their way (Sean, 2026-10-18: no limit is still a cut).
+ * same cut their way (Sean, 2026-10-18: no limit is still a cut), and so does a value past what
+ * places mean (1e15), which falls through to those six digits.
  */
 function firstWritten(
   value: number,
@@ -260,8 +261,10 @@ function firstWritten(
   if (display.format === 'fraction') {
     return formatFraction(value, { sizes: display.fractions, rounding, locale });
   }
-  if (display.places !== null)
-    return formatPlaces(value, { places: display.places, rounding, locale });
+  if (display.places !== null) {
+    const written = formatPlaces(value, { places: display.places, rounding, locale });
+    if (written !== null || rounding === 'nearest') return written;
+  }
   if (rounding === 'nearest') return null;
   const text = formatSignificant(value, { digits: significant, rounding, locale });
   return text === null ? null : { text, approx: false };

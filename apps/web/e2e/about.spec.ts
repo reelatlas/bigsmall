@@ -97,4 +97,22 @@ test('the header sits where the converter page has it', async ({ page }) => {
   expect(Math.abs(about.x - home.x)).toBeLessThanOrEqual(1);
   expect(Math.abs(about.y - home.y)).toBeLessThanOrEqual(1);
   expect(Math.abs(about.width - home.width)).toBeLessThanOrEqual(1);
+  // The foot on the same column: its text starts where the name does and sits on the frame, on
+  // both pages alike (the link's 44 px target taken back into its line).
+  const text = (locator: ReturnType<typeof page.getByText>) =>
+    locator.evaluate((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const box = range.getBoundingClientRect();
+      return {
+        x: box.left,
+        fromEnd: document.documentElement.scrollHeight - (box.bottom + scrollY),
+      };
+    });
+  const aboutFoot = await text(page.getByText(/^Visits are counted/));
+  expect(Math.abs(aboutFoot.x - about.x)).toBeLessThanOrEqual(1);
+  await page.goto('/');
+  const homeFoot = await text(page.getByRole('contentinfo').getByRole('link', { name: 'About' }));
+  expect(Math.abs(homeFoot.x - home.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(homeFoot.fromEnd - aboutFoot.fromEnd)).toBeLessThanOrEqual(1);
 });

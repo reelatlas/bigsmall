@@ -2,11 +2,12 @@
 import { CONTENT_COLUMN, INLINE_LINK, PAGE_COLUMN, QUIET_LINK } from '../lib/recipes';
 
 /*
- * The footer under every page (docs/UX-SPEC.md §1, "Footer"), from Base.astro. On every page but
- * About: one quiet link to it, on the left edge of the page's content like the header, out of the
- * way until hovered or focused (Sean, 2026-10-15). On About, where the name in the header leads
- * home: the privacy line in Sean's words (2026-10-18), on About's column, its two names inline
- * links (INLINE_LINK) in the sentence to what they name. On a page shorter than the window it sits at the window's
+ * The footer under every page (docs/UX-SPEC.md §1, "Footer"), from Base.astro, its content on the
+ * content column like the header, so its text starts where the name does (Sean, 2026-10-18). On
+ * every page but About: one quiet link to it, out of the way until hovered or focused (Sean,
+ * 2026-10-15), its 44 px target taken back into its line so the text sits on the frame as a
+ * paragraph would. On About, where the name in the header leads home: the privacy line in Sean's
+ * words (2026-10-18), its two names inline links (INLINE_LINK) in the sentence to what they name. On a page shorter than the window it sits at the window's
  * bottom, the body being a column at least the window's height (Base.astro), and otherwise after
  * the content (Sean, 2026-10-15; kept 2026-10-16). The address ends in a slash, as the build writes
  * the page and its canonical address. The foot sits on the page's frame (pb-frame, the frame
@@ -16,22 +17,24 @@ import { CONTENT_COLUMN, INLINE_LINK, PAGE_COLUMN, QUIET_LINK } from '../lib/rec
 const onAbout = Astro.url.pathname.replace(/\/+$/, '') === '/about';
 ---
 
-<footer class:list={[PAGE_COLUMN, 'mt-auto flex pb-frame text-sm']}>
-  {onAbout ? (
-    <p class:list={[CONTENT_COLUMN, 'text-ink-muted']}>
-      Visits are counted anonymously without cookies by{' '}
-      <a href="https://umami.is" class={INLINE_LINK}>
-        Umami
+<footer class:list={[PAGE_COLUMN, 'mt-auto pb-frame text-sm']}>
+  <div class={CONTENT_COLUMN}>
+    {onAbout ? (
+      <p class="text-ink-muted">
+        Visits are counted anonymously without cookies by{' '}
+        <a href="https://umami.is" class={INLINE_LINK}>
+          Umami
+        </a>
+        . Feedback goes through{' '}
+        <a href="https://formspark.io/legal/privacy-policy/" class={INLINE_LINK}>
+          Formspark
+        </a>{' '}
+        to our inbox. Your theme and settings stay in your browser; nothing else is kept.
+      </p>
+    ) : (
+      <a href="/about/" class={QUIET_LINK}>
+        About
       </a>
-      . Feedback goes through{' '}
-      <a href="https://formspark.io/legal/privacy-policy/" class={INLINE_LINK}>
-        Formspark
-      </a>{' '}
-      to our inbox. Your theme and settings stay in your browser; nothing else is kept.
-    </p>
-  ) : (
-    <a href="/about/" class={QUIET_LINK}>
-      About
-    </a>
-  )}
+    )}
+  </div>
 </footer>

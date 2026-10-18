@@ -132,7 +132,7 @@ export const LINK =
 // on hover or keyboard focus a link's ink and accent underline, faded in. It stands alone, so no
 // text around it needs telling apart from it (docs/DESIGN-SYSTEM.md, "Links").
 export const QUIET_LINK =
-  'inline-flex min-h-11 items-center text-sm text-ink-muted underline decoration-transparent decoration-2 underline-offset-4 transition-[color,text-decoration-color] hover:text-ink hover:decoration-accent focus-visible:text-ink focus-visible:decoration-accent';
+  'inline-flex items-center py-3 -my-3 text-sm text-ink-muted underline decoration-transparent decoration-2 underline-offset-4 transition-[color,text-decoration-color] hover:text-ink hover:decoration-accent focus-visible:text-ink focus-visible:decoration-accent';
 
 // A link inside a muted sentence (docs/DESIGN-SYSTEM.md, "Links"): at rest the sentence's own
 // muted ink and no underline, so the line reads as plain text, and on hover or focus a link's ink

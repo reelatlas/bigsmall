@@ -51,7 +51,7 @@ test('Send posts the kind, the email, the message, and the page as JSON, then sa
   await page.getByLabel('Your email').fill('someone@example.com');
   await message(page).fill('On my iPad, picking kilobytes scrolls the table to the top.');
   await send(page).click();
-  await expect(section(page).getByRole('status')).toHaveText('Sent. Thank you.');
+  await expect(section(page).getByRole('status')).toHaveText('Thank you for your feedback!');
   await expect(message(page)).toHaveValue('');
   await expect(page.getByLabel('Your email')).toHaveValue('someone@example.com');
   expect(posts).toHaveLength(1);

@@ -6,7 +6,7 @@ import { EXAMPLE, KINDS, sendFeedback, type Kind, type Outcome } from './report'
 
 /** What the lines after Send say: sent, or what to try. */
 const SAID: Record<Outcome, string> = {
-  sent: 'Sent. Thank you.',
+  sent: 'Thank you for your feedback!',
   failed: 'Could not send. Try again in a moment.',
 };
 

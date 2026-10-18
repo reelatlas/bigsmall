@@ -5,7 +5,9 @@ import { applyTheme, box, expectNoA11yViolations, pickTheme, ready, row, settled
 // Checks that span the site: every page and every theme pass axe, every Tab stop shows focus,
 // and reduced motion stills every theme. Each feature's flows have a file of their own.
 
-for (const path of ['/', '/about', '/dev/gallery', '/dev/wordmark-lab', '/dev/sketchbook-lab']) {
+const PAGES = ['/', '/about', '/dev/gallery', '/dev/wordmark-lab', '/dev/sketchbook-lab'];
+
+for (const path of PAGES) {
   test(`${path} renders with no WCAG violations`, async ({ page }) => {
     // The gallery holds every component in every theme: axe takes its time over it, the more so
     // on CI's dev server.
@@ -16,6 +18,30 @@ for (const path of ['/', '/about', '/dev/gallery', '/dev/wordmark-lab', '/dev/sk
     await expectNoA11yViolations(page);
   });
 }
+
+test('no text field on any page is under 16 px, the size a phone zooms into', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, 'the phone project reads the sizes');
+  // iOS zooms into a focused field whose text is under 16 px (docs/LEARNINGS.md, 2026-10-17):
+  // every drawn text field on every page, the labs' and the gallery's too, is 16 or more.
+  for (const path of PAGES) {
+    await page.goto(path);
+    if (path === '/') await ready(page);
+    const small = await page.evaluate(() =>
+      [
+        ...document.querySelectorAll<HTMLElement>(
+          'input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]), textarea, select',
+        ),
+      ]
+        .filter((el) => el.getClientRects().length > 0)
+        .filter((el) => parseFloat(getComputedStyle(el).fontSize) < 16)
+        .map((el) => el.outerHTML.slice(0, 80)),
+    );
+    expect(small, path).toEqual([]);
+  }
+});
 
 test('an unknown address shows the not-found page, with the way back', async ({ page }) => {
   const response = await page.goto('/no-such-page');

@@ -67,23 +67,25 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
  * open panel). Centered with its left edge on a whole pixel (`mx-page`, global.css), since the
  * scrollbar's room or an odd window would otherwise put the column on a half.
  */
-export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-4';
+export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-frame';
 
 /**
  * A block in the column that may paint past it (the sketchbook's changes): bled to the page's
- * edge, the column's gutter taken back as its own padding, and clipped there with clip, never
+ * edge, the column's gutter at each size taken back as its own padding, and clipped there with clip, never
  * hidden, which would make a scroll container. Focus rings inside the gutter stay whole, and a
  * phone never pans sideways to what a change paints (docs/LEARNINGS.md, 2026-10-16).
  */
-export const PAGE_BLEED = '-mx-4 px-4 overflow-x-clip';
+export const PAGE_BLEED = '-mx-frame px-frame overflow-x-clip';
 
 /**
- * A page's main column (the converter, About, 404, and the dev pages), with the page's padding:
- * the gutter's 16 px (PAGE_COLUMN's px-4) at every width, top and bottom, which the header's row
- * and the footer's link sit on (docs/DESIGN-SYSTEM.md, "The page's two ends mirror"; Sean,
- * 2026-10-18: one value on every side and every screen, nothing of its own over the header).
+ * A page's main column (the converter, About, 404, and the dev pages), with the page's frame:
+ * the frame token (--page-frame, global.css: Material's layout margin, 16 px on a phone and 24
+ * from sm), PAGE_COLUMN's gutter sideways and this top and bottom, which the header's row and
+ * the footer's link sit on
+ * (docs/DESIGN-SYSTEM.md, "The page's two ends mirror"; Sean, 2026-10-18: one logic on every
+ * side and every screen, a standard's ratio where it scales, nothing of its own over the header).
  */
-export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-4');
+export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-frame');
 
 /**
  * The converter's column: the toolbar, the box, and the table, and the header over them, capped

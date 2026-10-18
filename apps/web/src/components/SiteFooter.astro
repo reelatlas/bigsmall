@@ -9,14 +9,14 @@ import { ABOUT_COLUMN, INLINE_LINK, PAGE_COLUMN, QUIET_LINK } from '../lib/recip
  * in the sentence to what they name. On a page shorter than the window it sits at the window's
  * bottom, the body being a column at least the window's height (Base.astro), and otherwise after
  * the content (Sean, 2026-10-15; kept 2026-10-16). The address ends in a slash, as the build writes
- * the page and its canonical address. The foot sits on the page's padding (PAGE_MAIN's: the
- * gutter's 16 px at every width), the link's 44 px target its row, as the header's 48 px row
- * sits on it at the top (docs/DESIGN-SYSTEM.md, "The page's two ends mirror").
+ * the page and its canonical address. The foot sits on the page's frame (pb-frame, the frame
+ * token: 16 px on a phone, 24 from sm), the link's 44 px target its row, as the header's 48 px
+ * row sits on it at the top (docs/DESIGN-SYSTEM.md, "The page's two ends mirror").
  */
 const onAbout = Astro.url.pathname.replace(/\/+$/, '') === '/about';
 ---
 
-<footer class:list={[PAGE_COLUMN, 'mt-auto flex pb-4 text-sm']}>
+<footer class:list={[PAGE_COLUMN, 'mt-auto flex pb-frame text-sm']}>
   {onAbout ? (
     <p class:list={[ABOUT_COLUMN, 'text-ink-muted']}>
       Visits are counted anonymously without cookies by{' '}

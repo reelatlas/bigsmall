@@ -43,6 +43,14 @@
    */
   --color-accent-soft-hover: color-mix(in srgb, var(--accent-soft) 60%, var(--surface));
 
+  /*
+   * The page's frame, one spacing token (px-frame, py-frame, pb-frame, -mx-frame) the page's
+   * column, its padding, the footer, and the sketchbook's bleed read: Material's layout margin,
+   * 16 px on a compact screen and 24 from sm, set once in the base layer (--page-frame), so the
+   * step lives in one place (docs/DESIGN-SYSTEM.md, "The page's two ends mirror").
+   */
+  --spacing-frame: var(--page-frame);
+
   --font-display: var(--type-display);
   --font-body: var(--type-body);
   --font-numeric: var(--type-numeric);
@@ -216,6 +224,12 @@
        makes the page taller than the window moves nothing (docs/LEARNINGS.md, 2026-10-18);
        overlay scrollbars (macOS, phones) take no room either way. */
     scrollbar-gutter: stable;
+    /* The page's frame (--spacing-frame in the bridge): 16 px on a compact screen, 24 from sm,
+       Material's layout margins, on every side (Sean, 2026-10-18). */
+    --page-frame: calc(var(--spacing) * 4);
+    @variant sm {
+      --page-frame: calc(var(--spacing) * 6);
+    }
   }
 
   /* The one focus ring. Never pair `outline-none` with focus-visible utilities: in Tailwind v4 it

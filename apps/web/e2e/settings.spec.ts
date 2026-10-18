@@ -168,13 +168,18 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
   // A press lands while units glide, but Playwright waits for a still target, then scrolls it into
   // view a different way on each retry, moving the page this test measures.
   await settled(page);
+  // Playwright scrolls a control into view before it clicks, which would move the page this test
+  // measures (docs/LEARNINGS.md, 2026-10-18): Edit is brought into view first, as whoever presses
+  // it has it.
+  const edit = table(page).getByRole('button', { name: 'Edit', exact: true });
+  await edit.scrollIntoViewIfNeeded();
 
   // Edit reads Done in its place, focus staying on it, and nothing over the list moves: the
   // hidden units stay in Hidden below, never listed among the rows.
-  const top = async () =>
-    (await table(page).locator('[role="rowgroup"], [role="group"]').first().boundingBox())!.y;
+  const firstGroup = table(page).locator('[role="rowgroup"], [role="group"]').first();
+  const top = async () => (await firstGroup.boundingBox())!.y;
   const before = await top();
-  await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
+  await edit.click();
   const done = table(page).getByRole('button', { name: 'Done' });
   await expect(done).toBeFocused();
   expect(await top()).toBe(before);
@@ -197,8 +202,11 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
   await expect(
     page.getByRole('group', { name: 'Hidden, US (customary)' }).getByLabel(/teaspoons/),
   ).toBeVisible();
+  const beforeDone = await top();
   await done.click();
-  await expect(table(page).getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
+  await expect(edit).toBeFocused();
+  // Edit ends with the card where it was: focus goes back to Edit without the page moving.
+  expect(await top()).toBe(beforeDone);
   await expect(row(page, 'us-teaspoon')).toHaveCount(0);
   // Done closes Hidden, whoever just chose what to hide.
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');

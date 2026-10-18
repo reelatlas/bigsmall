@@ -215,17 +215,26 @@ test('the footer sits at the window’s bottom on a short page, and after the co
   const short = await place();
   expect(short.page).toBeLessThanOrEqual(short.window);
   expect(Math.abs(short.footerBottom - short.window)).toBeLessThanOrEqual(1);
-  // The foot sits on the page's padding as the head does, one step at every width, so the page is
-  // framed alike at both ends on every screen (docs/UX-SPEC.md §1, "Footer").
-  const ends = () =>
-    page.evaluate(() => ({
-      foot: getComputedStyle(document.querySelector('body > footer')!).paddingBottom,
-      head: getComputedStyle(document.querySelector('main')!).paddingTop,
-    }));
-  const wide = await ends();
-  expect(wide.foot).toBe(wide.head);
-  await windowOf(page, 390, 844);
-  expect(await ends()).toEqual(wide);
+  // The page's frame is one value on every side at each screen class: the head's padding the
+  // sides' and the foot's the head's (docs/UX-SPEC.md §1, "Footer"), at the project's width and
+  // a phone's.
+  const frame = () =>
+    page.evaluate(() => {
+      const main = getComputedStyle(document.querySelector('main')!);
+      return {
+        side: main.paddingLeft,
+        top: main.paddingTop,
+        foot: getComputedStyle(document.querySelector('body > footer')!).paddingBottom,
+      };
+    });
+  for (const width of [page.viewportSize()?.width ?? 1280, 390]) {
+    await windowOf(page, width, 844);
+    const at = await frame();
+    expect(at.top, `${width}px`).toBe(at.side);
+    expect(at.foot, `${width}px`).toBe(at.side);
+    // Material's layout margins: 16 px on a compact screen, 24 from sm.
+    expect(parseFloat(at.side), `${width}px`).toBe(width >= 640 ? 24 : 16);
+  }
   // A table taller than the window: the footer follows it.
   await page.setViewportSize({ width: page.viewportSize()?.width ?? 1280, height: 480 });
   await page.goto('/?a=mile&v=1');

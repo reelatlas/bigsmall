@@ -68,30 +68,28 @@ test('arrow keys preview themes in the open menu; Enter keeps the choice and clo
   await expect(page.locator('html')).toHaveAttribute('data-theme', reached!);
 });
 
-test('open, the theme menu reads "Theme" where its button shows the name alone', async ({
+test('the theme menu shows the name alone at rest and reads "Theme" while open, at any width', async ({
   page,
 }) => {
   await page.goto('/');
   const toggle = themeToggle(page);
   const name = page.locator('[data-theme-name]');
-
-  // In a header of 576 px or more the button shows "Theme" and the name, open or closed.
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await toggle.click();
-  await expect(name).toBeVisible();
-  await page.keyboard.press('Escape');
-
-  // In a narrower one it shows the name alone; open, it reads "Theme", the list's fill marking it.
-  await page.setViewportSize({ width: 375, height: 800 });
   const word = toggle.getByText('Theme', { exact: true });
-  await toggle.click();
-  await expect(name).toBeHidden();
-  expect((await word.boundingBox())!.width).toBeGreaterThan(10);
-  await page.keyboard.press('Escape');
-  await expect(name).toBeVisible();
+  // As the category menu does (Sean, 2026-10-17): the name alone at rest, the word only for
+  // screen readers; open, the word in its place, muted, the list's fill marking the theme.
+  for (const width of [1280, 375]) {
+    await page.setViewportSize({ width, height: 800 });
+    await expect(name, `${width}px`).toBeVisible();
+    expect((await word.boundingBox())?.width ?? 0, `${width}px`).toBeLessThanOrEqual(1);
+    await toggle.click();
+    await expect(name, `${width}px`).toBeHidden();
+    expect((await word.boundingBox())!.width, `${width}px`).toBeGreaterThan(10);
+    await page.keyboard.press('Escape');
+    await expect(name, `${width}px`).toBeVisible();
+  }
 });
 
-test('"Theme" and the shortcuts button switch by the header\'s own width, where all of it fits', async ({
+test("the shortcuts button switches by the header's own width, where all of it fits", async ({
   page,
   isMobile,
 }) => {
@@ -99,20 +97,17 @@ test('"Theme" and the shortcuts button switch by the header\'s own width, where 
   await page.goto('/');
   // The page's own header: on the dev server, as on CI, Astro's dev toolbar draws headers too.
   const header = page.locator('main > header');
-  const word = themeToggle(page).getByText('Theme', { exact: true });
   const headerWidth = () => header.evaluate((el) => el.getBoundingClientRect().width);
   // The page's 16 px gutters aside, a 600 px window leaves the header under 576 px, its container
-  // xl size: the name alone, no shortcuts button.
+  // xl size: no shortcuts button.
   await page.setViewportSize({ width: 600, height: 800 });
   expect(await headerWidth()).toBeLessThan(576);
   await expect(shortcutsButton(page)).toBeHidden();
-  expect((await word.boundingBox())?.width ?? 0).toBeLessThanOrEqual(1);
-  // From 576 px of header both show (the line they share, in every theme, is the width tests'
+  // From 576 px of header it shows (the line it shares, in every theme, is the width tests'
   // below), and the shortcuts map opens inside the window.
   await page.setViewportSize({ width: 610, height: 800 });
   expect(await headerWidth()).toBeGreaterThanOrEqual(576);
   await expect(shortcutsButton(page)).toBeVisible();
-  await expect(word).toBeVisible();
   await shortcutsButton(page).click();
   await expect(page.getByText('Pick a unit or value')).toBeVisible();
   // The open card, which grows left from the button.

@@ -24,11 +24,11 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
  * covers the whole menu and never changes size; option rows use rounded-nested-md, the md corner
  * minus the card's border and gutter, so the curves nest. The menu is as wide as its widest label,
  * so nothing beside it moves while the arrow keys preview themes, and the card is the same width:
- * the sizer below stacks every label in one grid cell, unseen, in the theme's own font, "Theme"
- * and a name in a header of 576 px or more (`@xl`, the header being an @container), a name alone
- * in a narrower one, where the word "Theme" is only for screen readers. Open there, the trigger
+ * the sizer below stacks every name in one grid cell, unseen, in the theme's own font. At rest
+ * the trigger shows the theme's name alone, the word "Theme" only for screen readers; open, it
  * reads "Theme" instead, muted, over the list, whose fill marks the theme, as the category menu
- * does.
+ * reads "Category" (Sean, 2026-10-17: one behavior for both menus; a wide header showed "Theme"
+ * and the name until then).
  */
 ---
 
@@ -36,7 +36,6 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
   <span aria-hidden="true" class={MENU_SIZER}>
     {THEMES.map((t) => (
       <span class={MENU_SIZER_LABEL}>
-        <span class="@max-xl:hidden">Theme</span>
         {t.name}
         <span class="size-4" />
       </span>
@@ -51,8 +50,8 @@ const defaultName = THEMES.find((t) => t.id === DEFAULT_LIGHT)?.name;
       aria-controls={menuId}
       class={MENU_TRIGGER}
     >
-      <span class="text-ink-muted @max-xl:sr-only @max-xl:group-data-open:not-sr-only">Theme</span>
-      <span data-theme-name class="@max-xl:group-data-open:hidden">
+      <span class="text-ink-muted sr-only group-data-open:not-sr-only">Theme</span>
+      <span data-theme-name class="group-data-open:hidden">
         {defaultName}
       </span>
       <ChevronDownIcon width="16" height="16" className={MENU_CHEVRON} />

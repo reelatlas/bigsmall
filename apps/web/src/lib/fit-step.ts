@@ -48,7 +48,7 @@ function whole(element: HTMLElement | null | undefined): boolean {
  * each theme's fonts, which change what fits without resizing anything. A change of height alone
  * is left out: every fit here is a matter of width, and a field's row grows taller as it wraps.
  */
-function useRefit(fit: () => void, observed: RefObject<HTMLElement | null>) {
+export function useRefit(fit: () => void, observed: RefObject<HTMLElement | null>) {
   useLayoutEffect(fit);
 
   useEffect(() => {

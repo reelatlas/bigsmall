@@ -3,6 +3,7 @@ import {
   Fragment,
   useEffect,
   useId,
+  useCallback,
   useLayoutEffect,
   useRef,
   useState,
@@ -26,6 +27,7 @@ import { fitTools } from '../../lib/overflow';
 import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
 import { useKept } from '../../lib/keeping';
+import { useRefit } from '../../lib/fit-step';
 import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
@@ -372,7 +374,9 @@ export function TableLayout({
    * at its end (MoreMenu). Which tools fit is measured, never counted: the row's width, the
    * category menu's, and each tool's as rendered (lib/overflow.ts), kept once read, since a tool
    * folded away cannot be measured again; More is a square like the tools, so until it has shown,
-   * the first tool stands in for its width.
+   * the first tool stands in for its width. Measured as every fit is (useRefit): before paint
+   * after each render, so a fold's More is read once it shows, when the row changes width, and
+   * when the theme changes, since a theme's fonts change the category menu's width.
    */
   const [coarse, setCoarse] = useState(false);
   useLayoutEffect(() => {
@@ -383,16 +387,8 @@ export function TableLayout({
     return () => pointer.removeEventListener('change', read);
   }, []);
   const [shownTools, setShownTools] = useState(tools.length);
-  const [, setResized] = useState(0);
   const widths = useRef(new Map<string, number>());
-  useLayoutEffect(() => {
-    const row = toolsRef.current;
-    if (!row || typeof ResizeObserver === 'undefined') return;
-    const resizes = new ResizeObserver(() => setResized((count) => count + 1));
-    resizes.observe(row);
-    return () => resizes.disconnect();
-  }, []);
-  useLayoutEffect(() => {
+  const measureTools = () => {
     const row = toolsRef.current;
     if (!row) return;
     // A thing's width on the row, margins included (the divider has them).
@@ -420,8 +416,15 @@ export function TableLayout({
           ...(dividerAt >= 0 && { divider: { before: dividerAt, width: read('divider') ?? 0 } }),
           more: read('more') ?? square,
         });
-    if (fit !== shownTools) setShownTools(fit);
+    setShownTools((shown) => (shown === fit ? shown : fit));
+  };
+  // The newest measuring, read through one stable callback, so the observers are set up once.
+  const measure = useRef(measureTools);
+  useLayoutEffect(() => {
+    measure.current = measureTools;
   });
+  const refitTools = useCallback(() => measure.current(), []);
+  useRefit(refitTools, toolsRef);
   // Where more of the scrolling row waits, for the fades: read as it scrolls and as it resizes.
   const [reach, setReach] = useState('');
   useLayoutEffect(() => {

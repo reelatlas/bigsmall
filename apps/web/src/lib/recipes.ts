@@ -132,13 +132,13 @@ export const LINK =
 export const QUIET_LINK =
   'inline-flex min-h-11 items-center text-ink-muted underline decoration-transparent decoration-2 underline-offset-4 transition-[color,text-decoration-color] hover:text-ink hover:decoration-accent focus-visible:text-ink focus-visible:decoration-accent';
 
-// A link inside a muted sentence (docs/DESIGN-SYSTEM.md, "Links"): no underline at rest, so the
-// line reads as text (Sean, 2026-10-18), the name in the ink among muted words, which marks it
-// by contrast (WCAG 1.4.1, G183), and the accent underline fading in on hover or focus. Inline, so
-// no 44 px of its own: its target is the line's (WCAG 2.5.8's inline exception). The privacy
-// line's two names.
+// A link inside a muted sentence (docs/DESIGN-SYSTEM.md, "Links"): at rest the sentence's own
+// muted ink and no underline, so the line reads as plain text, and on hover or focus a link's ink
+// and accent underline, faded in, as the footer's quiet link does (Sean, 2026-10-18: the names are
+// a courtesy, not a way anywhere; WCAG 1.4.1 noted, his call). Inline, so no 44 px of its own:
+// its target is the line's (WCAG 2.5.8's inline exception). The privacy line's two names.
 export const INLINE_LINK =
-  'text-ink underline decoration-transparent decoration-2 underline-offset-4 transition-[text-decoration-color] hover:decoration-accent focus-visible:decoration-accent';
+  'underline decoration-transparent decoration-2 underline-offset-4 transition-[color,text-decoration-color] hover:text-ink hover:decoration-accent focus-visible:text-ink focus-visible:decoration-accent';
 
 // Fluid shells (docs/DESIGN-SYSTEM.md, "Fluid shells"): a control and the list or panel it opens
 // drawn as one shape over the page. The placeholder around a shell carries `group`, a fixed size,

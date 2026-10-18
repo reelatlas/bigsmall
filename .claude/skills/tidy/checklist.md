@@ -104,4 +104,5 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - Persisted settings stay readable: stored by what changed, the version raised when the shape changes, an older version migrated (`settingsFrom`).
 - `CLAUDE.md`: "Current status" short and current, "Pick up here" listing the trials (with their reverting commits) and the questions open with Sean, the recipes current.
 - Each fact lives in one doc; the others link to it.
+- The `/dev` roster (`docs/DESIGN-SYSTEM.md`, "Tuning labs") matches `src/pages/dev/`: every page has its reason and its retirement condition, and one past its condition retires by the recipe.
 - The skills (`.claude/skills/`): each still has one job and says when to use it; a step the stretch since the last tidy failed or skipped is fixed or dropped; a thing done by hand three times that a skill should say is in it; a rule a skill spells out that CLAUDE.md or a doc now owns points there instead; each has its pointer in CLAUDE.md's "Recipes" and its row in PLAN §12 (CLAUDE.md, "How the docs and skills evolve").

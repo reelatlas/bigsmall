@@ -79,7 +79,7 @@ The feedback form on the About page (docs/UX-SPEC.md §1; ADR 0024) posts its fi
 
 - **Notifications** to the inbox he reads; the visitor's email, when given, is the Reply-To. The page names the notification: the sender "bigsmall feedback", the heading the kind, no footer or logo (`_email` in `features/feedback/report.ts`, the service's documented options).
 - **Automatic filter** on: every submission screened.
-- **Allowed domains**: `bigsmall.work` (its subdomains included), so a post from elsewhere is refused (403). To set once.
+- **Allowed domains**: `bigsmall.work` (its subdomains included), so a post from elsewhere is refused (403). Set by Sean on 2026-10-18 and checked with a real message from the live site.
 - **Honeypot**: the page sends a hidden `_honeypot` field; a filled one is dropped. No challenge (captcha): Send stays one button. Spam words and the autoresponder: not used.
 - **Submissions**: 250 free in all, then a one-time bundle ($25 for 50,000, which never expire); when they run out the service answers 402 and the page says it could not send. The form's Analytics tab shows the count left.
 - **After a deploy that touches the form:** send one real message from bigsmall.work and see it arrive; the browser tests never reach the service.

@@ -27,5 +27,16 @@ export default defineConfig({
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
+    // WebKit on a phone, Safari's engine, for the specs where it differs from Chromium in
+    // scrolling and focus (docs/TESTING.md, 2026-10-18): about, formulas, and feedback whole,
+    // smoke's axe and 16 px checks, the table's Cooking pills and its stuck head, Edit's kept
+    // place and the glides in settings, chosen by file and title. The clipboard tests skip
+    // there: WebKit grants the runner no clipboard permission.
+    {
+      name: 'mobile-webkit',
+      use: { ...devices['iPhone 13'] },
+      testMatch: /(about|formulas|feedback|smoke|table|settings)\.spec\.ts/,
+      grep: /about\.spec|formulas\.spec|feedback\.spec|renders with no WCAG violations|no text field on any page is under 16 px|Cooking|stay at the window’s top|Edit sends one to Hidden|glides to its place|glide moves only/,
+    },
   ],
 });

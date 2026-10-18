@@ -139,7 +139,9 @@ test('with a unit in the box the number pad comes up, but not where values go be
 test('a tapped row shows its copy button, which copies what the row shows', async ({
   page,
   context,
+  browserName,
 }) => {
+  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/?a=us-cup&v=2');
   await ready(page);

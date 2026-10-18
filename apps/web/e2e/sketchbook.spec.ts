@@ -483,8 +483,9 @@ test('the lab loads an earlier version’s settings to compare or roll back', as
   await expect(latest).toHaveValue(String(SKETCHBOOK_TIMING.idleMaxMs));
 });
 
-test('the lab copies its settings as code', async ({ page, context, isMobile }) => {
+test('the lab copies its settings as code', async ({ page, context, isMobile, browserName }) => {
   test.skip(isMobile, 'one viewport is enough');
+  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await openLab(page);
   await page.getByLabel('Hold', { exact: true }).fill('1200');

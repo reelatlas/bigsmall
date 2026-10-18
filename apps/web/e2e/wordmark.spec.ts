@@ -89,8 +89,9 @@ test('the art flips to a symbol, and its drawing comes home when play stops', as
   await expect(page.locator('header [data-theme-art]')).not.toHaveClass(/invisible/);
 });
 
-test('the lab copies its settings as code', async ({ page, context, isMobile }) => {
+test('the lab copies its settings as code', async ({ page, context, isMobile, browserName }) => {
   test.skip(isMobile, 'one viewport is enough');
+  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await openLab(page);
   await page.getByLabel('Rest', { exact: true }).fill('2400');

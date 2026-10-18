@@ -46,7 +46,7 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @bigsmall/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @bigsmall/web exec playwright install --with-deps chromium webkit
       - run: pnpm e2e
         env:
           CI: true

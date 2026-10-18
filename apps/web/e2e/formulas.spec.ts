@@ -161,7 +161,12 @@ test('a category closed from under the bar stays there, and so does the one bein
   else expect(await top(weight)).toBeGreaterThanOrEqual(under);
 });
 
-test('Copy all puts every formula on the clipboard as plain text', async ({ page, context }) => {
+test('Copy all puts every formula on the clipboard as plain text', async ({
+  page,
+  context,
+  browserName,
+}) => {
+  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   const section = await openFormulas(page);
   await section.getByRole('button', { name: 'Copy all as text' }).click();

@@ -399,8 +399,10 @@ test('keyboard: the arrows go through every row from the unit in the box, onto t
   page,
   context,
   isMobile,
+  browserName,
 }) => {
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
+  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/?a=us-cup&v=250');
   await ready(page);
@@ -1235,7 +1237,9 @@ test('More: a tool the row had no room for acts from the menu, with the keys, an
 test('one copy button, laid over the active row’s end, copies what the row shows', async ({
   page,
   context,
+  browserName,
 }) => {
+  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/?a=foot&v=2');
   await ready(page);
@@ -1297,7 +1301,9 @@ test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds
   page,
   context,
   isMobile,
+  browserName,
 }) => {
+  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/');
   await ready(page);
@@ -1611,7 +1617,9 @@ test('Copy URL copies the current conversion and confirms with a check', async (
   page,
   context,
   isMobile,
+  browserName,
 }) => {
+  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   // A phone's header hides Copy URL (docs/UX-SPEC.md §1); a tablet's, 768 px, shows it to touch.
   if (isMobile) await page.setViewportSize({ width: 768, height: 1024 });

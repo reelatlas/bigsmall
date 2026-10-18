@@ -711,12 +711,16 @@ export function ConversionTable<T extends ConversionRow>({
     // A pressed button or checkbox takes focus, as in Chromium: Safari leaves a clicked control
     // without it (SidePanel gives it the same way), so the keys reach the card after a click and
     // the button that reads Edit keeps focus as it turns into Done (docs/LEARNINGS.md,
-    // 2026-10-18). A control that keeps focus elsewhere on purpose, preventing its press's
-    // default (a copy button), is left alone.
+    // 2026-10-18). The press's default is prevented first, since Safari drops a focus given on
+    // the press otherwise. A control that keeps focus elsewhere on purpose, preventing its
+    // press's default itself (a copy button), is left alone.
     const onMouseDown = (event: MouseEvent) => {
       if (event.defaultPrevented) return;
       const control = (event.target as Element).closest<HTMLElement>('button, input');
-      if (control && !control.matches(':disabled')) control.focus({ preventScroll: true });
+      if (control && !control.matches(':disabled')) {
+        event.preventDefault();
+        control.focus({ preventScroll: true });
+      }
     };
     card.addEventListener('keydown', onKeyDown);
     card.addEventListener('mousedown', onMouseDown);

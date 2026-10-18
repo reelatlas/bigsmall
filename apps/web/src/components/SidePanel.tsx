@@ -37,7 +37,8 @@ export function SidePanel({ title, children, onClose, focusOnOpen = true }: Side
   // Native listeners: the card is not itself interactive. In a layout effect, so a key pressed
   // straight after another finds the latest onClose. A click in the panel makes it where the keys
   // go, as a click in the calculator does (Sean, 2026-10-15): on a control, focus goes to it
-  // (Safari leaves a clicked button or checkbox without focus); anywhere else in the panel, focus
+  // (Safari leaves a clicked button or checkbox without focus, and drops one given on the press
+  // unless the press's default is prevented); anywhere else in the panel, focus
   // stays inside it, or comes in onto its first control.
   useLayoutEffect(() => {
     const panel = ref.current;
@@ -49,6 +50,9 @@ export function SidePanel({ title, children, onClose, focusOnOpen = true }: Side
         target.closest<HTMLElement>('button, input') ??
         (target.closest('label')?.control as HTMLElement | null | undefined);
       if (control && !control.matches(':disabled')) {
+        // The press's default first: Safari drops the focus given on a press otherwise
+        // (docs/LEARNINGS.md, 2026-10-18, its correction).
+        event.preventDefault();
         control.focus({ preventScroll: true });
         return;
       }

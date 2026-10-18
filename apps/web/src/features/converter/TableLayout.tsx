@@ -25,6 +25,7 @@ import { pressedByTouch } from '../../lib/modality';
 import { fitTools } from '../../lib/overflow';
 import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
+import { useKept } from '../../lib/keeping';
 import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
@@ -238,20 +239,20 @@ export function TableLayout({
   const placeRef = useRef<HTMLDivElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
   /**
-   * The box's top before a change of the table, for the layout effect that keeps the page to it
-   * after (below): whatever the table is swapped for, the box stays where it was on the screen
-   * (docs/UX-SPEC.md §5). Every change goes through `dispatch` or the pill's open, which note it.
+   * Whatever the table is swapped for, the box stays where it was on the screen (docs/UX-SPEC.md
+   * §5): every change goes through `dispatch` or the pill's open, which hold the box's place for
+   * the render after (useKept). Where the virtual DOM removes the table before it inserts what
+   * replaces it, a browser that lays the page out in between clamps the scroll to the top and,
+   * without scroll anchoring (WebKit, an iPhone), leaves it there (docs/LEARNINGS.md,
+   * 2026-10-17); Chromium anchors by itself and finds nothing to do here.
    */
-  const anchored = useRef<number | null>(null);
-  const anchor = () => {
-    anchored.current = fieldRef.current?.getBoundingClientRect().top ?? null;
-  };
+  const holdBox = useKept(fieldRef);
   const dispatch = (action: HistoryAction) => {
-    anchor();
+    holdBox();
     send(action);
   };
   const setChoosingFor = (value: string | null) => {
-    anchor();
+    holdBox();
     setChoosingForState(value);
   };
 
@@ -689,19 +690,6 @@ export function TableLayout({
   }, [browsing, at, listId]);
   useEffect(() => {
     holdScroll.current = false;
-  });
-
-  // After a change of the table, the box back to where it was on the screen, before the page
-  // paints: where the virtual DOM removes the table before it inserts what replaces it, a browser
-  // that lays the page out in between clamps the scroll to the top and, without scroll anchoring
-  // (WebKit, an iPhone), leaves it there (docs/LEARNINGS.md, 2026-10-17). Chromium anchors by
-  // itself and finds nothing to do here.
-  useLayoutEffect(() => {
-    if (anchored.current === null) return;
-    const was = anchored.current;
-    anchored.current = null;
-    const now = fieldRef.current?.getBoundingClientRect().top;
-    if (now !== undefined && Math.abs(now - was) >= 1) window.scrollBy(0, now - was);
   });
 
   // After a pick that put the table where a list was (typed matches, Cooking's ingredients, the

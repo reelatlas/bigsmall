@@ -19,6 +19,7 @@ import {
 import { useColumnsFit } from '../lib/fit-step';
 import { flash } from '../lib/flash';
 import { panelKeys } from '../lib/panel-keys';
+import { useKept } from '../lib/keeping';
 import {
   CHECKBOX,
   CHOICE_FILL,
@@ -679,22 +680,12 @@ export function ConversionTable<T extends ConversionRow>({
   });
 
   /**
-   * Where the card's top sat on the screen as Edit started or ended, so it stays there: nothing
-   * over the list moves. WebKit (Safari) otherwise scrolls the page to its top as Edit's list
-   * takes the rows' place (docs/LEARNINGS.md, "Safari scrolls to the top as a list is swapped").
+   * The card stays where it sat on the screen as Edit starts or ends, held before the change
+   * (useKept): nothing over the list moves. WebKit (Safari) otherwise scrolls the page to its top
+   * as Edit's list takes the rows' place (docs/LEARNINGS.md, "Safari scrolls to the top as a
+   * list is swapped").
    */
-  const editAnchor = useRef<number | null>(null);
-  const holdCard = () => {
-    editAnchor.current = cardRef.current?.getBoundingClientRect().top ?? null;
-  };
-  useLayoutEffect(() => {
-    const was = editAnchor.current;
-    const card = cardRef.current;
-    editAnchor.current = null;
-    if (was === null || !card) return;
-    const moved = card.getBoundingClientRect().top - was;
-    if (Math.abs(moved) >= 1) window.scrollBy(0, moved);
-  }, [editing]);
+  const holdCard = useKept(cardRef);
 
   /** Ends Edit, as Done does, folding Hidden, with focus back on the button that reads Edit again. */
   const endEdit = () => {

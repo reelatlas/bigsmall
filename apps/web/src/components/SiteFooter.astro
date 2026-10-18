@@ -1,9 +1,18 @@
 ---
-import { CONTENT_COLUMN, INLINE_LINK, PAGE_COLUMN, QUIET_LINK } from '../lib/recipes';
+import {
+  COLUMN_CELL,
+  CONTENT_COLUMN,
+  CONVERTER_FOOT,
+  INLINE_LINK,
+  PAGE_COLUMN,
+  QUIET_LINK,
+} from '../lib/recipes';
 
 /*
  * The footer under every page (docs/UX-SPEC.md §1, "Footer"), from Base.astro, its content on the
- * content column like the header, so its text starts where the name does (Sean, 2026-10-18). On
+ * content column like the header, so its text starts where the name does (Sean, 2026-10-18); on the
+ * converter page the footer is the page's own grid (CONVERTER_FOOT), its line in the column's
+ * track, so the link follows the column when a side panel slides it (Sean, 2026-10-18). On
  * every page but About: one quiet link to it, out of the way until hovered or focused (Sean,
  * 2026-10-15), its 44 px target taken back into its line so the text sits on the frame as a
  * paragraph would. On About, where the name in the header leads home: the privacy line in Sean's
@@ -14,11 +23,13 @@ import { CONTENT_COLUMN, INLINE_LINK, PAGE_COLUMN, QUIET_LINK } from '../lib/rec
  * token: 16 px on a phone, 24 from sm), the link's 44 px target its row, as the header's 48 px
  * row sits on it at the top (docs/DESIGN-SYSTEM.md, "The page's two ends mirror").
  */
-const onAbout = Astro.url.pathname.replace(/\/+$/, '') === '/about';
+const path = Astro.url.pathname.replace(/\/+$/, '');
+const onAbout = path === '/about';
+const onConverter = path === '';
 ---
 
-<footer class:list={[PAGE_COLUMN, 'mt-auto pb-frame text-sm']}>
-  <div class={CONTENT_COLUMN}>
+<footer class:list={onConverter ? CONVERTER_FOOT : [PAGE_COLUMN, 'mt-auto pb-frame text-sm']}>
+  <div class:list={[CONTENT_COLUMN, onConverter && COLUMN_CELL]}>
     {onAbout ? (
       <p class="text-ink-muted">
         Visits are counted anonymously without cookies by{' '}

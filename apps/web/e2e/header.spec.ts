@@ -306,7 +306,7 @@ test('off the converter’s page the name leads home on a 44 px target in every 
 // trial, 2026-10-18): by nothing where the margin holds it, else just enough for the panel to end at
 // the window's frame, and never past the page's edge. The panel opens beside a whole box from about a
 // 960 px window; narrower, the box gives way and the header with it.
-test('the header ends where the box ends, the column centered, and with Units open the column moves only by what the panel lacks', async ({
+test('the header ends where the box ends, the column centered, and with Units open the column moves only by what the panel lacks, the foot with it', async ({
   page,
   isMobile,
 }) => {
@@ -326,6 +326,13 @@ test('the header ends where the box ends, the column centered, and with Units op
         pageRight: Math.round(body.right - frame),
       };
     });
+  // The foot's line starts where the box does, so the About link sits under the name wherever the
+  // column is, Units open or not (Sean, 2026-10-18).
+  const footLeft = () =>
+    page
+      .getByRole('contentinfo')
+      .getByRole('link', { name: 'About' })
+      .evaluate((link) => Math.round(link.getBoundingClientRect().left));
   for (const [width, whole] of [
     [1440, true],
     [1280, true],
@@ -338,6 +345,7 @@ test('the header ends where the box ends, the column centered, and with Units op
     const closed = await edges();
     expect(closed.header, `${width}px`).toBe(closed.box);
     expect(closed.width, `${width}px`).toBe(576);
+    expect(await footLeft(), `${width}px, the foot`).toBe(closed.boxLeft);
     // The column centered in the window, nothing kept beside it.
     expect(
       Math.abs(closed.boxLeft - closed.pageLeft - (closed.pageRight - closed.box)),
@@ -348,6 +356,7 @@ test('the header ends where the box ends, the column centered, and with Units op
     await expect(panel).toBeVisible();
     const open = await edges();
     expect(open.header, `${width}px, Units open`).toBe(open.box);
+    expect(await footLeft(), `${width}px, the foot with Units open`).toBe(open.boxLeft);
     if (whole) expect(open.width, `${width}px, Units open`).toBe(576);
     else expect(open.width, `${width}px, Units open`).toBeLessThan(576);
     // The panel one step from the box's edge, on the box's top line.

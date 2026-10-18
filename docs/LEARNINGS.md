@@ -1098,6 +1098,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** The margin-first slide needs the page grid to know whether a side panel is open: its margin track is `max(min())` of the centered inset and the room the panel leaves. The panel is a cell the island renders only while a panel is open, and the grid sits on `main`, outside the island, so the first thought was an attribute the island sets on `main` from an effect.
 **Rule.** The grid reads the cell itself: `main:has([data-side-cell])` sets the track's variable inside the utility (`grid-cols-margin-box-and-side`), so the page's one declaration holds both states and nothing in script touches the page. A layout that depends on whether some part is present asks `:has()` before it asks an effect.
+**Since then.** The variable moved to the page's root the same day (`html:has([data-side-cell])`, the base layer), so the footer, outside `main`, lays its line on the same tracks and follows the column (`CONVERTER_FOOT`): a variable one grid sets for itself serves one grid; set where every reader inherits it, it serves them all.
 
 ## 2026-10-18 — A panel beside a stuck head opened where the head was, and the browser's focus scroll decided the rest
 

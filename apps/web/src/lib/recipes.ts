@@ -65,7 +65,8 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
  * Its size is the stock one above the converter's column, a side panel, and their gutters
  * (576 + 16 + 320, and 16 each side; 896 until 2026-10-17, when the box gave up 48 px beside an
  * open panel); since 2026-10-18 the converter page's main spans the window instead (CONVERTER_MAIN),
- * so a panel may use the window's margin, and this column bounds the other pages and the footer. Centered with its left edge on a whole pixel (`mx-page`, global.css), since the
+ * so a panel may use the window's margin, and this column bounds the other pages and their footer
+ * (the converter page's is CONVERTER_FOOT). Centered with its left edge on a whole pixel (`mx-page`, global.css), since the
  * scrollbar's room or an odd window would otherwise put the column on a half.
  */
 export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-frame';
@@ -105,13 +106,21 @@ export const CONTENT_COLUMN = 'mx-auto w-full max-w-xl';
  * beside the column). The panel carries the step between them, so an empty track is no width.
  * Every block between the page and the layout's cells spans the three tracks and hands them on
  * (IN_CONVERTER_GRID); the column's cells sit in the second track (COLUMN_CELL) and the panel in
- * the third.
+ * the third. The footer under the page is the same grid (CONVERTER_FOOT), its line in the column's
+ * track, so it follows the column when a panel slides it (Sean, 2026-10-18).
  */
 export const CONVERTER_GRID = 'md:grid md:grid-cols-margin-box-and-side';
 export const CONVERTER_MAIN = cx('w-full px-frame py-frame', CONVERTER_GRID);
 export const IN_CONVERTER_GRID = 'md:col-span-3 md:grid md:grid-cols-subgrid';
 /** A cell of the converter's column: the grid's second track, after the page's margin. */
 export const COLUMN_CELL = 'md:col-start-2';
+/**
+ * The converter page's footer: the same three tracks as its main (CONVERTER_GRID), its line in
+ * the column's track (COLUMN_CELL), so the About link starts where the name does and follows the
+ * column when a panel slides it (Sean, 2026-10-18: the foot aligned to the column wherever it
+ * is). The other pages' footer sits on the page column (SiteFooter).
+ */
+export const CONVERTER_FOOT = cx('mt-auto w-full px-frame pb-frame text-sm', CONVERTER_GRID);
 
 /**
  * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; a trial, Sean,

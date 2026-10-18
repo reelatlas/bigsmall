@@ -127,20 +127,22 @@
 }
 
 /*
- * A small label trimmed to its cap height (the formulas' exact and measured tags; Sean,
- * 2026-10-18: the word sat higher than centered in its pill). A line box holds the font's ascent
- * and descent, 13 and 3 px at 12 px here, so a word of lowercase letters sat 5 px under the pill's
- * top and 3 over its bottom. The standard answer, CSS Inline Layout 3's text-box-trim: the box is
- * drawn from the cap height to the alphabetic baseline, and its own symmetric padding centers the
- * ink, the pill keeping its 16 px. The padding goes with the trim, so a browser without it keeps
- * the line box as it was. On a block container (the tag is a flex item, so one). Measured in
- * Chromium and WebKit (docs/LEARNINGS.md, "A word sat high in its pill").
+ * A small lowercase label centered in its pill (the formulas' exact and measured tags; Sean,
+ * 2026-10-18: the word sat higher than centered). A line box holds the font's ascent and descent,
+ * 13 and 3 px at 12 px here, so the word's body, its x-height band, sat 7 px under the pill's top
+ * and 3 over its bottom; a trim to the cap height, tried first the same day, left it 7 and 4, since
+ * the cap stands 3 px over the x-height. The standard, CSS Inline Layout 3's text-box-trim, with
+ * the x-height as the upper edge: the box is the word's body, and the pill is four spacing steps
+ * tall, 16 px, its padding what remains around that body, so the body sits centered in every
+ * theme's font. The padding goes with the trim, so a browser without it keeps the line box as it
+ * was. On a block container (the tag is a flex item, so one). The cap edge is for labels with
+ * capitals (docs/LEARNINGS.md, "A word sat high in its pill").
  */
-@utility text-trim-cap {
+@utility text-trim-ex {
   @supports (text-box-trim: trim-both) {
     text-box-trim: trim-both;
-    text-box-edge: cap alphabetic;
-    padding-block: calc(var(--spacing) * 1);
+    text-box-edge: ex alphabetic;
+    padding-block: calc((var(--spacing) * 4 - 1ex) / 2);
   }
 }
 

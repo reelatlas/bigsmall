@@ -32,10 +32,11 @@ const ROW = 'grid gap-x-3 gap-y-0.5 py-1.5 @lg:grid-cols-[minmax(0,--spacing(48)
 /**
  * Exact by definition, or measured: a small tag after the formula, on the shape token's smallest
  * corner, the keycap's, which each theme sets (Sean, 2026-10-18; a pill, `rounded-full`, outside
- * the tokens, until then; the token guard rejects it now), its box trimmed to the cap height so
- * the word sits centered in it (`text-trim-cap`, global.css; Sean, 2026-10-18: the word sat high).
+ * the tokens, until then; the token guard rejects it now), its box trimmed to the x-height so the
+ * word's body sits centered in a 16 px pill (`text-trim-ex`, global.css; Sean, 2026-10-18: the word
+ * sat high, and a trim to the cap height, tried first, left it there).
  */
-const TAG = 'rounded-sm px-2 text-xs font-medium text-trim-cap';
+const TAG = 'rounded-sm px-2 text-xs font-medium text-trim-ex';
 const EXACT = cx(TAG, 'bg-accent-soft text-ink');
 const MEASURED = cx(TAG, 'bg-surface-raised text-ink-muted');
 

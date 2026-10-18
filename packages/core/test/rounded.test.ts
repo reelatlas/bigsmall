@@ -208,3 +208,98 @@ describe('formatSignificant', () => {
     expect(significant(Number.NaN, 'up')).toBeNull();
   });
 });
+
+describe('the locale’s own marks', () => {
+  it('writes the decimal comma and the point groups of German', () => {
+    const de = 'de-DE';
+    expect(formatPlaces(1234.5678, { places: 1, rounding: 'nearest', locale: de })?.text).toBe(
+      '1.234,6',
+    );
+    expect(formatPlaces(0.000473, { places: 2, rounding: 'nearest', locale: de })?.text).toBe(
+      '< 0,01',
+    );
+    expect(formatPlaces(-0.004, { places: 2, rounding: 'nearest', locale: de })?.text).toBe(
+      '> -0,01',
+    );
+    expect(formatFraction(-1234.5, { sizes: eighths, rounding: 'nearest', locale: de })).toEqual({
+      text: '-1.234 1/2',
+      approx: false,
+    });
+    expect(
+      formatFraction(1_043_262.45, { sizes: eighths, rounding: 'nearest', locale: de })?.text,
+    ).toBe('1.043.262');
+    expect(formatSignificant(1234567.89, { digits: 6, rounding: 'down', locale: de })).toBe(
+      '1.234.560',
+    );
+  });
+
+  it('writes the minus sign the locale writes, U+2212 in Swedish', () => {
+    // The sign is read from Intl rather than written here: the claim is that every format writes
+    // the locale's own sign, whichever its ICU ships. A locale whose sign is the hyphen would
+    // prove nothing, so the test says so if Swedish ever stops writing U+2212.
+    const sv = 'sv-SE';
+    const minus = new Intl.NumberFormat(sv)
+      .formatToParts(-1)
+      .find((part) => part.type === 'minusSign')?.value;
+    expect(minus).not.toBe('-');
+    const grouped = (value: number) => new Intl.NumberFormat(sv).format(value);
+    expect(formatPlaces(-2.15, { places: 1, rounding: 'up', locale: sv })?.text).toBe(
+      `${minus}2,1`,
+    );
+    expect(formatPlaces(-0.004, { places: 2, rounding: 'nearest', locale: sv })?.text).toBe(
+      `> ${minus}0,01`,
+    );
+    expect(formatFraction(-1.5, { sizes: sizes(4), rounding: 'nearest', locale: sv })?.text).toBe(
+      `${minus}1 2/4`,
+    );
+    expect(formatFraction(-0.001, { sizes: eighths, rounding: 'nearest', locale: sv })?.text).toBe(
+      `> ${minus}1/8`,
+    );
+    expect(
+      formatFraction(-1_043_262.45, { sizes: eighths, rounding: 'down', locale: sv })?.text,
+    ).toBe(`${minus}${grouped(1_043_263)}`);
+    expect(formatSignificant(-2 / 3, { digits: 6, rounding: 'nearest', locale: sv })).toBe(
+      `${minus}0,666667`,
+    );
+  });
+
+  it('falls back to the runtime’s locale for one Intl does not know, as formatNumber does', () => {
+    const bad = 'not a locale';
+    expect(formatPlaces(1.5, { places: 1, rounding: 'nearest', locale: bad })?.text).toMatch(
+      /^1.5$/,
+    );
+    expect(formatPlaces(-0.004, { places: 2, rounding: 'nearest', locale: bad })?.text).toMatch(
+      /^> .0.01$/,
+    );
+    expect(formatFraction(2.5, { sizes: eighths, rounding: 'nearest', locale: bad })?.text).toBe(
+      '2 1/2',
+    );
+    expect(
+      formatFraction(-2e6, { sizes: eighths, rounding: 'nearest', locale: bad })?.text,
+    ).toMatch(/^.2.000.000$/);
+  });
+});
+
+describe('what the formats leave to the digits', () => {
+  it('leaves a value at and past 1e15 to them, where places would only repeat them', () => {
+    expect(places(1e15, 2)).toBeNull();
+    expect(places(2e15, 0)).toBeNull();
+    expect(places(-1e15, 1, 'down')).toBeNull();
+    expect(places(1e14, 2)).toBe('100,000,000,000,000.00');
+  });
+
+  it('leaves what is not finite to the caller, as places does', () => {
+    expect(fraction(Number.NaN, eighths)).toBeNull();
+    expect(fraction(Number.POSITIVE_INFINITY, eighths)).toBeNull();
+  });
+
+  it('writes the nearest digits where rounding up or the scale would overflow a double', () => {
+    expect(significant(1.7e308, 'up')).toBe('1.7E308');
+    // Rounding the largest double up would pass it; the scale for the smallest, 10^329, is
+    // infinite.
+    expect(significant(Number.MAX_VALUE, 'up')).toBe('1.79769E308');
+    expect(significant(-Number.MAX_VALUE, 'down')).toBe('-1.79769E308');
+    expect(significant(Number.MIN_VALUE)).toBe('5E-324');
+    expect(significant(1e-310, 'down')).toBe('1E-310');
+  });
+});

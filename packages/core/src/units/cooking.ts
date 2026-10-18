@@ -39,8 +39,8 @@ export const COOKING_UNITS: readonly string[] = [
 
 /**
  * An ingredient's own units, as recipes count it: weights of Weight, each listed only with its
- * ingredient (`ingredient`): a stick of butter and a packet of yeast by their packages' net weights,
- * exact; a large egg as the sources weigh one (docs/research/cooking-2.md).
+ * ingredient (`ingredient`): a stick of butter and a packet of yeast by their packages' net
+ * weights, exact; a large egg as the sources weigh one (docs/research/cooking-2.md).
  */
 export const ingredientUnits: readonly Unit[] = [
   {
@@ -68,7 +68,7 @@ export const ingredientUnits: readonly Unit[] = [
     name: 'large egg',
     plural: 'large eggs',
     symbol: 'egg',
-    aliases: ['large eggs'],
+    aliases: [],
     system: 'us',
     tier: 'standard',
     factor: 0.05,

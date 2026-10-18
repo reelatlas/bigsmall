@@ -6,7 +6,10 @@ import { golden } from './golden/index';
 /** Factors are exact; two floating-point operations cost about 1e-16 each. */
 const DEFAULT_TOLERANCE = 1e-12;
 
-/** `floor` sets a minimum scale so tiny values are judged on absolute error (affine offsets make relative error meaningless near zero). */
+/**
+ * `floor` sets a minimum scale so tiny values are judged on absolute error (affine offsets make
+ * relative error meaningless near zero).
+ */
 function expectClose(
   actual: number,
   expected: number,
@@ -146,8 +149,9 @@ describe('errors', () => {
 });
 
 describe('convertChange', () => {
-  // A change between two readings, not a reading (Sean, 2026-10-16): the scales' degree sizes alone,
-  // 1 °C and 1 K of change are 1 K, 1 °F and 1 °R are 5/9 K (NIST SP 811 Appendix B.8, exact).
+  // A change between two readings, not a reading (Sean, 2026-10-16): the scales' degree sizes
+  // alone, 1 °C and 1 K of change are 1 K, 1 °F and 1 °R are 5/9 K (NIST SP 811 Appendix B.8,
+  // exact).
   it('converts a change by the scales’ degree sizes alone, its sign kept', () => {
     expectClose(convertChange(5, 'celsius', 'fahrenheit'), 9);
     expect(convertChange(5, 'celsius', 'kelvin')).toBe(5);

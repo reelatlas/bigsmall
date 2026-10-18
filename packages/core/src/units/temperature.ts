@@ -27,7 +27,6 @@ export const temperatureUnits: readonly Unit[] = [
     aliases: [
       'c',
       'deg c',
-      'degc',
       'degree c',
       'degrees c',
       'degree celsius',
@@ -52,7 +51,6 @@ export const temperatureUnits: readonly Unit[] = [
     aliases: [
       'f',
       'deg f',
-      'degf',
       'degree f',
       'degrees f',
       'degree fahrenheit',
@@ -89,7 +87,7 @@ export const temperatureUnits: readonly Unit[] = [
     name: 'Rankine',
     plural: 'Rankine',
     symbol: '°R',
-    aliases: ['deg r', 'degr', 'degree r', 'degrees r', 'degree rankine', 'degrees rankine'],
+    aliases: ['deg r', 'degree r', 'degrees r', 'degree rankine', 'degrees rankine'],
     system: 'us',
     tier: 'specialty',
     factor: 5 / 9,

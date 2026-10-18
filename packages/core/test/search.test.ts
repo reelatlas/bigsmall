@@ -408,7 +408,8 @@ describe('search: categories and scope', () => {
   });
 
   it('ranks a preferred category first among equal matches, hiding none', () => {
-    // Units only: "p" also starts Pressure and Power, "f" Fuel economy, and categories lead their class.
+    // Units only: "p" also starts Pressure and Power, "f" Fuel economy, and categories lead their
+    // class.
     const unitIds = (response: SearchResponse) => ids(response).filter((id) => !id.startsWith('#'));
     expect(unitIds(search('p', { system: 'us' })).slice(0, 2)).toEqual(['pound', 'us-pint']);
     expect(unitIds(search('p', { system: 'us', prefer: 'volume' })).slice(0, 3)).toEqual([
@@ -570,5 +571,43 @@ describe('suggest', () => {
     const s = suggest('1,5 oz', { category: 'volume', separators: { decimal: ',', group: '.' } });
     expect(s.parsed.value).toBe(1.5);
     expect(s.exact?.id).toBe('us-fluid-ounce');
+  });
+});
+
+describe('search: the catalog’s alias decisions', () => {
+  // docs/UNITS-CATALOG.md records each alias decision (§0, "Alias decisions so far"; §4; §5's
+  // watchlist); each row pins one by the first result for its query, over every tier, as the
+  // converter asks (ADR 0018). Each cites the catalog's section and, as of v0.6, its line.
+  const decisions: ReadonlyArray<[query: string, first: string, where: string]> = [
+    ['/km', 'minute-per-kilometer', '§0 the paces, line 17'],
+    ['per km', 'minute-per-kilometer', '§0 the paces, line 17'],
+    ['km pace', 'minute-per-kilometer', '§0 the paces, line 17'],
+    ['/mi', 'minute-per-mile', '§0 the paces, line 17'],
+    ['/mile', 'minute-per-mile', '§0 the paces, line 17'],
+    ['per mile', 'minute-per-mile', '§0 the paces, line 17'],
+    ['mile pace', 'minute-per-mile', '§0 the paces, line 17'],
+    ['pace', '#speed', '§0 the paces, line 17: pace names Speed, which lists them'],
+    ['kph', 'kilometer-per-hour', '§0 colloquial aliases, line 18'],
+    ['kmh', 'kilometer-per-hour', '§0 colloquial aliases, line 18'],
+    ['ci', 'cubic-inch', '§0 the car words, line 20'],
+    ['cid', 'cubic-inch', '§0 the car words, line 20'],
+    ['displacement', '#volume', '§0 the car words, line 20'],
+    ['boost', '#pressure', '§0 the car words, line 20'],
+    ['lug nut torque', '#torque', '§0 the car words, line 20'],
+    ['engine power', '#power', '§0 the car words, line 20'],
+    ['gon', 'gradian', '§3 Angle, line 78: grad, the gon its alias'],
+    ['KB', 'kilobyte', '§4 Data, line 127: case folded, no alias'],
+  ];
+
+  it.each(decisions)('%s names %s (%s)', (query, first) => {
+    expect(ids(search(query, { tier: 'all' }))[0]).toBe(first);
+  });
+
+  it('offers grains before grams for "gr" (§0, line 24)', () => {
+    expect(ids(search('gr', { tier: 'all' })).slice(0, 2)).toEqual(['grain', 'gram']);
+  });
+
+  it('offers Length before Time for "how long", which both claim, by registry order (§5, line 150)', () => {
+    expect(ids(search('how long')).slice(0, 2)).toEqual(['#length', '#time']);
   });
 });

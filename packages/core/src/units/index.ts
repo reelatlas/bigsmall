@@ -41,7 +41,8 @@ export const units: readonly Unit[] = [
   ...lengthUnits,
   ...massUnits,
   ...volumeUnits,
-  // Cooking's ingredients' own units (a stick of butter), weights listed only with their ingredient.
+  // Cooking's ingredients' own units (a stick of butter), weights listed only with their
+  // ingredient.
   ...ingredientUnits,
   ...temperatureUnits,
   ...areaUnits,

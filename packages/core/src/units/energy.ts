@@ -22,7 +22,10 @@ const FOOT_POUND =
 const ELECTRONVOLT =
   'BIPM SI Brochure, 9th ed. (2019), Table 8: 1 eV = 1.602 176 634 × 10⁻¹⁹ J (exact)';
 
-/** The International Table BTU: the IT calorie per gram per degree Celsius, over a pound and a degree Fahrenheit. */
+/**
+ * The International Table BTU: the IT calorie per gram per degree Celsius, over a pound and a
+ * degree Fahrenheit.
+ */
 const BTU_IT = (4.1868 * 453.59237) / 1.8;
 
 export const energyUnits: readonly Unit[] = [
@@ -92,7 +95,7 @@ export const energyUnits: readonly Unit[] = [
     plural: 'kilowatt-hours',
     symbol: 'kWh',
     aliases: ['kilowatt hour', 'kilowatt hours', 'kW·h'],
-    system: 'si',
+    system: 'metric',
     tier: 'standard',
     factor: 3.6e6,
     exact: true,
@@ -106,7 +109,7 @@ export const energyUnits: readonly Unit[] = [
     plural: 'watt-hours',
     symbol: 'Wh',
     aliases: ['watt hour', 'watt hours', 'W·h'],
-    system: 'si',
+    system: 'metric',
     tier: 'standard',
     factor: 3600,
     exact: true,
@@ -202,7 +205,7 @@ export const energyUnits: readonly Unit[] = [
     name: 'electronvolt',
     plural: 'electronvolts',
     symbol: 'eV',
-    aliases: ['electron volt', 'electron volts', 'electron-volt', 'electron-volts'],
+    aliases: ['electron-volt', 'electron-volts'],
     system: 'other',
     tier: 'specialty',
     factor: 1.602176634e-19,

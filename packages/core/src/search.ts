@@ -63,8 +63,8 @@ export interface SearchResponse {
   results: SearchResult[];
   /**
    * True when a search for standard units showed specialty ones because nothing standard matched.
-   * Nothing reads it: the converter asks for every tier, and leaves specialty units out by Settings'
-   * Specialty switch instead (ADR 0018).
+   * Nothing reads it: the converter asks for every tier, and leaves specialty units out by
+   * Settings' Specialty switch instead (ADR 0018).
    */
   escalated: boolean;
 }
@@ -148,7 +148,10 @@ function classifyCategory(q: Query, key: CategoryKey): MatchClass | null {
   return null;
 }
 
-/** True when `a` and `b` differ by at most one edit: substitution, insertion, deletion, or adjacent swap. */
+/**
+ * True when `a` and `b` differ by at most one edit: substitution, insertion, deletion, or
+ * adjacent swap.
+ */
 function withinOneEdit(a: string, b: string): boolean {
   if (Math.abs(a.length - b.length) > 1) return false;
   if (a === b) return true;

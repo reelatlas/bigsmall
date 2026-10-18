@@ -1,7 +1,7 @@
 # 0016 — Every unit in the table: specialist units listed with the everyday ones, no modes
 
 Date: 2026-10-08
-Status: accepted; amended by 0017, now 0018 (the specialist units wait under Hidden on a fresh visit, one tap away)
+Status: accepted; amended by 0017, now 0018 (the specialist units wait under Hidden on a fresh visit, one tap away); amended 2026-10-16 (below)
 
 ## Context
 
@@ -30,3 +30,7 @@ Behavior: docs/UX-SPEC.md §3. Catalog: docs/UNITS-CATALOG.md §3.
 - Long names drop out in every row on a phone more often, since one long name (British thermal units) that does not fit beside its value hides the names of the whole table (`useColumnsFit`, docs/DESIGN-SYSTEM.md, "Columns that give way").
 - More category names start more letters, and a category whose name starts the query leads its class (docs/UX-SPEC.md §4): `250 p` now offers Pressure first, ahead of pounds.
 - The page's script grows with the units; the bundle budget (`pnpm bundle:check`) keeps watch.
+
+## Amendments
+
+- 2026-10-16: the tiers are named standard and specialty, the screen's words, in code, docs, and saved settings alike (`tier: 'standard' | 'specialty'`; everyday and specialist here, basic and advanced in the plan, until then; docs/UNITS-CATALOG.md §3). Among exact matches the ranking above is now third: the current category's unit leads, then a key written as typed, its letters' case included, and only then a standard unit before a specialty one (docs/UX-SPEC.md §4; Sean, 2026-10-16: `500 nm` is nanometers, `Nm` the newton meter).

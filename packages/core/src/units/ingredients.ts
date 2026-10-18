@@ -9,8 +9,8 @@ import type { Ingredient, IngredientKind } from '../types';
  */
 
 /**
- * The kinds, in the order Cooking lists them (its list with no ingredient, and the list its pill opens),
- * each with its heading; the ingredients follow this order.
+ * The kinds, in the order Cooking lists them (its list with no ingredient, and the list its pill
+ * opens), each with its heading; the ingredients follow this order.
  */
 export const INGREDIENT_KINDS: readonly { id: IngredientKind; name: string }[] = [
   // Named as a pantry names its shelves: mass nouns in the singular (Flour, Sugar, Dairy, Baking),

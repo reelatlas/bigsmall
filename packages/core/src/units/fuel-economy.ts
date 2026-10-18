@@ -21,7 +21,9 @@ const PER_100_MI =
 const MILE_KM = 1.609344;
 const US_GALLON_L = 3.785411784;
 const UK_GALLON_L = 4.54609;
-/** km/L at one US gallon per 100 miles: a hundred miles in kilometers over a US gallon in liters. */
+/**
+ * km/L at one US gallon per 100 miles: a hundred miles in kilometers over a US gallon in liters.
+ */
 const PER_100_MI_KM_PER_L = (100 * MILE_KM) / US_GALLON_L;
 
 /**

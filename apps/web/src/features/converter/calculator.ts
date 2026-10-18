@@ -1,4 +1,4 @@
-import { formatNumber, parse, type ParsedInput, type Separators } from '@bigsmall/core';
+import { formatNumber, MINUS, parse, type ParsedInput, type Separators } from '@bigsmall/core';
 import type { CalculatorKey } from '../../components/Calculator';
 import { EMPTY_CALC, NO_ANSWER_MESSAGES, type CalculatorState, type NumberEnv } from './state';
 
@@ -7,7 +7,6 @@ import { EMPTY_CALC, NO_ANSWER_MESSAGES, type CalculatorState, type NumberEnv } 
  * entry, and how a number goes into a box. Pure, so every rule is unit-tested in node.
  */
 
-const MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);
 

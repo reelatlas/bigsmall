@@ -1,17 +1,51 @@
 export interface FormatOptions {
   /** Significant digits to show, 1–21. Default 10. Trailing zeros are never shown. */
   precision?: number;
-  /** BCP 47 locale for grouping and the decimal mark. Default (or undefined): the runtime's locale. */
+  /**
+   * BCP 47 locale for grouping and the decimal mark. Default (or undefined): the runtime's
+   * locale.
+   */
   locale?: string | undefined;
   /** 'auto' switches to scientific notation for very large or very small magnitudes. */
   notation?: 'auto' | 'standard' | 'scientific';
 }
 
-/** Magnitudes at or beyond these switch to scientific notation in 'auto' mode (docs/UX-SPEC.md §7). */
+/**
+ * Magnitudes at or beyond these switch to scientific notation in 'auto' mode (docs/UX-SPEC.md
+ * §7).
+ */
 const SCIENTIFIC_ABOVE = 1e15;
 const SCIENTIFIC_BELOW = 1e-6;
 
 const DEFAULT_PRECISION = 10;
+
+/**
+ * The typographic minus, U+2212: the sign some locales write before a negative (minusSign), which
+ * the parser reads as one (parse.ts). Named once, never written as an escape.
+ */
+export const MINUS = String.fromCharCode(0x2212);
+
+/**
+ * A number format for the locale, or for the runtime's when the locale is not one Intl knows (an
+ * invalid tag throws a RangeError). Every number core writes goes through it, so a bad locale
+ * never breaks a table.
+ */
+export function numberFormat(
+  locale: string | undefined,
+  options: Intl.NumberFormatOptions = {},
+): Intl.NumberFormat {
+  try {
+    return new Intl.NumberFormat(locale, options);
+  } catch {
+    return new Intl.NumberFormat(undefined, options);
+  }
+}
+
+/** The minus sign the locale writes (U+2212 in some, a hyphen in most). */
+export function minusSign(locale: string | undefined): string {
+  const parts = numberFormat(locale).formatToParts(-1);
+  return parts.find((part) => part.type === 'minusSign')?.value ?? '-';
+}
 
 /**
  * Format a conversion result for display. Returns an empty string for NaN or infinities, which
@@ -29,16 +63,11 @@ export function formatNumber(value: number, options: FormatOptions = {}): string
         : 'standard'
       : options.notation;
 
-  const formatOptions: Intl.NumberFormatOptions = {
+  return numberFormat(options.locale, {
     maximumSignificantDigits: precision,
     notation,
     useGrouping: true,
-  };
-  try {
-    return new Intl.NumberFormat(options.locale, formatOptions).format(normalized);
-  } catch {
-    return new Intl.NumberFormat(undefined, formatOptions).format(normalized);
-  }
+  }).format(normalized);
 }
 
 /**
@@ -52,17 +81,8 @@ export function formatClock(minutes: number, options: Pick<FormatOptions, 'local
   if (!Number.isFinite(minutes)) return '';
   const seconds = Math.round(Math.abs(minutes) * 60);
   if (!Number.isSafeInteger(seconds)) return formatNumber(minutes, options);
-  const digits = (value: number, at: number) => {
-    const formatOptions: Intl.NumberFormatOptions = {
-      minimumIntegerDigits: at,
-      useGrouping: false,
-    };
-    try {
-      return new Intl.NumberFormat(options.locale, formatOptions).format(value);
-    } catch {
-      return new Intl.NumberFormat(undefined, formatOptions).format(value);
-    }
-  };
+  const digits = (value: number, at: number) =>
+    numberFormat(options.locale, { minimumIntegerDigits: at, useGrouping: false }).format(value);
   // A pace under a second is never written 0:00, so it is never taken for nothing, as a decimal
   // that rounds to zero reads "< 0.01" (formatPlaces).
   if (seconds === 0 && minutes !== 0) {
@@ -71,16 +91,6 @@ export function formatClock(minutes: number, options: Pick<FormatOptions, 'local
   }
   const sign = minutes < 0 && seconds > 0 ? minusSign(options.locale) : '';
   return `${sign}${digits(Math.floor(seconds / 60), 1)}:${digits(seconds % 60, 2)}`;
-}
-
-/** The minus sign the locale writes (U+2212 in some, a hyphen in most). */
-function minusSign(locale: string | undefined): string {
-  try {
-    const parts = new Intl.NumberFormat(locale).formatToParts(-1);
-    return parts.find((part) => part.type === 'minusSign')?.value ?? '-';
-  } catch {
-    return '-';
-  }
 }
 
 function clamp(n: number, min: number, max: number): number {

@@ -3,6 +3,7 @@ import {
   formatPlaces,
   formatSignificant,
   localeSeparators,
+  MINUS,
   type FractionSize,
   type Rounded,
   type Rounding,
@@ -219,9 +220,6 @@ function sectionEdge(at: number, kind: 'heading' | 'row'): string {
  * button, its corners the row's.
  */
 const COPY_CELL = 'absolute inset-y-0 right-0 flex';
-
-/** The minus sign some locales write (U+2212), which a copy turns into a plain hyphen. */
-const MINUS = String.fromCharCode(0x2212);
 
 /** What shows behind the copy button: the row's fill, the accent's soft tint for the box's unit. */
 function copyBehind(inBox: boolean): { fade: string; fill: string } {
@@ -769,8 +767,12 @@ export function ConversionTable<T extends ConversionRow>({
     >
       {checkbox(row, list === 'shown', list)}
       {/* The symbol on one line and a long name wrapping, as the matches write them, never cut short. */}
-      <span className={unitSymbol()}>{row.symbol}</span>
-      <span className={unitName(withNames)}>{row.name}</span>
+      <span className={unitSymbol()} data-symbol>
+        {row.symbol}
+      </span>
+      <span className={unitName(withNames)} data-name>
+        {row.name}
+      </span>
     </label>
   );
 

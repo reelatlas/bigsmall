@@ -1,13 +1,21 @@
+import { MINUS } from './format';
 import { DEFAULT_SEPARATORS, type Separators } from './locale';
 
-/** What the user typed, split into the number or arithmetic (if any) and the unit query (if any). */
+/**
+ * What the user typed, split into the number or arithmetic (if any) and the unit query (if any).
+ */
 export interface ParsedInput {
   raw: string;
-  /** The number the text starts with, or the value of the arithmetic it starts with ("5+3" is 8). */
+  /**
+   * The number the text starts with, or the value of the arithmetic it starts with ("5+3" is 8).
+   */
   value?: number;
   /** The exact substring read as the number or the arithmetic, a trailing operator included. */
   valueText?: string;
-  /** Whatever followed the number, trimmed, original case. The whole text when there is no number. */
+  /**
+   * Whatever followed the number, trimmed, original case. The whole text when there is no
+   * number.
+   */
   query?: string;
   /**
    * Set when the text holds an amount a double cannot hold, and `value` is then absent: 'large'
@@ -22,7 +30,10 @@ export interface ParsedInput {
   invalid?: 'divide-by-zero' | 'not-real';
   /** Set when the value comes from arithmetic rather than one number, so the UI can show it. */
   expression?: true;
-  /** Where the exponent markers ("e" or "E") sit within `valueText`, so the UI can set them apart. */
+  /**
+   * Where the exponent markers ("e" or "E") sit within `valueText`, so the UI can set them
+   * apart.
+   */
   exponentMarks?: number[];
   /**
    * The number exactly as typed, when the text is one number rather than arithmetic: its digits in
@@ -32,10 +43,10 @@ export interface ParsedInput {
   canonical?: string;
 }
 
-// Characters that are easy to get wrong as escapes, so they are named once.
+// Characters that are easy to get wrong as escapes, so they are named once (the minus in
+// format.ts).
 const NBSP = String.fromCharCode(0x00a0);
 const NARROW_NBSP = String.fromCharCode(0x202f);
-const UNICODE_MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);
 const RIGHT_QUOTE = String.fromCharCode(0x2019);
@@ -57,7 +68,7 @@ type Operator = 'add' | 'subtract' | 'multiply' | 'divide' | 'power';
 const OPERATORS: Readonly<Record<string, Operator>> = {
   '+': 'add',
   '-': 'subtract',
-  [UNICODE_MINUS]: 'subtract',
+  [MINUS]: 'subtract',
   '*': 'multiply',
   [TIMES]: 'multiply',
   '/': 'divide',
@@ -65,10 +76,10 @@ const OPERATORS: Readonly<Record<string, Operator>> = {
   '^': 'power',
 };
 
-const SIGNS = new Set(['+', '-', UNICODE_MINUS]);
+const SIGNS = new Set(['+', '-', MINUS]);
 const DIGITS = '[0-9]+';
 const SEPARATOR = `[.,${NBSP}${NARROW_NBSP}]`;
-const ENDS_A_NUMBER = `[ ${NBSP}${NARROW_NBSP})+*/^${TIMES}${DIVIDE}${UNICODE_MINUS}-]`;
+const ENDS_A_NUMBER = `[ ${NBSP}${NARROW_NBSP})+*/^${TIMES}${DIVIDE}${MINUS}-]`;
 
 /**
  * One unsigned number (arithmetic reads the signs): digit groups split by ".", ",", or a
@@ -76,7 +87,7 @@ const ENDS_A_NUMBER = `[ ${NBSP}${NARROW_NBSP})+*/^${TIMES}${DIVIDE}${UNICODE_MI
  * ("5." on the way to 5.5) when only space, an operator, or the end follows it.
  */
 const NUMBER = new RegExp(
-  `(?:${DIGITS}(?:${SEPARATOR}${DIGITS})*|[.,]${DIGITS})(?:[eE][+${UNICODE_MINUS}-]?${DIGITS})?(?:[.,](?=$|${ENDS_A_NUMBER}))?`,
+  `(?:${DIGITS}(?:${SEPARATOR}${DIGITS})*|[.,]${DIGITS})(?:[eE][+${MINUS}-]?${DIGITS})?(?:[.,](?=$|${ENDS_A_NUMBER}))?`,
   'y',
 );
 /**
@@ -409,7 +420,10 @@ function evaluate(scanned: readonly Token[]): Evaluation {
   return result;
 }
 
-/** The number the text spells, which may be Infinity or a zero that underflowed; parse() judges the range. */
+/**
+ * The number the text spells, which may be Infinity or a zero that underflowed; parse() judges
+ * the range.
+ */
 function toNumber(text: string, separators: Separators): number {
   if (text.includes(':')) {
     // A clock: each part sixtieths of the one before ("5:30" is 5.5, "1:05:30" 1.0916…).
@@ -420,7 +434,7 @@ function toNumber(text: string, separators: Separators): number {
 
 /** A typed number's digits in canonical form: a period decimal, no grouping, an E exponent. */
 function canonicalNumber(text: string, separators: Separators): string {
-  let body = text.replace(TRAILING_MARK, '').split(UNICODE_MINUS).join('-');
+  let body = text.replace(TRAILING_MARK, '').split(MINUS).join('-');
   let exponent = '';
   const expIndex = body.search(EXPONENT_MARK);
   if (expIndex >= 0) {

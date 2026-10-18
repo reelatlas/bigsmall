@@ -103,7 +103,7 @@ export const massUnits: readonly Unit[] = [
     name: 'pound',
     plural: 'pounds',
     symbol: 'lb',
-    aliases: ['lbs', 'lb.', 'pound (avoirdupois)'],
+    aliases: ['lbs', 'pound (avoirdupois)'],
     system: 'imperial',
     tier: 'standard',
     factor: 0.45359237,

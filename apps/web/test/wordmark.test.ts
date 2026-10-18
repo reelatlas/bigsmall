@@ -1,3 +1,4 @@
+import { convert, MINUS, resolveExact, type Unit } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import {
   ART_GLYPHS,
@@ -231,5 +232,65 @@ describe('pace', () => {
     expect(pace(1)).toBeLessThan(0.25);
     expect(pace(3)).toBeLessThan(pace(1));
     expect(pace(1, 7)).toBeLessThan(pace(1, 3.5));
+  });
+});
+
+describe('the conversions', () => {
+  // Every conversion phrase core can read, a value and a unit on each side of = or ≈, is held to
+  // core's own factor to the digits shown (ADR 0020; the phrases are typed by hand). The rest are
+  // named here as unchecked, so a new phrase is either checked or listed.
+  const UNCHECKED: readonly string[] = [
+    '°F = °C × 9/5 + 32', // a formula, not a value and a unit
+    '1 L = 1000 cm³', // cm³ is no unit of core's (the milliliter's alias is cc)
+    '1 mL = 1 cm³',
+    '1 Å = 0.1 nm', // the ångström is left out (docs/UNITS-CATALOG.md §3)
+    '1 J = 1 N·m', // energy against torque: two categories, which convert keeps apart
+    '1 W = 1 J/s', // J/s is no unit of core's
+    '360° = 2π rad', // 2π is not written in digits
+    '1 Mbps = 125 kB/s', // data rates are not a category yet
+    '1 mpg ≈ 0.425 km/L', // mpg names two gallons, so no one unit (docs/UNITS-CATALOG.md §4)
+  ];
+  /** A value and a unit: "−273.15 °C", "10 000 m²", "9.461e15 m", "57.3°". */
+  const SIDE = new RegExp(
+    `^([${MINUS}-]?\\d[\\d${NARROW_SPACE}]*(?:\\.\\d+)?(?:e[${MINUS}-]?\\d+)?)\\s*(\\S.*)$`,
+    'u',
+  );
+  const plain = (digits: string) => digits.replaceAll(NARROW_SPACE, '').replaceAll(MINUS, '-');
+
+  /** The conversion a phrase states, or null where core cannot read one. */
+  function readConversion(phrase: string) {
+    const sides = phrase.split(/ [=≈] /);
+    const left = sides.length === 2 ? SIDE.exec(sides[0]!) : null;
+    const right = sides.length === 2 ? SIDE.exec(sides[1]!) : null;
+    if (!left || !right) return null;
+    // Each side's unit on its own; an ambiguous one ("oz") in the other side's category.
+    let from: Unit | null = resolveExact(left[2]!);
+    let to: Unit | null = resolveExact(right[2]!);
+    if (from && !to) to = resolveExact(right[2]!, { category: from.category });
+    if (to && !from) from = resolveExact(left[2]!, { category: to.category });
+    if (!from || !to || from.category !== to.category) return null;
+    return { value: Number(plain(left[1]!)), from, to, shown: plain(right[1]!) };
+  }
+
+  it('agree with core to the digits shown, or are listed as unchecked', () => {
+    const unchecked: string[] = [];
+    let checked = 0;
+    for (const phrase of catalog().conversions) {
+      const read = readConversion(phrase);
+      if (!read) {
+        unchecked.push(phrase);
+        continue;
+      }
+      const [mantissa = '', exponent = '0'] = read.shown.toLowerCase().split('e');
+      const decimals = (mantissa.split('.')[1] ?? '').length;
+      const scaled = convert(read.value, read.from, read.to) / 10 ** Number(exponent);
+      // Within half of the last digit shown, and float noise.
+      expect(Math.abs(scaled - Number(mantissa)), phrase).toBeLessThanOrEqual(
+        0.5 * 10 ** -decimals + 1e-9,
+      );
+      checked += 1;
+    }
+    expect(unchecked).toEqual(UNCHECKED);
+    expect(checked).toBe(catalog().conversions.length - UNCHECKED.length);
   });
 });

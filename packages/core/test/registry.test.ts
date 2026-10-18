@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { categories, compactKey, getUnit, units, unitsIn } from '../src/index';
+import {
+  categories,
+  compactKey,
+  compactKeyWithDegree,
+  getUnit,
+  units,
+  unitsIn,
+} from '../src/index';
 
-/** Data-integrity rules every unit and category must satisfy. Fails fast when a new entry is malformed. */
+/**
+ * Data-integrity rules every unit and category must satisfy. Fails fast when a new entry is
+ * malformed.
+ */
 describe('registry integrity', () => {
   it('registers every category in display order', () => {
     expect(categories.map((c) => c.id)).toEqual([
@@ -79,6 +89,34 @@ describe('registry integrity', () => {
           ).toBe(true);
           owner.set(k, u.id);
         }
+      }
+    }
+  });
+
+  it('no two keys of one unit share a compact key, so no alias repeats another spelling', () => {
+    // Search drops case, periods, and spaces (normalize.ts), so an alias that folds to a key of
+    // its own unit ("in." beside "in", "sqft" beside "sq ft") finds nothing the other does not.
+    // The name, plural, and symbol may be one word written once (the cup, the stone, Celsius):
+    // identical spellings are one key. A scale's symbol keeps its degree sign here ("°c"), since
+    // its bare letter is an alias on purpose: the as-typed spelling that ranks Celsius over the
+    // speed of light for a typed "c" (docs/UNITS-CATALOG.md §5).
+    const keptOnPurpose: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+      // "oz." stays beside "oz" (Sean, 2026-10-18).
+      ['ounce', new Set(['oz.'])],
+    ]);
+    for (const u of units) {
+      const seen = new Map<string, string>();
+      const check = (key: string, compact: string) => {
+        const other = seen.get(compact);
+        expect(other, `${u.id}: "${key}" repeats "${other}" as "${compact}"`).toBeUndefined();
+        seen.set(compact, key);
+      };
+      check(u.symbol, compactKeyWithDegree(u.symbol) ?? compactKey(u.symbol));
+      for (const key of new Set([u.name, u.plural])) {
+        if (key !== u.symbol) check(key, compactKey(key));
+      }
+      for (const alias of u.aliases) {
+        if (!keptOnPurpose.get(u.id)?.has(alias)) check(alias, compactKey(alias));
       }
     }
   });

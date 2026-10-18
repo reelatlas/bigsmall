@@ -32,9 +32,16 @@ export type Tier = 'standard' | 'specialty';
 
 /**
  * Which measurement system a unit belongs to.
+ * - `si`: the SI units and their prefixed forms (meter, kilogram, cubic meter, joule, pascal,
+ *   kilowatt; the degree Celsius too).
+ * - `metric`: the metric units that are not SI: those the SI Brochure accepts for use with it
+ *   (liter, minute, hour, day, degree of arc, hectare, tonne) and the rest of the metric world
+ *   (bar, calorie, kilogram-force, metric horsepower). Nothing yet tells `si` from `metric`:
+ *   both list and section as metric (order.ts; the web's settings.ts).
  * - `imperial`: shared by US customary and British imperial (inch, foot, pound ...).
  * - `us`: a US-only variant (US gallon, short ton).
  * - `uk`: a British-only variant (imperial gallon, long ton, stone).
+ * - `other`: of no one system (knot, nautical mile, troy ounce, bit and byte, electronvolt).
  */
 export type UnitSystem = 'si' | 'metric' | 'imperial' | 'us' | 'uk' | 'other';
 
@@ -178,7 +185,10 @@ export interface Ingredient {
    * liquid's is its density times the cup, within its references. Measured, never exact.
    */
   gramsPerCup: number;
-  /** How the cup is filled for that weight ("spooned and leveled", "packed", "poured to the line"). */
+  /**
+   * How the cup is filled for that weight ("spooned and leveled", "packed", "poured to the
+   * line").
+   */
   method: string;
   /** The lowest and highest of `sources`, in grams. */
   range: readonly [number, number];

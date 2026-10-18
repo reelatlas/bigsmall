@@ -27,7 +27,7 @@ export function getIngredient(id: string): Ingredient | undefined {
 }
 
 /** The ingredient a text names exactly, by its name or an alias, case and spacing aside. */
-export function exactIngredient(text: string): Ingredient | undefined {
+function exactIngredient(text: string): Ingredient | undefined {
   return byKey.get(compactKey(text));
 }
 

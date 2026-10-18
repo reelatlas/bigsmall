@@ -1,4 +1,4 @@
-import { parse } from '@bigsmall/core';
+import { MINUS, parse } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import type { CalculatorKey } from '../src/components/Calculator';
 import {
@@ -11,7 +11,6 @@ import { EMPTY_CALC, type CalculatorState, type NumberEnv } from '../src/feature
 
 const EN: NumberEnv = { separators: { decimal: '.', group: ',' }, locale: 'en-US' };
 const DE: NumberEnv = { separators: { decimal: ',', group: '.' }, locale: 'de-DE' };
-const MINUS = String.fromCharCode(0x2212);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);
 

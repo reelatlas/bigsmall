@@ -4,7 +4,7 @@
  * six significant digits (formatNumber), is what a caller falls back to wherever these return null;
  * formatSignificant writes that same cut rounded up or down, since no limit is still a cut.
  */
-import { formatNumber } from './format';
+import { formatNumber, minusSign, numberFormat } from './format';
 
 /** Up is toward larger values and down toward smaller, below zero too, as ceiling and floor are. */
 export type Rounding = 'nearest' | 'up' | 'down';
@@ -68,14 +68,6 @@ function belowStep(value: number, step: string, locale: string | undefined): Rou
   return { text: value > 0 ? `< ${step}` : `> ${minusSign(locale)}${step}`, approx: false };
 }
 
-/** The locale's minus sign, as Intl writes it in the table's own text. */
-function minusSign(locale: string | undefined): string {
-  return (
-    new Intl.NumberFormat(locale).formatToParts(-1).find((part) => part.type === 'minusSign')
-      ?.value ?? '-'
-  );
-}
-
 /**
  * A value to `places` decimal places, rounded as chosen, small values too: 0.006 to two places is
  * 0.01, and so is 0.001 rounded up. One that is not zero but rounds to zero reads "< 0.01", never
@@ -91,7 +83,7 @@ export function formatPlaces(
   const scale = 10 ** options.places;
   const result = rounded(value * scale, options.rounding) / scale;
   if (Math.abs(result) >= PLACES_LIMIT) return null;
-  const written = new Intl.NumberFormat(options.locale, {
+  const written = numberFormat(options.locale, {
     minimumFractionDigits: options.places,
     maximumFractionDigits: options.places,
   });
@@ -156,9 +148,7 @@ export function formatFraction(
   if (Math.abs(value) >= FRACTION_LIMIT) {
     const whole = rounded(value, rounding);
     return {
-      text:
-        (whole < 0 ? minusSign(locale) : '') +
-        new Intl.NumberFormat(locale).format(Math.abs(whole)),
+      text: (whole < 0 ? minusSign(locale) : '') + numberFormat(locale).format(Math.abs(whole)),
       approx: Math.abs(value - whole) > noiseAt(value),
     };
   }
@@ -188,10 +178,7 @@ export function formatFraction(
   const size = Math.abs(count);
   const whole = Math.floor(size / pick.d);
   const part = size % pick.d;
-  const text = [
-    whole ? new Intl.NumberFormat(locale).format(whole) : '',
-    part ? `${part}/${pick.d}` : '',
-  ]
+  const text = [whole ? numberFormat(locale).format(whole) : '', part ? `${part}/${pick.d}` : '']
     .filter(Boolean)
     .join(' ');
   return {

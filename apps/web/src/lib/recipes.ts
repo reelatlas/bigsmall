@@ -77,8 +77,13 @@ export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-4';
  */
 export const PAGE_BLEED = '-mx-4 px-4 overflow-x-clip';
 
-/** A page's main column (the converter, About, and 404). */
-export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8 sm:py-12');
+/**
+ * A page's main column (the converter, About, 404, and the dev pages), with the page's padding:
+ * one step, 32 px, at every width, top and bottom, which the header's row and the footer's link
+ * sit on (docs/DESIGN-SYSTEM.md, "The page's two ends mirror"; Sean, 2026-10-18: the same logic
+ * on every screen, and no more room over the header than under the footer).
+ */
+export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8');
 
 /**
  * The converter's column: the toolbar, the box, and the table, and the header over them, capped

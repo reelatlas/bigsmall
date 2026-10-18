@@ -1,6 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
 import { DEFAULT_LIGHT, THEMES } from '../src/lib/themes';
-import { applyTheme, box, expectNoA11yViolations, pickTheme, ready, row, settled } from './support';
+import {
+  applyTheme,
+  box,
+  expectNoA11yViolations,
+  pickTheme,
+  ready,
+  row,
+  settled,
+  windowOf,
+} from './support';
 
 // Checks that span the site: every page and every theme pass axe, every Tab stop shows focus,
 // and reduced motion stills every theme. Each feature's flows have a file of their own.
@@ -206,6 +215,17 @@ test('the footer sits at the window’s bottom on a short page, and after the co
   const short = await place();
   expect(short.page).toBeLessThanOrEqual(short.window);
   expect(Math.abs(short.footerBottom - short.window)).toBeLessThanOrEqual(1);
+  // The foot sits on the page's padding as the head does, one step at every width, so the page is
+  // framed alike at both ends on every screen (docs/UX-SPEC.md §1, "Footer").
+  const ends = () =>
+    page.evaluate(() => ({
+      foot: getComputedStyle(document.querySelector('body > footer')!).paddingBottom,
+      head: getComputedStyle(document.querySelector('main')!).paddingTop,
+    }));
+  const wide = await ends();
+  expect(wide.foot).toBe(wide.head);
+  await windowOf(page, 390, 844);
+  expect(await ends()).toEqual(wide);
   // A table taller than the window: the footer follows it.
   await page.setViewportSize({ width: page.viewportSize()?.width ?? 1280, height: 480 });
   await page.goto('/?a=mile&v=1');

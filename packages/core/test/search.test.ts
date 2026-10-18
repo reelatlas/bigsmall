@@ -611,3 +611,28 @@ describe('search: the catalog’s alias decisions', () => {
     expect(ids(search('how long')).slice(0, 2)).toEqual(['#length', '#time']);
   });
 });
+
+describe('search: a word names the thing it is (Sean, 2026-10-18)', () => {
+  // Four aliases put another thing ahead of the one the word names, and were dropped: Volume's
+  // "cooking" listed Volume above the Cooking category, Data's "bytes" listed the category above
+  // the byte, Torque's "foot-pound" spellings took Energy's own unit name, and Mass's "oz." took the
+  // weight ounce outright while "oz" asks which (docs/UNITS-CATALOG.md §5).
+  it('"cooking" is the Cooking category alone', () => {
+    expect(ids(search('cooking'))).toEqual(['#cooking']);
+  });
+
+  it('"bytes" is the byte first, not the Data category', () => {
+    expect(ids(search('bytes'))[0]).toBe('byte');
+    expect(ids(search('bytes'))).not.toContain('#data');
+  });
+
+  it('"foot-pound" is Energy\'s foot-pound, and "ft-lb" still Torque\'s pound-foot first', () => {
+    expect(resolveExact('foot-pound', { tier: 'all' })?.id).toBe('foot-pound');
+    expect(ids(search('ft-lb', { tier: 'all' }))[0]).toBe('pound-foot');
+  });
+
+  it('"oz." asks which ounce, as "oz" does', () => {
+    expect(resolveExact('oz.')).toBeNull();
+    expect(resolveExact('oz')).toBeNull();
+  });
+});

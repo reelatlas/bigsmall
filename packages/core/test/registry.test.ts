@@ -100,10 +100,9 @@ describe('registry integrity', () => {
     // identical spellings are one key. A scale's symbol keeps its degree sign here ("°c"), since
     // its bare letter is an alias on purpose: the as-typed spelling that ranks Celsius over the
     // speed of light for a typed "c" (docs/UNITS-CATALOG.md §5).
-    const keptOnPurpose: ReadonlyMap<string, ReadonlySet<string>> = new Map([
-      // "oz." stays beside "oz" (Sean, 2026-10-18).
-      ['ounce', new Set(['oz.'])],
-    ]);
+    // None today: "oz." stayed beside "oz" until later on 2026-10-18, when Sean dropped it so
+    // that "oz." asks which ounce as "oz" does.
+    const keptOnPurpose: ReadonlyMap<string, ReadonlySet<string>> = new Map();
     for (const u of units) {
       const seen = new Map<string, string>();
       const check = (key: string, compact: string) => {

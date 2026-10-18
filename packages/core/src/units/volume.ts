@@ -9,7 +9,6 @@ export const volume: Category = {
     'liquid',
     'liquids',
     'capacity',
-    'cooking',
     'how much liquid',
     'displacement',
     'engine displacement',

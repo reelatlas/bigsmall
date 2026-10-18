@@ -3,7 +3,7 @@ import type { Category, Unit } from '../types';
 export const data: Category = {
   id: 'data',
   name: 'Data',
-  aliases: ['storage', 'file size', 'bytes', 'memory', 'disk', 'digital', 'data size'],
+  aliases: ['storage', 'file size', 'memory', 'disk', 'digital', 'data size'],
   baseUnit: 'byte',
   tier: 'standard',
   group: 'common',

@@ -88,7 +88,7 @@ export const massUnits: readonly Unit[] = [
     name: 'ounce',
     plural: 'ounces',
     symbol: 'oz',
-    aliases: ['ozs', 'oz.', 'ounce (avoirdupois)'],
+    aliases: ['ozs', 'ounce (avoirdupois)'],
     system: 'imperial',
     tier: 'standard',
     factor: 0.028349523125,

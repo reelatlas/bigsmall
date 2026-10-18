@@ -17,7 +17,7 @@ const list = (items: string) => items.split('|').map((item) => item.replaceAll('
 
 /** Stand-ins for "big", shown before "small". */
 const BIG = list(
-  '∞|10⁹|10¹⁰⁰|Σ|ly|AU|pc|Mpc|TB|GW|ton|km|mi|MAX|XL|XXL|huge|vast|giga|mega|tera|peta|yotta|Ω|≥|»|▲|↑',
+  '∞|10⁹|10¹⁰⁰|Σ|ly|au|pc|Mpc|TB|GW|ton|km|mi|MAX|XL|XXL|huge|vast|giga|mega|tera|peta|yotta|Ω|≥|»|▲|↑',
 );
 /** Stand-ins for "small", shown after "big". */
 const SMALL = list(
@@ -90,14 +90,14 @@ const CONVERSIONS = list(
     '1 lb = 16 oz|1 oz ≈ 28.35 g|1 st = 14 lb|1 t = 1000 kg|1 ct = 200 mg|1 gr = 64.79891 mg|1 gal ≈ 3.785 L|' +
     '1 gal = 4 qt|1 qt ≈ 946 mL|1 cup ≈ 236.6 mL|1 fl oz ≈ 29.57 mL|1 tbsp = 3 tsp|1 L = 1000 cm³|' +
     '1 mL = 1 cm³|1 ha = 10_000 m²|1 acre ≈ 4047 m²|1 kn = 1.852 km/h|1 mph ≈ 1.609 km/h|1 km/h ≈ 0.278 m/s|' +
-    '1 ly ≈ 9.461e15 m|1 AU ≈ 1.496e11 m|1 pc ≈ 3.26 ly|1 Å = 0.1 nm|1 µm = 1000 nm|1 B = 8 bit|' +
+    '1 ly ≈ 9.461e15 m|1 au ≈ 1.496e11 m|1 pc ≈ 3.26 ly|1 Å = 0.1 nm|1 µm = 1000 nm|1 B = 8 bit|' +
     '1 KiB = 1024 B|1 MiB = 1024 KiB|1 GB = 1000 MB|1 d = 86_400 s|1 h = 3600 s|1 wk = 604_800 s|' +
     '1 yr ≈ 3.156e7 s|1 atm = 101_325 Pa|1 bar = 100 kPa|1 psi ≈ 6.895 kPa|1 mmHg ≈ 133.3 Pa|1 cal = 4.184 J|' +
     '1 kWh = 3.6 MJ|1 BTU ≈ 1055 J|1 eV ≈ 1.602e−19 J|1 hp ≈ 745.7 W|1 N ≈ 0.2248 lbf|1 J = 1 N·m|' +
     '1 W = 1 J/s|1 rad ≈ 57.3°|360° = 2π rad|0 K = −459.67 °F|1 mi = 1760 yd|1 yd = 0.9144 m|' +
     '1 lb = 7000 gr|1 cup = 16 tbsp|1 pt = 2 cups|1 gal = 128 fl oz|1 ft² ≈ 0.0929 m²|1 m³ = 1000 L|' +
     '1 Mbps = 125 kB/s|1 mpg ≈ 0.425 km/L|1 lbf ≈ 4.448 N|1 MPa ≈ 145 psi|1 kcal = 4.184 kJ|' +
-    '1 ly ≈ 63_241 AU|1 pc ≈ 206_265 AU|1 kn = 1 nmi/h',
+    '1 ly ≈ 63_241 au|1 pc ≈ 206_265 au|1 kn = 1 nmi/h',
 );
 /** Wordplay on the name itself. */
 const NAME = list(

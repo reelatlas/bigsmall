@@ -86,7 +86,7 @@ The feedback form on the About page (docs/UX-SPEC.md §1; ADR 0024) posts its fi
 - **Replies** come from the inbox that gets the notification, Sean's Gmail for now (2026-10-17: a small experimental site, nothing to overcomplicate); the visitor gets no automatic mail, only the page's "Thank you for your feedback!" A domain address can take over later without a change to the site.
 - **The record** is the form's Submissions archive, kept indefinitely on the free plan, exported as JSON or CSV from the form's Exports (a period, or all time). No database of our own (ADR 0001). For an analysis, Sean exports and the file lands in `feedback-exports/` at the repo's root, which git ignores, since the messages carry visitors' addresses; the analysis Sean reads keeps the senders' addresses, since who writes, and how, is part of the picture (his call, 2026-10-18), and lives beside the export in `feedback-exports/`; the copy committed to `docs/research/feedback-<n>.md` carries the substance without them: counts by kind, the categories and units named, the themes, where messages overlap each other and the plan (`docs/PLAN.md` §2), and what each becomes (a lead for the research skill, a fix, a roadmap note). Google Sheets and the REST API come only with the upgraded workspace (the submission bundle), which the volume does not call for.
 
-The site stores nothing of a message; the service holds it. The privacy line, when it lands, says so (docs/UX-SPEC.md §14).
+The site stores nothing of a message; the service holds it. The privacy line in About's footer says so (docs/UX-SPEC.md §1, "Footer"; 2026-10-18).
 
 ## Changing the main domain
 

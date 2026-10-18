@@ -72,4 +72,7 @@ test('a link to #formulas opens that tab with the row in view; the tabs sit on t
     .boundingBox())!;
   expect(bar.x).toBeGreaterThanOrEqual(list.x);
   expect(bar.x - list.x).toBeLessThan(8);
+  // The privacy line in the footer sits on the same column.
+  const privacy = (await page.getByRole('contentinfo').locator('p').boundingBox())!;
+  expect(Math.round(privacy.x)).toBe(Math.round(list.x));
 });

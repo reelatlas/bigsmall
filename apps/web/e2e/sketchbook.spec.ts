@@ -503,8 +503,18 @@ test('the About page plays the sketchbook as shipped, from the footer, its name 
   await page.locator('[data-playing]').waitFor();
   await expect(tiles(page)).toHaveCount(SKETCHBOOK_TUNING.columns * SKETCHBOOK_TUNING.rows);
   await expect(page.getByRole('button', { name: 'Flip', exact: true })).toBeVisible();
-  // No footer here: the name in the header leads home.
-  await expect(page.getByRole('contentinfo')).toHaveCount(0);
+  // The footer here holds the privacy line and no link back: the name in the header leads home.
+  const footer = page.getByRole('contentinfo');
+  await expect(footer).toContainText('Visits are counted anonymously without cookies by Umami.');
+  await expect(footer.getByRole('link', { name: 'About' })).toHaveCount(0);
+  await expect(footer.getByRole('link', { name: 'Umami' })).toHaveAttribute(
+    'href',
+    'https://umami.is',
+  );
+  await expect(footer.getByRole('link', { name: 'Formspark' })).toHaveAttribute(
+    'href',
+    /formspark\.io/,
+  );
   await page.getByRole('link', { name: 'bigsmall' }).click();
   await expect(page).toHaveURL(/\/$/);
 });

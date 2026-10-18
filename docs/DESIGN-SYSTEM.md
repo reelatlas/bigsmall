@@ -77,15 +77,15 @@ Layout and spacing use Tailwind's default scale (`p-4`, `gap-2`, `max-w-2xl`). T
 
 `pnpm lint` checks every string in `apps/web/src`, which is where class lists live, and fails on a value that bypasses the tokens. The patterns are in `eslint.config.js` (`RAW_VALUES`). A new pattern is written without "/" (a selector's regex ends at the first one) and tried on a scratch file of violations and allowed look-alikes before it is trusted.
 
-| Flagged                                                                                  | Use instead                                                                              |
-| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Raw colors: hex, `rgb()`, `hsl()`, `oklch()`, `color-mix()`                              | A color token: `bg-surface`, `text-ink`, `border-line`                                   |
-| Tailwind palette colors: `bg-red-500`, `text-white`                                      | A color token. The palette does not follow the theme                                     |
-| Arbitrary values holding a length, color, time, or variable: `w-[37px]`, `bg-(--accent)` | The token utility, or the spacing scale                                                  |
-| Numbered durations and stock easings: `duration-150`, `ease-in-out`                      | `duration-fast`, `duration-base`, `duration-slow`, `ease-standard`                       |
-| Radii, shadows, and fonts outside the tokens: `rounded-xl`, `shadow-lg`, `font-mono`     | `rounded-sm/md/lg`, `rounded-nested`, `shadow-sm/md`, `font-display/body/numeric`        |
-| A color token made see-through: `bg-surface/40`, `border-edge/[0.5]`                     | A derived color in the bridge (`DERIVED_COLORS`), worked out once from every theme's own |
-| A number of milliseconds in `setTimeout` or `setInterval`                                | A named constant in `src/lib/timing.ts`                                                  |
+| Flagged                                                                                                                         | Use instead                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Raw colors: hex, `rgb()`, `hsl()`, `oklch()`, `color-mix()`                                                                     | A color token: `bg-surface`, `text-ink`, `border-line`                                   |
+| Tailwind palette colors: `bg-red-500`, `text-white`                                                                             | A color token. The palette does not follow the theme                                     |
+| Arbitrary values holding a length, color, time, or variable: `w-[37px]`, `bg-(--accent)`                                        | The token utility, or the spacing scale                                                  |
+| Numbered durations and stock easings: `duration-150`, `ease-in-out`                                                             | `duration-fast`, `duration-base`, `duration-slow`, `ease-standard`                       |
+| Radii, shadows, and fonts outside the tokens: `rounded-xl`, `rounded-full` (a pill; since 2026-10-18), `shadow-lg`, `font-mono` | `rounded-sm/md/lg`, `rounded-nested`, `shadow-sm/md`, `font-display/body/numeric`        |
+| A color token made see-through: `bg-surface/40`, `border-edge/[0.5]`                                                            | A derived color in the bridge (`DERIVED_COLORS`), worked out once from every theme's own |
+| A number of milliseconds in `setTimeout` or `setInterval`                                                                       | A named constant in `src/lib/timing.ts`                                                  |
 
 Allowed: arbitrary values that name structure rather than a value (`transition-[border-color,box-shadow]`, `grid-cols-[1fr_auto_1fr]`), the spacing scale, and `var(--token)` where the gallery paints its swatches. Raw values belong in the theme files and the bridge, which are CSS and outside the guard. Artwork keeps its own: the sketches' colors in their SVG files, and what the sketchbook sets as it plays (`features/sketchbook/`: the grid's columns and gap from the lab's tuning, on the spacing scale; the art's corner, `TILE_CORNER`; the effects' depths, filters, and offsets; the particles' sizes, shapes, and paths). These pass the guard because it reads class lists; their colors are still tokens, and their times come from `SKETCHBOOK_TIMING` and `BURST_TIMING`.
 

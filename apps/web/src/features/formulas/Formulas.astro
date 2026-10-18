@@ -29,8 +29,12 @@ const listId = 'formula-list';
  */
 const ROW = 'grid gap-x-3 gap-y-0.5 py-1.5 @lg:grid-cols-[minmax(0,--spacing(48))_minmax(0,1fr)]';
 
-/** Exact by definition, or measured: a small tag after the formula. */
-const TAG = 'rounded-full px-2 text-xs font-medium';
+/**
+ * Exact by definition, or measured: a small tag after the formula, on the shape token's smallest
+ * corner, the keycap's, which each theme sets (Sean, 2026-10-18; a pill, `rounded-full`, outside
+ * the tokens, until then; the token guard rejects it now).
+ */
+const TAG = 'rounded-sm px-2 text-xs font-medium';
 const EXACT = cx(TAG, 'bg-accent-soft text-ink');
 const MEASURED = cx(TAG, 'bg-surface-raised text-ink-muted');
 

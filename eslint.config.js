@@ -39,9 +39,9 @@ const RAW_VALUES = [
       'Literal motion. Use duration-fast, duration-base, duration-slow, and ease-standard, which reduced motion zeroes.',
   },
   {
-    pattern: String.raw`\brounded(?:-[a-z]{1,2})?-(?:xs|xl|2xl|3xl|4xl)\b|\b(?:shadow|drop-shadow|inset-shadow)-(?:xs|lg|xl|2xl)\b|\bfont-(?:sans|serif|mono)\b`,
+    pattern: String.raw`\brounded(?:-[a-z]{1,2})?-(?:xs|xl|2xl|3xl|4xl|full)\b|\b(?:shadow|drop-shadow|inset-shadow)-(?:xs|lg|xl|2xl)\b|\bfont-(?:sans|serif|mono)\b`,
     message:
-      'Untokened radius, shadow, or font. Use rounded-sm/md/lg or rounded-nested, shadow-sm/md, and font-display/body/numeric.',
+      'Untokened radius, shadow, or font. Use rounded-sm/md/lg or rounded-nested (a pill, rounded-full, is outside the shape tokens), shadow-sm/md, and font-display/body/numeric.',
   },
 ];
 

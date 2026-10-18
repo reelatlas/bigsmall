@@ -27,11 +27,17 @@ test('Feedback opens first; a click, the arrows, Home, and End open a tab, and t
   await expectNoA11yViolations(page);
 
   await hydrated(page);
+  // A switch keeps the row where it sat on the screen, scrolled to the page's foot too: WebKit
+  // clamps the scroll as the old panel hides before the new one shows (docs/LEARNINGS.md).
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  const rowTop = async () => (await page.getByRole('tablist', { name: 'About' }).boundingBox())!.y;
+  const rowWas = await rowTop();
   await tab(page, 'Every formula').click();
   await expect(tab(page, 'Every formula')).toHaveAttribute('aria-selected', 'true');
   await expect(panel(page, 'Every formula')).toBeVisible();
   await expect(panel(page, 'Feedback')).toBeHidden();
   await expect(page).toHaveURL(/#formulas$/);
+  expect(Math.abs((await rowTop()) - rowWas)).toBeLessThanOrEqual(1);
   await expect(
     panel(page, 'Every formula').getByRole('button', { name: 'Show all' }),
   ).toBeVisible();

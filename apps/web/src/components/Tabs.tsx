@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { flushSync } from 'react-dom';
 import { useIsHydrated } from '../lib/hydrated';
+import { keeping } from '../lib/keeping';
 
 export interface TabItem {
   /** The tab's id: its panel's id too when the tabs are linked, so `#id` in the address opens it. */
@@ -63,7 +65,10 @@ export function Tabs({ tabs, label, initial, linked = true, ...panels }: Props) 
   }, [fromHash, chosen]);
 
   const choose = (tab: string, focus = false) => {
-    setChosen(tab);
+    // The row stays where it sat on the screen: WebKit clamps the scroll as the old panel hides
+    // before the new one shows, and would leave the page at its top (Sean's iPhone, 2026-10-18;
+    // docs/LEARNINGS.md), so the switch is rendered at once and the row's place restored.
+    keeping(listRef.current, () => flushSync(() => setChosen(tab)));
     if (linked) window.history.replaceState(null, '', `#${tab}`);
     if (focus) document.getElementById(tabId(tab))?.focus();
   };

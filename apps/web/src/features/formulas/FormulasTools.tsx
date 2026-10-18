@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '../../components/Button';
 import { ChevronDownIcon, CopiedIcon, CopyIcon } from '../../components/icons';
 import { useCopied } from '../../lib/copied';
+import { keeping } from '../../lib/keeping';
 import { cx, DISCLOSURE } from '../../lib/recipes';
 
 /**
@@ -16,20 +17,6 @@ const BAR =
 
 /** Show all, a disclosure over the categories in their look: muted, the ink under the pointer. */
 const SHOW_ALL = cx(DISCLOSURE, 'font-medium text-ink-muted transition-colors hover:text-ink');
-
-/**
- * Runs a change to the list, keeping `anchor` where it sat on the screen: the category being read
- * stays put as others open or close above it, and one closed from under the bar stays there
- * rather than the page jumping on past it. WebKit has no scroll anchoring (docs/LEARNINGS.md,
- * "Safari scrolls to the top as a list is swapped").
- */
-function keeping(anchor: Element | null | undefined, change: () => void) {
-  const was = anchor?.getBoundingClientRect().top;
-  change();
-  if (!anchor || was === undefined) return;
-  const moved = anchor.getBoundingClientRect().top - was;
-  if (Math.abs(moved) >= 1) window.scrollBy(0, moved);
-}
 
 /** The categories of the list the page drew, by its id. */
 function groupsOf(listId: string): HTMLDetailsElement[] {

@@ -3,12 +3,12 @@ import PageHeader from '../components/PageHeader.astro';
 import { Converter } from '../features/converter/Converter';
 import Base from '../layouts/Base.astro';
 import { SITE } from '../lib/site';
-import { CONVERTER_COLUMN, CONVERTER_GRID, cx, PAGE_MAIN } from '../lib/recipes';
+import { CONTENT_COLUMN, CONVERTER_GRID, cx, PAGE_MAIN } from '../lib/recipes';
 ---
 
 <Base title={SITE.title}>
   <main class={cx(PAGE_MAIN, CONVERTER_GRID)}>
-    <PageHeader class={cx(CONVERTER_COLUMN, 'md:col-start-1')} actions shortcuts />
+    <PageHeader class={cx(CONTENT_COLUMN, 'md:col-start-1')} actions shortcuts />
     <Converter client:load />
   </main>
 </Base>

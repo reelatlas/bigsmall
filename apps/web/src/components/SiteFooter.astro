@@ -1,5 +1,5 @@
 ---
-import { ABOUT_COLUMN, INLINE_LINK, PAGE_COLUMN, QUIET_LINK } from '../lib/recipes';
+import { CENTERED_COLUMN, INLINE_LINK, PAGE_COLUMN, QUIET_LINK } from '../lib/recipes';
 
 /*
  * The footer under every page (docs/UX-SPEC.md §1, "Footer"), from Base.astro. On every page but
@@ -18,7 +18,7 @@ const onAbout = Astro.url.pathname.replace(/\/+$/, '') === '/about';
 
 <footer class:list={[PAGE_COLUMN, 'mt-auto flex pb-frame text-sm']}>
   {onAbout ? (
-    <p class:list={[ABOUT_COLUMN, 'text-ink-muted']}>
+    <p class:list={[CENTERED_COLUMN, 'text-ink-muted']}>
       Visits are counted anonymously without cookies by{' '}
       <a href="https://umami.is" class={INLINE_LINK}>
         Umami

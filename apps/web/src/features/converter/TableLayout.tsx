@@ -25,7 +25,7 @@ import { pressedByTouch } from '../../lib/modality';
 import { fitTools } from '../../lib/overflow';
 import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
-import { CONVERTER_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
+import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
 import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
@@ -62,7 +62,7 @@ const TABLE_GRID = cx(IN_CONVERTER_GRID, 'md:grid-rows-[auto_auto_auto_1fr]');
  * its own size. Over a section's name (STUCK_HEADING, 5) and under an open shell (SHELL, 20).
  */
 const TABLE_HEAD_CELL = cx(
-  CONVERTER_COLUMN,
+  CONTENT_COLUMN,
   'relative z-10 bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid',
 );
 /** The toolbar's row in the head, 8 px over the box. */
@@ -97,7 +97,7 @@ const TABLE_BOX_CELL = 'md:row-start-2';
  * wins, the two margins collapsing.
  */
 const TABLE_ROWS_CELL = cx(
-  CONVERTER_COLUMN,
+  CONTENT_COLUMN,
   '@container mt-2 md:col-start-1 md:row-span-2 md:row-start-3',
 );
 /**

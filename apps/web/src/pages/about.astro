@@ -6,13 +6,13 @@ import Formulas from '../features/formulas/Formulas.astro';
 import SketchSprite from '../features/sketchbook/SketchSprite.astro';
 import { Sketchbook } from '../features/sketchbook/Sketchbook';
 import Base from '../layouts/Base.astro';
-import { ABOUT_COLUMN, cx, PAGE_MAIN, SECTION_HEADING } from '../lib/recipes';
+import { CENTERED_COLUMN, cx, PAGE_MAIN, SECTION_HEADING } from '../lib/recipes';
 import { SITE } from '../lib/site';
 
 /*
  * The About page (docs/UX-SPEC.md §1), reached from the footer: the sketchbook, centered under its
  * heading (Sean, 2026-10-15 and 16), the logo sketches at play as tuned in /dev/sketchbook-lab;
- * then, in the page's column (ABOUT_COLUMN, the header on it too), two tabs on the column's left
+ * then, in the page's column (CENTERED_COLUMN, the content column centered, the header on it too), two tabs on the column's left
  * edge, Feedback and Every formula, the tab the title (Sean, 2026-10-18; kept), Feedback open
  * first: the form that posts to the form service (ADR 0024), and every formula the converter uses
  * with its source (Sean, 2026-10-16). A link to #feedback or #formulas opens its tab. The privacy
@@ -29,7 +29,7 @@ const TABS = [
   description="The bigsmall sketchbook and every formula and reference behind each calculation."
 >
   <main class={PAGE_MAIN}>
-    <PageHeader class={ABOUT_COLUMN} />
+    <PageHeader class={CENTERED_COLUMN} />
     <section class="mt-12 sm:mt-20" aria-labelledby="sketchbook">
       <h2 id="sketchbook" class:list={[SECTION_HEADING, 'mb-6']}>
         The sketchbook
@@ -37,7 +37,7 @@ const TABS = [
       <SketchSprite />
       <Sketchbook client:load />
     </section>
-    <div class={cx(ABOUT_COLUMN, 'mt-16 sm:mt-24')}>
+    <div class={cx(CENTERED_COLUMN, 'mt-16 sm:mt-24')}>
       <Tabs client:load label="About" tabs={TABS}>
         <div slot="feedback" class="max-w-md">
           <Feedback client:visible />

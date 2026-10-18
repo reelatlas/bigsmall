@@ -88,12 +88,14 @@ export const PAGE_BLEED = '-mx-frame px-frame overflow-x-clip';
 export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-frame');
 
 /**
- * The converter's column: the toolbar, the box, and the table, and the header over them, capped
- * at the xl container size, the narrowest stock width at which the box keeps every unit's name
+ * The content column, one width on every page (Sean, 2026-10-18): the converter's toolbar, box,
+ * and table with the header over them, and About's header, tabs, and privacy line, capped at the
+ * xl container size, 576 px, the narrowest stock width at which the box keeps every unit's name
  * beside a ten-digit number (measured 2026-10-17: at 528 px four of the eight longest names drop;
- * docs/DESIGN-SYSTEM.md, "A column beside the rows").
+ * docs/DESIGN-SYSTEM.md, "A column beside the rows"). The converter puts it in its grid's first
+ * track; a page with no side track centers it (CENTERED_COLUMN).
  */
-export const CONVERTER_COLUMN = 'max-w-xl';
+export const CONTENT_COLUMN = 'max-w-xl';
 
 /**
  * The converter page from md: one grid of two tracks on `main`, the column (`grid-cols-box-and-side`
@@ -106,10 +108,12 @@ export const CONVERTER_GRID = 'md:grid md:grid-cols-box-and-side md:gap-x-4';
 export const IN_CONVERTER_GRID = 'md:col-span-2 md:grid md:grid-cols-subgrid';
 
 /**
- * About's column: the header and the tabs under the sketchbook, 672 px (`2xl`) centered, the width
- * the formulas' rows read well at (Sean, 2026-10-18). Full width up to its own, as PAGE_COLUMN.
+ * The content column centered, where no side track stands beside it: About's header, its tabs
+ * under the sketchbook, and its privacy line. Full width up to the column's own, as PAGE_COLUMN.
+ * About took 672 px (`2xl`) on 2026-10-18 until Sean asked, the same day, for one column width
+ * on every page.
  */
-export const ABOUT_COLUMN = 'mx-auto w-full max-w-2xl';
+export const CENTERED_COLUMN = cx(CONTENT_COLUMN, 'mx-auto w-full');
 
 /**
  * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; a trial, Sean,

@@ -46,7 +46,11 @@ describe('the fields Send posts', () => {
   it('have five examples for every kind, all different, each short enough for two lines on a phone', () => {
     for (const { value } of KINDS) {
       expect(EXAMPLES[value]).toHaveLength(5);
-      for (const example of EXAMPLES[value]) expect(example.length).toBeLessThanOrEqual(64);
+      for (const example of EXAMPLES[value]) {
+        expect(example.length).toBeLessThanOrEqual(64);
+        // Ends as a typed line does, without a period (Sean, 2026-10-18).
+        expect(example.endsWith('.')).toBe(false);
+      }
     }
     const all = Object.values(EXAMPLES).flat();
     expect(new Set(all).size).toBe(all.length);

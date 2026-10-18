@@ -19,30 +19,31 @@ export type Kind = (typeof KINDS)[number]['value'];
  * random as a kind is chosen (Sean, 2026-10-17 and 18), so a visitor sees how a message of that
  * kind helps. An inaccuracy's says the value seen, the one expected, and where the visitor's
  * figure comes from, a lead for docs/RESEARCH.md §5; a bug's the device, the action, and what
- * happened; an idea's one wish in a line. Each fits two lines on a phone. The figures an
+ * happened; an idea's one wish in a line. Each fits two lines on a phone and ends without a
+ * period, as a line someone types does (Sean, 2026-10-18). The figures an
  * inaccuracy quotes as the site's are the site's.
  */
 export const EXAMPLES: Record<Kind, readonly string[]> = {
   inaccuracy: [
-    'A stone shows 6.35 kg, and the chart at my gym says 6.4.',
-    'A cup of flour shows 127 g here; the back of my bag says 120.',
-    'A US gallon came out as 3.79 L, but my textbook has 3.785.',
-    '1 psi shows 6.895 kPa; the manual for my gauge says 6.89.',
-    'A knot shows 1.15 mph; my flight handbook says 1.151.',
+    'A stone shows 6.35 kg, and the chart at my gym says 6.4',
+    'A cup of flour shows 127 g here; the back of my bag says 120',
+    'A US gallon came out as 3.79 L, but my textbook has 3.785',
+    '1 psi shows 6.895 kPa; the manual for my gauge says 6.89',
+    'A knot shows 1.15 mph; my flight handbook says 1.151',
   ],
   bug: [
-    'On my iPad, picking kilobytes scrolls the table to the top.',
-    'On my phone the theme menu stays open after I pick Sakura.',
-    'Typing 3/4 cup shows no answer until I add a space.',
-    'In Firefox, Copy URL copies the address without my number.',
-    'Undo jumps back two steps at once after I clear the box.',
+    'On my iPad, picking kilobytes scrolls the table to the top',
+    'On my phone the theme menu stays open after I pick Sakura',
+    'Typing 3/4 cup shows no answer until I add a space',
+    'In Firefox, Copy URL copies the address without my number',
+    'Undo jumps back two steps at once after I clear the box',
   ],
   idea: [
-    'Let me type 5 ft 10 in and see it in centimeters.',
-    'Remember the units I use most and show them first.',
-    'Add shoe sizes, US to EU.',
-    'Convert a whole recipe at once, every line.',
-    'Let me add a conversion to my phone’s home screen.',
+    'Let me type 5 ft 10 in and see it in centimeters',
+    'Remember the units I use most and show them first',
+    'Add shoe sizes, US to EU',
+    'Convert a whole recipe at once, every line',
+    'Let me add a conversion to my phone’s home screen',
   ],
 };
 

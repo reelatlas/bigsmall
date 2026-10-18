@@ -5,7 +5,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 ## Tokens and values
 
 - Colors, radii, shadows, fonts, and durations come only from token utilities (`bg-surface`, `rounded-nested`, `shadow-sm`, `font-numeric`, `duration-fast`). `pnpm lint` runs the token guard; it is never silenced.
-- No `style=` in components (only the gallery's swatches paint `var(--token)`, and the sketchbook's tiles set their grid and the art's corner from its tuning). Search: `style=` in `apps/web/src`.
+- No `style=` that carries a look. What stays is structure, or a measurement the stylesheet cannot know, five kinds today: the stuck headings' `top` at the head's measured height (`ConversionTable.tsx`, `UnitMatches.tsx`), the category menu's row count from the categories (`CategoryMenu.tsx`), the sketchbook's measures, its art's corner, and the Flip row's width from its tuning (`Sketchbook.tsx`), and the gallery's swatches painting `var(--token)`. Search: `style=` in `apps/web/src`, and judge each against those.
 - No arbitrary value that stands in for a scale step or a token. Search: `-\[` in `.tsx` and `.astro` files, then judge each: structure is allowed (`grid-cols-[auto_1fr]`, `transition-[border-color,box-shadow]`), values are not.
 - A delay is a named constant in `src/lib/timing.ts`, never a number of milliseconds.
 - A look no token expresses is a finding for Sean (reuse token X, or add token Y to every theme), never a raw value.
@@ -62,8 +62,8 @@ Walk each section over the files in scope. Searches find candidates; reading the
 
 ## Copy and formats
 
-- Sentence case for labels, buttons, headings, messages, and theme names; no exclamation marks; error and empty text says what to try next.
-- Unit symbols and names as the standards write them (mL, kB, °F; "Celsius" and "Fahrenheit" capitalized); category names single capitalized words.
+- Sentence case for labels, buttons, headings, messages, and theme names; no exclamation marks, but the one approved, the feedback form's "Thank you for your feedback!" (Sean, 2026-10-18); error and empty text says what to try next.
+- Unit symbols and names as the standards write them (mL, kB, °F; "Celsius" and "Fahrenheit" capitalized); category names in sentence case (Length, Fuel economy).
 - Digit groups that may wrap use U+202F; special characters are named constants (`MINUS`, `DIGIT_GROUP`, `NO_VALUE`), never Unicode escapes.
 - Strings Sean has approved stay exactly as approved; rewording one is a finding for Sean.
 
@@ -89,6 +89,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - A claim about geometry (it fits, it aligns, it goes four across, a fill keeps its gap) is pinned by a test in every theme where the fonts differ (`THEMES` loop).
 - The suite runs in one locale (`en-US` in `playwright.config.ts`, core's format tests passing theirs), so it means the same on any machine; a test that needs another locale sets its own.
 - A theme's lengths are read from its tokens (`cssTime`), never written as Daylight's numbers.
+- A scroll or focus fault is checked in WebKit as well as Chromium (`npx playwright install webkit`, a scratch config): Chromium's scroll anchoring hides a page clamped to its top as a list is swapped, a panel hidden before the next shows, or a tap's focus moving the page (docs/LEARNINGS.md: "Safari scrolls to the top as a list is swapped", "A table swapped in the page clamps the scroll to the top", "A tab that hides its panel before showing the next lets WebKit clamp the scroll", "WebKit draws a door hinged on the right half open").
 - `docs/TESTING.md` describes each spec file as it is.
 
 ## Docs

@@ -1,7 +1,7 @@
 # 0019 — Analytics: Umami Cloud, cookieless, through the site's own address
 
 Date: 2026-10-15
-Status: accepted
+Status: accepted; amended 2026-10-18
 
 ## Context
 
@@ -33,3 +33,7 @@ The plan asked for traffic, product events (what people convert, the calculator,
 - The free plan's 100,000 events a month cover very roughly 10,000 visits at this event rate; past it Umami stops recording until the month resets, so the $20 plan comes before that.
 - Search performance comes from Google Search Console, verified with a DNS record, apart from this.
 - Umami sets no cookies and stores nothing on the device; a one-line note that visits are counted anonymously is recommended, its wording Sean's to choose.
+
+## Amendments
+
+- **2026-10-18.** The events gained Ingredient chosen (its id) with Cooking (ADR 0021, 2026-10-16; `src/lib/analytics.ts`), ten in all with Theme picked. The note recommended above landed in the About page's footer as the privacy line, in Sean's words (docs/UX-SPEC.md §1, "Footer"): visits are counted anonymously without cookies by Umami, feedback goes through Formspark to our inbox (ADR 0024), and the theme and settings stay in the browser, nothing else kept. The rule for our own visits stands (docs/DEPLOYMENT.md, "Analytics"); whether Umami's gateway reads the visitor's address rather than Vercel's is still Sean's check to make there.

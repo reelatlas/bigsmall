@@ -1,7 +1,7 @@
 # 0012 — The table is the unit list: a category menu, and a cursor that keeps the caret in the field
 
 Date: 2026-10-07
-Status: accepted; partly supersedes 0009 (decision 2's table)
+Status: accepted; partly supersedes 0009 (decision 2's table); decision 3's loop replaced by 0014 (the planes, the page's ends stops), decision 6's two boxes by 0013
 
 ## Context
 

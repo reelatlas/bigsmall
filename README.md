@@ -30,18 +30,19 @@ pnpm dev
 
 ## Docs
 
-| Doc                                            | What it holds                                                                   |
-| ---------------------------------------------- | ------------------------------------------------------------------------------- |
-| [CLAUDE.md](CLAUDE.md)                         | Working conventions, non-negotiables, commands, and the current status          |
-| [docs/PLAN.md](docs/PLAN.md)                   | Vision, scope, stack, milestones, budgets, setup checklist, open questions      |
-| [docs/UX-SPEC.md](docs/UX-SPEC.md)             | Exact current behavior of the converter, plus what is planned                   |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)   | How the code is organized, what each module does, how data flows                |
-| [docs/DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md) | Tokens, the Tailwind bridge, component rules, patterns, and the inventory       |
-| [docs/THEMING.md](docs/THEMING.md)             | How themes work and how to author one                                           |
-| [docs/UNITS-CATALOG.md](docs/UNITS-CATALOG.md) | Category taxonomy, tiers, special-logic units, sources, and how to add a unit   |
-| [docs/TESTING.md](docs/TESTING.md)             | The test layers, what each covers, and the commands                             |
-| [docs/LEARNINGS.md](docs/LEARNINGS.md)         | Dated log of gotchas and practices found while building                         |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)       | Hosting, domains, CI's checks, and analytics                                    |
-| [docs/SEO.md](docs/SEO.md)                     | How pages are found in search: the contract, the conventions, the plan          |
-| [docs/decisions/](docs/decisions/README.md)    | Architecture Decision Records (ADRs)                                            |
-| [docs/research/](docs/research/)               | Lab write-ups, the retired labs index, feedback logs, the usability test script |
+| Doc                                            | What it holds                                                                                   |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [CLAUDE.md](CLAUDE.md)                         | Working conventions, non-negotiables, commands, and the current status                          |
+| [docs/PLAN.md](docs/PLAN.md)                   | Vision, scope, stack, milestones, budgets, setup checklist, open questions                      |
+| [docs/UX-SPEC.md](docs/UX-SPEC.md)             | Exact current behavior of the converter, plus what is planned                                   |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)   | How the code is organized, what each module does, how data flows                                |
+| [docs/DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md) | Tokens, the Tailwind bridge, component rules, patterns, and the inventory                       |
+| [docs/THEMING.md](docs/THEMING.md)             | How themes work and how to author one                                                           |
+| [docs/UNITS-CATALOG.md](docs/UNITS-CATALOG.md) | Category taxonomy, tiers, special-logic units, sources, and how to add a unit                   |
+| [docs/RESEARCH.md](docs/RESEARCH.md)           | How a fact is decided by its kind, defined, measured, or conventional, and how one is re-opened |
+| [docs/TESTING.md](docs/TESTING.md)             | The test layers, what each covers, and the commands                                             |
+| [docs/LEARNINGS.md](docs/LEARNINGS.md)         | Dated log of gotchas and practices found while building                                         |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)       | Hosting, domains, CI's checks, and analytics                                                    |
+| [docs/SEO.md](docs/SEO.md)                     | How pages are found in search: the contract, the conventions, the plan                          |
+| [docs/decisions/](docs/decisions/README.md)    | Architecture Decision Records (ADRs)                                                            |
+| [docs/research/](docs/research/)               | Lab write-ups, the retired labs index, feedback logs, the usability test script                 |

@@ -1,7 +1,7 @@
 # 0002 — Astro + React island + TypeScript + Tailwind v4
 
 Date: 2026-10-06
-Status: accepted (confirmed 2026-10-06; re-examined the same day, see the last section). Partly superseded: the accessible primitives by ADR 0006, the island's runtime by ADR 0007, hosting by ADR 0008
+Status: accepted; amended (see Amendments); partly superseded by 0006, 0007, 0008
 
 ## Context
 
@@ -43,10 +43,10 @@ Operating rule so the two component models never blur: **React for everything th
 
 Revisit if more than a handful of Astro components accumulate interaction, or if navigation between pair pages needs preserved converter state beyond what Astro's `transition:persist` provides.
 
-Milestone 2 outcome: React Aria Components was removed after measurement; the smart input is a hand-built WAI-ARIA combobox and other controls are native elements (ADR 0006). The rest of this decision stands.
+## Amendments
 
-Header menus outcome (2026-10-06): the keyboard shortcuts map joined the theme picker as a second header menu on the same inline-script controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`), with one shell recipe in `src/lib/shell.ts`. The exception therefore covers the header menus, not only the theme picker. A third header menu reuses the controller rather than adding script; a header control that needs the converter's state, or a React hook, is an island instead.
-
-Framework outcome (2026-10-06): the island moved from React to Preact through `preact/compat` (ADR 0007). Components keep the React API and import from `'react'`; the rest of this decision stands, and the operating rule above reads "TSX components for interaction" with Preact as their runtime.
-
-Hosting outcome (2026-10-07): the site is hosted on Vercel, with `bigsmall.work` as the main domain (ADR 0008); Cloudflare Pages is the fallback.
+- **2026-10-06.** Confirmed, and re-examined the same day against an all-React Vite framework (above): kept, with the operating rule.
+- **2026-10-06, milestone 2 outcome.** React Aria Components was removed after measurement; the smart input is a hand-built WAI-ARIA combobox and other controls are native elements (ADR 0006). The rest of this decision stands.
+- **2026-10-06, header menus outcome.** The keyboard shortcuts map joined the theme picker as a second header menu on the same inline-script controller in `layouts/Base.astro` (`data-shell`, `data-shell-toggle`), with one shell recipe in `src/lib/shell.ts` (now `src/lib/recipes.ts`). The exception therefore covers the header menus, not only the theme picker. A third header menu reuses the controller rather than adding script; a header control that needs the converter's state, or a React hook, is an island instead.
+- **2026-10-06, framework outcome.** The island moved from React to Preact through `preact/compat` (ADR 0007). Components keep the React API and import from `'react'`; the rest of this decision stands, and the operating rule above reads "TSX components for interaction" with Preact as their runtime.
+- **2026-10-07, hosting outcome.** The site is hosted on Vercel, with `bigsmall.work` as the main domain (ADR 0008); Cloudflare Pages is the fallback.

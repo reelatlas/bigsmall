@@ -11,15 +11,15 @@ Every push to `main` that passes CI deploys to `https://bigsmall.work` (CLAUDE.m
 ## 1. Gate
 
 - In Bash, first: `export PATH="/c/Users/seanr/AppData/Roaming/npm:/c/Program Files/nodejs:/c/Program Files/GitHub CLI:$PATH"`.
-- `pnpm format`, then `pnpm check` (lint with the token guard, format check, types, unit tests, build, bundle budget).
-- **Commit only on its exit status:** `pnpm check && git add -A && git commit …`. Never chain the commit after the check with `;`, which commits even when the check fails (a commit once shipped with a failing format check that way, 2026-10-15).
-- A change to behavior or look also runs the browser suite first. With Sean's dev server holding the project's dev slot, build and run it against `astro preview` on port 4322 through the Playwright config in the session's scratchpad (`baseURL` and `webServer` pointing at 4322, `reuseExistingServer`, the `en-US` locale), never stopping his server. If a preview of your own already holds 4322, stop it first, or the config's own fails to start.
+- `pnpm format`, then `pnpm check` (lint with the token guard, format check, types, unit tests, build, bundle budget, the SEO contract).
+- **Commit only on its exit status, in one foreground command:** `pnpm check && git add -A && git commit …`. Never chain the commit after the check with `;`, which commits even when the check fails (a commit once shipped with a failing format check that way, 2026-10-15), and never read a background run's notification as the gate's result: it carries the last command's exit code, an `echo`'s, and a commit once landed on a red gate that way (2026-10-16; docs/LEARNINGS.md, "A gate run in the background reports its last command's exit code").
+- A change to behavior or look also runs the browser suite first. With Sean's dev server holding the project's dev slot, run it against a build on `astro preview`, as docs/TESTING.md, "End to end", says, never stopping his server; if a preview of your own already holds 4322, stop it first, or the config's own fails to start. Each browser-test step a chain runs gates the next with an explicit exit check (`&&`, or `|| exit 1`), never `;`. Name the project with its value joined, `--project=desktop-chromium e2e/x.spec.ts`, whenever spec files follow it: `--project desktop-chromium e2e/x.spec.ts` swallows the files and runs everything (docs/LEARNINGS.md, 2026-10-18).
 
 ## 2. Commit
 
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `perf:`, `a11y:`, `style:` for a visual trial; a scope where it helps (`feat(core):`, `docs(tidy):`). Small and focused: one kind of change a commit.
 - A visual trial ("try and see") is a commit of its own, so rolling it back is one revert; say "(trial)" in its subject.
-- The message ends with the attribution line the session's system reminder gives (today `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`). Pass it through a quoted heredoc (`git commit -F - <<'EOF'`), never `-m` with quotes inside quotes.
+- The message ends with the attribution line the session's reminder gives, copied as given. Pass it through a quoted heredoc (`git commit -F - <<'EOF'`), never `-m` with quotes inside quotes.
 
 ## 3. Push and watch
 

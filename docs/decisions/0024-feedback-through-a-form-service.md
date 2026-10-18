@@ -26,3 +26,7 @@ Formspark over the others: its free allowance is 250 submissions in total and th
 - The service's settings live at Sean's screen and are written down in `docs/DEPLOYMENT.md`, "Feedback": the recipient, the filter, the allowed domains, the honeypot, and what happens when the 250 run out (the service answers 402, the page says it could not send).
 - The browser tests answer the post themselves and never reach the service; one real message after each deploy that touches the form is the check that it still arrives.
 - A report of an inaccuracy arrives as a lead with its source, which docs/RESEARCH.md §5 takes from there.
+
+## Outcome (2026-10-18)
+
+The privacy line landed in the About page's footer, in Sean's words (docs/UX-SPEC.md §1, "Footer"): feedback goes through Formspark to our inbox, and nothing else is kept.

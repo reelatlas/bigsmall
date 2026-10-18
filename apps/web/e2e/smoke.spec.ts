@@ -326,3 +326,36 @@ test('the privacy line’s links read as the text around them, until hovered or 
     await expect(link, name).toHaveCSS('text-decoration-color', accent);
   }
 });
+
+test('every control that answers a click shows the hand, and a disabled one the arrow', async ({
+  page,
+}) => {
+  // One rule throughout (docs/DESIGN-SYSTEM.md, "Cursors"; Sean, 2026-10-18): buttons, tabs, menu
+  // triggers, summaries, and links show the hand; a disabled control, by the attribute or by
+  // aria-disabled, keeps the arrow. Read on the converter with a conversion on screen (the rows'
+  // copy buttons), on About (the tabs, the summaries, Send), and on the gallery (every variant,
+  // disabled ones among them).
+  for (const path of ['/?a=mile&v=1', '/about', '/dev/gallery']) {
+    await page.goto(path);
+    if (path.startsWith('/?')) await ready(page);
+    const wrong = await page.evaluate(() =>
+      [
+        ...document.querySelectorAll<HTMLElement>(
+          'button, [role="button"], [role="tab"], summary, a[href]',
+        ),
+      ]
+        .filter((el) => el.getClientRects().length > 0)
+        .map((el) => {
+          const disabled = el.matches(':disabled, [aria-disabled="true"]');
+          const cursor = getComputedStyle(el).cursor;
+          const want = disabled ? 'default' : 'pointer';
+          const name = (el.getAttribute('aria-label') ?? el.textContent ?? '').trim().slice(0, 30);
+          return cursor === want
+            ? null
+            : `${el.tagName.toLowerCase()} "${name}" shows ${cursor}, not ${want}`;
+        })
+        .filter(Boolean),
+    );
+    expect(wrong, path).toEqual([]);
+  }
+});

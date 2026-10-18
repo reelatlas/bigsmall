@@ -238,6 +238,23 @@
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
+
+  /* Every control that answers a click shows the hand, as a link does: the web's rule (Material,
+     Bootstrap's reboot, GitHub's Primer) over the platforms', which give the hand to links alone,
+     since the table's rows, the menus' choices, and the segmented controls already had it and
+     one rule throughout is what every guide agrees on (Sean, 2026-10-18; docs/DESIGN-SYSTEM.md,
+     "Cursors"). Tailwind v4 leaves a button on the browser's arrow. A disabled control, by the
+     attribute or by aria-disabled, keeps the arrow, inside a row that shows the hand too. */
+  button,
+  [role='button'],
+  [role='tab'],
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled='true'] {
+    cursor: default;
+  }
 }
 
 /*

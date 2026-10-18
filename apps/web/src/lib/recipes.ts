@@ -119,9 +119,10 @@ export const SECTION_HEADING = 'font-display text-xl font-semibold';
 
 /**
  * A disclosure's row, its chevron 4 px in: Every formula's categories, and Show all over them,
- * which takes their look so its chevron sits over theirs (Sean, 2026-10-16).
+ * which takes their look so its chevron sits over theirs (Sean, 2026-10-16). The hand comes from
+ * the base rule, as on every control (docs/DESIGN-SYSTEM.md, "Cursors").
  */
-export const DISCLOSURE = 'flex min-h-11 cursor-pointer items-center gap-3 px-1';
+export const DISCLOSURE = 'flex min-h-11 items-center gap-3 px-1';
 
 // A link standing on its own line (docs/DESIGN-SYSTEM.md, "Links"): ink, underlined in the accent,
 // 44 px tall. The not-found page's way back.

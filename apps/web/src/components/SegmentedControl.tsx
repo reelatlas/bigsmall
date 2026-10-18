@@ -18,7 +18,7 @@ import type { ReactNode } from 'react';
  */
 
 const TARGET =
-  'group flex min-w-11 cursor-pointer items-center not-first:-ml-0.5 pointer-coarse:min-h-11 has-disabled:cursor-not-allowed';
+  'group flex min-w-11 cursor-pointer items-center not-first:-ml-0.5 pointer-coarse:min-h-11 has-disabled:cursor-default';
 const SEGMENT =
   'flex h-8 w-full items-center justify-center border-2 border-edge border-l-transparent bg-clip-padding px-2.5 text-sm whitespace-nowrap text-ink group-first:rounded-l-md group-first:border-l-edge group-last:rounded-r-md peer-checked:bg-accent-soft peer-focus-visible:relative peer-focus-visible:z-10 peer-focus-visible:border-focus peer-disabled:text-ink-muted';
 

@@ -62,15 +62,17 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
 /**
  * A page's column, under its header: the main content's and the footer's. Full width up to its
  * own, since in the body's column (Base.astro) side margins of auto would shrink it to its content.
- * Its size is the stock one above the converter's two tracks and their gutters (CONVERTER_GRID:
- * 576 + 16 + 320, and 16 each side; 896 until 2026-10-17, when the box gave up 48 px beside an
- * open panel). Centered with its left edge on a whole pixel (`mx-page`, global.css), since the
+ * Its size is the stock one above the converter's column, a side panel, and their gutters
+ * (576 + 16 + 320, and 16 each side; 896 until 2026-10-17, when the box gave up 48 px beside an
+ * open panel); since 2026-10-18 the converter page's main spans the window instead (CONVERTER_MAIN),
+ * so a panel may use the window's margin, and this column bounds the other pages and the footer. Centered with its left edge on a whole pixel (`mx-page`, global.css), since the
  * scrollbar's room or an odd window would otherwise put the column on a half.
  */
 export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-frame';
 
 /**
- * A page's main column (the converter, About, 404, and the dev pages), with the page's frame:
+ * A page's main column (About, 404, and the dev pages; the converter page's is CONVERTER_MAIN),
+ * with the page's frame:
  * the frame token (--page-frame, global.css: Material's layout margin, 16 px on a phone and 24
  * from sm), PAGE_COLUMN's gutter sideways and this top and bottom, which the header's row and
  * the footer's link sit on
@@ -85,23 +87,31 @@ export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-frame');
  * xl container size, 576 px, the narrowest stock width at which the box keeps every unit's name
  * beside a ten-digit number (measured 2026-10-17: at 528 px four of the eight longest names drop;
  * docs/DESIGN-SYSTEM.md, "A column beside the rows"), and centered on every page, so the header
- * sits in one place from page to page (Sean, 2026-10-18); on the converter page it is the first
- * track of the page's grid, which a side panel joins (CONVERTER_GRID).
+ * sits in one place from page to page (Sean, 2026-10-18); on the converter page it is the second
+ * track of the page's grid, after the page's margin, a side panel's track third (CONVERTER_GRID).
  */
 export const CONTENT_COLUMN = 'mx-auto w-full max-w-xl';
 
 /**
- * The converter page from md: one grid on `main` of the content column (`grid-cols-box-and-side`
- * in global.css: its cap, then a side panel's own width) and a side panel's track, the pair
- * centered: with no panel the column sits where it does on every page, and a panel opening
- * beside the box re-centers the pair, the box keeping its width wherever both fit (Sean,
- * 2026-10-18: no room kept for a panel that seldom shows; from 2026-10-17 the column sat at the
- * page's left with the panel's track empty beside it). The panel carries the step between them,
- * so an empty track is no width. Every block between the page and the layout's cells spans both
- * tracks and hands them on (IN_CONVERTER_GRID).
+ * The converter page's main from md: the page's frame as padding and a grid of three tracks
+ * (`grid-cols-margin-box-and-side` in global.css): the page's margin, the content column's cap,
+ * then a side panel's own width. Not the page column (PAGE_COLUMN), since the panel may sit past
+ * it in the window's margin. With no panel the column sits where it does on every page, centered;
+ * a panel opening beside the box takes the window's margin first, and the column slides left only
+ * by what the panel still lacks: nothing in a wide window (from about 1310 px), as little as it
+ * takes below, the box keeping its width wherever the window holds both and giving way below about
+ * 960 px (a trial, Sean, 2026-10-18: no movement where there is room; that morning the pair
+ * re-centered, the column sliding 168 px on every opening; from 2026-10-17 a track stood empty
+ * beside the column). The panel carries the step between them, so an empty track is no width.
+ * Every block between the page and the layout's cells spans the three tracks and hands them on
+ * (IN_CONVERTER_GRID); the column's cells sit in the second track (COLUMN_CELL) and the panel in
+ * the third.
  */
-export const CONVERTER_GRID = 'md:grid md:grid-cols-box-and-side md:justify-center';
-export const IN_CONVERTER_GRID = 'md:col-span-2 md:grid md:grid-cols-subgrid';
+export const CONVERTER_GRID = 'md:grid md:grid-cols-margin-box-and-side';
+export const CONVERTER_MAIN = cx('w-full px-frame py-frame', CONVERTER_GRID);
+export const IN_CONVERTER_GRID = 'md:col-span-3 md:grid md:grid-cols-subgrid';
+/** A cell of the converter's column: the grid's second track, after the page's margin. */
+export const COLUMN_CELL = 'md:col-start-2';
 
 /**
  * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; a trial, Sean,

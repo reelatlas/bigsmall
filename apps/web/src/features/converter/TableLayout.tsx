@@ -66,7 +66,7 @@ const TABLE_GRID = cx(IN_CONVERTER_GRID, 'md:grid-rows-[auto_auto_auto_1fr]');
  */
 const TABLE_HEAD_CELL = cx(
   CONTENT_COLUMN,
-  'relative z-10 bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid',
+  'relative z-10 bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-2 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid',
 );
 /** The toolbar's row in the head, 8 px over the box. */
 const TABLE_TOOLS_CELL = 'relative mb-2 md:row-start-1';
@@ -101,18 +101,18 @@ const TABLE_BOX_CELL = 'md:row-start-2';
  */
 const TABLE_ROWS_CELL = cx(
   CONTENT_COLUMN,
-  '@container mt-2 md:col-start-1 md:row-span-2 md:row-start-3',
+  '@container mt-2 md:col-start-2 md:row-span-2 md:row-start-3',
 );
 /**
  * Where a side panel opens (docs/DESIGN-SYSTEM.md, "Side panels"): on the column, 16 px from the
- * box and from the table, its card at most 384 px wide. From md, the grid's second track, 16 px
+ * box and from the table, its card at most 384 px wide. From md, the grid's third track, 16 px
  * from the box by its own margin, so the track takes no width while no panel shows, 320 px wide,
  * room for Units' four presets on one line (Sean, 2026-10-15), its top on the box's, as tall as
  * its card (`self-start`).
  */
 const TABLE_SIDE_CELL = cx(
   CONTENT_COLUMN,
-  'isolate my-4 md:col-start-2 md:row-span-3 md:row-start-2 md:mx-0 md:my-0 md:ml-4 md:w-80 md:max-w-none md:self-start',
+  'isolate my-4 md:col-start-3 md:row-span-3 md:row-start-2 md:mx-0 md:my-0 md:ml-4 md:w-80 md:max-w-none md:self-start',
 );
 const SIDE_PANEL_WIDTH = 'max-w-sm md:max-w-none';
 
@@ -1132,7 +1132,7 @@ export function TableLayout({
           </div>
         </div>
         {side && (
-          <div ref={sideRef} id={sideId} className={TABLE_SIDE_CELL}>
+          <div ref={sideRef} id={sideId} className={TABLE_SIDE_CELL} data-side-cell>
             <div className={SIDE_PANEL_WIDTH}>{side}</div>
           </div>
         )}

@@ -127,12 +127,34 @@
 }
 
 /*
- * The converter page's two tracks from md (src/lib/recipes.ts, CONVERTER_GRID): the column, capped
- * at the xl container size it shares with the box (`max-w-xl`), and the side panel's own width. A
- * utility, since a class cannot name the token (docs/LEARNINGS.md, 2026-10-17).
+ * The converter page's tracks from md (CONVERTER_GRID, src/lib/recipes.ts): the page's margin, the
+ * content column's cap, then a side panel's own width. The margin first: the column stays centered
+ * in the window while the window's margin holds an open panel, and slides left only by what the
+ * panel still lacks, as a document's comments sit in its margin (a trial, Sean, 2026-10-18; that
+ * morning the column and the panel re-centered as a pair, the column sliding 168 px on every
+ * opening). The grid learns that a panel is open through :has(), from the cell the layout renders
+ * only then (data-side-cell), so no script tells the page; the margin track rounds down to a whole
+ * pixel (docs/LEARNINGS.md, "A grid track from a division lands on fractional pixels"). A utility,
+ * since a class cannot name the token (docs/LEARNINGS.md, 2026-10-17).
  */
-@utility grid-cols-box-and-side {
-  grid-template-columns: minmax(0, var(--container-xl)) auto;
+@utility grid-cols-margin-box-and-side {
+  --side-track: 0px;
+  grid-template-columns:
+    round(
+      down,
+      max(
+        0px,
+        min(
+          calc((100% - var(--container-xl)) / 2),
+          calc(100% - var(--container-xl) - var(--side-track))
+        )
+      ),
+      1px
+    )
+    minmax(0, var(--container-xl)) auto;
+  &:has([data-side-cell]) {
+    --side-track: calc(var(--container-xs) + var(--spacing) * 4);
+  }
 }
 
 /*

@@ -301,10 +301,12 @@ test('off the converter’s page the name leads home on a 44 px target in every 
 });
 
 // The header is as wide as the content column, centered on the page as on every page (docs/UX-SPEC.md
-// §1; Sean, 2026-10-17 and 2026-10-18): its menus end where the box ends, with a side panel open too,
-// the column and the panel then centered as a pair. The panel opens beside a whole box from a 960 px
-// window; narrower, the box gives way and the header with it.
-test('the header ends where the box ends, the column centered, and with Units open the pair is centered beside a whole box', async ({
+// §1; Sean, 2026-10-17 and 2026-10-18): its menus end where the box ends, with a side panel open too.
+// A panel takes the window's margin first and the column slides left only by what the panel lacks (a
+// trial, 2026-10-18): by nothing where the margin holds it, else just enough for the panel to end at
+// the window's frame, and never past the page's edge. The panel opens beside a whole box from about a
+// 960 px window; narrower, the box gives way and the header with it.
+test('the header ends where the box ends, the column centered, and with Units open the column moves only by what the panel lacks', async ({
   page,
   isMobile,
 }) => {
@@ -313,19 +315,19 @@ test('the header ends where the box ends, the column centered, and with Units op
     pageHeader(page).evaluate((own) => {
       const header = own.getBoundingClientRect();
       const box = document.querySelector('[data-head]')!.getBoundingClientRect();
-      const main = document.querySelector('main')!;
-      const frame = getComputedStyle(main);
-      const page = main.getBoundingClientRect();
+      const frame = parseFloat(getComputedStyle(document.querySelector('main')!).paddingRight);
+      const body = document.body.getBoundingClientRect();
       return {
         header: Math.round(header.right),
         box: Math.round(box.right),
         boxLeft: Math.round(box.left),
         width: Math.round(box.width),
-        pageLeft: Math.round(page.left + parseFloat(frame.paddingLeft)),
-        pageRight: Math.round(page.right - parseFloat(frame.paddingRight)),
+        pageLeft: Math.round(body.left + frame),
+        pageRight: Math.round(body.right - frame),
       };
     });
   for (const [width, whole] of [
+    [1440, true],
     [1280, true],
     [1024, true],
     [768, false],
@@ -333,29 +335,37 @@ test('the header ends where the box ends, the column centered, and with Units op
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/?a=meter&v=1');
     await ready(page);
-    let m = await edges();
-    expect(m.header, `${width}px`).toBe(m.box);
-    expect(m.width, `${width}px`).toBe(576);
-    // The column centered in the page, nothing kept beside it.
+    const closed = await edges();
+    expect(closed.header, `${width}px`).toBe(closed.box);
+    expect(closed.width, `${width}px`).toBe(576);
+    // The column centered in the window, nothing kept beside it.
     expect(
-      Math.abs(m.boxLeft - m.pageLeft - (m.pageRight - m.box)),
+      Math.abs(closed.boxLeft - closed.pageLeft - (closed.pageRight - closed.box)),
       `${width}px, centered`,
     ).toBeLessThanOrEqual(1);
     await pressTool(page, 'Units');
     const panel = settingsPanel(page, 'Units');
     await expect(panel).toBeVisible();
-    m = await edges();
-    expect(m.header, `${width}px, Units open`).toBe(m.box);
-    if (whole) expect(m.width, `${width}px, Units open`).toBe(576);
-    else expect(m.width, `${width}px, Units open`).toBeLessThan(576);
+    const open = await edges();
+    expect(open.header, `${width}px, Units open`).toBe(open.box);
+    if (whole) expect(open.width, `${width}px, Units open`).toBe(576);
+    else expect(open.width, `${width}px, Units open`).toBeLessThan(576);
     // The panel one step from the box's edge, on the box's top line.
     const side = (await panel.boundingBox())!;
-    expect(Math.round(side.x) - m.box, `${width}px`).toBe(16);
-    // The column and the panel centered as a pair (both flush where the pair fills the page).
-    const pairRight = Math.round(side.x + side.width);
-    expect(
-      Math.abs(m.boxLeft - m.pageLeft - (m.pageRight - pairRight)),
-      `${width}px, the pair centered`,
-    ).toBeLessThanOrEqual(1);
+    expect(Math.round(side.x) - open.box, `${width}px`).toBe(16);
+    // The column slid only by what the panel lacked at the window's frame, and never past the
+    // page's edge; where it lacked anything, the panel now ends at the frame.
+    const lacked = Math.max(0, closed.box + 16 + Math.round(side.width) - closed.pageRight);
+    const room = closed.boxLeft - closed.pageLeft;
+    const slid = closed.boxLeft - open.boxLeft;
+    expect(Math.abs(slid - Math.min(lacked, room)), `${width}px, slid ${slid}`).toBeLessThanOrEqual(
+      1,
+    );
+    if (lacked > 0) {
+      expect(
+        Math.abs(Math.round(side.x + side.width) - open.pageRight),
+        `${width}px, the panel at the frame`,
+      ).toBeLessThanOrEqual(1);
+    }
   }
 });

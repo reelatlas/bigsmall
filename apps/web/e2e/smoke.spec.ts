@@ -62,14 +62,14 @@ test('no text field on any page is under 16 px, the size a phone zooms into', as
   }
 });
 
-test('the page keeps the scrollbar’s room, so a panel that brings one moves the page by nothing and the column by the pair’s half alone', async ({
+test('the page keeps the scrollbar’s room, so a panel that brings one moves the page by nothing and the column by what the panel lacks alone', async ({
   page,
 }) => {
   // A classic scrollbar (Windows, Linux) takes layout width when it appears, and a centered
   // page would step left by half of it (docs/LEARNINGS.md, 2026-10-18). Headless Chromium
-  // draws none, so the rule is read, and the page column's edge is held across a panel opening;
-  // the content column itself slides by half the panel and its step, the pair re-centering
-  // (docs/UX-SPEC.md §1, "Units and Display"), and by nothing else.
+  // draws none, so the rule is read, and the page's edge is held across a panel opening; the
+  // content column itself slides only by what the panel lacks at the window's frame, the margin
+  // first (docs/UX-SPEC.md §1, "Units and Display"; a trial, 2026-10-18), and by nothing else.
   await page.setViewportSize({ width: 1280, height: 600 });
   await page.goto('/?a=meter&v=1');
   await ready(page);
@@ -79,6 +79,12 @@ test('the page keeps the scrollbar’s room, so a panel that brings one moves th
   const edges = async () => ({
     page: await page.evaluate(() => document.querySelector('main')!.getBoundingClientRect().left),
     column: await pageHeader(page).evaluate((el) => el.getBoundingClientRect().left),
+    columnRight: await pageHeader(page).evaluate((el) => el.getBoundingClientRect().right),
+    limit: await page.evaluate(
+      () =>
+        document.body.getBoundingClientRect().right -
+        parseFloat(getComputedStyle(document.querySelector('main')!).paddingRight),
+    ),
   });
   const before = await edges();
   await page.getByRole('button', { name: 'Calculator', exact: true }).click();
@@ -87,7 +93,8 @@ test('the page keeps the scrollbar’s room, so a panel that brings one moves th
   const after = await edges();
   expect(after.page).toBe(before.page);
   const panel = (await calculator.boundingBox())!.width;
-  expect(Math.abs(before.column - after.column - (panel + 16) / 2)).toBeLessThanOrEqual(1);
+  const lacked = Math.max(0, before.columnRight + 16 + panel - before.limit);
+  expect(Math.abs(before.column - after.column - lacked)).toBeLessThanOrEqual(1);
 });
 
 test('an unknown address shows the not-found page, with the way back', async ({ page }) => {

@@ -1,6 +1,6 @@
 ---
 import { ChevronDownIcon } from '../../components/icons';
-import { DISCLOSURE } from '../../lib/recipes';
+import { cx, DISCLOSURE } from '../../lib/recipes';
 import { FORMULAS_HEADING, formulaGroups, SIGNIFICANT } from './formulas';
 import { FormulasTools } from './FormulasTools';
 
@@ -31,8 +31,8 @@ const ROW = 'grid gap-x-3 gap-y-0.5 py-1.5 @lg:grid-cols-[minmax(0,--spacing(48)
 
 /** Exact by definition, or measured: a small tag after the formula. */
 const TAG = 'rounded-full px-2 text-xs font-medium';
-const EXACT = `${TAG} bg-accent-soft text-ink`;
-const MEASURED = `${TAG} bg-surface-raised text-ink-muted`;
+const EXACT = cx(TAG, 'bg-accent-soft text-ink');
+const MEASURED = cx(TAG, 'bg-surface-raised text-ink-muted');
 
 /** A number in the line of counts, in the ink beside its muted words, so the values stand out. */
 const STAT = 'font-numeric text-ink';
@@ -44,7 +44,10 @@ const STAT = 'font-numeric text-ink';
  * bar with rounded corners shows what scrolls under it"), its focus ring inside its edge, where
  * the bar over it cannot cover it.
  */
-const SUMMARY = `${DISCLOSURE} sticky list-none bg-canvas focus-ring-inset [&::-webkit-details-marker]:hidden`;
+const SUMMARY = cx(
+  DISCLOSURE,
+  'sticky list-none bg-canvas focus-ring-inset [&::-webkit-details-marker]:hidden',
+);
 ---
 
 <div>

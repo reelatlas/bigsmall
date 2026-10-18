@@ -7,6 +7,7 @@ import {
   cx,
   GROUP_TITLE,
   LIST_CARD,
+  LIST_MESSAGE,
   ROW_RULE,
   rowFill,
   STUCK_HEADING,
@@ -158,7 +159,7 @@ export function UnitMatches({
   return (
     <div ref={ref} className={cx(LIST_CARD, 'p-2')}>
       {matches.length === 0 && hidden.length === 0 && (
-        <p className="px-2 py-2.5 text-sm text-ink-muted">{notFound}</p>
+        <p className={cx(LIST_MESSAGE, 'text-sm text-ink-muted')}>{notFound}</p>
       )}
       {(matches.length > 0 || hidden.length > 0) && (
         <div className={ROWS}>

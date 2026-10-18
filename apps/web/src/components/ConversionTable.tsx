@@ -26,6 +26,7 @@ import {
   CURSOR_ROW,
   cx,
   LIST_CARD,
+  LIST_MESSAGE,
   NO_ANSWER,
   PANEL_TITLE,
   ROW_RULE,
@@ -893,7 +894,7 @@ export function ConversionTable<T extends ConversionRow>({
   );
 
   let body: ReactNode;
-  if (message) body = <p className="px-2 py-2.5 font-medium text-danger">{message}</p>;
+  if (message) body = <p className={cx(LIST_MESSAGE, 'font-medium text-danger')}>{message}</p>;
   else body = editing ? shownList : grid;
 
   return (

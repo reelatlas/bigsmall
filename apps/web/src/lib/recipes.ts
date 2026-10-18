@@ -70,14 +70,6 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
 export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-frame';
 
 /**
- * A block in the column that may paint past it (the sketchbook's changes): bled to the page's
- * edge, the column's gutter at each size taken back as its own padding, and clipped there with clip, never
- * hidden, which would make a scroll container. Focus rings inside the gutter stay whole, and a
- * phone never pans sideways to what a change paints (docs/LEARNINGS.md, 2026-10-16).
- */
-export const PAGE_BLEED = '-mx-frame px-frame overflow-x-clip';
-
-/**
  * A page's main column (the converter, About, 404, and the dev pages), with the page's frame:
  * the frame token (--page-frame, global.css: Material's layout margin, 16 px on a phone and 24
  * from sm), PAGE_COLUMN's gutter sideways and this top and bottom, which the header's row and
@@ -123,8 +115,11 @@ export const CENTERED_COLUMN = cx(CONTENT_COLUMN, 'mx-auto w-full');
  */
 export const STUCK_HEADING = 'sticky z-5 bg-canvas';
 
-/** A section's heading on a page, centered over it: About's "The sketchbook" and "Every formula". */
-export const SECTION_HEADING = 'text-center font-display text-xl font-semibold';
+/**
+ * A section's heading on a page: About's sketchbook (centered there), the not-found page's, and
+ * the gallery's theme names.
+ */
+export const SECTION_HEADING = 'font-display text-xl font-semibold';
 
 /**
  * A disclosure's row, its chevron 4 px in: Every formula's categories, and Show all over them,
@@ -141,7 +136,7 @@ export const LINK =
 // on hover or keyboard focus a link's ink and accent underline, faded in. It stands alone, so no
 // text around it needs telling apart from it (docs/DESIGN-SYSTEM.md, "Links").
 export const QUIET_LINK =
-  'inline-flex min-h-11 items-center text-ink-muted underline decoration-transparent decoration-2 underline-offset-4 transition-[color,text-decoration-color] hover:text-ink hover:decoration-accent focus-visible:text-ink focus-visible:decoration-accent';
+  'inline-flex min-h-11 items-center text-sm text-ink-muted underline decoration-transparent decoration-2 underline-offset-4 transition-[color,text-decoration-color] hover:text-ink hover:decoration-accent focus-visible:text-ink focus-visible:decoration-accent';
 
 // A link inside a muted sentence (docs/DESIGN-SYSTEM.md, "Links"): at rest the sentence's own
 // muted ink and no underline, so the line reads as plain text, and on hover or focus a link's ink
@@ -215,9 +210,11 @@ export const CHECKBOX = 'size-4 accent-accent';
  */
 export const CHOICE_FILL = 'hover:bg-surface-raised has-focus-visible:bg-surface-raised';
 
-/** A row in a list of choices: 44 px tall, in the nested corner. */
-const OPTION_BASE =
-  'flex min-h-11 cursor-pointer items-center rounded-nested-md px-2 text-sm text-ink';
+/** A row in a list of choices: 44 px tall, in the nested corner (a setting's row, a menu's choice, More's items). */
+export const CHOICE_ROW = 'flex min-h-11 items-center rounded-nested-md px-2 text-sm text-ink';
+
+/** A choice someone picks, with a pointer's cursor. */
+const OPTION_BASE = cx(CHOICE_ROW, 'cursor-pointer');
 
 /**
  * A setting's row, a checkbox's, filled under the pointer and while its control has
@@ -278,6 +275,9 @@ export function unitName(shown: boolean): string {
  * calculator display's at its right.
  */
 export const NO_ANSWER = 'text-sm font-medium text-danger';
+
+/** A message in place of a list's rows (no answer, no match), set in the rows' gutter. */
+export const LIST_MESSAGE = 'px-2 py-2.5';
 
 // Lists a field's cursor moves through (docs/DESIGN-SYSTEM.md, "Lists"): the table, the matches,
 // and the start's categories, whose rows the arrows reach while the caret stays in the field.

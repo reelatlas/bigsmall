@@ -9,14 +9,14 @@ import { SITE } from '../lib/site';
  * (docs/UX-SPEC.md §1). The link is ink with an accent underline: ink keeps body-text contrast
  * in every theme, which the accent only promises for edges (docs/DESIGN-SYSTEM.md, "Links").
  */
-import { LINK, PAGE_MAIN } from '../lib/recipes';
+import { LINK, PAGE_MAIN, SECTION_HEADING } from '../lib/recipes';
 ---
 
 <Base title={`Page not found · ${SITE.name}`} noindex>
   <main class={PAGE_MAIN}>
     <PageHeader />
     <section class="mt-10 max-w-prose" aria-labelledby="not-found">
-      <h2 id="not-found" class="font-display text-xl font-semibold">
+      <h2 id="not-found" class={SECTION_HEADING}>
         Page not found
       </h2>
       <p class="mt-2 text-ink-muted">Address may be mistyped or the page may have moved.</p>

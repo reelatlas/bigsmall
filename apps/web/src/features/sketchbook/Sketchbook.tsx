@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { Button } from '../../components/Button';
 import { PauseIcon, PlayIcon } from '../../components/icons';
-import { cx, PAGE_BLEED } from '../../lib/recipes';
+import { cx } from '../../lib/recipes';
 import { SKETCHBOOK_TIMING } from '../../lib/timing';
 import { FlipButton } from './FlipButton';
 import { play, sketchHref, type SketchbookPlayer } from './motion';
@@ -12,6 +12,15 @@ import {
   TILE_CORNER,
   type SketchbookSettings,
 } from './sketches';
+
+/**
+ * The grid bled to the page's edge, the column's gutter at each size taken back as its own
+ * padding (the frame token), and clipped there with clip, never hidden, which would make a scroll
+ * container: a change's pieces paint past a tile, and past a phone's edge they would let the page
+ * pan sideways (Sean's iPhone, 2026-10-16; docs/LEARNINGS.md). Focus rings inside the gutter stay
+ * whole.
+ */
+const PAGE_BLEED = '-mx-frame px-frame overflow-x-clip';
 
 /**
  * A tile's layers, bottom to top: the sketch showing, the one arriving, and four pieces the

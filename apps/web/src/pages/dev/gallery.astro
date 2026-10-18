@@ -19,7 +19,7 @@ import { Keycap } from '../../components/Keycap';
 import { FieldSamples } from './_gallery/FieldSamples';
 import { SettingSamples } from './_gallery/SettingSamples';
 import DevPage from '../../layouts/DevPage.astro';
-import { LINK, QUIET_LINK } from '../../lib/recipes';
+import { LINK, QUIET_LINK, SECTION_HEADING } from '../../lib/recipes';
 import { THEMES, TOKEN_CONTRACT } from '../../lib/themes';
 
 // Every component in every theme, in the variants and states that ship, for visual QA
@@ -42,10 +42,7 @@ const swatches = TOKEN_CONTRACT.colors;
         class="rounded-lg border border-line bg-canvas p-5 text-ink shadow-md"
       >
         <div class="flex items-baseline justify-between gap-3">
-          <h2
-            id={`theme-${t.id}`}
-            class="flex items-center gap-2 font-display text-xl font-semibold"
-          >
+          <h2 id={`theme-${t.id}`} class:list={[SECTION_HEADING, 'flex items-center gap-2']}>
             {t.name}
             <ThemeArt theme={t.id} />
           </h2>
@@ -138,7 +135,7 @@ const swatches = TOKEN_CONTRACT.colors;
           <a href="/" class={LINK}>
             Go to the converter
           </a>
-          <a href="/about/" class:list={[QUIET_LINK, 'text-sm']}>
+          <a href="/about/" class={QUIET_LINK}>
             About
           </a>
         </div>

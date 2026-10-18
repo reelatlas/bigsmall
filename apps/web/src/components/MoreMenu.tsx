@@ -1,5 +1,5 @@
 import { useId, useLayoutEffect, useRef, useState, type FocusEvent, type ReactNode } from 'react';
-import { cx, SHELL } from '../lib/recipes';
+import { CHOICE_ROW, cx, SHELL } from '../lib/recipes';
 import { Button } from './Button';
 import { MoreIcon } from './icons';
 
@@ -33,8 +33,10 @@ const PANEL = cx(
 );
 
 /** A menu item: a row with the tool's icon, muted, and its label. */
-const ITEM =
-  'focus-ring-inset flex min-h-11 w-full items-center gap-3 rounded-nested-md px-2 text-sm text-ink hover:bg-surface-raised aria-disabled:opacity-50';
+const ITEM = cx(
+  CHOICE_ROW,
+  'w-full gap-3 focus-ring-inset hover:bg-surface-raised aria-disabled:opacity-50',
+);
 
 /**
  * More: the tools a toolbar's one row has no room for, behind one icon at its end (docs/UX-SPEC.md

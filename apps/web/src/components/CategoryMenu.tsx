@@ -1,6 +1,7 @@
 import type { Category, CategoryId } from '@bigsmall/core';
 import { useId, useLayoutEffect, useRef, useState, type FocusEvent } from 'react';
 import {
+  COUNT,
   cx,
   MENU_CHEVRON,
   MENU_OPTION,
@@ -308,7 +309,7 @@ export function CategoryMenu({
                   {/* A bare number, as the matches' group headers show it ("Weight 2"); the word
                       stays for screen readers. */}
                   {count !== undefined && count > 0 && (
-                    <span className="font-numeric text-xs text-ink-muted">
+                    <span className={cx(COUNT, 'text-xs text-ink-muted')}>
                       {count}
                       <span className="sr-only"> {count === 1 ? 'match' : 'matches'}</span>
                     </span>

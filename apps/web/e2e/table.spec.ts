@@ -13,6 +13,7 @@ import {
   hiddenToggle,
   MARGIN_MS,
   menu,
+  pressTool,
   ready,
   row,
   sectionIds,
@@ -1862,4 +1863,50 @@ test('the toolbar and the box stay at the window’s top as one block while a lo
   await page.evaluate(() => scrollTo(0, 500));
   await expect.poll(async () => (await boxRect()).top).toBeLessThan(0);
   await expect(page.locator('[data-head][data-stuck]')).toHaveCount(0);
+});
+
+test('a side panel opened under a stuck head sticks beside it from md, and below md the head comes to the window’s top with the panel under it', async ({
+  page,
+  isMobile,
+}) => {
+  // docs/UX-SPEC.md §1, the block (Sean, 2026-10-18: the calculator opened at the box's old place,
+  // above the window beside the stuck head, or behind it on a phone).
+  await page.goto('/?a=mile&v=1');
+  await ready(page);
+  const headRect = () =>
+    page.locator('[data-head]').evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom };
+    });
+  const boxTop = () =>
+    page.locator('[data-plane="box"]').evaluate((el) => el.getBoundingClientRect().top);
+  // A short window, so the page has room to scroll past the head on every project.
+  await page.setViewportSize({ width: page.viewportSize()!.width, height: 520 });
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect.poll(async () => Math.round((await headRect()).top)).toBe(0);
+  await pressTool(page, 'Calculator');
+  await expect(page.getByRole('group', { name: 'Calculator' })).toBeVisible();
+  const panel = page.locator('[data-side-cell]');
+  if (isMobile) {
+    // The head at the window's top, the panel under it, in view.
+    const head = await headRect();
+    const rect = (await panel.boundingBox())!;
+    expect(Math.round(head.top)).toBeLessThanOrEqual(1);
+    expect(rect.y).toBeGreaterThanOrEqual(head.bottom - 1);
+    expect(rect.y).toBeLessThanOrEqual(head.bottom + 17);
+  } else {
+    // Level with the box's top, in view, and still there after more scrolling: it sticks with the head.
+    const before = (await panel.boundingBox())!;
+    expect(Math.abs(before.y - (await boxTop()))).toBeLessThanOrEqual(1);
+    expect(before.y).toBeGreaterThanOrEqual(0);
+    const scrolled = await page.evaluate(() => {
+      window.scrollBy(0, 100);
+      return window.scrollY;
+    });
+    // The page moved, so the panel's stillness below is the sticky's doing.
+    expect(scrolled).toBeGreaterThanOrEqual(400);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrolled);
+    const after = (await panel.boundingBox())!;
+    expect(Math.abs(after.y - before.y)).toBeLessThanOrEqual(1);
+  }
 });

@@ -180,7 +180,8 @@ export function Calculator({
   // effects commit with the render; Preact runs plain effects after paint, a frame too late for
   // keys typed straight after the click that opened it.
   useLayoutEffect(() => {
-    if (focusOnOpen) equalsIn(groupRef.current)?.focus();
+    // Without the browser's own scroll to the key: the layout places the panel (2026-10-18).
+    if (focusOnOpen) equalsIn(groupRef.current)?.focus({ preventScroll: true });
   }, [focusOnOpen]);
 
   // Native listeners, like the converter's undo keys: the group is not itself interactive. Bound

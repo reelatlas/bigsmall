@@ -127,6 +127,21 @@
 }
 
 /*
+ * A side panel's room beside a stuck head (SIDE_PANEL_WIDTH, src/features/converter/TableLayout.tsx,
+ * 2026-10-18): the card inside the wrapper scrolls its own content below the window's height less
+ * the page's frame, --side-max set in line on the wrapper from the measured top. The card itself
+ * scrolls, not a wrapper around it, so its border, ring, and corners stay whole (docs/LEARNINGS.md,
+ * "A panel beside a stuck head opened where the head was"). A utility, since a class reading a
+ * variable is a one-off value to the guard.
+ */
+@utility side-panel-room {
+  & > * {
+    max-height: var(--side-max);
+    overflow-y: auto;
+  }
+}
+
+/*
  * The converter page's tracks from md (CONVERTER_GRID, src/lib/recipes.ts): the page's margin, the
  * content column's cap, then a side panel's own width. The margin first: the column stays centered
  * in the window while the window's margin holds an open panel, and slides left only by what the

@@ -31,7 +31,10 @@ export function SidePanel({ title, children, onClose, focusOnOpen = true }: Side
     const panel = ref.current;
     if (!focusOnOpen || !panel) return;
     const rows = rowsIn(panel);
-    stopOf(rows[1] ?? rows[0])?.focus();
+    // Without the browser's own scroll to the control: the layout places the panel (TableLayout
+    // brings it into view under a stuck head), and that scroll put the page wherever the first
+    // control happened to be, at the top for Units and nowhere for the calculator (2026-10-18).
+    stopOf(rows[1] ?? rows[0])?.focus({ preventScroll: true });
   }, [focusOnOpen]);
 
   // Native listeners: the card is not itself interactive. In a layout effect, so a key pressed

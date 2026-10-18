@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type CSSProperties,
   type FocusEvent,
   type KeyboardEvent,
   type ReactNode,
@@ -108,13 +109,23 @@ const TABLE_ROWS_CELL = cx(
  * box and from the table, its card at most 384 px wide. From md, the grid's third track, 16 px
  * from the box by its own margin, so the track takes no width while no panel shows, 320 px wide,
  * room for Units' four presets on one line (Sean, 2026-10-15), its top on the box's, as tall as
- * its card (`self-start`).
+ * its card (`self-start`), and stuck with the head while the head is stuck, level with the box's
+ * top (`top` set in line from the box's measured place in the head) and scrolling inside below the
+ * window's height (2026-10-18).
  */
 const TABLE_SIDE_CELL = cx(
   CONTENT_COLUMN,
-  'isolate my-4 md:col-start-3 md:row-span-3 md:row-start-2 md:mx-0 md:my-0 md:ml-4 md:w-80 md:max-w-none md:self-start',
+  'isolate my-4 md:col-start-3 md:row-span-3 md:row-start-2 md:mx-0 md:my-0 md:ml-4 md:w-80 md:max-w-none md:self-start group-data-stick/stick:md:sticky',
 );
-const SIDE_PANEL_WIDTH = 'max-w-sm md:max-w-none';
+/**
+ * The panel's wrapper: at most 384 px wide below md. Beside a stuck head its card scrolls inside
+ * below the window's height less the page's frame, so the card ends where the page's foot would:
+ * the room is `--side-max`, set in line from the measured top, and the card reads it as its max
+ * height (`side-panel-room`, global.css). The card itself scrolls, not a wrapper around it, so its
+ * border, ring, and corners stay whole while its content scrolls (a wrapper clipped the card's
+ * edges; docs/LEARNINGS.md, 2026-10-18).
+ */
+const SIDE_PANEL_WIDTH = 'max-w-sm md:max-w-none group-data-stick/stick:md:side-panel-room';
 
 /**
  * Keys that type into the field from a control beside it (a toolbar's, the chip, a copy button):
@@ -302,14 +313,18 @@ export function TableLayout({
    * than the head, a name, and three rows together (a phone on its side, 400% zoom), so the table
    * stays usable.
    */
-  const [stick, setStick] = useState({ height: 0, gap: 0, on: false });
+  const [stick, setStick] = useState({ height: 0, gap: 0, boxTop: 0, on: false });
   const [stuck, setStuck] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const head = headRef.current;
     if (!head || typeof ResizeObserver === 'undefined') return;
     const measure = () => {
-      const height = head.getBoundingClientRect().height;
+      const headRect = head.getBoundingClientRect();
+      const height = headRect.height;
+      // Where the box's top sits in the head: a panel stuck beside the head sits level with it.
+      const boxTop = (fieldRef.current?.getBoundingClientRect().top ?? headRect.top) - headRect.top;
       const place = placeRef.current;
       // The gap between the box and the table, which the stuck head's strip covers.
       const gap = place ? parseFloat(getComputedStyle(place).marginTop) || 0 : 0;
@@ -320,7 +335,9 @@ export function TableLayout({
         place?.querySelector('[data-row], [role="option"]')?.getBoundingClientRect().height ?? 0;
       const on = window.innerHeight >= height + gap + heading + 3 * row;
       setStick((now) =>
-        now.height === height && now.gap === gap && now.on === on ? now : { height, gap, on },
+        now.height === height && now.gap === gap && now.boxTop === boxTop && now.on === on
+          ? now
+          : { height, gap, boxTop, on },
       );
     };
     measure();
@@ -340,16 +357,36 @@ export function TableLayout({
     const measure = () => {
       const panel = sideRef.current;
       const field = fieldRef.current;
+      // Read sideways, which a stuck head does not move: beside the box the panel starts past the
+      // box's right edge, below md under its left. Read by its top against the box's bottom until
+      // 2026-10-18, which a stuck box, drawn at the window's top, got wrong, so the head stayed
+      // over a panel that had opened under it.
       setSideBelow(
         !!panel &&
           !!field &&
-          panel.getBoundingClientRect().top >= field.getBoundingClientRect().bottom - 1,
+          panel.getBoundingClientRect().left < field.getBoundingClientRect().right - 1,
       );
     };
     measure();
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
   }, [hasSide]);
+  // A panel that opens below md while the page is scrolled opens where the box's row is, above
+  // the window or behind the stuck head (Sean, 2026-10-18): the head comes to the window's top
+  // with the panel under it, unless the panel is already in view. From md the panel sticks with
+  // the head instead (TABLE_SIDE_CELL), so nothing moves.
+  useLayoutEffect(() => {
+    const panel = sideRef.current;
+    const grid = gridRef.current;
+    if (!panel || !grid || !sideBelow) return;
+    const rect = panel.getBoundingClientRect();
+    const covered = headRef.current?.getBoundingClientRect().bottom ?? 0;
+    // In view: under the head's edge, or the window's top once the head has let go (its edge is
+    // above the window then). Chrome's scroll anchoring has already kept the table's row in place
+    // by then, which is what put the panel above the window.
+    if (rect.top >= Math.max(0, covered) && rect.bottom <= window.innerHeight) return;
+    window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY });
+  }, [hasSide, sideBelow]);
   /**
    * The head sticks while the table is what scrolls under it, and lets go while Edit is on, Hidden
    * is open, or a settings panel sits between the box and the table: their rows' 16 px checkboxes
@@ -359,6 +396,9 @@ export function TableLayout({
   const sticking = stick.on && !editing && !hiddenOpen && !sideBelow;
   // A section's name sticks a pixel under the strip's lower edge (the head, then its gap).
   const stickTop = sticking ? stick.height + stick.gap - 1 : undefined;
+  // A side panel beside the stuck head sits level with the box's top, and its card scrolls
+  // inside below the window's height, so a tall panel (Units' list) stays reachable.
+  const sideTop = sticking ? stick.boxTop : undefined;
   // The rule under the head only while it is stuck: a pixel set 2 px over the head's top edge
   // leaves the window exactly then (at 1 px it would touch the window's edge, which still counts
   // as intersecting).
@@ -999,7 +1039,7 @@ export function TableLayout({
         if (![fieldRef, placeRef].some((part) => part.current?.contains(next))) setPosition(null);
       }}
     >
-      <div className={TABLE_GRID}>
+      <div ref={gridRef} className={TABLE_GRID}>
         <div
           ref={headRef}
           className={TABLE_HEAD_CELL}
@@ -1132,8 +1172,25 @@ export function TableLayout({
           </div>
         </div>
         {side && (
-          <div ref={sideRef} id={sideId} className={TABLE_SIDE_CELL} data-side-cell>
-            <div className={SIDE_PANEL_WIDTH}>{side}</div>
+          <div
+            ref={sideRef}
+            id={sideId}
+            className={TABLE_SIDE_CELL}
+            data-side-cell
+            style={sideTop === undefined ? undefined : { top: sideTop }}
+          >
+            <div
+              className={SIDE_PANEL_WIDTH}
+              style={
+                sideTop === undefined
+                  ? undefined
+                  : ({
+                      '--side-max': `calc(100dvh - ${sideTop}px - var(--page-frame))`,
+                    } as CSSProperties)
+              }
+            >
+              {side}
+            </div>
           </div>
         )}
         <div ref={placeRef} className={TABLE_ROWS_CELL}>

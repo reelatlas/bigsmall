@@ -36,7 +36,7 @@ export default defineConfig({
       name: 'mobile-webkit',
       use: { ...devices['iPhone 13'] },
       testMatch: /(about|formulas|feedback|smoke|table|settings)\.spec\.ts/,
-      grep: /about\.spec|formulas\.spec|feedback\.spec|renders with no WCAG violations|no text field on any page is under 16 px|Cooking|stay at the window’s top|Edit sends one to Hidden|glides to its place|glide moves only/,
+      grep: /about\.spec|formulas\.spec|feedback\.spec|renders with no WCAG violations|no text field on any page is under 16 px|Cooking|stay at the window’s top|a side panel opened under a stuck head|Edit sends one to Hidden|glides to its place|glide moves only/,
     },
   ],
 });

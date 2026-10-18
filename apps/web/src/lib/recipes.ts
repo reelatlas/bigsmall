@@ -79,11 +79,11 @@ export const PAGE_BLEED = '-mx-4 px-4 overflow-x-clip';
 
 /**
  * A page's main column (the converter, About, 404, and the dev pages), with the page's padding:
- * one step, 32 px, at every width, top and bottom, which the header's row and the footer's link
- * sit on (docs/DESIGN-SYSTEM.md, "The page's two ends mirror"; Sean, 2026-10-18: the same logic
- * on every screen, and no more room over the header than under the footer).
+ * the gutter's 16 px (PAGE_COLUMN's px-4) at every width, top and bottom, which the header's row
+ * and the footer's link sit on (docs/DESIGN-SYSTEM.md, "The page's two ends mirror"; Sean,
+ * 2026-10-18: one value on every side and every screen, nothing of its own over the header).
  */
-export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8');
+export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-4');
 
 /**
  * The converter's column: the toolbar, the box, and the table, and the header over them, capped

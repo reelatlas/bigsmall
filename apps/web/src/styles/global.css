@@ -127,6 +127,24 @@
 }
 
 /*
+ * A small label trimmed to its cap height (the formulas' exact and measured tags; Sean,
+ * 2026-10-18: the word sat higher than centered in its pill). A line box holds the font's ascent
+ * and descent, 13 and 3 px at 12 px here, so a word of lowercase letters sat 5 px under the pill's
+ * top and 3 over its bottom. The standard answer, CSS Inline Layout 3's text-box-trim: the box is
+ * drawn from the cap height to the alphabetic baseline, and its own symmetric padding centers the
+ * ink, the pill keeping its 16 px. The padding goes with the trim, so a browser without it keeps
+ * the line box as it was. On a block container (the tag is a flex item, so one). Measured in
+ * Chromium and WebKit (docs/LEARNINGS.md, "A word sat high in its pill").
+ */
+@utility text-trim-cap {
+  @supports (text-box-trim: trim-both) {
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
+    padding-block: calc(var(--spacing) * 1);
+  }
+}
+
+/*
  * A side panel's room beside a stuck head (SIDE_PANEL_WIDTH, src/features/converter/TableLayout.tsx,
  * 2026-10-18): the card inside the wrapper scrolls its own content below the window's height less
  * the page's frame, --side-max set in line on the wrapper from the measured top. The card itself

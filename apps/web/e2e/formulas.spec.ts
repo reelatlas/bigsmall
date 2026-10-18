@@ -179,3 +179,33 @@ test('Copy all puts every formula on the clipboard as plain text', async ({
     units.length + ingredients.length,
   );
 });
+
+test('a formula’s tag is trimmed to its cap height, so the word sits centered in it', async ({
+  page,
+}) => {
+  // docs/DESIGN-SYSTEM.md, "Small labels" (Sean, 2026-10-18: the word sat higher than centered,
+  // the font's ascent over its cap counted in the line box).
+  const section = await openFormulas(page);
+  await section.getByRole('button', { name: 'Show all' }).click();
+  const tag = section.getByText('exact', { exact: true }).first();
+  await expect(tag).toBeVisible();
+  const trims = await page.evaluate(() => CSS.supports('text-box-trim', 'trim-both'));
+  test.skip(!trims, 'this browser has no text-box-trim yet: the tag keeps its line box');
+  const box = await tag.evaluate((el) => {
+    const style = getComputedStyle(el);
+    const ink = document.createElement('canvas').getContext('2d')!;
+    ink.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    return {
+      trim: style.getPropertyValue('text-box-trim'),
+      edge: style.getPropertyValue('text-box-edge'),
+      height: el.getBoundingClientRect().height,
+      cap: ink.measureText('H').actualBoundingBoxAscent,
+      padding: parseFloat(style.paddingTop) + parseFloat(style.paddingBottom),
+    };
+  });
+  expect(box.trim).toBe('trim-both');
+  expect(box.edge).toBe('cap alphabetic');
+  expect(box.padding).toBeGreaterThan(0);
+  // The box is the cap height and the padding, none of the font's ascent or descent.
+  expect(Math.abs(box.height - (box.cap + box.padding))).toBeLessThanOrEqual(1);
+});

@@ -197,7 +197,7 @@ export function UnitMatches({
                     {group.items.map((match, offset) => {
                       const index = group.first + offset;
                       return (
-                        // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field
+                        // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys act; a click keeps focus there
                         <div
                           key={matchKey(match)}
                           id={itemId(index)}
@@ -302,7 +302,7 @@ export function UnitMatches({
               {hidden.map((match, offset) => {
                 const index = matches.length + offset;
                 return (
-                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field
+                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys act; a click keeps focus there
                   <div
                     key={match.unit.id}
                     id={itemId(index)}

@@ -9,7 +9,7 @@ import type { Ingredient, IngredientKind } from '../types';
  */
 
 /**
- * The kinds, in the order Cooking lists them (its list with no ingredient, and its Ingredient menu),
+ * The kinds, in the order Cooking lists them (its list with no ingredient, and the list its pill opens),
  * each with its heading; the ingredients follow this order.
  */
 export const INGREDIENT_KINDS: readonly { id: IngredientKind; name: string }[] = [

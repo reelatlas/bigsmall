@@ -640,7 +640,7 @@ test('a change stays inside its tile: Glitch paints nothing past the tiles, and 
   expect(await PIXELS.differing(page, lastFrame!, settled)).toBe(0);
 });
 
-test('Blur, the turns, and Squash reach past the tile into the gap, over no neighbor, and leave nothing behind; the rest stay inside (trial)', async ({
+test('Blur, the turns, and Squash reach past the tile into the gap, over no neighbor, and leave nothing behind; the rest stay inside', async ({
   page,
   isMobile,
 }) => {
@@ -694,8 +694,8 @@ test('Blur, the turns, and Squash reach past the tile into the gap, over no neig
       for (const animation of element.getAnimations({ subtree: true })) animation.finish();
     });
   const STEPS = 12;
-  // The reaching changes, all on the Web Animations API (the stepped ones stay clipped, Glitch
-  // then three clipped ones.
+  // The reaching changes on the Web Animations API (the stepped ones stay clipped; Glitch has its
+  // test above), then three clipped ones.
   const effects: SketchEffect[] = [
     ...[...REACHING_EFFECTS].filter((effect) => !STEPPED_EFFECTS.has(effect)),
     'doors',

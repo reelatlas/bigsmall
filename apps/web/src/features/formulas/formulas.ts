@@ -76,7 +76,7 @@ export function writtenFactor(value: number): string {
 }
 
 /** A unit's formula in its category's base unit, by its kind. */
-export function formulaOf(unit: Unit, base: Unit): string {
+function formulaOf(unit: Unit, base: Unit): string {
   if (unit.id === base.id) return `${unit.symbol}, the base unit`;
   switch (unit.kind) {
     case 'linear':

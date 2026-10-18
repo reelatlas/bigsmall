@@ -1768,7 +1768,7 @@ test.describe('in a German locale', () => {
   });
 });
 
-test('the toolbar and the box stay at the window’s top as one block while a long table scrolls, one toolbar line where it has wrapped, the section names under them (trial)', async ({
+test('the toolbar and the box stay at the window’s top as one block while a long table scrolls, the section names under them', async ({
   page,
 }) => {
   const boxRect = () =>
@@ -1815,7 +1815,7 @@ test('the toolbar and the box stay at the window’s top as one block while a lo
   await expect(matches(page)).toBeVisible();
   // Deep in the list, the first row of a long kind (Dairy and eggs, six rows) at the window's
   // top: its name stuck under the head, with the whole kind under it, so the name stays rather
-  // than being pushed up by the next kind's, however tall the head (two toolbar lines on a phone).
+  // than being pushed up by the next kind's, however tall the head (one toolbar row, ADR 0023).
   await page
     .getByRole('option', { name: /^milk/ })
     .evaluate((option) => option.scrollIntoView({ block: 'start' }));

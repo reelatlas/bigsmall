@@ -1,6 +1,5 @@
 /**
- * Every UI timing in one place. Code and tests import these instead of repeating numbers, and the
- * inline script in layouts/Base.astro receives the header-menu ones through define:vars.
+ * Every UI timing in one place. Code and tests import these instead of repeating numbers.
  * Behavior is described in docs/UX-SPEC.md.
  */
 

@@ -8,7 +8,7 @@ function ids(response: SearchResponse): string[] {
 }
 
 describe('search: idle lists', () => {
-  it('empty query lists the basic categories in display order', () => {
+  it('empty query lists the categories in display order', () => {
     expect(ids(search(''))).toEqual([
       '#length',
       '#mass',

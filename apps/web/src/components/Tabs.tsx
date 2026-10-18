@@ -14,8 +14,6 @@ interface Props {
   tabs: readonly TabItem[];
   /** What the set is, for assistive technology ("About"). */
   label: string;
-  /** The tab open first, the first unless said; a hash naming another opens that one instead. */
-  initial?: string;
   /**
    * Put the open tab's id in the address's hash and open the tab a hash names (the About page's);
    * off for a sample, whose panels then take ids of their own.
@@ -50,13 +48,13 @@ function namedByHash(tabs: readonly TabItem[]): string | null {
  * hash opens its tab once hydrated, the row brought into view since the browser could not scroll
  * to a hidden panel.
  */
-export function Tabs({ tabs, label, initial, linked = true, ...panels }: Props) {
+export function Tabs({ tabs, label, linked = true, ...panels }: Props) {
   const id = useId();
   const hydrated = useIsHydrated();
   const [chosen, setChosen] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const fromHash = linked && hydrated ? namedByHash(tabs) : null;
-  const selected = chosen ?? fromHash ?? initial ?? tabs[0]!.id;
+  const selected = chosen ?? fromHash ?? tabs[0]!.id;
   const tabId = (tab: string) => `${id}-tab-${tab}`;
   const panelId = (tab: string) => (linked ? tab : `${id}-panel-${tab}`);
 

@@ -23,7 +23,7 @@ const LIGHT_YEAR =
 const PARSEC =
   'NIST SP 811 (2008) Appendix B.8: parsec = 3.085678E+16 m; exact as 648 000/π au (IAU 2015 Resolution B2)';
 
-/** Standard units first, then specialty ones; the table lists them all (ADR 0016). */
+/** Most common first; `order.ts` places them by tier, system, and size (ADR 0011, ADR 0016). */
 export const lengthUnits: readonly Unit[] = [
   {
     kind: 'linear',

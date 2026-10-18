@@ -84,7 +84,10 @@ interface UnitMeta {
   exact: boolean;
   /** Citation for the factor or formula (ADR 0020). Example: "NIST SP 811 (2008) Appendix B.8". */
   source: string;
-  /** Short definition shown to users when the unit has a variant or convention worth stating. */
+  /**
+   * A short definition for a unit with a variant or convention worth stating; nothing shows it
+   * yet (docs/UX-SPEC.md §14, "Unit notes").
+   */
   note?: string;
   /**
    * A pace, time per distance (Sean, 2026-10-16): its value is in minutes, written in minutes and

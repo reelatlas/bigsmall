@@ -33,5 +33,3 @@ export const golden: Record<string, GoldenRow[]> = {
   torque,
   angle,
 };
-
-export type { GoldenRow } from './types';

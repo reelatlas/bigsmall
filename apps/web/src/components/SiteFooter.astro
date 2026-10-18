@@ -5,8 +5,8 @@ import { CENTERED_COLUMN, INLINE_LINK, PAGE_COLUMN, QUIET_LINK } from '../lib/re
  * The footer under every page (docs/UX-SPEC.md §1, "Footer"), from Base.astro. On every page but
  * About: one quiet link to it, on the left edge of the page's content like the header, out of the
  * way until hovered or focused (Sean, 2026-10-15). On About, where the name in the header leads
- * home: the privacy line in Sean's words (2026-10-18), on About's column, its two names quiet links
- * in the sentence to what they name. On a page shorter than the window it sits at the window's
+ * home: the privacy line in Sean's words (2026-10-18), on About's column, its two names inline
+ * links (INLINE_LINK) in the sentence to what they name. On a page shorter than the window it sits at the window's
  * bottom, the body being a column at least the window's height (Base.astro), and otherwise after
  * the content (Sean, 2026-10-15; kept 2026-10-16). The address ends in a slash, as the build writes
  * the page and its canonical address. The foot sits on the page's frame (pb-frame, the frame

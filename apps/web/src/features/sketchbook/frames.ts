@@ -64,7 +64,7 @@ export function glitchFrame(
 }
 
 /** Blocks to a side: Scramble lands the next sketch in a grid of this many by this many. */
-export const BLOCKS = 4;
+const BLOCKS = 4;
 
 /** The order Scramble lands its blocks in, at random. */
 export function scrambleOrder(random: () => number): number[] {
@@ -88,7 +88,7 @@ export function scrambleFrame(
 }
 
 /** Rows Scan draws the next sketch in, top to bottom. */
-export const SCAN_ROWS = 16;
+const SCAN_ROWS = 16;
 
 /**
  * Scan at `progress` (0 to 1): how much of the tile, from the top, shows the next sketch, and the
@@ -144,7 +144,7 @@ export interface Box {
 }
 
 /** Fractions as percentages, every edge exact. */
-export const PLAIN: Grain = {
+const PLAIN: Grain = {
   top: pct,
   bottom: (fraction) => pct(1 - fraction),
   left: pct,

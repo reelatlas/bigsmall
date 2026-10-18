@@ -26,7 +26,10 @@ export const SITE = {
   tagline: 'unit converter',
   /** The link preview image, 1200 × 630, in public/. */
   image: '/og.png',
-  /** The logo search engines show for the site: a square PNG over 112 px, in public/ (`pnpm brand`). */
+  /**
+   * The logo search engines show for the site: a square PNG over 112 px, in public/
+   * (`pnpm --filter @bigsmall/web brand`).
+   */
   logo: '/icon-512.png',
   imageAlt:
     'The bigsmall logo, a big circle with a small one in front, beside the name and “unit converter”.',

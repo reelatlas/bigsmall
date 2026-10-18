@@ -66,11 +66,6 @@ export interface ValueFieldProps {
 }
 
 /**
- * The text layer: the visible value lives here, over a field whose own text is transparent. That
- * is what lets the exponent marker in "1.5E21" carry weight, since a field cannot style part of
- * its value. The size steps are measured against this layer (docs/DESIGN-SYSTEM.md, "Fields").
- */
-/**
  * The box's resting edge, a shell's that never opens: bordered, clipped to its corners, the
  * accent edge showing keyboard focus inside and easing between edge and accent, since the box
  * stays in view through the change.
@@ -78,6 +73,11 @@ export interface ValueFieldProps {
 const FIELD_SHELL =
   'overflow-hidden border-edge bg-surface transition-[border-color,box-shadow] focus-within:border-accent';
 
+/**
+ * The text layer: the visible value lives here, over a field whose own text is transparent. That
+ * is what lets the exponent marker in "1.5E21" carry weight, since a field cannot style part of
+ * its value. The size steps are measured against this layer (docs/DESIGN-SYSTEM.md, "Fields").
+ */
 const TEXT_LAYER =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 

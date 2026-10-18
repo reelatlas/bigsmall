@@ -828,7 +828,7 @@ export function ConversionTable<T extends ConversionRow>({
                 data-row={row.id}
                 className="relative col-span-7 grid grid-cols-subgrid items-center"
               >
-                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys move and take; a click keeps focus in the field */}
+                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys act; a click keeps focus there */}
                 <div
                   id={itemId(rowIndex)}
                   role="gridcell"

@@ -24,6 +24,7 @@ const PAGES = [
   '/dev/wordmark-lab',
   '/dev/sketchbook-lab',
   '/dev/tidy-lab',
+  '/dev/owner',
 ];
 
 for (const path of PAGES) {
@@ -123,6 +124,7 @@ test('pages tell search engines and link previews what they are; dev pages stay 
     '/dev/wordmark-lab',
     '/dev/sketchbook-lab',
     '/dev/tidy-lab',
+    '/dev/owner',
   ]) {
     await page.goto(path);
     await expect(page.locator('meta[name="robots"]'), path).toHaveAttribute('content', 'noindex');

@@ -197,16 +197,30 @@ test('the shortcuts map opens with Enter, never as the keyboard passes, and clos
   await expect(shortcutsButton(page)).toHaveAttribute('aria-expanded', 'false');
 });
 
-test('in a narrow header the arrows follow what shows, the theme menu first', async ({ page }) => {
-  // Under 416 px the menus take their own line, theme menu first, and in a header under 576 px
-  // the shortcuts button hides.
+test('in a narrow header the arrows follow what shows: the theme menu alone, or Copy URL before it', async ({
+  page,
+}) => {
+  // Under 416 px the header hides its icons, Copy URL among them (docs/UX-SPEC.md §1), and the
+  // theme menu is its one tool; from 416 px Copy URL shows before it, while a header under 576 px
+  // still hides the shortcuts button.
   await page.setViewportSize({ width: 400, height: 800 });
   await page.goto('/');
   await ready(page);
+  await expect(tool(page, 'Copy URL')).toBeHidden();
   await page.keyboard.press('Tab');
   await expect(themeToggle(page)).toBeFocused();
   await page.keyboard.press('ArrowRight');
-  await expect(tool(page, 'Copy URL')).toBeFocused();
+  await expect(themeToggle(page)).toBeFocused();
+
+  await page.setViewportSize({ width: 500, height: 800 });
+  await page.goto('/');
+  await ready(page);
+  await expect(shortcutsButton(page)).toBeHidden();
+  await tool(page, 'Copy URL').focus();
   await page.keyboard.press('ArrowRight');
+  await expect(themeToggle(page)).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect(tool(page, 'Copy URL')).toBeFocused();
+  await page.keyboard.press('ArrowLeft');
   await expect(themeToggle(page)).toBeFocused();
 });

@@ -15,8 +15,9 @@ const { actions = false, shortcuts = false, manual = false } = Astro.props;
 
 /*
  * The header every page shares: the wordmark with its theme art, then the header menus. The
- * header is an @container, so where it is too narrow for the menus beside the name they take a
- * line of their own, 20 px under it (HeaderMenus, docs/UX-SPEC.md §1).
+ * header is an @container: under its sm size the icons hide so the theme menu keeps the name's
+ * line, and under xs the theme menu takes a line of its own, 20 px under the name (HeaderMenus,
+ * docs/UX-SPEC.md §1).
  */
 ---
 

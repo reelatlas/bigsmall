@@ -16,8 +16,8 @@ bigsmall is a static, client-side unit converter: web first, responsive, install
 
 Kept current at every save and tidy (the `save` skill); history goes in the findings log.
 
-1. **Next:** Sean's calls below; then the full tidy he asked for (`/tidy full`, system-wide consistencies in designs, components, styles, formats, and logic, the tidy skill itself and earlier decisions open to revision); then Search Console and Bing at his screen, and a text record at Porkbun (`docs/SEO.md` §3). The sixty-eighth to seventy-second passes have the context.
-   - **His call: the header on a phone** (the seventy-second pass): keep the two lines, move Copy URL into the converter's toolbar so the header fits one line from 352 px windows (recommended), or step the name down between 352 and 416 px.
+1. **Next:** Sean's calls below; then the full tidy he asked for (`/tidy full`, system-wide consistencies in designs, components, styles, formats, and logic, the tidy skill itself and earlier decisions open to revision); then Search Console and Bing at his screen, and a text record at Porkbun (`docs/SEO.md` §3). The sixty-eighth to seventy-third passes have the context.
+   - **Sean tries on his iPhone** (2026-10-17): the theme's name alone, the feedback form, and the header on one line, Copy URL hidden on a phone, as he asked (the seventy-third pass).
    - **Formspark, at his screen:** Allowed domains set to `bigsmall.work`; then one real message from bigsmall.work/about to see it arrive (`docs/DEPLOYMENT.md`, "Feedback"). The feedback form is live (`56a644f`, ADR 0024).
    - **The privacy line** on About, his words to approve: "Visits are counted anonymously, without cookies, with Umami. Feedback goes through Formspark to our inbox; the site keeps nothing."
    - **For the tidy:** a gallery sample of the text fields (`TEXT_INPUT`, `TEXT_AREA`); one hook for what the category menu and More share (opening, closing, the keys).

@@ -43,6 +43,7 @@ test('the theme menu closes on Escape, a click outside, and focus leaving it', a
 
 test('arrow keys preview themes in the open menu; Enter keeps the choice and closes it', async ({
   page,
+  isMobile,
 }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
@@ -57,14 +58,16 @@ test('arrow keys preview themes in the open menu; Enter keeps the choice and clo
   await page.keyboard.press('Enter');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(toggle).toBeFocused();
-  // ← and → leave the open menu on the theme reached and move along the header (Sean, 2026-10-15).
+  // ← and → leave the open menu on the theme reached and move along the header (Sean, 2026-10-15):
+  // to Copy URL where the header shows it; a phone's header hides it (§1), so there the theme
+  // menu is the header's one tool and keeps the focus.
   await toggle.press('Enter');
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('ArrowDown');
   const reached = await page.locator('html').getAttribute('data-theme');
   await page.keyboard.press('ArrowLeft');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-  await expect(page.getByRole('button', { name: 'Copy URL' })).toBeFocused();
+  await expect(isMobile ? toggle : page.getByRole('button', { name: 'Copy URL' })).toBeFocused();
   await expect(page.locator('html')).toHaveAttribute('data-theme', reached!);
 });
 
@@ -202,13 +205,19 @@ test('shortcuts name ⌘ and ⌥ on Apple devices, Ctrl and Alt elsewhere', asyn
   await expect(calculator).toHaveAttribute('title', 'Calculator (⌥C)');
 });
 
-// Under 416 px the header's menus take a line of their own, theme menu first and flush left; from
-// 416 px every theme's name, art, and menus share one line, the menus on the right.
-for (const width of [320, 375, 400, 414, 416, 430, 520, 600, 610, 640]) {
-  const ownLine = width < 416;
-  test(`at ${width} px the name keeps its art, and the menus ${ownLine ? 'wrap under it, theme first' : 'share its line'}`, async ({
-    page,
-  }) => {
+// The header keeps one line (Sean, 2026-10-17; docs/UX-SPEC.md §1): under 416 px of window (a
+// header under its sm size, 384 px) the icons hide, Copy URL among them, and the theme menu shares
+// the name's line down to 352 px (a header under xs, 320 px), where it takes a line of its own,
+// flush left; from 416 px Copy URL shows before the theme menu, the menus on the right.
+for (const width of [320, 351, 352, 375, 400, 415, 416, 430, 520, 600, 610, 640]) {
+  const ownLine = width < 352;
+  const copyShown = width >= 416;
+  const line = ownLine
+    ? 'the theme menu wraps under it'
+    : copyShown
+      ? 'Copy URL and the theme menu share its line'
+      : 'the theme menu alone shares its line';
+  test(`at ${width} px the name keeps its art, and ${line}`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/');
     await ready(page);
@@ -223,8 +232,7 @@ for (const width of [320, 375, 400, 414, 416, 430, 520, 600, 610, 640]) {
         const copyUrl = box('[aria-label="Copy URL"]');
         const button = document.querySelector('[data-theme-name]')!.closest('button')!;
         const trigger = button.getBoundingClientRect();
-        // The first words shown (the label in a header of 576 px or more, else the name) and the
-        // chevron at the end.
+        // The first words shown (the theme's name, at rest) and the chevron at the end.
         const first = [...button.querySelectorAll('span')]
           .find((span) => getComputedStyle(span).position !== 'absolute')!
           .getBoundingClientRect();
@@ -234,7 +242,8 @@ for (const width of [320, 375, 400, 414, 416, 430, 520, 600, 610, 640]) {
           ownLine: menus.top >= name.bottom,
           left: Math.round(menus.left - header.left),
           right: Math.round(header.right - menus.right),
-          themeFirst: trigger.right <= copyUrl.left,
+          copyShown: copyUrl.width > 0,
+          iconsFirst: copyUrl.right <= trigger.left,
           rowGap: Math.round(menus.top - name.bottom),
           padLeft: Math.round(first.left - trigger.left),
           padRight: Math.round(trigger.right - chevron.right),
@@ -242,9 +251,10 @@ for (const width of [320, 375, 400, 414, 416, 430, 520, 600, 610, 640]) {
       });
       expect(m.overflow, theme.id).toBe(0);
       expect(m.ownLine, theme.id).toBe(ownLine);
-      expect(m.themeFirst, theme.id).toBe(ownLine);
+      expect(m.copyShown, theme.id).toBe(copyShown);
+      if (copyShown) expect(m.iconsFirst, theme.id).toBe(true);
       expect(ownLine ? m.left : m.right, theme.id).toBe(0);
-      // A wrapped row of menus keeps 20 px of air under the name.
+      // A theme menu on a line of its own keeps 20 px of air under the name.
       if (ownLine) expect(m.rowGap, theme.id).toBe(20);
       // The trigger's padding is the same at both ends, to its first words and after its chevron.
       expect(m.padLeft, theme.id).toBe(m.padRight);

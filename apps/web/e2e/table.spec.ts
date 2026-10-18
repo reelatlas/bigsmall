@@ -1601,8 +1601,11 @@ test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, E
 test('Copy URL copies the current conversion and confirms with a check', async ({
   page,
   context,
+  isMobile,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  // A phone's header hides Copy URL (docs/UX-SPEC.md §1); a tablet's, 768 px, shows it to touch.
+  if (isMobile) await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto('/?a=mile&v=2');
   await ready(page);
   const copyUrl = page.getByRole('button', { name: 'Copy URL' });

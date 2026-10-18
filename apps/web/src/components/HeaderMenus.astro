@@ -29,26 +29,28 @@ const { actions = false, shortcuts = false } = Astro.props;
  * place, and 8 px from the last button to the theme menu's trigger (gap-1.5 and that 2 px), as
  * the toolbar's dividers sit 8 px from its buttons.
  *
- * Where the page's header (an @container) is narrower than sm, 384 px, too narrow for every
- * theme's name, art, and menus on one line (Hardhat's wide name needs the most, 353 px), the menus
- * take a line of their own under the name, flush left, with the theme menu first so the row reads
- * from the left edge (docs/UX-SPEC.md §1). Wider, they sit on the right, the icons before the
- * theme menu.
+ * The header keeps one line (Sean, 2026-10-17; docs/UX-SPEC.md §1). Where the page's header (an
+ * @container) is narrower than sm, 384 px, too narrow for every theme's name, art, Copy URL, and
+ * the theme menu together (Hardhat's wide name needs the most, 347 px), the icons hide, Copy URL
+ * among them, as the shortcuts button hides under xl: a nice-to-have gives way, and a phone shares
+ * its address from the browser. The name and the theme menu alone fit every theme down to xs,
+ * 320 px (Hardhat needs 297); narrower still, the theme menu takes a line of its own under the
+ * name, flush left. Wider than sm, the menus sit on the right, the icons before the theme menu.
  */
 ---
 
 <div
   role="toolbar"
   aria-label="Site"
-  class="ml-auto flex items-start gap-1.5 @max-sm:ml-0 @max-sm:basis-full"
+  class="ml-auto flex items-start gap-1.5 @max-xs:ml-0 @max-xs:basis-full"
   data-header-menus
   data-plane="header"
 >
-  <div class="flex items-start">
+  <div class="flex items-start @max-sm:hidden">
     {shortcuts && <ShortcutsHelp />}
     {actions && <div id={SLOTS.headerActions} class="size-12 p-0.5" />}
   </div>
-  <div class="flex items-start @max-sm:order-first">
+  <div class="flex items-start">
     <ThemePicker />
   </div>
 </div>

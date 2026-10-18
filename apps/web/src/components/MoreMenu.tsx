@@ -1,5 +1,6 @@
-import { useId, useLayoutEffect, useRef, useState, type FocusEvent, type ReactNode } from 'react';
+import { useId, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { CHOICE_ROW, cx, SHELL } from '../lib/recipes';
+import { useShellMenu } from '../lib/shell-menu';
 import { Button } from './Button';
 import { MoreIcon } from './icons';
 
@@ -52,17 +53,16 @@ const ITEM = cx(
  */
 export function MoreMenu({ items, tool, openAtFirst = false }: MoreMenuProps) {
   const menuId = useId();
-  const [open, setOpen] = useState(openAtFirst);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   /** The trigger, the root's own button (Button takes no ref). */
   const trigger = () =>
     rootRef.current?.querySelector<HTMLButtonElement>(':scope > button') ?? null;
-
-  const close = () => {
-    setOpen(false);
-    trigger()?.focus();
-  };
+  const { open, setOpen, close, closeOnBlur } = useShellMenu({
+    rootRef,
+    trigger,
+    initiallyOpen: openAtFirst,
+  });
   const take = (item: MoreMenuItem) => {
     if (item.disabled) return;
     close();
@@ -76,12 +76,12 @@ export function MoreMenu({ items, tool, openAtFirst = false }: MoreMenuProps) {
     menuRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus();
   }, [open]);
 
+  // While open, besides what every shell menu does (useShellMenu): ↑ and ↓ move through the
+  // items, round from end to end, Home and End to the first and last. Bound in a layout effect,
+  // so a key pressed straight after opening reaches the items.
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!open || !root) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (!root.contains(event.target as Node)) setOpen(false);
-    };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.target === trigger()) return;
       const menuItems = [
@@ -92,24 +92,13 @@ export function MoreMenu({ items, tool, openAtFirst = false }: MoreMenuProps) {
         event.preventDefault();
         menuItems[(index + menuItems.length) % menuItems.length]?.focus();
       };
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        close();
-      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-        event.preventDefault();
-        close();
-        trigger()?.dispatchEvent(new KeyboardEvent('keydown', { key: event.key, bubbles: true }));
-      } else if (event.key === 'ArrowDown') moveTo(at + 1);
+      if (event.key === 'ArrowDown') moveTo(at + 1);
       else if (event.key === 'ArrowUp') moveTo(at - 1);
       else if (event.key === 'Home') moveTo(0);
       else if (event.key === 'End') moveTo(menuItems.length - 1);
     };
-    document.addEventListener('pointerdown', onPointerDown);
     root.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      root.removeEventListener('keydown', onKeyDown);
-    };
+    return () => root.removeEventListener('keydown', onKeyDown);
   });
 
   return (
@@ -117,9 +106,7 @@ export function MoreMenu({ items, tool, openAtFirst = false }: MoreMenuProps) {
       ref={rootRef}
       className="group relative"
       data-open={open || undefined}
-      onBlur={(event: FocusEvent<HTMLDivElement>) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
-      }}
+      onBlur={closeOnBlur}
     >
       <Button
         variant="ghost"

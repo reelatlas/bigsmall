@@ -1,5 +1,5 @@
 import type { Category, CategoryId } from '@bigsmall/core';
-import { useId, useLayoutEffect, useRef, useState, type FocusEvent } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 import {
   COUNT,
   cx,
@@ -12,6 +12,7 @@ import {
   MENU_TRIGGER,
   SHELL_PANEL,
 } from '../lib/recipes';
+import { useShellMenu } from '../lib/shell-menu';
 import { ChevronDownIcon } from './icons';
 
 /** The trigger before a category is chosen: the control's own name, as a select shows its field's. */
@@ -96,12 +97,15 @@ export function CategoryMenu({
 }: CategoryMenuProps) {
   const menuId = useId();
   const groupName = useId();
-  const [open, setOpen] = useState(false);
   /** The choice the arrows have reached while open: the chosen category until they move. */
   const [reached, setReached] = useState<CategoryId | null>(value);
   const rootRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const { open, setOpen, closeOnBlur } = useShellMenu({
+    rootRef,
+    trigger: () => trigger.current,
+  });
   const listRef = useRef<HTMLDivElement>(null);
   /** Opened by a click or a tap, not by Enter or Space (a click with no pointer, detail 0). */
   const openedByPointer = useRef(false);
@@ -179,60 +183,34 @@ export function CategoryMenu({
     };
   }, [open]);
 
-  // While open: a click outside closes it; Enter chooses the choice reached and Escape closes it
-  // back on the trigger; ← and → close it there too and hand the key to the toolbar, which moves
-  // on from the trigger (layouts/Base.astro). Native listeners: the wrapper is not itself
-  // interactive. Bound in a layout effect, so a key pressed straight after opening reaches them.
+  // While open, besides what every shell menu does (useShellMenu: a press outside, focus leaving,
+  // Escape, ← and →): pressing a choice keeps focus where it is, or the menu would close on its
+  // own blur first; and Enter chooses the choice reached. Native listeners on the root, bound in
+  // a layout effect so a key pressed straight after opening reaches them.
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!open || !root) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (!root.contains(event.target as Node)) setOpen(false);
-    };
-    // Pressing a choice keeps focus where it is, or the menu would close on its own blur first.
     const onMouseDown = (event: MouseEvent) => {
       if ((event.target as Element).closest('label')) event.preventDefault();
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.target === trigger.current) return;
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        setOpen(false);
-        trigger.current?.focus();
-      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-        event.preventDefault();
-        setOpen(false);
-        trigger.current?.focus();
-        trigger.current?.dispatchEvent(
-          new KeyboardEvent('keydown', { key: event.key, bubbles: true }),
-        );
-      } else if (event.key === 'Enter') {
-        // The choice with focus: before any category, the first has focus without being checked.
-        event.preventDefault();
-        const radio = event.target instanceof HTMLInputElement ? event.target : null;
-        if (radio) choose(radio.value as CategoryId);
-        else setOpen(false);
-      }
+      if (event.target === trigger.current || event.key !== 'Enter') return;
+      // The choice with focus: before any category, the first has focus without being checked.
+      event.preventDefault();
+      const radio = event.target instanceof HTMLInputElement ? event.target : null;
+      if (radio) choose(radio.value as CategoryId);
+      else setOpen(false);
     };
-    document.addEventListener('pointerdown', onPointerDown);
     root.addEventListener('mousedown', onMouseDown);
     root.addEventListener('keydown', onKeyDown);
     return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
       root.removeEventListener('mousedown', onMouseDown);
       root.removeEventListener('keydown', onKeyDown);
     };
   });
 
   return (
-    <div
-      ref={rootRef}
-      className={MENU_ROOT}
-      data-open={open || undefined}
-      onBlur={(event: FocusEvent<HTMLDivElement>) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
-      }}
-    >
+    <div ref={rootRef} className={MENU_ROOT} data-open={open || undefined} onBlur={closeOnBlur}>
       {/* Unseen, every label stacked in one cell: the menu is as wide as the widest, so it keeps
           its width as categories change and while open (the theme menu's sizer). The room after
           each label is the chevron's, and open, a choice's count's: the trigger's padding and a

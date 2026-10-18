@@ -206,6 +206,13 @@ test('the footer sits at the window’s bottom on a short page, and after the co
   const short = await place();
   expect(short.page).toBeLessThanOrEqual(short.window);
   expect(Math.abs(short.footerBottom - short.window)).toBeLessThanOrEqual(1);
+  // The foot sits on the page's own padding, as the head does, so the page is framed alike at
+  // both ends (docs/UX-SPEC.md §1, "Footer"): the phone project reads the phone's padding.
+  const ends = await page.evaluate(() => ({
+    foot: getComputedStyle(document.querySelector('body > footer')!).paddingBottom,
+    head: getComputedStyle(document.querySelector('main')!).paddingTop,
+  }));
+  expect(ends.foot).toBe(ends.head);
   // A table taller than the window: the footer follows it.
   await page.setViewportSize({ width: page.viewportSize()?.width ?? 1280, height: 480 });
   await page.goto('/?a=mile&v=1');

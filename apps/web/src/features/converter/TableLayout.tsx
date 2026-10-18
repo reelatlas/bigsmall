@@ -25,7 +25,7 @@ import { pressedByTouch } from '../../lib/modality';
 import { fitTools } from '../../lib/overflow';
 import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
-import { cx } from '../../lib/recipes';
+import { CONVERTER_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
 import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
@@ -40,15 +40,16 @@ import {
 import type { ConverterEnv } from './useConverter';
 
 /**
- * The converter from md (docs/UX-SPEC.md §1): the toolbar, the box, and its table in the first
- * column, and the side panel open (the calculator, Units, or Display) in a column of its own on
- * their right, its top level with the box's (Sean, 2026-10-15). It spans the box's row, the
- * table's, and the last, 1fr, which takes whatever of it is taller than the box and the table, so
- * the table always sits right under the box. Below md the side panel opens between the box and the
- * table, flush left.
+ * The converter from md (docs/UX-SPEC.md §1): the toolbar, the box, and its table in the page's
+ * first track, and the side panel open (the calculator, Units, or Display) in the second, on
+ * their right, its top level with the box's (Sean, 2026-10-15). The tracks are the page grid's
+ * (`main`, CONVERTER_GRID), handed down by subgrids, so the header over them is as wide as the box
+ * (Sean, 2026-10-17); the rows are this grid's own. The panel spans the box's row, the table's,
+ * and the last, 1fr, which takes whatever of it is taller than the box and the table, so the table
+ * always sits right under the box. Below md the side panel opens between the box and the table,
+ * flush left.
  */
-const TABLE_GRID =
-  'md:grid md:grid-cols-[minmax(0,1fr)_auto] md:grid-rows-[auto_auto_auto_1fr] md:gap-x-4';
+const TABLE_GRID = cx(IN_CONVERTER_GRID, 'md:grid-rows-[auto_auto_auto_1fr]');
 /**
  * The head of the table: the toolbar and the box as one block (Sean, 2026-10-17: the category in
  * view and changeable while a long table scrolls), a subgrid over the grid's first two rows from
@@ -59,8 +60,10 @@ const TABLE_GRID =
  * rule only while the head is stuck (`data-stuck`). Drawn by a pseudo-element, so the head keeps
  * its own size. Over a section's name (STUCK_HEADING, 5) and under an open shell (SHELL, 20).
  */
-const TABLE_HEAD_CELL =
-  'relative z-10 max-w-xl bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid';
+const TABLE_HEAD_CELL = cx(
+  CONVERTER_COLUMN,
+  'relative z-10 bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-1 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid',
+);
 /** The toolbar's row in the head, 8 px over the box. */
 const TABLE_TOOLS_CELL = 'relative mb-2 md:row-start-1';
 /**
@@ -92,7 +95,10 @@ const TABLE_BOX_CELL = 'md:row-start-2';
  * go four across once it has the room. Under an open side panel (below md) the panel's own 16 px
  * wins, the two margins collapsing.
  */
-const TABLE_ROWS_CELL = '@container mt-2 max-w-xl md:col-start-1 md:row-span-2 md:row-start-3';
+const TABLE_ROWS_CELL = cx(
+  CONVERTER_COLUMN,
+  '@container mt-2 md:col-start-1 md:row-span-2 md:row-start-3',
+);
 /**
  * Where a side panel opens (docs/DESIGN-SYSTEM.md, "Side panels"): 16 px from the box and from the
  * table, a panel apart, at most 384 px wide. From md, a column of its own, 320 px wide, room for
@@ -989,7 +995,7 @@ export function TableLayout({
   return (
     <div
       ref={rootRef}
-      className="group/stick"
+      className={cx('group/stick', IN_CONVERTER_GRID)}
       data-stick={sticking ? '' : undefined}
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
         const next = event.relatedTarget as Node | null;

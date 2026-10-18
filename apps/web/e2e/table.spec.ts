@@ -770,10 +770,15 @@ test('a side panel takes a column from md, its top level with the box, and sits 
     expect(await gapUnderBox(), name).toBe(closed);
   }
   await calculatorButton(page).click();
-  // Flush right with the page, and the table still right under the box.
-  expect(
-    Math.abs(wide.calculator.x + wide.calculator.width - (wide.converter.x + wide.converter.width)),
-  ).toBeLessThan(1);
+  // One step right of the box's column, in the page's second track, the column whole beside it
+  // (the two tracks, 2026-10-17; flush with the page's right edge until then), inside the page,
+  // and the table still right under the box.
+  const column = (await page.locator('[data-head]').boundingBox())!;
+  expect(Math.round(wide.calculator.x - (column.x + column.width))).toBe(16);
+  expect(Math.round(column.width)).toBe(576);
+  expect(wide.calculator.x + wide.calculator.width).toBeLessThanOrEqual(
+    wide.converter.x + wide.converter.width + 1,
+  );
   expect(await gapUnderBox()).toBe(closed);
 
   await page.setViewportSize({ width: 375, height: 900 });

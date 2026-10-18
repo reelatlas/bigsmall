@@ -62,8 +62,11 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
 /**
  * A page's column, under its header: the main content's and the footer's. Full width up to its
  * own, since in the body's column (Base.astro) side margins of auto would shrink it to its content.
+ * Its size is the stock one above the converter's two tracks and their gutters (CONVERTER_GRID:
+ * 576 + 16 + 320, and 16 each side; 896 until 2026-10-17, when the box gave up 48 px beside an
+ * open panel).
  */
-export const PAGE_COLUMN = 'mx-auto w-full max-w-4xl px-4';
+export const PAGE_COLUMN = 'mx-auto w-full max-w-5xl px-4';
 
 /**
  * A block in the column that may paint past it (the sketchbook's changes): bled to the page's
@@ -75,6 +78,24 @@ export const PAGE_BLEED = '-mx-4 px-4 overflow-x-clip';
 
 /** A page's main column (the converter, About, and 404). */
 export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-8 sm:py-12');
+
+/**
+ * The converter's column: the toolbar, the box, and the table, and the header over them, capped
+ * at the xl container size, the narrowest stock width at which the box keeps every unit's name
+ * beside a ten-digit number (measured 2026-10-17: at 528 px four of the eight longest names drop;
+ * docs/DESIGN-SYSTEM.md, "A column beside the rows").
+ */
+export const CONVERTER_COLUMN = 'max-w-xl';
+
+/**
+ * The converter page from md: one grid of two tracks on `main`, the column (`grid-cols-box-and-side`
+ * in global.css: its cap, then the side panel's own width) and the side panel's, the design
+ * system's step between them, so the header's menus end where the box ends and a panel opens into
+ * the spare room without moving or narrowing anything (Sean, 2026-10-17; a trial). Every block
+ * between the page and the layout's cells spans both tracks and hands them on (IN_CONVERTER_GRID).
+ */
+export const CONVERTER_GRID = 'md:grid md:grid-cols-box-and-side md:gap-x-4';
+export const IN_CONVERTER_GRID = 'md:col-span-2 md:grid md:grid-cols-subgrid';
 
 /**
  * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; a trial, Sean,

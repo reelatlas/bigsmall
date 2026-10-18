@@ -9,19 +9,25 @@ interface Props {
   shortcuts?: boolean;
   /** The wordmark waits for the page to play it, as on the wordmark lab (Wordmark). */
   manual?: boolean;
+  /** The page's column, where the header is narrower than the page (the converter's). */
+  class?: string;
 }
 
-const { actions = false, shortcuts = false, manual = false } = Astro.props;
+const { actions = false, shortcuts = false, manual = false, class: className } = Astro.props;
 
 /*
  * The header every page shares: the wordmark with its theme art, then the header menus. The
  * header is an @container: under its sm size the icons hide so the theme menu keeps the name's
  * line, and under xs the theme menu takes a line of its own, 20 px under the name (HeaderMenus,
- * docs/UX-SPEC.md §1).
+ * docs/UX-SPEC.md §1). As wide as the page's column, which the page gives (`class`): the
+ * converter page puts it in its grid's first track with the box (CONVERTER_COLUMN,
+ * docs/DESIGN-SYSTEM.md, "A column beside the rows"); About leaves it the page's width.
  */
 ---
 
-<header class="@container flex flex-wrap items-center justify-between gap-x-4 gap-y-5">
+<header
+  class:list={['@container flex flex-wrap items-center justify-between gap-x-4 gap-y-5', className]}
+>
   <Wordmark manual={manual} />
   <HeaderMenus actions={actions} shortcuts={shortcuts} />
 </header>

@@ -112,6 +112,15 @@
 }
 
 /*
+ * The converter page's two tracks from md (src/lib/recipes.ts, CONVERTER_GRID): the column, capped
+ * at the xl container size it shares with the box (`max-w-xl`), and the side panel's own width. A
+ * utility, since a class cannot name the token (docs/LEARNINGS.md, 2026-10-17).
+ */
+@utility grid-cols-box-and-side {
+  grid-template-columns: minmax(0, var(--container-xl)) auto;
+}
+
+/*
  * A check that draws itself in, for a confirmation such as a reset done (docs/DESIGN-SYSTEM.md,
  * "Motion"). It rests fully drawn and animates from hidden, so reduced motion, which stops every
  * animation, shows it whole. 24 covers the check's path (about 20 units long).

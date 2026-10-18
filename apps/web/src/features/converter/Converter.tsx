@@ -20,6 +20,7 @@ import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { pressedByTouch } from '../../lib/modality';
 import { isApplePlatform } from '../../lib/platform';
+import { cx, IN_CONVERTER_GRID } from '../../lib/recipes';
 import { INTRO } from '../../lib/site';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
@@ -407,7 +408,7 @@ export function Converter() {
     <section
       ref={sectionRef}
       aria-label="Unit converter"
-      className="mt-6"
+      className={cx('mt-6', IN_CONVERTER_GRID)}
       data-hydrated={hydrated ? '' : undefined}
     >
       {/*
@@ -418,7 +419,7 @@ export function Converter() {
         menu's text and the icons' glyphs each inset in their buttons (docs/DESIGN-SYSTEM.md,
         "Space by what shows").
       */}
-      <p id={introId} className="mb-2 text-sm text-ink-muted">
+      <p id={introId} className="mb-2 text-sm text-ink-muted md:col-start-1">
         {INTRO}
       </p>
 

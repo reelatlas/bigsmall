@@ -6,7 +6,9 @@ import {
   expectNoA11yViolations,
   MARGIN_MS,
   pickTheme,
+  pressTool,
   ready,
+  settingsPanel,
   shortcutsButton,
   themeToggle,
 } from './support';
@@ -290,5 +292,47 @@ test('off the converter’s page the name leads home on a 44 px target in every 
     await applyTheme(page, theme);
     expect((await home.boundingBox())?.height, theme.id).toBeGreaterThanOrEqual(44);
     expect((await heading.boundingBox())?.height, theme.id).toBeCloseTo(heights.get(theme.id)!, 1);
+  }
+});
+
+// The header is as wide as the converter's column (docs/UX-SPEC.md §1; Sean, 2026-10-17, a trial):
+// its menus end where the box ends, with a side panel open too. The panel opens beside a whole box
+// from a 944 px window; narrower, the box gives way and the header with it.
+test('the header ends where the box ends, with Units open too, which opens beside a whole box', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'below md the side panel opens between the box and the table');
+  const edges = () =>
+    page.evaluate(() => {
+      const header = document.querySelector('main > header')!.getBoundingClientRect();
+      const box = document.querySelector('[data-head]')!.getBoundingClientRect();
+      return {
+        header: Math.round(header.right),
+        box: Math.round(box.right),
+        width: Math.round(box.width),
+      };
+    });
+  for (const [width, whole] of [
+    [1280, true],
+    [1024, true],
+    [768, false],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/?a=meter&v=1');
+    await ready(page);
+    let m = await edges();
+    expect(m.header, `${width}px`).toBe(m.box);
+    expect(m.width, `${width}px`).toBe(576);
+    await pressTool(page, 'Units');
+    const panel = settingsPanel(page, 'Units');
+    await expect(panel).toBeVisible();
+    m = await edges();
+    expect(m.header, `${width}px, Units open`).toBe(m.box);
+    if (whole) expect(m.width, `${width}px, Units open`).toBe(576);
+    else expect(m.width, `${width}px, Units open`).toBeLessThan(576);
+    // The panel one step from the box's edge, on the box's top line.
+    const side = (await panel.boundingBox())!;
+    expect(Math.round(side.x) - m.box, `${width}px`).toBe(16);
   }
 });

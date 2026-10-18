@@ -92,9 +92,9 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - A scroll or focus fault is checked in WebKit as well as Chromium (`npx playwright install webkit`, a scratch config): Chromium's scroll anchoring hides a page clamped to its top as a list is swapped, a panel hidden before the next shows, or a tap's focus moving the page (docs/LEARNINGS.md: "Safari scrolls to the top as a list is swapped", "A table swapped in the page clamps the scroll to the top", "A tab that hides its panel before showing the next lets WebKit clamp the scroll", "WebKit draws a door hinged on the right half open").
 - `docs/TESTING.md` describes each spec file as it is.
 
-## Docs
+## Docs and skills
 
-- `UX-SPEC.md`: current behavior only; built items in §14 say so; open questions in §15 still open.
+- `UX-SPEC.md`: current behavior only; §14 holds what is not built yet, a built item moved into its section with its date; open questions in §15 still open.
 - `DESIGN-SYSTEM.md`: the recipes paragraph, the patterns, the inventory, and the gallery paragraph match the code. The spacing rules hold: a line sits evenly between the ink on either side, and a fill (hovered, focused, switched on) keeps 4 px from a line. A control shown only on the active row stays reachable (`opacity-0 pointer-events-none`); dim text takes the muted ink, never opacity.
 - `ARCHITECTURE.md`: the file tables match the tree, and the conventions hold.
 - ADRs: a decision explained twice has one; a replaced one says so in its status line; the index lists all.
@@ -104,3 +104,4 @@ Walk each section over the files in scope. Searches find candidates; reading the
 - Persisted settings stay readable: stored by what changed, the version raised when the shape changes, an older version migrated (`settingsFrom`).
 - `CLAUDE.md`: "Current status" short and current, "Pick up here" listing the trials (with their reverting commits) and the questions open with Sean, the recipes current.
 - Each fact lives in one doc; the others link to it.
+- The skills (`.claude/skills/`): each still has one job and says when to use it; a step the stretch since the last tidy failed or skipped is fixed or dropped; a thing done by hand three times that a skill should say is in it; a rule a skill spells out that CLAUDE.md or a doc now owns points there instead; each has its pointer in CLAUDE.md's "Recipes" and its row in PLAN §12 (CLAUDE.md, "How the docs and skills evolve").

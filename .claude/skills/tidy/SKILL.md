@@ -54,7 +54,7 @@ The system's own docs are the yardstick, so read them before judging anything: `
 
 | Note                                                     | Home                                                                                                                                              |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| What the converter does                                  | `docs/UX-SPEC.md` (planned work in §14)                                                                                                           |
+| What the converter does                                  | `docs/UX-SPEC.md` (what is not built yet in §14; a built item moves into its section)                                                             |
 | How things look and are built: tokens, recipes, patterns | `docs/DESIGN-SYSTEM.md`, and its inventory row for each component                                                                                 |
 | Where code lives, conventions                            | `docs/ARCHITECTURE.md`                                                                                                                            |
 | What is tested where                                     | `docs/TESTING.md`                                                                                                                                 |

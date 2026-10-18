@@ -218,24 +218,24 @@ WCAG 2.2 AA throughout. Specifically:
 
 ## 12. Documentation system
 
-| Doc                        | Purpose                                                      | Updated when                            |
-| -------------------------- | ------------------------------------------------------------ | --------------------------------------- |
-| `CLAUDE.md`                | Conventions and rules for every working session              | Rules change                            |
-| `docs/PLAN.md`             | Vision, scope, architecture, milestones                      | Scope or plan changes                   |
-| `docs/UX-SPEC.md`          | Exact UI behavior                                            | Before any behavior change              |
-| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources                      | Units or categories change              |
-| `docs/RESEARCH.md`         | How a fact is decided by its kind, and re-opened (ADR 0022)  | The method changes                      |
-| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend                | Structure changes                       |
-| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                              | Tokens or components change             |
-| `docs/THEMING.md`          | How to author and QA a theme                                 | Theming mechanism changes               |
-| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates                | Test approach changes                   |
-| `docs/DEPLOYMENT.md`       | How the site is built and served; setup, releases, rollbacks | Hosting or domains change               |
-| `docs/SEO.md`              | The SEO contract every page meets, the conventions, the plan | A page, a category, or the plan changes |
-| `docs/decisions/NNNN-*.md` | Why we chose what we chose                                   | A decision is made or reversed          |
-| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices                      | Something is learned                    |
-| `docs/research/`           | Usability test scripts, feedback rounds, findings            | A test or feedback round runs           |
-| `docs/research/labs/`      | The retired labs index, with each lab's screenshots          | A lab retires                           |
-| `.claude/skills/`          | The working routines: tidy, save (a handoff), ship, research | A routine changes                       |
+| Doc                        | Purpose                                                                                                                        | Updated when                                            |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| `CLAUDE.md`                | Conventions and rules for every working session                                                                                | Rules change                                            |
+| `docs/PLAN.md`             | Vision, scope, architecture, milestones                                                                                        | Scope or plan changes                                   |
+| `docs/UX-SPEC.md`          | Exact UI behavior                                                                                                              | Before any behavior change                              |
+| `docs/UNITS-CATALOG.md`    | Taxonomy, tiers, special cases, sources                                                                                        | Units or categories change                              |
+| `docs/RESEARCH.md`         | How a fact is decided by its kind, and re-opened (ADR 0022)                                                                    | The method changes                                      |
+| `docs/ARCHITECTURE.md`     | Modules, data flow, boundaries, how to extend                                                                                  | Structure changes                                       |
+| `docs/DESIGN-SYSTEM.md`    | Tokens, components, usage rules                                                                                                | Tokens or components change                             |
+| `docs/THEMING.md`          | How to author and QA a theme                                                                                                   | Theming mechanism changes                               |
+| `docs/TESTING.md`          | Test layers, how to add golden rows, CI gates                                                                                  | Test approach changes                                   |
+| `docs/DEPLOYMENT.md`       | How the site is built and served; setup, releases, rollbacks                                                                   | Hosting or domains change                               |
+| `docs/SEO.md`              | The SEO contract every page meets, the conventions, the plan                                                                   | A page, a category, or the plan changes                 |
+| `docs/decisions/NNNN-*.md` | Why we chose what we chose                                                                                                     | A decision is made or reversed                          |
+| `docs/LEARNINGS.md`        | Dated log of gotchas and best practices                                                                                        | Something is learned                                    |
+| `docs/research/`           | Usability test scripts, feedback rounds, findings                                                                              | A test or feedback round runs                           |
+| `docs/research/labs/`      | The retired labs index, with each lab's screenshots                                                                            | A lab retires                                           |
+| `.claude/skills/`          | The working routines: tidy, save (a handoff), ship, research; how they evolve is `CLAUDE.md`, "How the docs and skills evolve" | A routine changes, in the same commit as what taught it |
 
 Rule of thumb: if a future session would have to rediscover it, write it down.
 

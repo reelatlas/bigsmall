@@ -4,6 +4,20 @@ A prototype lab answers a design question with a few working answers, built from
 
 Newest first.
 
+## Tidy lab, `/dev/tidy-lab` (2026-10-18)
+
+**Explored.** Three of the full tidy's calls, to see rather than read (the eighty-sixth and eighty-seventh passes in docs/research/findings-0-first-pass.md). How a side panel opens beside the box on a wide screen, three ways, each a stage the page column's width with a stand-in for the converter page, its own Units tool, and a measured line under it: the pair re-centering as then built (the column slides 168 px), the margin-first slide (the panel into the window's margin past the page column, the column sliding only by what the panel lacks), and a drawer fixed at the window's frame. The About page's vertical rhythm, every gap a band named by its class and measured, the converter page's beside it, and one section step for About's two section gaps on a control, 2, 3, or 4 times the frame. The formulas' exact and measured tags, today's pill against the shape token's corner, in every theme, with what extending the token guard means.
+
+**Decided** (Sean, 2026-10-18). The section step at three times the frame (`--spacing-section`, 48 px on a compact screen and 72 from `sm`; docs/DESIGN-SYSTEM.md, "Sections step by the frame"). The tags on `rounded-sm`, the keycap's corner, and `rounded-full` added to the token guard. On how a panel opens, his question was whether the margin first, with no movement while the margin holds the panel, is the better pattern; it is the one a centered document with a side tool uses (a document's comments in its margin), so it was built as a trial the same day, one revert (docs/UX-SPEC.md §1, "Units and Display").
+
+**Left out, and why.** The drawer: it covers the table's right end in a narrower window and scrolls apart from the page. The pair re-centering, as built from 2026-10-18's morning: a 168 px slide on every opening, in a window with room to spare. The 2 and 4 times steps: 2 made the tabs crowd the sketchbook; 4 kept the tabs' 96 px and widened the heading's gap to it.
+
+**Learned** (docs/LEARNINGS.md, 2026-10-18): a phone emulation's window settles after the first layout, so a page's end is measured against the body once the page is ready; a lab's own test is what caught its "About today" stack drawing the heading's gap twice; a grid whose first track is a measured inset must measure from the column's full width, not from one a panel has already narrowed.
+
+**Screenshots** (`tidy-lab/`): 1 the pair re-centering with Units open at 1280 px; 2 the margin first, the panel in the window's margin, the column 15 px left; 3 the drawer at the window's frame; 4 the panel stacked between the box and the rows on a phone; 5 the rhythm's three stacks at 1280 px, About today and one section step side by side; 6 the rhythm on a phone; 7 the tags in every theme, the pill against the keycap's corner.
+
+**Last commit.** `1501698`, in `apps/web/src/pages/dev/_tidy-lab/`, `apps/web/src/pages/dev/tidy-lab.astro`, and `apps/web/e2e/tidy-lab.spec.ts`. Research: the eighty-fifth to eighty-eighth passes in `docs/research/findings-0-first-pass.md`.
+
 ## Feedback lab, `/dev/feedback-lab` (2026-10-17)
 
 **Explored.** How a visitor reaches us from the About page: first two answers side by side, a form whose Send opened the visitor's email app with the message filled in, and the address alone with a copy; then, on Sean's shape, one form: a strip of three kinds (Inaccuracy, Bug, Idea), Your email, a Message whose empty state gives an example for the kind, Send alone, with what Send would deliver shown beside it.

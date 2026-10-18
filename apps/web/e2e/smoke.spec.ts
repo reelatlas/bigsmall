@@ -23,7 +23,6 @@ const PAGES = [
   '/dev/gallery',
   '/dev/wordmark-lab',
   '/dev/sketchbook-lab',
-  '/dev/tidy-lab',
   '/dev/owner',
 ];
 
@@ -119,13 +118,7 @@ test('pages tell search engines and link previews what they are; dev pages stay 
     /^https:\/\/bigsmall\.work\/about\/?$/,
   );
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
-  for (const path of [
-    '/dev/gallery',
-    '/dev/wordmark-lab',
-    '/dev/sketchbook-lab',
-    '/dev/tidy-lab',
-    '/dev/owner',
-  ]) {
+  for (const path of ['/dev/gallery', '/dev/wordmark-lab', '/dev/sketchbook-lab', '/dev/owner']) {
     await page.goto(path);
     await expect(page.locator('meta[name="robots"]'), path).toHaveAttribute('content', 'noindex');
     await expect(page.locator('link[rel="canonical"]'), path).toHaveCount(0);

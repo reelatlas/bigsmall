@@ -8,6 +8,7 @@ import {
   expectNoA11yViolations,
   islandReady,
   pageHeader,
+  ready,
 } from './support';
 
 // The About page's tabs (docs/UX-SPEC.md §1, "About"; Sean, 2026-10-18): under the sketchbook,
@@ -91,6 +92,7 @@ test('a link to #formulas opens that tab with the row in view; the tabs sit on t
 // it sits on the converter page, the content column centered on both.
 test('the header sits where the converter page has it', async ({ page }) => {
   await page.goto('/');
+  await ready(page);
   const home = (await pageHeader(page).boundingBox())!;
   await page.goto('/about/');
   const about = (await pageHeader(page).boundingBox())!;
@@ -98,7 +100,10 @@ test('the header sits where the converter page has it', async ({ page }) => {
   expect(Math.abs(about.y - home.y)).toBeLessThanOrEqual(1);
   expect(Math.abs(about.width - home.width)).toBeLessThanOrEqual(1);
   // The foot on the same column: its text starts where the name does and sits on the frame, on
-  // both pages alike (the link's 44 px target taken back into its line).
+  // both pages alike (the link's 44 px target taken back into its line). The page's end is the
+  // body's, the column the footer ends: the phone emulation's window settles after the first
+  // layout, so the document's scrollHeight read at once was taller than the page on CI
+  // (docs/LEARNINGS.md, 2026-10-18).
   const text = (locator: ReturnType<typeof page.getByText>) =>
     locator.evaluate((el) => {
       const range = document.createRange();
@@ -106,12 +111,13 @@ test('the header sits where the converter page has it', async ({ page }) => {
       const box = range.getBoundingClientRect();
       return {
         x: box.left,
-        fromEnd: document.documentElement.scrollHeight - (box.bottom + scrollY),
+        fromEnd: document.body.getBoundingClientRect().bottom - box.bottom,
       };
     });
   const aboutFoot = await text(page.getByText(/^Visits are counted/));
   expect(Math.abs(aboutFoot.x - about.x)).toBeLessThanOrEqual(1);
   await page.goto('/');
+  await ready(page);
   const homeFoot = await text(page.getByRole('contentinfo').getByRole('link', { name: 'About' }));
   expect(Math.abs(homeFoot.x - home.x)).toBeLessThanOrEqual(1);
   expect(Math.abs(homeFoot.fromEnd - aboutFoot.fromEnd)).toBeLessThanOrEqual(1);

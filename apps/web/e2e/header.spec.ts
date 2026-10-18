@@ -80,7 +80,8 @@ test('the theme menu shows the name alone at rest and reads "Theme" while open, 
   for (const width of [1280, 375]) {
     await page.setViewportSize({ width, height: 800 });
     await expect(name, `${width}px`).toBeVisible();
-    expect((await word.boundingBox())?.width ?? 0, `${width}px`).toBeLessThanOrEqual(1);
+    // A visually hidden word is a pixel wide, a hair over on a phone's fractional scale.
+    expect(Math.round((await word.boundingBox())?.width ?? 0), `${width}px`).toBeLessThanOrEqual(1);
     await toggle.click();
     await expect(name, `${width}px`).toBeHidden();
     expect((await word.boundingBox())!.width, `${width}px`).toBeGreaterThan(10);

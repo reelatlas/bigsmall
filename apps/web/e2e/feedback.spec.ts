@@ -13,8 +13,9 @@ const send = (page: Page) => page.getByRole('button', { name: 'Send', exact: tru
 async function openForm(page: Page) {
   await page.goto('/about');
   await section(page).scrollIntoViewIfNeeded();
-  // The island loads as it comes into view; its strip changing the example proves it has.
-  await page.getByRole('radio', { name: 'Bug' }).check();
+  // The island loads as it comes into view; its strip changing the example proves it has. A
+  // visually hidden radio is reached through its visible label, as a person reaches it.
+  await section(page).getByText('Bug', { exact: true }).click();
   await expect(message(page)).toHaveAttribute('placeholder', /iPad/);
 }
 
@@ -62,9 +63,9 @@ test('a refusal from the service says what to try and keeps the message; the str
   await openForm(page);
   await answering(page, 403);
   // Each kind's example, from a different category; the message is required.
-  await page.getByRole('radio', { name: 'Inaccuracy' }).check();
+  await section(page).getByText('Inaccuracy', { exact: true }).click();
   await expect(message(page)).toHaveAttribute('placeholder', /stone/);
-  await page.getByRole('radio', { name: 'Idea' }).check();
+  await section(page).getByText('Idea', { exact: true }).click();
   await expect(message(page)).toHaveAttribute('placeholder', /5 ft 10 in/);
   await message(page).fill('Let me type 5 ft 10 in and see it in centimeters.');
   await message(page).press('Enter');

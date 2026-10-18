@@ -4,8 +4,10 @@ import type { ReactNode } from 'react';
  * A setting's few choices joined in one strip (docs/DESIGN-SYSTEM.md, "Settings"; Sean chose it
  * over separate pills, 2026-10-10): one edge around all, a line between each, the chosen ones
  * filled with the accent's soft tint. Each segment is drawn 32 px tall with less padding than the
- * converter's controls, the text kept at text-sm, and still takes a 44 px tap: the label is the
- * target, the shape inside it is what shows. The caller wraps a strip in a fieldset whose legend
+ * converter's controls, the text kept at text-sm, and on a touch screen still takes a 44 px tap:
+ * the label is the target, the shape inside it is what shows. A mouse's target is the drawn strip
+ * alone (Sean, 2026-10-18: a pointer 6 px off the strip was already on it, cursor and all), which
+ * still clears the 24 px minimum. The caller wraps a strip in a fieldset whose legend
  * names it (a visually hidden one where the choices say what they are). A strip is marked
  * `data-strip`, so a side panel's arrows take it as one row (SidePanel). Each seam is drawn once:
  * every segment has its whole edge and overlaps the one before by the edge's width, its own left
@@ -16,7 +18,7 @@ import type { ReactNode } from 'react';
  */
 
 const TARGET =
-  'group flex min-h-11 min-w-11 cursor-pointer items-center not-first:-ml-0.5 has-disabled:cursor-not-allowed';
+  'group flex min-w-11 cursor-pointer items-center not-first:-ml-0.5 pointer-coarse:min-h-11 has-disabled:cursor-not-allowed';
 const SEGMENT =
   'flex h-8 w-full items-center justify-center border-2 border-edge border-l-transparent bg-clip-padding px-2.5 text-sm whitespace-nowrap text-ink group-first:rounded-l-md group-first:border-l-edge group-last:rounded-r-md peer-checked:bg-accent-soft peer-focus-visible:relative peer-focus-visible:z-10 peer-focus-visible:border-focus peer-disabled:text-ink-muted';
 

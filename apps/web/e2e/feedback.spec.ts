@@ -39,6 +39,14 @@ test('Send posts the kind, the email, the message, and the page as JSON, then sa
   page,
 }) => {
   await openForm(page);
+  // The email is optional and says so; a phone zooms into a field whose text is under 16 px
+  // (docs/LEARNINGS.md, 2026-10-17), so both fields' text is 16.
+  await expect(section(page).getByText('(optional)')).toBeVisible();
+  for (const field of [page.getByLabel('Your email'), message(page)]) {
+    expect(
+      await field.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+    ).toBeGreaterThanOrEqual(16);
+  }
   const posts = await answering(page, 200);
   await page.getByLabel('Your email').fill('someone@example.com');
   await message(page).fill('On my iPad, picking kilobytes scrolls the table to the top.');

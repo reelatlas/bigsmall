@@ -91,7 +91,7 @@ export const CONVERTER_COLUMN = 'max-w-xl';
  * The converter page from md: one grid of two tracks on `main`, the column (`grid-cols-box-and-side`
  * in global.css: its cap, then the side panel's own width) and the side panel's, the design
  * system's step between them, so the header's menus end where the box ends and a panel opens into
- * the spare room without moving or narrowing anything (Sean, 2026-10-17; a trial). Every block
+ * the spare room without moving or narrowing anything (Sean, 2026-10-17; kept). Every block
  * between the page and the layout's cells spans both tracks and hands them on (IN_CONVERTER_GRID).
  */
 export const CONVERTER_GRID = 'md:grid md:grid-cols-box-and-side md:gap-x-4';
@@ -221,12 +221,14 @@ export const FIELD_ROW = 'flex h-15 items-center gap-2 pr-2 pl-4';
 /**
  * A text field of a form (the feedback form's Your email and Message; the labs' controls take the
  * same): its label over its input in a stack, the input 44 px with the fields' 2 px edge on the
- * surface, a message 128 px tall with the row's vertical padding.
+ * surface, a message 128 px tall with the row's vertical padding. The input's text is 16 px
+ * (`text-base`), the size under which a phone zooms into a focused field and hides what is typed
+ * (Sean, 2026-10-17; docs/LEARNINGS.md); the label stays 14.
  */
 export const FIELD_STACK = 'grid gap-1 text-sm';
 export const FIELD_LABEL = 'text-sm font-medium';
 export const TEXT_INPUT =
-  'min-h-11 min-w-0 rounded-md border-2 border-edge bg-surface px-3 text-ink';
+  'min-h-11 min-w-0 rounded-md border-2 border-edge bg-surface px-3 text-base text-ink';
 export const TEXT_AREA = cx(TEXT_INPUT, 'min-h-32 py-2');
 
 // Text

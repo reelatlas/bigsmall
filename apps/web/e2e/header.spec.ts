@@ -295,7 +295,7 @@ test('off the converter’s page the name leads home on a 44 px target in every 
   }
 });
 
-// The header is as wide as the converter's column (docs/UX-SPEC.md §1; Sean, 2026-10-17, a trial):
+// The header is as wide as the converter's column (docs/UX-SPEC.md §1; Sean, 2026-10-17):
 // its menus end where the box ends, with a side panel open too. The panel opens beside a whole box
 // from a 944 px window; narrower, the box gives way and the header with it.
 test('the header ends where the box ends, with Units open too, which opens beside a whole box', async ({

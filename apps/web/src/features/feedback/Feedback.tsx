@@ -12,7 +12,7 @@ const SAID: Record<Outcome, string> = {
 
 /**
  * The feedback form on the About page (docs/UX-SPEC.md §1, "About"; ADR 0024), in the shape Sean
- * set (2026-10-17): what it is about, one strip of three kinds; Your email, optional, so anyone
+ * set (2026-10-17): what it is about, one strip of three kinds; Your email, labelled optional, so anyone
  * can write, the address becoming the Reply-To; a Message whose empty state gives an example for
  * the kind chosen; and Send alone. Send posts the fields to the form service, which mails them to
  * us; then a line says it was sent and the message clears, or says it could not and what to try.
@@ -62,7 +62,9 @@ export function Feedback() {
         />
       </fieldset>
       <label className={FIELD_STACK}>
-        <span className={FIELD_LABEL}>Your email</span>
+        <span className={FIELD_LABEL}>
+          Your email <span className="font-normal text-ink-muted">(optional)</span>
+        </span>
         <input
           className={TEXT_INPUT}
           type="email"

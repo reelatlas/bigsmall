@@ -43,6 +43,26 @@ test('no text field on any page is under 16 px, the size a phone zooms into', as
   }
 });
 
+test('the page keeps the scrollbar’s room, so a panel that brings one moves nothing', async ({
+  page,
+}) => {
+  // A classic scrollbar (Windows, Linux) takes layout width when it appears, and a centered
+  // column would step left by half of it (docs/LEARNINGS.md, 2026-10-18). Headless Chromium
+  // draws none, so the rule is read, and the column's edge is held across a panel opening.
+  await page.setViewportSize({ width: 1280, height: 600 });
+  await page.goto('/?a=meter&v=1');
+  await ready(page);
+  expect(
+    await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarGutter),
+  ).toBe('stable');
+  const left = () =>
+    page.locator('main > header').evaluate((el) => el.getBoundingClientRect().left);
+  const before = await left();
+  await page.getByRole('button', { name: 'Calculator', exact: true }).click();
+  await expect(page.getByRole('group', { name: 'Calculator' })).toBeVisible();
+  expect(await left()).toBe(before);
+});
+
 test('an unknown address shows the not-found page, with the way back', async ({ page }) => {
   const response = await page.goto('/no-such-page');
   expect(response?.status()).toBe(404);

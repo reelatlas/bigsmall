@@ -196,6 +196,10 @@
     color: var(--ink);
     font-family: var(--type-body);
     -webkit-text-size-adjust: 100%;
+    /* The room a classic scrollbar takes is kept whether or not one shows, so a side panel that
+       makes the page taller than the window moves nothing (docs/LEARNINGS.md, 2026-10-18);
+       overlay scrollbars (macOS, phones) take no room either way. */
+    scrollbar-gutter: stable;
   }
 
   /* The one focus ring. Never pair `outline-none` with focus-visible utilities: in Tailwind v4 it

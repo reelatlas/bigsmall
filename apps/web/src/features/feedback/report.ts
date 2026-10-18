@@ -36,10 +36,15 @@ export interface Report {
   honeypot: string;
 }
 
+/** The kind's label, as the strip shows it. */
+const labelOf = (kind: Kind) => KINDS.find((entry) => entry.value === kind)?.label ?? kind;
+
 /**
- * The fields posted to the form service as JSON: ours, the notification's subject from the kind
- * (`_email.subject`), and the honeypot's value (`_honeypot`), which the service checks. An empty
- * email is left out, so the service does not take it for an address.
+ * The fields posted to the form service as JSON: ours; the notification's subject from the kind,
+ * its sender name, its heading, and no footer (`_email`, the service's documented options, so the
+ * inbox reads bigsmall, not the service; docs/DEPLOYMENT.md, "Feedback"); and the honeypot's
+ * value (`_honeypot`), which the service checks. An empty email is left out, so the service does
+ * not take it for an address.
  */
 export function feedbackBody({ kind, email, message, page, honeypot }: Report) {
   const address = email.trim();
@@ -48,7 +53,11 @@ export function feedbackBody({ kind, email, message, page, honeypot }: Report) {
     ...(address && { email: address }),
     message,
     page,
-    _email: { subject: `bigsmall feedback: ${kind}` },
+    _email: {
+      subject: `bigsmall feedback: ${kind}`,
+      from: 'bigsmall feedback',
+      template: { title: labelOf(kind), footer: false },
+    },
     _honeypot: honeypot,
   };
 }

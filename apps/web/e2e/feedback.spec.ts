@@ -52,7 +52,11 @@ test('Send posts the kind, the email, the message, and the page as JSON, then sa
   expect(posted['email']).toBe('someone@example.com');
   expect(posted['message']).toBe('On my iPad, picking kilobytes scrolls the table to the top.');
   expect(posted['page']).toMatch(/\/about/);
-  expect(posted['_email']).toEqual({ subject: 'bigsmall feedback: bug' });
+  expect(posted['_email']).toEqual({
+    subject: 'bigsmall feedback: bug',
+    from: 'bigsmall feedback',
+    template: { title: 'Bug', footer: false },
+  });
   // The honeypot, empty from a person; its field is in neither the page nor the accessibility
   // tree, which a role query asks (a label query finds a hidden field too).
   expect(posted['_honeypot']).toBe('');

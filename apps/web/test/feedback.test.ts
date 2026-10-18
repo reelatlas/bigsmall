@@ -19,13 +19,17 @@ const report: Report = {
 };
 
 describe('the fields Send posts', () => {
-  it('carry the kind, the message, the page, the subject from the kind, and the honeypot', () => {
+  it('carry the kind, the message, the page, the notification named from the kind, and the honeypot', () => {
     expect(feedbackBody(report)).toEqual({
       kind: 'bug',
       email: 'someone@example.com',
       message: report.message,
       page: report.page,
-      _email: { subject: 'bigsmall feedback: bug' },
+      _email: {
+        subject: 'bigsmall feedback: bug',
+        from: 'bigsmall feedback',
+        template: { title: 'Bug', footer: false },
+      },
       _honeypot: '',
     });
   });

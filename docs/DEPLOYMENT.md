@@ -77,7 +77,7 @@ Umami Cloud counts visits (ADR 0019), in Sean's account on the free Hobby plan.
 
 The feedback form on the About page (docs/UX-SPEC.md §1; ADR 0024) posts its fields as JSON to Formspark, a form service, which mails each message to Sean and keeps a copy in its dashboard (dashboard.formspark.io, the "bigsmall" form, id `je13qw0h9`, `FEEDBACK_FORM_ID` in `apps/web/src/lib/site.ts`). The id is public by design, as a form's address is; what guards it is set on Formspark's side, at Sean's screen:
 
-- **Notifications** to the inbox he reads; the visitor's email, when given, is the Reply-To.
+- **Notifications** to the inbox he reads; the visitor's email, when given, is the Reply-To. The page names the notification: the sender "bigsmall feedback", the heading the kind, no footer or logo (`_email` in `features/feedback/report.ts`, the service's documented options).
 - **Automatic filter** on: every submission screened.
 - **Allowed domains**: `bigsmall.work` (its subdomains included), so a post from elsewhere is refused (403). To set once.
 - **Honeypot**: the page sends a hidden `_honeypot` field; a filled one is dropped. No challenge (captcha): Send stays one button. Spam words and the autoresponder: not used.

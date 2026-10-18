@@ -104,13 +104,17 @@ const TABLE_ROWS_CELL = cx(
   '@container mt-2 md:col-start-1 md:row-span-2 md:row-start-3',
 );
 /**
- * Where a side panel opens (docs/DESIGN-SYSTEM.md, "Side panels"): 16 px from the box and from the
- * table, a panel apart, at most 384 px wide. From md, a column of its own, 320 px wide, room for
- * Units' four presets on one line (Sean, 2026-10-15), its top on the box's, as tall as its card
- * (`self-start`).
+ * Where a side panel opens (docs/DESIGN-SYSTEM.md, "Side panels"): on the column, 16 px from the
+ * box and from the table, its card at most 384 px wide. From md, the grid's second track, 16 px
+ * from the box by its own margin, so the track takes no width while no panel shows, 320 px wide,
+ * room for Units' four presets on one line (Sean, 2026-10-15), its top on the box's, as tall as
+ * its card (`self-start`).
  */
-const TABLE_SIDE_CELL =
-  'isolate my-4 max-w-sm md:col-start-2 md:row-span-3 md:row-start-2 md:my-0 md:w-80 md:self-start';
+const TABLE_SIDE_CELL = cx(
+  CONTENT_COLUMN,
+  'isolate my-4 md:col-start-2 md:row-span-3 md:row-start-2 md:mx-0 md:my-0 md:ml-4 md:w-80 md:max-w-none md:self-start',
+);
+const SIDE_PANEL_WIDTH = 'max-w-sm md:max-w-none';
 
 /**
  * Keys that type into the field from a control beside it (a toolbar's, the chip, a copy button):
@@ -1129,7 +1133,7 @@ export function TableLayout({
         </div>
         {side && (
           <div ref={sideRef} id={sideId} className={TABLE_SIDE_CELL}>
-            {side}
+            <div className={SIDE_PANEL_WIDTH}>{side}</div>
           </div>
         )}
         <div ref={placeRef} className={TABLE_ROWS_CELL}>

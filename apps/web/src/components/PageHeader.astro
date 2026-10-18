@@ -9,7 +9,7 @@ interface Props {
   shortcuts?: boolean;
   /** The wordmark waits for the page to play it, as on the wordmark lab (Wordmark). */
   manual?: boolean;
-  /** The page's content column, which the header is as wide as: the converter's first track, About's centered. */
+  /** The page's content column, which the header is as wide as (CONTENT_COLUMN; the converter's grid places it). */
   class?: string;
 }
 
@@ -20,8 +20,8 @@ const { actions = false, shortcuts = false, manual = false, class: className } =
  * header is an @container: under its sm size the icons hide so the theme menu keeps the name's
  * line, and under xs the theme menu takes a line of its own, 20 px under the name (HeaderMenus,
  * docs/UX-SPEC.md §1). As wide as the page's column, which the page gives (`class`): the
- * converter page puts it in its grid's first track with the box (CONTENT_COLUMN,
- * docs/DESIGN-SYSTEM.md, "A column beside the rows"); About centers it (CENTERED_COLUMN).
+ * column is one and centered on every page (CONTENT_COLUMN, docs/DESIGN-SYSTEM.md, "A column
+ * beside the rows"), the converter page's the first track of its grid, which a side panel joins.
  */
 ---
 

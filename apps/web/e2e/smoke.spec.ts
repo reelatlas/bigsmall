@@ -55,23 +55,32 @@ test('no text field on any page is under 16 px, the size a phone zooms into', as
   }
 });
 
-test('the page keeps the scrollbar’s room, so a panel that brings one moves nothing', async ({
+test('the page keeps the scrollbar’s room, so a panel that brings one moves the page by nothing and the column by the pair’s half alone', async ({
   page,
 }) => {
   // A classic scrollbar (Windows, Linux) takes layout width when it appears, and a centered
-  // column would step left by half of it (docs/LEARNINGS.md, 2026-10-18). Headless Chromium
-  // draws none, so the rule is read, and the column's edge is held across a panel opening.
+  // page would step left by half of it (docs/LEARNINGS.md, 2026-10-18). Headless Chromium
+  // draws none, so the rule is read, and the page column's edge is held across a panel opening;
+  // the content column itself slides by half the panel and its step, the pair re-centering
+  // (docs/UX-SPEC.md §1, "Units and Display"), and by nothing else.
   await page.setViewportSize({ width: 1280, height: 600 });
   await page.goto('/?a=meter&v=1');
   await ready(page);
   expect(
     await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarGutter),
   ).toBe('stable');
-  const left = () => pageHeader(page).evaluate((el) => el.getBoundingClientRect().left);
-  const before = await left();
+  const edges = async () => ({
+    page: await page.evaluate(() => document.querySelector('main')!.getBoundingClientRect().left),
+    column: await pageHeader(page).evaluate((el) => el.getBoundingClientRect().left),
+  });
+  const before = await edges();
   await page.getByRole('button', { name: 'Calculator', exact: true }).click();
-  await expect(page.getByRole('group', { name: 'Calculator' })).toBeVisible();
-  expect(await left()).toBe(before);
+  const calculator = page.getByRole('group', { name: 'Calculator' });
+  await expect(calculator).toBeVisible();
+  const after = await edges();
+  expect(after.page).toBe(before.page);
+  const panel = (await calculator.boundingBox())!.width;
+  expect(Math.abs(before.column - after.column - (panel + 16) / 2)).toBeLessThanOrEqual(1);
 });
 
 test('an unknown address shows the not-found page, with the way back', async ({ page }) => {

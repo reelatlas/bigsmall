@@ -86,3 +86,15 @@ test('a link to #formulas opens that tab with the row in view; the tabs sit on t
     expect(Math.round(privacy.x), theme.id).toBe(Math.round(tabs.x));
   }
 });
+
+// One layout on every page (docs/UX-SPEC.md §1, "Header"; Sean, 2026-10-18): the header sits where
+// it sits on the converter page, the content column centered on both.
+test('the header sits where the converter page has it', async ({ page }) => {
+  await page.goto('/');
+  const home = (await pageHeader(page).boundingBox())!;
+  await page.goto('/about/');
+  const about = (await pageHeader(page).boundingBox())!;
+  expect(Math.abs(about.x - home.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(about.y - home.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(about.width - home.width)).toBeLessThanOrEqual(1);
+});

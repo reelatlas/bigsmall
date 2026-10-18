@@ -300,10 +300,11 @@ test('off the converter’s page the name leads home on a 44 px target in every 
   }
 });
 
-// The header is as wide as the converter's column (docs/UX-SPEC.md §1; Sean, 2026-10-17):
-// its menus end where the box ends, with a side panel open too. The panel opens beside a whole box
-// from a 944 px window; narrower, the box gives way and the header with it.
-test('the header ends where the box ends, with Units open too, which opens beside a whole box', async ({
+// The header is as wide as the content column, centered on the page as on every page (docs/UX-SPEC.md
+// §1; Sean, 2026-10-17 and 2026-10-18): its menus end where the box ends, with a side panel open too,
+// the column and the panel then centered as a pair. The panel opens beside a whole box from a 960 px
+// window; narrower, the box gives way and the header with it.
+test('the header ends where the box ends, the column centered, and with Units open the pair is centered beside a whole box', async ({
   page,
   isMobile,
 }) => {
@@ -312,10 +313,16 @@ test('the header ends where the box ends, with Units open too, which opens besid
     pageHeader(page).evaluate((own) => {
       const header = own.getBoundingClientRect();
       const box = document.querySelector('[data-head]')!.getBoundingClientRect();
+      const main = document.querySelector('main')!;
+      const frame = getComputedStyle(main);
+      const page = main.getBoundingClientRect();
       return {
         header: Math.round(header.right),
         box: Math.round(box.right),
+        boxLeft: Math.round(box.left),
         width: Math.round(box.width),
+        pageLeft: Math.round(page.left + parseFloat(frame.paddingLeft)),
+        pageRight: Math.round(page.right - parseFloat(frame.paddingRight)),
       };
     });
   for (const [width, whole] of [
@@ -329,6 +336,11 @@ test('the header ends where the box ends, with Units open too, which opens besid
     let m = await edges();
     expect(m.header, `${width}px`).toBe(m.box);
     expect(m.width, `${width}px`).toBe(576);
+    // The column centered in the page, nothing kept beside it.
+    expect(
+      Math.abs(m.boxLeft - m.pageLeft - (m.pageRight - m.box)),
+      `${width}px, centered`,
+    ).toBeLessThanOrEqual(1);
     await pressTool(page, 'Units');
     const panel = settingsPanel(page, 'Units');
     await expect(panel).toBeVisible();
@@ -339,5 +351,11 @@ test('the header ends where the box ends, with Units open too, which opens besid
     // The panel one step from the box's edge, on the box's top line.
     const side = (await panel.boundingBox())!;
     expect(Math.round(side.x) - m.box, `${width}px`).toBe(16);
+    // The column and the panel centered as a pair (both flush where the pair fills the page).
+    const pairRight = Math.round(side.x + side.width);
+    expect(
+      Math.abs(m.boxLeft - m.pageLeft - (m.pageRight - pairRight)),
+      `${width}px, the pair centered`,
+    ).toBeLessThanOrEqual(1);
   }
 });

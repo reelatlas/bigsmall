@@ -84,28 +84,24 @@ export const PAGE_MAIN = cx(PAGE_COLUMN, 'py-frame');
  * and table with the header over them, and About's header, tabs, and privacy line, capped at the
  * xl container size, 576 px, the narrowest stock width at which the box keeps every unit's name
  * beside a ten-digit number (measured 2026-10-17: at 528 px four of the eight longest names drop;
- * docs/DESIGN-SYSTEM.md, "A column beside the rows"). The converter puts it in its grid's first
- * track; a page with no side track centers it (CENTERED_COLUMN).
+ * docs/DESIGN-SYSTEM.md, "A column beside the rows"), and centered on every page, so the header
+ * sits in one place from page to page (Sean, 2026-10-18); on the converter page it is the first
+ * track of the page's grid, which a side panel joins (CONVERTER_GRID).
  */
-export const CONTENT_COLUMN = 'max-w-xl';
+export const CONTENT_COLUMN = 'mx-auto w-full max-w-xl';
 
 /**
- * The converter page from md: one grid of two tracks on `main`, the column (`grid-cols-box-and-side`
- * in global.css: its cap, then the side panel's own width) and the side panel's, the design
- * system's step between them, so the header's menus end where the box ends and a panel opens into
- * the spare room without moving or narrowing anything (Sean, 2026-10-17; kept). Every block
- * between the page and the layout's cells spans both tracks and hands them on (IN_CONVERTER_GRID).
+ * The converter page from md: one grid on `main` of the content column (`grid-cols-box-and-side`
+ * in global.css: its cap, then a side panel's own width) and a side panel's track, the pair
+ * centered: with no panel the column sits where it does on every page, and a panel opening
+ * beside the box re-centers the pair, the box keeping its width wherever both fit (Sean,
+ * 2026-10-18: no room kept for a panel that seldom shows; from 2026-10-17 the column sat at the
+ * page's left with the panel's track empty beside it). The panel carries the step between them,
+ * so an empty track is no width. Every block between the page and the layout's cells spans both
+ * tracks and hands them on (IN_CONVERTER_GRID).
  */
-export const CONVERTER_GRID = 'md:grid md:grid-cols-box-and-side md:gap-x-4';
+export const CONVERTER_GRID = 'md:grid md:grid-cols-box-and-side md:justify-center';
 export const IN_CONVERTER_GRID = 'md:col-span-2 md:grid md:grid-cols-subgrid';
-
-/**
- * The content column centered, where no side track stands beside it: About's header, its tabs
- * under the sketchbook, and its privacy line. Full width up to the column's own, as PAGE_COLUMN.
- * About took 672 px (`2xl`) on 2026-10-18 until Sean asked, the same day, for one column width
- * on every page.
- */
-export const CENTERED_COLUMN = cx(CONTENT_COLUMN, 'mx-auto w-full');
 
 /**
  * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; a trial, Sean,

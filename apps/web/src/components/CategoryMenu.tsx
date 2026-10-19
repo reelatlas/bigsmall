@@ -274,7 +274,7 @@ export function CategoryMenu({
                   key={category.id}
                   onPointerUp={() => choose(category.id)}
                   onTouchEnd={(event) => event.preventDefault()}
-                  className={cx(MENU_OPTION, 'justify-between gap-2')}
+                  className={MENU_OPTION}
                 >
                   <input
                     type="radio"

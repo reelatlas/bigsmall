@@ -24,7 +24,7 @@ Positioning in one line: _type anything into the box and see it in every unit at
 
 ### Later
 
-- PWA: installable, works offline. This covers most of the "app" ambition with no app store.
+- PWA: installable, works offline. This covers most of the "app" ambition with no app store. When it ships, the owner's switch for Umami is pressed inside the installed app too: on iOS an installed app keeps storage of its own, and Safari's seven-day purge applies to it (docs/DEPLOYMENT.md, "Our own visits"; 2026-10-19).
 - Currency (needs live rates from an API, still no database).
 - Cooking's later pieces (Cooking by ingredient shipped 2026-10-16, ADR 0021): the metric cup and spoons, the way of filling the cup as a choice beside the ingredient, weights rounded to the gram, more ingredients as people ask (docs/UX-SPEC.md §14, "Cooking, later").
 - Expression input, the rest of it: `+ − × ÷ ^` and parentheses with Enter as equals shipped on 2026-10-06; still to come are mixed fractions (`3 1/4`), feet-and-inches entry, and more calculator keys. Principle and phasing in `docs/UX-SPEC.md` §14.

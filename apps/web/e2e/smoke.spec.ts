@@ -95,8 +95,18 @@ test('an unknown address shows the not-found page, with the way back', async ({ 
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
   await expectNoA11yViolations(page);
+  // Its section sits a section step under the header, the step About's first section takes
+  // (docs/DESIGN-SYSTEM.md, "Sections step by the frame").
+  const step = (selector: string) =>
+    page.evaluate(
+      (s) => parseFloat(getComputedStyle(document.querySelector(s)!).marginTop),
+      selector,
+    );
+  const notFound = await step('main > section');
   await page.getByRole('link', { name: 'Go to the converter' }).click();
   await expect(page).toHaveURL('/');
+  await page.goto('/about');
+  expect(await step('main > section')).toBe(notFound);
 });
 
 test('pages tell search engines and link previews what they are; dev pages stay out of search', async ({

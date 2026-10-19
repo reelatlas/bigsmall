@@ -16,8 +16,9 @@ interface Props {
 const { title, description, manual = false, shortcuts = false } = Astro.props;
 
 /*
- * A development page under /dev: the site's header, a line saying what the page is for, then its
- * tools. Nothing on the site links here, and search engines are asked not to index it, so the
+ * A development page under /dev: the site's header, a line saying what the page is for 24 px
+ * under it (as the converter's intro sits), then its tools a section step down (docs/DESIGN-SYSTEM.md,
+ * "Sections step by the frame"). Nothing on the site links here, and search engines are asked not to index it, so the
  * live site keeps it for the owner without showing it to visitors (docs/ARCHITECTURE.md).
  */
 ---
@@ -25,7 +26,7 @@ const { title, description, manual = false, shortcuts = false } = Astro.props;
 <Base title={`bigsmall · ${title}`} description={description} noindex>
   <main class={PAGE_MAIN}>
     <PageHeader manual={manual} shortcuts={shortcuts} />
-    <p class="mt-2 max-w-prose text-sm text-ink-muted">
+    <p class="mt-6 max-w-prose text-sm text-ink-muted">
       <slot name="intro" />
     </p>
     <slot />

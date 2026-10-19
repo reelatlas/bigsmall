@@ -394,7 +394,7 @@ export function SketchbookLab() {
           press cross-fades, and Flip changes every tile at once.
         </p>
       )}
-      <div className="mt-8">
+      <div className="mt-section">
         <Sketchbook settings={settings} onPlayer={setPlayer} />
         {tuning.set.length === 0 && (
           <p className="mt-4 text-center text-sm text-ink-muted">
@@ -403,7 +403,7 @@ export function SketchbookLab() {
         )}
       </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-3">
+      <div className="mt-section grid gap-6 lg:grid-cols-3">
         <Panel title="Play">
           <Toggle
             label="Play without hovering"

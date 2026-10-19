@@ -493,7 +493,7 @@ export function WordmarkLab() {
           The sheet below still shows every phrase at its size.
         </p>
       )}
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div className="mt-section grid gap-6 lg:grid-cols-3">
         <Panel title="Play">
           <Readout player={player} />
           <label className={CHECK}>

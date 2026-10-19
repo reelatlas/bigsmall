@@ -154,6 +154,19 @@ export function Converter() {
     sectionRef.current?.querySelector<HTMLElement>('[data-tool="more"]') ??
     null;
   const calculatorToggle = () => toolElement(calculatorToggleId);
+  /**
+   * Focus back on a control without moving the page unless it is out of view. Chrome scrolls to
+   * a focused control's static place, which for a button in the stuck toolbar is the page's top:
+   * closing a panel by Escape or its button jumped the page there, and the head, in flow again at
+   * the top, read as no longer sticking (Sean, 2026-10-18). Measured, not assumed: a control the
+   * window does not show is still brought to it.
+   */
+  const focusStill = (element: HTMLElement | null | undefined) => {
+    if (!element) return;
+    element.focus({ preventScroll: true });
+    const { top, bottom } = element.getBoundingClientRect();
+    if (top < 0 || bottom > window.innerHeight) element.scrollIntoView({ block: 'nearest' });
+  };
 
   const openCalculator = (from: HTMLElement | null) => {
     returnTo.current = from;
@@ -162,7 +175,7 @@ export function Converter() {
 
   const closeCalculator = (focus: HTMLElement | null = returnTo.current) => {
     setSide(null);
-    (focus?.isConnected ? focus : calculatorToggle())?.focus();
+    focusStill(focus?.isConnected ? focus : calculatorToggle());
   };
 
   /** The open side panel closed by its key from inside it: focus back where the key opened it. */
@@ -175,7 +188,7 @@ export function Converter() {
     const toggle = side ? toolElement(button[side]) : null;
     const focus = returnTo.current;
     setSide(null);
-    (focus?.isConnected ? focus : toggle)?.focus();
+    focusStill(focus?.isConnected ? focus : toggle);
   };
 
   // Alt+C, Alt+V, and Alt+B (⌥ on Apple devices, where Option and a letter type a character)
@@ -218,7 +231,7 @@ export function Converter() {
   /** Closed from inside it (its × or Escape), focus goes back to its button. */
   const closeSettings = (key: 'units' | 'display') => {
     setSide(null);
-    toolElement(key === 'units' ? unitsToggleId : displayToggleId)?.focus();
+    focusStill(toolElement(key === 'units' ? unitsToggleId : displayToggleId));
   };
 
   /**

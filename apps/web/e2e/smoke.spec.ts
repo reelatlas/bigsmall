@@ -4,6 +4,7 @@ import {
   applyTheme,
   box,
   expectNoA11yViolations,
+  islandsReady,
   pageHeader,
   pickTheme,
   ready,
@@ -34,6 +35,11 @@ for (const path of PAGES) {
     await page.goto(path);
     if (path === '/') await ready(page);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    // axe reads colors: every island that hydrates on load first, then every transition over,
+    // or the owner's switch is sampled mid-fade as it enables (docs/LEARNINGS.md, "A color read
+    // right after a change catches the transition's first frame").
+    await islandsReady(page);
+    await settled(page);
     await expectNoA11yViolations(page);
   });
 }

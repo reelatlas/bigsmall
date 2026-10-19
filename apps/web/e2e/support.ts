@@ -23,6 +23,16 @@ export async function islandReady(island: Locator) {
 }
 
 /**
+ * Waits for every island that hydrates on load (`client:load`), what a page shows once scripted,
+ * before a read of its colors (docs/LEARNINGS.md, "A color read right after a change catches the
+ * transition's first frame"). An island that hydrates as it comes into view is left to the test
+ * that scrolls to it.
+ */
+export async function islandsReady(page: Page) {
+  await expect(page.locator('astro-island[client="load"][ssr]')).toHaveCount(0);
+}
+
+/**
  * Sets the window so the page's content is as wide as a `width` px window's with no classic
  * scrollbar. The page keeps the scrollbar's room always (`scrollbar-gutter: stable`, global.css),
  * 15 px where scrollbars are classic (CI's Linux, Windows, this headless Chromium too) and none
@@ -308,10 +318,10 @@ export async function sketchbookReady(page: Page) {
  * §10.8), so each run is wrapped for a moment with one after it and the probe's top read; a run
  * that is a flex item of its own keeps its layout wrapped, since a span as a flex item is laid out
  * as the anonymous item was. Text beside text aligns on the baseline (docs/LEARNINGS.md,
- * 2026-10-10): a word and its count in another face share one when the spread is under half a pixel; centred
- * beside each other instead, a monospace digit's sits about a pixel higher.
+ * 2026-10-10): a word and its count in another face share one when the spread is under half a
+ * pixel; centred beside each other instead, a monospace digit's sits about a pixel higher.
  */
-export async function baselines(locator: Locator): Promise<number[]> {
+async function baselines(locator: Locator): Promise<number[]> {
   return locator.evaluate((element) => {
     const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
     const runs: Text[] = [];
@@ -334,7 +344,7 @@ export async function baselines(locator: Locator): Promise<number[]> {
 }
 
 /** The spread of a few baselines: zero when they are one. */
-export const spread = (tops: number[]) => Math.max(...tops) - Math.min(...tops);
+const spread = (tops: number[]) => Math.max(...tops) - Math.min(...tops);
 
 /**
  * How far a count sits off its word's baseline, read with the count shrunk to 8 px: on one baseline

@@ -116,6 +116,10 @@ export const TOKEN_CONTRACT = {
 export const DERIVED_COLORS: ReadonlyArray<readonly [string, string, number, string]> = [
   // The unit chip's hover: its tint lightened toward the surface (the full tidy, 2026-10-15).
   ['accent-soft-hover', 'accent-soft', 0.6, 'surface'],
+  // The primary button's hover: the accent stepped a tenth toward the ink, deeper on a light theme
+  // and brighter on a dark one, always away from its label's color, so the label's contrast can only
+  // rise; the old 90 % opacity over the canvas fell under 4.5:1 in Sakura (2026-10-18).
+  ['accent-hover', 'accent', 0.9, 'ink'],
 ];
 
 /** [foreground, background, minimum contrast ratio]. 4.5 for text, 3 for UI (WCAG 2.2 AA). */
@@ -127,6 +131,7 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = 
   ['ink-muted', 'surface', 4.5],
   ['ink-muted', 'surface-raised', 4.5],
   ['on-accent', 'accent', 4.5],
+  ['on-accent', 'accent-hover', 4.5],
   ['ink', 'accent-soft', 4.5],
   ['ink-muted', 'accent-soft', 4.5],
   // The chip's name and symbol on its hover.

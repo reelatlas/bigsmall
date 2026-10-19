@@ -40,9 +40,9 @@ const BASE =
 
 // Secondary buttons share the fields' two-pixel edge, so every bordered control has one weight.
 // Under the pointer each steps as the design system's "States" says: a fill gains the raised
-// surface, the soft accent its hover tone (as the chip's), the primary fill 90 %.
+// surface, an accent fill its hover tone, derived in the bridge (accent-hover, accent-soft-hover).
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-on-accent hover:opacity-90',
+  primary: 'bg-accent text-on-accent hover:bg-accent-hover',
   secondary: 'border-2 border-edge bg-surface text-ink hover:bg-surface-raised',
   tonal: 'border-2 border-edge bg-surface-raised text-ink-muted hover:text-ink',
   soft: 'bg-accent-soft text-ink hover:bg-accent-soft-hover',

@@ -1,6 +1,6 @@
 ---
 name: research
-description: Sources, decides, checks, and records a fact for bigsmall by its kind (defined by a standard, measured by the written rule, conventional by a body), as docs/RESEARCH.md says (ADR 0022). Use when adding a category or a unit whose factor no standard defines, adding or re-opening an ingredient's figure, weighing an outside suggestion of sources, or answering a visitor's report that a figure is wrong; or when Sean types /research.
+description: Sources, decides, checks, and records a fact for bigsmall by its kind (defined by a standard, measured by the written rule, conventional by a body), or a practice in layers (docs/RESEARCH.md §8), as docs/RESEARCH.md says (ADR 0022). Use when adding a category or a unit whose factor no standard defines, adding or re-opening an ingredient's figure, weighing an outside suggestion of sources, or answering a visitor's report that a figure is wrong; or when Sean types /research.
 argument-hint: '[a category, a unit, an ingredient, a figure to re-open, or a pasted suggestion to weigh]'
 ---
 
@@ -61,3 +61,7 @@ Requested scope: `$ARGUMENTS`
 ## 8. Report to Sean
 
 Short, plain, in this order: what kind each fact is and the rule that decided it; what moved and why, the largest first; what the check found; what is thin and what would settle it; what was set aside from any suggestion he brought, with the reason each. Then ship (the `ship` skill) unless he asked to hold.
+
+## 9. A practice rather than a figure
+
+A way of doing something (a pattern of design, interaction, code, or process) has no kind: gather it in the layers of docs/RESEARCH.md §8, each layer apart, every finding with its layer and evidence level (measured, reasoned, asserted), then decide by the project's principles and record the reasoning where decisions go. Run with agents, the `orchestrate` skill arranges the workers and the checkers; this skill's steps still decide.

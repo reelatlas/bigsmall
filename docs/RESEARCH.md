@@ -1,6 +1,6 @@
 # Research: how a fact is sourced, decided, and checked
 
-The method behind every number and every word of fact in bigsmall: a factor, an ingredient's cup, a unit's name, a size table. `CLAUDE.md`'s first rule says every number is checked on our own; this is how, by the kind of fact, so the same steps decide the next category and re-open a figure a visitor questions. The `research` skill (`.claude/skills/research/`) runs these steps; ADR 0022 records the decision; `docs/research/cooking-2.md` is the worked example.
+The method behind every number and every word of fact in bigsmall: a factor, an ingredient's cup, a unit's name, a size table; and, since 2026-10-19, behind every practice we adopt, a way of doing something, researched in layers (§8). `CLAUDE.md`'s first rule says every number is checked on our own; this is how, by the kind of fact, so the same steps decide the next category and re-open a figure a visitor questions. The `research` skill (`.claude/skills/research/`) runs these steps; ADR 0022 records the decision; `docs/research/cooking-2.md` is the worked example.
 
 ## 1. Three kinds of fact
 
@@ -85,3 +85,21 @@ A change the rule needs for a category is written in that category's research do
 - `docs/research/<topic>-N.md`: one doc per topic and round; a later round supersedes an earlier one with a note at its top, and the earlier one stays as the record.
 - `docs/research/<topic>-N/`: the data file and its rule, the generators, each reviewer's findings and figures, the check, the extractions. Downloads are not kept.
 - `packages/core`: the data the generators write, the tests that hold it to its sources.
+
+## 8. A practice, not a figure: how a way of doing something is researched
+
+A figure has a kind (§1) and a rule computes it; a formula or a calculation is pure logic, verified on our own against its standard, with any dispute about it noted and nothing more (Sean, 2026-10-19: "for stuff that is purely factual or logic problems, we don't need to convolute the research"). A practice, a pattern of design, interaction, code, or process, a conceptual question, an idea to explore, has neither kind nor rule: it is gathered in layers and decided by principle (Sean's sourcing philosophy, 2026-10-19; ADR 0022, Amendments). The layers are gathered apart, and every finding carries its layer and its evidence level: measured with people, reasoned from principle, or asserted.
+
+1. **Our own evidence first.** What our visitors and friends do and say (the findings log, the feedback archive, Umami, Search Console) and what we measured on the built site. A fact about our own product outranks anything written about products in general.
+2. **The standards and the established practice**, two tiers kept apart: the normative floor nobody negotiates (WCAG, the WAI-ARIA patterns, the HTML and CSS specifications, a platform's own guidelines) and the reputable guidance built on research (the design research houses, the most cited pattern libraries, a field's agreed references). Where the guidance drifts or debates, the record says so rather than picking a side quietly.
+3. **The community and its thinkers.** Leading voices, forums, threads, a comment under a bug: what gets surfaced because it is right, because it is contested, or because it confirms the established with a reason. Weighed as opinion with its reason, never counted as a vote.
+4. **In the wild.** What working products and aspirational prototypes actually do, opened and tried rather than described: with a keyboard, a screen reader, and a phone, measured as we measure our own; and what they changed or reverted later, which is evidence too.
+5. **The one-offs.** Ideas abstract or far from convention, kept to test a convention's reasons against, not to replace it.
+
+**Deciding.** Where the layers agree, follow, and say which layer and which source. Where they conflict, decide by the principles this project already holds (CLAUDE.md's non-negotiables, docs/DESIGN-SYSTEM.md's patterns and component rules, docs/UX-SPEC.md) and record the reasoning where a decision goes: an ADR when it would be explained twice, else the findings log. Three rules keep it honest:
+
+- **A hypothesis is called one.** Much written about interfaces for the AI era, conversational and headless ones included, is asserted or reasoned, not measured. It is followed where its logic holds, extended where its gaps show, and checked afterwards on our own numbers. Setting a practice nobody has measured is allowed; claiming it proven is not.
+- **Neither contrarian nor deferential.** A break with a convention takes a stated reason and a way to check it; so does following one against our own evidence. Aesthetics and atmosphere are reasons (the themes, a wordmark at play), recorded as such, within the floors that never move: accuracy, accessibility, the budgets.
+- **Reversible first.** A practice we are unsure of ships as a trial, one revertable commit, measured after; the five-person test waits for traction, and friends' rounds and the counts stand in.
+
+Run with agents, workers gather by layer and checkers read the sources; the orchestrator decides (§4, "How the work is split"; the `orchestrate` skill).

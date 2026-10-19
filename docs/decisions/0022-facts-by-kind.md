@@ -1,7 +1,7 @@
 # 0022 — Facts by kind: defined by a standard, measured by a written rule, conventional by a body
 
 Date: 2026-10-16
-Status: accepted; extends 0020
+Status: accepted; extends 0020; amended 2026-10-19 (see Amendments)
 
 ## Context
 
@@ -31,3 +31,7 @@ ADR 0020 says every number is checked on our own against the standard that defin
 - A research doc per topic and round records the rule as applied, every source considered, the check, and how to re-open (`docs/research/cooking-2.md` is the first); its data file and generators write the code and the doc.
 - Thin figures are named and are the first to measure ourselves; the protocol is written.
 - When the site takes feedback, a report on a figure has a process: it is a lead, screened like any source.
+
+## Amendments
+
+- **2026-10-19.** The method extends to practices. A way of doing something, a pattern of design, interaction, code, or process, has no kind and no rule computes it; it is gathered in layers (our own evidence, the standards and the established practice, the community, the wild, the one-offs), every finding with its evidence level, and decided by principle, recorded where decisions go (docs/RESEARCH.md §8; Sean's sourcing philosophy, the ninety-fifth pass in docs/research/findings-0-first-pass.md).

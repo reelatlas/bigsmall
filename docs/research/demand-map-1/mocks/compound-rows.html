@@ -329,7 +329,7 @@
   }
   .u .sym {
     color: var(--muted);
-    min-width: 36px;
+    min-width: var(--sym, 36px);
     text-align: right;
   }
   .copy {
@@ -375,7 +375,8 @@
   <p>
     A value in two units is read by one grammar and shown as one row of the table, placed in the
     system that writes it that way. Pick what was typed; the mock is drawn in Daylight at this
-    window's width.
+    window's width. The symbol column is as wide as the table's widest symbol, measured, so a pair's
+    symbol keeps every name aligned (Sean, 2026-10-19).
   </p>
   <div class="seg" role="radiogroup" aria-label="What was typed">
     <label><input type="radio" name="ex" value="prime" id="ex-prime" checked /> 5'11</label>
@@ -669,6 +670,13 @@
     document.getElementById('table').innerHTML =
       rows + `<div class="tfoot"><span>› Hidden <b>${ex.hidden}</b></span><span>Edit</span></div>`;
     document.getElementById('note').innerHTML = `<b>This example.</b> ${esc(ex.note)}`;
+    // The symbol column is as wide as the table's widest symbol, measured, so the pair's "ft in" keeps every name aligned.
+    const tbl = document.getElementById('table');
+    tbl.style.setProperty('--sym', '0px');
+    const w = Math.max(
+      ...[...tbl.querySelectorAll('.sym')].map((s) => s.getBoundingClientRect().width),
+    );
+    tbl.style.setProperty('--sym', Math.ceil(w) + 'px');
   }
   document.querySelectorAll('input[name="ex"]').forEach((el) =>
     el.addEventListener('change', () => {

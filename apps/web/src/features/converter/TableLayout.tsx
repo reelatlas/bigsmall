@@ -349,8 +349,9 @@ export function TableLayout({
       window.removeEventListener('resize', measure);
     };
   }, []);
-  // Whether a side panel sits between the box and the table (below md) rather than beside them:
-  // its rows' small checkboxes would pass under a stuck box. Measured from the layout.
+  // Whether a side panel sits between the box and the table (below md) rather than beside them,
+  // which decides how a panel opening out of view is brought into it (the effect below).
+  // Measured from the layout.
   const [sideBelow, setSideBelow] = useState(false);
   const hasSide = !!side;
   useLayoutEffect(() => {
@@ -388,12 +389,13 @@ export function TableLayout({
     window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY });
   }, [hasSide, sideBelow]);
   /**
-   * The head sticks while the table is what scrolls under it, and lets go while Edit is on, Hidden
-   * is open, or a settings panel sits between the box and the table: their rows' 16 px checkboxes
-   * would pass under the stuck head within a target's safe space of the field (axe's target-size),
-   * and none of those is reading the table.
+   * The head sticks whenever the window is tall enough for it, Edit on, Hidden open, or a panel
+   * between the box and the table included (Sean, 2026-10-18): their rows scroll under it as the
+   * table's do. Until then it let go in those states, for their 16 px native checkboxes passing
+   * under the stuck head within a target's safe space of the field (axe's target-size, a real
+   * finding); the checkboxes are drawn by Checkbox now, their rows the 44 px targets.
    */
-  const sticking = stick.on && !editing && !hiddenOpen && !sideBelow;
+  const sticking = stick.on;
   // A section's name sticks a pixel under the strip's lower edge (the head, then its gap).
   const stickTop = sticking ? stick.height + stick.gap - 1 : undefined;
   // A side panel beside the stuck head sits level with the box's top, and its card scrolls

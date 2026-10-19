@@ -1,12 +1,12 @@
-import { useLayoutEffect, useRef, type InputHTMLAttributes } from 'react';
-import { CHECKBOX } from '../lib/recipes';
+import { useLayoutEffect, useRef } from 'react';
+import { Checkbox, type CheckboxProps } from './Checkbox';
 
 /** All of a group on, some of it, or none. */
 export type TriState = 'all' | 'some' | 'none';
 
 export interface TriCheckboxProps extends Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'checked' | 'defaultChecked' | 'className'
+  CheckboxProps,
+  'checked' | 'defaultChecked' | 'inputRef'
 > {
   state: TriState;
 }
@@ -16,7 +16,8 @@ export interface TriCheckboxProps extends Omit<
  * while all of the group is on, a dash while some of it is (`indeterminate`, which screen readers
  * hear as mixed), clear while none is. What a press does is the caller's; the convention, kept by
  * Settings' systems and the table's sections, is that a dash or a clear box turns the whole group
- * on and a checked one turns it off. The box itself is the native one, in the accent.
+ * on and a checked one turns it off. The box is the one Checkbox draws (2026-10-18; the native one
+ * in the accent until then).
  */
 export function TriCheckbox({ state, ...props }: TriCheckboxProps) {
   const ref = useRef<HTMLInputElement>(null);
@@ -24,7 +25,5 @@ export function TriCheckbox({ state, ...props }: TriCheckboxProps) {
   useLayoutEffect(() => {
     if (ref.current) ref.current.indeterminate = state === 'some';
   });
-  return (
-    <input ref={ref} type="checkbox" checked={state === 'all'} className={CHECKBOX} {...props} />
-  );
+  return <Checkbox inputRef={ref} checked={state === 'all'} {...props} />;
 }

@@ -22,7 +22,6 @@ import { flash } from '../lib/flash';
 import { panelKeys } from '../lib/panel-keys';
 import { useKept } from '../lib/keeping';
 import {
-  CHECKBOX,
   CHOICE_FILL,
   COUNT,
   CURSOR_ROW,
@@ -40,6 +39,7 @@ import {
 import { Button } from './Button';
 import { ChevronDownIcon, CopiedIcon, CopyIcon } from './icons';
 import { FormattedNumber } from './NumberText';
+import { Checkbox } from './Checkbox';
 import { TriCheckbox } from './TriCheckbox';
 
 /** One row as the table shows it; the converter maps its view onto these. */
@@ -734,14 +734,12 @@ export function ConversionTable<T extends ConversionRow>({
   });
 
   const checkbox = (row: T, on: boolean, list: List) => (
-    <input
+    <Checkbox
       id={`${checkId}-${row.id}`}
-      type="checkbox"
       checked={on}
       // The unit in the box always shows.
       disabled={row.inBox}
       onChange={() => move(list, [row], !on, row.id)}
-      className={CHECKBOX}
       data-spot={row.id}
     />
   );

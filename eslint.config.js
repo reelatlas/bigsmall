@@ -84,6 +84,12 @@ export default tseslint.config(
     rules: {
       ...jsxA11y.flatConfigs.recommended.rules,
       ...reactHooks.configs['recommended-latest'].rules,
+      // A label wrapping one of our own controls counts as labelling it: the rule knows a custom
+      // control only by name (Checkbox renders the native input out of sight, TriCheckbox through it).
+      'jsx-a11y/label-has-associated-control': [
+        'error',
+        { controlComponents: ['Checkbox', 'TriCheckbox'] },
+      ],
     },
   },
   // Node-side files: the web app's tests, configs, and scripts, and the repo's scripts.

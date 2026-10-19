@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { SegmentedControl, SegmentedToggles } from '../../../components/SegmentedControl';
+import { Checkbox } from '../../../components/Checkbox';
 import { SidePanel } from '../../../components/SidePanel';
 import { TriCheckbox } from '../../../components/TriCheckbox';
 import { cx, GROUP_TITLE, OPTION_ROW } from '../../../lib/recipes';
@@ -48,6 +49,21 @@ export function SettingSamples({ theme }: { theme: string }) {
           value="nearest"
           onChange={noop}
         />
+      </fieldset>
+      <fieldset className="grid">
+        <legend className={GROUP_TITLE}>Checkbox: off, on, and on but fixed</legend>
+        <label className={cx(OPTION_ROW, 'gap-2')}>
+          <Checkbox checked={false} onChange={noop} />
+          Off
+        </label>
+        <label className={cx(OPTION_ROW, 'gap-2')}>
+          <Checkbox checked onChange={noop} />
+          On
+        </label>
+        <label className={cx(OPTION_ROW, 'gap-2')}>
+          <Checkbox checked disabled onChange={noop} />
+          On and fixed
+        </label>
       </fieldset>
       <fieldset className="grid">
         <legend className={GROUP_TITLE}>Checkbox over a group: all, some, none</legend>

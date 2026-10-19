@@ -227,6 +227,14 @@ export async function pressTool(page: Page, name: string) {
   await page.getByRole('menuitem', { name, exact: true }).click();
 }
 
+/**
+ * Presses a checkbox or radio by its row. The native input is drawn by its label (Checkbox,
+ * SegmentedControl) and sits clipped out of sight, so a click on it lands on nothing; the label,
+ * a 44 px row, is the target a visitor presses.
+ */
+export const pressControl = (control: Locator) =>
+  control.locator('xpath=ancestor::label[1]').click();
+
 /** A settings side panel, by its title. */
 export const settingsPanel = (page: Page, name: 'Units' | 'Display') =>
   page.getByRole('group', { name, exact: true });

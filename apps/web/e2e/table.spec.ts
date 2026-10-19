@@ -13,6 +13,7 @@ import {
   hiddenToggle,
   MARGIN_MS,
   menu,
+  pressControl,
   pressTool,
   ready,
   row,
@@ -1031,7 +1032,7 @@ test('a long name wraps in Edit, in Hidden, and among the hidden matches, never 
   await card.getByRole('button', { name: 'Edit', exact: true }).click();
   await expectWhole('[data-list="shown"] label[data-unit] [data-name]', 'per 100 kilometers');
   // Sent to Hidden, it wraps there too.
-  await card.getByLabel(/miles per imperial gallon/).click();
+  await pressControl(card.getByLabel(/miles per imperial gallon/));
   await card.getByRole('button', { name: 'Done', exact: true }).click();
   await hiddenToggle(page).click();
   await expectWhole('[data-list="hidden"] label[data-unit] [data-name]', 'imperial gallon');
@@ -1894,6 +1895,11 @@ test('a side panel opened under a stuck head sticks beside it from md, and below
     expect(Math.round(head.top)).toBeLessThanOrEqual(1);
     expect(rect.y).toBeGreaterThanOrEqual(head.bottom - 1);
     expect(rect.y).toBeLessThanOrEqual(head.bottom + 17);
+    // And the head stays stuck as the page scrolls on, the panel passing under it like the table.
+    await page.evaluate(() => window.scrollBy(0, 100));
+    await expect.poll(async () => Math.round((await headRect()).top)).toBe(0);
+    const after = (await panel.boundingBox())!;
+    expect(Math.round(rect.y - after.y)).toBeGreaterThanOrEqual(90);
   } else {
     // Level with the box's top, in view, and still there after more scrolling: it sticks with the head.
     const before = (await panel.boundingBox())!;

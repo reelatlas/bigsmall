@@ -7,6 +7,7 @@ import {
   calculatorPanel,
   expectNoA11yViolations,
   hiddenToggle,
+  pressControl,
   ready,
   recordAnimations,
   row,
@@ -148,10 +149,9 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
   await expect(page.getByRole('group', { name: 'Hidden, Specialty' })).toBeVisible();
   await expectNoA11yViolations(page);
   // Checked, it leaves the list for its section, so a click, not a check that waits on it.
-  await page
-    .getByRole('group', { name: 'Hidden, Specialty' })
-    .getByLabel(/cubic inches/)
-    .click();
+  await pressControl(
+    page.getByRole('group', { name: 'Hidden, Specialty' }).getByLabel(/cubic inches/),
+  );
   await expect(row(page, 'cubic-inch')).toBeVisible();
   await expect(hiddenToggle(page)).toContainText(String(SPECIALTY - 1));
   // A press lands while units glide, but Playwright waits for a still target, then scrolls it into
@@ -184,10 +184,11 @@ test('the Hidden list brings a unit back into its section; Edit sends one to Hid
   const foot = (await done.boundingBox())!;
   expect(foot.y + foot.height).toBeLessThanOrEqual(page.viewportSize()!.height);
   // Unchecked, a row leaves for Hidden at once, as a unit checked there leaves for its row.
-  await table(page)
-    .getByRole('group', { name: 'US (customary)', exact: true })
-    .getByLabel(/teaspoons/)
-    .click();
+  await pressControl(
+    table(page)
+      .getByRole('group', { name: 'US (customary)', exact: true })
+      .getByLabel(/teaspoons/),
+  );
   await expect(
     page.getByRole('group', { name: 'Hidden, US (customary)' }).getByLabel(/teaspoons/),
   ).toBeVisible();
@@ -347,7 +348,7 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   await ready(page);
   // A specialty unit shown on its own, from Hidden.
   await hiddenToggle(page).click();
-  await page.getByRole('group', { name: 'Hidden, Specialty' }).getByLabel(/mils$/).click();
+  await pressControl(page.getByRole('group', { name: 'Hidden, Specialty' }).getByLabel(/mils$/));
   await expect(row(page, 'mil')).toBeVisible();
   await settingsButton(page, 'Units').click();
   const units = settingsPanel(page, 'Units');
@@ -359,9 +360,9 @@ test('with a system unchecked none of its units shows: its switch is final, and 
   await expect(units.getByRole('radio', { name: 'Standard' })).not.toBeChecked();
   // A press on the dash shows every specialty unit; the next hides every one, the unit shown on
   // its own too; changed by hand, the set stays the visitor's own, Custom lit.
-  await specialty.click();
+  await pressControl(specialty);
   await expect(specialty).toBeChecked();
-  await specialty.click();
+  await pressControl(specialty);
   await expect(specialty).not.toBeChecked();
   await expect(row(page, 'mil')).toHaveCount(0);
   await expect(page.locator('[data-section="specialty"]')).toHaveCount(0);
@@ -387,10 +388,11 @@ test("Custom lights for a set of the visitor's own; a preset keeps it aside, and
   await pick(/^Standard$/);
   // A unit hidden in Edit makes one, and Custom lights.
   await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
-  await table(page)
-    .getByRole('group', { name: 'US (customary)', exact: true })
-    .getByLabel(/teaspoons/)
-    .click();
+  await pressControl(
+    table(page)
+      .getByRole('group', { name: 'US (customary)', exact: true })
+      .getByLabel(/teaspoons/),
+  );
   await table(page).getByRole('button', { name: 'Done' }).click();
   await expect(custom).toBeChecked();
   // Standard sets exactly its set, teaspoons back; Custom brings the visitor's set back.
@@ -531,7 +533,7 @@ test('settings are remembered in this browser: what shows, Custom, the order, an
   await ready(page);
   await settingsButton(page, 'Units').click();
   const units = settingsPanel(page, 'Units');
-  await units.getByRole('checkbox', { name: 'UK (imperial)' }).click();
+  await pressControl(units.getByRole('checkbox', { name: 'UK (imperial)' }));
   await units.getByRole('button', { name: 'Move Metric' }).click();
   await units.getByRole('button', { name: 'Move up' }).click();
   await setSettings(page, 'Fraction');
@@ -744,10 +746,9 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     Math.max(0, ...(await startedAnimations(page, selector, property)));
   await hiddenToggle(page).click();
   await recordAnimations(page);
-  await page
-    .getByRole('group', { name: 'Hidden, Specialty' })
-    .getByLabel(/cubic inches/)
-    .click();
+  await pressControl(
+    page.getByRole('group', { name: 'Hidden, Specialty' }).getByLabel(/cubic inches/),
+  );
   await expect(row(page, 'cubic-inch')).toBeVisible();
   // It slides up from its line in Hidden, and flashes where it lands.
   expect(await animated('[data-row="cubic-inch"]', 'transform')).toBe(slow);
@@ -755,29 +756,30 @@ test('a unit moving between shown and hidden glides to its place and flashes as 
     fade,
   );
   // The page takes clicks while it moves: a second unit checked straight after the first shows.
-  await page
-    .getByRole('group', { name: 'Hidden, Specialty' })
-    .getByLabel(/oil barrels/)
-    .click();
+  await pressControl(
+    page.getByRole('group', { name: 'Hidden, Specialty' }).getByLabel(/oil barrels/),
+  );
   await expect(row(page, 'oil-barrel')).toBeVisible();
 
   // Edit sends one to Hidden: Hidden flashes as it takes it.
   await table(page).getByRole('button', { name: 'Edit', exact: true }).click();
   await recordAnimations(page);
-  await table(page)
-    .getByRole('group', { name: 'US (customary)', exact: true })
-    .getByLabel(/teaspoons/)
-    .click();
+  await pressControl(
+    table(page)
+      .getByRole('group', { name: 'US (customary)', exact: true })
+      .getByLabel(/teaspoons/),
+  );
   expect(await animated('[data-table-foot] button[aria-expanded]', 'backgroundColor')).toBe(fade);
   // With Hidden folded, the unit that left fades out where it was, rather than vanishing: a copy
   // laid over the page where it stood.
   await hiddenToggle(page).click();
   await expect(hiddenToggle(page)).toHaveAttribute('aria-expanded', 'false');
   await recordAnimations(page);
-  await table(page)
-    .getByRole('group', { name: 'US (customary)', exact: true })
-    .getByLabel(/tablespoons/)
-    .click();
+  await pressControl(
+    table(page)
+      .getByRole('group', { name: 'US (customary)', exact: true })
+      .getByLabel(/tablespoons/),
+  );
   await expect
     .poll(() => startedAnimations(page, '[data-unit="us-tablespoon"][style*="absolute"]'))
     .not.toEqual([]);
@@ -793,7 +795,7 @@ test('a glide moves only what moved on the page, however the page scrolls', asyn
     .getByLabel(/cubic inches/);
   await cubicInches.scrollIntoViewIfNeeded();
   await recordAnimations(page);
-  await cubicInches.click();
+  await pressControl(cubicInches);
   await expect(row(page, 'cubic-inch')).toBeVisible();
   // The one that arrived glided; the rows above it did not move on the page, so none of them did.
   await expect
@@ -815,10 +817,9 @@ test('with reduced motion a unit moves at once, and still flashes, a change of c
   await ready(page);
   await hiddenToggle(page).click();
   await recordAnimations(page);
-  await page
-    .getByRole('group', { name: 'Hidden, Specialty' })
-    .getByLabel(/cubic inches/)
-    .click();
+  await pressControl(
+    page.getByRole('group', { name: 'Hidden, Specialty' }).getByLabel(/cubic inches/),
+  );
   await expect(row(page, 'cubic-inch')).toBeVisible();
   // It flashed where it landed, for the theme's length, and nothing moved (a move of no length
   // is none).

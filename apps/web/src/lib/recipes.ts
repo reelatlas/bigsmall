@@ -216,7 +216,7 @@ export const MENU_TRIGGER =
 export const MENU_CHEVRON =
   'ml-auto shrink-0 text-ink-muted transition-transform group-data-open:rotate-180';
 
-/** A checkbox: the native one, 16 px, in the accent. */
+/** The labs' checkbox: the native one, 16 px, in the accent. The product's is `Checkbox`, drawn. */
 export const CHECKBOX = 'size-4 accent-accent';
 
 /**

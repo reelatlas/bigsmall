@@ -7,7 +7,7 @@ How the site is built and served, the one-time setup behind it, and how to relea
 - **Vercel builds from GitHub.** Every push to `main` builds a production deployment; every other branch gets a preview at its own `vercel.app` address. The output is static files only (`apps/web/dist`): no functions, no server.
 - **The project is the web app.** Its root directory is `apps/web` with Vercel's Astro preset, as Vercel detected on import: it installs the whole pnpm workspace from the repository's lockfile, runs `astro build`, and serves `dist`. The build reaches `packages/core` because Vercel includes the files outside the root directory, its default for a monorepo. `apps/web/vercel.json` holds what the preset does not: the headers, and the rewrites that serve Umami from the site's own address ("Analytics").
 - **Tool versions.** Node is the project's default, 24.x, the version CI uses (`.node-version`). pnpm is the exact `packageManager` version in the root `package.json`, through Corepack, which the project turns on with the variable `ENABLE_EXPERIMENTAL_COREPACK=1`; without it Vercel would pick pnpm 10 from the lockfile.
-- **CI stays the gate.** Vercel's Deployment Checks hold each production deployment until the two GitHub Actions jobs pass (docs/TESTING.md, "CI"), so a failing push never reaches `bigsmall.work`.
+- **A push to `main` deploys.** Vercel does not wait on GitHub Actions (Sean, 2026-10-18). The checks run on the machine that made the change (`pnpm check`, and `pnpm e2e` when behavior changed), or in Actions when someone starts the workflow (docs/TESTING.md, "CI").
 - **Headers** (`apps/web/vercel.json`): the hashed files under `/_astro/` are cached for a year, since a change gives them a new name; every response asks browsers not to guess content types, to send only the origin as referrer to other sites, never to show the site in a frame, and to keep the camera, microphone, and location off.
 - **Search and previews.** Astro's `site` is `https://bigsmall.work` (`apps/web/astro.config.mjs`): canonical links, the sitemap (`/sitemap-index.xml`, without the `/dev` pages), `robots.txt`, and link previews are built from it. `404.html` answers unknown addresses with status 404. The `/dev` pages are deployed but ask not to be indexed, and nothing links to them.
 - **Icons and the preview image** live in `apps/web/public/` and are drawn by `pnpm --filter @bigsmall/web brand` from the default theme (docs/DESIGN-SYSTEM.md, "Brand assets").
@@ -22,7 +22,7 @@ Done once by the owner in the Vercel and Porkbun dashboards; Claude never signs 
 2. Keep what Vercel detects: **Root Directory** `apps/web` and the **Astro** preset, with the build and output overrides off.
 3. Under **Environment Variables**, add `ENABLE_EXPERIMENTAL_COREPACK` with the value `1` for production and preview.
 4. **Deploy.** In the build log, check `pnpm 12` installs the dependencies and Node is 24. The site then answers at the project's `vercel.app` address.
-5. In **Settings → Deployment Checks**, **Add Checks**, choose **GitHub**, and open **Select checks to add**. Turn on **Show All Checks**: without it the list shows only checks that report through Vercel's own action, and is empty. Tick the two CI jobs, "Lint, format, typecheck, test, build" and "Browser and accessibility checks", and **Save**; both then show as GitHub checks for Production. Skip "Send workflow updates to Vercel", which is for workflows Vercel starts; CI runs on pushes. Remove Vercel's native Lint and TypeCheck checks if they are listed: CI runs both, so the gate stays in one place. (Done 2026-10-07.)
+5. In **Settings → Deployment Checks**, leave the list empty. The two GitHub jobs were added on 2026-10-07 and removed on 2026-10-18: while they are listed, a production deploy waits for a workflow that no longer starts on a push. Vercel's own Lint and TypeCheck checks stay off too.
 
 ### Domains
 
@@ -49,7 +49,7 @@ At Porkbun, for `bigsmall.work` and then `bigsmall.diy` (**Domain Management →
 
 ## Releasing
 
-- A release is a push to `main` that passes CI; Deployment Checks then promote it. To see a change before it is live, push a branch and open its preview address.
+- A release is a push to `main`. Vercel promotes it when its own build finishes. To see a change before it is live, push a branch and open its preview address.
 - Milestones are tagged: `v0.1.0` is the MVP shared with friends for feedback (docs/PLAN.md §13).
 
 ```bash

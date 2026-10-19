@@ -1,12 +1,12 @@
 ---
 name: ship
-description: Ship a change to bigsmall: gate on `pnpm check`, commit in Conventional Commits form with the attribution line, push to main, and watch CI until it passes, which deploys to bigsmall.work. Use whenever work is ready to land (a feature, a fix, a tidy commit, a save), or when Sean says ship, push, or deploy. Tidy and save end with it.
+description: Ship a change to bigsmall: gate on `pnpm check`, commit in Conventional Commits form with the attribution line, and push to main, which deploys to bigsmall.work on its own. Use whenever work is ready to land (a feature, a fix, a tidy commit, a save), or when Sean says ship, push, or deploy. Tidy and save end with it.
 argument-hint: '[the commit subject, or empty to write one from the diff]'
 ---
 
 # Ship
 
-Every push to `main` that passes CI deploys to `https://bigsmall.work` (CLAUDE.md, "Ship"; docs/DEPLOYMENT.md). No pull requests: work lands on `main`.
+Every push to `main` deploys to `https://bigsmall.work` when Vercel's own build finishes (CLAUDE.md, "Ship"; docs/DEPLOYMENT.md). GitHub Actions does not start on a push and does not hold the deploy. No pull requests: work lands on `main`.
 
 ## 1. Gate
 
@@ -21,15 +21,12 @@ Every push to `main` that passes CI deploys to `https://bigsmall.work` (CLAUDE.m
 - A visual trial ("try and see") is a commit of its own, so rolling it back is one revert; say "(trial)" in its subject.
 - The message ends with the attribution line the session's reminder gives, copied as given. Pass it through a quoted heredoc (`git commit -F - <<'EOF'`), never `-m` with quotes inside quotes.
 
-## 3. Push and watch
+## 3. Push
 
-- `git push origin HEAD:main`.
-- Find the run by the full SHA, not the short one: `gh run list --limit 5 --json databaseId,headSha -q '.[] | select(.headSha=="'"$(git rev-parse HEAD)"'") | .databaseId'`, retrying for a few seconds until it appears.
-- `gh run watch <id> --exit-status`, then `gh run view <id> --json conclusion -q .conclusion`.
-- CI runs the browser suite on the dev server, where Astro's dev toolbar adds elements a loose locator also finds: a new browser test runs on a dev server too before it ships, not only on the build.
-- Say CI passed only from the conclusion. A watch run in the background reports the exit status of its last command, so read the conclusion it printed (docs/LEARNINGS.md, "A test that passes on the build can fail on CI's dev server").
-- A failure: read the failed step (`gh run view <id> --log-failed`), fix, and ship again. Never force-push `main`.
+- `git push origin HEAD:main`. Vercel builds and promotes it. Do not start or watch GitHub Actions; a push does not run it.
+- A new browser test is run locally on a dev server before it ships, not only against the build: CI's old run used the dev server, where Astro's dev toolbar adds elements a loose locator also finds (docs/LEARNINGS.md, "A test that passes on the build can fail on CI's dev server").
+- Never force-push `main`.
 
 ## 4. Report
 
-One line each: what shipped (the commits' subjects or a summary), CI's result, and that it is live. A run cancelled because a newer push superseded it is not a failure; say so.
+One line each: what shipped (the commits' subjects or a summary), and that the push is on `main` for Vercel to build.

@@ -1,9 +1,12 @@
 name: CI
 
+# Started by hand (Actions → Run workflow, or `gh workflow run CI`). A push to main deploys
+# on its own (Sean, 2026-10-18): the browser job was about eleven minutes of every push,
+# and the account's 2,000 Actions minutes are shared. Checks before a push are local
+# (`pnpm check`, and `pnpm e2e` when behavior changed). Vercel must not list these jobs
+# as Deployment Checks, or a deploy waits for a run that never starts.
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

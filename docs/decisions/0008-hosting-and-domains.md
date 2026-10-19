@@ -9,7 +9,7 @@ ADR 0002 planned Cloudflare Pages for hosting. The site is fully static (Astro `
 
 ## Decision
 
-- Host on Vercel, connected to the GitHub repository: every push to `main` deploys, and other branches get preview deployments. GitHub Actions (`pnpm check` and the browser suite) stays the gate.
+- Host on Vercel, connected to the GitHub repository: every push to `main` deploys, and other branches get preview deployments. GitHub Actions (`pnpm check` and the browser suite) stays the gate. Amended 2026-10-18: the gate is lifted (Amendments).
 - `bigsmall.work` is the main domain. `bigsmall.diy` redirects to it permanently, so search engines see one site. Astro's `site` becomes `https://bigsmall.work`, which canonical URLs and the sitemap use.
 - DNS stays at Porkbun, pointed at Vercel. The exact records are added during launch prep.
 - Analytics is chosen later (docs/PLAN.md, "Explorations").
@@ -28,3 +28,7 @@ ADR 0002 planned Cloudflare Pages for hosting. The site is fully static (Astro `
 ## Outcome
 
 - **2026-10-15.** The main domain is settled for good as `bigsmall.work` (Sean; a .com or .org is not available), so the SEO pair pages build on it.
+
+## Amendments
+
+- **2026-10-18.** A push to `main` deploys without waiting for GitHub Actions. The two jobs had been Vercel's Deployment Checks since 2026-10-07; the browser job was about eleven minutes of every push, and the account's included minutes are shared and nearly spent. Checks run locally (`pnpm check`, and `pnpm e2e` when behavior changed), or when someone starts the workflow. The Deployment Checks list in Vercel is emptied, or a deploy waits for a run that never starts.

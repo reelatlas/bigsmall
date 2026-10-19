@@ -92,12 +92,10 @@ Adding a unit means adding at least one row that exercises it; a test fails when
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every push to `main` and every pull request:
+`.github/workflows/ci.yml` starts only when someone runs it (Actions → Run workflow, or `gh workflow run CI`). A push does not start it, and Vercel does not wait for it (Sean, 2026-10-18; docs/DEPLOYMENT.md).
 
-- **verify**: install, lint, format check, typecheck, unit tests, build, bundle budget, SEO contract. `pnpm check` runs the same steps locally.
-- **e2e**: install Chromium, run Playwright. The HTML report is uploaded on failure.
-
-Both must pass. There is no manual override; fix the code or fix the test.
+- **verify**: install, lint, format check, typecheck, unit tests, build, bundle budget, SEO contract. `pnpm check` runs the same steps locally, and that is the check to run before a push.
+- **e2e**: install Chromium and WebKit, run Playwright. The HTML report is uploaded on failure. Locally this is `pnpm e2e`, for a change to behavior.
 
 Both jobs run on a named image (`ubuntu-26.04`) with every action on its newest major. The comment above the jobs lists the pins and why; review them with the rest at each milestone (ADR 0005).
 

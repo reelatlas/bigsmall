@@ -28,7 +28,7 @@ A number written by `Intl.NumberFormat` and read back by the parser, as happens 
 
 ### Rounding: one fixed, one open
 
-- **Float noise is handled:** a value is snapped to 12 significant digits before it is rounded, so 1.005 is 1.01 and 2.675 is 2.68 to two places, as a person expects, though the doubles sit just below.
+- **Float noise is handled:** a value is snapped to 12 significant digits before it is rounded, so 1.005 is 1.01 and 2.675 is 2.68 to two places, as a person expects, though the doubles sit just below. (Until 2026-10-18, when the snap was found to drop a large value's real digits; since then the value itself rounds and float noise alone is forgiven, `7460d32`, docs/LEARNINGS.md's correction.)
 - **Fixed in `cfddbb3`:** past a million, fractions mark a whole number "≈" when the value is not exactly it, and that compared against a fixed 1e-9, below a double's step at that size: 12,345 miles in feet (65,181,600 exactly) showed as approximate. Noise now grows with the value.
 - **Open:** a tie below zero rounds up, toward larger values, in places and fractions (−2.5 to −2, −0.125 to −0.12, −0.5 to "> −1"), while the same tie above zero rounds away from it (2.5 to 3), and the table's own significant digits round −0.125 to −0.13 (below).
 

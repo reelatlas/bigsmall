@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "pnpm --filter @bigsmall/web e2e",
+    "e2e:preview": "pnpm --filter @bigsmall/web e2e:preview",
     "lint": "eslint .",
     "typecheck": "pnpm -r typecheck",
     "format": "prettier --write .",

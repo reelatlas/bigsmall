@@ -53,7 +53,7 @@ describe('formatNumber', () => {
   it('clamps precision and survives an invalid locale', () => {
     expect(formatNumber(1 / 3, { precision: 0, locale: 'en-US' })).toBe('0.3');
     // A double holds about 16–17 significant digits; asking for more never invents digits.
-    expect(formatNumber(1 / 3, { precision: 99 })).toMatch(/^0\.3{15,17}$/);
+    expect(formatNumber(1 / 3, { precision: 99, locale: 'en-US' })).toMatch(/^0\.3{15,17}$/);
     expect(formatNumber(1234.5, { locale: 'not a locale' }).length).toBeGreaterThan(0);
   });
 });

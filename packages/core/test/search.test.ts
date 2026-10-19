@@ -577,7 +577,7 @@ describe('suggest', () => {
 describe('search: the catalog’s alias decisions', () => {
   // docs/UNITS-CATALOG.md records each alias decision (§0, "Alias decisions so far"; §4; §5's
   // watchlist); each row pins one by the first result for its query, over every tier, as the
-  // converter asks (ADR 0018). Each cites the catalog's section and, as of v0.6, its line.
+  // converter asks (ADR 0018). Each cites the catalog's section and, as of v0.7, its line.
   const decisions: ReadonlyArray<[query: string, first: string, where: string]> = [
     ['/km', 'minute-per-kilometer', '§0 the paces, line 17'],
     ['per km', 'minute-per-kilometer', '§0 the paces, line 17'],
@@ -595,8 +595,8 @@ describe('search: the catalog’s alias decisions', () => {
     ['boost', '#pressure', '§0 the car words, line 20'],
     ['lug nut torque', '#torque', '§0 the car words, line 20'],
     ['engine power', '#power', '§0 the car words, line 20'],
-    ['gon', 'gradian', '§3 Angle, line 78: grad, the gon its alias'],
-    ['KB', 'kilobyte', '§4 Data, line 127: case folded, no alias'],
+    ['gon', 'gradian', '§3 Angle, line 79: grad, the gon its alias'],
+    ['KB', 'kilobyte', '§4 Data, line 128: case folded, no alias'],
   ];
 
   it.each(decisions)('%s names %s (%s)', (query, first) => {
@@ -607,7 +607,7 @@ describe('search: the catalog’s alias decisions', () => {
     expect(ids(search('gr', { tier: 'all' })).slice(0, 2)).toEqual(['grain', 'gram']);
   });
 
-  it('offers Length before Time for "how long", which both claim, by registry order (§5, line 150)', () => {
+  it('offers Length before Time for "how long", which both claim, by registry order (§5, line 151)', () => {
     expect(ids(search('how long')).slice(0, 2)).toEqual(['#length', '#time']);
   });
 });
@@ -615,8 +615,8 @@ describe('search: the catalog’s alias decisions', () => {
 describe('search: a word names the thing it is (Sean, 2026-10-18)', () => {
   // Four aliases put another thing ahead of the one the word names, and were dropped: Volume's
   // "cooking" listed Volume above the Cooking category, Data's "bytes" listed the category above
-  // the byte, Torque's "foot-pound" spellings took Energy's own unit name, and Mass's "oz." took the
-  // weight ounce outright while "oz" asks which (docs/UNITS-CATALOG.md §5).
+  // the byte, Torque's "foot-pound" spellings took Energy's own unit name, and Mass's "oz." took
+  // the weight ounce outright while "oz" asks which (docs/UNITS-CATALOG.md §0, the last bullet).
   it('"cooking" is the Cooking category alone', () => {
     expect(ids(search('cooking'))).toEqual(['#cooking']);
   });

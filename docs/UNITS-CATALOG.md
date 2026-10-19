@@ -1,6 +1,6 @@
 # Units catalog
 
-v0.6, 2026-10-18. Taxonomy, tiers, special-logic units, and verification sources. The code in `packages/core/src/units/` is the source of truth; this file explains the structure and the policies.
+v0.7, 2026-10-18. Taxonomy, tiers, special-logic units, and verification sources. The code in `packages/core/src/units/` is the source of truth; this file explains the structure and the policies.
 
 ## 0. Implementation status
 
@@ -23,6 +23,7 @@ Alias decisions so far (each one changes the ranking, and so which row Enter tak
 - `mbar` and `millibar` → hectopascal, the same size, an alias rather than a second row; `food calories` and `large calories` → kilocalorie, while `cal` and `calories` are the small calorie, the standard (Sean, 2026-10-08).
 - `gr` is the grain's symbol, and grams answer to `g`; typing `gr` offers grains, then grams (Sean, 2026-10-08). `c` is Celsius's alias and the speed of light's symbol; the standard unit leads.
 - Unit `note` fields carry the definition for anything with a variant or a common mix-up, and since 2026-10-08 for the specialty and newer units that need one (the atmosphere, the mercury columns, the calories, the BTU and the therm, the horsepowers, the UK measures, the tons): bit and byte; the decimal data prefixes (kB, MB, GB, TB); tonne, ounce, and stone; knot; kelvin; month and year; and the US liquid family (teaspoon, tablespoon, fluid ounce, cup, pint, quart, gallon). The UI does not show notes yet (docs/UX-SPEC.md §14).
+- A word names the thing it is (Sean, 2026-10-18): four aliases that put another thing ahead of the one the word names were dropped. Volume's `cooking` listed Volume above the Cooking category, Data's `bytes` listed the category above the byte, Torque's `foot-pound` spellings took Energy's own unit name (`ft-lb` still offers Torque's pound-foot first), and Mass's `oz.` took the weight ounce outright while `oz` asks which. `BTU` stays. Pinned in `packages/core/test/search.test.ts`.
 
 ## 1. Coverage research
 
@@ -115,7 +116,7 @@ Data transfer rate, Image resolution (dpi/ppi), Typography (pt, px at an assumed
 
 ### Deferred
 
-Currency (live rates), Clothing and shoe sizes (lookup tables), Sound (logarithmic), Number bases, Fractions (a formatter, not a converter), Date/time zones, SI prefix tool, Fun units.
+Currency (live rates), Clothing and shoe sizes (lookup tables), Sound (logarithmic), Number bases, Date/time zones, SI prefix tool, Fun units. Fractions were on this list as a formatter, not a converter, and shipped as Display's Fraction format on 2026-10-15 (ADR 0018).
 
 ## 4. Special logic
 

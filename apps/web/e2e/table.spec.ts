@@ -1,5 +1,5 @@
 import { categories, INGREDIENT_KINDS, unitsIn } from '@bigsmall/core';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { ANNOUNCE_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
 import {
@@ -36,6 +36,15 @@ import {
 
 const tiles = (page: Page) => page.getByRole('listbox', { name: 'Categories' });
 const matches = (page: Page) => page.getByRole('listbox', { name: 'Matches' });
+/** The headings over a list's groups, in order: the ingredients' kinds under the Cooking pill. */
+const kindHeadings = (list: Locator) =>
+  list
+    .getByRole('group')
+    .evaluateAll((groups) =>
+      groups.map((group) =>
+        document.getElementById(group.getAttribute('aria-labelledby') ?? '')?.textContent?.trim(),
+      ),
+    );
 const VOLUME_UNITS = unitsIn('volume').length;
 /** What a fresh visit lists: every unit but the specialty ones, the Standard preset (ADR 0018). */
 const VOLUME_STANDARD = unitsIn('volume').filter((unit) => unit.tier === 'standard').length;
@@ -1520,14 +1529,7 @@ test('Cooking: the ingredient’s pill opens every ingredient under its kind, th
   expect(await page.evaluate(() => Math.round(scrollY))).toBe(60);
   await page.evaluate(() => scrollTo(0, 0));
   const list = page.getByRole('listbox', { name: 'Matches' });
-  const headings = await list
-    .getByRole('group')
-    .evaluateAll((groups) =>
-      groups.map((group) =>
-        document.getElementById(group.getAttribute('aria-labelledby') ?? '')?.textContent?.trim(),
-      ),
-    );
-  expect(headings).toEqual(INGREDIENT_KINDS.map((kind) => kind.name));
+  expect(await kindHeadings(list)).toEqual(INGREDIENT_KINDS.map((kind) => kind.name));
   // The cursor starts on the one in the box.
   await expect(list.getByRole('option', { selected: true })).toHaveText(/all-purpose flour/);
   await expectNoA11yViolations(page);
@@ -1589,14 +1591,7 @@ test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, E
   const list = page.getByRole('listbox', { name: 'Matches' });
   await expect(list.getByRole('option').first()).toHaveText(/all-purpose flour/);
   // Under their kinds' headings, in the kinds' order: Flour first.
-  const headings = await list
-    .getByRole('group')
-    .evaluateAll((groups) =>
-      groups.map((group) =>
-        document.getElementById(group.getAttribute('aria-labelledby') ?? '')?.textContent?.trim(),
-      ),
-    );
-  expect(headings).toEqual(INGREDIENT_KINDS.map((kind) => kind.name));
+  expect(await kindHeadings(list)).toEqual(INGREDIENT_KINDS.map((kind) => kind.name));
   await expectNoA11yViolations(page);
   // Enter goes into the list rather than taking for you; Enter again takes what the cursor is on.
   await box(page).press('Enter');
@@ -1866,7 +1861,7 @@ test('the toolbar and the box stay at the window’s top as one block while a lo
   await expect(page.locator('[data-head][data-stuck]')).toHaveCount(0);
 });
 
-test('a side panel opened under a stuck head sticks beside it from md, and below md the head comes to the window’s top with the panel under it', async ({
+test('a side panel opened under a stuck head sticks beside it from md, and below md the head comes to the window’s top with the panel under it; a close leaves the head stuck', async ({
   page,
   isMobile,
 }) => {
@@ -1910,13 +1905,20 @@ test('a side panel opened under a stuck head sticks beside it from md, and below
     await page.keyboard.press('Escape');
     await expect(page.getByRole('group', { name: 'Units', exact: true })).toHaveCount(0);
     expect(Math.round((await headRect()).top)).toBe(0);
+    // By the button's second press as well as by Escape (docs/UX-SPEC.md §1).
+    await pressTool(page, 'Calculator');
+    await expect(page.getByRole('group', { name: 'Calculator' })).toBeVisible();
+    await pressTool(page, 'Calculator');
+    await expect(page.getByRole('group', { name: 'Calculator' })).toHaveCount(0);
+    expect(Math.round((await headRect()).top)).toBe(0);
     // The head's canvas reaches past the column, so a card's ring passes behind it, not beside it.
     const bleed = await page
       .locator('[data-head]')
       .evaluate((el) => parseFloat(getComputedStyle(el, '::before').left));
     expect(bleed).toBeLessThanOrEqual(-2);
   } else {
-    // Level with the box's top, in view, and still there after more scrolling: it sticks with the head.
+    // Level with the box's top, in view, and still there after more scrolling: it sticks with the
+    // head.
     const before = (await panel.boundingBox())!;
     expect(Math.abs(before.y - (await boxTop()))).toBeLessThanOrEqual(1);
     expect(before.y).toBeGreaterThanOrEqual(0);
@@ -1929,5 +1931,11 @@ test('a side panel opened under a stuck head sticks beside it from md, and below
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrolled);
     const after = (await panel.boundingBox())!;
     expect(Math.abs(after.y - before.y)).toBeLessThanOrEqual(1);
+    // Closing it by the button's second press leaves the page where it was and the head stuck:
+    // focus returns to the button without a scroll of its own (docs/UX-SPEC.md §1).
+    await pressTool(page, 'Calculator');
+    await expect(page.getByRole('group', { name: 'Calculator' })).toHaveCount(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(scrolled);
+    expect(Math.round((await headRect()).top)).toBe(0);
   }
 });

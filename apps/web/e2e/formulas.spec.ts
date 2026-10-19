@@ -6,6 +6,29 @@ import { aboutPanel, aboutTab, aboutTabs, applyTheme } from './support';
 // Every formula on the About page (docs/UX-SPEC.md §1, "About"): folded by category, Show all and
 // Hide all, and Copy all as plain text. Under its tab since 2026-10-18.
 
+/**
+ * What the two tests of the stuck names measure: a locator's top, a line scrolled to the window's
+ * top, where a name sticks (stuck at the window's top, the bar ends at its own height, and the
+ * names stick a pixel under it, so no hairline of the page shows between the two), and Length's
+ * and Weight's names.
+ */
+function stuckNames(section: Locator) {
+  const hide = section.getByRole('button', { name: 'Hide all' });
+  return {
+    top: (locator: Locator) =>
+      locator.evaluate((element) => Math.round(element.getBoundingClientRect().top)),
+    toTop: (text: string) =>
+      section
+        .getByText(text, { exact: true })
+        .evaluate((line) => line.scrollIntoView({ block: 'start' })),
+    under: hide.evaluate((button) =>
+      Math.round(button.parentElement!.getBoundingClientRect().height - 1),
+    ),
+    length: section.locator('summary').first(),
+    weight: section.locator('summary').filter({ hasText: /^\s*Weight/ }),
+  };
+}
+
 /** The About page with Every formula open: its hash opens the tab once the tabs hydrate. */
 async function openFormulas(page: Page) {
   await page.goto('/about/#formulas');
@@ -96,20 +119,8 @@ test('an open category’s name stays under the bar while its units scroll past,
 }) => {
   const section = await openFormulas(page);
   await section.getByRole('button', { name: 'Show all' }).click();
-  const hide = section.getByRole('button', { name: 'Hide all' });
-  const top = (locator: ReturnType<typeof section.locator>) =>
-    locator.evaluate((element) => Math.round(element.getBoundingClientRect().top));
-  const toTop = (text: string) =>
-    section
-      .getByText(text, { exact: true })
-      .evaluate((line) => line.scrollIntoView({ block: 'start' }));
-  // Stuck at the window's top, the bar ends at its own height; the names stick a pixel under it,
-  // so no hairline of the page shows between the two.
-  const under = await hide.evaluate((button) =>
-    Math.round(button.parentElement!.getBoundingClientRect().height - 1),
-  );
-  const length = section.locator('summary').first();
-  const weight = section.locator('summary').filter({ hasText: /^\s*Weight/ });
+  const { top, toTop, length, weight } = stuckNames(section);
+  const under = await stuckNames(section).under;
 
   // Deep in Length's units, Length's name sits right under the bar.
   await toTop('1 mi = 1609.344 m');
@@ -125,16 +136,8 @@ test('a category closed from under the bar stays there, and so does the one bein
 }) => {
   const section = await openFormulas(page);
   await section.getByRole('button', { name: 'Show all' }).click();
-  const hide = section.getByRole('button', { name: 'Hide all' });
-  const top = (locator: ReturnType<typeof section.locator>) =>
-    locator.evaluate((element) => Math.round(element.getBoundingClientRect().top));
-  // Stuck at the window's top, the bar ends at its own height; the names stick a pixel under it,
-  // so no hairline of the page shows between the two.
-  const under = await hide.evaluate((button) =>
-    Math.round(button.parentElement!.getBoundingClientRect().height - 1),
-  );
-  const length = section.locator('summary').first();
-  const weight = section.locator('summary').filter({ hasText: /^\s*Weight/ });
+  const { top, length, weight } = stuckNames(section);
+  const under = await stuckNames(section).under;
 
   // Closing Length from where its name sticks leaves it there, rather than the page jumping on.
   await section
@@ -184,28 +187,32 @@ test('a formula’s tag is trimmed to its cap height, so the word sits centered 
   page,
 }) => {
   // docs/DESIGN-SYSTEM.md, "Small labels" (Sean, 2026-10-18: the word sat higher than centered,
-  // the font's ascent over its cap counted in the line box).
+  // the font's ascent over its cap counted in the line box). The tag's face is the theme's, so
+  // the trim is read in every theme.
   const section = await openFormulas(page);
   await section.getByRole('button', { name: 'Show all' }).click();
   const tag = section.getByText('exact', { exact: true }).first();
   await expect(tag).toBeVisible();
   const trims = await page.evaluate(() => CSS.supports('text-box-trim', 'trim-both'));
   test.skip(!trims, 'this browser has no text-box-trim yet: the tag keeps its line box');
-  const box = await tag.evaluate((el) => {
-    const style = getComputedStyle(el);
-    const ink = document.createElement('canvas').getContext('2d')!;
-    ink.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-    return {
-      trim: style.getPropertyValue('text-box-trim'),
-      edge: style.getPropertyValue('text-box-edge'),
-      height: el.getBoundingClientRect().height,
-      cap: ink.measureText('H').actualBoundingBoxAscent,
-      padding: parseFloat(style.paddingTop) + parseFloat(style.paddingBottom),
-    };
-  });
-  expect(box.trim).toBe('trim-both');
-  expect(box.edge).toBe('cap alphabetic');
-  expect(box.padding).toBeGreaterThan(0);
-  // The box is the cap height and the padding, none of the font's ascent or descent.
-  expect(Math.abs(box.height - (box.cap + box.padding))).toBeLessThanOrEqual(1);
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const box = await tag.evaluate((el) => {
+      const style = getComputedStyle(el);
+      const ink = document.createElement('canvas').getContext('2d')!;
+      ink.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      return {
+        trim: style.getPropertyValue('text-box-trim'),
+        edge: style.getPropertyValue('text-box-edge'),
+        height: el.getBoundingClientRect().height,
+        cap: ink.measureText('H').actualBoundingBoxAscent,
+        padding: parseFloat(style.paddingTop) + parseFloat(style.paddingBottom),
+      };
+    });
+    expect(box.trim, theme.id).toBe('trim-both');
+    expect(box.edge, theme.id).toBe('cap alphabetic');
+    expect(box.padding, theme.id).toBeGreaterThan(0);
+    // The box is the cap height and the padding, none of the font's ascent or descent.
+    expect(Math.abs(box.height - (box.cap + box.padding)), theme.id).toBeLessThanOrEqual(1);
+  }
 });

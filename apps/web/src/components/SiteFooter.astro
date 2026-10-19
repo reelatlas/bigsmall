@@ -9,6 +9,11 @@ import {
   QUIET_LINK,
 } from '../lib/recipes';
 
+interface Props {
+  /** Its place in the page, the page's to give (Base.astro): `mt-auto` in the body's column. */
+  class?: string;
+}
+
 /*
  * The footer under every page (docs/UX-SPEC.md §1, "Footer"), from Base.astro, its content on the
  * content column like the header, so its text starts where the name does (Sean, 2026-10-18); on the
@@ -28,9 +33,10 @@ import {
 const path = Astro.url.pathname.replace(/\/+$/, '');
 const onAbout = path === '/about';
 const onConverter = path === '';
+const { class: className } = Astro.props;
 ---
 
-<footer class:list={onConverter ? CONVERTER_FOOT : [PAGE_COLUMN, FOOT]}>
+<footer class:list={[onConverter ? CONVERTER_FOOT : [PAGE_COLUMN, FOOT], className]}>
   <div class:list={[CONTENT_COLUMN, onConverter && COLUMN_CELL]}>
     {onAbout ? (
       <p class="text-ink-muted">

@@ -122,10 +122,11 @@ export const IN_CONVERTER_GRID = 'md:col-span-3 md:grid md:grid-cols-subgrid';
 /** A cell of the converter's column: the grid's second track, after the page's margin. */
 export const COLUMN_CELL = 'md:col-start-2';
 /**
- * The footer's own: after the content, or at the window's bottom on a short page (mt-auto in the
- * body's column, Base.astro), on the page's frame (pb-frame), in the small size (SiteFooter).
+ * The footer's own: on the page's frame (pb-frame), in the small size (SiteFooter). Its place in
+ * the body's column, after the content or at the window's bottom, is Base.astro's to give
+ * (`mt-auto`), as whoever places a component spaces it (component rule 13).
  */
-export const FOOT = 'mt-auto pb-frame text-sm';
+export const FOOT = 'pb-frame text-sm';
 /**
  * The converter page's footer: the same three tracks as its main (CONVERTER_GRID), its line in
  * the column's track (COLUMN_CELL), so the About link starts where the name does and follows the

@@ -1,0 +1,4 @@
+printed steps 8.47/6.67: of 162 non-US values, table above formula 74, below 88, equal 0
+   examples below: ['Mondo 215->EUR', 'Mondo 225->EUR', 'Mondo 225->UK', 'Mondo 230->UK', 'Mondo 235->EUR', 'Mondo 235->UK', 'Mondo 245->EUR', 'Mondo 250->UK', 'Mondo 255->EUR', 'Mondo 255->UK', 'Mondo 260->UK', 'Mondo 265->EUR']
+exact steps 25.4/3, 20/3: of 162 non-US values, table above formula 63, below 78, equal 21
+   examples below: ['Mondo 215->EUR', 'Mondo 225->EUR', 'Mondo 225->UK', 'Mondo 230->UK', 'Mondo 235->EUR', 'Mondo 235->UK', 'Mondo 245->EUR', 'Mondo 250->UK', 'Mondo 255->EUR', 'Mondo 255->UK', 'Mondo 260->UK', 'Mondo 265->EUR']

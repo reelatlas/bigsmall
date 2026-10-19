@@ -85,7 +85,8 @@ export default tseslint.config(
       ...jsxA11y.flatConfigs.recommended.rules,
       ...reactHooks.configs['recommended-latest'].rules,
       // A label wrapping one of our own controls counts as labelling it: the rule knows a custom
-      // control only by name (Checkbox renders the native input out of sight, TriCheckbox through it).
+      // control only by name (Checkbox renders the native input out of sight, TriCheckbox through
+      // it).
       'jsx-a11y/label-has-associated-control': [
         'error',
         { controlComponents: ['Checkbox', 'TriCheckbox'] },

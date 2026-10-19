@@ -138,7 +138,7 @@ export async function expectNoA11yViolations(page: Page) {
   expect(results.violations).toEqual([]);
 }
 
-/** The page's own header, under `main` (the dev server's toolbar draws headers of its own). */
+/** The page's own header, under `main` (a dev server started by hand draws headers of its own). */
 export const pageHeader = (page: Page) => page.locator('main > header');
 
 /** The header's theme menu trigger, whatever theme it names. */

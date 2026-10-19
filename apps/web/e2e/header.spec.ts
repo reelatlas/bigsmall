@@ -104,7 +104,8 @@ test("the shortcuts button switches by the header's own width, where all of it f
 }) => {
   test.skip(isMobile, 'the shortcuts button is hidden on touch-first devices');
   await page.goto('/');
-  // The page's own header: on the dev server, as on CI, Astro's dev toolbar draws headers too.
+  // The page's own header: a dev server started by hand keeps Astro's dev toolbar, which draws
+  // headers of its own; the suite's own server has it off (astro.config.mjs).
   const header = pageHeader(page);
   const headerWidth = () => header.evaluate((el) => el.getBoundingClientRect().width);
   // The page's 16 px gutters aside, a 600 px window leaves the header under 576 px, its container
@@ -300,12 +301,13 @@ test('off the converter’s page the name leads home on a 44 px target in every 
   }
 });
 
-// The header is as wide as the content column, centered on the page as on every page (docs/UX-SPEC.md
-// §1; Sean, 2026-10-17 and 2026-10-18): its menus end where the box ends, with a side panel open too.
-// A panel takes the window's margin first and the column slides left only by what the panel lacks (a
-// trial, 2026-10-18): by nothing where the margin holds it, else just enough for the panel to end at
-// the window's frame, and never past the page's edge. The panel opens beside a whole box from about a
-// 960 px window; narrower, the box gives way and the header with it.
+// The header is as wide as the content column, centered on the page as on every page
+// (docs/UX-SPEC.md §1; Sean, 2026-10-17 and 2026-10-18): its menus end where the box ends, with a
+// side panel open too. A panel takes the window's margin first and the column slides left only by
+// what the panel lacks (2026-10-18, kept): by nothing where the margin holds it, else just enough
+// for the panel to end at the window's frame, and never past the page's edge. The panel opens
+// beside a whole box from about a 960 px window; narrower, the box gives way and the header with
+// it.
 test('the header ends where the box ends, the column centered, and with Units open the column moves only by what the panel lacks, the foot with it', async ({
   page,
   isMobile,

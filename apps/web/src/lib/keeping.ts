@@ -4,8 +4,8 @@ import { useLayoutEffect, useRef, type RefObject } from 'react';
  * Runs a change to the page, keeping `anchor` where it sat on the screen: the part being read stays
  * put as what is above or around it changes. The browsers' own scroll anchoring would not do:
  * WebKit has none, and clamps the scroll as a swap passes through a shorter page
- * (docs/LEARNINGS.md, "Safari scrolls to the top as a list is swapped", and 2026-10-18 on the tabs),
- * and Chrome's is a heuristic the page cannot steer, which once pulled the page up as a panel
+ * (docs/LEARNINGS.md, "Safari scrolls to the top as a list is swapped", and 2026-10-18 on the
+ * tabs), and Chrome's is a heuristic the page cannot steer, which once pulled the page up as a panel
  * closed under a stuck head; so the page opts out of it (`overflow-anchor: none`, global.css, ADR
  * 0025), and this, with `useKept`, is the one way a part stays put, the same in every engine
  * (docs/DESIGN-SYSTEM.md, "Stuck layers"). A change React renders goes in through `flushSync`, so

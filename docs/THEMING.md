@@ -26,6 +26,7 @@ Because custom properties cascade, any element can carry its own `data-theme`. T
 - every token in the contract is present
 - every color token is 6-digit hex (so the test can compute contrast)
 - text pairs reach 4.5:1, UI pairs reach 3:1
+- the bridge mixes each derived color as `DERIVED_COLORS` says (`accent-soft-hover`, `accent-hover`), and their pairs are checked like the theme's own, so a theme never defines them
 
 A theme that fails any of these fails `pnpm test`, and therefore `pnpm check`, the gate before every push.
 

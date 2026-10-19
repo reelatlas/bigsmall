@@ -76,12 +76,13 @@ export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-frame';
  * with the page's frame:
  * the frame token (--page-frame, global.css: Material's layout margin, 16 px on a phone and 24
  * from sm), PAGE_COLUMN's gutter sideways and this at the top, which the header's row sits on,
- * and at the bottom a section step (pb-section, three frames), so a long page's content ends well
- * clear of the foot, which sits on the frame itself (Sean, 2026-10-18: the foot hugged the last card)
+ * and at the bottom 48 px (pb-12), so a long page's content ends clear of the foot, which sits on
+ * the frame itself (Sean, 2026-10-18: the foot hugged the last card; three frames, tried first,
+ * read too big beside a desktop's table; 48, the section step's compact value, right on both)
  * (docs/DESIGN-SYSTEM.md, "The page's two ends mirror"; Sean, 2026-10-18: one logic on every
  * side and every screen, a standard's ratio where it scales, nothing of its own over the header).
  */
-export const PAGE_MAIN = cx(PAGE_COLUMN, 'pt-frame pb-section');
+export const PAGE_MAIN = cx(PAGE_COLUMN, 'pt-frame pb-12');
 
 /**
  * The content column, one width on every page (Sean, 2026-10-18): the converter's toolbar, box,
@@ -95,8 +96,8 @@ export const PAGE_MAIN = cx(PAGE_COLUMN, 'pt-frame pb-section');
 export const CONTENT_COLUMN = 'mx-auto w-full max-w-xl';
 
 /**
- * The converter page's main from md: the page's frame as padding (a section step at the bottom,
- * as PAGE_MAIN) and a grid of three tracks
+ * The converter page's main from md: the page's frame as padding (48 px at the bottom, as
+ * PAGE_MAIN) and a grid of three tracks
  * (`grid-cols-margin-box-and-side` in global.css): the page's margin, the content column's cap,
  * then a side panel's own width. Not the page column (PAGE_COLUMN), since the panel may sit past
  * it in the window's margin. With no panel the column sits where it does on every page, centered;
@@ -112,7 +113,7 @@ export const CONTENT_COLUMN = 'mx-auto w-full max-w-xl';
  * track, so it follows the column when a panel slides it (Sean, 2026-10-18).
  */
 export const CONVERTER_GRID = 'md:grid md:grid-cols-margin-box-and-side';
-export const CONVERTER_MAIN = cx('w-full px-frame pt-frame pb-section', CONVERTER_GRID);
+export const CONVERTER_MAIN = cx('w-full px-frame pt-frame pb-12', CONVERTER_GRID);
 export const IN_CONVERTER_GRID = 'md:col-span-3 md:grid md:grid-cols-subgrid';
 /** A cell of the converter's column: the grid's second track, after the page's margin. */
 export const COLUMN_CELL = 'md:col-start-2';

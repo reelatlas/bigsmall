@@ -267,9 +267,10 @@ test('the footer sits at the window’s bottom on a short page, and after the co
     const at = await frame();
     expect(at.top, `${width}px`).toBe(at.side);
     expect(at.foot, `${width}px`).toBe(at.side);
-    // The content ends a section step, three frames, above the foot (docs/DESIGN-SYSTEM.md,
-    // "Sections step by the frame"; Sean, 2026-10-18: the foot hugged a long page's last card).
-    expect(parseFloat(at.bottom), `${width}px`).toBe(3 * parseFloat(at.side));
+    // The content ends 48 px above the foot on every screen (docs/DESIGN-SYSTEM.md, "The page's
+    // two ends mirror"; Sean, 2026-10-18: the foot hugged a long page's last card, and three frames
+    // read too big on a desktop).
+    expect(parseFloat(at.bottom), `${width}px`).toBe(48);
     // Material's layout margins: 16 px on a compact screen, 24 from sm.
     expect(parseFloat(at.side), `${width}px`).toBe(width >= 640 ? 24 : 16);
   }

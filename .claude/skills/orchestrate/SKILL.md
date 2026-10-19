@@ -28,6 +28,8 @@ The shape docs/RESEARCH.md §4 proved on Cooking's figures, generalized (docs/PL
 3. **Wave 2, verify**: checkers over the claims; a claim with no reachable source is "could not reach", never guessed.
 4. **Wave 3, decide**: the orchestrator synthesizes, the decisions numbered for Sean (where to see it, what changes, one recommendation), the record written, the cost logged, this skill amended with what the run taught.
 
+**One wave per session.** A wave's reports land in the orchestrator's context (five research reports are 40 to 60 thousand tokens), and a compaction mid-run loses the thread, so a wave's close is a save (the `save` skill) and the next wave starts fresh from "Pick up here" and the pass's doc. The orchestrator says when a session has grown long and proposes the save rather than running on (Sean, 2026-10-19: estimates, and a pause before a compaction).
+
 Estimates come from precedent and are written before the wave: Cooking's checker took about 0.7 million tokens over 255 tool calls, a worker less (docs/RESEARCH.md §4); five research workers at 150 calls are 1.5 to 2.5 million. Each wave ends with the actuals in the pass's doc and a save (the `save` skill). A wave that would exceed its estimate by half stops and reports rather than finishing.
 
 ## 4. Handoffs are files, and sessions are interchangeable

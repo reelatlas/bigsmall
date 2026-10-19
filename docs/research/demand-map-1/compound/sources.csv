@@ -1,0 +1,40 @@
+source,what it gave,status,date_read
+"repo: docs/RESEARCH.md 3,4,8; docs/research/demand-map-1.md 1,4; docs/UX-SPEC.md 2,14; docs/PLAN.md 2; docs/research/findings-friends-1.md","brief reading; our own evidence (Mike, Sean, the parser today)",read,2026-10-19
+"suggestqueries.google.com, api.bing.com/osjson.aspx, duckduckgo.com/ac","autocomplete for 70 prefixes (frequency, ordinal only)",read; raw JSON in downloads/autocomplete*.json,2026-10-19
+suggestqueries.google.com (calculator '=' suggestions),Google's calculator on 125 typed forms,"read; raw in downloads/gprobe*.json; a proxy for the results page, which blocked us",2026-10-19
+"https://www.google.com/search?q=5'11"" in cm",nothing: access-error page,could not reach,2026-10-19
+https://www.bing.com/search?q=5+ft+11+in+in+cm,"results about the number 5, no answer box",no usable result,2026-10-19
+https://api.duckduckgo.com/ (25 forms),which forms trigger the conversions answer,read; raw in downloads/ddgprobe.json,2026-10-19
+https://raw.githubusercontent.com/duckduckgo/zeroclickinfo-goodies/master/lib/DDG/Goodie/Conversions.pm,the feet-inch hack and the connecting words (archived source),read; downloads/ddg/,2026-10-19
+https://www.nist.gov/pml/special-publication-811/nist-guide-si-chapter-7-rules-and-style-conventions-expressing-values,"SP 811 7.2, 7.3, 7.6",read,2026-10-19
+https://physics.nist.gov/cuu/Units/checklist.html,"checklist items 13, 15",read,2026-10-19
+https://www.unicode.org/Public/UCD/latest/ucd/NamesList.txt,"U+2032, U+2033, U+0027, U+0022 annotations (Unicode 18.0.0)",read; downloads/unicode/,2026-10-19
+https://raw.githubusercontent.com/unicode-org/cldr/main/common/supplemental/units.xml and common/main/en.xml,"unit preferences (person-height, person mass), English unit patterns and list patterns",read; downloads/cldr/,2026-10-19
+https://www.law.cornell.edu/cfr/text/21/101.7,"net quantity pairs, abbreviations",read (eCFR itself redirected to a bot check: could not reach),2026-10-19
+https://assets.vde-verlag.de/iec-normen/preview-pdf/info_iso80000-1%7Bed2.0%7Den.pdf,ISO 80000-1:2022 preview: contents only,could not reach the text,2026-10-19
+https://webstore.ansi.org/preview-pages/ISO/preview_ISO+80000-1-2022.pdf,403,could not reach,2026-10-19
+https://www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf,downloaded; text not extractable here,could not read,2026-10-19
+https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers,"feet-inches, mixed units, time, angles, 'in' warning",read,2026-10-19
+https://www.govinfo.gov/content/pkg/GPO-STYLEMANUAL-2000/html/GPO-STYLEMANUAL-2000-13.htm,"rule 9.3 (in as preposition), 9.56 (angle spacing)",read,2026-10-19
+https://vitrinelinguistique.oqlf.gouv.qc.ca/21516/la-typographie/nombres/ecriture-des-heures,French time writing 18 h 15,read,2026-10-19
+https://www.gnu.org/software/units/manual/units.html,"unit lists, sums",read (first 100k chars; one 429 before),2026-10-19
+https://mathjs.org/docs/datatypes/units.html ; https://mathjs.org/docs/expressions/syntax.html,"to/in operators, splitUnit",read,2026-10-19
+https://documentation.soulver.app/syntax-reference/units-and-conversions/units.md,"to, in, as; reverse in (summary only: the fetch tool refused to quote)","read, paraphrase",2026-10-19
+https://reference.wolfram.com/language/ref/MixedUnit.html,MixedUnit,read,2026-10-19
+"https://www.wolframalpha.com/input?i=5'11"" to cm",needs JavaScript,could not reach,2026-10-19
+https://pint.readthedocs.io/en/latest/getting/tutorial.html,parse_pattern,read,2026-10-19
+https://git.invenhost.com/inventree/InvenTree/commit/8719dd7e1eb3dc285cf2d15e79b696bab3111d46?files=docs,"compound 3'6"" not supported",read,2026-10-19
+https://help.autodesk.com/cloudhelp/2024/ENU/AutoCAD-LT/files/GUID-0FADBD70-8E41-4067-824E-E45A8BB1A57C.htm,"architectural feet-inch entry, dash as separator",read,2026-10-19
+https://www.archtoolbox.com/calculator/,"fraction rounding steps, display-only rounding, 6′-3″",read,2026-10-19
+https://www.inchcalculator.com/height-converter/,two boxes; 5′ 8″ in prose,"read (page text only, no JS)",2026-10-19
+https://www.omnicalculator.com/conversion/height-converter,fields incl. metres-and-centimetres,read (page text only),2026-10-19
+https://www.rapidtables.com/convert/length/cm-to-feet-inch.html,"floor formula, separate output boxes",read (page text only),2026-10-19
+https://www.basketball-reference.com/players/j/jamesle01.html,6-9 hyphen form,read,2026-10-19
+https://developer.apple.com/forums/thread/125024,MeasurementFormatter cannot do ft+in,read,2026-10-19
+https://nutrient.io/blog/ios-11-smart-punctuation,iOS curly-quote substitution,read,2026-10-19
+https://uxmovement.substack.com/p/whats-the-best-way-to-enter-units,"two fields argued, no data",read,2026-10-19
+local Node v24.19.0 Intl,"NumberFormat, ListFormat, DurationFormat outputs",run,2026-10-19
+https://www.nhs.uk/health-assessment-tools/calculate-your-body-mass-index/calculate-bmi-for-adults,inputs not in page text,no usable result,2026-10-19
+https://www.convertunits.com/from/5+ft+11+in/to/cm,403,could not reach,2026-10-19
+https://trends.google.com/trends/explore,429,could not reach,2026-10-19
+"WebSearch result pages (style-guide spam, Gravity Forms and Adobe threads seen only as snippets)","leads only, not cited",not opened,2026-10-19

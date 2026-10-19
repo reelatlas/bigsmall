@@ -1,0 +1,17 @@
+rows 32, values checked 324, mismatches 3, ties 13
+tie   Mondo 215.0: EUR given 34.0, down 34.0 up 34.5
+tie   UK 2.0: EUR given 34.0, down 33.5 up 34.0
+tie   Mondo 225.0: EUR given 35.5, down 35.5 up 36.0
+tie   Mondo 235.0: EUR given 37.0, down 37.0 up 37.5
+MISS  Mondo 235.0: UK given 4.5, formula 5.0
+tie   Mondo 245.0: EUR given 38.5, down 38.5 up 39.0
+tie   Mondo 255.0: EUR given 40.0, down 40.0 up 40.5
+tie   Mondo 265.0: EUR given 41.5, down 41.5 up 42.0
+tie   Mondo 275.0: EUR given 43.0, down 43.0 up 43.5
+tie   Mondo 285.0: EUR given 44.5, down 44.5 up 45.0
+MISS  Mondo 290.0: UK given 11.0, formula 11.5
+tie   Mondo 295.0: EUR given 46.0, down 46.0 up 46.5
+tie   Mondo 305.0: EUR given 47.5, down 47.5 up 48.0
+tie   Mondo 315.0: EUR given 49.0, down 49.0 up 49.5
+tie   UK 14.5: Mondo given 320.0, down 315.0 up 320.0
+MISS  UK 15.0: EUR given 50.0, formula 50.5

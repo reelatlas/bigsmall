@@ -1,0 +1,922 @@
+{
+  "cm to inches": {
+    "us": [2, 4, "head"]
+  },
+  "inches to cm": {
+    "us": [6, 10, "mid"]
+  },
+  "mm to inches": {
+    "us": [2, 8, "head"]
+  },
+  "inches to mm": {
+    "us": [8, 7, "mid"]
+  },
+  "feet to meters": {
+    "us": [3, 2, "head"]
+  },
+  "meters to feet": {
+    "us": [4, 1, "mid"]
+  },
+  "km to miles": {
+    "us": [4, 3, "mid"]
+  },
+  "miles to km": {
+    "us": [10, 5, "long"]
+  },
+  "cm to feet": {
+    "us": [2, 1, "head"]
+  },
+  "feet to cm": {
+    "us": [3, 6, "head"]
+  },
+  "m to ft": {
+    "us": [3, 1, "mid"]
+  },
+  "yards to meters": {
+    "us": [5, 3, "mid"]
+  },
+  "meters to yards": {
+    "us": [4, 9, "mid"]
+  },
+  "inches to feet": {
+    "us": [5, 10, "mid"]
+  },
+  "mm to cm": {
+    "us": [2, 6, "head"]
+  },
+  "nautical miles to miles": {
+    "us": [4, 5, "mid"]
+  },
+  "light year to km": {
+    "us": [12, 3, "long"]
+  },
+  "kg to lbs": {
+    "us": [2, 1, "head"],
+    "gb": [2, 1, "head"]
+  },
+  "lbs to kg": {
+    "us": [3, 9, "head"],
+    "gb": [2, 1, "head"]
+  },
+  "grams to ounces": {
+    "us": [4, 5, "mid"],
+    "gb": [4, 6, "mid"]
+  },
+  "oz to grams": {
+    "us": [4, 3, "mid"],
+    "gb": [4, 2, "mid"]
+  },
+  "grams to pounds": {
+    "us": [4, 6, "mid"],
+    "gb": [4, 7, "mid"]
+  },
+  "pounds to grams": {
+    "us": [6, 5, "mid"],
+    "gb": [11, 1, "long"]
+  },
+  "stone to kg": {
+    "us": [8, 7, "mid"],
+    "gb": [4, 3, "mid"]
+  },
+  "kg to stone": {
+    "us": [7, 2, "long"],
+    "gb": [2, 3, "head"]
+  },
+  "stone to lbs": {
+    "us": [7, 6, "mid"],
+    "gb": [7, 4, "mid"]
+  },
+  "mg to g": {
+    "us": [2, 8, "head"],
+    "gb": [4, 1, "mid"]
+  },
+  "tons to kg": {
+    "us": [6, 3, "mid"],
+    "gb": [6, 1, "mid"]
+  },
+  "carats to grams": {
+    "us": [6, 4, "mid"],
+    "gb": [6, 4, "mid"]
+  },
+  "mg to mcg": {
+    "us": [4, 2, "mid"],
+    "gb": [4, 3, "mid"]
+  },
+  "ml to oz": {
+    "us": [4, 10, "mid"],
+    "gb": [4, 1, "mid"]
+  },
+  "oz to ml": {
+    "us": [5, 10, "mid"],
+    "gb": [2, 4, "head"]
+  },
+  "liters to gallons": {
+    "us": [6, 9, "mid"],
+    "gb": [6, 9, "mid"]
+  },
+  "gallons to liters": {
+    "us": [5, 2, "mid"],
+    "gb": [7, 1, "mid"]
+  },
+  "cups to ml": {
+    "us": [6, 7, "mid"],
+    "gb": [4, 7, "mid"]
+  },
+  "ml to cups": {
+    "us": [4, 3, "mid"],
+    "gb": [4, 5, "mid"]
+  },
+  "tsp to ml": {
+    "us": [3, 6, "head"],
+    "gb": [3, 10, "head"]
+  },
+  "tbsp to ml": {
+    "us": [3, 10, "head"],
+    "gb": [3, 8, "head"]
+  },
+  "liters to cups": {
+    "us": [6, 6, "mid"],
+    "gb": [6, 8, "mid"]
+  },
+  "quarts to liters": {
+    "us": [6, 3, "mid"],
+    "gb": [6, 3, "mid"]
+  },
+  "cubic feet to gallons": {
+    "us": [4, 9, "mid"],
+    "gb": [7, 4, "mid"]
+  },
+  "ml to liters": {
+    "us": [4, 6, "mid"],
+    "gb": [4, 6, "mid"]
+  },
+  "cups to oz": {
+    "us": [9, 2, "long"],
+    "gb": [9, 2, "long"]
+  },
+  "tbsp to tsp": {
+    "us": [3, 5, "head"],
+    "gb": [3, 7, "head"]
+  },
+  "oz to cups": {
+    "us": [2, 6, "head"],
+    "gb": [4, 4, "mid"]
+  },
+  "cups to grams": {
+    "us": [4, 9, "mid"],
+    "gb": [4, 6, "mid"]
+  },
+  "grams to cups": {
+    "us": [5, 3, "mid"],
+    "gb": [5, 3, "mid"]
+  },
+  "1 cup flour in grams": {
+    "us": [4, 10, "mid"],
+    "gb": [3, 5, "mid"]
+  },
+  "1 cup sugar in grams": {
+    "us": [4, 8, "mid"],
+    "gb": [4, 6, "mid"]
+  },
+  "1 cup butter in grams": {
+    "us": [7, 1, "long"],
+    "gb": [4, 5, "mid"]
+  },
+  "stick of butter in grams": {
+    "us": [17, 3, "long"],
+    "gb": [8, 6, "mid"]
+  },
+  "1 cup rice in grams": {
+    "us": [12, 1, "long"],
+    "gb": [7, 2, "long"]
+  },
+  "100g flour to cups": {
+    "us": [4, 4, "mid"],
+    "gb": [12, 1, "long"]
+  },
+  "grams to tablespoons": {
+    "us": [7, 8, "mid"],
+    "gb": [5, 10, "mid"]
+  },
+  "tablespoon of butter in grams": {
+    "us": [15, 3, "long"],
+    "gb": [12, 2, "mid"]
+  },
+  "celsius to fahrenheit": {
+    "us": [4, 3, "mid"],
+    "gb": [3, 4, "head"]
+  },
+  "fahrenheit to celsius": {
+    "us": [3, 5, "head"],
+    "gb": [3, 1, "head"]
+  },
+  "c to f": {
+    "us": [3, 1, "mid"],
+    "gb": [3, 1, "mid"]
+  },
+  "f to c": {
+    "us": [3, 1, "mid"],
+    "gb": [3, 1, "mid"]
+  },
+  "kelvin to celsius": {
+    "us": [4, 4, "mid"],
+    "gb": [4, 2, "mid"]
+  },
+  "celsius to kelvin": {
+    "us": [4, 5, "mid"],
+    "gb": [4, 8, "mid"]
+  },
+  "350 f to c": {
+    "us": [5, 1, "mid"],
+    "gb": [2, 1, "head"]
+  },
+  "180 c to f": {
+    "us": [5, 4, "mid"],
+    "gb": [3, 4, "head"]
+  },
+  "400 f to c": {
+    "us": [5, 1, "mid"],
+    "gb": [5, 1, "mid"]
+  },
+  "sq ft to sq m": {
+    "us": [4, 4, "mid"]
+  },
+  "square meters to square feet": {
+    "us": [8, 1, "mid"]
+  },
+  "acres to hectares": {
+    "us": [4, 6, "mid"]
+  },
+  "hectares to acres": {
+    "us": [4, 5, "mid"]
+  },
+  "acres to square feet": {
+    "us": [4, 3, "mid"]
+  },
+  "square feet to acres": {
+    "us": [13, 1, "long"]
+  },
+  "sq km to sq miles": {
+    "us": [4, 1, "mid"]
+  },
+  "mph to kph": {
+    "us": [3, 3, "head"]
+  },
+  "kph to mph": {
+    "us": [3, 2, "head"]
+  },
+  "km/h to mph": {
+    "us": [3, 1, "head"]
+  },
+  "knots to mph": {
+    "us": [5, 2, "mid"]
+  },
+  "m/s to km/h": {
+    "us": [2, 7, "head"]
+  },
+  "mph to m/s": {
+    "us": [3, 9, "head"]
+  },
+  "min/km to min/mile": {
+    "us": [4, 1, "mid"]
+  },
+  "pace converter": {
+    "us": [7, 2, "mid"]
+  },
+  "mph to pace": {
+    "us": [8, 1, "long"]
+  },
+  "km pace to mile pace": {
+    "us": [4, 4, "mid"]
+  },
+  "hours to minutes": {
+    "us": [7, 2, "mid"]
+  },
+  "minutes to hours": {
+    "us": [4, 7, "mid"]
+  },
+  "seconds to minutes": {
+    "us": [7, 3, "mid"]
+  },
+  "days to weeks": {
+    "us": [7, 7, "mid"]
+  },
+  "days to years": {
+    "us": [6, 5, "mid"]
+  },
+  "ms to seconds": {
+    "us": [4, 3, "mid"]
+  },
+  "weeks to months": {
+    "us": [7, 1, "mid"]
+  },
+  "mb to gb": {
+    "us": [4, 1, "mid"]
+  },
+  "gb to mb": {
+    "us": [4, 1, "mid"]
+  },
+  "gb to tb": {
+    "us": [4, 2, "mid"]
+  },
+  "kb to mb": {
+    "us": [2, 8, "head"]
+  },
+  "mb to kb": {
+    "us": [4, 2, "mid"]
+  },
+  "tb to gb": {
+    "us": [5, 1, "mid"]
+  },
+  "bits to bytes": {
+    "us": [6, 1, "mid"]
+  },
+  "mbps to mb/s": {
+    "us": [3, 4, "head"]
+  },
+  "mpg to l/100km": {
+    "us": [5, 8, "mid"]
+  },
+  "l/100km to mpg": {
+    "us": [2, 4, "head"]
+  },
+  "km/l to mpg": {
+    "us": [3, 4, "head"]
+  },
+  "mpg to km/l": {
+    "us": [8, 6, "long"]
+  },
+  "kwh to btu": {
+    "us": [5, 4, "mid"]
+  },
+  "btu to kwh": {
+    "us": [5, 3, "mid"]
+  },
+  "joules to calories": {
+    "us": [4, 8, "mid"]
+  },
+  "calories to joules": {
+    "us": [10, 2, "mid"]
+  },
+  "kj to kcal": {
+    "us": [4, 3, "mid"]
+  },
+  "kcal to kj": {
+    "us": [6, 4, "mid"]
+  },
+  "kwh to joules": {
+    "us": [5, 5, "mid"]
+  },
+  "therms to kwh": {
+    "us": [6, 2, "mid"]
+  },
+  "psi to bar": {
+    "us": [5, 2, "mid"]
+  },
+  "bar to psi": {
+    "us": [5, 1, "mid"]
+  },
+  "kpa to psi": {
+    "us": [3, 2, "head"]
+  },
+  "psi to kpa": {
+    "us": [5, 4, "mid"]
+  },
+  "mmhg to kpa": {
+    "us": [3, 9, "head"]
+  },
+  "inhg to mb": {
+    "us": [9, 4, "long"]
+  },
+  "atm to psi": {
+    "us": [5, 2, "mid"]
+  },
+  "mpa to psi": {
+    "us": [3, 4, "head"]
+  },
+  "hp to kw": {
+    "us": [4, 2, "mid"]
+  },
+  "kw to hp": {
+    "us": [4, 1, "mid"]
+  },
+  "btu to watts": {
+    "us": [3, 10, "head"]
+  },
+  "watts to btu": {
+    "us": [10, 2, "long"]
+  },
+  "hp to watts": {
+    "us": [4, 4, "mid"]
+  },
+  "ps to hp": {
+    "us": [4, 2, "mid"]
+  },
+  "newtons to lbs": {
+    "us": [9, 3, "mid"]
+  },
+  "lbf to n": {
+    "us": [3, 3, "head"]
+  },
+  "kn to lbs": {
+    "us": [4, 1, "mid"]
+  },
+  "kg to newtons": {
+    "us": [7, 1, "long"]
+  },
+  "n to kg": {
+    "us": [3, 7, "mid"]
+  },
+  "nm to ft lbs": {
+    "us": [4, 2, "mid"]
+  },
+  "ft lbs to nm": {
+    "us": [4, 3, "mid"]
+  },
+  "inch pounds to foot pounds": {
+    "us": [6, 2, "mid"]
+  },
+  "in lbs to nm": {
+    "us": [5, 2, "mid"]
+  },
+  "nm to in lbs": {
+    "us": [4, 3, "mid"]
+  },
+  "degrees to radians": {
+    "us": [5, 8, "mid"]
+  },
+  "radians to degrees": {
+    "us": [7, 1, "mid"]
+  },
+  "degrees to percent": {
+    "us": [9, 9, "mid"]
+  },
+  "arcseconds to degrees": {
+    "us": [5, 5, "mid"]
+  },
+  "gradians to degrees": {
+    "us": [8, 4, "mid"]
+  },
+  "5'10 in cm": {
+    "us": [2, 1, "head"],
+    "gb": [2, 9, "head"]
+  },
+  "5'8 in cm": {
+    "us": [2, 2, "head"],
+    "gb": [2, 4, "head"]
+  },
+  "5'5 in cm": {
+    "us": [2, 5, "head"],
+    "gb": [2, 2, "head"]
+  },
+  "6'2 in cm": {
+    "us": [2, 1, "head"],
+    "gb": [2, 1, "head"]
+  },
+  "6 feet in cm": {
+    "us": [3, 5, "mid"],
+    "gb": [3, 1, "mid"]
+  },
+  "5 feet in cm": {
+    "us": [3, 5, "mid"],
+    "gb": [3, 1, "mid"]
+  },
+  "5 ft 10 in cm": {
+    "us": [4, 9, "mid"],
+    "gb": [4, 7, "mid"]
+  },
+  "170 cm in feet": {
+    "us": [2, 9, "head"],
+    "gb": [2, 3, "head"]
+  },
+  "180 cm in feet": {
+    "us": [8, 1, "long"],
+    "gb": [2, 3, "head"]
+  },
+  "160 cm in feet": {
+    "us": [6, 8, "mid"],
+    "gb": [5, 10, "mid"]
+  },
+  "cm to feet and inches": {
+    "us": [4, 8, "mid"],
+    "gb": [4, 9, "mid"]
+  },
+  "feet and inches to cm": {
+    "us": [6, 3, "mid"],
+    "gb": [6, 1, "mid"]
+  },
+  "5/8 inch to mm": {
+    "us": [3, 5, "head"]
+  },
+  "3/8 inch in mm": {
+    "us": [10, 1, "long"]
+  },
+  "1/4 inch in mm": {
+    "us": [10, 1, "long"]
+  },
+  "3/4 inch to mm": {
+    "us": [3, 9, "head"]
+  },
+  "1/2 inch to mm": {
+    "us": [3, 4, "head"]
+  },
+  "3/16 in mm": {
+    "us": [6, 3, "mid"]
+  },
+  "mm to fraction": {
+    "us": [7, 4, "long"]
+  },
+  "mm to inches fraction": {
+    "us": [4, 7, "mid"]
+  },
+  "shoe size converter": {
+    "us": [11, 10, "long"],
+    "gb": [7, 9, "mid"]
+  },
+  "us to eu shoe size": {
+    "us": [5, 8, "mid"],
+    "gb": [5, 8, "mid"]
+  },
+  "eu to us shoe size": {
+    "us": [4, 1, "mid"],
+    "gb": [4, 2, "mid"]
+  },
+  "uk to us shoe size": {
+    "us": [4, 5, "mid"],
+    "gb": [5, 3, "mid"]
+  },
+  "womens to mens shoe size": {
+    "us": [8, 7, "mid"],
+    "gb": [9, 3, "mid"]
+  },
+  "gas mark 4 in c": {
+    "us": [10, 8, "long"],
+    "gb": [10, 7, "long"]
+  },
+  "gas mark to celsius": {
+    "us": [10, 2, "long"],
+    "gb": [10, 2, "long"]
+  },
+  "180c in gas mark": {
+    "us": [6, 9, "mid"],
+    "gb": [4, 6, "mid"]
+  },
+  "mg/dl to mmol/l": {
+    "us": [3, 4, "head"],
+    "gb": [3, 1, "head"]
+  },
+  "mmol/l to mg/dl": {
+    "us": [4, 1, "mid"],
+    "gb": [3, 4, "head"]
+  },
+  "a4 size in inches": {
+    "us": [2, 6, "head"],
+    "gb": [2, 3, "head"]
+  },
+  "a4 size in cm": {
+    "us": [4, 6, "mid"],
+    "gb": [2, 4, "head"]
+  },
+  "a5 size in inches": {
+    "us": [2, 6, "head"],
+    "gb": [2, 8, "head"]
+  },
+  "letter size in mm": {
+    "us": [13, 5, "long"],
+    "gb": [13, 3, "long"]
+  },
+  "mbps to gbps": {
+    "us": [3, 6, "head"]
+  },
+  "mb/s to mbps": {
+    "us": [3, 1, "head"]
+  },
+  "hz to rpm": {
+    "us": [4, 4, "mid"]
+  },
+  "rpm to hz": {
+    "us": [6, 2, "mid"]
+  },
+  "khz to hz": {
+    "us": [3, 1, "head"]
+  },
+  "ghz to mhz": {
+    "us": [null, null, "long"]
+  },
+  "kg/m3 to lb/ft3": {
+    "us": [3, 1, "head"]
+  },
+  "g/cm3 to kg/m3": {
+    "us": [5, 1, "mid"]
+  },
+  "density converter": {
+    "us": [10, 3, "mid"]
+  },
+  "gpm to lpm": {
+    "us": [5, 2, "mid"]
+  },
+  "lpm to gpm": {
+    "us": [3, 3, "head"]
+  },
+  "cfm to m3/h": {
+    "us": [5, 2, "mid"]
+  },
+  "g to m/s2": {
+    "us": [7, 4, "long"]
+  },
+  "m/s2 to g": {
+    "us": [4, 4, "mid"]
+  },
+  "g force to m/s2": {
+    "us": [12, 2, "long"]
+  },
+  "pt to px": {
+    "us": [7, 3, "long"]
+  },
+  "px to rem": {
+    "us": [4, 2, "mid"]
+  },
+  "px to pt": {
+    "us": [4, 10, "mid"]
+  },
+  "pt to mm": {
+    "us": [7, 2, "long"]
+  },
+  "px to em": {
+    "us": [5, 9, "mid"]
+  },
+  "dpi to ppi": {
+    "us": [5, 5, "mid"]
+  },
+  "unit converter": {
+    "us": [6, 2, "mid"],
+    "gb": [6, 2, "mid"]
+  },
+  "unit conversion": {
+    "us": [6, 3, "mid"],
+    "gb": [6, 3, "mid"]
+  },
+  "metric conversion": {
+    "us": [5, 4, "mid"],
+    "gb": [5, 4, "mid"]
+  },
+  "conversion calculator": {
+    "us": [8, 3, "mid"],
+    "gb": [7, 9, "mid"]
+  },
+  "5 10 in cm": {
+    "us": [3, 1, "mid"],
+    "gb": [3, 1, "mid"]
+  },
+  "5 foot 10 in cm": {
+    "us": [4, 6, "mid"],
+    "gb": [4, 4, "mid"]
+  },
+  "5 feet 10 inches in cm": {
+    "us": [8, 3, "long"],
+    "gb": [4, 10, "mid"]
+  },
+  "5'11 in cm": {
+    "us": [2, 10, "head"],
+    "gb": [3, 3, "head"]
+  },
+  "5'6 in cm": {
+    "us": [2, 7, "head"],
+    "gb": [2, 5, "head"]
+  },
+  "5'7 in cm": {
+    "us": [2, 6, "head"],
+    "gb": [2, 1, "head"]
+  },
+  "5'9 in cm": {
+    "us": [2, 3, "head"],
+    "gb": [2, 3, "head"]
+  },
+  "5'4 in cm": {
+    "us": [2, 8, "head"],
+    "gb": [2, 7, "head"]
+  },
+  "5'2 in cm": {
+    "us": [2, 4, "head"],
+    "gb": [2, 6, "head"]
+  },
+  "6 ft in cm": {
+    "us": [6, 2, "long"],
+    "gb": [4, 2, "mid"]
+  },
+  "6 foot in cm": {
+    "us": [4, 1, "mid"],
+    "gb": [3, 2, "mid"]
+  },
+  "175 cm in feet": {
+    "us": [2, 3, "head"],
+    "gb": [2, 4, "head"]
+  },
+  "165 cm in feet": {
+    "us": [2, 3, "head"],
+    "gb": [2, 1, "head"]
+  },
+  "180 cm to feet": {
+    "us": [2, 5, "head"],
+    "gb": [5, 5, "mid"]
+  },
+  "height converter": {
+    "us": [8, 8, "mid"],
+    "gb": [8, 6, "mid"]
+  },
+  "height in cm": {
+    "us": [8, 1, "mid"],
+    "gb": [3, 9, "head"]
+  },
+  "cup of flour in grams": {
+    "us": [8, 1, "long"],
+    "gb": [8, 1, "long"]
+  },
+  "1 cup of sugar in grams": {
+    "us": [7, 9, "long"],
+    "gb": [7, 5, "long"]
+  },
+  "1 cup oats in grams": {
+    "us": [8, 2, "long"],
+    "gb": [7, 7, "long"]
+  },
+  "1 cup milk in grams": {
+    "us": [7, 2, "long"],
+    "gb": [7, 1, "long"]
+  },
+  "1 cup water in grams": {
+    "us": [7, 1, "long"],
+    "gb": [7, 2, "long"]
+  },
+  "1 cup brown sugar in grams": {
+    "us": [7, 5, "long"],
+    "gb": [7, 2, "long"]
+  },
+  "1 cup powdered sugar in grams": {
+    "us": [7, 1, "long"],
+    "gb": [7, 2, "long"]
+  },
+  "100 grams of flour in cups": {
+    "us": [14, 2, "long"],
+    "gb": [20, 1, "long"]
+  },
+  "200g flour in cups": {
+    "us": [6, 1, "mid"],
+    "gb": [4, 5, "mid"]
+  },
+  "1 cup in grams": {
+    "us": [7, 2, "long"],
+    "gb": [3, 4, "mid"]
+  },
+  "1 stick of butter in grams": {
+    "us": [4, 7, "mid"],
+    "gb": [5, 1, "mid"]
+  },
+  "1 tbsp sugar in grams": {
+    "us": [8, 1, "long"],
+    "gb": [5, 7, "mid"]
+  },
+  "how many grams in a cup": {
+    "us": [10, 6, "long"],
+    "gb": [10, 6, "long"]
+  },
+  "how many grams in a tablespoon": {
+    "us": [11, 8, "long"],
+    "gb": [11, 5, "long"]
+  },
+  "5/8 to mm": {
+    "us": [2, 8, "head"]
+  },
+  "5/8 inch in mm": {
+    "us": [10, 1, "long"]
+  },
+  "3/8 in mm": {
+    "us": [8, 2, "long"]
+  },
+  "3/4 inch in mm": {
+    "us": [10, 1, "long"]
+  },
+  "1/2 inch in mm": {
+    "us": [10, 1, "long"]
+  },
+  "1/8 inch in mm": {
+    "us": [10, 1, "long"]
+  },
+  "1/16 inch in mm": {
+    "us": [11, 1, "long"]
+  },
+  "inch fraction calculator": {
+    "us": [6, 6, "mid"]
+  },
+  "10mm in inches": {
+    "us": [6, 1, "mid"]
+  },
+  "6mm in inches": {
+    "us": [5, 1, "mid"]
+  },
+  "8mm in inches": {
+    "us": [5, 1, "mid"]
+  },
+  "pace calculator": {
+    "us": [4, 7, "mid"]
+  },
+  "running pace calculator": {
+    "us": [9, 5, "mid"]
+  },
+  "mile pace to km pace": {
+    "us": [6, 4, "mid"]
+  },
+  "mph to min per mile": {
+    "us": [8, 7, "long"]
+  },
+  "min per mile to mph": {
+    "us": [6, 2, "mid"]
+  },
+  "nm to ftlb": {
+    "us": [null, null, "long"]
+  },
+  "torque converter": {
+    "us": [4, 3, "mid"]
+  },
+  "torque conversion": {
+    "us": [14, 1, "long"]
+  },
+  "foot pounds to inch pounds": {
+    "us": [7, 2, "mid"]
+  },
+  "newton meters to foot pounds": {
+    "us": [8, 4, "mid"]
+  },
+  "ft lb to nm": {
+    "us": [7, 1, "long"]
+  },
+  "shoe size conversion": {
+    "us": [7, 2, "mid"],
+    "gb": [7, 2, "mid"]
+  },
+  "us to uk shoe size": {
+    "us": [7, 1, "long"],
+    "gb": [5, 6, "mid"]
+  },
+  "mens to womens shoe size": {
+    "us": [6, 3, "mid"],
+    "gb": [7, 2, "mid"]
+  },
+  "shoe size chart": {
+    "us": [6, 10, "mid"],
+    "gb": [6, 6, "mid"]
+  },
+  "gas mark 4": {
+    "us": [8, 10, "long"],
+    "gb": [6, 8, "mid"]
+  },
+  "gas mark 6": {
+    "us": [7, 1, "mid"],
+    "gb": [6, 6, "mid"]
+  },
+  "gas mark to fahrenheit": {
+    "us": [10, 4, "long"],
+    "gb": [13, 4, "long"]
+  },
+  "oven temperature conversion": {
+    "us": [18, 1, "long"],
+    "gb": [7, 8, "mid"]
+  },
+  "mmol to mg/dl": {
+    "us": [4, 6, "mid"],
+    "gb": [4, 2, "mid"]
+  },
+  "blood sugar converter": {
+    "us": [14, 5, "long"],
+    "gb": [13, 2, "long"]
+  },
+  "a4 size": {
+    "us": [2, 2, "head"],
+    "gb": [2, 1, "head"]
+  },
+  "a4 paper size": {
+    "us": [2, 1, "head"],
+    "gb": [2, 2, "head"]
+  },
+  "a5 size": {
+    "us": [2, 1, "head"],
+    "gb": [2, 1, "head"]
+  },
+  "a3 size": {
+    "us": [2, 7, "head"],
+    "gb": [2, 1, "head"]
+  },
+  "letter size": {
+    "us": [8, 1, "mid"],
+    "gb": [8, 1, "mid"]
+  },
+  "density calculator": {
+    "us": [9, 1, "mid"]
+  },
+  "cfm to cmh": {
+    "us": [8, 1, "long"]
+  },
+  "px to vw": {
+    "us": [7, 1, "long"]
+  }
+}

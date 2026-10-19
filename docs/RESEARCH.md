@@ -83,7 +83,7 @@ A change the rule needs for a category is written in that category's research do
 ## 7. Files
 
 - `docs/research/<topic>-N.md`: one doc per topic and round; a later round supersedes an earlier one with a note at its top, and the earlier one stays as the record.
-- `docs/research/<topic>-N/`: the data file and its rule, the generators, each reviewer's findings and figures, the check, the extractions. Downloads are not kept.
+- `docs/research/<topic>-N/`: the data file and its rule, the generators, each reviewer's findings and figures, the check, the extractions, and a worker's scripts where they show how a pass measured (tooling, not product code: the lint leaves them alone). Downloads are not kept.
 - `packages/core`: the data the generators write, the tests that hold it to its sources.
 
 ## 8. A practice, not a figure: how a way of doing something is researched

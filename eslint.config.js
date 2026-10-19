@@ -69,6 +69,9 @@ export default tseslint.config(
       '**/test-results/**',
       // An agent's worktree (git keeps them out of status; the gate keeps them out of lint).
       '.claude/worktrees/**',
+      // A research worker's scripts, kept with the record of how a pass measured (docs/RESEARCH.md §7):
+      // tooling, not product code.
+      'docs/research/**/*.{js,cjs,mjs}',
     ],
   },
   js.configs.recommended,

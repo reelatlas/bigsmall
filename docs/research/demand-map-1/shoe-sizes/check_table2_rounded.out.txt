@@ -1,0 +1,4 @@
+rows 32, values checked 324, mismatches 3, ties 0
+MISS  UK 2.0: EUR given 34.0, formula 33.5
+MISS  UK 8.0: Mondo given 260.0, formula 265.0
+MISS  UK 15.0: EUR given 50.0, formula 50.5

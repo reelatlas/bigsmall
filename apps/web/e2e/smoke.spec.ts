@@ -258,6 +258,7 @@ test('the footer sits at the window’s bottom on a short page, and after the co
       return {
         side: main.paddingLeft,
         top: main.paddingTop,
+        bottom: main.paddingBottom,
         foot: getComputedStyle(document.querySelector('body > footer')!).paddingBottom,
       };
     });
@@ -266,6 +267,9 @@ test('the footer sits at the window’s bottom on a short page, and after the co
     const at = await frame();
     expect(at.top, `${width}px`).toBe(at.side);
     expect(at.foot, `${width}px`).toBe(at.side);
+    // The content ends a section step, three frames, above the foot (docs/DESIGN-SYSTEM.md,
+    // "Sections step by the frame"; Sean, 2026-10-18: the foot hugged a long page's last card).
+    expect(parseFloat(at.bottom), `${width}px`).toBe(3 * parseFloat(at.side));
     // Material's layout margins: 16 px on a compact screen, 24 from sm.
     expect(parseFloat(at.side), `${width}px`).toBe(width >= 640 ? 24 : 16);
   }

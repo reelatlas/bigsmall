@@ -18,6 +18,8 @@ Newest first.
 
 **Last commit.** `d700951`, in `apps/web/src/pages/dev/owner.astro`, `apps/web/src/pages/dev/_owner/OwnVisits.tsx`, and `apps/web/e2e/owner.spec.ts`. Research: the eighty-sixth, eighty-eighth, and eighty-ninth passes in `docs/research/findings-0-first-pass.md`.
 
+**Came back** (2026-10-19). Sean wanted an easy way to be sure a testing browser is not counted, with an indicator that cannot mislead; and Safari deletes a site's storage after seven days without a visit, so a phone loses the key in a quiet week. The page returned unchanged from `d700951` as a standing tool with a row in the roster (docs/DESIGN-SYSTEM.md, "Tuning labs"); this entry stays as its history (the ninety-fourth pass).
+
 ## Tidy lab, `/dev/tidy-lab` (2026-10-18)
 
 **Explored.** Three of the full tidy's calls, to see rather than read (the eighty-sixth and eighty-seventh passes in docs/research/findings-0-first-pass.md). How a side panel opens beside the box on a wide screen, three ways, each a stage the page column's width with a stand-in for the converter page, its own Units tool, and a measured line under it: the pair re-centering as then built (the column slides 168 px), the margin-first slide (the panel into the window's margin past the page column, the column sliding only by what the panel lacks), and a drawer fixed at the window's frame. The About page's vertical rhythm, every gap a band named by its class and measured, the converter page's beside it, and one section step for About's two section gaps on a control, 2, 3, or 4 times the frame. The formulas' exact and measured tags, today's pill against the shape token's corner, in every theme, with what extending the token guard means.

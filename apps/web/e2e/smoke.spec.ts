@@ -17,7 +17,14 @@ import {
 // Checks that span the site: every page and every theme pass axe, every Tab stop shows focus,
 // and reduced motion stills every theme. Each feature's flows have a file of their own.
 
-const PAGES = ['/', '/about', '/dev/gallery', '/dev/wordmark-lab', '/dev/sketchbook-lab'];
+const PAGES = [
+  '/',
+  '/about',
+  '/dev/gallery',
+  '/dev/wordmark-lab',
+  '/dev/sketchbook-lab',
+  '/dev/owner',
+];
 
 for (const path of PAGES) {
   test(`${path} renders with no WCAG violations`, async ({ page }) => {
@@ -128,7 +135,7 @@ test('pages tell search engines and link previews what they are; dev pages stay 
     /^https:\/\/bigsmall\.work\/about\/?$/,
   );
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
-  for (const path of ['/dev/gallery', '/dev/wordmark-lab', '/dev/sketchbook-lab']) {
+  for (const path of ['/dev/gallery', '/dev/wordmark-lab', '/dev/sketchbook-lab', '/dev/owner']) {
     await page.goto(path);
     await expect(page.locator('meta[name="robots"]'), path).toHaveAttribute('content', 'noindex');
     await expect(page.locator('link[rel="canonical"]'), path).toHaveCount(0);

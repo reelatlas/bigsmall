@@ -1,10 +1,11 @@
 import { unitsIn } from '@bigsmall/core';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import {
   applyTheme,
   box,
   calculatorButton,
   calculatorPanel,
+  countOffBaseline,
   expectNoA11yViolations,
   hiddenToggle,
   pressControl,
@@ -616,6 +617,57 @@ test("Display's figures are set in the numeric face: Round to's as the fraction 
   const figures = await face('1/2');
   expect(await face('No limit')).not.toBe(figures);
   for (const places of ['0.1', '0.01', '0.001']) expect(await face(places), places).toBe(figures);
+});
+
+test("Round to's two strips sit 12 px apart with any pointer, the room a touch target leaves", async ({
+  page,
+}) => {
+  // On a touch screen each segment's label is 44 px tall around its 32 px drawing, so two strips
+  // stacked are 12 px apart by the taps' room; with a mouse the drawing is the whole target and
+  // the group's own gap keeps the same 12 (docs/DESIGN-SYSTEM.md, "Settings"; until 2026-10-19 the
+  // rows touched on a mouse).
+  await page.goto('/?a=foot&v=6.3');
+  await ready(page);
+  await settingsButton(page, 'Display').click();
+  const panel = settingsPanel(page, 'Display');
+  await panel
+    .locator('label')
+    .filter({ hasText: /^Fraction$/ })
+    .click();
+  const strips = panel.getByRole('group', { name: 'Round to' }).locator('[data-strip]');
+  await expect(strips).toHaveCount(2);
+  const drawn = async (strip: Locator) =>
+    (await strip.locator('label > span').first().boundingBox())!;
+  const first = await drawn(strips.nth(0));
+  const second = await drawn(strips.nth(1));
+  expect(Math.round(second.y - (first.y + first.height))).toBe(12);
+});
+
+test('a word and its count share a baseline in every theme: Units\u2019 reset and the table\u2019s Hidden', async ({
+  page,
+}) => {
+  // The count is set in the numeric face, another font in Hardhat and Neo-noir, whose line box is
+  // not the body's: centred beside the word its digit sits off the line (docs/LEARNINGS.md,
+  // 2026-10-10), read here with the count shrunk, which no agreeing metrics can hide. A custom
+  // hidden unit first, so Units' reset shows its count.
+  await page.goto('/?a=foot&v=6.3');
+  await ready(page);
+  const region = page.getByRole('region', { name: 'Length' });
+  await region.getByRole('button', { name: 'Edit', exact: true }).click();
+  await pressControl(
+    region.getByRole('group', { name: 'US (customary)', exact: true }).getByLabel(/inches/),
+  );
+  await region.getByRole('button', { name: 'Done' }).click();
+  await settingsButton(page, 'Units').click();
+  const reset = settingsPanel(page, 'Units').getByRole('button', {
+    name: /^Show custom hidden units/,
+  });
+  await expect(reset).toContainText('1');
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    expect(await countOffBaseline(reset), `${theme.id} reset`).toBeLessThan(0.5);
+    expect(await countOffBaseline(hiddenToggle(page)), `${theme.id} Hidden`).toBeLessThan(0.5);
+  }
 });
 
 test('fractions, both, and rounding write the values and never move the columns', async ({

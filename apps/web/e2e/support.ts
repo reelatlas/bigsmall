@@ -301,3 +301,55 @@ export const aboutPanel = (page: Page, name: string) =>
 export async function sketchbookReady(page: Page) {
   await page.locator('[data-playing]').waitFor();
 }
+
+/**
+ * Where each run of text in an element sits: the y of its baseline, one per run, the visually
+ * hidden ones left out. A zero-size inline-block rests on the baseline of the line it is in (CSS 2
+ * §10.8), so each run is wrapped for a moment with one after it and the probe's top read; a run
+ * that is a flex item of its own keeps its layout wrapped, since a span as a flex item is laid out
+ * as the anonymous item was. Text beside text aligns on the baseline (docs/LEARNINGS.md,
+ * 2026-10-10): a word and its count in another face share one when the spread is under half a pixel; centred
+ * beside each other instead, a monospace digit's sits about a pixel higher.
+ */
+export async function baselines(locator: Locator): Promise<number[]> {
+  return locator.evaluate((element) => {
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    const runs: Text[] = [];
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const text = node as Text;
+      if (!text.textContent?.trim() || text.parentElement?.closest('.sr-only')) continue;
+      runs.push(text);
+    }
+    return runs.map((text) => {
+      const wrap = document.createElement('span');
+      const probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0';
+      text.replaceWith(wrap);
+      wrap.append(text, probe);
+      const top = probe.getBoundingClientRect().top;
+      wrap.replaceWith(text);
+      return top;
+    });
+  });
+}
+
+/** The spread of a few baselines: zero when they are one. */
+export const spread = (tops: number[]) => Math.max(...tops) - Math.min(...tops);
+
+/**
+ * How far a count sits off its word's baseline, read with the count shrunk to 8 px: on one baseline
+ * (`LABEL_WITH_COUNT`) a smaller digit still sits on the line, so the spread stays at zero; centred
+ * beside the word instead, it rises with its line box. Read at the count's own size, fonts whose
+ * metrics happen to agree at one zoom can hide a centring, as Hardhat's did on 2026-10-19.
+ */
+export async function countOffBaseline(locator: Locator): Promise<number> {
+  const counts = locator.locator('.font-numeric');
+  const size = (value: string) =>
+    counts.evaluateAll((spans, size) => {
+      for (const span of spans) (span as HTMLElement).style.fontSize = size;
+    }, value);
+  await size('8px');
+  const tops = await baselines(locator);
+  await size('');
+  return spread(tops);
+}

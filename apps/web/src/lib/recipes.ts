@@ -41,6 +41,15 @@ export const GROUP_TITLE = 'text-xs font-medium text-ink-muted';
 /** A count beside a label (Hidden's, Units' reset, the matches' groups): its digits at the regular weight. */
 export const COUNT = 'font-numeric font-normal';
 
+/**
+ * A word and its count on one baseline (Hidden's, Units' reset, the matches' groups, the category
+ * menu's choices): the count is set in the numeric face, another font in some themes, whose line
+ * box is not the body's, so centred beside the word its digit sits off the line, by a pixel or more
+ * as the fonts and the zoom fall (docs/LEARNINGS.md, 2026-10-10). An icon beside the pair is
+ * centred against the pair, outside it.
+ */
+export const LABEL_WITH_COUNT = 'flex items-baseline gap-1.5';
+
 /** A line over a row or a foot that fills, 4 px from it; each use sets its own margin. */
 export const ROW_RULE = 'border-t border-line pt-1';
 

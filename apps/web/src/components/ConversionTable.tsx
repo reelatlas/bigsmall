@@ -24,6 +24,7 @@ import { useKept } from '../lib/keeping';
 import {
   CHOICE_FILL,
   COUNT,
+  LABEL_WITH_COUNT,
   CURSOR_ROW,
   cx,
   LIST_CARD,
@@ -962,7 +963,7 @@ export function ConversionTable<T extends ConversionRow>({
                   className={cx('transition-transform', !hiddenOpen && '-rotate-90')}
                 />
                 {/* The word and its count on one baseline, as the matches' headers; the icon centred. */}
-                <span className="flex items-baseline gap-1.5">
+                <span className={LABEL_WITH_COUNT}>
                   Hidden
                   <span className={COUNT}>{hiddenCount}</span>
                 </span>

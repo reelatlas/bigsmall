@@ -9,6 +9,7 @@ import {
   calculatorButton,
   calculatorPanel,
   copyCell,
+  countOffBaseline,
   expectNoA11yViolations,
   hiddenToggle,
   MARGIN_MS,
@@ -281,6 +282,10 @@ test('open, the category menu is two columns as wide as the menu, down the first
     expect(overflowing, theme.id).toEqual([]);
     // A bare number on screen; screen readers hear "2 matches".
     await expect(page.getByRole('radio', { name: /^Volume \d+ matches$/ })).toBeAttached();
+    // The count on the name's baseline, in the numeric face's own line box (docs/LEARNINGS.md,
+    // 2026-10-10).
+    const volume = shell.locator('label').filter({ hasText: /^Volume/ });
+    expect(await countOffBaseline(volume), theme.id).toBeLessThan(0.5);
     await page.keyboard.press('Escape');
   }
 });

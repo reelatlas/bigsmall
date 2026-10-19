@@ -3,6 +3,7 @@ import { useId, useLayoutEffect, useRef } from 'react';
 import { panelKeys } from '../lib/panel-keys';
 import {
   COUNT,
+  LABEL_WITH_COUNT,
   CURSOR_ROW,
   cx,
   GROUP_TITLE,
@@ -181,7 +182,8 @@ export function UnitMatches({
                       id={headerId}
                       className={cx(
                         GROUP_TITLE,
-                        'col-span-2 flex items-baseline gap-1.5 px-2 pb-1',
+                        LABEL_WITH_COUNT,
+                        'col-span-2 px-2 pb-1',
                         groupIndex === 0 ? 'pt-1' : 'mt-1.5 border-t border-line pt-2',
                         stickTop !== undefined && STUCK_HEADING,
                       )}

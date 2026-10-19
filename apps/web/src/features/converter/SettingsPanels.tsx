@@ -15,7 +15,7 @@ import {
 import { track } from '../../lib/analytics';
 import { useCopied } from '../../lib/copied';
 import { SidePanel } from '../../components/SidePanel';
-import { COUNT, cx, GROUP_TITLE, ROW_RULE } from '../../lib/recipes';
+import { COUNT, cx, GROUP_TITLE, LABEL_WITH_COUNT, ROW_RULE } from '../../lib/recipes';
 import {
   displayChanged,
   FRESH_DISPLAY,
@@ -120,7 +120,11 @@ function FractionSizes({
     onChange(next);
   };
   return (
-    <fieldset className="grid">
+    // Two strips stacked sit 12 px apart with any pointer: on a touch screen the taps' room around
+    // the drawings gives it (44 px labels on 32 px drawings), with a mouse the group's own gap,
+    // since the drawing is then the whole target (docs/DESIGN-SYSTEM.md, "Settings"; until
+    // 2026-10-19 the rows touched on a mouse, the gap having been the taps' room alone).
+    <fieldset className="grid gap-y-3 pointer-coarse:gap-y-0">
       <legend className={GROUP_TITLE}>{legend}</legend>
       {SIZE_ROWS.map((sizes) => (
         <SegmentedToggles<FractionSize>
@@ -247,8 +251,10 @@ export function UnitsPanel({ settings, preference, onSettings, onClose }: Settin
           }}
           pointer={pointerProps('unhide')}
         >
-          Show custom hidden units
-          {hiddenCount > 0 && <span className={COUNT}>{hiddenCount}</span>}
+          <span className={LABEL_WITH_COUNT}>
+            Show custom hidden units
+            {hiddenCount > 0 && <span className={COUNT}>{hiddenCount}</span>}
+          </span>
         </Reset>
         <Reset
           off={!orderChanged(settings, preference)}

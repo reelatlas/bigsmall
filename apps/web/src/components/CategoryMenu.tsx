@@ -2,6 +2,7 @@ import type { Category, CategoryId } from '@bigsmall/core';
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import {
   COUNT,
+  LABEL_WITH_COUNT,
   cx,
   MENU_CHEVRON,
   MENU_OPTION,
@@ -283,15 +284,18 @@ export function CategoryMenu({
                     onChange={() => setReached(category.id)}
                     className="sr-only"
                   />
-                  {category.name}
-                  {/* A bare number, as the matches' group headers show it ("Weight 2"); the word
-                      stays for screen readers. */}
-                  {count !== undefined && count > 0 && (
-                    <span className={cx(COUNT, 'text-xs text-ink-muted')}>
-                      {count}
-                      <span className="sr-only"> {count === 1 ? 'match' : 'matches'}</span>
-                    </span>
-                  )}
+                  {/* The name and its count on one baseline, the count at the choice's end. */}
+                  <span className={cx(LABEL_WITH_COUNT, 'flex-1 justify-between')}>
+                    {category.name}
+                    {/* A bare number, as the matches' group headers show it ("Weight 2"); the
+                        word stays for screen readers. */}
+                    {count !== undefined && count > 0 && (
+                      <span className={cx(COUNT, 'text-xs text-ink-muted')}>
+                        {count}
+                        <span className="sr-only"> {count === 1 ? 'match' : 'matches'}</span>
+                      </span>
+                    )}
+                  </span>
                 </label>
               );
             })}

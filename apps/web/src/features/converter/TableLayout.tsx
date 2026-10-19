@@ -323,7 +323,6 @@ export function TableLayout({
   const [stick, setStick] = useState({ height: 0, gap: 0, boxTop: 0, on: false });
   const [stuck, setStuck] = useState(false);
   // The same, readable by an effect at the moment a panel closes, before the observer has spoken.
-  const stuckRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -383,22 +382,18 @@ export function TableLayout({
   }, [hasSide]);
   // Below md a panel sits between the box and the table, and the head stays stuck over it (Sean,
   // 2026-10-18). Opening one while the page is scrolled, or switching to another, puts it where
-  // the box's row is, above the window or behind the head, and Chrome's scroll anchoring then
-  // keeps the table's row in place; so unless the panel is already in view under the head, the
-  // page scrolls to the grid's top: the head at the window's top, the panel under it. Closing one
-  // takes its height out of the flow, and Chrome's anchoring would pull the page up by as much,
-  // the head sliding down out of its stuck place; the head stays where it was. From md the panel
-  // sticks beside the head instead (TABLE_SIDE_CELL), so nothing moves.
+  // the box's row is, above the window or behind the head; so unless the panel is already in view
+  // under the head, the page scrolls to the grid's top: the head at the window's top, the panel
+  // under it. Closing one takes its height out of the flow and the rows move up under the stuck
+  // head, the page itself still, since the page opts out of scroll anchoring (global.css, ADR
+  // 0025); Chrome's anchoring once pulled the page up by as much, and the head slid down. From
+  // md the panel sticks beside the head instead (TABLE_SIDE_CELL), so nothing moves.
   useLayoutEffect(() => {
     const grid = gridRef.current;
     const head = headRef.current;
     if (!grid || !head || !sideBelow) return;
     const panel = sideRef.current;
-    if (!panel) {
-      const { top } = head.getBoundingClientRect();
-      if (stuckRef.current && top > 0) window.scrollBy(0, top);
-      return;
-    }
+    if (!panel) return;
     const rect = panel.getBoundingClientRect();
     const covered = head.getBoundingClientRect().bottom;
     // In view: under the head's edge, or the window's top where the head does not stick and has
@@ -426,7 +421,6 @@ export function TableLayout({
     if (!sentinel || typeof IntersectionObserver === 'undefined') return;
     const watcher = new IntersectionObserver(([entry]) => {
       const on = sticking && !!entry && !entry.isIntersecting;
-      stuckRef.current = on;
       setStuck(on);
     });
     watcher.observe(sentinel);
@@ -672,15 +666,15 @@ export function TableLayout({
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       const input = inputRef.current;
       const target = event.target as Node;
-      // An open menu keeps its keys (docs/UX-SPEC.md §8, as the header's menus do): a letter on
-      // the category menu's choice or on More's item never types into the box.
-      if ((target as Element).closest('[data-open]')) return;
       if (!input || target === input || event.defaultPrevented || event.isComposing) return;
       const parts = sideTypes
         ? [toolsRef, fieldRef, placeRef, sideRef]
         : [toolsRef, fieldRef, placeRef];
       const own = parts.some((part) => part.current?.contains(target));
       if (!own) return;
+      // An open menu keeps its keys (docs/UX-SPEC.md §8, as the header's menus do): a letter on
+      // the category menu's choice or on More's item never types into the box.
+      if ((target as Element).closest('[data-open]')) return;
       if (event.key === 'Escape') {
         if ((target as Element).closest('[data-tool]')) return;
         event.preventDefault();

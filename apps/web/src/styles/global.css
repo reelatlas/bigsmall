@@ -290,6 +290,10 @@
   html {
     background: var(--canvas);
     color: var(--ink);
+    /* No scroll anchoring, in Chrome as in Safari, which has none: what must stay put as the
+       page changes above it is kept by hand (src/lib/keeping.ts), the same in every engine, and
+       nothing moves the page that the page did not ask for (ADR 0025). */
+    overflow-anchor: none;
     font-family: var(--type-body);
     -webkit-text-size-adjust: 100%;
     /* The room a classic scrollbar takes is kept whether or not one shows, so a side panel that

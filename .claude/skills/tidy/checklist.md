@@ -41,7 +41,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 
 ## Patterns, not band-aids
 
-- A fix reaches for the platform's own mechanism first (sticky, a pseudo-element, scroll anchoring, a combobox's standard manners); where the platform lacks it, the smallest stand-in, scoped to one place and documented as a pattern in `docs/DESIGN-SYSTEM.md` with the standard it stands in for and when to retire it (the stuck-state sentinel until `scroll-state()` container queries reach WebKit; the by-hand scroll anchoring until Safari anchors). A stand-in that names no standard, or none that could be retired, is a finding (Sean, 2026-10-17).
+- A fix reaches for the platform's own mechanism first (sticky, a pseudo-element, scroll anchoring, a combobox's standard manners); where the platform lacks it, the smallest stand-in, scoped to one place and documented as a pattern in `docs/DESIGN-SYSTEM.md` with the standard it stands in for and when to retire it (the stuck-state sentinel until `scroll-state()` container queries reach WebKit); a platform behavior the page opts out of says so once, in CSS and in an ADR (scroll anchoring, ADR 0025: what must stay put is kept by hand, `keeping`, in every engine). A stand-in that names no standard, or none that could be retired, is a finding (Sean, 2026-10-17).
 - No padding-and-negative-margin tricks where a pseudo-element keeps the geometry honest; no speculative fixes stacked on a symptom that was not measured; no numbers tuned to one machine. A workaround says so in its comment and in the docs rather than passing for the design.
 - A change made twice the same way becomes one recipe, component, hook, or effect; the third time it is a named pattern in the design system.
 

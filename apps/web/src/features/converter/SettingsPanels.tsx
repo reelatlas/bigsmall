@@ -151,7 +151,7 @@ function FractionSizes({
   );
 }
 
-export interface SettingsPanelProps {
+interface SettingsPanelProps {
   settings: Settings;
   preference: UnitPreference;
   onSettings: (update: (settings: Settings) => Settings) => void;

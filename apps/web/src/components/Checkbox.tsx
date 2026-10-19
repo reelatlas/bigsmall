@@ -11,10 +11,10 @@ export interface CheckboxProps extends Omit<
 
 /**
  * The drawn box: the native input's state, read through `peer`. Its ring is the one focus ring
- * (global.css), drawn here since the input itself is out of sight.
+ * (`focus-ring-peer`, global.css), on the box since the input itself is out of sight.
  */
 const BOX =
-  'pointer-events-none absolute inset-0 rounded-sm border-2 border-edge bg-surface transition-colors peer-checked:border-accent peer-checked:bg-accent peer-indeterminate:border-accent peer-indeterminate:bg-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus';
+  'pointer-events-none absolute inset-0 rounded-sm border-2 border-edge bg-surface transition-colors peer-checked:border-accent peer-checked:bg-accent peer-indeterminate:border-accent peer-indeterminate:bg-accent focus-ring-peer';
 
 /**
  * A checkbox the design draws (docs/DESIGN-SYSTEM.md, "A list of choices"; 2026-10-18): the native

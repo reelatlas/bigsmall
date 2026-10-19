@@ -4,7 +4,7 @@ import { cx } from '../lib/recipes';
 export type ButtonVariant = 'primary' | 'secondary' | 'tonal' | 'soft' | 'ghost';
 
 // className is a plain string, as in React: Preact's own typing also allows a signal there.
-export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   className?: string | undefined;
   /**
    * ghost: icon actions on the page (undo, copy, clear all). secondary: bordered text button.

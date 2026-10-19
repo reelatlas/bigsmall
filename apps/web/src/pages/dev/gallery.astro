@@ -19,7 +19,7 @@ import { Keycap } from '../../components/Keycap';
 import { FieldSamples } from './_gallery/FieldSamples';
 import { SettingSamples } from './_gallery/SettingSamples';
 import DevPage from '../../layouts/DevPage.astro';
-import { LINK, QUIET_LINK, SECTION_HEADING } from '../../lib/recipes';
+import { INLINE_LINK, LINK, QUIET_LINK, SECTION_HEADING } from '../../lib/recipes';
 import { THEMES, TOKEN_CONTRACT } from '../../lib/themes';
 
 // Every component in every theme, in the variants and states that ship, for visual QA
@@ -138,6 +138,13 @@ const swatches = TOKEN_CONTRACT.colors;
           <a href="/about/" class={QUIET_LINK}>
             About
           </a>
+          <p class="text-sm text-ink-muted">
+            A sentence with{' '}
+            <a href="/about/" class={INLINE_LINK}>
+              a link in it
+            </a>
+            , as the privacy line has.
+          </p>
         </div>
       </section>
     ))}

@@ -23,9 +23,11 @@ export const CARD = 'rounded-lg border border-line bg-surface';
  * The card of the table's place (the start's tiles, the category's units, the matches), the list
  * the box's cursor moves through: a control's 2 px edge, like the box above it, since it is the
  * box's popup (ADR 0012) and holds the rows people pick. Its rows' corners nest in it
- * (rounded-nested). Sean, 2026-10-08.
+ * (rounded-nested). Sean, 2026-10-08. The edge itself is FIELD_EDGE, a field's resting edge,
+ * which the calculator's display takes too (docs/DESIGN-SYSTEM.md, "Calculator").
  */
-export const LIST_CARD = 'rounded-lg border-2 border-edge bg-surface';
+export const FIELD_EDGE = 'rounded-lg border-2 border-edge bg-surface';
+export const LIST_CARD = FIELD_EDGE;
 
 /**
  * A panel's title, naming its group as a label names what it labels: the calculator's and the
@@ -64,17 +66,18 @@ export const PANEL_HEADING = cx('pl-1', PANEL_TITLE);
  * own, since in the body's column (Base.astro) side margins of auto would shrink it to its content.
  * Its size is the stock one above the converter's column, a side panel, and their gutters
  * (576 + 16 + 320, and 16 each side; 896 until 2026-10-17, when the box gave up 48 px beside an
- * open panel); since 2026-10-18 the converter page's main spans the window instead (CONVERTER_MAIN),
- * so a panel may use the window's margin, and this column bounds the other pages and their footer
- * (the converter page's is CONVERTER_FOOT). Centered with its left edge on a whole pixel (`mx-page`, global.css), since the
- * scrollbar's room or an odd window would otherwise put the column on a half.
+ * open panel); since 2026-10-18 the converter page's main spans the window instead
+ * (CONVERTER_MAIN), so a panel may use the window's margin, and this column bounds the other pages
+ * and their footer (the converter page's is CONVERTER_FOOT). Centered with its left edge on a
+ * whole pixel (`mx-page`, global.css), since the scrollbar's room or an odd window would otherwise
+ * put the column on a half.
  */
 export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-frame';
 
 /**
  * A page's main column (About, 404, and the dev pages; the converter page's is CONVERTER_MAIN),
- * with the page's frame:
- * the frame token (--page-frame, global.css: Material's layout margin, 16 px on a phone and 24
+ * with the page's frame: the frame token (--page-frame, global.css: Material's layout margin, 16
+ * px on a phone and 24
  * from sm), PAGE_COLUMN's gutter sideways and this at the top, which the header's row sits on,
  * and at the bottom 48 px (pb-12), so a long page's content ends clear of the foot, which sits on
  * the frame itself (Sean, 2026-10-18: the foot hugged the last card; three frames, tried first,
@@ -82,7 +85,8 @@ export const PAGE_COLUMN = 'mx-page w-full max-w-5xl px-frame';
  * (docs/DESIGN-SYSTEM.md, "The page's two ends mirror"; Sean, 2026-10-18: one logic on every
  * side and every screen, a standard's ratio where it scales, nothing of its own over the header).
  */
-export const PAGE_MAIN = cx(PAGE_COLUMN, 'pt-frame pb-12');
+const MAIN_ENDS = 'pt-frame pb-12';
+export const PAGE_MAIN = cx(PAGE_COLUMN, MAIN_ENDS);
 
 /**
  * The content column, one width on every page (Sean, 2026-10-18): the converter's toolbar, box,
@@ -97,8 +101,8 @@ export const CONTENT_COLUMN = 'mx-auto w-full max-w-xl';
 
 /**
  * The converter page's main from md: the page's frame as padding (48 px at the bottom, as
- * PAGE_MAIN) and a grid of three tracks
- * (`grid-cols-margin-box-and-side` in global.css): the page's margin, the content column's cap,
+ * PAGE_MAIN) and a grid of three tracks (`grid-cols-margin-box-and-side` in global.css): the
+ * page's margin, the content column's cap,
  * then a side panel's own width. Not the page column (PAGE_COLUMN), since the panel may sit past
  * it in the window's margin. With no panel the column sits where it does on every page, centered;
  * a panel opening beside the box takes the window's margin first, and the column slides left only
@@ -112,24 +116,30 @@ export const CONTENT_COLUMN = 'mx-auto w-full max-w-xl';
  * the third. The footer under the page is the same grid (CONVERTER_FOOT), its line in the column's
  * track, so it follows the column when a panel slides it (Sean, 2026-10-18).
  */
-export const CONVERTER_GRID = 'md:grid md:grid-cols-margin-box-and-side';
-export const CONVERTER_MAIN = cx('w-full px-frame pt-frame pb-12', CONVERTER_GRID);
+const CONVERTER_GRID = 'md:grid md:grid-cols-margin-box-and-side';
+export const CONVERTER_MAIN = cx('w-full px-frame', MAIN_ENDS, CONVERTER_GRID);
 export const IN_CONVERTER_GRID = 'md:col-span-3 md:grid md:grid-cols-subgrid';
 /** A cell of the converter's column: the grid's second track, after the page's margin. */
 export const COLUMN_CELL = 'md:col-start-2';
+/**
+ * The footer's own: after the content, or at the window's bottom on a short page (mt-auto in the
+ * body's column, Base.astro), on the page's frame (pb-frame), in the small size (SiteFooter).
+ */
+export const FOOT = 'mt-auto pb-frame text-sm';
 /**
  * The converter page's footer: the same three tracks as its main (CONVERTER_GRID), its line in
  * the column's track (COLUMN_CELL), so the About link starts where the name does and follows the
  * column when a panel slides it (Sean, 2026-10-18: the foot aligned to the column wherever it
  * is). The other pages' footer sits on the page column (SiteFooter).
  */
-export const CONVERTER_FOOT = cx('mt-auto w-full px-frame pb-frame text-sm', CONVERTER_GRID);
+export const CONVERTER_FOOT = cx(FOOT, 'w-full px-frame', CONVERTER_GRID);
 
 /**
- * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; a trial, Sean,
- * 2026-10-17), the canvas behind it. The stuck layers, lowest to highest: the rows (no z-index), a
- * section's name (5), the head, the toolbar and the box (10, `TABLE_HEAD_CELL` in TableLayout), and an open shell over all
- * of them (`SHELL`, 20). Its `top` is set in line, from the box's measured height.
+ * A section's name stuck under the box while the table scrolls (docs/UX-SPEC.md §1; Sean,
+ * 2026-10-17, kept the same day), the canvas behind it. The stuck layers, lowest to highest: the
+ * rows (no z-index), a section's name (5), the head, the toolbar and the box (10,
+ * `TABLE_HEAD_CELL` in TableLayout), and an open shell over all of them (`SHELL`, 20). Its `top`
+ * is set in line, from the box's measured height.
  */
 export const STUCK_HEADING = 'sticky z-5 bg-canvas';
 
@@ -219,9 +229,6 @@ export const MENU_TRIGGER =
 export const MENU_CHEVRON =
   'ml-auto shrink-0 text-ink-muted transition-transform group-data-open:rotate-180';
 
-/** The labs' checkbox: the native one, 16 px, in the accent. The product's is `Checkbox`, drawn. */
-export const CHECKBOX = 'size-4 accent-accent';
-
 /**
  * A row holding a control, filled as the table's cursor fills a row: under the pointer, and while
  * its control has the keyboard's focus, whose own ring stays (Sean, 2026-10-15). A whole row is the
@@ -236,10 +243,10 @@ export const CHOICE_ROW = 'flex min-h-11 items-center rounded-nested-md px-2 tex
 const OPTION_BASE = cx(CHOICE_ROW, 'cursor-pointer');
 
 /**
- * A setting's row, a checkbox's, filled under the pointer and while its control has
- * focus (CHOICE_FILL).
+ * A setting's row, a checkbox's with its words 8 px from it, filled under the pointer and while
+ * its control has focus (CHOICE_FILL).
  */
-export const OPTION_ROW = cx(OPTION_BASE, CHOICE_FILL);
+export const OPTION_ROW = cx(OPTION_BASE, 'gap-2', CHOICE_FILL);
 
 /**
  * A menu's choice: a label around its visually hidden radio, the checked one in the accent's soft

@@ -44,7 +44,7 @@
   --color-accent-soft-hover: color-mix(in srgb, var(--accent-soft) 60%, var(--surface));
 
   /*
-   * The page's frame, one spacing token (px-frame, py-frame, pb-frame, -mx-frame) the page's
+   * The page's frame, one spacing token (px-frame, pt-frame, pb-frame, -mx-frame) the page's
    * column, its padding, the footer, and the sketchbook's bleed read: Material's layout margin,
    * 16 px on a compact screen and 24 from sm, set once in the base layer (--page-frame), so the
    * step lives in one place (docs/DESIGN-SYSTEM.md, "The page's two ends mirror").
@@ -116,6 +116,17 @@
 }
 
 /*
+ * The ring on a drawn control whose input is out of sight (Checkbox): the box takes the base ring
+ * when its peer, the input before it, has focus, so the ring is still defined once.
+ */
+@utility focus-ring-peer {
+  .peer:focus-visible ~ & {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+/*
  * A row that scrolls sideways without a bar (the converter's toolbar on a touch screen, ADR
  * 0023): the fade at each edge says where more waits, and a swipe is the way along it.
  */
@@ -145,8 +156,9 @@
 }
 
 /*
- * A side panel's room beside a stuck head (SIDE_PANEL_WIDTH, src/features/converter/TableLayout.tsx,
- * 2026-10-18): the card inside the wrapper scrolls its own content below the window's height less
+ * A side panel's room beside a stuck head (SIDE_PANEL_WRAP, src/features/converter/
+ * TableLayout.tsx, 2026-10-18): the card inside the wrapper scrolls its own content below the
+ * window's height less
  * the page's frame, --side-max set in line on the wrapper from the measured top. The card itself
  * scrolls, not a wrapper around it, so its border, ring, and corners stay whole (docs/LEARNINGS.md,
  * "A panel beside a stuck head opened where the head was"). A utility, since a class reading a
@@ -168,8 +180,9 @@
  * opening). The page learns that a panel is open through :has() at its root (--side-track, the base
  * layer), from the cell the layout renders only then (data-side-cell), so no script tells the page
  * and the footer, a grid of the same tracks (CONVERTER_FOOT), follows the column (2026-10-18); the
- * margin track rounds down to a whole pixel (docs/LEARNINGS.md, "A grid track from a division lands on fractional pixels"). A utility,
- * since a class cannot name the token (docs/LEARNINGS.md, 2026-10-17).
+ * margin track rounds down to a whole pixel (docs/LEARNINGS.md, "A grid track from a division
+ * lands on fractional pixels"). A utility, since a class cannot name the token (docs/LEARNINGS.md,
+ * 2026-10-17).
  */
 @utility grid-cols-margin-box-and-side {
   grid-template-columns:

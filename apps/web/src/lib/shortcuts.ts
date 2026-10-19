@@ -9,7 +9,7 @@
  */
 export type Key = string;
 
-export interface Shortcut {
+interface Shortcut {
   action: string;
   /** Alternatives, shown separated by "or"; each is the keys pressed together, in order. */
   keys: readonly (readonly Key[])[];

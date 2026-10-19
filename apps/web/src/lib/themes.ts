@@ -10,10 +10,10 @@ export const THEME_STORAGE_KEY = 'bigsmall:theme';
 
 export type ThemeId = 'daylight' | 'midnight' | 'sakura' | 'neo-noir' | 'hardhat' | 'theorem';
 
-export type ThemeScheme = 'light' | 'dark';
+type ThemeScheme = 'light' | 'dark';
 
 /** baseline: the reference theme · palette: tokens only, no decoration yet · designed: finished */
-export type ThemeStatus = 'baseline' | 'palette' | 'designed';
+type ThemeStatus = 'baseline' | 'palette' | 'designed';
 
 export interface ThemeMeta {
   id: ThemeId;

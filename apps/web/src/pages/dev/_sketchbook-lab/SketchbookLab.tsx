@@ -20,9 +20,9 @@ import {
 } from '../../../features/sketchbook/sketches';
 import { useCopied } from '../../../lib/copied';
 import { useIsHydrated } from '../../../lib/hydrated';
-import { CARD, CHECKBOX, cx } from '../../../lib/recipes';
+import { CARD, cx } from '../../../lib/recipes';
 import { FRAME_MS, SKETCHBOOK_TIMING } from '../../../lib/timing';
-import { CHECK, FIELD, HEADING, Panel, SELECT, Slider } from '../_lab/controls';
+import { CHECK, CHECKBOX, FIELD, HEADING, Panel, SELECT, Slider } from '../_lab/controls';
 import { PRESETS, SHIPPED } from './presets';
 
 // Development page: tunes the sketchbook at play (pages/dev/sketchbook-lab.astro). Settings apply

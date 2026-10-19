@@ -28,7 +28,7 @@ interface ChipProps {
  * never goes compact, then a chevron: its body opens every ingredient to choose from, and
  * `expanded` turns the chevron over while they show (a trial, Sean, 2026-10-16).
  */
-export type UnitChipProps = ChipProps &
+type UnitChipProps = ChipProps &
   (
     | { unit: Unit; ingredient?: undefined; expanded?: undefined }
     | { ingredient: Ingredient; unit?: undefined; expanded?: boolean }

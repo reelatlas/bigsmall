@@ -15,12 +15,11 @@ import { CheckIcon, CopyIcon } from '../../../components/icons';
 import {
   ART_LINE,
   CARD,
-  CHECKBOX,
   cx,
   PLAYING_LINE,
-  type WordmarkSize,
   WORDMARK_FACE,
   WORDMARK_SIZES,
+  type WordmarkSize,
 } from '../../../lib/recipes';
 import {
   play,
@@ -30,7 +29,7 @@ import {
 } from '../../../lib/wordmark-motion';
 import { useCopied } from '../../../lib/copied';
 import { FRAME_MS, WORDMARK_TIMING } from '../../../lib/timing';
-import { CHECK, FIELD, HEADING, INPUT, Panel, SELECT, Slider } from '../_lab/controls';
+import { CHECK, CHECKBOX, FIELD, HEADING, INPUT, Panel, SELECT, Slider } from '../_lab/controls';
 import { PRESETS, SHIPPED } from './presets';
 import {
   ART_GLYPHS,

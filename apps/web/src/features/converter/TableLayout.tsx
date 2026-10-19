@@ -46,8 +46,9 @@ import type { ConverterEnv } from './useConverter';
 
 /**
  * The converter from md (docs/UX-SPEC.md §1): the toolbar, the box, and its table in the page's
- * first track, and the side panel open (the calculator, Units, or Display) in the second, on
- * their right, its top level with the box's (Sean, 2026-10-15). The tracks are the page grid's
+ * column, the grid's second track after the page's margin (COLUMN_CELL), and the side panel open
+ * (the calculator, Units, or Display) in the third, on their right, its top level with the box's
+ * (Sean, 2026-10-15). The tracks are the page grid's
  * (`main`, CONVERTER_GRID), handed down by subgrids, so the header over them is as wide as the box
  * (Sean, 2026-10-17); the rows are this grid's own. The panel spans the box's row, the table's,
  * and the last, 1fr, which takes whatever of it is taller than the box and the table, so the table
@@ -59,11 +60,11 @@ const TABLE_GRID = cx(IN_CONVERTER_GRID, 'md:grid-rows-[auto_auto_auto_1fr]');
  * The head of the table: the toolbar and the box as one block (Sean, 2026-10-17: the category in
  * view and changeable while a long table scrolls), a subgrid over the grid's first two rows from
  * md, so the side panel's top still sits on the box's. Stuck to the window's top while the table
- * scrolls where the window is tall enough (`data-stick` on the layout, measured below; a trial):
- * the canvas behind it, reaching one step past the column on both sides so a card's ring or shadow
- * passing under it paints behind it, not beside it (Sean, 2026-10-18), and a strip of canvas under
- * it as deep as the gap to the table
- * (`after:h-2`, the rows cell's `mt-2`), cover the rows passing under; the strip's lower edge is a
+ * scrolls where the window is tall enough (`data-stick` on the layout, measured below; Sean,
+ * 2026-10-17, kept the same day): the canvas behind it, reaching one step past the column on both
+ * sides so a card's ring or shadow passing under it paints behind it, not beside it (Sean,
+ * 2026-10-18), and a strip of canvas under it as deep as the gap to the table (`after:h-2`, the
+ * rows cell's `mt-2`), cover the rows passing under; the strip's lower edge is a
  * rule only while the head is stuck (`data-stuck`). Drawn by a pseudo-element, so the head keeps
  * its own size. Over a section's name (STUCK_HEADING, 5) and under an open shell (SHELL, 20).
  */
@@ -127,7 +128,7 @@ const TABLE_SIDE_CELL = cx(
  * border, ring, and corners stay whole while its content scrolls (a wrapper clipped the card's
  * edges; docs/LEARNINGS.md, 2026-10-18).
  */
-const SIDE_PANEL_WIDTH = 'max-w-sm md:max-w-none group-data-stick/stick:md:side-panel-room';
+const SIDE_PANEL_WRAP = 'max-w-sm md:max-w-none group-data-stick/stick:md:side-panel-room';
 
 /**
  * Keys that type into the field from a control beside it (a toolbar's, the chip, a copy button):
@@ -177,7 +178,7 @@ export interface ToolbarTool {
   dividerBefore?: boolean;
 }
 
-export interface TableLayoutProps {
+interface TableLayoutProps {
   /** The toolbar's tools after the category menu, in the order they show. */
   tools: readonly ToolbarTool[];
   /** What shows and how it looks (settings.ts). */
@@ -312,7 +313,8 @@ export function TableLayout({
 
   /**
    * The head, the toolbar and the box, stays at the window's top while the table scrolls, the
-   * section names under it (a trial, Sean, 2026-10-17; docs/UX-SPEC.md §1). Measured, never
+   * section names under it (Sean, 2026-10-17, kept the same day; docs/UX-SPEC.md §1). Measured,
+   * never
    * counted: the head's height says where a name sticks under it, a pixel under the strip's edge
    * (docs/LEARNINGS.md, "Stacked sticky headers"), and nothing sticks where the window is shorter
    * than the head, a name, and three rows together (a phone on its side, 400% zoom), so the table
@@ -399,17 +401,15 @@ export function TableLayout({
     }
     const rect = panel.getBoundingClientRect();
     const covered = head.getBoundingClientRect().bottom;
-    // In view: under the head's edge, or the window's top once the head has let go (its edge is
-    // above the window then).
+    // In view: under the head's edge, or the window's top where the head does not stick and has
+    // scrolled off (its edge is above the window then).
     if (rect.top >= Math.max(0, covered) && rect.bottom <= window.innerHeight) return;
     window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY });
   }, [hasSide, sideKey, sideBelow]);
   /**
    * The head sticks whenever the window is tall enough for it, Edit on, Hidden open, or a panel
-   * between the box and the table included (Sean, 2026-10-18): their rows scroll under it as the
-   * table's do. Until then it let go in those states, for their 16 px native checkboxes passing
-   * under the stuck head within a target's safe space of the field (axe's target-size, a real
-   * finding); the checkboxes are drawn by Checkbox now, their rows the 44 px targets.
+   * between the box and the table included (Sean, 2026-10-18): their rows, 44 px targets since
+   * Checkbox drew the box (its docblock has the history), scroll under it as the table's do.
    */
   const sticking = stick.on;
   // A section's name sticks a pixel under the strip's lower edge (the head, then its gap).
@@ -419,7 +419,8 @@ export function TableLayout({
   const sideTop = sticking ? stick.boxTop : undefined;
   // The rule under the head only while it is stuck: a pixel set 2 px over the head's top edge
   // leaves the window exactly then (at 1 px it would touch the window's edge, which still counts
-  // as intersecting).
+  // as intersecting). A stand-in for `@container scroll-state(stuck: top)` until WebKit has it
+  // (docs/DESIGN-SYSTEM.md, "Stuck layers").
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || typeof IntersectionObserver === 'undefined') return;
@@ -1200,7 +1201,7 @@ export function TableLayout({
             style={sideTop === undefined ? undefined : { top: sideTop }}
           >
             <div
-              className={SIDE_PANEL_WIDTH}
+              className={SIDE_PANEL_WRAP}
               style={
                 sideTop === undefined
                   ? undefined

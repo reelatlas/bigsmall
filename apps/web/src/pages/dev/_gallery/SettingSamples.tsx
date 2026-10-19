@@ -3,7 +3,7 @@ import { SegmentedControl, SegmentedToggles } from '../../../components/Segmente
 import { Checkbox } from '../../../components/Checkbox';
 import { SidePanel } from '../../../components/SidePanel';
 import { TriCheckbox } from '../../../components/TriCheckbox';
-import { cx, GROUP_TITLE, OPTION_ROW } from '../../../lib/recipes';
+import { GROUP_TITLE, OPTION_ROW } from '../../../lib/recipes';
 
 // Gallery-only: the settings' controls in frozen states, so every theme is checked against what
 // ships. Nothing here changes; a press does nothing.
@@ -52,15 +52,15 @@ export function SettingSamples({ theme }: { theme: string }) {
       </fieldset>
       <fieldset className="grid">
         <legend className={GROUP_TITLE}>Checkbox: off, on, and on but fixed</legend>
-        <label className={cx(OPTION_ROW, 'gap-2')}>
+        <label className={OPTION_ROW}>
           <Checkbox checked={false} onChange={noop} />
           Off
         </label>
-        <label className={cx(OPTION_ROW, 'gap-2')}>
+        <label className={OPTION_ROW}>
           <Checkbox checked onChange={noop} />
           On
         </label>
-        <label className={cx(OPTION_ROW, 'gap-2')}>
+        <label className={OPTION_ROW}>
           <Checkbox checked disabled onChange={noop} />
           On and fixed
         </label>
@@ -68,7 +68,7 @@ export function SettingSamples({ theme }: { theme: string }) {
       <fieldset className="grid">
         <legend className={GROUP_TITLE}>Checkbox over a group: all, some, none</legend>
         {(['all', 'some', 'none'] as const).map((state) => (
-          <label key={state} className={cx(OPTION_ROW, 'gap-2')}>
+          <label key={state} className={OPTION_ROW}>
             <TriCheckbox state={state} onChange={noop} />
             {state === 'all' ? 'All shown' : state === 'some' ? 'Some shown' : 'None shown'}
           </label>

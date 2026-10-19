@@ -15,7 +15,7 @@ import { ClearIcon } from './icons';
 import { NumberText, runningValue } from './NumberText';
 import { UnitChip } from './UnitChip';
 
-export interface ValueFieldProps {
+interface ValueFieldProps {
   inputRef: RefObject<HTMLInputElement>;
   /** Accessible name of the field. */
   label: string;

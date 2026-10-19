@@ -10,8 +10,10 @@ export const FIELD = FIELD_STACK;
 export const INPUT = TEXT_INPUT;
 export const SELECT = cx(INPUT, 'w-full');
 export const CHECK = 'flex min-h-11 items-center gap-2 text-sm';
+/** The labs' checkbox: the native one, 16 px, in the accent. The product's is `Checkbox`, drawn. */
+export const CHECKBOX = 'size-4 accent-accent';
 
-export interface SliderProps {
+interface SliderProps {
   label: string;
   value: number;
   /** The shipped default, shown beside a changed value. */

@@ -2,6 +2,7 @@ import { useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type ReactNo
 import { useFitStep } from '../lib/fit-step';
 import {
   cx,
+  FIELD_EDGE,
   FIELD_ROW,
   NO_ANSWER,
   NUMBER_SIZES,
@@ -86,7 +87,7 @@ function equalsIn(container: ParentNode | null | undefined): HTMLElement | null 
   return container?.querySelector<HTMLElement>(`[${STOP}="equals"]`) ?? null;
 }
 
-export interface CalculatorProps {
+interface CalculatorProps {
   /** What the display shows, such as a NumberText; empty shows a muted 0. */
   display: ReactNode;
   /**
@@ -294,7 +295,7 @@ export function Calculator({
         </Button>
       </div>
       {/* The display has a field's size and edge, so it reads as where the typing goes. */}
-      <div className="rounded-lg border-2 border-edge bg-surface">
+      <div className={FIELD_EDGE}>
         <div className={FIELD_ROW}>
           <div ref={displayRef} className={cx(DISPLAY_TEXT, size)} data-entry>
             {display || <span className="text-ink-muted">0</span>}
@@ -335,7 +336,7 @@ export function Calculator({
   );
 }
 
-export interface SendButtonProps extends Omit<
+interface SendButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'children' | 'className' | 'disabled'
 > {

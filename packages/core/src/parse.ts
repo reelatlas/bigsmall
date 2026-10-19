@@ -45,7 +45,8 @@ export interface ParsedInput {
 
 // Characters that are easy to get wrong as escapes, so they are named once (the minus in
 // format.ts).
-const NBSP = String.fromCharCode(0x00a0);
+/** The no-break space, named once (an amount and its symbol stay on one line in the web). */
+export const NBSP = String.fromCharCode(0x00a0);
 const NARROW_NBSP = String.fromCharCode(0x202f);
 const TIMES = String.fromCharCode(0x00d7);
 const DIVIDE = String.fromCharCode(0x00f7);

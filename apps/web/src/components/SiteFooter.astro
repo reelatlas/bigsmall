@@ -3,6 +3,7 @@ import {
   COLUMN_CELL,
   CONTENT_COLUMN,
   CONVERTER_FOOT,
+  FOOT,
   INLINE_LINK,
   PAGE_COLUMN,
   QUIET_LINK,
@@ -16,8 +17,9 @@ import {
  * every page but About: one quiet link to it, out of the way until hovered or focused (Sean,
  * 2026-10-15), its 44 px target taken back into its line so the text sits on the frame as a
  * paragraph would. On About, where the name in the header leads home: the privacy line in Sean's
- * words (2026-10-18), its two names inline links (INLINE_LINK) in the sentence to what they name. On a page shorter than the window it sits at the window's
- * bottom, the body being a column at least the window's height (Base.astro), and otherwise after
+ * words (2026-10-18), its two names inline links (INLINE_LINK) in the sentence to what they
+ * name. On a page shorter than the window it sits at the window's bottom, the body being a
+ * column at least the window's height (Base.astro), and otherwise after
  * the content (Sean, 2026-10-15; kept 2026-10-16). The address ends in a slash, as the build writes
  * the page and its canonical address. The foot sits on the page's frame (pb-frame, the frame
  * token: 16 px on a phone, 24 from sm), the link's 44 px target its row, as the header's 48 px
@@ -28,7 +30,7 @@ const onAbout = path === '/about';
 const onConverter = path === '';
 ---
 
-<footer class:list={onConverter ? CONVERTER_FOOT : [PAGE_COLUMN, 'mt-auto pb-frame text-sm']}>
+<footer class:list={onConverter ? CONVERTER_FOOT : [PAGE_COLUMN, FOOT]}>
   <div class:list={[CONTENT_COLUMN, onConverter && COLUMN_CELL]}>
     {onAbout ? (
       <p class="text-ink-muted">

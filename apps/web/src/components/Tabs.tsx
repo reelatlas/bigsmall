@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom';
 import { useIsHydrated } from '../lib/hydrated';
 import { keeping } from '../lib/keeping';
 
-export interface TabItem {
+interface TabItem {
   /** The tab's id: its panel's id too when the tabs are linked, so `#id` in the address opens it. */
   id: string;
   label: string;

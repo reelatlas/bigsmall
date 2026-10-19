@@ -16,7 +16,7 @@ export interface MoreMenuItem {
   keys?: string | undefined;
 }
 
-export interface MoreMenuProps {
+interface MoreMenuProps {
   items: readonly MoreMenuItem[];
   /** Its name as a control of the toolbar it sits in (`data-tool`, ADR 0014). */
   tool?: string;

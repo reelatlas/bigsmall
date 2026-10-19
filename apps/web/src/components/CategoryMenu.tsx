@@ -47,7 +47,7 @@ function revealIn(list: HTMLElement, item: HTMLElement) {
   else if (at.bottom > shown.bottom) list.scrollTop += at.bottom - shown.bottom;
 }
 
-export interface CategoryMenuProps {
+interface CategoryMenuProps {
   categories: readonly Category[];
   /** The category chosen, or null before one is. */
   value: CategoryId | null;

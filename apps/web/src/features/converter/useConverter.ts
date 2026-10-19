@@ -52,7 +52,7 @@ function detectEnv(): ConverterEnv {
   };
 }
 
-export interface ConverterController {
+interface ConverterController {
   state: ConverterState;
   /** The box as the field shows it. */
   box: BoxView;

@@ -58,7 +58,7 @@ function textWidth(line: HTMLElement): number {
 }
 
 /** A phrase as set: the step that fits (null when none does), and its text, broken for two lines. */
-export interface Fitted {
+interface Fitted {
   step: FitStep | null;
   text: string;
 }

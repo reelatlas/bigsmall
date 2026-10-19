@@ -39,7 +39,7 @@ export interface At {
  * starts after the press and how long it lasts in ms, how far it drifts sideways in px, how far
  * it turns in degrees, the points a firefly wanders through in px, and its fill and edge.
  */
-export interface Particle {
+interface Particle {
   x: number;
   y: number;
   size: number;

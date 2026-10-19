@@ -1,7 +1,7 @@
 import type { Category } from '@bigsmall/core';
 import { CURSOR_ROW, cx, LIST_CARD, rowFill } from '../lib/recipes';
 
-export interface CategoryTilesProps {
+interface CategoryTilesProps {
   /** The listbox's id, which the field's combobox controls. */
   id: string;
   categories: readonly Category[];

@@ -13,6 +13,7 @@ import {
   INGREDIENT_KINDS,
   ingredients,
   matchIngredients,
+  NBSP,
   parse,
   resolveExact,
   search,
@@ -75,7 +76,7 @@ export interface ConverterState {
 }
 
 /** Where typing lands: the box, or the calculator's entry. */
-export type TextTarget = 'box' | 'calc';
+type TextTarget = 'box' | 'calc';
 
 /** The part of the state a URL or a later persistence layer restores, through the `hydrate` action. */
 export type Restorable = Partial<Pick<ConverterState, 'text' | 'unit' | 'ingredient'>>;
@@ -251,7 +252,7 @@ export function selectBox(state: ConverterState, options: NumberEnv): BoxView {
  * Why a conversion has no answer to show: beyond what a double holds, rounded to zero, arithmetic
  * with no answer (a division by zero, a power with no real value), or 0 in a reciprocal unit.
  */
-export type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real' | 'zero';
+type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real' | 'zero';
 
 /**
  * What the converter says when there is no answer to show (docs/UX-SPEC.md §1, §8): in full in
@@ -312,7 +313,7 @@ export interface TableRow {
 }
 
 /** A match while a unit is typed: a unit, or a category whose name matched, to open. */
-export type MatchRow =
+type MatchRow =
   | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean }
   | { kind: 'category'; category: Category }
   /**
@@ -337,7 +338,7 @@ interface TableViewBase {
 }
 
 /** Before any category: the categories to start from. */
-export interface StartView extends TableViewBase {
+interface StartView extends TableViewBase {
   kind: 'start';
 }
 
@@ -346,7 +347,7 @@ export interface StartView extends TableViewBase {
  * then. Those the settings show are in their sections (docs/UX-SPEC.md §3), and `rows` is them in
  * that order, the order the cursor moves in; those they hide wait in `hidden`, in theirs.
  */
-export interface UnitsView extends TableViewBase {
+interface UnitsView extends TableViewBase {
   kind: 'units';
   category: CategoryId;
   rows: TableRow[];
@@ -361,7 +362,7 @@ export interface UnitsView extends TableViewBase {
 }
 
 /** While a unit is typed: matches from every category, under their category, without values. */
-export interface MatchesView extends TableViewBase {
+interface MatchesView extends TableViewBase {
   kind: 'matches';
   /**
    * The category the converter is in, the box's unit's or the one chosen, or null: its matches
@@ -379,7 +380,7 @@ export interface MatchesView extends TableViewBase {
 }
 
 /** A hidden unit that matches, with the name of the section it would show in. */
-export interface HiddenMatch {
+interface HiddenMatch {
   unit: Unit;
   category: Category;
   section: string;
@@ -387,7 +388,7 @@ export interface HiddenMatch {
 
 export type TableView = StartView | UnitsView | MatchesView;
 
-export interface TableOptions extends NumberEnv {
+interface TableOptions extends NumberEnv {
   /** The visitor's unit family, listed first. */
   system: UnitPreference;
   /** Which units show (settings.ts); without one, every unit does. */
@@ -694,12 +695,9 @@ function changeLabel(parsed: ParsedInput, unit: Unit | null, locale: string | un
     ? formatNumber(parsed.value, { locale })
     : (parsed.valueText ?? '');
   // A no-break space keeps the amount and its symbol on one line.
-  const amount = `${typed}${NO_BREAK}${unit.symbol}`;
+  const amount = `${typed}${NBSP}${unit.symbol}`;
   return parsed.value < 0 ? `${heading}: ${amount}` : `${heading}: ${amount} warmer or cooler`;
 }
-
-/** The no-break space between an amount and its symbol. */
-const NO_BREAK = String.fromCharCode(0x00a0);
 
 /** How a row converts the box's value into its unit: convert, or Cooking's through a density. */
 type Converter = (value: number, from: Unit, to: Unit) => number | undefined;

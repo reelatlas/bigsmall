@@ -47,14 +47,14 @@ function matchKey(match: UnitMatch): string {
 }
 
 /** A unit that matches but the settings hide: offered apart, with its category and section. */
-export interface HiddenUnitMatch {
+interface HiddenUnitMatch {
   unit: Unit;
   category: Category;
   /** The section it would show in: "Specialty". */
   section: string;
 }
 
-export interface UnitMatchesProps {
+interface UnitMatchesProps {
   /** The listbox's id, which the field's combobox controls. */
   id: string;
   /** The hidden matches' listbox's id, under the line that offers them; the field controls it too while they show. */

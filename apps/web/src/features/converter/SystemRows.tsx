@@ -50,7 +50,7 @@ interface Drag {
   moved: boolean;
 }
 
-export interface SystemRowsProps {
+interface SystemRowsProps {
   settings: Settings;
   preference: UnitPreference;
   onSettings: (update: (settings: Settings) => Settings) => void;
@@ -282,7 +282,7 @@ export function SystemRows({ settings, preference, onSettings }: SystemRowsProps
             data-moving={open || undefined}
             className={ROW}
           >
-            <label className={cx(OPTION_ROW, 'min-w-0 flex-1 gap-2')}>
+            <label className={cx(OPTION_ROW, 'min-w-0 flex-1')}>
               <TriCheckbox
                 state={state}
                 aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"

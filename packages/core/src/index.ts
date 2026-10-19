@@ -10,7 +10,7 @@ export { regionDefaults } from './region';
 export type { RegionDefaults, UnitPreference } from './region';
 export { DEFAULT_SEPARATORS, localeSeparators } from './locale';
 export type { Separators } from './locale';
-export { parse } from './parse';
+export { NBSP, parse } from './parse';
 export type { ParsedInput } from './parse';
 export { normalizeKey, compactKey, compactKeyWithDegree } from './normalize';
 export { search, resolveExact, suggest } from './search';

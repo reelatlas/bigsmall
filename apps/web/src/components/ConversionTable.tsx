@@ -43,7 +43,7 @@ import { Checkbox } from './Checkbox';
 import { TriCheckbox } from './TriCheckbox';
 
 /** One row as the table shows it; the converter maps its view onto these. */
-export interface ConversionRow {
+interface ConversionRow {
   /** The unit's id: the row's key, and what copying and moving name. */
   id: string;
   /** Singular or plural to agree with the value ("1 cup", "2.5 cups"). */
@@ -73,7 +73,7 @@ export interface ConversionRow {
 }
 
 /** A section of rows under its name ("US (customary)"). */
-export interface RowSection<T extends ConversionRow> {
+interface RowSection<T extends ConversionRow> {
   key: string;
   label: string;
   rows: readonly T[];
@@ -82,7 +82,7 @@ export interface RowSection<T extends ConversionRow> {
 }
 
 /** How values and names show (docs/UX-SPEC.md §7): the converter's Display settings. */
-export interface TableDisplay {
+interface TableDisplay {
   names: 'symbol' | 'both';
   /** Both writes the decimal, then its fraction after it in the muted ink. */
   format: 'decimal' | 'fraction' | 'both';
@@ -752,8 +752,8 @@ export function ConversionTable<T extends ConversionRow>({
     const marker =
       list === 'shown' ? { 'data-section': section.key } : { 'data-hidden-section': section.key };
     const spot = `section:${section.key}`;
-    // Not stuck: this heading carries a control, and stuck under the box its checkbox would sit a
-    // few pixels from the field (a target-size finding); Edit and Hidden scroll with their lists.
+    // Not stuck: Edit's and Hidden's headings scroll with their lists; the table's alone stick
+    // under the box (docs/UX-SPEC.md §1).
     return (
       <h3 className={edge} {...marker}>
         <label className={cx(PANEL_TITLE, CURSOR_ROW, 'flex items-center gap-2', CHOICE_FILL)}>
@@ -950,7 +950,8 @@ export function ConversionTable<T extends ConversionRow>({
                 onClick={() => onHiddenOpen(!hiddenOpen)}
                 className={cx(
                   PANEL_TITLE,
-                  'flex min-h-11 items-center gap-2 rounded-nested px-2 hover:bg-surface-raised',
+                  CURSOR_ROW,
+                  'flex items-center gap-2 hover:bg-surface-raised',
                 )}
               >
                 <ChevronDownIcon

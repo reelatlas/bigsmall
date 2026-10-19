@@ -14,7 +14,7 @@ import { shuffle } from './sketches';
 export const FLICKER_SHARE = 0.25;
 
 /** A horizontal slice of a tile, in fractions of its height, moved sideways `shift` tile widths. */
-export interface Band {
+interface Band {
   top: number;
   height: number;
   shift: number;
@@ -22,7 +22,7 @@ export interface Band {
   other: boolean;
 }
 
-export interface GlitchFrame {
+interface GlitchFrame {
   bands: Band[];
   /** How far the picture's edges split into the theme's colors, 0 to 1. */
   fringe: number;

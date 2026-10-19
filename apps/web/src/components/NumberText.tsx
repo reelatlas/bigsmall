@@ -1,7 +1,7 @@
 import { formatNumber, type ParsedInput } from '@bigsmall/core';
 import type { ReactNode } from 'react';
 
-export interface NumberTextProps {
+interface NumberTextProps {
   text: string;
   /** The parse of `text`, which says where the exponent markers are. */
   parsed: ParsedInput;

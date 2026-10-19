@@ -2,12 +2,9 @@ import { useLayoutEffect, useRef } from 'react';
 import { Checkbox, type CheckboxProps } from './Checkbox';
 
 /** All of a group on, some of it, or none. */
-export type TriState = 'all' | 'some' | 'none';
+type TriState = 'all' | 'some' | 'none';
 
-export interface TriCheckboxProps extends Omit<
-  CheckboxProps,
-  'checked' | 'defaultChecked' | 'inputRef'
-> {
+interface TriCheckboxProps extends Omit<CheckboxProps, 'checked' | 'defaultChecked' | 'inputRef'> {
   state: TriState;
 }
 

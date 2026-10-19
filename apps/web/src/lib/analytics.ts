@@ -8,7 +8,7 @@
  * few and their properties short. 'Theme picked' is sent by Base.astro's inline script, which no
  * bundle reaches.
  */
-export type AnalyticsEvent =
+type AnalyticsEvent =
   | 'Unit chosen'
   | 'Ingredient chosen'
   | 'Value copied'

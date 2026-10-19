@@ -170,7 +170,7 @@ export const FRESH_RULE: ViewRule = {
   overrides: new Map(),
 };
 
-export type ShowPreset = 'all' | 'standard' | 'region';
+type ShowPreset = 'all' | 'standard' | 'region';
 
 /** What Units' presets can light: a preset, or Custom, the visitor's own set (Sean, 2026-10-15). */
 export type ShowChoice = ShowPreset | 'custom';
@@ -253,7 +253,7 @@ export function shows(unit: Unit, rule: ViewRule, preference: UnitPreference): b
   return rule.overrides.get(unit.id) ?? bySystem(unit, rule.shown, preference);
 }
 
-export type GroupState = 'all' | 'some' | 'none';
+type GroupState = 'all' | 'some' | 'none';
 
 /** Units chosen on their own: an exception where it differs from the switch, none where it agrees. */
 export function withChoice(
@@ -448,7 +448,7 @@ interface StoredRule {
  * 3 knows Other's switch. Version 4 keys Specialty's switch `specialty`, the screen's word, where
  * earlier versions stored `specialist` (Sean, 2026-10-16: one vocabulary in code and on screen).
  */
-export interface StoredSettings {
+interface StoredSettings {
   v: 4;
   rule: StoredRule;
   kept: StoredRule | null;

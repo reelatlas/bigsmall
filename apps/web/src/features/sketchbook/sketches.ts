@@ -10,7 +10,7 @@ import type { Mood } from './burst';
  * sketch on the page once, and a tile shows one by its id. Pure; tested in node.
  */
 
-export type FamilyId =
+type FamilyId =
   | 'refined'
   | 'abstract'
   | 'bold'
@@ -34,7 +34,7 @@ export interface Family {
 /** The rounds of sketches: the logo canvas's, then two drawn for the sketchbook (2026-10-15). */
 export type Round = 1 | 2 | 3;
 
-export interface Sketch {
+interface Sketch {
   id: string;
   /** What a screen reader says for its tile. */
   name: string;

@@ -4,7 +4,7 @@ import { PANEL_CARD, PANEL_HEAD, PANEL_HEADING } from '../lib/recipes';
 import { Button } from './Button';
 import { CloseIcon } from './icons';
 
-export interface SidePanelProps {
+interface SidePanelProps {
   title: string;
   children: ReactNode;
   /** The close button, and Escape inside the panel. */

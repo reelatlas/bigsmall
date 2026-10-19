@@ -17,7 +17,7 @@ import {
  */
 
 /** One unit's line: what one of it is in its category's base unit, or its formula. */
-export interface FormulaLine {
+interface FormulaLine {
   id: string;
   name: string;
   symbol: string;
@@ -30,7 +30,7 @@ export interface FormulaLine {
   plain: string;
 }
 
-export interface FormulaGroup {
+interface FormulaGroup {
   category: Category;
   base: Unit;
   lines: FormulaLine[];

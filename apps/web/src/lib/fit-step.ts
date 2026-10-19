@@ -97,7 +97,7 @@ export function useFitStep(
  * pill's chevron), the text's step, and, in a row with a second pill, whether the pills take a line
  * of their own under the text.
  */
-export interface FieldFit {
+interface FieldFit {
   gaveWay: number;
   step: number;
   wrap: boolean;

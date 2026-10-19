@@ -21,6 +21,7 @@ import {
   WORDMARK_SIZES,
   type WordmarkSize,
 } from '../../../lib/recipes';
+import { Checkbox } from '../../../components/Checkbox';
 import {
   play,
   fitPhrase,
@@ -29,7 +30,7 @@ import {
 } from '../../../lib/wordmark-motion';
 import { useCopied } from '../../../lib/copied';
 import { FRAME_MS, WORDMARK_TIMING } from '../../../lib/timing';
-import { CHECK, CHECKBOX, FIELD, HEADING, INPUT, Panel, SELECT, Slider } from '../_lab/controls';
+import { CHECK, FIELD, HEADING, INPUT, Panel, SELECT, Slider } from '../_lab/controls';
 import { PRESETS, SHIPPED } from './presets';
 import {
   ART_GLYPHS,
@@ -326,11 +327,9 @@ const Sheet = memo(function Sheet({
           Every phrase
         </h2>
         <label className={CHECK}>
-          <input
-            type="checkbox"
+          <Checkbox
             checked={withBoth}
             onChange={(event) => setWithBoth(event.currentTarget.checked)}
-            className={CHECKBOX}
           />
           Include all {phrases.both.length} “both halves” pairs
         </label>
@@ -497,9 +496,7 @@ export function WordmarkLab() {
         <Panel title="Play">
           <Readout player={player} />
           <label className={CHECK}>
-            <input
-              type="checkbox"
-              className={CHECKBOX}
+            <Checkbox
               checked={pinned}
               disabled={still}
               onChange={(event) => pin(event.currentTarget.checked)}
@@ -507,9 +504,7 @@ export function WordmarkLab() {
             Play without hovering
           </label>
           <label className={CHECK}>
-            <input
-              type="checkbox"
-              className={CHECKBOX}
+            <Checkbox
               checked={held}
               disabled={still}
               onChange={(event) => hold(event.currentTarget.checked)}

@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { WORDMARK_TIMING } from '../src/lib/timing';
 import { WORDMARK_TUNING } from '../src/lib/wordmark';
-import { applyTheme, ready, themeToggle } from './support';
+import { applyTheme, pressControl, ready, themeToggle } from './support';
 
 // The header wordmark and its art (docs/UX-SPEC.md §1), and /dev/wordmark-lab, which tunes them.
 
@@ -66,7 +66,8 @@ test('every phrase fits the name’s width in every theme, on one line or two', 
 }) => {
   test.skip(isMobile, 'the name is the same width at every viewport');
   await openLab(page);
-  await page.getByLabel(/^Include all/).check();
+  await pressControl(page.getByLabel(/^Include all/));
+  await expect(page.getByLabel(/^Include all/)).toBeChecked();
   const report = page.locator('[data-sheet-report]');
   for (const theme of THEMES) {
     await applyTheme(page, theme);
@@ -79,11 +80,13 @@ test('the art flips to a symbol, and its drawing comes home when play stops', as
   await openLab(page);
   await page.getByLabel('Art flips to a symbol').fill('1');
   const pinned = page.getByLabel('Play without hovering');
-  await pinned.check();
+  await pressControl(pinned);
+  await expect(pinned).toBeChecked();
   const symbol = page.locator('header [data-art-line]');
   await expect(symbol).toBeVisible();
   await expect(page.locator('header [data-theme-art]')).toHaveClass(/invisible/);
-  await pinned.uncheck();
+  await pressControl(pinned);
+  await expect(pinned).not.toBeChecked();
   await expect(symbol).toBeHidden();
   await expect(page.locator('[data-wordmark]')).toHaveText('bigsmall');
   await expect(page.locator('header [data-theme-art]')).not.toHaveClass(/invisible/);

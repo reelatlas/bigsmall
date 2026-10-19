@@ -21,8 +21,9 @@ import {
 import { useCopied } from '../../../lib/copied';
 import { useIsHydrated } from '../../../lib/hydrated';
 import { CARD, cx } from '../../../lib/recipes';
+import { Checkbox } from '../../../components/Checkbox';
 import { FRAME_MS, SKETCHBOOK_TIMING } from '../../../lib/timing';
-import { CHECK, CHECKBOX, FIELD, HEADING, Panel, SELECT, Slider } from '../_lab/controls';
+import { CHECK, FIELD, HEADING, Panel, SELECT, Slider } from '../_lab/controls';
 import { PRESETS, SHIPPED } from './presets';
 
 // Development page: tunes the sketchbook at play (pages/dev/sketchbook-lab.astro). Settings apply
@@ -245,9 +246,7 @@ function Toggle({
 }) {
   return (
     <label className={CHECK}>
-      <input
-        type="checkbox"
-        className={CHECKBOX}
+      <Checkbox
         checked={checked}
         disabled={disabled}
         onChange={(event) => onChange(event.currentTarget.checked)}

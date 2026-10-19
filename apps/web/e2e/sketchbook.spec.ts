@@ -13,6 +13,7 @@ import {
 import { SKETCHBOOK_TIMING } from '../src/lib/timing';
 import {
   MARGIN_MS,
+  pressControl,
   recordAnimations,
   sketchbookReady,
   startedAnimations,
@@ -405,7 +406,9 @@ test('only sketches in the rotation are dealt, and the sheet chooses them', asyn
     await expect(tile).not.toHaveAttribute('data-sketch', was!);
     expect(await sketchOf(tile)).toMatch(/^k\d$/);
   }
-  await page.getByLabel(`${SKETCH_BY_ID.get('k1')!.name}: In the rotation`).uncheck();
+  const k1 = page.getByLabel(`${SKETCH_BY_ID.get('k1')!.name}: In the rotation`);
+  await pressControl(k1);
+  await expect(k1).not.toBeChecked();
   await expect(count).toContainText('5 of');
 });
 

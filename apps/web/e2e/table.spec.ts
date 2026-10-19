@@ -49,6 +49,39 @@ const VOLUME_UNITS = unitsIn('volume').length;
 /** What a fresh visit lists: every unit but the specialty ones, the Standard preset (ADR 0018). */
 const VOLUME_STANDARD = unitsIn('volume').filter((unit) => unit.tier === 'standard').length;
 
+/**
+ * The name of the section being read sits a pixel under the stuck head's lower edge, the strip of
+ * canvas as deep as the gap to the table (the hairline tuck): the lowest name at or above that
+ * edge, since the one before it is pushed up behind the head. `names` says whose: the table's and
+ * the matches' (TABLE_NAMES), or Edit's and Hidden's headings.
+ */
+const nameUnderHead = (page: Page, names: string) =>
+  page.evaluate((selector) => {
+    const cell = document.querySelector('[data-head]')!;
+    const box = cell.getBoundingClientRect();
+    const strip = parseFloat(getComputedStyle(cell, '::after').height) || 0;
+    const edge = Math.round(box.bottom + strip);
+    const tops = [...document.querySelectorAll(selector)]
+      .map((name) => Math.round(name.getBoundingClientRect().top))
+      .filter((top) => top <= edge);
+    return { first: Math.max(...tops), boxBottom: edge };
+  }, names);
+const TABLE_NAMES = '[role="grid"] [data-section], [role="listbox"] [role="group"] > :first-child';
+
+/**
+ * Scrolls so a heading's own place would sit 10 px above the stuck head's lower edge, where it
+ * sticks a pixel under the edge instead, whatever its list's length: the head's height stands in
+ * for its stuck place, since the head is measured before it sticks.
+ */
+const scrollHeadingUnder = (page: Page, heading: string) =>
+  page.evaluate((selector) => {
+    const cell = document.querySelector('[data-head]')!;
+    const strip = parseFloat(getComputedStyle(cell, '::after').height) || 0;
+    const edge = cell.getBoundingClientRect().height + strip;
+    const own = document.querySelector(selector)!.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo(0, Math.round(own - edge + 10));
+  }, heading);
+
 /** What the field's cursor is on, as it reads, or null while it rests. */
 async function cursor(page: Page): Promise<string | null> {
   return box(page).evaluate((input) => {
@@ -1793,24 +1826,7 @@ test('the toolbar and the box stay at the window’s top as one block while a lo
         document.querySelector('[data-plane="tools"] > :first-child')!.getBoundingClientRect().top,
       ),
     );
-  // The name of the section being read sits a pixel under the stuck head's lower edge, the strip
-  // of canvas as deep as the gap to the table (the hairline tuck): the lowest name at or above
-  // that edge, since the one before it is pushed up behind the head.
-  const nameUnderBox = () =>
-    page.evaluate(() => {
-      const cell = document.querySelector('[data-head]')!;
-      const box = cell.getBoundingClientRect();
-      const strip = parseFloat(getComputedStyle(cell, '::after').height) || 0;
-      const edge = Math.round(box.bottom + strip);
-      const tops = [
-        ...document.querySelectorAll(
-          '[role="grid"] [data-section], [role="listbox"] [role="group"] > :first-child',
-        ),
-      ]
-        .map((name) => Math.round(name.getBoundingClientRect().top))
-        .filter((top) => top <= edge);
-      return { first: Math.max(...tops), boxBottom: edge };
-    });
+  const nameUnderBox = () => nameUnderHead(page, TABLE_NAMES);
   const tableTop = () =>
     page.evaluate(() =>
       Math.round(
@@ -1859,6 +1875,45 @@ test('the toolbar and the box stay at the window’s top as one block while a lo
   await page.evaluate(() => scrollTo(0, 500));
   await expect.poll(async () => (await boxRect()).top).toBeLessThan(0);
   await expect(page.locator('[data-head][data-stuck]')).toHaveCount(0);
+});
+
+test('in Edit and in Hidden the section headings stick under the block as the table’s names do', async ({
+  page,
+}) => {
+  // docs/UX-SPEC.md §1 and §3 (Sean, 2026-10-18: one rule wherever a section's name heads a
+  // list). Length's Edit, then Data's Hidden: its nine specialty units, hidden by the Standard
+  // preset, give the page room to scroll a hidden heading up to the head.
+  await page.goto('/?a=meter&v=1');
+  await ready(page);
+  const width = page.viewportSize()!.width;
+  await page.setViewportSize({ width, height: 520 });
+  await page.getByRole('button', { name: 'Edit', exact: true }).click();
+  await expect(page.locator('[data-list="shown"]')).toBeVisible();
+  // The second section's heading, scrolled to where it would pass under the head: it sits a pixel
+  // under the head's edge instead, the first section's pushed up behind.
+  await scrollHeadingUnder(page, '[data-list="shown"] > :nth-child(2) [data-section]');
+  await expect(page.locator('[data-head][data-stuck]')).toHaveCount(1);
+  await expect
+    .poll(async () => {
+      const edit = await nameUnderHead(page, '[data-list="shown"] [data-section]');
+      return edit.boxBottom - edit.first;
+    })
+    .toBe(1);
+  await expectNoA11yViolations(page);
+  await page.getByRole('button', { name: 'Done', exact: true }).click();
+  await page.goto('/?a=byte&v=1');
+  await ready(page);
+  await page.getByRole('button', { name: /^Hidden/ }).click();
+  await expect(page.locator('[data-list="hidden"]')).toBeVisible();
+  await scrollHeadingUnder(page, '[data-list="hidden"] > :first-child [data-hidden-section]');
+  await expect(page.locator('[data-head][data-stuck]')).toHaveCount(1);
+  await expect
+    .poll(async () => {
+      const list = await nameUnderHead(page, '[data-list="hidden"] [data-hidden-section]');
+      return list.boxBottom - list.first;
+    })
+    .toBe(1);
+  await expectNoA11yViolations(page);
 });
 
 test('a side panel opened under a stuck head sticks beside it from md, and below md the head comes to the window’s top with the panel under it; a close leaves the head stuck', async ({

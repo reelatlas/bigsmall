@@ -143,8 +143,9 @@ export interface ConversionTableProps<T extends ConversionRow> {
   /**
    * Where a section's name sticks under the box while the table scrolls, in px from the window's
    * top, so the section being read is always named; none where nothing sticks (the layout decides
-   * by the window's height, docs/UX-SPEC.md §1). The table's headings only: Edit's and Hidden's
-   * carry a checkbox, and scroll with their lists.
+   * by the window's height, docs/UX-SPEC.md §1). The table's headings, and Edit's and Hidden's
+   * with their checkboxes alike (Sean, 2026-10-18: one rule wherever a section's name heads a
+   * list).
    */
   stickTop?: number | undefined;
 }
@@ -752,10 +753,11 @@ export function ConversionTable<T extends ConversionRow>({
     const marker =
       list === 'shown' ? { 'data-section': section.key } : { 'data-hidden-section': section.key };
     const spot = `section:${section.key}`;
-    // Not stuck: Edit's and Hidden's headings scroll with their lists; the table's alone stick
-    // under the box (docs/UX-SPEC.md §1).
+    // Stuck under the box as the table's headings are, so the section being read stays named in
+    // Edit and in Hidden too (docs/UX-SPEC.md §1); its group ends where the next one's heading
+    // pushes it up.
     return (
-      <h3 className={edge} {...marker}>
+      <h3 className={cx(edge, stuck)} style={stickStyle} {...marker}>
         <label className={cx(PANEL_TITLE, CURSOR_ROW, 'flex items-center gap-2', CHOICE_FILL)}>
           <TriCheckbox
             state={state}

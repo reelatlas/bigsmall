@@ -1,7 +1,7 @@
 # 0008 — Hosting on Vercel, with bigsmall.work as the main domain
 
 Date: 2026-10-07
-Status: accepted
+Status: accepted; amended 2026-10-18 (see Amendments)
 
 ## Context
 

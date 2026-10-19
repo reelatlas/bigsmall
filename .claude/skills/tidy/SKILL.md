@@ -42,11 +42,13 @@ The system's own docs are the yardstick, so read them before judging anything: `
 - When a fix extends the system (a new recipe, component, variant, or token), document it where that kind of thing is documented (step 7) in the same commit.
 - Commit as the ship skill says.
 - After a rename, search the old name everywhere it can hide: code, docblocks, e2e variable names, test titles, docs, and the findings log's open rows.
+- A doc edited by script anchors on a table cell's text, never on a whole padded row: Prettier pads every row of a Markdown table to its widest cell, so a row's spaces change whenever any row in the column does, and an anchor copied with its padding misses after the next format (docs/LEARNINGS.md, "Prettier pads a Markdown table's rows"). Anchor on the file as it is now, never on a discarded attempt's text, and when one anchor fails, carry the rest in a follow-up script rather than re-running the whole.
+- A reviewer agent's path check compares normalized paths: on Windows a glob returns backslashes, and a `endswith` against a forward-slash path misses its own file (the tidy of 2026-10-18 night).
 
 ## 6. Verify
 
 - `pnpm check` passes.
-- The browser suite passes: `pnpm e2e`. Astro allows one dev server per project; if Sean's dev server holds it, never stop it: run the suite against a build on `astro preview`, as docs/TESTING.md, "End to end", says (the scratch config, the port, the locale, and what a test that blocks the island must block in a build).
+- The browser suite passes: `pnpm e2e`. Astro allows one dev server per project; if Sean's dev server holds it, never stop it: run the suite against a build on `astro preview`, as docs/TESTING.md, "End to end", says (`pnpm build && pnpm e2e:preview`, and what a test that blocks the island must block in a build).
 - Motion and CSS values count only on the built site (the minifier writes 400ms as .4s): read them through `cssTime`, and sample frames rather than trusting one read.
 - For anything visual, take screenshots in a background browser (headless Playwright against the running server), at a phone width and a wide one, in more than one theme. Never drive the tab Sean is looking at.
 
@@ -74,8 +76,8 @@ Short, plain, and in this order:
 1. **Fixed**: by area, one line each, with what it makes easier.
 2. **Your call**: each finding that needs Sean, the recommendation first, one line each.
 3. **Logged for later**: what went into `docs/PLAN.md`, one line each.
-4. **Checks**: what passed (gates, browser suite, CI) and anything skipped, said plainly.
+4. **Checks**: what passed (the gate, the browser suite, and the workflow if it was started by hand) and anything skipped, said plainly.
 
 ## 9. Ship
 
-Use the ship skill: push the commits to `main` and watch CI, as every change to bigsmall ships (`CLAUDE.md`, "Ship"), unless Sean asked to hold. Report the outcome.
+Use the ship skill: push the commits to `main`, which deploys on its own, as every change to bigsmall ships (`CLAUDE.md`, "Ship"), unless Sean asked to hold. Report the outcome.

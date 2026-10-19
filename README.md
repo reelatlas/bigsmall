@@ -10,7 +10,7 @@ The existing converters have the math right and the experience wrong: dense page
 
 ## Principles
 
-1. **Fast on any device.** Static site, small JS, no backend. Budgets are enforced in CI.
+1. **Fast on any device.** Static site, small JS, no backend. Budgets are tests that gate every push (`pnpm check`).
 2. **Accessible by default.** WCAG 2.2 AA, keyboard-complete, screen-reader-announced results, in every theme.
 3. **Correct and sourced.** Every unit cites the standard that defines it ([docs/UNITS-CATALOG.md](docs/UNITS-CATALOG.md) §2), checked on our own; golden tests guard them.
 4. **Our own.** Our own concept, UX, design, and code. Other converters are references we use freely, and every number is checked on our own. See [ADR 0020](docs/decisions/0020-references-and-our-own-checks.md).
@@ -26,7 +26,7 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm check` runs what CI's verify job runs; `pnpm e2e` runs the browser and accessibility suite. All commands are in [CLAUDE.md](CLAUDE.md).
+`pnpm check` is the gate before every push (CLAUDE.md, rule 7); `pnpm e2e` runs the browser and accessibility suite. All commands are in [CLAUDE.md](CLAUDE.md).
 
 ## Docs
 
@@ -42,7 +42,7 @@ pnpm dev
 | [docs/RESEARCH.md](docs/RESEARCH.md)           | How a fact is decided by its kind, defined, measured, or conventional, and how one is re-opened |
 | [docs/TESTING.md](docs/TESTING.md)             | The test layers, what each covers, and the commands                                             |
 | [docs/LEARNINGS.md](docs/LEARNINGS.md)         | Dated log of gotchas and practices found while building                                         |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)       | Hosting, domains, CI's checks, and analytics                                                    |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)       | Hosting, domains, how a push deploys, analytics, and feedback                                   |
 | [docs/SEO.md](docs/SEO.md)                     | How pages are found in search: the contract, the conventions, the plan                          |
 | [docs/decisions/](docs/decisions/README.md)    | Architecture Decision Records (ADRs)                                                            |
 | [docs/research/](docs/research/)               | Lab write-ups, the retired labs index, feedback logs, the usability test script                 |

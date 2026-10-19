@@ -24,5 +24,5 @@ Bring `CLAUDE.md`'s "Pick up here" list up to date, kept short:
 
 ## 3. Ship and stop
 
-- Use the ship skill: gate on `pnpm check`, commit (`docs: …`), push, watch CI.
+- Use the ship skill: gate on `pnpm check`, commit (`docs: …`), and push; Vercel deploys it on its own.
 - Report in a few lines: what is saved where, what is live, and what the next session starts with. Then stop: no new work after a save unless Sean asks.

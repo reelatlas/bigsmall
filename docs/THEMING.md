@@ -27,7 +27,7 @@ Because custom properties cascade, any element can carry its own `data-theme`. T
 - every color token is 6-digit hex (so the test can compute contrast)
 - text pairs reach 4.5:1, UI pairs reach 3:1
 
-A theme that fails any of these fails `pnpm test`, and therefore CI.
+A theme that fails any of these fails `pnpm test`, and therefore `pnpm check`, the gate before every push.
 
 ## Authoring a theme
 

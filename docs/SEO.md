@@ -4,7 +4,7 @@ v0.1, 2026-10-15. How bigsmall is found in search, kept true as pages, categorie
 
 ## 1. The contract
 
-Every page in the sitemap meets these, and `pnpm check` fails when one does not (`scripts/seo-check.mjs`, after the build, as the bundle budget is checked; CI's verify job runs it):
+Every page in the sitemap meets these, and `pnpm check` fails when one does not (`scripts/seo-check.mjs`, after the build, as the bundle budget is checked; the gate before every push, CLAUDE.md rule 7):
 
 - **One canonical address**, absolute, the page's own (`https://bigsmall.work/about/`), never with a query: the URL's `?a=…&v=…` is a conversion's state, not a page.
 - **In the sitemap**, and not asking to be left out of search. A page left out of the sitemap (the dev pages, the not-found page) asks not to be indexed (`noindex`) and names no canonical address.

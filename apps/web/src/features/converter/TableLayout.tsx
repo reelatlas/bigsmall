@@ -60,14 +60,16 @@ const TABLE_GRID = cx(IN_CONVERTER_GRID, 'md:grid-rows-[auto_auto_auto_1fr]');
  * view and changeable while a long table scrolls), a subgrid over the grid's first two rows from
  * md, so the side panel's top still sits on the box's. Stuck to the window's top while the table
  * scrolls where the window is tall enough (`data-stick` on the layout, measured below; a trial):
- * the canvas behind it, and a strip of canvas under it as deep as the gap to the table
+ * the canvas behind it, reaching one step past the column on both sides so a card's ring or shadow
+ * passing under it paints behind it, not beside it (Sean, 2026-10-18), and a strip of canvas under
+ * it as deep as the gap to the table
  * (`after:h-2`, the rows cell's `mt-2`), cover the rows passing under; the strip's lower edge is a
  * rule only while the head is stuck (`data-stuck`). Drawn by a pseudo-element, so the head keeps
  * its own size. Over a section's name (STUCK_HEADING, 5) and under an open shell (SHELL, 20).
  */
 const TABLE_HEAD_CELL = cx(
   CONTENT_COLUMN,
-  'relative z-10 bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-2 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid',
+  'relative z-10 bg-canvas group-data-stick/stick:sticky group-data-stick/stick:top-0 before:pointer-events-none before:absolute before:-inset-x-1 before:top-0 before:-bottom-2 before:-z-10 before:bg-canvas after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:border-b after:border-transparent after:bg-canvas data-stuck:after:border-line md:col-start-2 md:row-span-2 md:row-start-1 md:grid md:grid-rows-subgrid',
 );
 /** The toolbar's row in the head, 8 px over the box. */
 const TABLE_TOOLS_CELL = 'relative mb-2 md:row-start-1';
@@ -196,6 +198,8 @@ export interface TableLayoutProps {
    */
   side: ReactNode;
   sideId: string;
+  /** Which panel is open, so a switch from one to another places the new one as an opening does. */
+  sideKey: string | null;
   /**
    * Whether typing in the side panel lands in the field, as from the toolbar: so for a settings
    * panel; the calculator keeps its keys.
@@ -229,6 +233,7 @@ export function TableLayout({
   describedBy,
   side,
   sideId,
+  sideKey,
   sideTypes,
   copiedRow,
   onCopyRow,
@@ -315,6 +320,8 @@ export function TableLayout({
    */
   const [stick, setStick] = useState({ height: 0, gap: 0, boxTop: 0, on: false });
   const [stuck, setStuck] = useState(false);
+  // The same, readable by an effect at the moment a panel closes, before the observer has spoken.
+  const stuckRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -372,22 +379,31 @@ export function TableLayout({
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
   }, [hasSide]);
-  // A panel that opens below md while the page is scrolled opens where the box's row is, above
-  // the window or behind the stuck head (Sean, 2026-10-18): the head comes to the window's top
-  // with the panel under it, unless the panel is already in view. From md the panel sticks with
-  // the head instead (TABLE_SIDE_CELL), so nothing moves.
+  // Below md a panel sits between the box and the table, and the head stays stuck over it (Sean,
+  // 2026-10-18). Opening one while the page is scrolled, or switching to another, puts it where
+  // the box's row is, above the window or behind the head, and Chrome's scroll anchoring then
+  // keeps the table's row in place; so unless the panel is already in view under the head, the
+  // page scrolls to the grid's top: the head at the window's top, the panel under it. Closing one
+  // takes its height out of the flow, and Chrome's anchoring would pull the page up by as much,
+  // the head sliding down out of its stuck place; the head stays where it was. From md the panel
+  // sticks beside the head instead (TABLE_SIDE_CELL), so nothing moves.
   useLayoutEffect(() => {
-    const panel = sideRef.current;
     const grid = gridRef.current;
-    if (!panel || !grid || !sideBelow) return;
+    const head = headRef.current;
+    if (!grid || !head || !sideBelow) return;
+    const panel = sideRef.current;
+    if (!panel) {
+      const { top } = head.getBoundingClientRect();
+      if (stuckRef.current && top > 0) window.scrollBy(0, top);
+      return;
+    }
     const rect = panel.getBoundingClientRect();
-    const covered = headRef.current?.getBoundingClientRect().bottom ?? 0;
+    const covered = head.getBoundingClientRect().bottom;
     // In view: under the head's edge, or the window's top once the head has let go (its edge is
-    // above the window then). Chrome's scroll anchoring has already kept the table's row in place
-    // by then, which is what put the panel above the window.
+    // above the window then).
     if (rect.top >= Math.max(0, covered) && rect.bottom <= window.innerHeight) return;
     window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY });
-  }, [hasSide, sideBelow]);
+  }, [hasSide, sideKey, sideBelow]);
   /**
    * The head sticks whenever the window is tall enough for it, Edit on, Hidden open, or a panel
    * between the box and the table included (Sean, 2026-10-18): their rows scroll under it as the
@@ -407,9 +423,11 @@ export function TableLayout({
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || typeof IntersectionObserver === 'undefined') return;
-    const watcher = new IntersectionObserver(([entry]) =>
-      setStuck(sticking && !!entry && !entry.isIntersecting),
-    );
+    const watcher = new IntersectionObserver(([entry]) => {
+      const on = sticking && !!entry && !entry.isIntersecting;
+      stuckRef.current = on;
+      setStuck(on);
+    });
     watcher.observe(sentinel);
     return () => watcher.disconnect();
   }, [sticking]);

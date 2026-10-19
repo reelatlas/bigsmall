@@ -1900,6 +1900,21 @@ test('a side panel opened under a stuck head sticks beside it from md, and below
     await expect.poll(async () => Math.round((await headRect()).top)).toBe(0);
     const after = (await panel.boundingBox())!;
     expect(Math.round(rect.y - after.y)).toBeGreaterThanOrEqual(90);
+    // A switch to another panel places the new one under the head too, and closing it leaves the
+    // head stuck where it was (Chrome's scroll anchoring would pull the page to the top).
+    await pressTool(page, 'Units');
+    await expect(page.getByRole('group', { name: 'Units', exact: true })).toBeVisible();
+    const units = (await panel.boundingBox())!;
+    expect(Math.round((await headRect()).top)).toBe(0);
+    expect(units.y).toBeGreaterThanOrEqual((await headRect()).bottom - 1);
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('group', { name: 'Units', exact: true })).toHaveCount(0);
+    expect(Math.round((await headRect()).top)).toBe(0);
+    // The head's canvas reaches past the column, so a card's ring passes behind it, not beside it.
+    const bleed = await page
+      .locator('[data-head]')
+      .evaluate((el) => parseFloat(getComputedStyle(el, '::before').left));
+    expect(bleed).toBeLessThanOrEqual(-2);
   } else {
     // Level with the box's top, in view, and still there after more scrolling: it sticks with the head.
     const before = (await panel.boundingBox())!;

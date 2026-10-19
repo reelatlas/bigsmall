@@ -449,6 +449,7 @@ export function Converter() {
         describedBy={introId}
         side={sidePanel}
         sideId={sideId}
+        sideKey={side}
         sideTypes={side === 'units' || side === 'display'}
         copiedRow={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
         onCopyRow={copyRow}

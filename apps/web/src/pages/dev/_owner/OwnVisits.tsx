@@ -39,7 +39,7 @@ export function OwnVisits() {
   };
 
   return (
-    <div className="mt-6 grid max-w-prose gap-3">
+    <div className="mt-section grid max-w-prose gap-3">
       <p role="status" className="text-sm">
         {disabled === null
           ? 'Reading this browser’s setting…'

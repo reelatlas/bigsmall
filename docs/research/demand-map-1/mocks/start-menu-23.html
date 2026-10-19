@@ -1,0 +1,589 @@
+<title>Start and menu at 23</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<style>
+  /* Layout: the mock's own strip (burnt orange, never the site's) above a faithful 576 px site column
+     drawn in the Daylight tokens; the start's tiles panel, then the menu drawn open and static. */
+  :root {
+    --canvas: #fafaf9;
+    --surface: #ffffff;
+    --raised: #f5f5f4;
+    --ink: #1c1917;
+    --muted: #57534e;
+    --accent: #0f766e;
+    --on-accent: #ffffff;
+    --soft: #ccfbf1;
+    --line: #d6d3d1;
+    --edge: #928f8d;
+    --mock: #9a3412;
+    --mock-bg: #fff4e8;
+    --mock-line: #f2c9a8;
+    --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --canvas: #1c1917;
+      --surface: #292524;
+      --raised: #332f2c;
+      --ink: #fafaf9;
+      --muted: #a8a29e;
+      --accent: #2dd4bf;
+      --on-accent: #042f2e;
+      --soft: #134e4a;
+      --line: #44403c;
+      --edge: #78716c;
+      --mock: #fdba74;
+      --mock-bg: #3a2112;
+      --mock-line: #7c3f1a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --canvas: #1c1917;
+    --surface: #292524;
+    --raised: #332f2c;
+    --ink: #fafaf9;
+    --muted: #a8a29e;
+    --accent: #2dd4bf;
+    --on-accent: #042f2e;
+    --soft: #134e4a;
+    --line: #44403c;
+    --edge: #78716c;
+    --mock: #fdba74;
+    --mock-bg: #3a2112;
+    --mock-line: #7c3f1a;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.4;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0 48px;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* The mock's strip */
+  .strip {
+    max-width: 576px;
+    margin: 0 auto 20px;
+    padding: 14px 16px 16px;
+    background: var(--mock-bg);
+    border: 1px solid var(--mock-line);
+    border-radius: 12px;
+    color: var(--ink);
+  }
+  .strip h1 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--mock);
+    text-wrap: balance;
+  }
+  .strip p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 60ch;
+  }
+  .seg {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .seg label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--mock-line);
+    border-radius: 999px;
+    font-size: 14px;
+    cursor: pointer;
+    background: var(--surface);
+  }
+  .seg input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .seg label:has(input:checked) {
+    background: var(--mock);
+    color: #fff;
+    border-color: var(--mock);
+  }
+  .seg label:has(input:focus-visible) {
+    outline: 2px solid var(--mock);
+    outline-offset: 2px;
+  }
+  .opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+    margin-top: 12px;
+    font-size: 14px;
+  }
+  .opts label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 28px;
+    cursor: pointer;
+  }
+  .opts input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--mock);
+  }
+  .measure {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .measure b {
+    color: var(--mock);
+    font-weight: 600;
+  }
+
+  /* The site column, drawn */
+  .site {
+    max-width: 576px;
+    margin: 0 auto;
+  }
+  .hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 16px 10px;
+  }
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .sun {
+    width: 26px;
+    height: 26px;
+  }
+  .theme {
+    font-size: 14px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .intro {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 10px 0 8px;
+  }
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    height: 40px;
+    margin-bottom: 6px;
+  }
+  .trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 28px;
+    font-size: 15px;
+    color: var(--muted);
+    padding: 0 8px;
+    min-width: 128px;
+    justify-content: space-between;
+    height: 40px;
+  }
+  .tools svg {
+    width: 20px;
+    height: 20px;
+    color: var(--ink);
+    opacity: 0.85;
+  }
+  .tools .dim svg {
+    opacity: 0.3;
+  }
+  .box {
+    border: 2px solid var(--edge);
+    border-radius: 20px;
+    background: var(--surface);
+    padding: 14px 18px;
+    font-size: 24px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .panel {
+    border: 2px solid var(--edge);
+    border-radius: 20px;
+    background: var(--surface);
+    padding: 10px 14px 12px;
+  }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+  }
+  @media (min-width: 512px) {
+    .tiles {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .tile {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    font-size: 17px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ghead {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 14px 6px 2px;
+  }
+  .ghead:first-child {
+    padding-top: 6px;
+  }
+  .rule {
+    grid-column: 1 / -1;
+    height: 1px;
+    background: var(--line);
+    margin: 8px 6px;
+  }
+  .list {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+  }
+  @media (min-width: 512px) {
+    .list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .row {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mark-new .new::after {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-left: 8px;
+    flex: none;
+  }
+
+  /* The menu, drawn open and static */
+  .menu-wrap {
+    margin-top: 28px;
+  }
+  .menu-cap {
+    font-size: 13px;
+    color: var(--mock);
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+  .menu {
+    width: 100%;
+    max-width: 268px;
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  @media (min-width: 640px) {
+    .menu.wide {
+      max-width: 420px;
+    }
+  }
+  .menu-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 12px 12px 12px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .menu-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    padding: 6px 0;
+  }
+  @media (min-width: 640px) {
+    .menu.wide .menu-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .menu-list.colmajor {
+    grid-auto-flow: column;
+  }
+  .opt {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .menu-list .ghead {
+    padding: 12px 12px 4px;
+  }
+  .foot {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 40px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .panel,
+    .menu {
+      transition: none;
+    }
+  }
+</style>
+
+<section class="strip" aria-labelledby="mock-title">
+  <h1 id="mock-title">The start and the menu at 23 categories</h1>
+  <p>
+    Today's sixteen plus Shoe size, Data rate, Frequency, Density, Flow, Acceleration, and Blood
+    sugar. Drawn in Daylight at this window's width; open it on a phone too. The heights are
+    measured as drawn, not counted.
+  </p>
+  <div class="seg" role="radiogroup" aria-label="Variant">
+    <label><input type="radio" name="variant" value="today" id="v-today" /> Today, 16</label>
+    <label
+      ><input type="radio" name="variant" value="flat" id="v-flat" checked /> Flat 23, Everyday
+      first</label
+    >
+    <label
+      ><input type="radio" name="variant" value="more" id="v-more" /> Everyday, then More</label
+    >
+    <label
+      ><input type="radio" name="variant" value="groups" id="v-groups" /> Five named groups</label
+    >
+  </div>
+  <div class="opts">
+    <label
+      ><input type="checkbox" id="opt-rule" checked /> Hairline after Everyday (flat only)</label
+    >
+    <label><input type="checkbox" id="opt-new" /> Dot the seven new ones</label>
+    <label><input type="checkbox" id="opt-wide" checked /> Menu in three columns from 640 px</label>
+  </div>
+  <p class="measure" id="measure"></p>
+</section>
+
+<div class="site" id="site">
+  <div class="hdr">
+    <div class="wordmark">
+      bigsmall
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="5" fill="#f59e0b" />
+        <g stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
+          <path
+            d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"
+          />
+        </g>
+      </svg>
+    </div>
+    <div class="theme">
+      Daylight
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </div>
+  </div>
+  <p class="intro">Type a number, unit, or both to compare all at once.</p>
+  <div class="tools" aria-hidden="true">
+    <span class="trigger"
+      >Category
+      <svg width="14" height="14" viewBox="0 0 24 24">
+        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" /></svg
+    ></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M16 15h0" />
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M7 4v16M4 7l3-3 3 3M13 6h7M13 12h5M13 18h3" />
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M3 17 17 3l4 4L7 21l-4-4zM7 13l2 2M10 10l2 2M13 7l2 2" />
+    </svg>
+    <span class="dim"
+      ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 14 4 9l5-5" />
+        <path d="M4 9h11a5 5 0 0 1 0 10h-3" /></svg
+    ></span>
+  </div>
+  <div class="box">Number or unit</div>
+  <div class="panel" id="panel"></div>
+
+  <div class="menu-wrap">
+    <p class="menu-cap">The category menu, drawn open</p>
+    <div class="menu wide" id="menu"></div>
+  </div>
+  <p class="foot">About</p>
+</div>
+
+<script>
+  const EVERYDAY = [
+    'Length',
+    'Weight',
+    'Volume',
+    'Cooking',
+    'Temperature',
+    'Area',
+    'Speed',
+    'Time',
+  ];
+  const REST_TODAY = [
+    'Data',
+    'Fuel economy',
+    'Energy',
+    'Pressure',
+    'Power',
+    'Force',
+    'Torque',
+    'Angle',
+  ];
+  const NEW = new Set([
+    'Shoe size',
+    'Data rate',
+    'Frequency',
+    'Density',
+    'Flow',
+    'Acceleration',
+    'Blood sugar',
+  ]);
+  const FLAT_REST = [
+    'Data',
+    'Data rate',
+    'Frequency',
+    'Energy',
+    'Power',
+    'Pressure',
+    'Fuel economy',
+    'Flow',
+    'Force',
+    'Torque',
+    'Density',
+    'Acceleration',
+    'Angle',
+    'Shoe size',
+    'Blood sugar',
+  ];
+  const GROUPS = [
+    ['Everyday', EVERYDAY],
+    ['Home and road', ['Energy', 'Power', 'Pressure', 'Fuel economy', 'Flow']],
+    ['Build and engineer', ['Force', 'Torque', 'Density', 'Acceleration', 'Angle']],
+    ['Digital', ['Data', 'Data rate', 'Frequency']],
+    ['Sizes and health', ['Shoe size', 'Blood sugar']],
+  ];
+  const MORE = [...FLAT_REST].sort((a, b) => a.localeCompare(b));
+
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const item = (name, cls) =>
+    `<div class="${cls}${NEW.has(name) ? ' new' : ''}">${esc(name)}</div>`;
+  const tiles = (names) => names.map((n) => item(n, 'tile')).join('');
+  const opts = (names) => names.map((n) => item(n, 'opt')).join('');
+  const head = (t) => `<div class="ghead">${esc(t)}</div>`;
+
+  function renderStart(v, rule) {
+    if (v === 'today') return `<div class="tiles">${tiles([...EVERYDAY, ...REST_TODAY])}</div>`;
+    if (v === 'flat')
+      return `<div class="tiles">${tiles(EVERYDAY)}${rule ? '<div class="rule"></div>' : ''}${tiles(FLAT_REST)}</div>`;
+    if (v === 'more')
+      return `<div class="tiles">${tiles(EVERYDAY)}${head('More')}<div class="list">${MORE.map((n) => item(n, 'row')).join('')}</div></div>`;
+    return `<div class="tiles">${GROUPS.map(([t, names]) => head(t) + tiles(names)).join('')}</div>`;
+  }
+
+  function renderMenu(v) {
+    const headEl = `<div class="menu-head">Category <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15l-6-6-6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>`;
+    if (v === 'today')
+      return (
+        headEl +
+        `<div class="menu-list colmajor" style="grid-template-rows: repeat(8, 44px)">${opts([...EVERYDAY, ...REST_TODAY])}</div>`
+      );
+    if (v === 'flat') {
+      const all = [...EVERYDAY, ...FLAT_REST];
+      const cols =
+        document.getElementById('menu').classList.contains('wide') && window.innerWidth >= 640
+          ? 3
+          : 2;
+      const rows = Math.ceil(all.length / cols);
+      return (
+        headEl +
+        `<div class="menu-list colmajor" style="grid-template-rows: repeat(${rows}, 44px)">${opts(all)}</div>`
+      );
+    }
+    if (v === 'more')
+      return headEl + `<div class="menu-list">${opts(EVERYDAY)}${head('More')}${opts(MORE)}</div>`;
+    return (
+      headEl +
+      `<div class="menu-list">${GROUPS.map(([t, names]) => head(t) + opts(names)).join('')}</div>`
+    );
+  }
+
+  function measure(v) {
+    const p = document.getElementById('panel').getBoundingClientRect().height;
+    const m = document.getElementById('menu').getBoundingClientRect().height;
+    const n = v === 'today' ? 16 : 23;
+    document.getElementById('measure').innerHTML =
+      `At <b>${Math.round(window.innerWidth)} px</b> wide: the start's panel is <b>${Math.round(p)} px</b> tall and the open menu <b>${Math.round(m)} px</b>, ${n} categories. The live site at 390 px today: the panel 380 px, the menu 352 px (measured by script, 2026-10-19).`;
+  }
+
+  function render() {
+    const v = document.querySelector('input[name="variant"]:checked').value;
+    const rule = document.getElementById('opt-rule').checked;
+    document.body.classList.toggle('mark-new', document.getElementById('opt-new').checked);
+    document
+      .getElementById('menu')
+      .classList.toggle('wide', document.getElementById('opt-wide').checked);
+    document.getElementById('panel').innerHTML = renderStart(v, rule);
+    document.getElementById('menu').innerHTML = renderMenu(v);
+    requestAnimationFrame(() => measure(v));
+  }
+  document.querySelectorAll('input').forEach((el) => el.addEventListener('change', render));
+  window.addEventListener('resize', render);
+  render();
+</script>

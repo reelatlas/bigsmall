@@ -1,0 +1,681 @@
+<title>Compound rows and the quiet line</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<style>
+  /* Layout: the mock's strip (burnt orange) above a faithful 576 px site column in the Daylight tokens:
+     the box with what was typed, the quiet line under it, and the table with the pair as a row. */
+  :root {
+    --canvas: #fafaf9;
+    --surface: #ffffff;
+    --raised: #f5f5f4;
+    --ink: #1c1917;
+    --muted: #57534e;
+    --accent: #0f766e;
+    --on-accent: #ffffff;
+    --soft: #ccfbf1;
+    --line: #d6d3d1;
+    --edge: #928f8d;
+    --mock: #9a3412;
+    --mock-bg: #fff4e8;
+    --mock-line: #f2c9a8;
+    --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --canvas: #1c1917;
+      --surface: #292524;
+      --raised: #332f2c;
+      --ink: #fafaf9;
+      --muted: #a8a29e;
+      --accent: #2dd4bf;
+      --on-accent: #042f2e;
+      --soft: #134e4a;
+      --line: #44403c;
+      --edge: #78716c;
+      --mock: #fdba74;
+      --mock-bg: #3a2112;
+      --mock-line: #7c3f1a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --canvas: #1c1917;
+    --surface: #292524;
+    --raised: #332f2c;
+    --ink: #fafaf9;
+    --muted: #a8a29e;
+    --accent: #2dd4bf;
+    --on-accent: #042f2e;
+    --soft: #134e4a;
+    --line: #44403c;
+    --edge: #78716c;
+    --mock: #fdba74;
+    --mock-bg: #3a2112;
+    --mock-line: #7c3f1a;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.4;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0 48px;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .strip {
+    max-width: 576px;
+    margin: 0 auto 20px;
+    padding: 14px 16px 16px;
+    background: var(--mock-bg);
+    border: 1px solid var(--mock-line);
+    border-radius: 12px;
+  }
+  .strip h1 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--mock);
+    text-wrap: balance;
+  }
+  .strip p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 60ch;
+  }
+  .seg {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .seg label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--mock-line);
+    border-radius: 999px;
+    font-size: 14px;
+    cursor: pointer;
+    background: var(--surface);
+    font-variant-numeric: tabular-nums;
+  }
+  .seg input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .seg label:has(input:checked) {
+    background: var(--mock);
+    color: #fff;
+    border-color: var(--mock);
+  }
+  .seg label:has(input:focus-visible) {
+    outline: 2px solid var(--mock);
+    outline-offset: 2px;
+  }
+  .opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+    margin-top: 12px;
+    font-size: 14px;
+  }
+  .opts label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 28px;
+    cursor: pointer;
+  }
+  .opts input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--mock);
+  }
+  .note {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .note b {
+    color: var(--mock);
+    font-weight: 600;
+  }
+
+  .site {
+    max-width: 576px;
+    margin: 0 auto;
+  }
+  .hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 16px 10px;
+  }
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .sun {
+    width: 26px;
+    height: 26px;
+  }
+  .theme {
+    font-size: 14px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .intro {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 10px 0 8px;
+  }
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    height: 40px;
+    margin-bottom: 6px;
+  }
+  .trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    font-size: 15px;
+    color: var(--ink);
+    padding: 0 8px;
+    min-width: 128px;
+    height: 40px;
+  }
+  .tools svg {
+    width: 20px;
+    height: 20px;
+    opacity: 0.85;
+  }
+  .tools .dim svg {
+    opacity: 0.3;
+  }
+
+  .box {
+    border: 2px solid var(--edge);
+    border-radius: 20px;
+    background: var(--surface);
+    padding: 8px 10px 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .typed {
+    flex: 1;
+    font-size: 24px;
+    font-variant-numeric: tabular-nums;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .clear {
+    width: 22px;
+    height: 22px;
+    color: var(--muted);
+    flex: none;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--soft);
+    border-radius: 12px;
+    padding: 10px 10px 10px 12px;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .chip .sym {
+    color: var(--muted);
+  }
+  .chip .x {
+    color: var(--muted);
+    font-size: 18px;
+    margin-left: 4px;
+  }
+  .quiet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+    min-height: 22px;
+    padding: 6px 18px 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .quiet .alt {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .quiet .alt:hover {
+    color: var(--ink);
+  }
+
+  .table {
+    border: 2px solid var(--edge);
+    border-radius: 20px;
+    background: var(--surface);
+    margin-top: 10px;
+    padding: 8px 10px 6px;
+  }
+  .band {
+    background: var(--raised);
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin: 6px 0 4px;
+  }
+  .r {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 10px 0 14px;
+    border-radius: 12px;
+    gap: 12px;
+  }
+  .r.on {
+    background: var(--soft);
+  }
+  .val {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    font-size: 17px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .u {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 150px;
+    font-size: 17px;
+    white-space: nowrap;
+  }
+  .u .sym {
+    color: var(--muted);
+    min-width: 36px;
+    text-align: right;
+  }
+  .copy {
+    width: 18px;
+    height: 18px;
+    color: var(--muted);
+    margin-left: 6px;
+    flex: none;
+    align-self: center;
+  }
+  .tfoot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px 8px;
+    font-size: 15px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    margin-top: 8px;
+  }
+  .tfoot b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .foot {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 40px;
+  }
+  @media (max-width: 420px) {
+    .u {
+      min-width: 136px;
+    }
+    .val,
+    .u {
+      font-size: 16px;
+    }
+  }
+</style>
+
+<section class="strip" aria-labelledby="mock-title">
+  <h1 id="mock-title">Compound quantities: the box, the quiet line, and the pair as a row</h1>
+  <p>
+    A value in two units is read by one grammar and shown as one row of the table, placed in the
+    system that writes it that way. Pick what was typed; the mock is drawn in Daylight at this
+    window's width.
+  </p>
+  <div class="seg" role="radiogroup" aria-label="What was typed">
+    <label><input type="radio" name="ex" value="prime" id="ex-prime" checked /> 5'11</label>
+    <label><input type="radio" name="ex" value="decimal" id="ex-decimal" /> 5.11 ft</label>
+    <label><input type="radio" name="ex" value="cm" id="ex-cm" /> 180 cm</label>
+    <label><input type="radio" name="ex" value="half" id="ex-half" /> 5 ft 11 1/2 in</label>
+    <label><input type="radio" name="ex" value="stone" id="ex-stone" /> 11 st 4</label>
+  </div>
+  <div class="opts">
+    <label
+      ><input type="checkbox" id="opt-frac" /> Inches as fractions, to a sixteenth (Display, Round
+      to)</label
+    >
+  </div>
+  <p class="note" id="note"></p>
+</section>
+
+<div class="site">
+  <div class="hdr">
+    <div class="wordmark">
+      bigsmall
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="5" fill="#f59e0b" />
+        <g stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
+          <path
+            d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"
+          />
+        </g>
+      </svg>
+    </div>
+    <div class="theme">
+      Daylight
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </div>
+  </div>
+  <p class="intro">Type a number, unit, or both to compare all at once.</p>
+  <div class="tools" aria-hidden="true">
+    <span class="trigger" id="cat"
+      >Length
+      <svg width="14" height="14" viewBox="0 0 24 24">
+        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" /></svg
+    ></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2" />
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M7 4v16M4 7l3-3 3 3M13 6h7M13 12h5M13 18h3" />
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M3 17 17 3l4 4L7 21l-4-4zM7 13l2 2M10 10l2 2M13 7l2 2" />
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <circle cx="5" cy="12" r="1.2" />
+      <circle cx="12" cy="12" r="1.2" />
+      <circle cx="19" cy="12" r="1.2" />
+    </svg>
+  </div>
+
+  <div class="box">
+    <div class="typed" id="typed"></div>
+    <svg
+      class="clear"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9 9l6 6M15 9l-6 6" />
+    </svg>
+    <span class="chip" id="chip"></span>
+  </div>
+  <div class="quiet" id="quiet"></div>
+  <div class="table" id="table"></div>
+  <p class="foot">About</p>
+</div>
+
+<script>
+  // Values precomputed from exact factors (1 in = 2.54 cm; 1 lb = 0.45359237 kg; 1 st = 14 lb), 2 decimals.
+  const COPY =
+    '<svg class="copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>';
+  const LEN = (ftin, inch, ft, yd, mm, cm, m, nm, um, on) => ({
+    cat: 'Length',
+    sections: [
+      [
+        'US (customary)',
+        [
+          ['ft in', 'feet and inches', ftin, 'pair'],
+          ['in', 'inches', inch, 'in'],
+          ['ft', 'feet', ft],
+          ['yd', 'yards', yd],
+          ['mi', 'miles', '< 0.01'],
+        ],
+      ],
+      [
+        'Metric',
+        [
+          ['nm', 'nanometers', nm],
+          ['µm', 'micrometers', um],
+          ['mm', 'millimeters', mm],
+          ['cm', 'centimeters', cm],
+          ['m', 'meters', m],
+          ['km', 'kilometers', '< 0.01'],
+        ],
+      ],
+      [
+        'Other',
+        [
+          ['nmi', 'nautical miles', '< 0.01'],
+          ['ly', 'light-years', '< 0.01'],
+        ],
+      ],
+    ],
+    on,
+    hidden: 5,
+  });
+  // Each value cell: a string, or [decimal, fraction] when the fraction setting changes it.
+  const EX = {
+    prime: {
+      typed: "5'11",
+      chip: ['ft in', 'feet and inches'],
+      quiet: ['Read as 5 ft 11 in', null],
+      ...LEN(
+        '5 ft 11 in',
+        ['71.00', '71'],
+        '5.92',
+        '1.97',
+        '1,803.40',
+        '180.34',
+        '1.80',
+        '1,803,400,000.00',
+        '1,803,400.00',
+        'ft in',
+      ),
+      note: 'The apostrophe before two digits is the foot mark, the inch mark left off, so the box reads a height. The quiet line says what was read; nothing else was plausible, so no other reading is offered.',
+    },
+    decimal: {
+      typed: '5.11 ft',
+      chip: ['ft', 'feet'],
+      quiet: ['Read as 5.11 ft, decimal feet', ['Read as 5 ft 11 in instead', 'decimalAlt']],
+      ...LEN(
+        ['5 ft 1.32 in', '5 ft 1 5/16 in'],
+        ['61.32', '61 5/16'],
+        '5.11',
+        '1.70',
+        '1,557.53',
+        '155.75',
+        '1.56',
+        '1,557,528,000.00',
+        '1,557,528.00',
+        'ft',
+      ),
+      note: 'A decimal is read as written, as Google does, and the pair row shows what 5.11 ft is in feet and inches. The other reading is one press away in the quiet line; pressing it keeps the text and reads it the other way.',
+    },
+    decimalAlt: {
+      typed: '5.11 ft',
+      chip: ['ft in', 'feet and inches'],
+      quiet: ['Read as 5 ft 11 in', ['Read as 5.11 ft instead', 'decimal']],
+      ...LEN(
+        '5 ft 11 in',
+        ['71.00', '71'],
+        '5.92',
+        '1.97',
+        '1,803.40',
+        '180.34',
+        '1.80',
+        '1,803,400,000.00',
+        '1,803,400.00',
+        'ft in',
+      ),
+      note: 'The same text, read the other way after the press: the chip and the highlighted row change with it, and the quiet line offers the way back.',
+    },
+    cm: {
+      typed: '180',
+      chip: ['cm', 'centimeters'],
+      quiet: null,
+      ...LEN(
+        ['5 ft 10.87 in', '5 ft 10 7/8 in'],
+        ['70.87', '70 7/8'],
+        '5.91',
+        '1.97',
+        '1,800.00',
+        '180.00',
+        '1.80',
+        '1,800,000,000.00',
+        '1,800,000.00',
+        'cm',
+      ),
+      note: 'Nothing ambiguous was typed, so there is no quiet line. The pair row shows the height the way the US and the UK write it, the total rounded first and then split, so it never reads 5 ft 12 in; the fraction setting applies to the last part.',
+    },
+    half: {
+      typed: '5 ft 11 1/2 in',
+      chip: ['ft in', 'feet and inches'],
+      quiet: ['Read as 5 ft 11½ in', null],
+      ...LEN(
+        ['5 ft 11.50 in', '5 ft 11 1/2 in'],
+        ['71.50', '71 1/2'],
+        '5.96',
+        '1.99',
+        '1,816.10',
+        '181.61',
+        '1.82',
+        '1,816,100,000.00',
+        '1,816,100.00',
+        'ft in',
+      ),
+      note: 'A fraction, a decimal, a mixed number, or "and a half" can sit in any part, with or without spaces.',
+    },
+    stone: {
+      typed: '11 st 4',
+      chip: ['st lb', 'stone and pounds'],
+      quiet: ['Read as 11 st 4 lb', null],
+      cat: 'Weight',
+      sections: [
+        [
+          'UK (imperial)',
+          [
+            ['st lb', 'stone and pounds', '11 st 4 lb', 'pair'],
+            ['st', 'stone', '11.29'],
+          ],
+        ],
+        [
+          'US (customary)',
+          [
+            ['lb oz', 'pounds and ounces', '158 lb 0 oz', 'pair'],
+            ['lb', 'pounds', '158.00'],
+            ['oz', 'ounces', '2,528.00'],
+          ],
+        ],
+        [
+          'Metric',
+          [
+            ['kg', 'kilograms', '71.67'],
+            ['g', 'grams', '71,667.59'],
+            ['mg', 'milligrams', '71,667,594.46'],
+            ['t', 'tonnes', '0.07'],
+          ],
+        ],
+      ],
+      on: 'st lb',
+      hidden: 3,
+      note: 'The last unit may be left off where the first has one partner: 11 st 4 is stone and pounds. Each pair sits in the section that writes it that way (CLDR: stone and pounds in the UK, pounds and ounces in the US), as a display row, never a category.',
+    },
+  };
+
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  let current = 'prime';
+
+  function cell(v, frac) {
+    if (Array.isArray(v)) return frac ? v[1] : v[0];
+    return v;
+  }
+
+  function render() {
+    const ex = EX[current];
+    const frac = document.getElementById('opt-frac').checked;
+    document.getElementById('cat').firstChild.textContent = ex.cat + ' ';
+    document.getElementById('typed').textContent = ex.typed;
+    document.getElementById('chip').innerHTML =
+      `<span class="sym">${esc(ex.chip[0])}</span>${esc(ex.chip[1])}<span class="x" aria-hidden="true">×</span>`;
+    const q = document.getElementById('quiet');
+    if (!ex.quiet) q.innerHTML = '';
+    else
+      q.innerHTML =
+        `<span>${esc(ex.quiet[0])}</span>` +
+        (ex.quiet[1]
+          ? `<button class="alt" type="button" data-to="${ex.quiet[1][1]}">${esc(ex.quiet[1][0])}</button>`
+          : '');
+    q.querySelectorAll('.alt').forEach((b) =>
+      b.addEventListener('click', () => {
+        current = b.dataset.to;
+        render();
+      }),
+    );
+    const rows = ex.sections
+      .map(
+        ([band, list]) =>
+          `<div class="band">${esc(band)}</div>` +
+          list
+            .map(([sym, name, v]) => {
+              const on = sym === ex.on;
+              return `<div class="r${on ? ' on' : ''}"><div class="val">${esc(cell(v, frac))}</div><div class="u"><span class="sym">${esc(sym)}</span><span>${esc(name)}</span>${on ? COPY : ''}</div></div>`;
+            })
+            .join(''),
+      )
+      .join('');
+    document.getElementById('table').innerHTML =
+      rows + `<div class="tfoot"><span>› Hidden <b>${ex.hidden}</b></span><span>Edit</span></div>`;
+    document.getElementById('note').innerHTML = `<b>This example.</b> ${esc(ex.note)}`;
+  }
+  document.querySelectorAll('input[name="ex"]').forEach((el) =>
+    el.addEventListener('change', () => {
+      current = el.value;
+      render();
+    }),
+  );
+  document.getElementById('opt-frac').addEventListener('change', render);
+  render();
+</script>

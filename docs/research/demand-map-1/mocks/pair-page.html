@@ -1,0 +1,736 @@
+<title>The cm to inches page</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<style>
+  /* Layout: one 576 px column as every bigsmall page has, in the Daylight tokens; the mock's strip above it
+     switches the section labels on, so each part of the page can be matched to the spec. */
+  :root {
+    --canvas: #fafaf9;
+    --surface: #ffffff;
+    --raised: #f5f5f4;
+    --ink: #1c1917;
+    --muted: #57534e;
+    --accent: #0f766e;
+    --on-accent: #ffffff;
+    --soft: #ccfbf1;
+    --line: #d6d3d1;
+    --edge: #928f8d;
+    --mock: #9a3412;
+    --mock-bg: #fff4e8;
+    --mock-line: #f2c9a8;
+    --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --canvas: #1c1917;
+      --surface: #292524;
+      --raised: #332f2c;
+      --ink: #fafaf9;
+      --muted: #a8a29e;
+      --accent: #2dd4bf;
+      --on-accent: #042f2e;
+      --soft: #134e4a;
+      --line: #44403c;
+      --edge: #78716c;
+      --mock: #fdba74;
+      --mock-bg: #3a2112;
+      --mock-line: #7c3f1a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --canvas: #1c1917;
+    --surface: #292524;
+    --raised: #332f2c;
+    --ink: #fafaf9;
+    --muted: #a8a29e;
+    --accent: #2dd4bf;
+    --on-accent: #042f2e;
+    --soft: #134e4a;
+    --line: #44403c;
+    --edge: #78716c;
+    --mock: #fdba74;
+    --mock-bg: #3a2112;
+    --mock-line: #7c3f1a;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0 48px;
+  }
+  a {
+    color: var(--accent);
+    text-underline-offset: 3px;
+  }
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .strip {
+    max-width: 576px;
+    margin: 0 auto 20px;
+    padding: 14px 16px 16px;
+    background: var(--mock-bg);
+    border: 1px solid var(--mock-line);
+    border-radius: 12px;
+  }
+  .strip h1 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--mock);
+    text-wrap: balance;
+  }
+  .strip p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 60ch;
+  }
+  .opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+    font-size: 14px;
+  }
+  .opts label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 28px;
+    cursor: pointer;
+  }
+  .opts input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--mock);
+  }
+  .serp {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--mock-line);
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .serp .url {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .serp .t {
+    color: #1a0dab;
+    font-size: 17px;
+    margin: 2px 0;
+  }
+  :root[data-theme='dark'] .serp .t {
+    color: #8ab4f8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .serp .t {
+      color: #8ab4f8;
+    }
+  }
+  .serp .d {
+    color: var(--ink);
+  }
+
+  .site {
+    max-width: 576px;
+    margin: 0 auto;
+  }
+  .hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 16px 10px;
+  }
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .sun {
+    width: 26px;
+    height: 26px;
+  }
+  .theme {
+    font-size: 14px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .crumbs {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 6px 0 14px;
+  }
+  .crumbs a {
+    color: var(--muted);
+  }
+  .crumbs span {
+    margin: 0 6px;
+  }
+  h1.pair {
+    font-size: 28px;
+    line-height: 1.2;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .answer {
+    font-size: 17px;
+    margin: 0 0 18px;
+  }
+  .answer .src {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .answer .src a {
+    color: var(--muted);
+  }
+
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    height: 40px;
+    margin-bottom: 6px;
+  }
+  .trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    font-size: 15px;
+    color: var(--ink);
+    padding: 0 8px;
+    min-width: 128px;
+    height: 40px;
+  }
+  .tools svg {
+    width: 20px;
+    height: 20px;
+    opacity: 0.85;
+  }
+  .box {
+    border: 2px solid var(--edge);
+    border-radius: 20px;
+    background: var(--surface);
+    padding: 8px 10px 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .typed {
+    flex: 1;
+    font-size: 24px;
+    font-variant-numeric: tabular-nums;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--soft);
+    border-radius: 12px;
+    padding: 10px 10px 10px 12px;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .chip .sym {
+    color: var(--muted);
+  }
+  .chip .x {
+    color: var(--muted);
+    font-size: 18px;
+    margin-left: 4px;
+  }
+  .table {
+    border: 2px solid var(--edge);
+    border-radius: 20px;
+    background: var(--surface);
+    margin-top: 10px;
+    padding: 8px 10px 6px;
+  }
+  .band {
+    background: var(--raised);
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin: 6px 0 4px;
+  }
+  .r {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 10px 0 14px;
+    border-radius: 12px;
+    gap: 12px;
+  }
+  .r.on {
+    background: var(--soft);
+  }
+  .r.to .u {
+    font-weight: 600;
+  }
+  .val {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    font-size: 17px;
+  }
+  .u {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 150px;
+    font-size: 17px;
+  }
+  .u .sym {
+    color: var(--muted);
+    min-width: 36px;
+    text-align: right;
+  }
+  .tfoot {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 14px 8px;
+    font-size: 15px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    margin-top: 8px;
+  }
+  .tfoot b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  section.part {
+    margin-top: 32px;
+  }
+  h2 {
+    font-size: 20px;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  p {
+    margin: 0 0 12px;
+    max-width: 65ch;
+  }
+  .vals {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+  .vals th,
+  .vals td {
+    text-align: right;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .vals th {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .vals td:first-child,
+  .vals th:first-child {
+    text-align: left;
+  }
+  .vals tr:target td {
+    background: var(--soft);
+  }
+  .vals .f {
+    color: var(--muted);
+  }
+  .wrap {
+    overflow-x: auto;
+  }
+  .formula {
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+    padding: 12px 16px;
+    background: var(--raised);
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  .links {
+    display: grid;
+    gap: 8px;
+  }
+  .links a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--surface);
+  }
+  .links a .k {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .links a:hover {
+    border-color: var(--edge);
+  }
+  .foot {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 40px;
+    display: flex;
+    gap: 18px;
+  }
+  .foot a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  /* The shape's labels, on when asked */
+  .labels [data-part] {
+    position: relative;
+    outline: 1px dashed var(--mock);
+    outline-offset: 6px;
+    border-radius: 4px;
+  }
+  .labels [data-part]::before {
+    content: attr(data-part);
+    position: absolute;
+    top: -24px;
+    left: 0;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mock);
+    background: var(--mock-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .labels section.part {
+    margin-top: 44px;
+  }
+  .labels .page-h1 {
+    margin-top: 30px;
+  }
+</style>
+
+<section class="strip">
+  <h1>The pair page, drawn for cm to inches</h1>
+  <p>
+    The shape the pair-pages worker recommends after reading forty ranking pages and Google's own
+    rules: the pair as the heading, the cited factor as the answer, bigsmall's box and table opened
+    on the pair, the values people search, the formula, the pitfall that is real for this pair, and
+    the links that make it a page in a hierarchy. Text written for the pair, nothing generic.
+  </p>
+  <div class="opts">
+    <label><input type="checkbox" id="opt-labels" /> Label the parts of the shape</label>
+  </div>
+  <div class="serp" aria-label="How a search result would show this page">
+    <div class="url">bigsmall.work › cm-to-inches</div>
+    <div class="t">cm to inches · bigsmall</div>
+    <div class="d">
+      Centimeters to inches: 1 in = 2.54 cm exactly. Type any value and read every unit at once,
+      inches as decimals or fractions. Heights too: 180 cm is 5 ft 10 ⅞ in.
+    </div>
+  </div>
+</section>
+
+<div class="site" id="site">
+  <div class="hdr">
+    <a class="wordmark" href="#" data-part="wordmark, a link home"
+      >bigsmall
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="5" fill="#f59e0b" />
+        <g stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
+          <path
+            d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"
+          />
+        </g>
+      </svg>
+    </a>
+    <div class="theme">
+      Daylight
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </div>
+  </div>
+
+  <nav class="crumbs" aria-label="Breadcrumb" data-part="breadcrumb, BreadcrumbList">
+    <a href="#">bigsmall</a><span>›</span><a href="#">Length</a><span>›</span>cm to inches
+  </nav>
+
+  <h1 class="pair page-h1" data-part="h1, the pair in words">Centimeters to inches</h1>
+  <p class="answer" data-part="the answer line, the cited factor">
+    <strong>1 in = 2.54 cm</strong>, exactly, and 1 cm ≈ 0.3937 in.
+    <span class="src"
+      >The inch has been defined as 2.54 cm since 1959 (<a href="#">NIST SP 811, Appendix B</a
+      >).</span
+    >
+  </p>
+
+  <div data-part="the converter, opened on the pair">
+    <div class="tools" aria-hidden="true">
+      <span class="trigger"
+        >Length
+        <svg width="14" height="14" viewBox="0 0 24 24">
+          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" /></svg
+      ></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="5" y="3" width="14" height="18" rx="2" />
+        <path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2" />
+      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M7 4v16M4 7l3-3 3 3M13 6h7M13 12h5M13 18h3" />
+      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 17 17 3l4 4L7 21l-4-4zM7 13l2 2M10 10l2 2M13 7l2 2" />
+      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="5" cy="12" r="1.2" />
+        <circle cx="12" cy="12" r="1.2" />
+        <circle cx="19" cy="12" r="1.2" />
+      </svg>
+    </div>
+    <div class="box">
+      <div class="typed">1</div>
+      <span class="chip"
+        ><span class="sym">cm</span>centimeters<span class="x" aria-hidden="true">×</span></span
+      >
+    </div>
+    <div class="table">
+      <div class="band">US (customary)</div>
+      <div class="r to">
+        <div class="val">0.39</div>
+        <div class="u"><span class="sym">in</span><span>inches</span></div>
+      </div>
+      <div class="r">
+        <div class="val">0.03</div>
+        <div class="u"><span class="sym">ft</span><span>feet</span></div>
+      </div>
+      <div class="r">
+        <div class="val">0.01</div>
+        <div class="u"><span class="sym">yd</span><span>yards</span></div>
+      </div>
+      <div class="r">
+        <div class="val">&lt; 0.01</div>
+        <div class="u"><span class="sym">mi</span><span>miles</span></div>
+      </div>
+      <div class="band">Metric</div>
+      <div class="r">
+        <div class="val">10.00</div>
+        <div class="u"><span class="sym">mm</span><span>millimeters</span></div>
+      </div>
+      <div class="r on">
+        <div class="val">1.00</div>
+        <div class="u"><span class="sym">cm</span><span>centimeters</span></div>
+      </div>
+      <div class="r">
+        <div class="val">0.01</div>
+        <div class="u"><span class="sym">m</span><span>meters</span></div>
+      </div>
+      <div class="r">
+        <div class="val">&lt; 0.01</div>
+        <div class="u"><span class="sym">km</span><span>kilometers</span></div>
+      </div>
+      <div class="tfoot">
+        <span>› Hidden <b>7</b></span
+        ><span>Edit</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="part" data-part="the values people search, an anchor a row">
+    <h2>Centimeters to inches, the values people look up</h2>
+    <p>
+      Inches as a decimal and to the nearest sixteenth, the fraction a tape measure shows. Type any
+      other value in the box above.
+    </p>
+    <div class="wrap">
+      <table class="vals">
+        <thead>
+          <tr>
+            <th>cm</th>
+            <th>inches</th>
+            <th>to a sixteenth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="v-1">
+            <td>1 cm</td>
+            <td>0.39</td>
+            <td class="f">⅜ in</td>
+          </tr>
+          <tr id="v-2">
+            <td>2 cm</td>
+            <td>0.79</td>
+            <td class="f">¹³⁄₁₆ in</td>
+          </tr>
+          <tr id="v-2-5">
+            <td>2.5 cm</td>
+            <td>0.98</td>
+            <td class="f">1 in</td>
+          </tr>
+          <tr id="v-3">
+            <td>3 cm</td>
+            <td>1.18</td>
+            <td class="f">1 ³⁄₁₆ in</td>
+          </tr>
+          <tr id="v-4">
+            <td>4 cm</td>
+            <td>1.57</td>
+            <td class="f">1 ⁹⁄₁₆ in</td>
+          </tr>
+          <tr id="v-5">
+            <td>5 cm</td>
+            <td>1.97</td>
+            <td class="f">1 ¹⁵⁄₁₆ in</td>
+          </tr>
+          <tr id="v-6">
+            <td>6 cm</td>
+            <td>2.36</td>
+            <td class="f">2 ⅜ in</td>
+          </tr>
+          <tr id="v-7">
+            <td>7 cm</td>
+            <td>2.76</td>
+            <td class="f">2 ¾ in</td>
+          </tr>
+          <tr id="v-8">
+            <td>8 cm</td>
+            <td>3.15</td>
+            <td class="f">3 ⅛ in</td>
+          </tr>
+          <tr id="v-10">
+            <td>10 cm</td>
+            <td>3.94</td>
+            <td class="f">3 ¹⁵⁄₁₆ in</td>
+          </tr>
+          <tr id="v-12">
+            <td>12 cm</td>
+            <td>4.72</td>
+            <td class="f">4 ¾ in</td>
+          </tr>
+          <tr id="v-15">
+            <td>15 cm</td>
+            <td>5.91</td>
+            <td class="f">5 ⅞ in</td>
+          </tr>
+          <tr id="v-20">
+            <td>20 cm</td>
+            <td>7.87</td>
+            <td class="f">7 ⅞ in</td>
+          </tr>
+          <tr id="v-25">
+            <td>25 cm</td>
+            <td>9.84</td>
+            <td class="f">9 ¹³⁄₁₆ in</td>
+          </tr>
+          <tr id="v-30">
+            <td>30 cm</td>
+            <td>11.81</td>
+            <td class="f">11 ¹³⁄₁₆ in</td>
+          </tr>
+          <tr id="v-40">
+            <td>40 cm</td>
+            <td>15.75</td>
+            <td class="f">15 ¾ in</td>
+          </tr>
+          <tr id="v-50">
+            <td>50 cm</td>
+            <td>19.69</td>
+            <td class="f">19 ¹¹⁄₁₆ in</td>
+          </tr>
+          <tr id="v-100">
+            <td>100 cm</td>
+            <td>39.37</td>
+            <td class="f">39 ⅜ in</td>
+          </tr>
+          <tr id="v-180">
+            <td>180 cm</td>
+            <td>70.87</td>
+            <td class="f">70 ⅞ in</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="part" data-part="how to convert, one worked example">
+    <h2>How to convert</h2>
+    <div class="formula">inches = centimeters ÷ 2.54</div>
+    <p>
+      A height of 180 cm: 180 ÷ 2.54 = 70.87 in, which is 5 ft 10.87 in, or 5 ft 10 ⅞ in to the
+      nearest sixteenth. Going the other way, multiply by 2.54: 6 in × 2.54 = 15.24 cm.
+    </p>
+  </section>
+
+  <section class="part" data-part="the pitfall real for this pair">
+    <h2>One inch has been 2.54 cm since 1959</h2>
+    <p>
+      Before 1959 the US and the UK each kept an inch of their own, a few millionths apart. The
+      international yard and pound agreement fixed the inch at exactly 2.54 cm, so every conversion
+      on this page is exact until it is rounded. The one survivor, the US survey foot, differed by
+      two parts in a million and was retired at the end of 2022; it matters for land surveys, never
+      for a height, a screen, or a parcel.
+    </p>
+    <p>
+      Where it comes up: heights (the US and the UK say 5 ft 11 in, most of the world 180 cm),
+      screens and paper sizes, shoe lasts, and anything measured with a tape that shows sixteenths.
+    </p>
+  </section>
+
+  <section class="part" data-part="links: the reverse pair, related pairs, the category">
+    <h2>Related</h2>
+    <div class="links">
+      <a href="#">Inches to centimeters <span class="k">the reverse</span></a>
+      <a href="#">Feet and inches to centimeters <span class="k">heights</span></a>
+      <a href="#">Millimeters to inches</a>
+      <a href="#">Meters to feet</a>
+      <a href="#">Length, every pair <span class="k">the category</span></a>
+    </div>
+  </section>
+
+  <p class="foot"><a href="#">About</a></p>
+</div>
+
+<script>
+  const t = document.getElementById('opt-labels');
+  const apply = () => document.getElementById('site').classList.toggle('labels', t.checked);
+  t.addEventListener('change', apply);
+  apply();
+</script>

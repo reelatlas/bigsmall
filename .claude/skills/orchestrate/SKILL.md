@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Runs a task as waves of agents for bigsmall: an orchestrator's brief, parallel workers with one question or one part each, checkers kept apart from gatherers, handoffs as files, a budget and a stop at every wave, the record and the cost written. Use when a task has several independent parts of one shape (a research pass over candidates, a bounded build with independent pieces), or when Sean says orchestrate, delegate, fan out, or run agents; not for a handful of calls, a lookup with a known target, or a design judgment, which is Sean's with a mock. v0, written at the demand map's first wave (2026-10-19), completed from what each run teaches.
+description: Runs a task as waves of agents for bigsmall: an orchestrator's brief, parallel workers with one question or one part each, checkers kept apart from gatherers, handoffs as files, a budget and a stop at every wave, the record and the cost written. Use when a task has several independent parts of one shape (a research pass over candidates, a bounded build with independent pieces), or when Sean says orchestrate, delegate, fan out, or run agents; not for a handful of calls, a lookup with a known target, or a design judgment, which is Sean's with a mock. v1, completed from the demand map's run (2026-10-19) and amended by each run that teaches it.
 argument-hint: '[the task, or the research doc that holds its briefs]'
 ---
 
@@ -67,3 +67,13 @@ The Agent tool for a handful of independent workers (model and effort per agent;
 ## 8. The record
 
 The pass's doc (`docs/research/<pass>.md`): the decisions numbered, the cost per wave, what the briefs got wrong; the findings log with Sean's words; a learning for each surprise; this skill amended in the same commit as the run that taught it (CLAUDE.md, "How the docs and skills evolve").
+
+## 9. A run, step by step
+
+What the demand map's run settled (2026-10-19), as the checklist a session follows; the sections above hold the reasons.
+
+0. **The plan.** The pass's doc with the questions, the method, every brief, and the budget table; `docs/RESEARCH.md` amended where the method grows; shipped before any agent runs.
+1. **Gather.** Workers in parallel from the doc's briefs (Opus 5.5, high; 150 calls; the report as the reply's text, the data by the worker's scripts into its own scratchpad folder; the safety rules in every brief). Save each report as `findings.md`, copy the keepers into `docs/research/<pass>/<worker>/`, write the headlines into the doc, the cost into its table, and save.
+2. **Verify.** Select the load-bearing claims into one file with a `check` note per row, 60 to 80 rows split by topic; two checkers at max, 60 to 80 calls each, told never to open a worker's notes and to re-download what the worker downloaded; save and copy as in step 1; read every corrected source yourself; amend the positions; record the corrections and the caveats; the learnings; save.
+3. **Decide.** The decisions numbered for Sean, each with where to see it, what changes, one recommendation, and his call; a mock as an artifact for anything he judges by eye, drawn from the product's own screenshots and tokens and kept as HTML with the pass; the spec drafted where a shape was decided; this skill amended; "Pick up here" pointing at the answers to come; save.
+4. **At every piece's end**, the context gauge (§3): the estimate given, `/context` asked for, and continue, compact, or a fresh session said.

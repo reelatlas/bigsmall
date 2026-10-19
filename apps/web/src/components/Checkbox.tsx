@@ -24,7 +24,8 @@ const BOX =
  * radios have theirs, so a stuck head may pass over a list of them: the native 16 px box was a
  * target under WCAG 2.5.8's 24 px, which axe flagged the moment the stuck toolbar's button sat
  * beside one, and until then the head had to let go over Edit, Hidden, and a panel below md.
- * Keys, labels, and screen readers see the input as before.
+ * Keys, labels, and screen readers see the input as before. A fixed one (`disabled`) fades its
+ * box alone, since its row still names the unit in the box (docs/DESIGN-SYSTEM.md, "States").
  */
 export function Checkbox({ inputRef, ...props }: CheckboxProps) {
   return (

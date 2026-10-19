@@ -37,7 +37,7 @@ export function SettingSamples({ theme }: { theme: string }) {
           onToggle={noop}
         />
       </fieldset>
-      <fieldset disabled className="grid">
+      <fieldset disabled className="grid transition-opacity disabled:opacity-50">
         <legend className={GROUP_TITLE}>Disabled</legend>
         <SegmentedControl
           name={`${id}-rounding`}

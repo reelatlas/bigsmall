@@ -39,11 +39,13 @@ const BASE =
   'disabled:opacity-50 aria-disabled:opacity-50 active:opacity-80';
 
 // Secondary buttons share the fields' two-pixel edge, so every bordered control has one weight.
+// Under the pointer each steps as the design system's "States" says: a fill gains the raised
+// surface, the soft accent its hover tone (as the chip's), the primary fill 90 %.
 const VARIANTS: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-on-accent hover:opacity-90',
   secondary: 'border-2 border-edge bg-surface text-ink hover:bg-surface-raised',
   tonal: 'border-2 border-edge bg-surface-raised text-ink-muted hover:text-ink',
-  soft: 'bg-accent-soft text-ink hover:opacity-90',
+  soft: 'bg-accent-soft text-ink hover:bg-accent-soft-hover',
   ghost: 'text-ink-muted hover:bg-surface-raised hover:text-ink',
 };
 

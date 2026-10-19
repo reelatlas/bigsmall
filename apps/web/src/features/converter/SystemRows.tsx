@@ -24,6 +24,8 @@ const DRAG_START = 4;
  * moves joined in one strip under the handle, no gutter, each seam drawn once (a move's left edge
  * clear over its neighbour's line), and the move with focus turning its own edge the focus color,
  * lifted over its neighbour, so the highlight is the strip's edge itself, never a ring inside it.
+ * An end that cannot move further takes the muted ink: a segment inert alone in a joined strip,
+ * where a fade would cut the strip's shared edge (docs/DESIGN-SYSTEM.md, "States").
  */
 const MOVE_MENU = 'absolute top-full right-0 z-20 flex rounded-md bg-surface shadow-md';
 const MOVE =

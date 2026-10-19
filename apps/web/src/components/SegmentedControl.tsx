@@ -14,13 +14,15 @@ import type { ReactNode } from 'react';
  * edge clear over its neighbour's line (its fill kept inside its edge), so no seam is two lines
  * that a scaled screen rounds apart. With focus a segment's own edge turns the focus color and it
  * is lifted over its neighbours: the highlight is the edge, the same width at rest and with focus,
- * on all four sides alike wherever the segment is (Sean, 2026-10-15).
+ * on all four sides alike wherever the segment is (Sean, 2026-10-15). A strip that can do nothing
+ * fades as one, its fieldset at 50 % (docs/DESIGN-SYSTEM.md, "States"); no segment is disabled
+ * alone.
  */
 
 const TARGET =
   'group flex min-w-11 cursor-pointer items-center not-first:-ml-0.5 pointer-coarse:min-h-11 has-disabled:cursor-default';
 const SEGMENT =
-  'flex h-8 w-full items-center justify-center border-2 border-edge border-l-transparent bg-clip-padding px-2.5 text-sm whitespace-nowrap text-ink group-first:rounded-l-md group-first:border-l-edge group-last:rounded-r-md peer-checked:bg-accent-soft peer-focus-visible:relative peer-focus-visible:z-10 peer-focus-visible:border-focus peer-disabled:text-ink-muted';
+  'flex h-8 w-full items-center justify-center border-2 border-edge border-l-transparent bg-clip-padding px-2.5 text-sm whitespace-nowrap text-ink group-first:rounded-l-md group-first:border-l-edge group-last:rounded-r-md peer-checked:bg-accent-soft peer-focus-visible:relative peer-focus-visible:z-10 peer-focus-visible:border-focus';
 
 export interface SegmentedOption<T> {
   value: T;

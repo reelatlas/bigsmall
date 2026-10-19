@@ -84,7 +84,7 @@ function Choices<T extends string | number>({
 }) {
   const name = useId();
   return (
-    <fieldset disabled={disabled} className="grid">
+    <fieldset disabled={disabled} className="grid transition-opacity disabled:opacity-50">
       <legend className={hideLegend ? 'sr-only' : GROUP_TITLE}>{legend}</legend>
       <SegmentedControl
         name={name}

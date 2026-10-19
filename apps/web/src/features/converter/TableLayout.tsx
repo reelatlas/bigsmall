@@ -672,6 +672,9 @@ export function TableLayout({
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       const input = inputRef.current;
       const target = event.target as Node;
+      // An open menu keeps its keys (docs/UX-SPEC.md §8, as the header's menus do): a letter on
+      // the category menu's choice or on More's item never types into the box.
+      if ((target as Element).closest('[data-open]')) return;
       if (!input || target === input || event.defaultPrevented || event.isComposing) return;
       const parts = sideTypes
         ? [toolsRef, fieldRef, placeRef, sideRef]

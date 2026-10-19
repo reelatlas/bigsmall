@@ -332,6 +332,41 @@ test('opening the category menu leaves the page where it was; the keyboard bring
   await expect(label).toBeInViewport();
 });
 
+test('a letter pressed on an open menu’s choice stays with the menu: the box takes nothing', async ({
+  page,
+  isMobile,
+}) => {
+  // docs/UX-SPEC.md §8, Typing: never with focus in another control, a menu's choices among them,
+  // as the header's theme menu already kept its keys (Sean, 2026-10-18; until then a letter on
+  // the category menu's choice typed into the box and shut the menu).
+  await page.goto('/?a=meter&v=1');
+  await ready(page);
+  const before = await box(page).inputValue();
+  await menu(page).click();
+  const chosen = page.getByRole('radio', { name: 'Length' });
+  await expect(chosen).toBeFocused();
+  await page.keyboard.press('k');
+  await expect(menu(page)).toHaveAttribute('aria-expanded', 'true');
+  await expect(chosen).toBeFocused();
+  expect(await box(page).inputValue()).toBe(before);
+  await page.keyboard.press('Escape');
+  await expect(menu(page)).toHaveAttribute('aria-expanded', 'false');
+  if (isMobile) return;
+  // More's menu the same, where a pointer gets More (ADR 0023).
+  await windowOf(page, 375, 800);
+  const more = page
+    .getByRole('toolbar', { name: 'Tools' })
+    .getByRole('button', { name: 'More tools' });
+  await more.focus();
+  await page.keyboard.press('Enter');
+  const first = page.getByRole('menuitem').first();
+  await expect(first).toBeFocused();
+  await page.keyboard.press('k');
+  await expect(more).toHaveAttribute('aria-expanded', 'true');
+  await expect(first).toBeFocused();
+  expect(await box(page).inputValue()).toBe(before);
+});
+
 test('in a short window the open category menu scrolls inside, the chosen category in view and the page still', async ({
   page,
 }) => {

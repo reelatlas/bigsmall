@@ -14,11 +14,14 @@ export interface CheckboxProps extends Omit<
  * (`focus-ring-peer`, global.css), on the box since the input itself is out of sight.
  */
 const BOX =
-  'pointer-events-none absolute inset-0 rounded-sm border-2 border-edge bg-surface transition-colors peer-checked:border-accent peer-checked:bg-accent peer-indeterminate:border-accent peer-indeterminate:bg-accent focus-ring-peer';
+  'pointer-events-none absolute inset-0 rounded-mark border-2 border-edge bg-surface transition-colors peer-checked:border-accent peer-checked:bg-accent peer-indeterminate:border-accent peer-indeterminate:bg-accent focus-ring-peer';
 
 /**
  * A checkbox the design draws (docs/DESIGN-SYSTEM.md, "A list of choices"; 2026-10-18): the native
- * input, visually hidden, with a 16 px box beside it on the tokens, the check in the accent's ink
+ * input, visually hidden, with a 16 px box beside it on the tokens, square in every theme (its
+ * corner `rounded-mark`, the theme's small one capped at a quarter of the side: a circle would say
+ * radio; Sean, 2026-10-18),
+ * the check in the accent's ink
  * while it is on, a dash while a group is partly on (`indeterminate`, TriCheckbox), and the focus
  * ring on the box. The row around it, a 44 px label, is the target, as the segmented control's
  * radios have theirs, so a stuck head may pass over a list of them: the native 16 px box was a

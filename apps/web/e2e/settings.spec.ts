@@ -30,6 +30,37 @@ import { THEMES } from '../src/lib/themes';
 const table = (page: Page) => page.getByRole('region', { name: 'Volume' });
 const SPECIALTY = unitsIn('volume').filter((unit) => unit.tier === 'specialty').length;
 
+test('the drawn checkbox is a square in every theme: its corner at most a quarter of its side', async ({
+  page,
+}) => {
+  // docs/DESIGN-SYSTEM.md, "Corners" (Sean, 2026-10-18: a circle says radio; the theme's small
+  // corner, 8 px in Sakura, had made the 16 px box one).
+  await page.goto('/?a=meter&v=1');
+  await ready(page);
+  await page.keyboard.press('Alt+V');
+  const units = page.getByRole('group', { name: 'Units', exact: true });
+  await expect(units).toBeVisible();
+  const drawn = units
+    .locator('input[type="checkbox"]')
+    .first()
+    .locator('xpath=following-sibling::span[1]');
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const box = await drawn.evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      return {
+        width: rect.width,
+        height: rect.height,
+        corner: parseFloat(getComputedStyle(el).borderTopLeftRadius),
+      };
+    });
+    expect(box.width, theme.id).toBe(box.height);
+    // Rounded by the theme, never a circle: more than nothing, at most a quarter of the side.
+    expect(box.corner, theme.id).toBeGreaterThan(0);
+    expect(box.corner, theme.id).toBeLessThanOrEqual(box.width / 4);
+  }
+});
+
 test('a fresh visit shows symbols and names, two places, and the specialty units hidden', async ({
   page,
 }) => {

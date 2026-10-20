@@ -159,7 +159,8 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
  * left-aligned in its own; the copied check flashing over its end. The names keep to one
  * line: where one would not fit beside its value (a long value on a phone), the pairs' names give
- * way first, then every name (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the
+ * way first, then the pairs' symbols, then every name (GIVE_WAY), then Both's fraction moves
+ * under the decimal, on a second line in the
  * value's columns, the symbol and the name centred beside both lines. The unit's cell has no column gap,
  * since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2). Seven
  * columns, so a row spans col-span-7.
@@ -169,10 +170,11 @@ const ROWS =
 
 /**
  * The columns that give way when a row has no room for them, in that order (useColumnsFit): the
- * pairs' names first, the table's longest (hours, minutes, and seconds), so the single units keep
- * theirs; then every name; then Both's fraction (Sean, 2026-10-19).
+ * pairs' names first, the table's longest (hours, minutes, and seconds), then the pairs' symbols
+ * (h min s, the widest), whose values carry their units, so the single units keep their names;
+ * then every name; then Both's fraction (Sean, 2026-10-19 and 2026-10-20).
  */
-const GIVE_WAY = ['pair', 'name', 'second'] as const;
+const GIVE_WAY = ['pair', 'pair-symbol', 'name', 'second'] as const;
 
 /** A symbol's trailing exponent, set in a column of its own: "km²" is "km" and "²". */
 const EXPONENT = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+$/u;
@@ -434,6 +436,7 @@ export function ConversionTable<T extends ConversionRow>({
   const fitted = useColumnsFit(gridRef, GIVE_WAY);
   const namesHidden = fitted.includes('name');
   const pairNamesHidden = fitted.includes('pair');
+  const pairSymbolsHidden = fitted.includes('pair-symbol');
   const secondHidden = fitted.includes('second');
   const withNames = display.names === 'both';
   const both = display.format === 'both';
@@ -501,8 +504,9 @@ export function ConversionTable<T extends ConversionRow>({
 
   /** A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and name. */
   const cells = (row: T) => {
-    // A pair draws no symbol: its value is its notation, its name the row's label (ADR 0026).
-    const [base, exponent] = splitExponent(row.pair ? '' : row.symbol);
+    // A pair's row is every row's: its symbol (ft in) beside its value in the marks, then its
+    // name (ADR 0026; Sean, 2026-10-20: the units in the table, as everywhere else).
+    const [base, exponent] = splitExponent(row.symbol);
     const written = both ? secondOf(row) : null;
     const fraction = written ? writtenText(row, written) : null;
     const stacked = written ? splitFraction(written) : null;
@@ -570,21 +574,29 @@ export function ConversionTable<T extends ConversionRow>({
             </span>
           </>
         )}
-        <span aria-hidden="true" className={cx(SYMBOL_CELL, tall)} data-symbol>
+        {/* A pair's symbol gives way after its name and before any single unit's name: the value
+            carries its units. The cells after it keep their columns while it is hidden. */}
+        <span
+          aria-hidden="true"
+          hidden={row.pair ? pairSymbolsHidden : undefined}
+          className={cx(SYMBOL_CELL, tall)}
+          data-symbol
+          data-column={row.pair ? 'pair-symbol' : undefined}
+        >
           {base}
         </span>
-        <span aria-hidden="true" className={cx(unitSymbol(), tall)}>
+        <span aria-hidden="true" className={cx('col-start-6', unitSymbol(), tall)}>
           {exponent}
         </span>
         {!row.pair && <span className="sr-only">{row.symbol}</span>}
         {/* A pair's name sits in the names' column as every row's does, and gives way first: the
-            table's longest, it goes before the single units' names do, the value then its own
-            label (5′ 11″, 11 st 4 lb) (ADR 0026; Sean, 2026-10-19). */}
+            table's longest, it goes before the single units' names do, the symbol then the label
+            that stays (ft in) (ADR 0026; Sean, 2026-10-19 and 2026-10-20). */}
         {withNames ? (
           <span
             aria-hidden="true"
             hidden={row.pair ? pairNamesHidden : namesHidden}
-            className={cx(NAME_CELL, 'text-ink', tall)}
+            className={cx(NAME_CELL, 'col-start-7 text-ink', tall)}
             data-name
             data-column={row.pair ? 'pair' : 'name'}
           >
@@ -668,8 +680,16 @@ export function ConversionTable<T extends ConversionRow>({
       <span className={cx(SYMBOL_CELL, 'row-start-1')}>
         {stack((row) => splitExponent(row.pair ? '' : row.symbol)[0])}
       </span>
+      {/* The pairs' symbols, a column of their own, which gives way after the pairs' names. */}
+      <span
+        hidden={pairSymbolsHidden}
+        className={cx(SYMBOL_CELL, 'row-start-1')}
+        data-column="pair-symbol"
+      >
+        {stack((row) => (row.pair ? splitExponent(row.symbol)[0] : ''))}
+      </span>
       <span className={cx('col-start-6 row-start-1', unitSymbol())}>
-        {stack((row) => splitExponent(row.pair ? '' : row.symbol)[1])}
+        {stack((row) => splitExponent(row.symbol)[1])}
       </span>
       {withNames && (
         <>

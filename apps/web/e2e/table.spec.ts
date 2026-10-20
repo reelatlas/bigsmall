@@ -2038,11 +2038,11 @@ test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row
   await expect(box(page)).toHaveAttribute('placeholder', 'Number');
   // No quiet line: the chip and the table say what was read (the ninety-eighth pass).
   await expect(page.locator('[data-read]')).toHaveCount(0);
-  // The pair's row sits under Mixed units, its value in the marks people write, no symbol (the
-  // marks are the value's) and its name in the names' column, a column of its own to the fit,
-  // which gives way before the names do: the single units read as before, their names kept.
+  // The pair's row sits under Mixed units, its value in the marks people write, its symbol as
+  // every row's, and its name in the names' column, a column of its own to the fit, which gives
+  // way before the names do: the single units read as before, their names kept.
   await expect(row(page, 'foot-inch')).toContainText('5′ 11.00″');
-  await expect(row(page, 'foot-inch').locator('[data-symbol]')).toHaveText('');
+  await expect(row(page, 'foot-inch').locator('[data-symbol]')).toHaveText('ft in');
   await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveText('feet and inches');
   await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveAttribute(
     'data-column',
@@ -2070,4 +2070,7 @@ test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row
   await box(page).press('Enter');
   await expect(row(page, 'hour-minute-second')).toContainText('1:30:00');
   await expect(row(page, 'minute')).toContainText('90.00');
+  // The pair's symbol, the table's widest (h min s), never costs the single rows their names: it
+  // gives way before them, after the pair's name (the hundred-and-first pass).
+  await expect(row(page, 'minute').locator('[data-name]')).toBeVisible();
 });

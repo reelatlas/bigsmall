@@ -52,8 +52,9 @@ interface ConversionRow {
   /**
    * What the text is: a value; a dash, while there is no number or no unit to convert from; a
    * message, in the danger color; or beyond, a value past the row's scale (ADR 0027), its text
-   * where the scale ends ("> 13.5") in the muted ink, written across as a message is. Only a
-   * value can be copied; a row beyond its scale is taken, as the layout decides.
+   * where the scale ends ("> 13.5") in the muted ink, written in the value's columns so its
+   * decimal point lines up. Only a value can be copied; a row beyond its scale is taken, as the
+   * layout decides.
    */
   tone: 'value' | 'empty' | 'message' | 'beyond';
   /** The unit in the box: marked in the accent's soft fill. */
@@ -411,7 +412,14 @@ function valueParts(
   mark: string,
   significant: number,
 ): ValueParts {
-  if (row.tone !== 'value') return { across: row.text };
+  // A dash and a message are written across both columns. A row beyond its scale (ADR 0027) is
+  // written as a value is, its "> 13" in the whole column and ".5" after the mark, so its decimal
+  // point lines up with the sizes' (Sean, 2026-10-20: written across, it sat past them); across
+  // where every value is, with Fraction.
+  if (row.tone === 'empty' || row.tone === 'message') return { across: row.text };
+  if (row.tone === 'beyond') {
+    return display.format === 'fraction' ? { across: row.text } : splitAtMark(row.text, mark);
+  }
   const written =
     row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
   // A fraction, and a pair, have no decimal point to line up on: written whole, right-aligned; a
@@ -424,7 +432,11 @@ function valueParts(
     return { across: writtenText(row, written), spoken: spoken?.text };
   }
   if (display.format === 'fraction' && !row.clock) return { across: writtenText(row, written) };
-  const text = written?.text ?? row.text;
+  return splitAtMark(written?.text ?? row.text, mark);
+}
+
+/** A value in two, at its decimal mark, or at the exponent marker without one ("1E23"). */
+function splitAtMark(text: string, mark: string): ValueParts {
   let at = text.indexOf(mark);
   if (at < 0) at = text.indexOf('E');
   // A pace's colon lines up as a decimal point does: 5:30 over 10.91.

@@ -86,6 +86,20 @@ const scrollHeadingUnder = (page: Page, heading: string) =>
     window.scrollTo(0, Math.round(own - edge + 10));
   }, heading);
 
+/**
+ * The right edge of every row's first drawn cell: the whole number's with Decimal, where the
+ * decimal points line up, and the value's across with Fraction; one edge for every row when the
+ * rows line up.
+ */
+const firstCellRights = (page: Page) =>
+  page.locator('[data-row] > [role="gridcell"]:first-child').evaluateAll((units) =>
+    units.map((unit) => {
+      const range = document.createRange();
+      range.selectNodeContents(unit.firstElementChild!);
+      return Math.round(range.getBoundingClientRect().right);
+    }),
+  );
+
 /** What the field's cursor is on, as it reads, or null while it rests. */
 async function cursor(page: Page): Promise<string | null> {
   return box(page).evaluate((input) => {
@@ -1446,6 +1460,9 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await expect(row(page, 'mondopoint')).toContainText('280');
   // An adult's foot is beyond the children's table: the row says where the scale ends.
   await expect(row(page, 'us-children')).toContainText('> 13.5');
+  // Its "> 13" sits in the whole column, so its decimal point lines up with the sizes' (Sean,
+  // 2026-10-20: written across, it sat past them).
+  expect(new Set(await firstCellRights(page)).size).toBe(1);
   await expect(page.getByText(/^ISO 19407/)).toBeVisible();
   // A size moves into the box as the row writes it.
   await unitCell(page, 'eu').click();
@@ -1462,16 +1479,7 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await expect(row(page, 'us-men')).toContainText('10 1/2');
   await expect(row(page, 'uk')).toContainText('9 1/2');
   await expect(row(page, 'eu')).toContainText('≈ 43 1/2');
-  const rights = await page
-    .locator('[data-row] > [role="gridcell"]:first-child')
-    .evaluateAll((units) =>
-      units.map((unit) => {
-        const range = document.createRange();
-        range.selectNodeContents(unit.firstElementChild!);
-        return Math.round(range.getBoundingClientRect().right);
-      }),
-    );
-  expect(new Set(rights).size).toBe(1);
+  expect(new Set(await firstCellRights(page)).size).toBe(1);
   // A row beyond its scale, taken, brings the scale into the box with the number cleared, for a
   // size of its own, the rows waiting with dashes (Sean, 2026-10-20).
   await expect(row(page, 'us-children')).toContainText('> 13.5');

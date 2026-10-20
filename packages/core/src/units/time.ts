@@ -79,10 +79,12 @@ export const timeUnits: readonly Unit[] = [
     kind: 'linear',
     id: 'hour-minute-second',
     category: 'time',
-    name: 'hours, minutes, and seconds',
-    plural: 'hours, minutes, and seconds',
-    symbol: 'h min s',
-    aliases: ['hours minutes seconds', 'hms'],
+    name: 'hours, minutes, seconds',
+    plural: 'hours, minutes, seconds',
+    // The clock's own shape, a legend for 1:30:00; the grammar reads m as a minute after an hour.
+    // Narrow enough for a phone's row, where h min s was not (Sean, 2026-10-20).
+    symbol: 'h:m:s',
+    aliases: ['hours, minutes, and seconds', 'hours minutes seconds', 'hms', 'h min s'],
     system: 'metric',
     tier: 'standard',
     factor: 3600,

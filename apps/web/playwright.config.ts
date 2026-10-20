@@ -32,13 +32,15 @@ export default defineConfig({
     // smoke's axe and 16 px checks, the table's Cooking pills, its stuck head, the headings stuck
     // under it in Edit and Hidden, a side panel opened under it, and the category menu's opening
     // without a scroll, Edit's kept place and
-    // the glides in settings, chosen by file and title. The clipboard tests skip there: WebKit
-    // grants the runner no clipboard permission.
+    // the glides in settings, and the double-tap's copy leaving the row's cells in place (WebKit
+    // laid the row's nested subgrid out wrong under a positioned flash, 2026-10-20), chosen by file
+    // and title. The clipboard reads skip there: WebKit grants the runner no permission to read it;
+    // its writes go through.
     {
       name: 'mobile-webkit',
       use: { ...devices['iPhone 13'] },
-      testMatch: /(about|formulas|feedback|smoke|table|settings)\.spec\.ts/,
-      grep: /about\.spec|formulas\.spec|feedback\.spec|renders with no WCAG violations|no text field on any page is under 16 px|Cooking|stay at the window’s top|section headings stick under the block|a side panel opened under a stuck head|opening the category menu leaves the page|open category menu scrolls inside|Edit sends one to Hidden|glides to its place|glide moves only/,
+      testMatch: /(about|formulas|feedback|smoke|table|settings|touch)\.spec\.ts/,
+      grep: /about\.spec|formulas\.spec|feedback\.spec|renders with no WCAG violations|no text field on any page is under 16 px|Cooking|stay at the window’s top|section headings stick under the block|a side panel opened under a stuck head|opening the category menu leaves the page|open category menu scrolls inside|Edit sends one to Hidden|glides to its place|glide moves only|a second tap on a row/,
     },
     // WebKit on a desktop, for what only a wide window has: a side panel stuck beside the head
     // from md, the head staying at the window's top, and the foot following the column (checked

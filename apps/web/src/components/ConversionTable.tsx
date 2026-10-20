@@ -157,24 +157,27 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * the decimal point (96 beside 473.18); with Both, its fraction beside it; past a column that takes
  * the spare width, on the right, the symbol right-aligned in its column, an exponent hanging after
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
- * left-aligned in its own; the copied check flashing over its end. The names keep to one
- * line: where one would not fit beside its value (a long value on a phone), the pairs' names give
- * way first, then the pairs' symbols, then every name (GIVE_WAY), then Both's fraction moves
- * under the decimal, on a second line in the
- * value's columns, the symbol and the name centred beside both lines. The unit's cell has no column gap,
- * since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2). Seven
- * columns, so a row spans col-span-7.
+ * left-aligned in its own; the copied check flashing over its end, a grid item laid on the
+ * row's own area (never a positioned child: WebKit lays a nested subgrid out wrong under one,
+ * docs/LEARNINGS.md, 2026-10-20). The names keep to one line: where one would not fit beside
+ * its value (a long value on a phone), the pairs' symbols give way first, then every name
+ * (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
+ * columns, the symbol and the name centred beside both lines; a column comes back once a later
+ * one's going makes its room. The single units size the columns and a pair reacts to the room
+ * they leave (Sean, 2026-10-20): its symbol takes the spare width before the symbols, its name
+ * is cut short in the names' column. The unit's cell has no column gap, since the symbol and
+ * its exponent touch: its parts space themselves (pr-2, pl-2). Seven columns, so a row spans
+ * col-span-7.
  */
 const ROWS =
   'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
 
 /**
  * The columns that give way when a row has no room for them, in that order (useColumnsFit): the
- * pairs' names first, the table's longest (hours, minutes, and seconds), then the pairs' symbols
- * (h min s, the widest), whose values carry their units, so the single units keep their names;
- * then every name; then Both's fraction (Sean, 2026-10-19 and 2026-10-20).
+ * pairs' symbols first (h:m:s, the widest, whose value carries its units), then every name, then
+ * Both's fraction; each comes back once a later one's going makes its room (Sean, 2026-10-20).
  */
-const GIVE_WAY = ['pair', 'pair-symbol', 'name', 'second'] as const;
+const GIVE_WAY = ['pair-symbol', 'name', 'second'] as const;
 
 /** A symbol's trailing exponent, set in a column of its own: "km²" is "km" and "²". */
 const EXPONENT = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+$/u;
@@ -204,7 +207,23 @@ const SECOND_CELL = 'min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric w
 const STACKED_WHOLE_CELL = 'col-start-1 text-right text-sm font-numeric whitespace-nowrap';
 const STACKED_PART_CELL = 'col-start-2 pr-2 pl-1 text-sm font-numeric whitespace-nowrap';
 const SYMBOL_CELL = cx('col-start-5 pl-2 text-right', unitSymbol());
+/**
+ * A pair's symbol, wider than any single unit's (h:m:s): right-aligned with the symbols, it takes
+ * the spare width before them rather than widening their column, and gives way where even that
+ * lacks the room (Sean, 2026-10-20: the single units size the columns, a pair reacts).
+ */
+const PAIR_SYMBOL_CELL = cx(
+  'col-start-4 col-end-6 min-w-0 overflow-hidden pl-2 text-right',
+  unitSymbol(),
+);
 const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
+/**
+ * A pair's name in the names' column, which the single units' names size: sized as if empty
+ * (`contain: inline-size`, the platform's size containment), it never widens the column, and what
+ * does not fit is cut short with an ellipsis, the symbol beside it saying the rest (Sean,
+ * 2026-10-20: a label cut short with the sign of more, never hidden while the row has a symbol).
+ */
+const PAIR_NAME_CELL = cx(NAME_CELL, 'truncate [contain:inline-size]');
 const HEADING = cx(PANEL_TITLE, 'px-2 pb-1');
 const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
 
@@ -228,7 +247,14 @@ function sectionEdge(at: number, kind: 'heading' | 'row'): string {
  * kept for it, so names keep their room; a short fade of the row's own fill, then the fill behind
  * the check, its corners the row's. Nothing sits in a row at rest.
  */
-const COPY_CELL = 'absolute inset-y-0 right-0 flex';
+/**
+ * Laid over the row's end as a grid item on the row's own area, the cell named to the same area
+ * (an auto-placed item would take the row under it), painting over the cell by document order,
+ * taps going through it; never a positioned child, which WebKit's nested subgrid laid out wrong,
+ * the value and the symbol drifting apart (docs/LEARNINGS.md, 2026-10-20).
+ */
+const COPY_CELL =
+  'pointer-events-none col-start-1 col-end-8 row-start-1 flex self-stretch justify-self-end';
 
 /** What shows behind the copy button: the row's fill, the accent's soft tint for the box's unit. */
 function copyBehind(inBox: boolean): { fade: string; fill: string } {
@@ -435,7 +461,6 @@ export function ConversionTable<T extends ConversionRow>({
   const gridRef = useRef<HTMLDivElement>(null);
   const fitted = useColumnsFit(gridRef, GIVE_WAY);
   const namesHidden = fitted.includes('name');
-  const pairNamesHidden = fitted.includes('pair');
   const pairSymbolsHidden = fitted.includes('pair-symbol');
   const secondHidden = fitted.includes('second');
   const withNames = display.names === 'both';
@@ -574,12 +599,13 @@ export function ConversionTable<T extends ConversionRow>({
             </span>
           </>
         )}
-        {/* A pair's symbol gives way after its name and before any single unit's name: the value
-            carries its units. The cells after it keep their columns while it is hidden. */}
+        {/* A pair's symbol takes the spare width before the symbols and gives way first, before
+            any single unit's name, its value carrying its units; it comes back once the names have
+            gone. The cells after it keep their columns while it is hidden. */}
         <span
           aria-hidden="true"
           hidden={row.pair ? pairSymbolsHidden : undefined}
-          className={cx(SYMBOL_CELL, tall)}
+          className={cx(row.pair ? PAIR_SYMBOL_CELL : SYMBOL_CELL, tall)}
           data-symbol
           data-column={row.pair ? 'pair-symbol' : undefined}
         >
@@ -589,16 +615,17 @@ export function ConversionTable<T extends ConversionRow>({
           {exponent}
         </span>
         {!row.pair && <span className="sr-only">{row.symbol}</span>}
-        {/* A pair's name sits in the names' column as every row's does, and gives way first: the
-            table's longest, it goes before the single units' names do, the symbol then the label
-            that stays (ft in) (ADR 0026; Sean, 2026-10-19 and 2026-10-20). */}
+        {/* A pair's name sits in the names' column as every row's does, the table's longest: it
+            never sizes the column, and is cut short where the single units' names leave it less
+            room, the symbol beside it saying the rest; it goes with the names (ADR 0026; Sean,
+            2026-10-19 and 2026-10-20). */}
         {withNames ? (
           <span
             aria-hidden="true"
-            hidden={row.pair ? pairNamesHidden : namesHidden}
-            className={cx(NAME_CELL, 'col-start-7 text-ink', tall)}
+            hidden={namesHidden}
+            className={cx(row.pair ? PAIR_NAME_CELL : NAME_CELL, 'col-start-7 text-ink', tall)}
             data-name
-            data-column={row.pair ? 'pair' : 'name'}
+            data-column={row.pair ? undefined : 'name'}
           >
             {row.name}
           </span>
@@ -680,10 +707,11 @@ export function ConversionTable<T extends ConversionRow>({
       <span className={cx(SYMBOL_CELL, 'row-start-1')}>
         {stack((row) => splitExponent(row.pair ? '' : row.symbol)[0])}
       </span>
-      {/* The pairs' symbols, a column of their own, which gives way after the pairs' names. */}
+      {/* The pairs' symbols, a column of their own and the first to give way, over the spare
+          width and the symbols' column, never widening the latter. */}
       <span
         hidden={pairSymbolsHidden}
-        className={cx(SYMBOL_CELL, 'row-start-1')}
+        className={cx(PAIR_SYMBOL_CELL, 'row-start-1')}
         data-column="pair-symbol"
       >
         {stack((row) => (row.pair ? splitExponent(row.symbol)[0] : ''))}
@@ -691,24 +719,15 @@ export function ConversionTable<T extends ConversionRow>({
       <span className={cx('col-start-6 row-start-1', unitSymbol())}>
         {stack((row) => splitExponent(row.symbol)[1])}
       </span>
+      {/* The single units' names alone: a pair's never sizes the column (PAIR_NAME_CELL). */}
       {withNames && (
-        <>
-          <span
-            hidden={namesHidden}
-            className={cx(NAME_CELL, 'col-start-7 row-start-1')}
-            data-column="name"
-          >
-            {stack((row) => (row.pair ? '' : row.name))}
-          </span>
-          {/* The pairs' names, a column of their own, which gives way before the names do. */}
-          <span
-            hidden={pairNamesHidden}
-            className={cx(NAME_CELL, 'col-start-7 row-start-1')}
-            data-column="pair"
-          >
-            {stack((row) => (row.pair ? row.name : ''))}
-          </span>
-        </>
+        <span
+          hidden={namesHidden}
+          className={cx(NAME_CELL, 'col-start-7 row-start-1')}
+          data-column="name"
+        >
+          {stack((row) => (row.pair ? '' : row.name))}
+        </span>
       )}
     </div>
   );
@@ -939,10 +958,11 @@ export function ConversionTable<T extends ConversionRow>({
                       onCopy(row);
                     }
                   }}
-                  // No double-tap zoom on a row, so the second tap reaches it; pinch zoom stays.
+                  // No double-tap zoom on a row, so the second tap reaches it, and no word selected
+                  // by it, as a double-tap selects one where the zoom is off; pinch zoom stays.
                   className={cx(
                     CURSOR_ROW,
-                    'col-span-7 grid touch-manipulation grid-cols-subgrid items-center',
+                    'col-span-7 col-start-1 row-start-1 grid touch-manipulation grid-cols-subgrid items-center select-none',
                     rowFill(row.inBox, rowIndex === cursor),
                   )}
                 >

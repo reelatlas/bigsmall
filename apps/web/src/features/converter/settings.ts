@@ -67,7 +67,7 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
 /**
  * The system switches, in their order: the regional systems, Other (a regional category's
  * standard units that belong to none of them, the knot and the atmosphere), Mixed units (a
- * category's pairs, feet and inches, stone and pounds, hours, minutes, and seconds; ADR 0026,
+ * category's pairs, feet and inches, stone and pounds, hours, minutes, seconds; ADR 0026,
  * Sean, 2026-10-19), and Specialty. Every heading the table shows has its row in Units but
  * Standard, which is the whole standard list of a category with no regional system (time, data,
  * angle): a switch would only empty its table (Sean, 2026-10-15: Other had none until then, always

@@ -104,7 +104,7 @@ interface UnitMeta {
   pace?: true;
   /**
    * A pair, or a triple: a quantity written in two or three units of one kind, largest first
-   * (feet and inches, stone and pounds, hours, minutes, and seconds; ADR 0026), by its parts' ids.
+   * (feet and inches, stone and pounds, hours, minutes, seconds; ADR 0026), by its parts' ids.
    * The unit's own factor is its first part's, so a plain number in it is that part (6 in feet and
    * inches is 6 ft); its value is read from and written as its parts (compound.ts), and it leads
    * its section in the table (order.ts).
@@ -113,7 +113,7 @@ interface UnitMeta {
   /**
    * How a pair is written where not by its parts' symbols (ADR 0026; Sean, 2026-10-19): a mark
    * after each part, attached, in the parts' order (feet and inches: ′ ″, so 5′ 11″), or as a
-   * clock, the first part then two digits for each after it (hours, minutes, and seconds:
+   * clock, the first part then two digits for each after it (hours, minutes, seconds:
    * 1:30:00). The URL and speech keep the parts' symbols ("5 ft 11 in").
    */
   notation?: readonly string[] | 'clock';

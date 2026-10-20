@@ -187,9 +187,12 @@ export function useFieldFit(
 }
 
 /**
- * Shows every column that may give way, then hides them in the order named until each cell still
- * shown fits its width on one line; a column's stand-ins show where it hides. Leaves the cells as
- * chosen and returns the columns hidden, or null while the grid is not drawn.
+ * Decides the columns that may give way, from the last to give way to the first: a column shows if
+ * the grid fits with it shown, every column before it hidden, and those after it as decided; a
+ * column's stand-ins show where it hides. So a column hidden for room comes back once a later
+ * one's going makes that room, which hiding in order alone never did (the pairs' symbols once the
+ * names had gone; docs/LEARNINGS.md, 2026-10-20). Leaves the cells as chosen and returns the
+ * columns hidden, or null while the grid is not drawn.
  */
 function fitColumns(
   grid: RefObject<HTMLElement | null>,
@@ -207,16 +210,17 @@ function fitColumns(
     for (const cell of cells(column)) cell.hidden = !shown;
     for (const cell of standIns(column)) cell.hidden = shown;
   };
-  for (const column of columns) show(column, true);
+  // A hidden cell is 0 by 0, so every column's cells can be asked at once.
+  const fits = () =>
+    columns.every((column) => cells(column).every((cell) => cell.scrollWidth <= cell.clientWidth));
   const hidden: string[] = [];
-  for (const column of columns) {
-    const fits = columns.every(
-      (each) =>
-        hidden.includes(each) || cells(each).every((cell) => cell.scrollWidth <= cell.clientWidth),
-    );
-    if (fits) break;
-    show(column, false);
-    hidden.push(column);
+  for (const column of [...columns].reverse()) {
+    for (const before of columns.slice(0, columns.indexOf(column))) show(before, false);
+    show(column, true);
+    if (!fits()) {
+      show(column, false);
+      hidden.unshift(column);
+    }
   }
   return hidden;
 }
@@ -224,8 +228,9 @@ function fitColumns(
 /**
  * Fits a grid's columns that give way (docs/DESIGN-SYSTEM.md, "Columns that give way"): columns
  * that may hide, named in the order they give way, each cell marked `data-column` with its
- * column's name and kept to one line, clipped. A column shows while each of its cells fits whole;
- * otherwise it hides in every row at once, never one cell, so the rows keep reading alike. A
+ * column's name and kept to one line, clipped. A column shows while each of its cells fits whole
+ * with every column before it hidden; otherwise it hides in every row at once, never one cell, so
+ * the rows keep reading alike, and it comes back once a later column's going makes its room. A
  * column may have stand-ins, marked `data-instead` with its name, which show exactly where it
  * hides (Both's fraction, under the decimal). The measurement hides and shows the cells itself, as
  * useFieldFit does the chip's name, and the grid renders them with the same `hidden`; `grid` is

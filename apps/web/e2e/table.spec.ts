@@ -2020,6 +2020,7 @@ test('a side panel opened under a stuck head sticks beside it from md, and below
 
 test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row writes the total split in the pair’s own marks, its name beside it (ADR 0026)', async ({
   page,
+  isMobile,
 }) => {
   await page.goto('/');
   await ready(page);
@@ -2044,9 +2045,9 @@ test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row
   await expect(row(page, 'foot-inch')).toContainText('5′ 11.00″');
   await expect(row(page, 'foot-inch').locator('[data-symbol]')).toHaveText('ft in');
   await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveText('feet and inches');
-  await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveAttribute(
+  await expect(row(page, 'foot-inch').locator('[data-name]')).not.toHaveAttribute(
     'data-column',
-    'pair',
+    'name',
   );
   await expect(row(page, 'inch').locator('[data-name]')).toBeVisible();
   expect(await sectionIds(page)).toEqual(['us', 'metric', 'other', 'mixed']);
@@ -2070,7 +2071,22 @@ test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row
   await box(page).press('Enter');
   await expect(row(page, 'hour-minute-second')).toContainText('1:30:00');
   await expect(row(page, 'minute')).toContainText('90.00');
-  // The pair's symbol, the table's widest (h min s), never costs the single rows their names: it
-  // gives way before them, after the pair's name (the hundred-and-first pass).
+  // The pair's symbol, the table's widest (h:m:s), never costs the single rows their names: it
+  // takes the spare width before the symbols, and gives way before any name (the hundred-and-first
+  // and hundred-and-second passes).
   await expect(row(page, 'minute').locator('[data-name]')).toBeVisible();
+  // The pair's name never sizes the names' column, the single units' names do: where it has less
+  // room than it needs (a phone), it is cut short with an ellipsis, the symbol saying the rest.
+  const pairName = row(page, 'hour-minute-second').locator('[data-name]');
+  await expect(pairName).toBeVisible();
+  await expect(pairName).toHaveText('hours, minutes, seconds');
+  if (isMobile) {
+    expect(await pairName.evaluate((cell) => cell.scrollWidth > cell.clientWidth)).toBe(true);
+  }
+  // At 320 px the names give way; the pair's symbol, hidden before them for the room, comes back
+  // once they have gone (the fit decides from the last column to give way).
+  await windowOf(page, 320, 800);
+  await expect(row(page, 'minute').locator('[data-name]')).toBeHidden();
+  await expect(row(page, 'hour-minute-second').locator('[data-symbol]')).toBeVisible();
+  await expect(row(page, 'hour-minute-second').locator('[data-symbol]')).toHaveText('h:m:s');
 });

@@ -136,13 +136,15 @@ test('with a unit in the box the number pad comes up, but not where values go be
   await expect(box(page)).toHaveAttribute('inputmode', 'text');
 });
 
-test('a second tap on a row copies what it shows, the check flashing; a tap at a row’s end takes that row', async ({
+test('a second tap on a row copies what it shows, the check flashing and the row in place; a tap at a row’s end takes that row', async ({
   page,
   context,
   browserName,
 }) => {
-  test.skip(browserName === 'webkit', 'WebKit grants the test runner no clipboard permission');
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  // WebKit grants the test runner no clipboard read; its write goes through, the check says so.
+  if (browserName !== 'webkit') {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  }
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
   // A tap takes the row into the box, the keyboard staying down; a second tap within the window
@@ -151,8 +153,19 @@ test('a second tap on a row copies what it shows, the check flashing; a tap at a
   await expect(page.getByRole('button', { name: 'Remove liters' })).toBeVisible();
   await unitCell(page, 'liter').tap();
   await expect(copyCell(page, 'liter').locator('[data-copied]')).toBeVisible();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.47');
+  if (browserName !== 'webkit') {
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.47');
+  }
   await expect(box(page)).not.toBeFocused();
+  // The flash leaves the row's cells where they were: a grid item laid over the row, never a
+  // positioned child, under which WebKit laid the nested subgrid out wrong, the value and the
+  // symbol drifting apart until a later layout (Sean's iPhone, 2026-10-20).
+  const right = (id: string, part: string) =>
+    row(page, id)
+      .locator(part)
+      .evaluate((cell) => Math.round(cell.getBoundingClientRect().right));
+  expect(await right('liter', '[data-symbol]')).toBe(await right('milliliter', '[data-symbol]'));
+  expect(await right('liter', '[data-whole]')).toBe(await right('milliliter', '[data-whole]'));
   // No button sits in a row: a tap at a row's end takes that row.
   const pint = row(page, 'us-pint');
   const size = (await pint.boundingBox())!;

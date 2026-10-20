@@ -1,7 +1,7 @@
 # 0027 — Shoe sizes: ISO's foot-length model, gender and age as units, the chart as the second value later
 
 Date: 2026-10-20
-Status: accepted
+Status: accepted; amended 2026-10-20 (below)
 
 ## Context
 
@@ -33,4 +33,8 @@ A fact of this kind is conventional (docs/RESEARCH.md §1, ADR 0022): one body's
 
 - Seventeen categories. New fields on a unit, `step`, `range`, `prefix`, and `conventional`, and on a category, `note` and `prefix`, each with its docblock; the formulas page says "by convention" for a scale; the change section is Temperature's alone, since a shoe scale is affine too.
 - Easier: the next conventional size (ring sizes, a clothing scale) is a scale with a step, a table with a range, and a note, all in place.
-- To watch: ISO 19407:2023's text is unread, so whether its numbers differ from 2015's is unknown; brands' charts wait for the second value; Sean's calls on the women's offset, the target's use, and the symbols (`US M`, `US W`, `US C`).
+- To watch: ISO 19407:2023's text is unread, so whether its numbers differ from 2015's is unknown; brands' charts wait for the second value; Sean's calls on the women's offset, the target's use, and the Out of range rows' interaction.
+
+## Amendments
+
+- **2026-10-20** (the hundred-and-sixth pass, Sean's feedback on the build). The names carry no possessive: US men, US women, US children, European children, British children; the symbols stay. A size takes no places, but Fraction writes its half as one (10 1/2), its scale's own step whatever sizes are chosen, across as every row is, and Both the decimal first and the fraction after it: a size split on its decimal beside rows written across moved with every click.

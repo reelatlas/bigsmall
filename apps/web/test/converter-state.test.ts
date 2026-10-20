@@ -702,7 +702,7 @@ describe('shoe sizes (ADR 0027)', () => {
       'us-children',
     ]);
     expect(table.note).toMatch(/^ISO 19407/);
-    expect(table.announcement).toBe('11 US men’s in 9 units of shoe size');
+    expect(table.announcement).toBe('11 US men in 9 units of shoe size');
   });
 
   it('reads a child’s foot from its table, and a size outside a scale has no foot to convert', () => {

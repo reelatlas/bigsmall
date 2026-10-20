@@ -1432,9 +1432,9 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await ready(page);
   await box(page).fill('us 11');
   // A bare "us" is men's, the first match (ADR 0027).
-  await expect(matches(page).getByRole('option').first()).toContainText('US men’s');
+  await expect(matches(page).getByRole('option').first()).toContainText('US men');
   await box(page).press('Enter');
-  await expect(page.getByRole('button', { name: 'Remove US men’s' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
   await expect(box(page)).toHaveValue('11');
   const table = page.getByRole('region', { name: 'Shoe size' });
   await expect(table).toBeVisible();
@@ -1452,6 +1452,26 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
   await expect(box(page)).toHaveValue('44');
   await expect(row(page, 'us-men')).toContainText('11');
+  // In Fraction a size's half is written as one and every row across, lined up on its right edge
+  // with the box's own row (Sean, 2026-10-20: a size split on its decimal beside rows written
+  // across moved with every click); the scale's own half, whatever sizes are chosen.
+  await unitCell(page, 'us-men').click();
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await setSettings(page, 'Fraction');
+  await box(page).fill('10.5');
+  await expect(row(page, 'us-men')).toContainText('10 1/2');
+  await expect(row(page, 'uk')).toContainText('9 1/2');
+  await expect(row(page, 'eu')).toContainText('≈ 43 1/2');
+  const rights = await page
+    .locator('[data-row] > [role="gridcell"]:first-child')
+    .evaluateAll((units) =>
+      units.map((unit) => {
+        const range = document.createRange();
+        range.selectNodeContents(unit.firstElementChild!);
+        return Math.round(range.getBoundingClientRect().right);
+      }),
+    );
+  expect(new Set(rights).size).toBe(1);
 });
 
 test('a temperature is said as a change too, after the readings: 5 °C warmer is 9 °F warmer', async ({

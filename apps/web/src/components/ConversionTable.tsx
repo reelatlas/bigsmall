@@ -63,7 +63,9 @@ interface ConversionRow {
   clock?: boolean;
   /**
    * A size on a scale marked in steps (ADR 0027): its text is the step the conversion rounds to,
-   * whatever the display's places or fractions, and it copies as it shows.
+   * whatever the display's places; with Fraction its half is written as one (10 1/2), its scale's
+   * own step whatever sizes are chosen, and with Both the decimal first and the fraction after it,
+   * as every row is (Sean, 2026-10-20). It copies as it shows.
    */
   stepped?: boolean;
   /**
@@ -284,11 +286,12 @@ export function copiedText(
 ): string | null {
   if (row.tone !== 'value') return null;
   const written =
-    row.value === null || row.clock || row.stepped
-      ? null
-      : firstWritten(row, display, locale, significant);
+    row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
   return (written?.text ?? row.text).replaceAll(MINUS, '-');
 }
+
+/** A size's own step as a fraction: a half (ADR 0027). */
+const HALVES: ReadonlySet<FractionSize> = new Set([2]);
 
 /**
  * How a pair is written under the display: the last part to its places or sizes, else the
@@ -320,6 +323,13 @@ function firstWritten(
 ) {
   const value = row.value;
   if (value === null) return null;
+  // A size (ADR 0027) takes no places: its decimal is the row's own text (10.5), and in Fraction
+  // its half is written as one (10 1/2), its scale's own step whatever sizes are chosen.
+  if (row.stepped) {
+    return display.format === 'fraction'
+      ? formatFraction(value, { sizes: HALVES, rounding: 'nearest', locale })
+      : null;
+  }
   if (row.pair) {
     return formatPair(
       value,
@@ -344,6 +354,7 @@ function firstWritten(
 function secondWritten(row: ConversionRow, display: TableDisplay, locale: string | undefined) {
   if (display.format !== 'both' || row.value === null) return null;
   if (row.pair) return formatPair(row.value, row.pair, pairOptions(display, locale, 0, true));
+  if (row.stepped) return formatFraction(row.value, { sizes: HALVES, rounding: 'nearest', locale });
   return formatFraction(row.value, {
     sizes: display.fractions,
     rounding: display.rounding,
@@ -399,9 +410,7 @@ function valueParts(
 ): ValueParts {
   if (row.tone !== 'value') return { across: row.text };
   const written =
-    row.value === null || row.clock || row.stepped
-      ? null
-      : firstWritten(row, display, locale, significant);
+    row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
   // A fraction, and a pair, have no decimal point to line up on: written whole, right-aligned; a
   // pair in its own notation (5′ 11″), and in its parts' words for screen readers.
   if (row.pair && row.value !== null) {
@@ -411,9 +420,7 @@ function valueParts(
     });
     return { across: writtenText(row, written), spoken: spoken?.text };
   }
-  if (display.format === 'fraction' && !row.clock && !row.stepped) {
-    return { across: writtenText(row, written) };
-  }
+  if (display.format === 'fraction' && !row.clock) return { across: writtenText(row, written) };
   const text = written?.text ?? row.text;
   let at = text.indexOf(mark);
   if (at < 0) at = text.indexOf('E');
@@ -530,7 +537,7 @@ export function ConversionTable<T extends ConversionRow>({
   const parts = (row: T, under: TableDisplay = display) =>
     valueParts(row, under, locale, mark, significant);
   const secondOf = (row: T, under: TableDisplay = display) =>
-    row.tone !== 'value' || row.value === null || row.clock || row.stepped
+    row.tone !== 'value' || row.value === null || row.clock
       ? null
       : secondWritten(row, under, locale);
   const second = (row: T, under: TableDisplay = display): ReactNode => {

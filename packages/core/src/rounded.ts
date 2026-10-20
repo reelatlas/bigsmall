@@ -156,11 +156,11 @@ export function fractionsOf(sizes: ReadonlySet<FractionSize>): Fraction[] {
 }
 
 /**
- * A value rounded to the fractions of the sizes chosen, as a count of the step that writes it: 2 7/8
- * to eighths is 23 of 8 (`count`, signed, and `d`), and past a million the whole number alone (d 1).
- * What formatFraction writes, and what a pair's last part is split from (compound.ts). A tie rounds
- * away from zero: 2 1/16 to eighths is 2 1/8, and −2 1/16 is −2 1/8. Null with no size chosen, or
- * past where places stop meaning anything.
+ * A value rounded to the fractions of the sizes chosen, as a count of the step that writes it:
+ * 2 7/8 to eighths is 23 of 8 (`count`, signed, and `d`), and past a million the whole number
+ * alone (d 1). What formatFraction writes, and what a pair's last part is split from
+ * (compound.ts). A tie rounds away from zero: 2 1/16 to eighths is 2 1/8, and −2 1/16 is −2 1/8.
+ * Null with no size chosen, or past where places stop meaning anything.
  */
 export function roundToFraction(
   value: number,

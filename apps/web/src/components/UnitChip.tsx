@@ -23,9 +23,9 @@ interface ChipProps {
 }
 
 /**
- * A unit's chip, its symbol and then its name, a pair's too; or, Cooking's second pill (ADR 0021), an
- * ingredient's, its name, which gives way to the number by truncating where the box is narrow, and
- * never goes compact, then a chevron: its body opens every ingredient to choose from, and
+ * A unit's chip, its symbol and then its name, a pair's too; or, Cooking's second pill (ADR 0021),
+ * an ingredient's, its name, which gives way to the number by truncating where the box is narrow,
+ * and never goes compact, then a chevron: its body opens every ingredient to choose from, and
  * `expanded` turns the chevron over while they show (a trial, Sean, 2026-10-16).
  */
 type UnitChipProps = ChipProps &

@@ -45,11 +45,10 @@ const NUMBER = new RegExp(
 /**
  * A time written as a clock writes it, each part sixtieths of the one before: "5:30" is 5 and 30
  * sixtieths, a pace's minutes and seconds ("5:30 /km") or an hour and a half ("1:30 h"), and
- * "1:05:30" has three parts. Every part after the first is two digits under 60. Read before a
- * plain number, so its digits are not taken for one.
+ * "1:05:30" has three parts. Every part after the first is under 60, one digit or two: 5:3 is
+ * 5:03, on its way to 5:30 or not, never 5 alone with ":3" left over (Sean, 2026-10-20). Read
+ * before a plain number, so its digits are not taken for one.
  */
-// A part after the first is under 60, one digit or two: 5:3 is 5:03, on its way to 5:30 or not,
-// never 5 alone with ":3" left over (Sean, 2026-10-20).
 const CLOCK = /[0-9]+(?::[0-5]?[0-9]){1,2}(?![0-9])/y;
 const ANY_SEPARATOR = new RegExp(SEPARATOR, 'g');
 const TRAILING_MARK = /[.,]$/;

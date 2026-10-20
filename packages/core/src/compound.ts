@@ -41,12 +41,18 @@ export interface Compound {
   parts: CompoundPart[];
 }
 
-/** A compound read from text: with its value in the pair's first part, where it ended, and its canonical text. */
+/**
+ * A compound read from text: with its value in the pair's first part, where it ended, and its
+ * canonical text.
+ */
 export interface CompoundRead extends Compound {
   value: number;
   /** The index in the typed text right after the compound. */
   end: number;
-  /** The compound in the pair's own words at ten significant digits: "5 ft 11 in"; reads back as the same value. */
+  /**
+   * The compound in the pair's own words at ten significant digits: "5 ft 11 in"; reads back as the
+   * same value.
+   */
   canonical: string;
 }
 
@@ -55,10 +61,15 @@ export function pairParts(unit: Unit): Unit[] {
   return (unit.pair ?? []).flatMap((id) => getUnit(id) ?? []);
 }
 
-/** A pair's part symbol that is a mark (°, ′, ″) attaches to its number; every other takes a space. */
+/**
+ * A pair's part symbol that is a mark (°, ′, ″) attaches to its number; every other takes a space.
+ */
 const ATTACHED_SYMBOL = /^[°′″]$/u;
 
-/** The feet mark and its look-alikes, and the inch mark and its own; after a degree, arcminutes and arcseconds. */
+/**
+ * The feet mark and its look-alikes, and the inch mark and its own; after a degree, arcminutes and
+ * arcseconds.
+ */
 const SINGLE_MARKS = new Set(["'", '′', RIGHT_QUOTE, String.fromCharCode(0x2018), '´']);
 const DOUBLE_MARKS = new Set(['"', '″', String.fromCharCode(0x201d)]);
 const DEGREE = '°';
@@ -122,7 +133,10 @@ const FIRST_CONTEXT: Readonly<Record<string, Readonly<Record<string, number>>>> 
   'degree-arcminute-arcsecond': { d: 0 },
 };
 
-/** What a single and a double mark mean in a pair: feet and inches, or after a degree, minutes and seconds. */
+/**
+ * What a single and a double mark mean in a pair: feet and inches, or after a degree, minutes and
+ * seconds.
+ */
 const MARKS: Readonly<Record<string, readonly [single: number, double: number]>> = {
   'foot-inch': [0, 1],
   'degree-arcminute-arcsecond': [1, 2],
@@ -170,7 +184,10 @@ function factorOf(unit: Unit): number {
   return unit.kind === 'linear' ? unit.factor : Number.NaN;
 }
 
-/** The number at `at`, with a fraction, a worded fraction, or a vulgar one joined to it; null where none starts. */
+/**
+ * The number at `at`, with a fraction, a worded fraction, or a vulgar one joined to it; null where
+ * none starts.
+ */
 function partNumber(
   text: string,
   at: number,
@@ -214,7 +231,10 @@ function partNumber(
   return { value, end };
 }
 
-/** The unit written at `at`: a mark, the degree sign alone, or a word; null where a number or nothing follows. */
+/**
+ * The unit written at `at`: a mark, the degree sign alone, or a word; null where a number or
+ * nothing follows.
+ */
 function unitToken(text: string, at: number): { token: UnitToken; end: number } | null {
   const char = text[at] ?? '';
   if (char === "'" && text[at + 1] === "'")
@@ -319,7 +339,10 @@ function resolveParts(
   return parts.length >= 2 ? { parts, context, end } : null;
 }
 
-/** The pairs a first part could start, each with the part's index in it, and whether a context spelling named it. */
+/**
+ * The pairs a first part could start, each with the part's index in it, and whether a context
+ * spelling named it.
+ */
 function candidates(first: RawPart, raw: readonly RawPart[]): Array<[PairInfo, number, boolean]> {
   const found: Array<[PairInfo, number, boolean]> = [];
   for (const info of pairs()) {
@@ -391,7 +414,10 @@ export function readCompound(text: string, separators: Separators): CompoundRead
 // ---------------------------------------------------------------------------
 // Writing a pair: the total rounded, then split.
 
-/** How a pair is written: the last part to a number of places, as a fraction, or the whole to significant digits. */
+/**
+ * How a pair is written: the last part to a number of places, as a fraction, or the whole to
+ * significant digits.
+ */
 export interface PairFormat {
   locale?: string | undefined;
   rounding: Rounding;
@@ -410,10 +436,15 @@ interface Split {
   negative: boolean;
   /** Each part's count, the last part's whole number only. */
   counts: number[];
-  /** The last part's rest: decimal digits after its point ("87", or none), or a fraction in its own size. */
+  /**
+   * The last part's rest: decimal digits after its point ("87", or none), or a fraction in its own
+   * size.
+   */
   rest: { kind: 'decimals'; digits: string } | { kind: 'fraction'; n: number; d: number };
   approx: boolean;
-  /** The total is not zero but rounds to it: said as below the step, in the last part ("< 0.01"). */
+  /**
+   * The total is not zero but rounds to it: said as below the step, in the last part ("< 0.01").
+   */
   below: string | null;
 }
 
@@ -494,7 +525,10 @@ function withSymbol(number: string, unit: Unit): string {
   return ATTACHED_SYMBOL.test(unit.symbol) ? `${number}${unit.symbol}` : `${number} ${unit.symbol}`;
 }
 
-/** A number of a part as the pair writes it: its mark attached where the pair has marks, else its symbol. */
+/**
+ * A number of a part as the pair writes it: its mark attached where the pair has marks, else its
+ * symbol.
+ */
 function withNotation(number: string, unit: Unit, mark: string | undefined): string {
   return mark === undefined ? withSymbol(number, unit) : `${number}${mark}`;
 }

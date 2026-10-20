@@ -104,7 +104,8 @@ export const lengthUnits: readonly Unit[] = [
     name: 'foot',
     plural: 'feet',
     symbol: 'ft',
-    // The marks people type and the typographic prime (Sean, 2026-10-20: "5′" finds feet as "5'" does).
+    // The marks people type and the typographic prime (Sean, 2026-10-20: "5′" finds feet as "5'"
+    // does).
     aliases: ["'", '′', '’'],
     system: 'imperial',
     tier: 'standard',

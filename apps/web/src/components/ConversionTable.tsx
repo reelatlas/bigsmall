@@ -166,9 +166,8 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * The single units size the columns and a pair reacts to the room they leave (Sean, 2026-10-20):
  * its symbol takes the spare width before the symbols and must fit there, the names going for it
  * as for a wide value, and its name is cut short in the names' column. The unit's cell has no
- * column gap, since the symbol and
- * its exponent touch: its parts space themselves (pr-2, pl-2). Seven columns, so a row spans
- * col-span-7.
+ * column gap, since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2).
+ * Seven columns, so a row spans col-span-7.
  */
 const ROWS =
   'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
@@ -249,18 +248,18 @@ function sectionEdge(at: number, kind: 'heading' | 'row'): string {
  * The copied check, laid over the row's end for a moment after a second tap or click copied it
  * (Sean, 2026-10-19; a copy button sat here, on the active row, from 2026-10-15): no column is
  * kept for it, so names keep their room; a short fade of the row's own fill, then the fill behind
- * the check, its corners the row's. Nothing sits in a row at rest.
- */
-/**
- * Laid over the row's end as a grid item on the row's own area, the cell named to the same area
- * (an auto-placed item would take the row under it), painting over the cell by document order,
- * taps going through it; never a positioned child, which WebKit's nested subgrid laid out wrong,
- * the value and the symbol drifting apart (docs/LEARNINGS.md, 2026-10-20).
+ * the check, its corners the row's. Nothing sits in a row at rest. A grid item on the row's own
+ * area, the cell named to the same area (an auto-placed item would take the row under it),
+ * painting over the cell by document order, taps going through it; never a positioned child,
+ * which WebKit's nested subgrid laid out wrong, the value and the symbol drifting apart
+ * (docs/LEARNINGS.md, 2026-10-20).
  */
 const COPY_CELL =
   'pointer-events-none col-start-1 col-end-8 row-start-1 flex self-stretch justify-self-end';
 
-/** What shows behind the copy button: the row's fill, the accent's soft tint for the box's unit. */
+/**
+ * What shows behind the copied check: the row's fill, the accent's soft tint for the box's unit.
+ */
 function copyBehind(inBox: boolean): { fade: string; fill: string } {
   return inBox
     ? { fade: 'bg-linear-to-r from-transparent to-accent-soft', fill: 'bg-accent-soft' }
@@ -284,7 +283,10 @@ export function copiedText(
   return (written?.text ?? row.text).replaceAll(MINUS, '-');
 }
 
-/** How a pair is written under the display: the last part to its places or sizes, else the significant digits. */
+/**
+ * How a pair is written under the display: the last part to its places or sizes, else the
+ * significant digits.
+ */
 function pairOptions(
   display: TableDisplay,
   locale: string | undefined,
@@ -423,14 +425,14 @@ type List = 'shown' | 'hidden';
  * open Hidden; and after a unit moves focus stays where it was, on the line that took its place.
  * The field keeps focus and its cursor moves through the shown rows (aria-activedescendant on a
  * grid, ADR 0012), so the rows are no Tab stops; a click or tap on one is the field's to act on,
- * and focus stays in the field. A row's value is copied by a second tap or click on it within the double-tap window, the
- * first having taken the row into the box (the ninety-ninth pass), or by Ctrl/⌘+C on the cursor's
- * row: a check flashes over the row's end for a moment, and no button sits in the rows, so nothing
- * covers a name (a hover button did, 2026-10-15 to 2026-10-19). Columns line up across rows
- * through a subgrid (ROWS), each as wide as the widest it could hold across every row and every
- * rounding (a sizer row no one sees), so a setting that changes what shows never moves the rest.
- * Screen readers hear the symbol whole ("km²") and the name, shown or not, from copies of their
- * own; the columns they are drawn in are hidden from them.
+ * and focus stays in the field. A row's value is copied by a second tap or click on it within the
+ * double-tap window, the first having taken the row into the box (the ninety-ninth pass), or by
+ * Ctrl/⌘+C on the cursor's row: a check flashes over the row's end for a moment, and no button
+ * sits in the rows, so nothing covers a name (a hover button did, 2026-10-15 to 2026-10-19).
+ * Columns line up across rows through a subgrid (ROWS), each as wide as the widest it could hold
+ * across every row and every rounding (a sizer row no one sees), so a setting that changes what
+ * shows never moves the rest. Screen readers hear the symbol whole ("km²") and the name, shown or
+ * not, from copies of their own; the columns they are drawn in are hidden from them.
  */
 export function ConversionTable<T extends ConversionRow>({
   id,

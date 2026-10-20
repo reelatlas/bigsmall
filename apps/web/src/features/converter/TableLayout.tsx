@@ -217,7 +217,7 @@ interface TableLayoutProps {
    * panel; the calculator keeps its keys.
    */
   sideTypes: boolean;
-  /** The row whose copy button shows the check, by unit id. */
+  /** The row whose value was just copied, by unit id: a check flashes over its end. */
   copiedRow: string | null;
   onCopyRow: (unitId: string) => void;
 }
@@ -575,7 +575,10 @@ export function TableLayout({
           .filter(Boolean)
           .join(' ')
       : listId;
-  /** The matches lead with a compound's pair, which Enter takes as it takes a typed unit's best match. */
+  /**
+   * The matches lead with a compound's pair, which Enter takes as it takes a typed unit's best
+   * match.
+   */
   const offersPair =
     table.kind === 'matches' &&
     box.parsed.compound !== undefined &&

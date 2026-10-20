@@ -767,7 +767,7 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** A test pressed Enter to open the shortcuts map and read the icon's background straight after, to check its switched-on fill: it read transparent. The button eases `background-color` over the theme's fast length, so the first read caught the start.
 **Rule.** After a change to something with a transition, poll for the settled value (`expect.poll`), or read the class or attribute that sets it.
-**Since then** (2026-10-19): axe is a color read too. The owner's switch, disabled until its island reads the browser's storage, eases from half opacity to full as it enables, and the smoke test's axe caught it mid-fade once in 341 runs; the test now waits for every load-time island (`islandsReady`) and for the page's animations (`settled`) before axe, on every page.
+**Since then** (2026-10-19): axe is a color read too. The owner's switch, disabled until its island reads the browser's storage, eases from half opacity to full as it enables, and the smoke test's axe caught it mid-fade once in 341 runs; the test now waits for every load-time island (`islandsReady`) and for the page's animations (`settled`) before axe, on every page. Twice in four runs on 2026-10-20 it caught it again: the switch enables in an effect after hydration, so `islandsReady` had resolved and `settled` had found nothing running before the fade began; the test now waits for the line that effect writes, then settles. An island's effect runs after its hydration mark drops: wait on what the effect produces, never on the mark alone.
 
 ## 2026-10-15 — The gallery's axe run outgrows the default timeout on CI
 

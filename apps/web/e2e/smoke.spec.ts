@@ -39,6 +39,9 @@ for (const path of PAGES) {
     // or the owner's switch is sampled mid-fade as it enables (docs/LEARNINGS.md, "A color read
     // right after a change catches the transition's first frame").
     await islandsReady(page);
+    // The owner's switch enables in an effect after its island hydrates, so its fade starts after
+    // islandsReady resolves: wait for the line the same effect writes, then settle (2026-10-20).
+    if (path === '/dev/owner') await expect(page.getByRole('status')).toContainText('counted');
     await settled(page);
     await expectNoA11yViolations(page);
   });

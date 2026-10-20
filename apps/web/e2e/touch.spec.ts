@@ -136,7 +136,7 @@ test('with a unit in the box the number pad comes up, but not where values go be
   await expect(box(page)).toHaveAttribute('inputmode', 'text');
 });
 
-test('a tapped row shows its copy button, which copies what the row shows', async ({
+test('a second tap on a row copies what it shows, the check flashing; a tap at a row’s end takes that row', async ({
   page,
   context,
   browserName,
@@ -145,15 +145,15 @@ test('a tapped row shows its copy button, which copies what the row shows', asyn
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/?a=us-cup&v=2');
   await ready(page);
+  // A tap takes the row into the box, the keyboard staying down; a second tap within the window
+  // copies it as the row shows it, the check flashing over its end (Sean, 2026-10-19).
   await unitCell(page, 'liter').tap();
-  const copy = copyCell(page, 'liter');
-  await expect(copy).toHaveCSS('opacity', '1');
-  await expect(copyCell(page, 'us-cup')).toHaveCSS('opacity', '0');
-  await copy.getByRole('button', { name: /^Copy/ }).tap();
-  await expect(copy.locator('[data-copied]')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove liters' })).toBeVisible();
+  await unitCell(page, 'liter').tap();
+  await expect(copyCell(page, 'liter').locator('[data-copied]')).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.47');
   await expect(box(page)).not.toBeFocused();
-  // Another row's unseen button is out of the way: a tap at its end takes that row.
+  // No button sits in a row: a tap at a row's end takes that row.
   const pint = row(page, 'us-pint');
   const size = (await pint.boundingBox())!;
   await pint.tap({ position: { x: size.width - 12, y: size.height / 2 } });

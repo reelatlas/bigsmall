@@ -42,3 +42,7 @@ ADR 0017 (2026-10-11) set the settings model: sections by system under fixed nam
 - Browser tests about something else set the table as it was before Settings (`showEverything`, `e2e/support.ts`).
 - Current docs and code cite this record for settings; 0017's text stays as written, its status pointing here.
 - Still explorations (docs/PLAN.md §2): templates of settings, a setting surfaced on its own in the toolbar, and choosing the sort.
+
+## Amendments
+
+- **2026-10-19** (ADR 0026): Units gains a Mixed units switch between Other and Specialty, for a category's pairs, on in every preset; stored settings move to version 5, an older store reading Mixed units as on and placed before Specialty where Specialty ends the order, else last.

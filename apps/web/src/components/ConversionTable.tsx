@@ -10,19 +10,12 @@ import {
   type Rounding,
   type Unit,
 } from '@bigsmall/core';
-import {
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ButtonHTMLAttributes,
-  type ReactNode,
-} from 'react';
+import { useId, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useColumnsFit } from '../lib/fit-step';
 import { flash } from '../lib/flash';
 import { panelKeys } from '../lib/panel-keys';
 import { useKept } from '../lib/keeping';
+import { DOUBLE_TAP_MS } from '../lib/timing';
 import {
   CHOICE_FILL,
   COUNT,
@@ -40,7 +33,7 @@ import {
   unitSymbol,
 } from '../lib/recipes';
 import { Button } from './Button';
-import { ChevronDownIcon, CopiedIcon, CopyIcon } from './icons';
+import { ChevronDownIcon, CopiedIcon } from './icons';
 import { FormattedNumber } from './NumberText';
 import { Checkbox } from './Checkbox';
 import { TriCheckbox } from './TriCheckbox';
@@ -125,16 +118,15 @@ export interface ConversionTableProps<T extends ConversionRow> {
   cursor: number;
   /** The id of a row's unit cell, which the field points at while the cursor is on it. */
   itemId: (index: number) => string;
-  /** The row whose copy button shows the check, by id. */
+  /** The row whose value was just copied, by id: a check flashes over its end. */
   copied: string | null;
   /** A row was clicked or tapped, by index. */
   onPick: (index: number) => void;
-  /** A row's copy button was pressed: the converter copies what it shows (`copiedText`). */
+  /**
+   * A row was tapped or clicked a second time within the double-tap window (the ninety-ninth
+   * pass): the converter copies what it shows (`copiedText`).
+   */
   onCopy: (row: T) => void;
-  /** More props for a row's copy button: the copy hook's pointer handlers, its tooltip. */
-  copyProps?: (
-    row: T,
-  ) => Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'onPointerEnter' | 'onPointerLeave' | 'title'>;
   /** Edit: each shown row is a checkbox, the hidden units staying in Hidden. */
   editing: boolean;
   hiddenOpen: boolean;
@@ -165,7 +157,7 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * the decimal point (96 beside 473.18); with Both, its fraction beside it; past a column that takes
  * the spare width, on the right, the symbol right-aligned in its column, an exponent hanging after
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
- * left-aligned in its own; the active row's copy button laid over its end. The names keep to one
+ * left-aligned in its own; the copied check flashing over its end. The names keep to one
  * line: where one would not fit beside its value (a long value on a phone), the names give way in
  * every row (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the
  * value's columns, the symbol and the name centred beside both lines. The unit's cell has no column gap,
@@ -225,9 +217,10 @@ function sectionEdge(at: number, kind: 'heading' | 'row'): string {
 }
 
 /**
- * The active row's copy button, laid over the row's end (Sean, 2026-10-15): no column is kept for
- * it, so names keep their room; a short fade of the row's own fill, then the fill behind the
- * button, its corners the row's.
+ * The copied check, laid over the row's end for a moment after a second tap or click copied it
+ * (Sean, 2026-10-19; a copy button sat here, on the active row, from 2026-10-15): no column is
+ * kept for it, so names keep their room; a short fade of the row's own fill, then the fill behind
+ * the check, its corners the row's. Nothing sits in a row at rest.
  */
 const COPY_CELL = 'absolute inset-y-0 right-0 flex';
 
@@ -394,10 +387,10 @@ type List = 'shown' | 'hidden';
  * open Hidden; and after a unit moves focus stays where it was, on the line that took its place.
  * The field keeps focus and its cursor moves through the shown rows (aria-activedescendant on a
  * grid, ADR 0012), so the rows are no Tab stops; a click or tap on one is the field's to act on,
- * and focus stays in the field. One copy button shows at a time, laid over the active row's end in
- * a cell of its own: the row under the mouse, else the row the cursor is on, else the box's unit's
- * (the row a tap took in), out of the Tab order since Ctrl/⌘+C copies the cursor's row; the others
- * stay for screen readers, unseen and out of the pointer's way. Columns line up across rows
+ * and focus stays in the field. A row's value is copied by a second tap or click on it within the double-tap window, the
+ * first having taken the row into the box (the ninety-ninth pass), or by Ctrl/⌘+C on the cursor's
+ * row: a check flashes over the row's end for a moment, and no button sits in the rows, so nothing
+ * covers a name (a hover button did, 2026-10-15 to 2026-10-19). Columns line up across rows
  * through a subgrid (ROWS), each as wide as the widest it could hold across every row and every
  * rounding (a sizer row no one sees), so a setting that changes what shows never moves the rest.
  * Screen readers hear the symbol whole ("km²") and the name, shown or not, from copies of their
@@ -418,7 +411,6 @@ export function ConversionTable<T extends ConversionRow>({
   copied,
   onPick,
   onCopy,
-  copyProps,
   editing,
   hiddenOpen,
   isShown,
@@ -445,10 +437,8 @@ export function ConversionTable<T extends ConversionRow>({
   const mark = useMemo(() => localeSeparators(locale).decimal, [locale]);
   const cardRef = useRef<HTMLDivElement>(null);
   const hiddenToggleRef = useRef<HTMLButtonElement>(null);
-  /** The row the mouse is over, whose copy button shows before any other's. */
-  const [pointed, setPointed] = useState<string | null>(null);
-  const shownRows = sections.flatMap((section) => section.rows);
-  const active = pointed ?? shownRows[cursor]?.id ?? shownRows.find((row) => row.inBox)?.id ?? null;
+  /** The last row tapped or clicked, and when: a second within the window copies it. */
+  const lastTap = useRef<{ id: string; at: number } | null>(null);
 
   /**
    * What showed after the last change, so the next one can mark what moved (docs/UX-SPEC.md §3,
@@ -582,7 +572,9 @@ export function ConversionTable<T extends ConversionRow>({
           {exponent}
         </span>
         {!row.pair && <span className="sr-only">{row.symbol}</span>}
-        {withNames ? (
+        {/* A pair's value names itself (5′ 11″, 11 st 4 lb): no name in the table, so the
+            pairs' long names never widen the column every section shares (ADR 0026). */}
+        {withNames && !row.pair ? (
           <span
             aria-hidden="true"
             hidden={namesHidden}
@@ -679,7 +671,7 @@ export function ConversionTable<T extends ConversionRow>({
           className={cx(NAME_CELL, 'col-start-7 row-start-1')}
           data-column="name"
         >
-          {stack((row) => row.name)}
+          {stack((row) => (row.pair ? '' : row.name))}
         </span>
       )}
     </div>
@@ -859,20 +851,7 @@ export function ConversionTable<T extends ConversionRow>({
     sections.slice(0, at).reduce((sum, section) => sum + section.rows.length, 0),
   );
   const grid = (
-    <div
-      ref={gridRef}
-      id={id}
-      role="grid"
-      aria-labelledby={titleId}
-      className={ROWS}
-      // The mouse's row shows its copy button; a touch never leaves a row pointed at.
-      onPointerOver={(event) => {
-        if (event.pointerType !== 'mouse') return;
-        const row = (event.target as Element).closest<HTMLElement>('[data-row]');
-        setPointed(row?.dataset.row ?? null);
-      }}
-      onPointerLeave={() => setPointed(null)}
-    >
+    <div ref={gridRef} id={id} role="grid" aria-labelledby={titleId} className={ROWS}>
       {sections.map((section, at) => (
         <div
           key={section.key}
@@ -908,38 +887,36 @@ export function ConversionTable<T extends ConversionRow>({
                   aria-disabled={row.tone === 'message' || undefined}
                   aria-describedby={row.inBox || row.tone === 'message' ? undefined : moveHintId}
                   onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => onPick(rowIndex)}
+                  onClick={() => {
+                    onPick(rowIndex);
+                    // A second tap or click on the same row within the window copies it, the
+                    // first having taken it into the box; a tap's action never waits for a
+                    // second, which would lag every tap (Sean, 2026-10-19).
+                    const now = performance.now();
+                    const last = lastTap.current;
+                    lastTap.current = { id: row.id, at: now };
+                    if (
+                      last?.id === row.id &&
+                      now - last.at <= DOUBLE_TAP_MS &&
+                      row.tone === 'value'
+                    ) {
+                      onCopy(row);
+                    }
+                  }}
+                  // No double-tap zoom on a row, so the second tap reaches it; pinch zoom stays.
                   className={cx(
                     CURSOR_ROW,
-                    'col-span-7 grid grid-cols-subgrid items-center',
+                    'col-span-7 grid touch-manipulation grid-cols-subgrid items-center',
                     rowFill(row.inBox, rowIndex === cursor),
                   )}
                 >
                   {cells(row)}
                 </div>
-                {row.tone === 'value' && (
-                  <div
-                    role="gridcell"
-                    className={cx(COPY_CELL, row.id !== active && 'pointer-events-none opacity-0')}
-                    data-copy-cell
-                  >
-                    <span aria-hidden="true" className={cx('w-4', behind.fade)} />
-                    <span className={cx('flex items-center rounded-r-nested', behind.fill)}>
-                      <Button
-                        variant="ghost"
-                        square
-                        nested
-                        tabIndex={-1}
-                        aria-label={`Copy ${row.name}`}
-                        aria-keyshortcuts="Control+C Meta+C"
-                        // A click never takes focus from the field, as a row's doesn't: the
-                        // arrows go on through the rows after a copy (Sean, 2026-10-15).
-                        onMouseDown={(event) => event.preventDefault()}
-                        onClick={() => onCopy(row)}
-                        {...copyProps?.(row)}
-                      >
-                        {copied === row.id ? <CopiedIcon /> : <CopyIcon />}
-                      </Button>
+                {row.tone === 'value' && copied === row.id && (
+                  <div aria-hidden="true" className={COPY_CELL} data-copy-cell>
+                    <span className={cx('w-4', behind.fade)} />
+                    <span className={cx('flex items-center rounded-r-nested px-3', behind.fill)}>
+                      <CopiedIcon />
                     </span>
                   </div>
                 )}
@@ -974,7 +951,7 @@ export function ConversionTable<T extends ConversionRow>({
         {title}
       </h2>
       <p id={moveHintId} className="sr-only">
-        Moves this unit into the box.
+        Moves this unit into the box; a second press copies its value.
       </p>
       <div
         ref={cardRef}

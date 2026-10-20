@@ -1,7 +1,7 @@
 import { categories, INGREDIENT_KINDS, unitsIn } from '@bigsmall/core';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
-import { ANNOUNCE_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
+import { ANNOUNCE_MS, COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
 import {
   applyTheme,
   blur,
@@ -79,6 +79,9 @@ const scrollHeadingUnder = (page: Page, heading: string) =>
     const cell = document.querySelector('[data-head]')!;
     const strip = parseFloat(getComputedStyle(cell, '::after').height) || 0;
     const edge = cell.getBoundingClientRect().height + strip;
+    // Measured from the page's top, where no heading is stuck: a stuck heading's rect is not its
+    // place in the flow, and a target taken from it lands past its group (2026-10-19).
+    window.scrollTo(0, 0);
     const own = document.querySelector(selector)!.getBoundingClientRect().top + window.scrollY;
     window.scrollTo(0, Math.round(own - edge + 10));
   }, heading);
@@ -1318,7 +1321,7 @@ test('More: a tool the row had no room for acts from the menu, with the keys, an
   await expect(bar.getByRole('button', { name: 'Clear all', exact: true })).toBeVisible();
 });
 
-test('one copy button, laid over the active row’s end, copies what the row shows', async ({
+test('a second tap or click on a row copies what it shows, the check flashing over its end; Ctrl/⌘+C copies the cursor’s row', async ({
   page,
   context,
   browserName,
@@ -1328,55 +1331,31 @@ test('one copy button, laid over the active row’s end, copies what the row sho
   await page.goto('/?a=foot&v=2');
   await ready(page);
   await box(page).click();
-  const shown = () =>
-    page
-      .locator('[data-copy-cell]')
-      .evaluateAll((cells) =>
-        cells
-          .filter((cell) => getComputedStyle(cell).opacity !== '0')
-          .map((cell) => cell.closest<HTMLElement>('[data-row]')!.dataset.row),
-      );
-  // The box has no copy button; at rest the row of the box's unit shows the table's one.
-  await expect(page.getByRole('button', { name: 'Copy value' })).toHaveCount(0);
-  await expect.poll(shown).toEqual(['foot']);
-  // No column is kept: the row runs to the card's edge, the button over its end.
-  const edges = await row(page, 'yard').evaluate((each) => {
-    const cell = each.querySelector('[role="gridcell"]')!.getBoundingClientRect();
-    const copy = each.querySelector('[data-copy-cell]')!.getBoundingClientRect();
-    return { row: each.getBoundingClientRect().right, cell: cell.right, copy: copy.right };
-  });
-  expect(Math.abs(edges.cell - edges.row)).toBeLessThanOrEqual(1);
-  expect(Math.abs(edges.copy - edges.row)).toBeLessThanOrEqual(1);
-
-  // The mouse's row shows it instead, and it copies what the row shows, not the full value.
-  await unitCell(page, 'meter').hover();
-  await expect.poll(shown).toEqual(['meter']);
-  const copyMeter = copyCell(page, 'meter').getByRole('button', { name: /^Copy/ });
-  await copyMeter.click();
-  await expect(copyMeter.locator('[data-copied]')).toBeVisible();
+  // No copy button anywhere (Copy URL is the header's): nothing covers a name, and no column is
+  // kept (Sean, 2026-10-19).
+  await expect(page.getByRole('button', { name: /^Copy (?!URL)/ })).toHaveCount(0);
+  await expect(page.locator('[data-copy-cell]')).toHaveCount(0);
+  // A click takes the row into the box; a second within the window copies it as it shows, not
+  // the full value, the check over the row's end and the status saying so.
+  await unitCell(page, 'meter').click();
+  await expect(page.getByRole('button', { name: 'Remove meters' })).toBeVisible();
+  await unitCell(page, 'meter').click();
+  await expect(copyCell(page, 'meter').locator('[data-copied]')).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.61');
-  await expect(copyMeter).toHaveAttribute('title', 'Copy (Ctrl+C)');
-  // The click kept focus in the box: the arrows go on through the rows, the cursor's row showing it.
+  // The clicks kept focus in the box, and the check goes after a moment.
   await expect(box(page)).toBeFocused();
-  await page.mouse.move(0, 0);
-  await expect.poll(shown).toEqual(['foot']);
-  await page.keyboard.press('ArrowDown');
-  await expect.poll(shown).toEqual(['yard']);
-  await page.keyboard.press('Escape');
-  await expect.poll(shown).toEqual(['foot']);
+  await expect(copyCell(page, 'meter')).toHaveCount(0, { timeout: COPIED_MS + MARGIN_MS });
+  await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(0);
 
-  // A row taken into the box shows it, the cursor resting there, and Ctrl/⌘+C copies it.
+  // Ctrl/⌘+C copies the row the cursor rests on, the box's unit's right after a take, as shown.
   await unitCell(page, 'yard').click();
   await expect(page.getByRole('button', { name: 'Remove yards' })).toBeVisible();
-  await page.mouse.move(0, 0);
-  await expect.poll(shown).toEqual(['yard']);
   await page.keyboard.press('ControlOrMeta+c');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('0.67');
-
-  // The cursor's row shows it, and Ctrl/⌘+C copies that row as shown.
+  await expect(copyCell(page, 'yard').locator('[data-copied]')).toBeVisible();
+  // The cursor's row, moved to with the keys, copies as shown.
   await page.keyboard.press('ArrowUp');
-  await expect.poll(shown).toEqual(['foot']);
   await page.keyboard.press('ControlOrMeta+c');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2.00');
 });
@@ -1416,8 +1395,9 @@ test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds
   await expect(page).toHaveURL(/[?&]v=5%3A30/);
 
   if (!isMobile) {
-    await unitCell(page, 'minute-per-mile').hover();
-    await copyCell(page, 'minute-per-mile').getByRole('button', { name: /^Copy/ }).click();
+    // A second click on the pace's row copies it as written, the first taking it into the box.
+    await unitCell(page, 'minute-per-mile').click();
+    await unitCell(page, 'minute-per-mile').click();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('8:51');
   }
 
@@ -1907,7 +1887,10 @@ test('the toolbar and the box stay at the window’s top as one block while a lo
   await ready(page);
   const width = page.viewportSize()!.width;
   await page.setViewportSize({ width, height: 520 });
-  await row(page, 'centimeter').evaluate((line) => line.scrollIntoView({ block: 'start' }));
+  // The second metric row: four rows of its section below it keep the name's room under the head
+  // (sticky ends with its group; a row near the group's end scrolled to the top pushed the name up
+  // once Mixed units made the page long enough to scroll that far, 2026-10-19).
+  await row(page, 'micrometer').evaluate((line) => line.scrollIntoView({ block: 'start' }));
   await expect.poll(leadingTop).toBe(0);
   const table = await nameUnderBox();
   expect(table.first).toBe(table.boxBottom - 1);
@@ -2051,10 +2034,13 @@ test('a height: "5\'11" offers feet and inches by name, Enter takes it, and the 
   await expect(box(page)).toHaveAttribute('placeholder', 'Feet and inches');
   // No quiet line: the chip and the table say what was read (the ninety-eighth pass).
   await expect(page.locator('[data-read]')).toHaveCount(0);
-  // The pair's row leads its section, its value in the marks people write, no symbol beside it.
+  // The pair's row sits under Mixed units, its value in the marks people write, no symbol and no
+  // name beside it; the single units read as before.
   await expect(row(page, 'foot-inch')).toContainText('5′ 11.00″');
   await expect(row(page, 'foot-inch').locator('[data-symbol]')).toHaveText('');
-  await expect(page.locator('[data-row]').first()).toHaveAttribute('data-row', 'foot-inch');
+  await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveCount(0);
+  expect(await sectionIds(page)).toEqual(['us', 'metric', 'other', 'mixed']);
+  await expect(page.locator('[data-row]').first()).toHaveAttribute('data-row', 'inch');
   await expect(row(page, 'centimeter')).toContainText('180.34');
   await expect(row(page, 'inch')).toContainText('71.00');
   // The URL carries the compound in the pair's words.

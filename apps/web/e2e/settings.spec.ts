@@ -451,7 +451,7 @@ test("the systems reorder in Units, by a handle's Move menu or a drag, and the t
   await units.getByRole('button', { name: 'Move Metric' }).click();
   await units.getByRole('button', { name: 'Move up' }).click();
   await expect.poll(sections).toEqual(['metric', 'us', 'uk']);
-  await expect(units.getByRole('status').filter({ hasText: 'Metric, 1 of 5' })).toHaveCount(1);
+  await expect(units.getByRole('status').filter({ hasText: 'Metric, 1 of 6' })).toHaveCount(1);
   await expect(units.getByRole('button', { name: 'Move up' })).toHaveAttribute(
     'aria-disabled',
     'true',
@@ -492,7 +492,7 @@ test("Alt and an arrow move a system's row; Escape closes its Move menu, the pan
   await page.keyboard.press('Alt+ArrowUp');
   await expect.poll(sections).toEqual(['us', 'uk', 'metric']);
   await expect(uk).toBeFocused();
-  await expect(units.getByRole('status').filter({ hasText: 'UK (imperial), 2 of 5' })).toHaveCount(
+  await expect(units.getByRole('status').filter({ hasText: 'UK (imperial), 2 of 6' })).toHaveCount(
     1,
   );
   // → reaches the row's handle; Enter opens its menu, Escape closes it.

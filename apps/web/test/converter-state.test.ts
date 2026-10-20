@@ -562,7 +562,7 @@ describe('compound quantities (ADR 0026)', () => {
     ).toMatchObject({ kind: 'unit', unit: { id: 'stone-pound' } });
   });
 
-  it('converts a compound from its pair, the pair’s row written in its own marks, leading its section', () => {
+  it('converts a compound from its pair, the pair’s row written in its own marks under Mixed units', () => {
     const t = units({ type: 'use', unit: 'foot-inch', text: "5'11" });
     const row = (id: string) => t.rows.find((each) => each.id === id)!;
     expect(row('foot-inch')).toMatchObject({
@@ -574,13 +574,21 @@ describe('compound quantities (ADR 0026)', () => {
     expect(row('centimeter').text).toBe('180.34');
     expect(row('inch').text).toBe('71');
     expect(row('foot').pair).toBeUndefined();
-    // The pair leads its system's section, ahead of the size order (ADR 0011, amended).
-    expect(t.sections[0]!.label).toBe('US (customary)');
+    // The pair sits in a section of its own, Mixed units, after the systems and before Specialty,
+    // its value its own label (Sean, 2026-10-19); the single units read as before.
+    expect(t.sections.map((section) => section.label)).toEqual([
+      'US (customary)',
+      'Metric',
+      'Other',
+      'Mixed units',
+      'Specialty',
+    ]);
     expect(t.sections[0]!.rows.map((each) => each.id).slice(0, 3)).toEqual([
-      'foot-inch',
       'inch',
       'foot',
+      'yard',
     ]);
+    expect(t.sections[3]!.rows.map((each) => each.id)).toEqual(['foot-inch']);
     expect(t.announcement).toBe(`5 ft 11 in in ${t.rows.length} units of length`);
   });
 
@@ -607,7 +615,9 @@ describe('compound quantities (ADR 0026)', () => {
       'UK (imperial)',
       'Metric',
     ]);
-    expect(stone.sections[0]!.rows[0]!.id).toBe('stone-pound');
+    expect(
+      stone.sections.find((section) => section.key === 'mixed')?.rows.map((each) => each.id),
+    ).toEqual(['stone-pound', 'pound-ounce']);
   });
 
   it('keeps the compound as typed in the box, and the pair as the unit, through use and the URL’s hydrate', () => {

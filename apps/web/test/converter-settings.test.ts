@@ -56,7 +56,7 @@ describe('settings: sections', () => {
       'Pace',
       'Specialty',
     ]);
-    expect(labels('time', 'us')).toEqual(['Standard', 'Specialty']);
+    expect(labels('time', 'us')).toEqual(['Standard', 'Mixed units', 'Specialty']);
   });
 
   it('puts the shared inch with the visitor’s customary section', () => {
@@ -127,10 +127,10 @@ describe('settings: what shows', () => {
   });
 
   it("orders the sections as set: the visitor's own first on a fresh visit, Standard first, Other a system like the rest", () => {
-    expect(defaultOrder('us')).toEqual(['us', 'metric', 'uk', 'other', 'specialty']);
-    expect(defaultOrder('metric')).toEqual(['metric', 'us', 'uk', 'other', 'specialty']);
+    expect(defaultOrder('us')).toEqual(['us', 'metric', 'uk', 'other', 'mixed', 'specialty']);
+    expect(defaultOrder('metric')).toEqual(['metric', 'us', 'uk', 'other', 'mixed', 'specialty']);
     const moved = withOrder(FRESH_SETTINGS, 'specialty', 0, 'us');
-    expect(orderOf(moved, 'us')).toEqual(['specialty', 'us', 'metric', 'uk', 'other']);
+    expect(orderOf(moved, 'us')).toEqual(['specialty', 'us', 'metric', 'uk', 'other', 'mixed']);
     expect(orderChanged(moved, 'us')).toBe(true);
     expect(orderChanged(withOrder(moved, 'specialty', 9, 'us'), 'us')).toBe(false);
     for (const category of ['speed', 'pressure', 'time'] as const) {
@@ -138,9 +138,9 @@ describe('settings: what shows', () => {
       const present = new Set(rows.map((row) => sectionOf(row.unit, 'us')));
       // Other where it is set, as any system: here between UK and Specialty. Pace after every
       // system but Specialty, wherever Specialty is set: here last.
-      const order = ['uk', 'other', 'specialty', 'metric', 'us'] as const;
+      const order = ['uk', 'other', 'mixed', 'specialty', 'metric', 'us'] as const;
       expect(sectionsOf(rows, 'us', order).map((section) => section.key)).toEqual(
-        ['standard', 'uk', 'other', 'specialty', 'metric', 'us', 'pace'].filter((key) =>
+        ['standard', 'uk', 'other', 'mixed', 'specialty', 'metric', 'us', 'pace'].filter((key) =>
           present.has(key as never),
         ),
       );
@@ -188,7 +188,7 @@ describe('settings: what shows', () => {
     expect(Object.keys(stored.display).sort()).toEqual(['format', 'fractions', 'places']);
     const back = settingsFrom(stored)!;
     expect(back.custom).toBe(true);
-    expect(back.order).toEqual(['uk', 'us', 'metric', 'other', 'specialty']);
+    expect(back.order).toEqual(['uk', 'us', 'metric', 'other', 'mixed', 'specialty']);
     expect(shows(unit('inch'), back.rule, 'us')).toBe(false);
     expect([...back.rule.shown].sort()).toEqual([...settings.rule.shown].sort());
     expect(back.display).toEqual(settings.display);
@@ -205,7 +205,7 @@ describe('settings: what shows', () => {
       order: ['us', 'us'],
       display: { names: 'loud', places: 7, fractions: [5, 9] },
     })!;
-    expect([...odd.rule.shown]).toEqual(['metric']);
+    expect([...odd.rule.shown]).toEqual(['metric', 'mixed']);
     expect(odd.rule.overrides.size).toBe(0);
     expect(odd.order).toBeNull();
     expect(odd.display.names).toBe('both');
@@ -227,7 +227,9 @@ describe('settings: what shows', () => {
       order: ['specialist', 'uk', 'us', 'metric'],
     })!;
     expect(older.rule.shown.has('other')).toBe(true);
-    expect(older.order).toEqual(['specialty', 'uk', 'us', 'metric', 'other']);
+    // Before version 5 Mixed units had no switch: on, and last in an order Specialty does not end.
+    expect(older.rule.shown.has('mixed')).toBe(true);
+    expect(older.order).toEqual(['specialty', 'uk', 'us', 'metric', 'other', 'mixed']);
     // Before version 4 Specialty's key was "specialist": switched on, kept aside, or ordered, it
     // reads as "specialty", so nobody's choices are lost (Sean, 2026-10-16).
     const before4 = settingsFrom({
@@ -237,13 +239,20 @@ describe('settings: what shows', () => {
       custom: true,
       order: ['specialist', 'metric', 'us', 'uk', 'other'],
     })!;
-    expect([...before4.rule.shown].sort()).toEqual(['metric', 'other', 'specialty']);
-    expect([...before4.kept!.shown].sort()).toEqual(['specialty', 'us']);
-    expect(before4.order).toEqual(['specialty', 'metric', 'us', 'uk', 'other']);
-    expect(storedOf(before4).v).toBe(4);
+    expect([...before4.rule.shown].sort()).toEqual(['metric', 'mixed', 'other', 'specialty']);
+    expect([...before4.kept!.shown].sort()).toEqual(['mixed', 'specialty', 'us']);
+    expect(before4.order).toEqual(['specialty', 'metric', 'us', 'uk', 'other', 'mixed']);
+    expect(storedOf(before4).v).toBe(5);
+    // An order Specialty ends takes Mixed units before it, where a fresh visit's has it.
+    const ended = settingsFrom({
+      v: 4,
+      rule: { shown: ['us', 'metric'], overrides: [] },
+      order: ['us', 'metric', 'uk', 'other', 'specialty'],
+    })!;
+    expect(ended.order).toEqual(['us', 'metric', 'uk', 'other', 'mixed', 'specialty']);
     expect(settingsFrom(null)).toBeNull();
     expect(settingsFrom({ v: 2 })).toBeNull();
-    expect(settingsFrom({ v: 5, rule: { shown: [], overrides: [] } })).toBeNull();
+    expect(settingsFrom({ v: 6, rule: { shown: [], overrides: [] } })).toBeNull();
   });
 });
 

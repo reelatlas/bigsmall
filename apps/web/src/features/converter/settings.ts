@@ -29,8 +29,9 @@ import {
 /**
  * A section of the table: `standard` holds a category with no regional system (time, data, angle),
  * `pace` a category's paces (Speed's min/km and min/mi), apart from the speeds they equal,
- * `change` the box's number as a change rather than a reading (Temperature's, state.ts), and
- * `weight` and `volume` Cooking's two quantities (ADR 0021).
+ * `mixed` a category's pairs, a value in two or three units (feet and inches, ADR 0026), apart from
+ * the single units, `change` the box's number as a change rather than a reading (Temperature's,
+ * state.ts), and `weight` and `volume` Cooking's two quantities (ADR 0021).
  */
 export type SectionKey =
   | 'metric'
@@ -39,6 +40,7 @@ export type SectionKey =
   | 'other'
   | 'standard'
   | 'pace'
+  | 'mixed'
   | 'specialty'
   | 'change'
   | 'weight'
@@ -55,6 +57,7 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
   other: 'Other',
   standard: 'Standard',
   pace: 'Pace',
+  mixed: 'Mixed units',
   specialty: 'Specialty',
   change: 'As a change',
   weight: 'Weight',
@@ -63,12 +66,21 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
 
 /**
  * The system switches, in their order: the regional systems, Other (a regional category's
- * standard units that belong to none of them, the knot and the atmosphere), and Specialty. Every
- * heading the table shows has its row in Units but Standard, which is the whole standard list of a
- * category with no regional system (time, data, angle): a switch would only empty its table
- * (Sean, 2026-10-15: Other had none until then, always showing, after the last regional system).
+ * standard units that belong to none of them, the knot and the atmosphere), Mixed units (a
+ * category's pairs, feet and inches, stone and pounds, hours, minutes, and seconds; ADR 0026,
+ * Sean, 2026-10-19), and Specialty. Every heading the table shows has its row in Units but
+ * Standard, which is the whole standard list of a category with no regional system (time, data,
+ * angle): a switch would only empty its table (Sean, 2026-10-15: Other had none until then, always
+ * showing, after the last regional system).
  */
-export const SYSTEM_KEYS: readonly SectionKey[] = ['metric', 'us', 'uk', 'other', 'specialty'];
+export const SYSTEM_KEYS: readonly SectionKey[] = [
+  'metric',
+  'us',
+  'uk',
+  'other',
+  'mixed',
+  'specialty',
+];
 
 const REGIONAL: ReadonlySet<UnitSystem> = new Set(['us', 'imperial', 'uk']);
 const regional = new Map<CategoryId, boolean>();
@@ -96,6 +108,8 @@ function ownSection(preference: UnitPreference): SectionKey {
  * every standard pace Pace's (Sean, 2026-10-16).
  */
 export function sectionOf(unit: Unit, preference: UnitPreference): SectionKey {
+  // A pair sits apart from the single units, whatever its system (ADR 0026).
+  if (unit.pair) return 'mixed';
   if (unit.tier === 'specialty') return 'specialty';
   if (unit.pace) return 'pace';
   if (!categoryIsRegional(unit.category)) return 'standard';
@@ -187,8 +201,9 @@ export function presetKeys(
 ): ReadonlySet<SectionKey> {
   if (preset === 'all') return new Set(SYSTEM_KEYS);
   if (preset === 'standard') return new Set(SYSTEM_KEYS.filter((key) => key !== 'specialty'));
-  // The visitor's own system, and the units no region owns (the knot, the atmosphere).
-  return new Set([ownSection(preference), 'other']);
+  // The visitor's own system, the units no region owns (the knot, the atmosphere), and the mixed
+  // units, which are how a region writes a height or a weight.
+  return new Set([ownSection(preference), 'other', 'mixed']);
 }
 
 /** The preset the switches alone match, or null for a custom set. */
@@ -447,9 +462,10 @@ interface StoredRule {
  * later reaches everyone who never chose otherwise; version 1, a day old, kept all of it. Version
  * 3 knows Other's switch. Version 4 keys Specialty's switch `specialty`, the screen's word, where
  * earlier versions stored `specialist` (Sean, 2026-10-16: one vocabulary in code and on screen).
+ * Version 5 knows Mixed units' switch (ADR 0026).
  */
 interface StoredSettings {
-  v: 4;
+  v: 5;
   rule: StoredRule;
   kept: StoredRule | null;
   custom: boolean;
@@ -472,7 +488,7 @@ export function storedOf(settings: Settings): StoredSettings {
   if (!sameSizes(display.fractions, fresh.fractions)) changed.fractions = [...display.fractions];
   if (display.rounding !== fresh.rounding) changed.rounding = display.rounding;
   return {
-    v: 4,
+    v: 5,
     rule: storedRule(settings.rule),
     kept: settings.kept && storedRule(settings.kept),
     custom: settings.custom,
@@ -485,7 +501,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
 /** The versions settingsFrom reads. */
-const VERSIONS: readonly unknown[] = [1, 2, 3, 4];
+const VERSIONS: readonly unknown[] = [1, 2, 3, 4, 5];
 
 /** A system's key as stored, read as today's: before version 4, Specialty's was `specialist`. */
 const keyOf = (key: unknown): unknown => (key === 'specialist' ? 'specialty' : key);
@@ -520,19 +536,29 @@ function oneOf<T>(value: unknown, allowed: readonly T[], fallback: T): T {
  * 1 stored every display setting, so its names cannot tell a choice from the old default, symbols
  * alone: they take today's. Before version 3 Other had no switch and always showed: it comes back
  * on, placed after the last regional system, where it stood. Before version 4 Specialty's key was
- * `specialist`: it reads as `specialty`, so nobody's choices are lost.
+ * `specialist`: it reads as `specialty`, so nobody's choices are lost. Before version 5 Mixed units
+ * had no switch: it comes back on, placed before Specialty where Specialty ends a stored order,
+ * else last.
  */
 export function settingsFrom(value: unknown): Settings | null {
   if (!isRecord(value) || !VERSIONS.includes(value.v)) return null;
   const before3 = value.v === 1 || value.v === 2;
+  const before5 = value.v !== 5;
   const withOther = (rule: ViewRule | null): ViewRule | null =>
     rule && before3 ? { ...rule, shown: new Set([...rule.shown, 'other']) } : rule;
-  const rule = withOther(ruleFrom(value.rule));
+  const withMixed = (rule: ViewRule | null): ViewRule | null =>
+    rule && before5 ? { ...rule, shown: new Set([...rule.shown, 'mixed']) } : rule;
+  const rule = withMixed(withOther(ruleFrom(value.rule)));
   if (!rule) return null;
   let stored = Array.isArray(value.order) ? (value.order as unknown[]).map(keyOf) : null;
   if (stored && before3 && !stored.includes('other')) {
     const after = Math.max(...(['metric', 'us', 'uk'] as const).map((key) => stored!.indexOf(key)));
     stored = [...stored.slice(0, after + 1), 'other', ...stored.slice(after + 1)];
+  }
+  if (stored && before5 && !stored.includes('mixed')) {
+    const at = stored.indexOf('specialty');
+    const place = at === stored.length - 1 ? at : stored.length;
+    stored = [...stored.slice(0, place), 'mixed', ...stored.slice(place)];
   }
   const order =
     stored &&
@@ -555,7 +581,7 @@ export function settingsFrom(value: unknown): Settings | null {
   return {
     rule,
     display,
-    kept: withOther(ruleFrom(value.kept)),
+    kept: withMixed(withOther(ruleFrom(value.kept))),
     custom: value.custom === true,
     order,
   };

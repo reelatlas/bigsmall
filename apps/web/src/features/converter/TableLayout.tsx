@@ -25,7 +25,7 @@ import {
 import { Button } from '../../components/Button';
 import { CategoryMenu } from '../../components/CategoryMenu';
 import { CategoryTiles } from '../../components/CategoryTiles';
-import { ConversionTable, type ConversionTableProps } from '../../components/ConversionTable';
+import { ConversionTable } from '../../components/ConversionTable';
 import { MoreMenu } from '../../components/MoreMenu';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { UnitMatches } from '../../components/UnitMatches';
@@ -219,7 +219,6 @@ interface TableLayoutProps {
   /** The row whose copy button shows the check, by unit id. */
   copiedRow: string | null;
   onCopyRow: (unitId: string) => void;
-  copyRowProps: NonNullable<ConversionTableProps<TableRow>['copyProps']>;
 }
 
 /**
@@ -248,7 +247,6 @@ export function TableLayout({
   sideTypes,
   copiedRow,
   onCopyRow,
-  copyRowProps,
 }: TableLayoutProps) {
   const listId = useId();
   const hiddenListId = `${listId}-hidden`;
@@ -1061,7 +1059,6 @@ export function TableLayout({
         copied={copiedRow}
         onPick={pick}
         onCopy={(row) => onCopyRow(row.id)}
-        copyProps={copyRowProps}
         editing={editing}
         hiddenOpen={hiddenOpen}
         isShown={(row) => row.inBox || shows(row.unit, rule, env.system)}

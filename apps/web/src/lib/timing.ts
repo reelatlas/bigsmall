@@ -15,6 +15,12 @@ export const ANNOUNCE_MS = 600;
 /** How long an input the box could not read stands before its shape is counted (§11, ADR 0019). */
 export const UNREAD_SETTLE_MS = 1500;
 
+/**
+ * A second tap or click on the same row within this copies its value (§7): the platforms' own
+ * double-tap windows run 300 to 500 ms.
+ */
+export const DOUBLE_TAP_MS = 400;
+
 /** The copy check shows at least this long, so a quick click-and-move still shows it (§7). */
 export const COPIED_MIN_MS = 1000;
 

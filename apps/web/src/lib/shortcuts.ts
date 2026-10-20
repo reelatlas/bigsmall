@@ -21,14 +21,15 @@ interface Shortcut {
 // toolbar's, its side panels in its order, then undo and redo (Sean, 2026-10-15). Tab, Home and
 // End in a toolbar, Backspace on an empty box, and Alt+↑ ↓ on a system's row in Units work too
 // but are left out, to keep it short and until reordering has a way to be shown. Copying is in:
-// its button shows only on the active row.
+// no button shows it.
 // The range of letters reads a–z, lowercase as most unit symbols are; a shortcut's letter reads
 // as its keycap prints it.
 export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Type from anywhere', keys: [['0–9'], ['a–z']] },
   { action: 'Pick a unit or value', keys: [['Enter']] },
   { action: 'Step back or clear', keys: [['Esc']] },
-  { action: 'Copy row value', keys: [['Mod', 'C']] },
+  // A second click on a row copies it too (docs/UX-SPEC.md §7), named here as the keys are.
+  { action: 'Copy row value', keys: [['Mod', 'C'], ['Double-click']] },
   // Each pair of arrows shares one group so they sit side by side with nothing between them.
   { action: 'Move up and down page', keys: [['↑', '↓']] },
   { action: 'Move across a toolbar', keys: [['←', '→']] },

@@ -292,7 +292,7 @@ export function Converter() {
 
   /**
    * Copies a table row's value as the row shows it (docs/UX-SPEC.md §7; Sean, 2026-10-15), from
-   * its copy button or Ctrl/⌘+C. A check in the success color confirms it, and the status line
+   * a second tap or click on it or Ctrl/⌘+C. A check in the success color confirms it, and the status line
    * says so; useCopied decides when it reverts.
    */
   const copyRow = (unitId: string) => {
@@ -472,10 +472,6 @@ export function Converter() {
         sideTypes={side === 'units' || side === 'display'}
         copiedRow={copied?.startsWith('row-') ? copied.slice('row-'.length) : null}
         onCopyRow={copyRow}
-        copyRowProps={(row) => ({
-          ...pointerProps(`row-${row.id}`),
-          title: apple ? 'Copy (⌘C)' : 'Copy (Ctrl+C)',
-        })}
       />
 
       {/* The page's two live regions (docs/UX-SPEC.md §12): the table's sentence, once it settles,

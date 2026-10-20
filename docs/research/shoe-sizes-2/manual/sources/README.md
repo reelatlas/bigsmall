@@ -8,12 +8,13 @@ One folder per brand. Everything the compiled `../brand-charts.json` was read fr
 
 Checker note: the JSON was built from the pasted text where it exists (parsed, not retyped); screenshots were used to confirm layout and to settle the HOKA all-gender misalignment and the New Balance women's width row that split across lines.
 
-| brand       | screenshots                | pasted text                            | other                                                       |
-| ----------- | -------------------------- | -------------------------------------- | ----------------------------------------------------------- |
-| adidas      | 6                          | adult (men's + women's pages), kids cm | —                                                           |
-| new-balance | 5 (printable sizing tools) | —                                      | size-guide-page-text.txt, width-guide-page-text.txt, 2 PDFs |
-| vans        | 12                         | all 5 tables, in + cm                  | —                                                           |
-| ugg         | 10 (incl. kids PDF guide)  | 8 web tables; kids PDF transcribed     | —                                                           |
-| hoka        | 22                         | all tables, in + cm                    | —                                                           |
-| timberland  | 18                         | all 8 tables, in + cm                  | —                                                           |
-| on          | 6                          | men, women, kids in + cm               | —                                                           |
+| brand       | screenshots                                    | pasted text                                                       | other                                                                                        |
+| ----------- | ---------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| adidas      | 6                                              | adult (men's + women's pages), kids cm                            | —                                                                                            |
+| new-balance | 5 (printable sizing tools)                     | —                                                                 | size-guide-page-text.txt, width-guide-page-text.txt, 2 PDFs                                  |
+| vans        | 12                                             | all 5 tables, in + cm                                             | —                                                                                            |
+| ugg         | 10 (incl. kids PDF guide)                      | 8 web tables; kids PDF transcribed                                | —                                                                                            |
+| hoka        | 22                                             | all tables, in + cm                                               | —                                                                                            |
+| timberland  | 18                                             | all 8 tables, in + cm                                             | —                                                                                            |
+| on          | 6                                              | men, women, kids in + cm                                          | —                                                                                            |
+| dr-martens  | 4 (adults cm, adults in, how to measure, kids) | adults cm, adults in, kids (the page text highlighted and copied) | added 2026-10-20 after wave 2; not in brand-charts.json, read from the pasted text at wave 3 |

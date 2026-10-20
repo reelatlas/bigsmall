@@ -1,0 +1,74 @@
+# Pasted by Sean from drmartens.com/us/en/about/size-guide (the page text highlighted and copied), 2026-10-20, after wave 2. Tab-separated, verbatim; a blank cell is an empty field. Screenshots: 01 the adults' cm toggle, 02 the inch toggle, 03 the How to Measure panel over the inch table, 04 the Kid's Sizing tab.
+
+## Women's and Men's, cm toggle (the page's first table; the two half-size rows leave US Men's blank)
+
+Foot length	Foot width	UK	EU	US Men's	US Women's
+22	8.4	3	36	4	5
+23	8.7	4	37	5	6
+24	8.9	5	38	6	7
+25	9.1	6	39	7	8
+25.5	9.2	6.5	40		8.5
+26	9.3	7	41	8	9
+27	9.5	8	42	9	10
+28	9.7	9	43	10	11
+28.5	9.8	9.5	44		11.5
+29	9.9	10	45	11	12
+30	10.1	11	46	12	13
+31	10.3	12	47	13	14
+32	10.6	13	48	14	15
+33	10.8	14	49	15	16
+34	11	15	50	16	17
+
+## Women's and Men's, in toggle
+
+Foot length	Foot width	UK	EU	US Men's	US Women's
+9.35"	3.34"	3	36	4	5
+9.69"	3.42"	4	37	5	6
+10.02"	3.5"	5	38	6	7
+10.35"	3.59"	6	39	7	8
+10.35"	3.63"	6.5	40		8.5
+10.69"	3.67"	7	41	8	9
+11.02"	3.76"	8	42	9	10
+11.35"	3.84"	9	43	10	11
+11.35"	3.88"	9.5	44		11.5
+11.69"	3.92"	10	45	11	12
+12.02"	4.01"	11	46	12	13
+12.35"	4.09"	12	47	13	14
+12.68"	4.17"	13	48	14	15
+13.02"	4.26"	14	49	15	16
+13.35"	4.34"	15	50	16	17
+
+## Kid's Sizing
+
+UK	EU	Japan	Age	US Kids
+0	16	9	0-3 Months	1
+1	17	10	3-6 Months	2
+2	18	11	6-9 Months	3
+3	19	11.5	9-12 Months	4
+3	19	11.5	Toddler	4
+4	20	12	Toddler	5
+4.5	21	12.5	Toddler	5.5
+5	21.5	13	Toddler	6
+5.5	22	13.5	Toddler	6.5
+6	23	14	Toddler	7
+7	24	14.5	Toddler	8
+7.5	25	15	Toddler	8.5
+8	26	15.5	Toddler	9
+9	27	16	Toddler	10
+10	28	17	Junior	11
+10.5	28.5	17.5	Junior	11.5
+11	29	17.5	Junior	12
+11.5	30	18	Junior	12.5
+12	31	18.5	Junior	13
+13	32	19	Junior	1
+1	33	20	Junior	2
+1.5	33.5	20.5	Junior	2.5
+2	34	21	Junior	3
+2.5	35	21.5	Junior	3.5
+3	36	22	Junior	4
+
+## How to Measure (the panel's three steps, from screenshot-03)
+
+Step 1: Place sheet of paper next to the wall. Stand on the paper with your heels against the wall.
+Step 2: Mark the end of the longest toe of each foot.
+Step 3: Mark the widest point at the left and right side of the ball of your feet.

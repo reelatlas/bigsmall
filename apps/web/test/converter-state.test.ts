@@ -766,6 +766,11 @@ describe('shoe sizes (ADR 0027)', () => {
     expect(units({ type: 'use', unit: 'us-men', text: '11' }, type('11 to')).target).toBe('');
     expect(units({ type: 'use', unit: 'us-men', text: '11' }, type('11 in')).target).toBe('');
     expect(units({ type: 'use', unit: 'us-men', text: '11' }, type('11')).target).toBeUndefined();
+    // A compound's target goes through the same rule: the pair offered first, the target kept.
+    const compound = selectTable(run(type("5'11 to cm")), options);
+    if (compound.kind !== 'matches') throw new Error('expected matches');
+    expect(compound.rows[0]).toMatchObject({ kind: 'unit', unit: { id: 'foot-inch' } });
+    expect(compound.target).toBe('cm');
     // Without a unit, a connective alone is a query that matches nothing, its target kept.
     const alone = selectTable(run(type('11 to eu')), options);
     if (alone.kind !== 'matches') throw new Error('expected matches');

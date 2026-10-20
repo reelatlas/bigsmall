@@ -28,8 +28,16 @@ export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Type from anywhere', keys: [['0–9'], ['a–z']] },
   { action: 'Pick a unit or value', keys: [['Enter']] },
   { action: 'Step back or clear', keys: [['Esc']] },
-  // A second click on a row copies it too (docs/UX-SPEC.md §7), named here as the keys are.
-  { action: 'Copy row value', keys: [['Mod', 'C'], ['Double-click']] },
+  // A second Enter on a row Enter just took copies it, as a second click does (docs/UX-SPEC.md
+  // §7): each shown as the two presses it is, never as a chord (Sean, 2026-10-20).
+  {
+    action: 'Copy row value',
+    keys: [
+      ['Mod', 'C'],
+      ['Enter', 'Enter'],
+      ['Click', 'Click'],
+    ],
+  },
   // Each pair of arrows shares one group so they sit side by side with nothing between them.
   { action: 'Move up and down page', keys: [['↑', '↓']] },
   { action: 'Move across a toolbar', keys: [['←', '→']] },

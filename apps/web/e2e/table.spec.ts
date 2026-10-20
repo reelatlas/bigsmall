@@ -1358,6 +1358,13 @@ test('a second tap or click on a row copies what it shows, the check flashing ov
   await page.keyboard.press('ArrowUp');
   await page.keyboard.press('ControlOrMeta+c');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2.00');
+  // Enter twice on a row copies it: the first takes it, a second within the window copies it as
+  // shown, the way a second click does (Sean, 2026-10-20).
+  await page.evaluate(() => navigator.clipboard.writeText('nothing yet'));
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2.00');
 });
 
 test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds, which copy, move into the box, and link as written', async ({
@@ -2091,24 +2098,36 @@ test('a height: "5\'11" offers feet, inches, Enter takes it, and the pair row wr
   await expect(row(page, 'hour-minute-second').locator('[data-symbol]')).toHaveText('h:m:s');
 });
 
-test('a clock names its units: "5:55" offers the time pair, then the paces, Enter takes the pair, and a part of one digit reads as that many (ADR 0026)', async ({
+test('a clock names its units: "5:55" offers the paces first, "1:30:00" the time pair, Enter takes the first, 5:5 is 5:05, and "5\'" offers feet then the pair (ADR 0026)', async ({
   page,
 }) => {
   await page.goto('/');
   await ready(page);
+  // Two parts are minutes and seconds: the paces first, the mile's for this US visitor.
   await box(page).fill('5:55');
   const options = matches(page).getByRole('option');
   await expect(options).toHaveCount(3);
-  await expect(options.nth(0)).toContainText('hours, minutes, seconds');
+  await expect(options.nth(0)).toContainText('min/mi');
   await expect(options.nth(1)).toContainText('min/km');
-  await expect(options.nth(2)).toContainText('min/mi');
+  await expect(options.nth(2)).toContainText('hours, minutes, seconds');
   await box(page).press('Enter');
-  await expect(page.getByRole('button', { name: 'Remove hours, minutes, seconds' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove minutes per mile' })).toBeVisible();
   await expect(box(page)).toHaveValue('5:55');
-  await expect(row(page, 'hour-minute-second')).toContainText('5:55:00');
-  await expect(row(page, 'minute')).toContainText('355.00');
+  await expect(row(page, 'minute-per-mile')).toContainText('5:55');
+  await expect(row(page, 'minute-per-kilometer')).toContainText('3:41');
   // 5:5 is 5:05, never 5 alone with ":5" left over (Sean, 2026-10-20).
   await box(page).fill('5:5');
-  await expect(row(page, 'hour-minute-second')).toContainText('5:05:00');
-  await expect(row(page, 'minute')).toContainText('305.00');
+  await expect(row(page, 'minute-per-mile')).toContainText('5:05');
+  // Three parts are hours, minutes, seconds: the time pair first, from the start (in Speed, where
+  // the pace left the converter, the paces would lead, as the category one is in always does).
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('1:30:00');
+  await expect(options.first()).toContainText('hours, minutes, seconds');
+  // A number and a lone foot mark are feet, the pair offered after them in case the inches follow.
+  await box(page).fill("5'");
+  await expect(options).toHaveCount(2);
+  await expect(options.nth(0)).toContainText('feet');
+  await expect(options.nth(0)).not.toContainText('feet, inches');
+  await expect(options.nth(1)).toContainText('feet, inches');
 });

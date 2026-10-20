@@ -17,6 +17,7 @@ import {
   matchIngredients,
   NBSP,
   pairParts,
+  pairsOpenedBy,
   parse,
   resolveExact,
   search,
@@ -472,7 +473,18 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   // A clock names its units (ADR 0026; Sean, 2026-10-20): typed alone, "5:55" offers the units
   // written as a clock, the time pair first, then the paces, until one is in the box; a unit
   // typed after it, or in the box, takes the clock as a number.
-  if (parsed.clock && !unit && !typingUnit(parsed)) return withClockUnits(base, category);
+  if (parsed.clock && !unit && !typingUnit(parsed)) {
+    return withClockUnits(base, category, parsed, options.system);
+  }
+  // A number and a lone foot mark are feet (ADR 0026: "6'" is six feet), and the pair the mark
+  // opens is offered after them, in case the inches follow (Sean, 2026-10-20).
+  const opened =
+    parsed.value !== undefined && parsed.query
+      ? pairsOpenedBy(parsed.query).filter((pair) => pair.id !== unit?.id)
+      : [];
+  if (opened.length > 0) {
+    return withPairsAfter(selectMatches(base, parsed.query ?? '', unit, category, options), opened);
+  }
   if (typingUnit(parsed)) return selectMatches(base, parsed.query ?? '', unit, category, options);
   if (!category) return { ...base, kind: 'start', announcement: null };
   if (category === 'cooking') {
@@ -483,12 +495,31 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   return selectUnits(base, category, unit, parsed, options);
 }
 
-/** The units written as a clock, offered for a clock typed alone: the time pair, then the paces. */
-function withClockUnits(base: ViewBase, current: CategoryId | null): MatchesView {
-  const rows: MatchRow[] = clockUnits().flatMap((clock) => {
-    const category = getCategory(clock.category);
-    return category ? [{ kind: 'unit', unit: clock, category, inBox: false }] : [];
-  });
+/**
+ * The units written as a clock, offered for a clock typed alone (Sean, 2026-10-20): the category
+ * the converter is in first, as matches always come; else by the clock's shape, two parts being
+ * minutes and seconds, a pace, and three hours, minutes, seconds; the paces with the visitor's own
+ * first, the mile's where the region is not metric.
+ */
+function withClockUnits(
+  base: ViewBase,
+  current: CategoryId | null,
+  parsed: ParsedInput,
+  system: UnitPreference,
+): MatchesView {
+  const parts = (parsed.valueText ?? '').split(':').length;
+  const timeFirst = current === 'time' || (current !== 'speed' && parts >= 3);
+  const rank = (clock: Unit): number => {
+    const group = (clock.pace ? !timeFirst : timeFirst) ? 0 : 10;
+    const own = clock.pace && (clock.system === 'metric') !== (system === 'metric') ? 1 : 0;
+    return group + own;
+  };
+  const rows: MatchRow[] = [...clockUnits()]
+    .sort((a, b) => rank(a) - rank(b))
+    .flatMap((clock) => {
+      const category = getCategory(clock.category);
+      return category ? [{ kind: 'unit', unit: clock, category, inBox: false }] : [];
+    });
   const counts: Partial<Record<CategoryId, number>> = {};
   for (const row of rows) counts[row.category.id] = (counts[row.category.id] ?? 0) + 1;
   return {
@@ -501,6 +532,27 @@ function withClockUnits(base: ViewBase, current: CategoryId | null): MatchesView
     hidden: [],
     announcement: `${rows.length} ${rows.length === 1 ? 'unit' : 'units'} written as a clock`,
   };
+}
+
+/** The matches with the pairs a lone mark opens after them, each at its category's group's end. */
+function withPairsAfter(view: MatchesView, opened: readonly Unit[]): MatchesView {
+  const rows = [...view.rows];
+  const counts = { ...view.counts };
+  for (const pair of opened) {
+    const category = getCategory(pair.category);
+    if (!category || rows.some((row) => row.kind === 'unit' && row.unit.id === pair.id)) continue;
+    const last = rows.map((row) => row.category.id).lastIndexOf(pair.category);
+    rows.splice(last < 0 ? rows.length : last + 1, 0, {
+      kind: 'unit',
+      unit: pair,
+      category,
+      inBox: false,
+    });
+    counts[pair.category] = (counts[pair.category] ?? 0) + 1;
+  }
+  const hidden = view.hidden.filter((each) => !opened.some((pair) => pair.id === each.unit.id));
+  const announcement = `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`;
+  return { ...view, rows, counts, hidden, announcement };
 }
 
 /** The matches with a compound's pair leading them, its category's group first, counted once. */

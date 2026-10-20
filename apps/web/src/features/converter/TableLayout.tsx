@@ -38,6 +38,7 @@ import { stepPlane } from '../../lib/planes';
 import { useKept } from '../../lib/keeping';
 import { useRefit } from '../../lib/fit-step';
 import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
+import { DOUBLE_TAP_MS } from '../../lib/timing';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
 import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
@@ -314,6 +315,8 @@ export function TableLayout({
    * Enter, labelled Done, puts the keyboard away once it has done its job (ADR 0015).
    */
   const tappedIn = useRef(false);
+  /** The row Enter took last, and when: a second Enter within the window copies it (§7). */
+  const lastEnter = useRef<{ id: string; at: number } | null>(null);
   /** Edit, in the category it was started in: a new category ends it. */
   const [editingIn, setEditingIn] = useState<string | null>(null);
   const editing = table.kind === 'units' && editingIn === table.category;
@@ -980,15 +983,29 @@ export function TableLayout({
         // into the table, to pick a category or a unit.
         event.preventDefault();
         const worked = evaluatedText(box.text, env);
-        if (browsing) takeRow(at);
-        // A typed unit takes its best match, a compound its pair, and a clock the first unit
-        // written as one (ADR 0026); Cooking's ingredients, listed to choose from, are gone into,
-        // as a category's units are.
-        else if (table.kind === 'matches' && (table.query !== '' || offersPair || offersClock))
+        const lastTaken = lastEnter.current;
+        lastEnter.current = null;
+        if (browsing) {
+          takeRow(at);
+          const taken = table.kind === 'units' ? table.rows[at] : undefined;
+          // A second Enter within the window copies the row this one took, as a second tap or
+          // click does (Sean, 2026-10-20).
+          if (taken?.tone === 'value') lastEnter.current = { id: taken.id, at: performance.now() };
+        } else if (table.kind === 'matches' && (table.query !== '' || offersPair || offersClock)) {
+          // A typed unit takes its best match, a compound its pair, and a clock the first unit
+          // written as one (ADR 0026); Cooking's ingredients, listed to choose from, are gone
+          // into, as a category's units are.
           takeRow(0);
-        else if (table.kind === 'matches') setPosition(0);
+        } else if (table.kind === 'matches') setPosition(0);
         else if (worked !== null) dispatch({ type: 'replace', text: worked });
-        else if (box.unit) setPosition(null);
+        else if (
+          lastTaken !== null &&
+          table.kind === 'units' &&
+          performance.now() - lastTaken.at <= DOUBLE_TAP_MS &&
+          table.rows.find((row) => row.inBox)?.id === lastTaken.id
+        ) {
+          onCopyRow(lastTaken.id);
+        } else if (box.unit) setPosition(null);
         else if (rowCount > 0) setPosition(0);
         // On a touch screen's keyboard Enter reads Done: what it did stands, and the keyboard goes
         // away, so the table shows (ADR 0015).

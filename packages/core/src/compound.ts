@@ -612,3 +612,16 @@ export function pairCanonical(value: number, unit: Unit): string {
   });
   return `${split.negative ? '-' : ''}${words.join(' ')}`;
 }
+
+/**
+ * The pairs a lone mark after a number opens, by naming their first part: "5'" is five feet, and
+ * feet and inches is offered after feet, in case the inches follow (Sean, 2026-10-20); "5\"" opens
+ * none, the inch being no pair's first part, and so does a lone minute mark, the angle's second.
+ */
+export function pairsOpenedBy(mark: string): Unit[] {
+  const at = SINGLE_MARKS.has(mark) ? 0 : DOUBLE_MARKS.has(mark) ? 1 : null;
+  if (at === null) return [];
+  return pairs()
+    .filter((info) => info.marks?.[at] === 0)
+    .map((info) => info.unit);
+}

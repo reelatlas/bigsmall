@@ -562,15 +562,30 @@ describe('compound quantities (ADR 0026)', () => {
     ).toMatchObject({ kind: 'unit', unit: { id: 'stone-pound' } });
   });
 
-  it('offers the units written as a clock for a clock typed alone: the time pair, then the paces', () => {
+  it('offers the units written as a clock for a clock typed alone, by its shape and the category it is in', () => {
+    const ids = (shown: ReturnType<typeof matches>) =>
+      shown.rows.map((row) => (row.kind === 'unit' ? row.unit.id : row.kind));
+    // Two parts are minutes and seconds: the paces first, this US visitor's mile first.
     const clock = matches(type('5:55'));
-    expect(clock.rows.map((row) => row.kind === 'unit' && row.unit.id)).toEqual([
-      'hour-minute-second',
-      'minute-per-kilometer',
-      'minute-per-mile',
-    ]);
+    expect(ids(clock)).toEqual(['minute-per-mile', 'minute-per-kilometer', 'hour-minute-second']);
     expect(clock.counts).toEqual({ time: 1, speed: 2 });
     expect(clock.announcement).toBe('3 units written as a clock');
+    // Three parts are hours, minutes, seconds: the time pair first.
+    expect(ids(matches(type('1:30:00')))).toEqual([
+      'hour-minute-second',
+      'minute-per-mile',
+      'minute-per-kilometer',
+    ]);
+    // The category the converter is in leads, as matches always come.
+    expect(ids(matches({ type: 'chooseCategory', category: 'time' }, type('5:55')))[0]).toBe(
+      'hour-minute-second',
+    );
+    expect(ids(matches({ type: 'chooseCategory', category: 'speed' }, type('1:30:00')))[0]).toBe(
+      'minute-per-mile',
+    );
+    // A number and a lone foot mark are feet, the pair offered after them in case the inches follow.
+    expect(ids(matches(type("5'")))).toEqual(['foot', 'foot-inch']);
+    expect(matches(type("5'")).announcement).toBe('2 matches');
     // A unit typed after it is the match, as for any number; in the box, a unit takes the clock.
     expect(matches(type('5:55 min/mi')).rows[0]).toMatchObject({ unit: { id: 'minute-per-mile' } });
     expect(view(type('5:55'), { type: 'use', unit: 'hour-minute-second', text: '5:55' }).kind).toBe(

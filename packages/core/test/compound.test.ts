@@ -5,6 +5,7 @@ import {
   getUnit,
   pairCanonical,
   pairParts,
+  pairsOpenedBy,
   parse,
   readCompound,
   units,
@@ -493,5 +494,17 @@ describe('pairCanonical', () => {
     expect(pairCanonical(5280 + 0.5 / 12, unit('foot-inch'))).toBe('5280 ft 0.5 in');
     expect(pairCanonical(70.866141732 / 12, unit('foot-inch'))).toBe('5 ft 10.86614173 in');
     expect(pairCanonical(1.5, unit('hour-minute-second'))).toBe('1 h 30 min 0 s');
+  });
+});
+
+describe('pairsOpenedBy', () => {
+  it('names the pair a lone mark opens: feet and inches after a foot mark, none after an inch mark', () => {
+    for (const mark of ["'", '′', '’']) {
+      expect(
+        pairsOpenedBy(mark).map((unit) => unit.id),
+        mark,
+      ).toEqual(['foot-inch']);
+    }
+    for (const mark of ['"', '″', 'x', '', '5']) expect(pairsOpenedBy(mark), mark).toEqual([]);
   });
 });

@@ -90,7 +90,7 @@ export const lengthUnits: readonly Unit[] = [
     name: 'inch',
     plural: 'inches',
     symbol: 'in',
-    aliases: ['"', 'ins'],
+    aliases: ['"', '″', '”', 'ins'],
     system: 'imperial',
     tier: 'standard',
     factor: 0.0254,
@@ -104,7 +104,8 @@ export const lengthUnits: readonly Unit[] = [
     name: 'foot',
     plural: 'feet',
     symbol: 'ft',
-    aliases: ["'"],
+    // The marks people type and the typographic prime (Sean, 2026-10-20: "5′" finds feet as "5'" does).
+    aliases: ["'", '′', '’'],
     system: 'imperial',
     tier: 'standard',
     factor: 0.3048,

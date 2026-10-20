@@ -28,14 +28,14 @@ export const SHORTCUTS: readonly Shortcut[] = [
   { action: 'Type from anywhere', keys: [['0–9'], ['a–z']] },
   { action: 'Pick a unit or value', keys: [['Enter']] },
   { action: 'Step back or clear', keys: [['Esc']] },
-  // A second Enter on a row Enter just took copies it, as a second click does (docs/UX-SPEC.md
-  // §7): each shown as the two presses it is, never as a chord (Sean, 2026-10-20).
+  // A second press copies a row: a second Enter on the row Enter took or rested on, a second
+  // click or tap on it (docs/UX-SPEC.md §7); one entry for all three, two keycaps, never a count
+  // or a chord (Sean, 2026-10-20).
   {
     action: 'Copy row value',
     keys: [
       ['Mod', 'C'],
-      ['Enter', 'Enter'],
-      ['Click', 'Click'],
+      ['Tap', 'Tap'],
     ],
   },
   // Each pair of arrows shares one group so they sit side by side with nothing between them.

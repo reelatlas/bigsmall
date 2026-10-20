@@ -983,30 +983,45 @@ export function TableLayout({
         // into the table, to pick a category or a unit.
         event.preventDefault();
         const worked = evaluatedText(box.text, env);
+        const now = performance.now();
         const lastTaken = lastEnter.current;
         lastEnter.current = null;
+        /** A second Enter within the window copies the row this one took or rested on (§7). */
+        const remember = (id: string | undefined) => {
+          if (id !== undefined) lastEnter.current = { id, at: now };
+        };
+        /** The box's unit's row, which Enter rests the cursor on, where it has a value to copy. */
+        const resting = () => {
+          const row = table.kind === 'units' ? table.rows.find((each) => each.inBox) : undefined;
+          return row?.tone === 'value' ? row.id : undefined;
+        };
         if (browsing) {
           takeRow(at);
           const taken = table.kind === 'units' ? table.rows[at] : undefined;
-          // A second Enter within the window copies the row this one took, as a second tap or
-          // click does (Sean, 2026-10-20).
-          if (taken?.tone === 'value') lastEnter.current = { id: taken.id, at: performance.now() };
+          remember(taken?.tone === 'value' ? taken.id : undefined);
         } else if (table.kind === 'matches' && (table.query !== '' || offersPair || offersClock)) {
           // A typed unit takes its best match, a compound its pair, and a clock the first unit
           // written as one (ADR 0026); Cooking's ingredients, listed to choose from, are gone
           // into, as a category's units are.
           takeRow(0);
+          const match = table.rows[0];
+          remember(match?.kind === 'unit' ? match.unit.id : undefined);
         } else if (table.kind === 'matches') setPosition(0);
         else if (worked !== null) dispatch({ type: 'replace', text: worked });
         else if (
           lastTaken !== null &&
-          table.kind === 'units' &&
-          performance.now() - lastTaken.at <= DOUBLE_TAP_MS &&
-          table.rows.find((row) => row.inBox)?.id === lastTaken.id
+          now - lastTaken.at <= DOUBLE_TAP_MS &&
+          resting() === lastTaken.id
         ) {
+          // The second Enter within the window, on the row the first took or rested the cursor
+          // on: it copies, as a second tap or click does, and as Ctrl/⌘+C copies the resting row
+          // (Sean, 2026-10-20).
           onCopyRow(lastTaken.id);
-        } else if (box.unit) setPosition(null);
-        else if (rowCount > 0) setPosition(0);
+        } else if (box.unit) {
+          // With a unit the cursor comes back to rest on its row, which a second Enter copies.
+          setPosition(null);
+          remember(resting());
+        } else if (rowCount > 0) setPosition(0);
         // On a touch screen's keyboard Enter reads Done: what it did stands, and the keyboard goes
         // away, so the table shows (ADR 0015).
         if (tappedIn.current) inputRef.current?.blur();

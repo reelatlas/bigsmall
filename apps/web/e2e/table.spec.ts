@@ -1365,6 +1365,12 @@ test('a second tap or click on a row copies what it shows, the check flashing ov
   await page.keyboard.press('Enter');
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2.00');
+  // In the box with a unit in it, Enter rests the cursor on the unit's row, and a second Enter
+  // copies it, as Ctrl/⌘+C copies the resting row (Sean, 2026-10-20).
+  await page.evaluate(() => navigator.clipboard.writeText('nothing yet'));
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2.00');
 });
 
 test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds, which copy, move into the box, and link as written', async ({

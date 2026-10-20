@@ -95,7 +95,7 @@ Walk each section over the files in scope. Searches find candidates; reading the
 ## Docs and skills
 
 - `UX-SPEC.md`: current behavior only; §14 holds what is not built yet, a built item moved into its section with its date; open questions in §15 still open.
-- `DESIGN-SYSTEM.md`: the recipes paragraph, the patterns, the inventory, and the gallery paragraph match the code. The spacing rules hold: a line sits evenly between the ink on either side, and a fill (hovered, focused, switched on) keeps 4 px from a line. A control shown only on the active row stays reachable (`opacity-0 pointer-events-none`); dim text takes the muted ink, never opacity.
+- `DESIGN-SYSTEM.md`: the recipes paragraph, the patterns, the inventory, and the gallery paragraph match the code. The spacing rules hold: a line sits evenly between the ink on either side, and a fill (hovered, focused, switched on) keeps 4 px from a line. A control shown in one state that screen readers should still reach stays reachable (`opacity-0 pointer-events-none`, never `hidden`; the copy button did, 2026-10-15 to 2026-10-19); dim text takes the muted ink, never opacity.
 - `ARCHITECTURE.md`: the file tables match the tree, and the conventions hold.
 - ADRs: a decision explained twice has one; a replaced one says so in its status line; the index lists all.
 - `LEARNINGS.md`: every gotcha found has a dated entry, listed in its topic index; one that keeps coming back is promoted into `CLAUDE.md`, an ADR, or the doc where the rule lives, its entry saying **Promoted** to where.

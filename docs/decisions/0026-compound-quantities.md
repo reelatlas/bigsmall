@@ -1,7 +1,7 @@
 # 0026 — Compound quantities: one grammar reads them, and a pair is a unit of its own
 
 Date: 2026-10-19
-Status: accepted; amended 2026-10-19 (the ninety-eighth pass)
+Status: accepted; amended 2026-10-19 and 2026-10-20 (the ninety-eighth to hundred-and-fourth passes, below)
 
 ## Context
 

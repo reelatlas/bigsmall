@@ -1,6 +1,6 @@
 ---
 name: tidy
-description: Tidy pass for bigsmall after a lab, a feature, or a stretch without one. Audits what changed (or the whole system) against the design system, the architecture, and the docs; fixes what is mechanical (dead code, duplicated class lists, one-off components, stale docs, missing gallery samples and inventory rows); brings anything that would change a look, a behavior, or a token to Sean with a recommendation; records learnings in the right docs; then ships. Use when Sean asks to tidy, clean up, systemize, check hygiene, or get ready to launch, or types /tidy. After a lab or a feature lands, offer it rather than running it unasked.
+description: Tidy pass for bigsmall after a lab, a feature, or a stretch without one. Audits what changed (or the whole system) against the design system, the architecture, and the docs; fixes what is mechanical (dead code, duplicated class lists, one-off components, stale docs, missing gallery samples and inventory rows); brings anything that would change a look, a behavior, or a token to Sean with a recommendation; records learnings in the right docs; then ships. Use when Sean asks to tidy, clean up, systemize, check hygiene, or get ready to launch, or types /tidy. After a lab or a feature lands, and when a stretch of feedback rounds closes with his sign-off, offer it in that reply, scoped to the stretch, rather than running it unasked, so the next piece starts from a tidied base (Sean, 2026-10-20); the full tidy comes before launch, with the second accuracy audit (docs/PLAN.md §11).
 argument-hint: '[empty: since the last tidy | an area or path | full]'
 ---
 
@@ -41,7 +41,7 @@ The system's own docs are the yardstick, so read them before judging anything: `
 - A visible change is never a side effect. If Sean approves one, it goes in a commit of its own, so rolling it back is one revert, and the report says so.
 - When a fix extends the system (a new recipe, component, variant, or token), document it where that kind of thing is documented (step 7) in the same commit.
 - Commit as the ship skill says.
-- After a rename, search the old name everywhere it can hide: code, docblocks, e2e variable names, test titles, docs, and the findings log's open rows.
+- After a rename, search the old name everywhere it can hide: code, docblocks, e2e variable names, test titles, docs, and the findings log's open rows. After a rule is reversed, search for the condition its exceptions were written on (`row.pair`) on every surface and in every file, since a fix made where the fault showed is not the reversal (docs/LEARNINGS.md, 2026-10-20).
 - A doc edited by script anchors on a table cell's text, never on a whole padded row: Prettier pads every row of a Markdown table to its widest cell, so a row's spaces change whenever any row in the column does, and an anchor copied with its padding misses after the next format (docs/LEARNINGS.md, "Prettier pads a Markdown table's rows"). Anchor on the file as it is now, never on a discarded attempt's text, and when one anchor fails, carry the rest in a follow-up script rather than re-running the whole.
 - A reviewer agent's path check compares normalized paths: on Windows a glob returns backslashes, and a `endswith` against a forward-slash path misses its own file (the tidy of 2026-10-18 night).
 

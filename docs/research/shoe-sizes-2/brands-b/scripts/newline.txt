@@ -1,0 +1,2 @@
+b.claim('Crocs region files are the same on crocs.co.uk and crocs.de as on crocs.com (gb.json and emea.json byte-identical); the crocs.co.uk/size-chart HTML (401 KB) carried no measuring text in what the script read', 'measured', 'https://www.crocs.co.uk/size-chart/gb.json', '(cmp: identical)')
+b.save()

@@ -1,0 +1,131 @@
+[
+  {
+    "before": " Choose your Size Guide Womens Mens Kids & Babies We know correctly fitting shoes are important which is why we offer whole and half sizes and a range of widths for a perfect fit! Wear your favourite footwear in the comfort and style that you would expect from Clarks by using our shoe fitting guide.",
+    "rows": [
+      [
+        "Clarks UK Size",
+        "Clarks EU Size",
+        "Standard EU Size",
+        "Foot Length (Millimetres)(MMs)",
+        "Shop Links"
+      ],
+      ["3", "35½", "36", "221", "Shop size 3"],
+      ["3½", "36", "36½", "225", "Shop size 3½"],
+      ["4", "37", "37", "229", "Shop size 4"],
+      ["4½", "37½", "37½", "233", "Shop size 4½"],
+      ["5", "38", "38", "237", "Shop size 5"],
+      ["5½", "39", "38½", "241", "Shop size 5½"],
+      ["6", "39½", "39", "246", "Shop size 6"],
+      ["6½", "40", "40", "250", "Shop size 6½"],
+      ["7", "41", "41", "254", "Shop size 7"],
+      ["7½", "41½", "41½", "258", "Shop size 7½"],
+      ["8", "42", "42", "263", "Shop size 8"],
+      ["8½", "42½", "42½", "267", "Shop size 8½"],
+      ["9", "43", "43", "272", "Shop size 9"]
+    ]
+  },
+  {
+    "before": " Choose your Size Guide Womens Mens Kids & Babies We know correctly fitting shoes are important which is why we offer whole and half sizes and a range of widths for a perfect fit! Wear your favourite footwear in the comfort and style that you would expect from Clarks by using our shoe fitting guide.",
+    "rows": [
+      ["Width", "Description", "Shop Links"],
+      ["D", "Standard Fit", "Shop Standard Fit"],
+      ["E", "Wide Fit", "Shop Wide Fit"],
+      ["EE", "Extra Wide Fit", "Shop Extra Wide Fit"]
+    ]
+  },
+  {
+    "before": " Choose your Size Guide Womens Mens Kids & Babies We know correctly fitting shoes are important which is why we offer whole and half sizes and a range of widths for a perfect fit! Wear your favourite footwear in the comfort and style that you would expect from Clarks by using our shoe fitting guide.",
+    "rows": [
+      [
+        "Clarks UK Size",
+        "Clarks EU Size",
+        "Standard EU Size",
+        "Foot Length (Millimetres)(MMs)",
+        "Shop Links"
+      ],
+      ["5", "38", "38", "237", "Shop size 5"],
+      ["5½", "39", "38½", "241", "Shop size 5½"],
+      ["6", "39½", "39", "246", "Shop size 6"],
+      ["6½", "40", "40", "250", "Shop size 6½"],
+      ["7", "41", "41", "254", "Shop size 7"],
+      ["7½", "41½", "41½", "258", "Shop size 7½"],
+      ["8", "42", "42", "263", "Shop size 8"],
+      ["8½", "42½", "42½", "267", "Shop size 8½"],
+      ["9", "43", "43", "272", "Shop size 9"],
+      ["9½", "44", "44", "276", "Shop size 9½"],
+      ["10", "44½", "45", "280", "Shop size 10"],
+      ["10½", "45", "45½", "285", "Shop size 10½"],
+      ["11", "46", "46", "289", "Shop size 11"],
+      ["12", "47", "47", "298", "Shop size 12"],
+      ["13", "48", "48", "306", "Shop size 13"],
+      ["14", "49½", "49", "314", "Shop size 14"]
+    ]
+  },
+  {
+    "before": " Choose your Size Guide Womens Mens Kids & Babies We know correctly fitting shoes are important which is why we offer whole and half sizes and a range of widths for a perfect fit! Wear your favourite footwear in the comfort and style that you would expect from Clarks by using our shoe fitting guide.",
+    "rows": [
+      ["Width", "Description", "Shop Links"],
+      ["G", "Standard Fit", "Shop Standard Fit"],
+      ["H", "Wide Fit", "Shop Wide Fit"]
+    ]
+  },
+  {
+    "before": "r heel is also touching, then take the length in millimetres from the tip of your longest toe to your heel. (Please be aware that your longest toe may not always be your big toe.) *These measurements do not correlate to measuring with a Clarks foot gauge. For this method, follow these instructions .",
+    "rows": [
+      ["Clarks UK Size", "Clarks EU Size", "Foot Length (Millimetres)(MMs)", "Shop Links"],
+      ["2", "17½", "101", "Shop size 2"],
+      ["2½", "18", "105", "Shop size 2½"],
+      ["3", "18½", "109", "Shop size 3"],
+      ["3½", "19", "113", "Shop size 3½"],
+      ["4", "20", "117", "Shop size 4"],
+      ["4½", "20½", "122", "Shop size 4½"],
+      ["5", "21", "126", "Shop size 5"],
+      ["5½", "22", "130", "Shop size 5½"],
+      ["6", "22½", "134", "Shop size 6"],
+      ["6½", "23", "138", "Shop size 6½"],
+      ["7", "24", "142", "Shop size 7"],
+      ["7½", "25", "147", "Shop size 7½"],
+      ["8", "25½", "151", "Shop size 8"],
+      ["8½", "26", "155", "Shop size 8½"],
+      ["9", "27", "159", "Shop size 9"],
+      ["9½", "27½", "164", "Shop size 9½"],
+      ["10", "28", "168", "Shop size 10"],
+      ["10½", "28½", "172", "Shop size 10½"],
+      ["11", "29", "176", "Shop size 11"],
+      ["11½", "29½", "181", "Shop size 11½"],
+      ["12", "30", "185", "Shop size 12"],
+      ["12½", "31", "189", "Shop size 12½"],
+      ["13", "32", "193", "Shop size 13"],
+      ["13½", "32½", "198", "Shop size 13½"],
+      ["1", "33", "202", "Shop size 1"],
+      ["1½", "33½", "206", "Shop size 1½"],
+      ["2", "34", "210", "Shop size 2"],
+      ["2½", "35", "214", "Shop size 2½"],
+      ["3", "35½", "219", "Shop size 3"],
+      ["3½", "36", "223", "Shop size 3½"],
+      ["4", "37", "227", "Shop size 4"],
+      ["4½", "37½", "231", "Shop size 4½"],
+      ["5", "38", "236", "Shop size 5"],
+      ["5½", "39", "240", "Shop size 5½"],
+      ["6", "39½", "244", "Shop size 6"],
+      ["6½", "40", "249", "Shop size 6½"],
+      ["7", "41", "253", "Shop size 7"],
+      ["7½", "41½", "257", "Shop size 7½"],
+      ["8", "42", "261", "Shop size 8"],
+      ["8½", "42½", "265", "Shop size 8½"],
+      ["9", "43", "269", "Shop size 9"],
+      ["9½", "44", "274", "Shop size 9½"],
+      ["10", "44½", "278", "Shop size 10"]
+    ]
+  },
+  {
+    "before": "r heel is also touching, then take the length in millimetres from the tip of your longest toe to your heel. (Please be aware that your longest toe may not always be your big toe.) *These measurements do not correlate to measuring with a Clarks foot gauge. For this method, follow these instructions .",
+    "rows": [
+      ["Width", "Description", "Shop Links"],
+      ["E", "Narrow Fit", "Shop Narrow Fit"],
+      ["F", "Standard Fit", "Shop Standard Fit"],
+      ["G", "Wide Fit", "Shop Wide Fit"],
+      ["H", "Extra Wide Fit", "Shop Extra Wide Fit"]
+    ]
+  }
+]

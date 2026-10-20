@@ -1,0 +1,27 @@
+[
+  {
+    "before": "sted in European sizes. To find yours, use the formula below or reference your U.S. shoe size in our conversion chart. Women’s: U.S. size + 31 = EU size Men’s: U.S. size + 33 = EU size You can also use measure your foot using our template: Download the foot measurement template Size Conversion Chart",
+    "rows": [
+      ["Women", "Men", "Kids"],
+      [
+        "U.S. Size",
+        "BIRKENSTOCK Size",
+        "U.S. Size",
+        "BIRKENSTOCK Size",
+        "U.S. Size",
+        "BIRKENSTOCK Size"
+      ],
+      ["4 - 4 1/2", "35", "7 - 7 1/2", "40", "6 - 6 1/2", "24"],
+      ["5 - 5 1/2", "36", "8 - 8 1/2", "41", "7 - 7 1/2", "25"],
+      ["6 - 6 1/2", "37", "9 - 9 1/2", "42", "8 - 8 1/2", "26"],
+      ["7 - 7 1/2", "38", "10 - 10 1/2", "43", "9 - 9 1/2", "27"],
+      ["8 - 8 1/2", "39", "11 - 11 1/2", "44", "10 - 10 1/2", "28"],
+      ["9 - 9 1/2", "40", "12 - 12 1/2", "45", "11 - 11 1/2", "29"],
+      ["10 - 10 1/2", "41", "13 - 13 1/2", "46", "12 - 12 1/2", "30"],
+      ["11 - 11 1/2", "42", "14 - 14 1/2", "47", "13 - 13 1/2", "31"],
+      ["", "", "15 - 15 1/2", "48", "1 - 1 1/2", "32"],
+      ["", "", "16 - 16 1/2", "49", "2 - 2 1/2", "33"],
+      ["", "", "17 - 17 1/2", "50", "3 - 3 1/2", "34"]
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "before": "ing, how to measure your feet accurately, and the importance of selecting the right width . Let's step into the world of shoe fitting with confidence! Men’s Shoe Size Chart Understanding the shoe size chart is the first step in finding the perfect fit. Here's our men's shoe size chart for reference:",
+    "rows": [
+      ["US Size", "UK Size", "Foot Length (IN)", "Mens Clarks Shoe Sizes"],
+      ["7", "6", "9.7", "Shop Size 7"],
+      ["7½", "6½", "9.8", "Shop Size 7½"],
+      ["8", "7", "10", "Shop Size 8"],
+      ["8½", "7½", "10.1", "Shop Size 8½"],
+      ["9", "8", "10.4", "Shop Size 9"],
+      ["9½", "8½", "10.5", "Shop Size 9½"],
+      ["10", "9", "10.7", "Shop Size 10"],
+      ["10½", "9½", "10.9", "Shop Size 10½"],
+      ["11", "10", "11", "Shop Size 11"],
+      ["11½", "10½", "11.2", "Shop Size 11½"],
+      ["12", "11", "11.4", "Shop Size 12"],
+      ["13", "12", "11.7", "Shop Size 13"],
+      ["14", "13", "12", "Shop Size 14"],
+      ["15", "14", "12.4", "Shop Size 15"]
+    ]
+  },
+  {
+    "before": "ly, measure their length and width. This can help in comparing the inner dimensions of new shoes. Calf Measurement (for boots): Wrap a measuring tape around the widest part of your calf. This ensures that boots will fit comfortably around your lower leg. Narrow, Standard, Wide, and Extra Wide Sizing",
+    "rows": [
+      ["Width", "Description"],
+      ["G", "Medium Fit"],
+      ["H", "Wide Fit"],
+      ["XW", "Extra Wide Fit"]
+    ]
+  }
+]

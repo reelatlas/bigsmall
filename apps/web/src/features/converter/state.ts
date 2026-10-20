@@ -330,7 +330,11 @@ export interface TableRow {
   /** Singular or plural to agree with the value ("1 cup", "2.5 cups"). */
   name: string;
   symbol: string;
-  /** The value in this unit at full precision, for copying and for moving into the box; null without one. */
+  /**
+   * The value in this unit at full precision, for copying and for moving into the box; null
+   * without one. A row beyond its scale holds the scale's end (13.5), for the table to write as
+   * a size under the display.
+   */
   value: number | null;
   /** As the row shows it: TABLE_PRECISION significant digits, "Too large" or "Too small", or NO_VALUE. */
   text: string;
@@ -338,8 +342,8 @@ export interface TableRow {
    * What the text is: a value; a dash, while there is no number or no unit to convert from; a
    * message, when a double cannot hold the value and there is nothing to copy or move; or
    * beyond, where the value lies past the row's scale (a children's table, ADR 0027): the text
-   * says where the scale ends ("> 13.5"), and taking the row brings its unit with the number
-   * cleared, for a size of its own.
+   * is the sign and where the scale ends ("> 13.5", "< 4"), and taking the row brings its unit
+   * with the number cleared, for a size of its own.
    */
   tone: 'value' | 'empty' | 'message' | 'beyond';
   /** The unit in the box. */
@@ -501,13 +505,13 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
           hidden: [],
           announcement: null,
         };
-    return withPairFirst(rest, pair);
+    return withPairFirst(rest, pair, options);
   }
   // A clock names its units (ADR 0026; Sean, 2026-10-20): typed alone, "5:55" offers the units
   // written as a clock, the time pair first, then the paces, until one is in the box; a unit
   // typed after it, or in the box, takes the clock as a number.
   if (parsed.clock && !unit && !typingUnit(parsed)) {
-    return withClockUnits(base, category, parsed, options.system);
+    return withClockUnits(base, category, parsed, options);
   }
   // A number and a lone foot mark are feet (ADR 0026: "6'" is six feet), and the pair the mark
   // opens is offered after them, in case the inches follow (Sean, 2026-10-20).
@@ -516,7 +520,11 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       ? pairsOpenedBy(parsed.query).filter((pair) => pair.id !== unit?.id)
       : [];
   if (opened.length > 0) {
-    return withPairsAfter(selectMatches(base, parsed.query ?? '', unit, category, options), opened);
+    return withPairsAfter(
+      selectMatches(base, parsed.query ?? '', unit, category, options),
+      opened,
+      options,
+    );
   }
   // A target typed after the number with a unit in the box ("11 to eu", "11 in"; ADR 0027): the
   // table stays, converting, and the target names the row the cursor rests on (TableLayout).
@@ -547,81 +555,126 @@ function withClockUnits(
   base: ViewBase,
   current: CategoryId | null,
   parsed: ParsedInput,
-  system: UnitPreference,
+  options: TableOptions,
 ): MatchesView {
   const parts = (parsed.valueText ?? '').split(':').length;
   const timeFirst = current === 'time' || (current !== 'speed' && parts >= 3);
+  const metric = options.system === 'metric';
   const rank = (clock: Unit): number => {
     const group = (clock.pace ? !timeFirst : timeFirst) ? 0 : 10;
-    const own = clock.pace && (clock.system === 'metric') !== (system === 'metric') ? 1 : 0;
+    const own = clock.pace && (clock.system === 'metric') !== metric ? 1 : 0;
     return group + own;
   };
-  const rows: MatchRow[] = [...clockUnits()]
+  const listed: MatchRow[] = [...clockUnits()]
     .sort((a, b) => rank(a) - rank(b))
     .flatMap((clock) => {
       const category = getCategory(clock.category);
       return category ? [{ kind: 'unit', unit: clock, category, inBox: false }] : [];
     });
-  const counts: Partial<Record<CategoryId, number>> = {};
-  for (const row of rows) counts[row.category.id] = (counts[row.category.id] ?? 0) + 1;
+  const { rows, hidden } = apart(listed, [], options);
   return {
     ...base,
     kind: 'matches',
     category: current,
     query: '',
     rows,
-    counts,
-    hidden: [],
-    announcement: `${rows.length} ${rows.length === 1 ? 'unit' : 'units'} written as a clock`,
+    counts: countsOf(rows),
+    hidden,
+    announcement:
+      rows.length > 0
+        ? `${rows.length} ${rows.length === 1 ? 'unit' : 'units'} written as a clock`
+        : matchesAnnouncement(rows, hidden),
   };
 }
 
 /** The matches with the pairs a lone mark opens after them, each at its category's group's end. */
-function withPairsAfter(view: MatchesView, opened: readonly Unit[]): MatchesView {
-  const rows = [...view.rows];
-  const counts = { ...view.counts };
+function withPairsAfter(
+  view: MatchesView,
+  opened: readonly Unit[],
+  options: TableOptions,
+): MatchesView {
+  const listed = [...view.rows];
   for (const pair of opened) {
     const category = getCategory(pair.category);
-    if (!category || rows.some((row) => row.kind === 'unit' && row.unit.id === pair.id)) continue;
-    const last = rows.map((row) => row.category.id).lastIndexOf(pair.category);
-    rows.splice(last < 0 ? rows.length : last + 1, 0, {
+    if (!category || listed.some((row) => row.kind === 'unit' && row.unit.id === pair.id)) continue;
+    const last = listed.map((row) => row.category.id).lastIndexOf(pair.category);
+    listed.splice(last < 0 ? listed.length : last + 1, 0, {
       kind: 'unit',
       unit: pair,
       category,
       inBox: false,
     });
-    counts[pair.category] = (counts[pair.category] ?? 0) + 1;
   }
-  const hidden = view.hidden.filter((each) => !opened.some((pair) => pair.id === each.unit.id));
-  const announcement = `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`;
-  return { ...view, rows, counts, hidden, announcement };
+  const { rows, hidden } = apart(listed, view.hidden, options);
+  return {
+    ...view,
+    rows,
+    counts: countsOf(rows),
+    hidden,
+    announcement: matchesAnnouncement(rows, hidden),
+  };
 }
 
 /** The matches with a compound's pair leading them, its category's group first, counted once. */
-function withPairFirst(view: MatchesView, pair: Unit): MatchesView {
+function withPairFirst(view: MatchesView, pair: Unit, options: TableOptions): MatchesView {
   const category = getCategory(pair.category);
   if (!category) return view;
   const rest = view.rows.filter((row) => !(row.kind === 'unit' && row.unit.id === pair.id));
   const own = rest.filter((row) => row.category.id === pair.category);
   const others = rest.filter((row) => row.category.id !== pair.category);
-  const rows: MatchRow[] = [
+  const listed: MatchRow[] = [
     { kind: 'unit', unit: pair, category, inBox: false },
     ...own,
     ...others,
   ];
+  const { rows, hidden } = apart(listed, view.hidden, options);
+  return {
+    ...view,
+    rows,
+    counts: countsOf(rows),
+    hidden,
+    announcement: matchesAnnouncement(rows, hidden),
+  };
+}
+
+/**
+ * The units the settings hide set apart from the matches, under their sections' names
+ * (docs/UX-SPEC.md §3; ADR 0018), whatever matched them: a typed name, a compound's or a clock's
+ * shape, or the mark that opens a pair; one rule for every list of matches (Sean, 2026-10-20: a
+ * compound's pair and a clock's units had been offered hidden or not). The box's unit always
+ * shows. Those set apart here follow any already apart, each unit once.
+ */
+function apart(
+  listed: readonly MatchRow[],
+  hidden: readonly HiddenMatch[],
+  options: TableOptions,
+): { rows: MatchRow[]; hidden: HiddenMatch[] } {
+  const rule = options.rule ?? SHOW_ALL;
+  const rows: MatchRow[] = [];
+  const more: HiddenMatch[] = [];
+  for (const row of listed) {
+    if (row.kind !== 'unit' || row.inBox || shows(row.unit, rule, options.system)) rows.push(row);
+    else if (!hidden.some((each) => each.unit.id === row.unit.id)) {
+      const section = SECTION_LABEL[sectionOf(row.unit, options.system)];
+      more.push({ unit: row.unit, category: row.category, section, target: row.target });
+    }
+  }
+  return { rows, hidden: [...hidden, ...more] };
+}
+
+/** How many units match, per category with any match; one that matched by name alone counts 0. */
+function countsOf(rows: readonly MatchRow[]): Partial<Record<CategoryId, number>> {
   const counts: Partial<Record<CategoryId, number>> = {};
   for (const row of rows) {
     counts[row.category.id] = (counts[row.category.id] ?? 0) + (row.kind === 'category' ? 0 : 1);
   }
-  // A pair the settings hide is still the compound's own, offered here; taking it shows it.
-  const hidden = view.hidden.filter((each) => each.unit.id !== pair.id);
-  return {
-    ...view,
-    rows,
-    counts,
-    hidden,
-    announcement: `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`,
-  };
+  return counts;
+}
+
+/** What the live region says of the matches: how many, or that only hidden units, or none, match. */
+function matchesAnnouncement(rows: readonly MatchRow[], hidden: readonly HiddenMatch[]): string {
+  if (rows.length > 0) return `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`;
+  return hidden.length > 0 ? 'Only hidden units match' : 'No unit matches';
 }
 
 /** Each kind's heading, by its id. */
@@ -928,9 +981,19 @@ function valueRow(
   converter: Converter = safeConvert,
 ): TableRow {
   // A foot beyond the row's scale (a children's table, ADR 0027): the row says where the scale
-  // ends, "> 13.5" or "< 4", in place of a size no shoe is marked in.
-  const beyond = target.id === from.id ? null : beyondScale(from, target, value, locale);
-  if (beyond !== null) return { ...emptyRow(target, from), text: beyond, tone: 'beyond' };
+  // ends, "> 13.5" or "< 4", in place of a size no shoe is marked in, the sign first in the form
+  // a value under a step takes ("< 0.01"), the end its value, which the table writes as a size
+  // under the display ("> 13 1/2" with Fraction).
+  const beyond = target.id === from.id ? null : beyondScale(from, target, value);
+  if (beyond) {
+    return {
+      ...emptyRow(target, from),
+      value: beyond.end,
+      text: `${beyond.past ? '>' : '<'} ${sizeText(beyond.end, locale)}`,
+      tone: 'beyond',
+      stepped: target.step !== undefined,
+    };
+  }
   const exact = target.id === from.id ? value : converter(value, from, target);
   // A size is written to its scale's step, ≈ where that moved it (ADR 0027): the row's value is
   // the size itself, so it copies and moves into the box as it shows; the box's own row echoes
@@ -975,22 +1038,25 @@ function valueRow(
 /**
  * Where a scale ends (ADR 0027): the size at its range's low or high end, read through the unit
  * and rounded inward to its step, since the range lies half a row past the table (US children's
- * 4 and 13.5), written for the locale.
+ * 4 and 13.5).
  */
-function scaleEnd(unit: Unit, end: 'low' | 'high', locale: string | undefined): string {
+function scaleEnd(unit: Unit, end: 'low' | 'high'): number {
   const at = unit.range
     ? fromBase(unit, end === 'low' ? unit.range[0] : unit.range[1])
     : Number.NaN;
-  const marked =
-    unit.step === undefined
-      ? at
-      : (roundToStep(at, unit.step, end === 'low' ? 'up' : 'down')?.value ?? at);
-  return formatNumber(marked, { precision: TABLE_PRECISION, locale });
+  return unit.step === undefined
+    ? at
+    : (roundToStep(at, unit.step, end === 'low' ? 'up' : 'down')?.value ?? at);
+}
+
+/** A size written as the table writes one (13.5), for the locale. */
+function sizeText(size: number, locale: string | undefined): string {
+  return formatNumber(size, { precision: TABLE_PRECISION, locale });
 }
 
 /** A scale's span, "4 to 13.5", for the live region. */
 function scaleSpan(unit: Unit, locale: string | undefined): string {
-  return `${scaleEnd(unit, 'low', locale)} to ${scaleEnd(unit, 'high', locale)}`;
+  return `${sizeText(scaleEnd(unit, 'low'), locale)} to ${sizeText(scaleEnd(unit, 'high'), locale)}`;
 }
 
 /** The value in the base unit, or null where the unit cannot read it. */
@@ -1010,21 +1076,19 @@ function beyondOwnScale(unit: Unit, value: number): boolean {
 }
 
 /**
- * Where the row's scale ends, for a value beyond it (ADR 0027): "> 13.5" past its largest size,
- * "< 4" below its smallest, in the form a value under a step takes ("< 0.01"); null for a value
- * within it, or a unit with no range.
+ * Where the row's scale ends, for a value beyond it (ADR 0027): past its largest size or below its
+ * smallest, and that end; null for a value within it, or a unit with no range.
  */
 function beyondScale(
   from: Unit,
   target: Unit,
   value: number,
-  locale: string | undefined,
-): string | null {
+): { past: boolean; end: number } | null {
   if (!target.range) return null;
   const base = baseOf(from, value);
   if (base === null || (base >= target.range[0] && base <= target.range[1])) return null;
   const past = base > target.range[1];
-  return `${past ? '>' : '<'} ${scaleEnd(target, past ? 'high' : 'low', locale)}`;
+  return { past, end: scaleEnd(target, past ? 'high' : 'low') };
 }
 
 function emptyRow(target: Unit, inBox: Unit | null): TableRow {
@@ -1056,27 +1120,24 @@ function selectMatches(
   current: CategoryId | null,
   options: TableOptions,
 ): MatchesView {
+  // Every result, not the shown list's limit, so a hidden unit ranked past it is still offered
+  // apart: the shown and the hidden each keep to the limit.
   const { results, target } = search(query, {
     system: options.system,
     tier: EVERY_TIER,
     prefer: current,
-    limit: MATCH_LIMIT,
+    limit: Number.POSITIVE_INFINITY,
   });
-  const rule = options.rule ?? SHOW_ALL;
-  const hidden: HiddenMatch[] = [];
-  const ranked = results.flatMap((result): MatchRow[] => {
+  const listed = results.flatMap((result): MatchRow[] => {
     if (result.kind === 'category') return [{ kind: 'category', category: result.category }];
     const category = getCategory(result.unit.category);
     if (!category) return [];
     const inBox = result.unit.id === unit?.id;
-    // A hidden unit leaves the matches and is offered apart, under its section's name.
-    if (!inBox && !shows(result.unit, rule, options.system)) {
-      const section = SECTION_LABEL[sectionOf(result.unit, options.system)];
-      hidden.push({ unit: result.unit, category, section, target: result.target });
-      return [];
-    }
     return [{ kind: 'unit', unit: result.unit, category, inBox, target: result.target }];
   });
+  const set = apart(listed, [], options);
+  const ranked = set.rows.slice(0, MATCH_LIMIT);
+  const hidden = set.hidden.slice(0, MATCH_LIMIT);
   // Ingredients under Cooking (ADR 0021): one the query ends with first, with the unit typed
   // before it ("2 cups flour"), then those whose names match, the group placed by its best match.
   const cooked = ingredientMatches(query, current, results[0]?.matchClass, options);
@@ -1088,26 +1149,16 @@ function selectMatches(
     ...ranked.filter((row) => row.category.id === id && row.kind === 'category'),
     ...ranked.filter((row) => row.category.id === id && row.kind !== 'category'),
   ]);
-  const counts: Partial<Record<CategoryId, number>> = {};
-  for (const row of rows) {
-    counts[row.category.id] = (counts[row.category.id] ?? 0) + (row.kind === 'category' ? 0 : 1);
-  }
-  const announcement =
-    rows.length > 0
-      ? `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`
-      : hidden.length > 0
-        ? 'Only hidden units match'
-        : 'No unit matches';
   return {
     ...base,
     kind: 'matches',
     category: current,
     query,
     rows,
-    counts,
+    counts: countsOf(rows),
     hidden,
     target,
-    announcement,
+    announcement: matchesAnnouncement(rows, hidden),
   };
 }
 

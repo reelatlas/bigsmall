@@ -87,9 +87,9 @@ const scrollHeadingUnder = (page: Page, heading: string) =>
   }, heading);
 
 /**
- * The right edge of every row's first drawn cell: the whole number's with Decimal, where the
- * decimal points line up, and the value's across with Fraction; one edge for every row when the
- * rows line up.
+ * The right edge of every row's first drawn cell, the whole number's: with Decimal the decimal
+ * points line up on it, with Fraction the whole numbers; one edge for every row when the rows
+ * line up.
  */
 const firstCellRights = (page: Page) =>
   page.locator('[data-row] > [role="gridcell"]:first-child').evaluateAll((units) =>
@@ -1469,9 +1469,10 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
   await expect(box(page)).toHaveValue('44');
   await expect(row(page, 'us-men')).toContainText('11');
-  // In Fraction a size's half is written as one and every row across, lined up on its right edge
-  // with the box's own row (Sean, 2026-10-20: a size split on its decimal beside rows written
-  // across moved with every click); the scale's own half, whatever sizes are chosen.
+  // In Fraction a size's half is written as one, the scale's own half whatever sizes are chosen,
+  // and every row splits at its fraction as a decimal does at its point, the whole numbers lined
+  // up and the fractions in the column after them (Sean, 2026-10-20: right-aligned across, the
+  // whole numbers and the signs sat scattered); a row beyond its scale is written the same way.
   await unitCell(page, 'us-men').click();
   await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
   await setSettings(page, 'Fraction');
@@ -1479,10 +1480,11 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await expect(row(page, 'us-men')).toContainText('10 1/2');
   await expect(row(page, 'uk')).toContainText('9 1/2');
   await expect(row(page, 'eu')).toContainText('≈ 43 1/2');
+  await expect(row(page, 'us-children')).toContainText('> 13 1/2');
+  await expect(unitCell(page, 'us-men').locator('> span').nth(1)).toHaveText(/^\s*1\/2$/);
   expect(new Set(await firstCellRights(page)).size).toBe(1);
   // A row beyond its scale, taken, brings the scale into the box with the number cleared, for a
   // size of its own, the rows waiting with dashes (Sean, 2026-10-20).
-  await expect(row(page, 'us-children')).toContainText('> 13.5');
   await unitCell(page, 'us-children').click();
   await expect(page.getByRole('button', { name: 'Remove US children' })).toBeVisible();
   await expect(box(page)).toHaveValue('');

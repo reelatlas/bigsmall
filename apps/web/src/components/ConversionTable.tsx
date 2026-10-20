@@ -5,6 +5,7 @@ import {
   formatSignificant,
   localeSeparators,
   MINUS,
+  NBSP,
   type FractionSize,
   type Rounded,
   type Rounding,
@@ -46,15 +47,18 @@ interface ConversionRow {
   name: string;
   /** The value at six significant digits, "Too large" or "Too small", or a dash. */
   text: string;
-  /** The value at full precision, which the display writes to its places or fractions; null without one. */
+  /**
+   * The value at full precision, which the display writes to its places or fractions; null
+   * without one. A row beyond its scale holds the scale's end (13.5), written the same way.
+   */
   value: number | null;
   symbol: string;
   /**
    * What the text is: a value; a dash, while there is no number or no unit to convert from; a
    * message, in the danger color; or beyond, a value past the row's scale (ADR 0027), its text
-   * where the scale ends ("> 13.5") in the muted ink, written in the value's columns so its
-   * decimal point lines up. Only a value can be copied; a row beyond its scale is taken, as the
-   * layout decides.
+   * the sign and where the scale ends ("> 13.5") in the muted ink, written in the value's columns
+   * as a size is, the end in the display's form ("> 13 1/2" with Fraction), so it lines up with
+   * the sizes. Only a value can be copied; a row beyond its scale is taken, as the layout decides.
    */
   tone: 'value' | 'empty' | 'message' | 'beyond';
   /** The unit in the box: marked in the accent's soft fill. */
@@ -164,7 +168,8 @@ export interface ConversionTableProps<T extends ConversionRow> {
 /**
  * A row reads "250 … mL milliliters": the value on the left in equal-width digits, a decimal in two
  * columns, its whole part right-aligned and the rest left-aligned after it, so values line up on
- * the decimal point (96 beside 473.18); with Both, its fraction beside it; past a column that takes
+ * the decimal point (96 beside 473.18), and a fraction split the same way at its fraction part, so
+ * whole numbers line up (10 beside 10 1/2); with Both, its fraction beside it; past a column that takes
  * the spare width, on the right, the symbol right-aligned in its column, an exponent hanging after
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
  * left-aligned in its own; the copied check flashing over its end, a grid item laid on the
@@ -215,10 +220,11 @@ const SECOND_CELL = 'min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric w
 /**
  * Both's fraction where its column has no room (a phone): on a second line under the value, a step
  * smaller so the row keeps its 44 px, lined up on the decimal point as the values are, its whole
- * number (and "≈") under the value's whole part and the rest after the point (Sean, 2026-10-15).
+ * number (and "≈") under the value's whole part and the fraction after the point (Sean,
+ * 2026-10-15), split as every fraction is (splitAtFraction), the space between them in the text.
  */
 const STACKED_WHOLE_CELL = 'col-start-1 text-right text-sm font-numeric whitespace-nowrap';
-const STACKED_PART_CELL = 'col-start-2 pr-2 pl-1 text-sm font-numeric whitespace-nowrap';
+const STACKED_PART_CELL = 'col-start-2 pr-2 text-sm font-numeric whitespace-nowrap';
 const SYMBOL_CELL = cx('col-start-5 pl-2 text-right', unitSymbol());
 /**
  * A pair's symbol, wider than any single unit's (h:m:s): right-aligned with the symbols, it takes
@@ -368,18 +374,12 @@ function secondWritten(row: ConversionRow, display: TableDisplay, locale: string
 
 /**
  * Both's fraction in two, to sit under the decimal: its whole number, "≈" ahead of one that
- * rounds, and the fraction after it ("≈ 36" and "3/4"). A minus with no whole number stays with
- * the fraction.
+ * rounds, and the fraction after it ("≈ 36" and "3/4"), split as the Fraction display splits
+ * every value (splitAtFraction).
  */
 function splitFraction(written: Rounded): { whole: string; part: string } {
-  const at = written.text.search(/\d+\/\d+$/);
-  let whole = at < 0 ? written.text : written.text.slice(0, at).trimEnd();
-  let part = at < 0 ? '' : written.text.slice(at);
-  if (!/\p{Nd}/u.test(whole)) {
-    part = whole + part;
-    whole = '';
-  }
-  return { whole: (written.approx ? '≈ ' : '') + whole, part };
+  const split = splitAtFraction(written.text, written.approx);
+  return { whole: (split.approx ? '≈ ' : '') + split.whole, part: split.decimals };
 }
 
 /** A value as written, "≈" ahead of one that rounds or is measured; the row's own text where nothing is. */
@@ -398,12 +398,22 @@ function writtenText(row: ConversionRow, written: Rounded | null): ReactNode {
 /**
  * A row's value as the first two columns draw it. A decimal splits at its decimal mark, or at the
  * exponent marker without one ("1E23"), so its whole part and the rest sit in two columns and every
- * decimal point lines up; screen readers hear it whole, from `text`. A fraction, whose parts are
- * not digits after a point, a dash, and a message are written whole across both, right-aligned.
+ * decimal point lines up; a fraction splits at its fraction part the same way, so every whole
+ * number lines up and the fractions hang in a column after them (10 beside 10 1/2; Sean,
+ * 2026-10-20: right-aligned across, a whole number sat under the fraction of the row above and
+ * the signs scattered); screen readers hear it whole, from `text`, "about" ahead of one that
+ * rounds. A pair, in its own notation, a dash, and a message are written whole across both,
+ * right-aligned.
  */
-type ValueParts =
-  | { text: string; whole: string; decimals: string }
-  | { across: ReactNode; spoken?: string | undefined };
+interface SplitValue {
+  text: string;
+  whole: string;
+  decimals: string;
+  /** Rounds: "≈" is drawn ahead of the whole part, and "about" read. */
+  approx: boolean;
+}
+
+type ValueParts = SplitValue | { across: ReactNode; spoken?: string | undefined };
 
 function valueParts(
   row: ConversionRow,
@@ -412,37 +422,59 @@ function valueParts(
   mark: string,
   significant: number,
 ): ValueParts {
-  // A dash and a message are written across both columns. A row beyond its scale (ADR 0027) is
-  // written as a value is, its "> 13" in the whole column and ".5" after the mark, so its decimal
-  // point lines up with the sizes' (Sean, 2026-10-20: written across, it sat past them); across
-  // where every value is, with Fraction.
+  // A dash and a message are written across both columns.
   if (row.tone === 'empty' || row.tone === 'message') return { across: row.text };
+  const fraction = display.format === 'fraction';
+  // A row beyond its scale (ADR 0027) is written as a size is: its sign, then the scale's end in
+  // the display's form, "> 13" in the whole column and ".5" after the mark, or "> 13" and "1/2"
+  // with Fraction, so it lines up with the sizes (Sean, 2026-10-20: written across, it sat past
+  // them, and in Fraction its decimal sat among their halves).
   if (row.tone === 'beyond') {
-    return display.format === 'fraction' ? { across: row.text } : splitAtMark(row.text, mark);
+    const end =
+      fraction && row.value !== null
+        ? formatFraction(row.value, { sizes: HALVES, rounding: 'nearest', locale })
+        : null;
+    const text = end ? `${row.text.slice(0, 1)} ${end.text}` : row.text;
+    return fraction ? splitAtFraction(text, false) : splitAtMark(text, mark, false);
   }
   const written =
     row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
-  // A fraction, and a pair, have no decimal point to line up on: written whole, right-aligned; a
-  // pair in its own notation (5′ 11″), and in its parts' words for screen readers.
+  // A pair has no decimal point to line up on: written whole, right-aligned, in its own notation
+  // (5′ 11″), and in its parts' words for screen readers.
   if (row.pair && row.value !== null) {
     const spoken = formatPair(row.value, row.pair, {
-      ...pairOptions(display, locale, significant, display.format === 'fraction'),
+      ...pairOptions(display, locale, significant, fraction),
       words: true,
     });
     return { across: writtenText(row, written), spoken: spoken?.text };
   }
-  if (display.format === 'fraction' && !row.clock) return { across: writtenText(row, written) };
-  return splitAtMark(written?.text ?? row.text, mark);
+  if (fraction && !row.clock && written) {
+    return splitAtFraction(written.text, written.approx || row.approx === true);
+  }
+  return splitAtMark(written?.text ?? row.text, mark, row.approx === true);
 }
 
 /** A value in two, at its decimal mark, or at the exponent marker without one ("1E23"). */
-function splitAtMark(text: string, mark: string): ValueParts {
+function splitAtMark(text: string, mark: string, approx: boolean): SplitValue {
   let at = text.indexOf(mark);
   if (at < 0) at = text.indexOf('E');
   // A pace's colon lines up as a decimal point does: 5:30 over 10.91.
   if (at < 0) at = text.indexOf(':');
   if (at < 0) at = text.length;
-  return { text, whole: text.slice(0, at), decimals: text.slice(at) };
+  return { text, whole: text.slice(0, at), decimals: text.slice(at), approx };
+}
+
+/**
+ * A fraction in two, at its fraction part: the whole number with its sign ("−", "<", "> 13") in
+ * the whole column, and the fraction after it a space off, as "10 1/2" is written, the space a
+ * no-break one, since a cell's first space is stripped (docs/LEARNINGS.md, 2026-10-20). A
+ * fraction with no whole number ("3/4", "< 1/8") has its sign alone before it, if any, and a whole
+ * number alone ("≈ 1,043,262") nothing after.
+ */
+function splitAtFraction(text: string, approx: boolean): SplitValue {
+  const at = text.search(/\d+\/\d+$/);
+  if (at < 0) return { text, whole: text, decimals: '', approx };
+  return { text, whole: text.slice(0, at).trimEnd(), decimals: NBSP + text.slice(at), approx };
 }
 
 /** Which of the two lists a unit's line is in: the shown units in Edit, or Hidden. */
@@ -595,7 +627,7 @@ export function ConversionTable<T extends ConversionRow>({
           <>
             <span className={cx(WHOLE_CELL, tone)}>
               <span aria-hidden="true" data-whole>
-                {row.approx && <span className="text-ink-muted">≈ </span>}
+                {value.approx && <span className="text-ink-muted">≈ </span>}
                 <FormattedNumber text={value.whole} />
               </span>
             </span>
@@ -603,7 +635,7 @@ export function ConversionTable<T extends ConversionRow>({
               <FormattedNumber text={value.decimals} />
             </span>
             <span className="sr-only">
-              {row.approx && 'about '}
+              {value.approx && 'about '}
               {value.text}
             </span>
           </>
@@ -693,11 +725,20 @@ export function ConversionTable<T extends ConversionRow>({
         {cell(row, { ...display, rounding })}
       </span>
     ));
-  /** One part of a row's value as drawn, under a rounding: its whole part, the rest, or all of it across. */
+  /**
+   * One part of a row's value as drawn, under a rounding: its whole part, "≈" ahead of it where
+   * it rounds, the rest, or all of it across.
+   */
   const part = (pick: 'whole' | 'decimals' | 'across') => (row: T, under: TableDisplay) => {
     const value = parts(row, under);
     if ('across' in value) return pick === 'across' ? value.across : null;
-    return pick === 'across' ? null : <FormattedNumber text={value[pick]} />;
+    if (pick === 'across') return null;
+    return (
+      <>
+        {pick === 'whole' && value.approx && '≈ '}
+        <FormattedNumber text={value[pick]} />
+      </>
+    );
   };
   const sizer = (
     <div

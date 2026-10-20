@@ -1,4 +1,4 @@
-import { getUnit, unitsIn, type CategoryId, type UnitPreference } from '@bigsmall/core';
+import { getUnit, search, unitsIn, type CategoryId, type UnitPreference } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import {
   displayChanged,
@@ -26,6 +26,7 @@ import {
   withoutHidden,
   withPresetPicked,
   withSystem,
+  type ViewRule,
 } from '../src/features/converter/settings';
 import { initialState, selectTable } from '../src/features/converter/state';
 
@@ -312,5 +313,56 @@ describe('the table and the matches, by the settings', () => {
     expect(view.hidden.length).toBeGreaterThan(0);
     expect(view.hidden[0]).toMatchObject({ section: 'Specialty' });
     expect(view.announcement).toBe('Only hidden units match');
+  });
+
+  // One rule for every list of matches (Sean, 2026-10-20): a unit the settings hide is offered
+  // apart whatever matched it, a typed name, a compound's or a clock's shape, or the mark that
+  // opens a pair; a compound's pair and a clock's units had been offered hidden or not.
+  const NO_PAIRS: ViewRule = {
+    ...FRESH_RULE,
+    shown: new Set([...FRESH_RULE.shown].filter((key) => key !== 'mixed')),
+  };
+  const matchesOf = (text: string, rule: ViewRule = NO_PAIRS) => {
+    const view = selectTable({ ...initialState, text }, { ...EN, system: 'us', rule });
+    if (view.kind !== 'matches') throw new Error(view.kind);
+    return view;
+  };
+  const ids = (rows: readonly { kind: string; unit?: { id: string } | null }[]) =>
+    rows.map((row) => (row.kind === 'unit' ? row.unit!.id : row.kind));
+
+  it('offers a compound’s pair, a clock’s units, and the pair a mark opens apart when the settings hide them', () => {
+    const compound = matchesOf("5'11");
+    expect(compound.rows).toEqual([]);
+    expect(compound.hidden.map((each) => each.unit.id)).toEqual(['foot-inch']);
+    expect(compound.hidden[0]).toMatchObject({ section: 'Mixed units' });
+    expect(compound.announcement).toBe('Only hidden units match');
+    // Shown, the pair leads, as before.
+    expect(ids(matchesOf("5'11", FRESH_RULE).rows)[0]).toBe('foot-inch');
+    // A clock of three parts: the time pair, hidden, apart; the paces offered, the visitor's first.
+    const clock = matchesOf('1:30:00');
+    expect(ids(clock.rows)).toEqual(['minute-per-mile', 'minute-per-kilometer']);
+    expect(clock.hidden.map((each) => each.unit.id)).toEqual(['hour-minute-second']);
+    expect(clock.announcement).toBe('2 units written as a clock');
+    // A lone foot mark: feet, and the pair it opens apart.
+    const opened = matchesOf("5'");
+    expect(ids(opened.rows)[0]).toBe('foot');
+    expect(ids(opened.rows)).not.toContain('foot-inch');
+    expect(opened.hidden.map((each) => each.unit.id)).toContain('foot-inch');
+  });
+
+  it('offers a hidden unit apart even where it ranks past the shown list’s limit', () => {
+    // Every unit "m" matches, as core ranks them: the shown list's 20 and the rest.
+    const ranked = search('m', { system: 'us', tier: 'all', limit: Number.POSITIVE_INFINITY });
+    const past = ranked.results.flatMap((result, at) =>
+      result.kind === 'unit' && at >= 20 && !shows(result.unit, FRESH_RULE, 'us')
+        ? [result.unit.id]
+        : [],
+    );
+    expect(past.length).toBeGreaterThan(0);
+    const view = matchesOf('m', FRESH_RULE);
+    // The units and categories keep to the limit; Cooking's ingredients come on top of it.
+    expect(view.rows.filter((row) => row.kind !== 'ingredient').length).toBeLessThanOrEqual(20);
+    expect(view.hidden.length).toBeLessThanOrEqual(20);
+    expect(view.hidden.map((each) => each.unit.id)).toContain(past[0]);
   });
 });

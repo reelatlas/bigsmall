@@ -1,0 +1,50 @@
+[
+  ["clarks_gb_fitguide.html", "https://www.clarks.com/en-gb/fitguide", "en-GB,en;q=0.9"],
+  ["clarks_ie_fitguide.html", "https://www.clarks.com/en-ie/fitguide", "en-IE,en;q=0.9"],
+  ["clarks_us_mens.html", "https://www.clarks.com/en-us/fit-guide/mens"],
+  ["clarks_us_womens.html", "https://www.clarks.com/en-us/fit-guide/womens"],
+  ["clarks_au_sizeguide.html", "https://clarks.com.au/pages/size-guide", "en-AU,en;q=0.9"],
+  ["drm_us_sizeguide_script.html", "https://www.drmartens.com/us/en/about/size-guide"],
+  [
+    "drm_dk_sizeguide_script.html",
+    "https://www.drmartens.com/dk/en_eu/shoe-size-guide",
+    "en-DK,en;q=0.9"
+  ],
+  ["birk_us_fitguide.html", "https://www.birkenstock.com/us/fit-guide/"],
+  [
+    "birk_gb_sizechart.html",
+    "https://www.birkenstock.com/gb/fit-guide-size-chart.html",
+    "en-GB,en;q=0.9"
+  ],
+  [
+    "birk_template_us_a4.pdf",
+    "https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf",
+    "en-US,en;q=0.9",
+    "application/pdf,*/*"
+  ],
+  [
+    "crocs_default.json",
+    "https://www.crocs.com/size-chart/default.json",
+    "en-US,en;q=0.9",
+    "application/json,*/*"
+  ],
+  [
+    "crocs_gb.json",
+    "https://www.crocs.com/size-chart/gb.json",
+    "en-US,en;q=0.9",
+    "application/json,*/*"
+  ],
+  ["crocs_sizechart.html", "https://www.crocs.com/size-chart"],
+  ["salomon_us_sizingchart.html", "https://www.salomon.com/en-us/sizingchart"],
+  ["salomon_sg_men.html", "https://sg.salomon.com/pages/men-size-guide", "en-SG,en;q=0.9"],
+  [
+    "brooks_au_conversion.html",
+    "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart",
+    "en-AU,en;q=0.9"
+  ],
+  [
+    "brooks_au_howknow.html",
+    "https://support.brooksrunning.com.au/hc/en-us/articles/360046951054-How-do-I-know-my-shoe-size",
+    "en-AU,en;q=0.9"
+  ]
+]

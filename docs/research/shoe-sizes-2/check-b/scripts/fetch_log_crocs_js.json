@@ -1,0 +1,422 @@
+[
+  {
+    "name": "crocs_js/01eebm9nxv2wd.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/01eebm9nxv2wd.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/01eebm9nxv2wd.js",
+    "bytes": 25942,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/02l6cyqimqf8p.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/02l6cyqimqf8p.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/02l6cyqimqf8p.js",
+    "bytes": 31301,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/04-nyg_hhgk70.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/04-nyg_hhgk70.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/04-nyg_hhgk70.js",
+    "bytes": 19173,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/043ksacjpo9jv.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/043ksacjpo9jv.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/043ksacjpo9jv.js",
+    "bytes": 19976,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/07r18lr3q50oq.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/07r18lr3q50oq.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/07r18lr3q50oq.js",
+    "bytes": 91105,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/08_wxtm0hqb6_.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/08_wxtm0hqb6_.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/08_wxtm0hqb6_.js",
+    "bytes": 140479,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/0c0hxoamwjsbw.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/0c0hxoamwjsbw.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/0c0hxoamwjsbw.js",
+    "bytes": 112594,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/0goqmz5xxk5h4.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/0goqmz5xxk5h4.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/0goqmz5xxk5h4.js",
+    "bytes": 35449,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/0h5dwbtdfsbep.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/0h5dwbtdfsbep.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/0h5dwbtdfsbep.js",
+    "bytes": 22348,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/0ojingfs96eox.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/0ojingfs96eox.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/0ojingfs96eox.js",
+    "bytes": 32989,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/0pgunb_jjnjkc.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/0pgunb_jjnjkc.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/0pgunb_jjnjkc.js",
+    "bytes": 1905,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/0s85bgzzims7f.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/0s85bgzzims7f.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/0s85bgzzims7f.js",
+    "bytes": 26800,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/0xt_rovd28qbv.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/0xt_rovd28qbv.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/0xt_rovd28qbv.js",
+    "bytes": 35970,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/1-0ynbco7nn87.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/1-0ynbco7nn87.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/1-0ynbco7nn87.js",
+    "bytes": 24735,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/13rs9g8b31oin.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/13rs9g8b31oin.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/13rs9g8b31oin.js",
+    "bytes": 27737,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:23"
+  },
+  {
+    "name": "crocs_js/15kmgawgivedh.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/15kmgawgivedh.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/15kmgawgivedh.js",
+    "bytes": 31935,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/1prlmhcl4l8db.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/1prlmhcl4l8db.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/1prlmhcl4l8db.js",
+    "bytes": 76480,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/1sgeu0l7_hjb3.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/1sgeu0l7_hjb3.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/1sgeu0l7_hjb3.js",
+    "bytes": 22973,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/1zr-vcuurxwtd.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/1zr-vcuurxwtd.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/1zr-vcuurxwtd.js",
+    "bytes": 39887,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/2dazif3uhmg00.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/2dazif3uhmg00.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/2dazif3uhmg00.js",
+    "bytes": 22765,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/2fgzf6ywtx_k0.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/2fgzf6ywtx_k0.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/2fgzf6ywtx_k0.js",
+    "bytes": 31461,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/2gxjgz3q479z-.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/2gxjgz3q479z-.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/2gxjgz3q479z-.js",
+    "bytes": 31885,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/2mgio0lxlkeo1.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/2mgio0lxlkeo1.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/2mgio0lxlkeo1.js",
+    "bytes": 235513,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/2nlo81kg_xw-8.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/2nlo81kg_xw-8.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/2nlo81kg_xw-8.js",
+    "bytes": 441,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/2oibclz650x2o.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/2oibclz650x2o.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/2oibclz650x2o.js",
+    "bytes": 268456,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/31aoi5hbmy3e5.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/31aoi5hbmy3e5.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/31aoi5hbmy3e5.js",
+    "bytes": 30218,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/32opr--82f3of.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/32opr--82f3of.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/32opr--82f3of.js",
+    "bytes": 27841,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/37cn2zrwdt121.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/37cn2zrwdt121.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/37cn2zrwdt121.js",
+    "bytes": 16225,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/38xnjbg_q7fq8.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/38xnjbg_q7fq8.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/38xnjbg_q7fq8.js",
+    "bytes": 21275,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3a62a4ah3ow5o.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3a62a4ah3ow5o.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3a62a4ah3ow5o.js",
+    "bytes": 58342,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3c8_8x374jzar.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3c8_8x374jzar.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3c8_8x374jzar.js",
+    "bytes": 21620,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3d5o29szcv4f0.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3d5o29szcv4f0.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3d5o29szcv4f0.js",
+    "bytes": 32715,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3h_uq8qzrsa07.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3h_uq8qzrsa07.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3h_uq8qzrsa07.js",
+    "bytes": 70831,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3nwx142frc9wl.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3nwx142frc9wl.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3nwx142frc9wl.js",
+    "bytes": 1359,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3on-wtotir61w.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3on-wtotir61w.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3on-wtotir61w.js",
+    "bytes": 26054,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3rv4bgiegz9fz.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3rv4bgiegz9fz.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3rv4bgiegz9fz.js",
+    "bytes": 25781,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3s0tksitwa3o9.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3s0tksitwa3o9.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3s0tksitwa3o9.js",
+    "bytes": 29757,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3y8l25oymy2hd.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3y8l25oymy2hd.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3y8l25oymy2hd.js",
+    "bytes": 40945,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3yg2cedfb97zz.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3yg2cedfb97zz.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3yg2cedfb97zz.js",
+    "bytes": 23533,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/3zeclf9d6o00a.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3zeclf9d6o00a.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/3zeclf9d6o00a.js",
+    "bytes": 440090,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/44p5eh7lz133a.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/44p5eh7lz133a.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/44p5eh7lz133a.js",
+    "bytes": 49473,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  },
+  {
+    "name": "crocs_js/turbopack-1byz1flvc-bu1.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/turbopack-1byz1flvc-bu1.js",
+    "status": 200,
+    "final": "https://www.crocs.com/_next/static/immutable/chunks/turbopack-1byz1flvc-bu1.js",
+    "bytes": 11255,
+    "ctype": "application/javascript; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:35:24"
+  }
+]

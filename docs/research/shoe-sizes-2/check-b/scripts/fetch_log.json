@@ -1,0 +1,172 @@
+[
+  {
+    "name": "clarks_gb_fitguide.html",
+    "url": "https://www.clarks.com/en-gb/fitguide",
+    "status": 200,
+    "final": "https://www.clarks.com/en-gb/fitguide",
+    "bytes": 917465,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "clarks_ie_fitguide.html",
+    "url": "https://www.clarks.com/en-ie/fitguide",
+    "status": 200,
+    "final": "https://www.clarks.com/en-ie/fitguide",
+    "bytes": 817432,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "clarks_us_mens.html",
+    "url": "https://www.clarks.com/en-us/fit-guide/mens",
+    "status": 200,
+    "final": "https://www.clarks.com/en-us/fit-guide/mens",
+    "bytes": 750329,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "clarks_us_womens.html",
+    "url": "https://www.clarks.com/en-us/fit-guide/womens",
+    "status": 200,
+    "final": "https://www.clarks.com/en-us/fit-guide/womens",
+    "bytes": 713083,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "clarks_au_sizeguide.html",
+    "url": "https://clarks.com.au/pages/size-guide",
+    "status": 200,
+    "final": "https://clarks.com.au/pages/size-guide",
+    "bytes": 376331,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "drm_us_sizeguide_script.html",
+    "url": "https://www.drmartens.com/us/en/about/size-guide",
+    "status": 403,
+    "final": "https://www.drmartens.com/us/en/about/size-guide",
+    "bytes": 51996,
+    "ctype": "text/html; charset=UTF-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "drm_dk_sizeguide_script.html",
+    "url": "https://www.drmartens.com/dk/en_eu/shoe-size-guide",
+    "status": 403,
+    "final": "https://www.drmartens.com/dk/en_eu/shoe-size-guide",
+    "bytes": 51996,
+    "ctype": "text/html; charset=UTF-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "birk_us_fitguide.html",
+    "url": "https://www.birkenstock.com/us/fit-guide/",
+    "status": 200,
+    "final": "https://www.birkenstock.com/us/us-service-fittingguide.html",
+    "bytes": 484286,
+    "ctype": "text/html;charset=UTF-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "birk_gb_sizechart.html",
+    "url": "https://www.birkenstock.com/gb/fit-guide-size-chart.html",
+    "status": 200,
+    "final": "https://www.birkenstock.com/gb/fit-guide-size-chart.html",
+    "bytes": 476329,
+    "ctype": "text/html;charset=UTF-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "birk_template_us_a4.pdf",
+    "url": "https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf",
+    "status": 200,
+    "final": "https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf",
+    "bytes": 693592,
+    "ctype": "application/pdf",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "crocs_default.json",
+    "url": "https://www.crocs.com/size-chart/default.json",
+    "status": 200,
+    "final": "https://www.crocs.com/size-chart/default.json",
+    "bytes": 7271,
+    "ctype": "application/json; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "crocs_gb.json",
+    "url": "https://www.crocs.com/size-chart/gb.json",
+    "status": 200,
+    "final": "https://www.crocs.com/size-chart/gb.json",
+    "bytes": 5421,
+    "ctype": "application/json; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "crocs_sizechart.html",
+    "url": "https://www.crocs.com/size-chart",
+    "status": 200,
+    "final": "https://www.crocs.com/size-chart",
+    "bytes": 458562,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "salomon_us_sizingchart.html",
+    "url": "https://www.salomon.com/en-us/sizingchart",
+    "status": 200,
+    "final": "https://www.salomon.com/en-us/sizingchart",
+    "bytes": 847983,
+    "ctype": "text/html; charset=utf-8",
+    "server": "Vercel",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "salomon_sg_men.html",
+    "url": "https://sg.salomon.com/pages/men-size-guide",
+    "status": 200,
+    "final": "https://sg.salomon.com/pages/men-size-guide",
+    "bytes": 413219,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:15"
+  },
+  {
+    "name": "brooks_au_conversion.html",
+    "url": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart",
+    "status": 200,
+    "final": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart",
+    "bytes": 27696,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  },
+  {
+    "name": "brooks_au_howknow.html",
+    "url": "https://support.brooksrunning.com.au/hc/en-us/articles/360046951054-How-do-I-know-my-shoe-size",
+    "status": 200,
+    "final": "https://support.brooksrunning.com.au/hc/en-us/articles/360046951054-How-do-I-know-my-shoe-size",
+    "bytes": 22013,
+    "ctype": "text/html; charset=utf-8",
+    "server": "cloudflare",
+    "time": "2026-10-20T15:29:14"
+  }
+]

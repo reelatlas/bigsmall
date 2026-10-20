@@ -1,0 +1,682 @@
+{
+  "B01": {
+    "id": "B01",
+    "result": "confirmed",
+    "found_value": "44½",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-gb/fitguide | check-b/downloads/clarks_gb_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Men's chart (caption 'Mens Clarks Shoe Sizes'), data row 11: Clarks UK Size 10 | Clarks EU Size 44½ | Standard EU Size 45 | Foot Length (Millimetres)(MMs) 280. Both EU columns and the length as recorded."
+  },
+  "B02": {
+    "id": "B02",
+    "result": "confirmed",
+    "found_value": "45",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-gb/fitguide | check-b/downloads/clarks_gb_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Men's chart (caption 'Mens Clarks Shoe Sizes'), data row 11: Clarks UK Size 10 | Clarks EU Size 44½ | Standard EU Size 45 | Foot Length (Millimetres)(MMs) 280. Both EU columns and the length as recorded."
+  },
+  "B03": {
+    "id": "B03",
+    "result": "confirmed",
+    "found_value": "280",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-gb/fitguide | check-b/downloads/clarks_gb_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Men's chart (caption 'Mens Clarks Shoe Sizes'), data row 11: Clarks UK Size 10 | Clarks EU Size 44½ | Standard EU Size 45 | Foot Length (Millimetres)(MMs) 280. Both EU columns and the length as recorded. Heading carries the unit: Foot Length (Millimetres)(MMs)."
+  },
+  "B04": {
+    "id": "B04",
+    "result": "confirmed",
+    "found_value": "237",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-gb/fitguide | check-b/downloads/clarks_gb_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Women's chart (caption 'Womens Clarks Shoe Sizes'), data row 5: Clarks UK Size 5 | Clarks EU Size 38 | Standard EU Size 38 | Foot Length 237."
+  },
+  "B05": {
+    "id": "B05",
+    "result": "confirmed",
+    "found_value": "38",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-gb/fitguide | check-b/downloads/clarks_gb_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Women's chart (caption 'Womens Clarks Shoe Sizes'), data row 5: Clarks UK Size 5 | Clarks EU Size 38 | Standard EU Size 38 | Foot Length 237."
+  },
+  "B06": {
+    "id": "B06",
+    "result": "confirmed",
+    "found_value": "126",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-gb/fitguide | check-b/downloads/clarks_gb_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Kids & Babies chart, data row 7: Clarks UK Size 5 | Clarks EU Size 21 | Foot Length 126 (the infant 5). The check's expectation (a millimetre from the women's) does not hold for this row: the kids' chart runs 2 to 13½ then restarts at 1 to 10 (43 data rows), and its second UK 5, data row 33, reads EU 38 | 236 mm, one millimetre under the women's 237. The recorded cell at row 7 is as printed."
+  },
+  "B07": {
+    "id": "B07",
+    "result": "confirmed",
+    "found_value": "21",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-gb/fitguide | check-b/downloads/clarks_gb_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Kids & Babies chart, data row 7: Clarks UK Size 5 | Clarks EU Size 21 | Foot Length 126 (the infant 5). The check's expectation (a millimetre from the women's) does not hold for this row: the kids' chart runs 2 to 13½ then restarts at 1 to 10 (43 data rows), and its second UK 5, data row 33, reads EU 38 | 236 mm, one millimetre under the women's 237. The recorded cell at row 7 is as printed."
+  },
+  "B08": {
+    "id": "B08",
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "*These measurements do not correlate to measuring with a Clarks foot gauge. For this method, follow these instructions .",
+    "url_or_file": "https://www.clarks.com/en-ie/fitguide | check-b/downloads/clarks_ie_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "On the IE page, at the end of the measuring steps ('...take the length in millimetres from the tip of your longest toe to your heel. (Please be aware that your longest toe may not always be your big toe.)'), just above the Kids & Babies chart; the GB page carries the same sentence in the same place."
+  },
+  "B09": {
+    "id": "B09",
+    "result": "confirmed",
+    "found_value": "9.7",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-us/fit-guide/mens | check-b/downloads/clarks_us_mens.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's chart (heading 'Men’s Shoe Size Chart'; columns US Size, UK Size, Foot Length (IN)): row 1 = US 7 | UK 6 | 9.7; row 8 = US 10½ | UK 9½ | 10.9; row 14 (last) = US 15 | UK 14 | 12.4. Every cell at these rows as recorded."
+  },
+  "B10": {
+    "id": "B10",
+    "result": "confirmed",
+    "found_value": "6",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-us/fit-guide/mens | check-b/downloads/clarks_us_mens.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's chart (heading 'Men’s Shoe Size Chart'; columns US Size, UK Size, Foot Length (IN)): row 1 = US 7 | UK 6 | 9.7; row 8 = US 10½ | UK 9½ | 10.9; row 14 (last) = US 15 | UK 14 | 12.4. Every cell at these rows as recorded."
+  },
+  "B11": {
+    "id": "B11",
+    "result": "confirmed",
+    "found_value": "10.9",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-us/fit-guide/mens | check-b/downloads/clarks_us_mens.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's chart (heading 'Men’s Shoe Size Chart'; columns US Size, UK Size, Foot Length (IN)): row 1 = US 7 | UK 6 | 9.7; row 8 = US 10½ | UK 9½ | 10.9; row 14 (last) = US 15 | UK 14 | 12.4. Every cell at these rows as recorded."
+  },
+  "B12": {
+    "id": "B12",
+    "result": "confirmed",
+    "found_value": "9½",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-us/fit-guide/mens | check-b/downloads/clarks_us_mens.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's chart (heading 'Men’s Shoe Size Chart'; columns US Size, UK Size, Foot Length (IN)): row 1 = US 7 | UK 6 | 9.7; row 8 = US 10½ | UK 9½ | 10.9; row 14 (last) = US 15 | UK 14 | 12.4. Every cell at these rows as recorded."
+  },
+  "B13": {
+    "id": "B13",
+    "result": "confirmed",
+    "found_value": "12.4",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-us/fit-guide/mens | check-b/downloads/clarks_us_mens.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's chart (heading 'Men’s Shoe Size Chart'; columns US Size, UK Size, Foot Length (IN)): row 1 = US 7 | UK 6 | 9.7; row 8 = US 10½ | UK 9½ | 10.9; row 14 (last) = US 15 | UK 14 | 12.4. Every cell at these rows as recorded. Past US 12 the chart steps by whole sizes (12, 13, 14, 15)."
+  },
+  "B14": {
+    "id": "B14",
+    "result": "confirmed",
+    "found_value": "14",
+    "exact_words": "",
+    "url_or_file": "https://www.clarks.com/en-us/fit-guide/mens | check-b/downloads/clarks_us_mens.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's chart (heading 'Men’s Shoe Size Chart'; columns US Size, UK Size, Foot Length (IN)): row 1 = US 7 | UK 6 | 9.7; row 8 = US 10½ | UK 9½ | 10.9; row 14 (last) = US 15 | UK 14 | 12.4. Every cell at these rows as recorded."
+  },
+  "B15": {
+    "id": "B15",
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "Account for Foot Swelling Feet may swell throughout the day, particularly in warm weather or after prolonged standing. Consider sizing up slightly to accommodate potential swelling and ensure comfort throughout the day.",
+    "url_or_file": "https://www.clarks.com/en-us/fit-guide/womens | check-b/downloads/clarks_us_womens.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Under the heading 'Account for Foot Swelling' on the US women's fit guide; the US men's fit guide carries no such advice (no 'swelling' anywhere in it)."
+  },
+  "B34": {
+    "id": "B34",
+    "result": "confirmed",
+    "found_value": "6 - 6 1/2",
+    "exact_words": "",
+    "url_or_file": "https://www.birkenstock.com/us/fit-guide/ (redirected to https://www.birkenstock.com/us/us-service-fittingguide.html) | check-b/downloads/birk_us_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Size Conversion Chart, Women columns (U.S. Size | BIRKENSTOCK Size), data row 3: '6 - 6 1/2' | 37. The URL now redirects to us-service-fittingguide.html."
+  },
+  "B35": {
+    "id": "B35",
+    "result": "confirmed",
+    "found_value": "10 - 10 1/2",
+    "exact_words": "",
+    "url_or_file": "https://www.birkenstock.com/us/fit-guide/ (redirected to https://www.birkenstock.com/us/us-service-fittingguide.html) | check-b/downloads/birk_us_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Size Conversion Chart, Men columns, data row 4: '10 - 10 1/2' | 43 (the men's run is 40 to 50, the women's 35 to 42)."
+  },
+  "B36": {
+    "id": "B36",
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "All our footwear is listed in European sizes. To find yours, use the formula below or reference your U.S. shoe size in our conversion chart. Women’s: U.S. size + 31 = EU size Men’s: U.S. size + 33 = EU size",
+    "url_or_file": "https://www.birkenstock.com/us/fit-guide/ (redirected to https://www.birkenstock.com/us/us-service-fittingguide.html) | check-b/downloads/birk_us_fitguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Under 'FIND YOUR EUROPEAN SIZE'; the page writes Women’s and Men’s with a curly apostrophe. The chart agrees with the formula (W 6 -> 37, M 10 -> 43)."
+  },
+  "B37": {
+    "id": "B37",
+    "result": "confirmed",
+    "found_value": "251",
+    "exact_words": "",
+    "url_or_file": "https://www.birkenstock.com/gb/fit-guide-size-chart.html | check-b/downloads/birk_gb_sizechart.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Adults tab, subtitle 'UK sizes and measurements (in mm)'; size 7 is the 6th size (2,5; 3,5; 4,5; 5; 5,5; 7: comma decimals, no 6 or 6,5), spanning a Narrow and a Regular line, both Length From 251 To 260. Columns: Size | Width (Narrow/Regular) | Length From, To | Width From, To."
+  },
+  "B38": {
+    "id": "B38",
+    "result": "confirmed",
+    "found_value": "260",
+    "exact_words": "",
+    "url_or_file": "https://www.birkenstock.com/gb/fit-guide-size-chart.html | check-b/downloads/birk_gb_sizechart.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "As B37: size 7, Length From 251 To 260 on both the Narrow and the Regular line; widths 90-95 (Narrow), 96-104 (Regular)."
+  },
+  "B58": {
+    "id": "B58",
+    "result": "confirmed",
+    "found_value": "15 M",
+    "exact_words": "",
+    "url_or_file": "https://sg.salomon.com/pages/men-size-guide | check-b/downloads/salomon_sg_men.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Men's Footwear Sizing Guide, last data row (23): UK 14.5 | EUR 50 2/3 | JP 33 | US 15 M | FOOT LENGTH (CM) 32,5 | FOOT LENGTH (INCH) 12,8."
+  },
+  "B59": {
+    "id": "B59",
+    "result": "confirmed",
+    "found_value": "32,5",
+    "exact_words": "",
+    "url_or_file": "https://sg.salomon.com/pages/men-size-guide | check-b/downloads/salomon_sg_men.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "As B58; the page writes the length with a comma decimal (32,5)."
+  },
+  "B60": {
+    "id": "B60",
+    "result": "confirmed",
+    "found_value": "50 2/3",
+    "exact_words": "",
+    "url_or_file": "https://sg.salomon.com/pages/men-size-guide | check-b/downloads/salomon_sg_men.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "As B58."
+  },
+  "B61": {
+    "id": "B61",
+    "result": "confirmed",
+    "found_value": "10.5",
+    "exact_words": "",
+    "url_or_file": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart | check-b/downloads/brooks_au_conversion.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's 9 is the table's 14th row as the worker counted (11 data rows, an empty row, a repeated header row, then this row): US Men 9 | US Women 10.5 | UK Men 8 | UK Women 8.5 | Europe Unisex 42.5 | Japan Men (cm) 27 | Japan Women (cm) 28."
+  },
+  "B62": {
+    "id": "B62",
+    "result": "confirmed",
+    "found_value": "8",
+    "exact_words": "",
+    "url_or_file": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart | check-b/downloads/brooks_au_conversion.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's 9 is the table's 14th row as the worker counted (11 data rows, an empty row, a repeated header row, then this row): US Men 9 | US Women 10.5 | UK Men 8 | UK Women 8.5 | Europe Unisex 42.5 | Japan Men (cm) 27 | Japan Women (cm) 28."
+  },
+  "B63": {
+    "id": "B63",
+    "result": "confirmed",
+    "found_value": "8.5",
+    "exact_words": "",
+    "url_or_file": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart | check-b/downloads/brooks_au_conversion.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's 9 is the table's 14th row as the worker counted (11 data rows, an empty row, a repeated header row, then this row): US Men 9 | US Women 10.5 | UK Men 8 | UK Women 8.5 | Europe Unisex 42.5 | Japan Men (cm) 27 | Japan Women (cm) 28."
+  },
+  "B64": {
+    "id": "B64",
+    "result": "confirmed",
+    "found_value": "42.5",
+    "exact_words": "",
+    "url_or_file": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart | check-b/downloads/brooks_au_conversion.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's 9 is the table's 14th row as the worker counted (11 data rows, an empty row, a repeated header row, then this row): US Men 9 | US Women 10.5 | UK Men 8 | UK Women 8.5 | Europe Unisex 42.5 | Japan Men (cm) 27 | Japan Women (cm) 28."
+  },
+  "B65": {
+    "id": "B65",
+    "result": "confirmed",
+    "found_value": "27",
+    "exact_words": "",
+    "url_or_file": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart | check-b/downloads/brooks_au_conversion.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's 9 is the table's 14th row as the worker counted (11 data rows, an empty row, a repeated header row, then this row): US Men 9 | US Women 10.5 | UK Men 8 | UK Women 8.5 | Europe Unisex 42.5 | Japan Men (cm) 27 | Japan Women (cm) 28."
+  },
+  "B66": {
+    "id": "B66",
+    "result": "confirmed",
+    "found_value": "28",
+    "exact_words": "",
+    "url_or_file": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart | check-b/downloads/brooks_au_conversion.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "US men's 9 is the table's 14th row as the worker counted (11 data rows, an empty row, a repeated header row, then this row): US Men 9 | US Women 10.5 | UK Men 8 | UK Women 8.5 | Europe Unisex 42.5 | Japan Men (cm) 27 | Japan Women (cm) 28."
+  },
+  "B67": {
+    "id": "B67",
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "4 | 5.5 | 3 | 3.5 | 36 | 23 | 22.5 ; 4.5 | 6 | 3.5 | 4 | 36.5 | 23 | 23 ; 6.5 | 8 | 5.5 | 6 | 39 | 25 | 25 ; 7 | 8.5 | 6 | 6.5 | 40 | 25 | 25.5 ; 8.5 | 10 | 7.5 | 8 | 42 | 26.5 | 27 ; 9 | 10.5 | 8 | 8.5 | 42.5 | 27 | 28",
+    "url_or_file": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart | check-b/downloads/brooks_au_conversion.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "All three named: Japan Men 23 at US M 4 and 4.5; 25 at US M 6.5 and 7; Japan Women 27 at US W 10, then 28 at US W 10.5 (a 1 cm step where its neighbours step 0.5). The four rows the worker quoted match cell for cell. Also seen: Europe Unisex steps 36.5 to 37.5 (US M 4.5 to 5) and 39 to 40 (6.5 to 7); Japan Women is blank from US W 13 (US M 11.5) on."
+  },
+  "B68": {
+    "id": "B68",
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "Because the foot is three-dimensional, any two-dimensional measuring tool, such as a ruler or Brannock device® can only approximate your true shoe size. Please also keep in mind that manufacturers use different lasts to construct their shoes, and sizing may vary accordingly.",
+    "url_or_file": "https://support.brooksrunning.com.au/hc/en-us/articles/360046951054-How-do-I-know-my-shoe-size | check-b/downloads/brooks_au_howknow.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py)",
+    "date_checked": "2026-10-20",
+    "note": "Word for word, ® included; the next sentence: 'Note that the Brooks running shoes are all in US sizes.'"
+  },
+  "B16": {
+    "id": "B16",
+    "result": "confirmed",
+    "found_value": "6.5",
+    "exact_words": "",
+    "url_or_file": "https://clarks.com.au/pages/size-guide | check-b/downloads/clarks_au_sizeguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py, explore2.py)",
+    "date_checked": "2026-10-20",
+    "note": "Womens tab (div id='Womens', second of the tabs Mens, Womens, Kids), data row 5: UK 4 | EU 37 | US 6.5 | CM 22.9. Aside: the Mens table has no CM column; its fourth heading reads UK and repeats the UK sizes."
+  },
+  "B17": {
+    "id": "B17",
+    "result": "confirmed",
+    "found_value": "22.9",
+    "exact_words": "",
+    "url_or_file": "https://clarks.com.au/pages/size-guide | check-b/downloads/clarks_au_sizeguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py, explore2.py)",
+    "date_checked": "2026-10-20",
+    "note": "Womens tab (div id='Womens', second of the tabs Mens, Womens, Kids), data row 5: UK 4 | EU 37 | US 6.5 | CM 22.9. Aside: the Mens table has no CM column; its fourth heading reads UK and repeats the UK sizes."
+  },
+  "B18": {
+    "id": "B18",
+    "result": "confirmed",
+    "found_value": "37",
+    "exact_words": "",
+    "url_or_file": "https://clarks.com.au/pages/size-guide | check-b/downloads/clarks_au_sizeguide.html",
+    "tool": "script (python urllib: fetch.py; parsed with html.parser: parse_html.py, explore2.py)",
+    "date_checked": "2026-10-20",
+    "note": "Womens tab (div id='Womens', second of the tabs Mens, Womens, Kids), data row 5: UK 4 | EU 37 | US 6.5 | CM 22.9. Aside: the Mens table has no CM column; its fourth heading reads UK and repeats the UK sizes."
+  },
+  "B19": {
+    "id": "B19",
+    "result": "confirmed",
+    "found_value": "25.5",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Row 5 as the fetcher gives it: Foot length 25.5 | Foot width 9.2 | UK 6.5 | EU 40 | 8.5 | [blank]. The foot length and EU are unambiguous by position and by value. The fetcher says on a second reading that its source is flattened text with no cell boundaries, so the blank's column cannot be read (B21, B22)."
+  },
+  "B20": {
+    "id": "B20",
+    "result": "confirmed",
+    "found_value": "40",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Row 5 as the fetcher gives it: Foot length 25.5 | Foot width 9.2 | UK 6.5 | EU 40 | 8.5 | [blank]. The foot length and EU are unambiguous by position and by value. The fetcher says on a second reading that its source is flattened text with no cell boundaries, so the blank's column cannot be read (B21, B22)."
+  },
+  "B21": {
+    "id": "B21",
+    "result": "could not reach",
+    "found_value": "8.5 (column not established)",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse); worker's saved copy opened: a bot-check page",
+    "date_checked": "2026-10-20",
+    "note": "Could not reach the cell's column. The row holds one value (8.5) and one blank between US Men's and US Women's. The fetcher's first reading put 8.5 under US Men's and the blank under US Women's, as the worker did; asked again, it said its source is flattened text, 'The source does not show which position is empty'. A script gets Cloudflare's 403 bot check, and the worker's saved copy (opened only after the fetcher could not tell) is that bot-check page ('Help us verify real visitors'), with no chart. Not a reading but worth knowing: in every full row US Men's = UK + 1 and US Women's = UK + 2, by which 8.5 at UK 6.5 fits US Women's and the blank would be US Men's."
+  },
+  "B22": {
+    "id": "B22",
+    "result": "could not reach",
+    "found_value": "a blank in one of the two US columns (column not established)",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse); worker's saved copy opened: a bot-check page",
+    "date_checked": "2026-10-20",
+    "note": "Could not reach the cell's column. The row holds one value (8.5) and one blank between US Men's and US Women's. The fetcher's first reading put 8.5 under US Men's and the blank under US Women's, as the worker did; asked again, it said its source is flattened text, 'The source does not show which position is empty'. A script gets Cloudflare's 403 bot check, and the worker's saved copy (opened only after the fetcher could not tell) is that bot-check page ('Help us verify real visitors'), with no chart. Not a reading but worth knowing: in every full row US Men's = UK + 1 and US Women's = UK + 2, by which 8.5 at UK 6.5 fits US Women's and the blank would be US Men's."
+  },
+  "B23": {
+    "id": "B23",
+    "result": "confirmed",
+    "found_value": "28.5",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Row 9 as the fetcher gives it: Foot length 28.5 | Foot width 9.8 | UK 9.5 | EU 44 | 11.5 | [blank]. The foot length and EU are unambiguous; the blank's column cannot be read (B25, B26)."
+  },
+  "B24": {
+    "id": "B24",
+    "result": "confirmed",
+    "found_value": "44",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Row 9 as the fetcher gives it: Foot length 28.5 | Foot width 9.8 | UK 9.5 | EU 44 | 11.5 | [blank]. The foot length and EU are unambiguous; the blank's column cannot be read (B25, B26)."
+  },
+  "B25": {
+    "id": "B25",
+    "result": "could not reach",
+    "found_value": "11.5 (column not established)",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse); worker's saved copy opened: a bot-check page",
+    "date_checked": "2026-10-20",
+    "note": "Could not reach the cell's column. The row holds one value (11.5) and one blank between US Men's and US Women's. The fetcher's first reading put 11.5 under US Men's and the blank under US Women's, as the worker did; asked again, it said its source is flattened text, 'The source does not show which position is empty'. A script gets Cloudflare's 403 bot check, and the worker's saved copy (opened only after the fetcher could not tell) is that bot-check page ('Help us verify real visitors'), with no chart. Not a reading but worth knowing: in every full row US Men's = UK + 1 and US Women's = UK + 2, by which 11.5 at UK 9.5 fits US Women's and the blank would be US Men's."
+  },
+  "B26": {
+    "id": "B26",
+    "result": "could not reach",
+    "found_value": "a blank in one of the two US columns (column not established)",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse); worker's saved copy opened: a bot-check page",
+    "date_checked": "2026-10-20",
+    "note": "Could not reach the cell's column. The row holds one value (11.5) and one blank between US Men's and US Women's. The fetcher's first reading put 11.5 under US Men's and the blank under US Women's, as the worker did; asked again, it said its source is flattened text, 'The source does not show which position is empty'. A script gets Cloudflare's 403 bot check, and the worker's saved copy (opened only after the fetcher could not tell) is that bot-check page ('Help us verify real visitors'), with no chart. Not a reading but worth knowing: in every full row US Men's = UK + 1 and US Women's = UK + 2, by which 11.5 at UK 9.5 fits US Women's and the blank would be US Men's."
+  },
+  "B27": {
+    "id": "B27",
+    "result": "confirmed",
+    "found_value": "26",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Row 6, a full row: Foot length 26 | Foot width 9.3 | UK 7 | EU 41 | US Men's 8 | US Women's 9. Headings: Foot length, Foot width, UK, EU, US Men's, US Women's; the fetcher reports that the Foot length (and Foot width) heading carries no unit."
+  },
+  "B28": {
+    "id": "B28",
+    "result": "confirmed",
+    "found_value": "41",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Row 6, a full row: Foot length 26 | Foot width 9.3 | UK 7 | EU 41 | US Men's 8 | US Women's 9. Headings: Foot length, Foot width, UK, EU, US Men's, US Women's; the fetcher reports that the Foot length (and Foot width) heading carries no unit."
+  },
+  "B29": {
+    "id": "B29",
+    "result": "confirmed",
+    "found_value": "8",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Row 6, a full row: Foot length 26 | Foot width 9.3 | UK 7 | EU 41 | US Men's 8 | US Women's 9. Headings: Foot length, Foot width, UK, EU, US Men's, US Women's; the fetcher reports that the Foot length (and Foot width) heading carries no unit."
+  },
+  "B30": {
+    "id": "B30",
+    "result": "confirmed",
+    "found_value": "41",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/dk/en_eu/shoe-size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_dk_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Heading 'DR. MARTENS SIZING GUIDE'; columns UK, EUR, US WOMEN, US MEN, JAPAN (women before men, unlike the US page); row 5: UK 7 | EUR 41 | US WOMEN 9 | US MEN 8 | JAPAN 26. The fetcher's source was flattened, but with no blank cell its 65 values fall into 13 rows of five without ambiguity. Whole sizes only (UK 3 to 15); EUR skips 40 and 44."
+  },
+  "B31": {
+    "id": "B31",
+    "result": "confirmed",
+    "found_value": "8",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/dk/en_eu/shoe-size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_dk_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Heading 'DR. MARTENS SIZING GUIDE'; columns UK, EUR, US WOMEN, US MEN, JAPAN (women before men, unlike the US page); row 5: UK 7 | EUR 41 | US WOMEN 9 | US MEN 8 | JAPAN 26. The fetcher's source was flattened, but with no blank cell its 65 values fall into 13 rows of five without ambiguity. Whole sizes only (UK 3 to 15); EUR skips 40 and 44."
+  },
+  "B32": {
+    "id": "B32",
+    "result": "confirmed",
+    "found_value": "26",
+    "exact_words": "",
+    "url_or_file": "https://www.drmartens.com/dk/en_eu/shoe-size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_dk_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "Heading 'DR. MARTENS SIZING GUIDE'; columns UK, EUR, US WOMEN, US MEN, JAPAN (women before men, unlike the US page); row 5: UK 7 | EUR 41 | US WOMEN 9 | US MEN 8 | JAPAN 26. The fetcher's source was flattened, but with no blank cell its 65 values fall into 13 rows of five without ambiguity. Whole sizes only (UK 3 to 15); EUR skips 40 and 44."
+  },
+  "B33": {
+    "id": "B33",
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "The size of our boots, shoes and sandals can differ between silhouettes, but we'd say that most run true to size.",
+    "url_or_file": "https://www.drmartens.com/us/en/about/size-guide (fetcher; the script got a 403 bot check: check-b/downloads/drm_us_sizeguide_script.html)",
+    "tool": "fetcher (WebFetch: its model transcription of the page, not a parse)",
+    "date_checked": "2026-10-20",
+    "note": "As the fetcher quotes it, word for word the worker's; the page also says 'DM's can differ in size depending on the style.' The apostrophes are the fetcher's and may be curly on the page."
+  },
+  "B39": {
+    "id": "B39",
+    "result": "confirmed",
+    "found_value": "260",
+    "exact_words": "",
+    "url_or_file": "https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf | check-b/downloads/birk_template_us_a4.pdf (text: birk_template-raw.txt, birk_template-table.txt, birk_template_layout.txt)",
+    "tool": "script (python urllib; Xpdf pdftotext 4.06 -raw, -table, -layout: explore3.py, explore6.py, explore7.py)",
+    "date_checked": "2026-10-20",
+    "note": "Read from the PDF's text layer with Xpdf pdftotext 4.06. -raw gives each row in stream order after its label: EU 24 ... 50 (27); US Children 6-6.5 ... 3-3.5 (11); US Ladies 4-4.5 ... 11-11.5 (8); US Men 7-7.5 ... 17-17.5 (11); UK 7,0 ... 14,5 (27); MM 150 ... 325 (27). -table places each value by its position on the page: US Children under EU 24-34, US Ladies under EU 35-42 (9-9.5 under 40), US Men under EU 40-50 (7-7.5 under 40). EU 40 is the 17th column: MM 260, UK 7,0. Both modes agree with the worker's reading of which US row is which. No page image was rendered: this machine has no PDF renderer (no pdftoppm, pdftopng, Ghostscript, ImageMagick, MuPDF, or Python PDF library)."
+  },
+  "B40": {
+    "id": "B40",
+    "result": "confirmed",
+    "found_value": "9-9.5",
+    "exact_words": "",
+    "url_or_file": "https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf | check-b/downloads/birk_template_us_a4.pdf (text: birk_template-raw.txt, birk_template-table.txt, birk_template_layout.txt)",
+    "tool": "script (python urllib; Xpdf pdftotext 4.06 -raw, -table, -layout)",
+    "date_checked": "2026-10-20",
+    "note": "Read from the PDF's text layer with Xpdf pdftotext 4.06. -raw gives each row in stream order after its label: EU 24 ... 50 (27); US Children 6-6.5 ... 3-3.5 (11); US Ladies 4-4.5 ... 11-11.5 (8); US Men 7-7.5 ... 17-17.5 (11); UK 7,0 ... 14,5 (27); MM 150 ... 325 (27). -table places each value by its position on the page: US Children under EU 24-34, US Ladies under EU 35-42 (9-9.5 under 40), US Men under EU 40-50 (7-7.5 under 40). EU 40 is the 17th column: MM 260, UK 7,0. Both modes agree with the worker's reading of which US row is which. No page image was rendered: this machine has no PDF renderer (no pdftoppm, pdftopng, Ghostscript, ImageMagick, MuPDF, or Python PDF library)."
+  },
+  "B41": {
+    "id": "B41",
+    "result": "confirmed",
+    "found_value": "7-7.5",
+    "exact_words": "",
+    "url_or_file": "https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf | check-b/downloads/birk_template_us_a4.pdf (text: birk_template-raw.txt, birk_template-table.txt, birk_template_layout.txt)",
+    "tool": "script (python urllib; Xpdf pdftotext 4.06 -raw, -table, -layout)",
+    "date_checked": "2026-10-20",
+    "note": "Read from the PDF's text layer with Xpdf pdftotext 4.06. -raw gives each row in stream order after its label: EU 24 ... 50 (27); US Children 6-6.5 ... 3-3.5 (11); US Ladies 4-4.5 ... 11-11.5 (8); US Men 7-7.5 ... 17-17.5 (11); UK 7,0 ... 14,5 (27); MM 150 ... 325 (27). -table places each value by its position on the page: US Children under EU 24-34, US Ladies under EU 35-42 (9-9.5 under 40), US Men under EU 40-50 (7-7.5 under 40). EU 40 is the 17th column: MM 260, UK 7,0. Both modes agree with the worker's reading of which US row is which. No page image was rendered: this machine has no PDF renderer (no pdftoppm, pdftopng, Ghostscript, ImageMagick, MuPDF, or Python PDF library)."
+  },
+  "B42": {
+    "id": "B42",
+    "result": "confirmed",
+    "found_value": "7,0",
+    "exact_words": "",
+    "url_or_file": "https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf | check-b/downloads/birk_template_us_a4.pdf (text: birk_template-raw.txt, birk_template-table.txt, birk_template_layout.txt)",
+    "tool": "script (python urllib; Xpdf pdftotext 4.06 -raw, -table, -layout)",
+    "date_checked": "2026-10-20",
+    "note": "Read from the PDF's text layer with Xpdf pdftotext 4.06. -raw gives each row in stream order after its label: EU 24 ... 50 (27); US Children 6-6.5 ... 3-3.5 (11); US Ladies 4-4.5 ... 11-11.5 (8); US Men 7-7.5 ... 17-17.5 (11); UK 7,0 ... 14,5 (27); MM 150 ... 325 (27). -table places each value by its position on the page: US Children under EU 24-34, US Ladies under EU 35-42 (9-9.5 under 40), US Men under EU 40-50 (7-7.5 under 40). EU 40 is the 17th column: MM 260, UK 7,0. Both modes agree with the worker's reading of which US row is which. No page image was rendered: this machine has no PDF renderer (no pdftoppm, pdftopng, Ghostscript, ImageMagick, MuPDF, or Python PDF library). The PDF writes the UK size with a comma decimal (7,0)."
+  },
+  "B43": {
+    "id": "B43",
+    "result": "confirmed",
+    "found_value": "28",
+    "exact_words": "",
+    "url_or_file": "https://www.crocs.com/size-chart/default.json | check-b/downloads/crocs_default.json (and crocs_gb.json)",
+    "tool": "script (python urllib; parsed with json: explore3.py)",
+    "date_checked": "2026-10-20",
+    "note": "default.json, adults, row 9: inches 10 3/8 | cm 28 | mm 280 | us_women 12 | us_men 10 | uk_women 10 | uk_men 9 | eu 43-44 | jp 28 | kr 290mm. At this row the cm and mm fields agree. They differ by a centimetre in rows 1-6 (cm 20-25 against mm 210-260) and by half a centimetre in row 7 (26 against 265), then agree from row 8. The Korea field runs a centimetre above cm in every row (290mm here). The page shows inches or cm, never this file's mm field (B48)."
+  },
+  "B44": {
+    "id": "B44",
+    "result": "confirmed",
+    "found_value": "280",
+    "exact_words": "",
+    "url_or_file": "https://www.crocs.com/size-chart/default.json | check-b/downloads/crocs_default.json (and crocs_gb.json)",
+    "tool": "script (python urllib; parsed with json)",
+    "date_checked": "2026-10-20",
+    "note": "default.json, adults, row 9: inches 10 3/8 | cm 28 | mm 280 | us_women 12 | us_men 10 | uk_women 10 | uk_men 9 | eu 43-44 | jp 28 | kr 290mm. At this row the cm and mm fields agree. They differ by a centimetre in rows 1-6 (cm 20-25 against mm 210-260) and by half a centimetre in row 7 (26 against 265), then agree from row 8. The Korea field runs a centimetre above cm in every row (290mm here). The page shows inches or cm, never this file's mm field (B48)."
+  },
+  "B45": {
+    "id": "B45",
+    "result": "confirmed",
+    "found_value": "43-44",
+    "exact_words": "",
+    "url_or_file": "https://www.crocs.com/size-chart/default.json | check-b/downloads/crocs_default.json (and crocs_gb.json)",
+    "tool": "script (python urllib; parsed with json)",
+    "date_checked": "2026-10-20",
+    "note": "default.json, adults, row 9: inches 10 3/8 | cm 28 | mm 280 | us_women 12 | us_men 10 | uk_women 10 | uk_men 9 | eu 43-44 | jp 28 | kr 290mm. At this row the cm and mm fields agree. They differ by a centimetre in rows 1-6 (cm 20-25 against mm 210-260) and by half a centimetre in row 7 (26 against 265), then agree from row 8. The Korea field runs a centimetre above cm in every row (290mm here). The page shows inches or cm, never this file's mm field (B48)."
+  },
+  "B46": {
+    "id": "B46",
+    "result": "confirmed",
+    "found_value": "9",
+    "exact_words": "",
+    "url_or_file": "https://www.crocs.com/size-chart/default.json | check-b/downloads/crocs_default.json (and crocs_gb.json)",
+    "tool": "script (python urllib; parsed with json)",
+    "date_checked": "2026-10-20",
+    "note": "default.json, adults, row 9: inches 10 3/8 | cm 28 | mm 280 | us_women 12 | us_men 10 | uk_women 10 | uk_men 9 | eu 43-44 | jp 28 | kr 290mm. At this row the cm and mm fields agree. They differ by a centimetre in rows 1-6 (cm 20-25 against mm 210-260) and by half a centimetre in row 7 (26 against 265), then agree from row 8. The Korea field runs a centimetre above cm in every row (290mm here). The page shows inches or cm, never this file's mm field (B48)."
+  },
+  "B47": {
+    "id": "B47",
+    "result": "confirmed",
+    "found_value": "12",
+    "exact_words": "",
+    "url_or_file": "https://www.crocs.com/size-chart/default.json | check-b/downloads/crocs_default.json (and crocs_gb.json)",
+    "tool": "script (python urllib; parsed with json)",
+    "date_checked": "2026-10-20",
+    "note": "default.json, adults, row 9: inches 10 3/8 | cm 28 | mm 280 | us_women 12 | us_men 10 | uk_women 10 | uk_men 9 | eu 43-44 | jp 28 | kr 290mm. At this row the cm and mm fields agree. They differ by a centimetre in rows 1-6 (cm 20-25 against mm 210-260) and by half a centimetre in row 7 (26 against 265), then agree from row 8. The Korea field runs a centimetre above cm in every row (290mm here). The page shows inches or cm, never this file's mm field (B48)."
+  },
+  "B48": {
+    "id": "B48",
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "(page script 37cn2zrwdt121.js) v=((l=v||{}).KOREA=\"korea.json\",l.JAPAN=\"japan.json\",l.GB=\"gb.json\",l.EMEA=\"emea.json\",l.DEFAULT=\"default.json\",l);let p={[x.k.KR]:\"korea.json\",[x.k.JP]:\"japan.json\",[x.k.GB]:\"gb.json\",...Object.fromEntries([...j.a].map(e=>[e,\"emea.json\"])),fallback:\"default.json\"} ... async function E(e){let t=await fetch(`/size-chart/${e}`) ... let y=[...j.h,x.k.AU],z={defaultUnit:\"inches\",showToggle:!0},C={[x.k.KR]:{defaultUnit:\"mm\",showToggle:!1},...Object.fromEntries(y.map(e=>[e,z])),fallback:{defaultUnit:\"cm\",showToggle:!1}} ... J=[S.INCHES,S.CM]",
+    "url_or_file": "https://www.crocs.com/size-chart | check-b/downloads/crocs_sizechart.html and check-b/downloads/crocs_js/37cn2zrwdt121.js",
+    "tool": "script (python urllib: the page and its 42 script chunks, read as text: explore3.py, explore4.py, explore5.py)",
+    "date_checked": "2026-10-20",
+    "note": "Confirmed: the file is keyed to the page's locale code (the storefront's, read through the page's i18n locale hook; en-US on crocs.com): ko-KR korea.json, ja-JP japan.json, en-GB gb.json, the set de-DE, en-ES, fr-FR, fi-FI, nl-NL emea.json, every other (en-US, en-CA, fr-CA, en-AU, en-SG) default.json. Which length shows: the chart is transposed, the length heads each column as e[unit] plus the unit's suffix; en-US, en-CA, fr-CA and en-AU open in inches with a toggle to cm (the toggle offers only inches and cm), ko-KR shows mm with no toggle, every other locale cm with no toggle. So a default.json visitor sees inches or the cm field, never the mm field; mm shows only for ko-KR, from korea.json. The Korea row (kr) is a body row and shows its own values, 290mm at US M 10."
+  },
+  "B49": {
+    "id": "B49",
+    "result": "confirmed",
+    "found_value": "21-22",
+    "exact_words": "",
+    "url_or_file": "https://www.crocs.com/size-chart/default.json | check-b/downloads/crocs_default.json (and crocs_gb.json)",
+    "tool": "script (python urllib; parsed with json)",
+    "date_checked": "2026-10-20",
+    "note": "default.json, kids, row 6: us C6 | cm 13.2 | mm 132 | uk 6 | eu 21-22 | jp 14 | kr 130. gb.json, kids, row 6: us C6 | cm 13.2 | uk 6 | eu 22-23 | jp 14 | kr 155. gb.json's EU runs above default's from C6 on (one size at C6, two at C10, three at J1), and its Korea is higher from C4 to C13 (140 against 115 at C4) and the same from J1."
+  },
+  "B50": {
+    "id": "B50",
+    "result": "confirmed",
+    "found_value": "130",
+    "exact_words": "",
+    "url_or_file": "https://www.crocs.com/size-chart/default.json | check-b/downloads/crocs_default.json (and crocs_gb.json)",
+    "tool": "script (python urllib; parsed with json)",
+    "date_checked": "2026-10-20",
+    "note": "default.json, kids, row 6: us C6 | cm 13.2 | mm 132 | uk 6 | eu 21-22 | jp 14 | kr 130. gb.json, kids, row 6: us C6 | cm 13.2 | uk 6 | eu 22-23 | jp 14 | kr 155. gb.json's EU runs above default's from C6 on (one size at C6, two at C10, three at J1), and its Korea is higher from C4 to C13 (140 against 115 at C4) and the same from J1."
+  },
+  "B51": {
+    "id": "B51",
+    "result": "corrected",
+    "found_value": "",
+    "exact_words": "Column label: \"Heel to Toe Length\" (adultLength, kidsLength, footLength). Meta description: \"Find the perfect size for your Crocs shoes with our size chart. Measure your foot and find the right size for your Crocs shoes.\" Tip: \"Tip: If you're in between sizes, <strong>round up</strong>. For wide feet order your normal size.\"",
+    "url_or_file": "https://www.crocs.com/size-chart | check-b/downloads/crocs_sizechart.html and check-b/downloads/crocs_js/37cn2zrwdt121.js",
+    "tool": "script (page HTML, its flight data and 42 script chunks searched) and fetcher (WebFetch)",
+    "date_checked": "2026-10-20",
+    "note": "The worker's quoted step ('3. Measure the point from your heel to your longest toe. This is your Heel-to-Toe length.') is not on this page: no 'longest', no numbered steps, no tracing, no paper, in the HTML, the flight data with its English strings, or any of the 42 scripts, and the fetcher finds 'no numbered steps, heel-to-toe instructions, tracing or paper-based directions'. The modal's 'Learn how to measure' link points back to /size-chart itself. What stands: the length column is labelled 'Heel to Toe Length' and the description says to measure your foot; 'measured by tracing the foot' has no support here."
+  },
+  "B52": {
+    "id": "B52",
+    "result": "confirmed",
+    "found_value": "27",
+    "exact_words": "",
+    "url_or_file": "https://www.salomon.com/en-us/sizingchart | check-b/downloads/salomon_us_sizingchart.html (Next.js flight data)",
+    "tool": "script (python urllib; the self.__next_f flight chunks decoded and parsed with json: explore3.py, explore5.py, explore6.py)",
+    "date_checked": "2026-10-20",
+    "note": "Entry 'Unisex Footwear' (subtitle 'Calculate your own measurements, then select your product size'; gender men and women; slug unisex-footwear) in the page's Next.js flight data. Header: FOOT LENGTH (CM) (inch view: FOOT LENGTH (INCH)) | UK | EUR | US | JP. Row 12: 27 (inch 10,6) | 9 | 43 1/3 | 9.5 M / 10.5 W | 27,5. JP is the foot length plus 0.5 in this row and in all 23. The server HTML holds no table; the chart renders from this data."
+  },
+  "B53": {
+    "id": "B53",
+    "result": "confirmed",
+    "found_value": "43 1/3",
+    "exact_words": "",
+    "url_or_file": "https://www.salomon.com/en-us/sizingchart | check-b/downloads/salomon_us_sizingchart.html (Next.js flight data)",
+    "tool": "script (python urllib; the self.__next_f flight chunks decoded and parsed with json: explore3.py, explore5.py, explore6.py)",
+    "date_checked": "2026-10-20",
+    "note": "Entry 'Unisex Footwear' (subtitle 'Calculate your own measurements, then select your product size'; gender men and women; slug unisex-footwear) in the page's Next.js flight data. Header: FOOT LENGTH (CM) (inch view: FOOT LENGTH (INCH)) | UK | EUR | US | JP. Row 12: 27 (inch 10,6) | 9 | 43 1/3 | 9.5 M / 10.5 W | 27,5. JP is the foot length plus 0.5 in this row and in all 23. The server HTML holds no table; the chart renders from this data."
+  },
+  "B54": {
+    "id": "B54",
+    "result": "confirmed",
+    "found_value": "9.5 M / 10.5 W",
+    "exact_words": "",
+    "url_or_file": "https://www.salomon.com/en-us/sizingchart | check-b/downloads/salomon_us_sizingchart.html (Next.js flight data)",
+    "tool": "script (python urllib; the self.__next_f flight chunks decoded and parsed with json: explore3.py, explore5.py, explore6.py)",
+    "date_checked": "2026-10-20",
+    "note": "Entry 'Unisex Footwear' (subtitle 'Calculate your own measurements, then select your product size'; gender men and women; slug unisex-footwear) in the page's Next.js flight data. Header: FOOT LENGTH (CM) (inch view: FOOT LENGTH (INCH)) | UK | EUR | US | JP. Row 12: 27 (inch 10,6) | 9 | 43 1/3 | 9.5 M / 10.5 W | 27,5. JP is the foot length plus 0.5 in this row and in all 23. The server HTML holds no table; the chart renders from this data."
+  },
+  "B55": {
+    "id": "B55",
+    "result": "confirmed",
+    "found_value": "27,5",
+    "exact_words": "",
+    "url_or_file": "https://www.salomon.com/en-us/sizingchart | check-b/downloads/salomon_us_sizingchart.html (Next.js flight data)",
+    "tool": "script (python urllib; the self.__next_f flight chunks decoded and parsed with json: explore3.py, explore5.py, explore6.py)",
+    "date_checked": "2026-10-20",
+    "note": "Entry 'Unisex Footwear' (subtitle 'Calculate your own measurements, then select your product size'; gender men and women; slug unisex-footwear) in the page's Next.js flight data. Header: FOOT LENGTH (CM) (inch view: FOOT LENGTH (INCH)) | UK | EUR | US | JP. Row 12: 27 (inch 10,6) | 9 | 43 1/3 | 9.5 M / 10.5 W | 27,5. JP is the foot length plus 0.5 in this row and in all 23. The server HTML holds no table; the chart renders from this data. The data writes it with a comma decimal (27,5)."
+  },
+  "B56": {
+    "id": "B56",
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "Place a sheet of paper on the floor and against a wall | Make sure you are wearing the same socks that you would normally wear with this type of shoe | Wearing these socks, stand on the sheet of paper with your foot perpendicular to the wall and your heel against the wall. | Then use a pen to draw a line just in front of your big toe. Repeat for both feet and take the longer distance to determine your size. | Using a ruler, measure the distance between the wall and the line you drew to find your size.",
+    "url_or_file": "https://www.salomon.com/en-us/sizingchart | check-b/downloads/salomon_us_sizingchart.html (Next.js flight data)",
+    "tool": "script (python urllib; the self.__next_f flight chunks decoded and parsed with json: explore3.py, explore5.py, explore6.py)",
+    "date_checked": "2026-10-20",
+    "note": "The Unisex Footwear entry's own steps (a list; its first two items carry no full stop there). Socks, heel against the wall and the longer foot are all there."
+  },
+  "B57": {
+    "id": "B57",
+    "result": "corrected",
+    "found_value": "",
+    "exact_words": "To find out your foot width, do the same but using the outside of your foot against the wall. If the width is more than 107mm (4.21’’), your foot is wide. To have a better fit, you can: - order the wide version of the model if it available - or, you can add +0.5 to your order size.",
+    "url_or_file": "https://www.salomon.com/en-us/sizingchart | check-b/downloads/salomon_us_sizingchart.html (Next.js flight data)",
+    "tool": "script (python urllib; the self.__next_f flight chunks decoded and parsed with json: explore3.py, explore5.py, explore6.py)",
+    "date_checked": "2026-10-20",
+    "note": "The words are on the page's data but only in two kids' charts, \"Kid's Snowboard Boots (Project BOA)\" and \"Kid's Snowboard Boots (Whipstar)\" (gender kids). The Unisex, Men's, Women's and Kid's Footwear entries say nothing of width. So the claim holds for those kids' snowboard boots, not for Salomon's footwear in general. The page writes the inch mark as two U+2019."
+  }
+}

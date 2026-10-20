@@ -1,0 +1,177 @@
+[
+  {
+    "what": "Clarks GB fit guide",
+    "url": "https://www.clarks.com/en-gb/fitguide",
+    "file": "check-b/downloads/clarks_gb_fitguide.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, server-rendered HTML tables: women, men, kids and babies (sizes and widths); B01-B07"
+  },
+  {
+    "what": "Clarks IE fit guide",
+    "url": "https://www.clarks.com/en-ie/fitguide",
+    "file": "check-b/downloads/clarks_ie_fitguide.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, same tables as GB; the foot-gauge sentence; B08"
+  },
+  {
+    "what": "Clarks US men's fit guide",
+    "url": "https://www.clarks.com/en-us/fit-guide/mens",
+    "file": "check-b/downloads/clarks_us_mens.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, HTML table US/UK/inches; B09-B14"
+  },
+  {
+    "what": "Clarks US women's fit guide",
+    "url": "https://www.clarks.com/en-us/fit-guide/womens",
+    "file": "check-b/downloads/clarks_us_womens.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, HTML table; the swelling advice; B15"
+  },
+  {
+    "what": "Clarks AU size guide",
+    "url": "https://clarks.com.au/pages/size-guide",
+    "file": "check-b/downloads/clarks_au_sizeguide.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, five HTML tables; B16-B18"
+  },
+  {
+    "what": "Dr. Martens US size guide (script attempt)",
+    "url": "https://www.drmartens.com/us/en/about/size-guide",
+    "file": "check-b/downloads/drm_us_sizeguide_script.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "403 from Cloudflare to the script, as for the worker; re-read through the fetcher"
+  },
+  {
+    "what": "Dr. Martens DK/EU size guide (script attempt)",
+    "url": "https://www.drmartens.com/dk/en_eu/shoe-size-guide",
+    "file": "check-b/downloads/drm_dk_sizeguide_script.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "403 from Cloudflare to the script; re-read through the fetcher"
+  },
+  {
+    "what": "Birkenstock US fit guide",
+    "url": "https://www.birkenstock.com/us/fit-guide/",
+    "file": "check-b/downloads/birk_us_fitguide.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200 after a redirect to /us/us-service-fittingguide.html; conversion table and the formula; B34-B36"
+  },
+  {
+    "what": "Birkenstock GB size chart",
+    "url": "https://www.birkenstock.com/gb/fit-guide-size-chart.html",
+    "file": "check-b/downloads/birk_gb_sizechart.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, Adults and Kids tables in mm; B37-B38"
+  },
+  {
+    "what": "Birkenstock US printable template A4 (PDF)",
+    "url": "https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf",
+    "file": "check-b/downloads/birk_template_us_a4.pdf",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, application/pdf, 693,592 bytes; B39-B42"
+  },
+  {
+    "what": "Crocs default.json",
+    "url": "https://www.crocs.com/size-chart/default.json",
+    "file": "check-b/downloads/crocs_default.json",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200 JSON; B43-B47, B49-B50"
+  },
+  {
+    "what": "Crocs gb.json",
+    "url": "https://www.crocs.com/size-chart/gb.json",
+    "file": "check-b/downloads/crocs_gb.json",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200 JSON; the comparison for B49"
+  },
+  {
+    "what": "Crocs size chart page",
+    "url": "https://www.crocs.com/size-chart",
+    "file": "check-b/downloads/crocs_sizechart.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, Next.js page, no server-rendered table; B48, B51"
+  },
+  {
+    "what": "Salomon US sizing chart",
+    "url": "https://www.salomon.com/en-us/sizingchart",
+    "file": "check-b/downloads/salomon_us_sizingchart.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200 (Vercel), chart in Next.js flight data; B52-B57"
+  },
+  {
+    "what": "Salomon SG men's size guide",
+    "url": "https://sg.salomon.com/pages/men-size-guide",
+    "file": "check-b/downloads/salomon_sg_men.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, HTML table; B58-B60"
+  },
+  {
+    "what": "Brooks Australia size conversion chart",
+    "url": "https://support.brooksrunning.com.au/hc/en-us/articles/360047594793-Size-Conversion-Chart",
+    "file": "check-b/downloads/brooks_au_conversion.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, one HTML table with a blank row and a repeated header mid-table; B61-B67"
+  },
+  {
+    "what": "Brooks Australia: How do I know my shoe size?",
+    "url": "https://support.brooksrunning.com.au/hc/en-us/articles/360046951054-How-do-I-know-my-shoe-size",
+    "file": "check-b/downloads/brooks_au_howknow.html",
+    "tool": "script (python urllib, 2026-10-20 15:29)",
+    "gave": "200, article text; B68"
+  },
+  {
+    "what": "Dr. Martens US size guide, first reading",
+    "url": "https://www.drmartens.com/us/en/about/size-guide",
+    "file": "",
+    "tool": "fetcher (WebFetch)",
+    "gave": "the size guide table (15 rows; blanks on the 25.5 and 28.5 rows, placed under US Women's), the socks table, the silhouettes sentence; B19-B29, B33"
+  },
+  {
+    "what": "Dr. Martens DK/EU size guide",
+    "url": "https://www.drmartens.com/dk/en_eu/shoe-size-guide",
+    "file": "",
+    "tool": "fetcher (WebFetch)",
+    "gave": "heading DR. MARTENS SIZING GUIDE, 13 rows of five, no blanks; B30-B32"
+  },
+  {
+    "what": "Crocs page scripts (42 chunks)",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/*.js",
+    "file": "check-b/downloads/crocs_js/",
+    "tool": "script (python urllib)",
+    "gave": "42 of 42 fetched (200); 37cn2zrwdt121.js holds the region-file map, the fetch, the unit rules and the table renderer; no measuring steps in any; B48, B51"
+  },
+  {
+    "what": "Birkenstock template PDF, text layer",
+    "url": "as above",
+    "file": "check-b/downloads/birk_template-raw.txt, birk_template-table.txt, birk_template_layout.txt",
+    "tool": "Xpdf pdftotext 4.06 (-layout, -raw, -table) on my own download",
+    "gave": "the size table rows with labels (raw) and by position (table); no renderer for a page image; B39-B42"
+  },
+  {
+    "what": "Dr. Martens US size guide, second reading",
+    "url": "https://www.drmartens.com/us/en/about/size-guide",
+    "file": "",
+    "tool": "fetcher (WebFetch)",
+    "gave": "its source is flattened text with no cell boundaries; it cannot tell which column is blank on the 25.5 and 28.5 rows; B21, B22, B25, B26"
+  },
+  {
+    "what": "Worker's saved copy of the Dr. Martens US page",
+    "url": "n/a",
+    "file": "scratchpad\\shoe-sizes-2\\brands-b\\downloads\\drm_us_sizeguide.html",
+    "tool": "worker's saved copy (opened only after the fetcher could not tell the blank column)",
+    "gave": "Cloudflare's 'Help us verify real visitors' page, 51,910 characters, no table: no help; the UK saved copy not opened"
+  },
+  {
+    "what": "Crocs size chart page",
+    "url": "https://www.crocs.com/size-chart",
+    "file": "",
+    "tool": "fetcher (WebFetch)",
+    "gave": "no measuring instructions; the chart shows 'Loading...' (client-rendered); B51"
+  },
+  {
+    "what": "Crocs i18n module (590327) in 3y8l25oymy2hd.js",
+    "url": "https://www.crocs.com/_next/static/immutable/chunks/3y8l25oymy2hd.js",
+    "file": "check-b/downloads/crocs_js/3y8l25oymy2hd.js",
+    "tool": "script (already downloaded; read as text)",
+    "gave": "the locale hook the region map is keyed on is the i18n library, so the key is the page locale; B48 note made precise"
+  }
+]

@@ -11,7 +11,7 @@ import type { Separators } from './locale';
 // format.ts).
 /** The no-break space, named once (an amount and its symbol stay on one line in the web). */
 export const NBSP = String.fromCharCode(0x00a0);
-export const NARROW_NBSP = String.fromCharCode(0x202f);
+const NARROW_NBSP = String.fromCharCode(0x202f);
 export const TIMES = String.fromCharCode(0x00d7);
 export const DIVIDE = String.fromCharCode(0x00f7);
 export const RIGHT_QUOTE = String.fromCharCode(0x2019);

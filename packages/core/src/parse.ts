@@ -14,8 +14,6 @@ import {
   toNumber,
 } from './number';
 
-export { NBSP } from './number';
-
 /**
  * What the user typed, split into the number or arithmetic (if any) and the unit query (if any).
  */

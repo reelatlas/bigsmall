@@ -10,7 +10,8 @@ export { regionDefaults } from './region';
 export type { RegionDefaults, UnitPreference } from './region';
 export { DEFAULT_SEPARATORS, localeSeparators } from './locale';
 export type { Separators } from './locale';
-export { NBSP, parse } from './parse';
+export { parse } from './parse';
+export { NBSP } from './number';
 export type { ParsedInput } from './parse';
 export {
   formatPair,

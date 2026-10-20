@@ -931,7 +931,7 @@ export function ConversionTable<T extends ConversionRow>({
                 role="row"
                 aria-selected={rowIndex === cursor}
                 data-row={row.id}
-                className="relative col-span-7 grid grid-cols-subgrid items-center"
+                className="col-span-7 grid grid-cols-subgrid items-center"
               >
                 {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys act; a click keeps focus there */}
                 <div

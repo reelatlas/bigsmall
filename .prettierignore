@@ -9,3 +9,8 @@ pnpm-lock.yaml
 # A research record kept as delivered (docs/research/shoe-sizes-2.md §7, the manual capture)
 docs/research/shoe-sizes-2/manual/brand-charts.json
 docs/research/shoe-sizes-2/manual/brand-charts-check.html
+
+# Written by docs/research/shoe-sizes-2/brands.py (the brands' charts record, wave 3)
+docs/research/shoe-sizes-2/brands.json
+docs/research/shoe-sizes-2/deltas.csv
+docs/research/shoe-sizes-2/deltas.md

@@ -146,17 +146,15 @@ export function UnitMatches({
   /** The line's words, which name the hidden matches' list. */
   const lineId = `${groupId}-line`;
   /**
-   * A unit's symbol and name, as every match writes them; the name for screen readers alone with
-   * Symbol only. A pair by its name alone, shown whatever the setting (ADR 0026).
+   * A unit's symbol and name, as every match writes them, a pair's too (ADR 0026; Sean,
+   * 2026-10-19); the name for screen readers alone with Symbol only.
    */
   const unitText = (unit: Unit) => (
     <>
-      {!unit.pair && (
-        <span className={unitSymbol()} data-symbol>
-          <MatchedText text={unit.symbol} query={query} className="text-ink" />
-        </span>
-      )}
-      <span className={unitName(!symbolOnly || Boolean(unit.pair))} data-name>
+      <span className={unitSymbol()} data-symbol>
+        <MatchedText text={unit.symbol} query={query} className="text-ink" />
+      </span>
+      <span className={unitName(!symbolOnly)} data-name>
         <MatchedText text={unit.plural} query={query} className="font-semibold" />
       </span>
     </>
@@ -325,15 +323,13 @@ export function UnitMatches({
                       rowFill(false, index === cursor),
                     )}
                   >
-                    {!match.unit.pair && (
-                      <span className={unitSymbol()} data-symbol>
-                        <MatchedText text={match.unit.symbol} query={query} className="text-ink" />
-                      </span>
-                    )}
+                    <span className={unitSymbol()} data-symbol>
+                      <MatchedText text={match.unit.symbol} query={query} className="text-ink" />
+                    </span>
                     {/* Where the name and its category share no line, the category goes under
                         it: the name is never cut short. */}
                     <span className="flex min-w-0 flex-wrap items-baseline gap-x-2">
-                      <span className={unitName(!symbolOnly || Boolean(match.unit.pair))} data-name>
+                      <span className={unitName(!symbolOnly)} data-name>
                         <MatchedText
                           text={match.unit.plural}
                           query={query}

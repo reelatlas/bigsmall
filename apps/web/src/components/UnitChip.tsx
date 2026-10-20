@@ -23,7 +23,7 @@ interface ChipProps {
 }
 
 /**
- * A unit's chip, its symbol and then its name; or, Cooking's second pill (ADR 0021), an
+ * A unit's chip, its symbol and then its name, a pair's too; or, Cooking's second pill (ADR 0021), an
  * ingredient's, its name, which gives way to the number by truncating where the box is narrow, and
  * never goes compact, then a chevron: its body opens every ingredient to choose from, and
  * `expanded` turns the chevron over while they show (a trial, Sean, 2026-10-16).
@@ -82,9 +82,11 @@ export function UnitChip({
       >
         {unit ? (
           <span className={BODY}>
-            {/* A pair shows its name alone (ADR 0026): its symbol would only repeat the value's words. */}
-            {!unit.pair && <span className={unitSymbol(compact)}>{unit.symbol}</span>}
-            <span ref={nameRef ?? null} hidden={compact && !unit.pair}>
+            {/* A pair's chip is every chip's, symbol then name (Sean, 2026-10-19). The name's
+                `hidden` is the fit's own, which measures by writing it: an element rendered
+                otherwise keeps the fit's write (docs/LEARNINGS.md, 2026-10-19). */}
+            <span className={unitSymbol(compact)}>{unit.symbol}</span>
+            <span ref={nameRef ?? null} hidden={compact}>
               {name}
             </span>
           </span>

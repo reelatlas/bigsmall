@@ -2018,27 +2018,37 @@ test('a side panel opened under a stuck head sticks beside it from md, and below
   }
 });
 
-test('a height: "5\'11" offers feet and inches by name, Enter takes it, and the pair row writes the total split in the pair’s own marks (ADR 0026)', async ({
+test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row writes the total split in the pair’s own marks, its name beside it (ADR 0026)', async ({
   page,
 }) => {
   await page.goto('/');
   await ready(page);
   await box(page).fill("5'11");
-  // The compound names its pair: the one match, by its name alone.
+  // The compound names its pair: the one match, its symbol and its name as every match.
   await expect(matches(page).getByRole('option')).toHaveCount(1);
   await expect(matches(page).getByRole('option').first()).toContainText('feet and inches');
-  await expect(matches(page).getByRole('option').first()).not.toContainText('ft in');
+  await expect(matches(page).getByRole('option').first()).toContainText('ft in');
   await box(page).press('Enter');
   await expect(page.getByRole('button', { name: 'Remove feet and inches' })).toBeVisible();
+  // The chip is every unit's: the symbol, then the name where the box has the room; the
+  // placeholder says Number as for any unit (the hundredth pass).
+  const chip = page.getByRole('button', { name: 'Unit: feet and inches' });
+  await expect(chip.getByText('ft in', { exact: true }).first()).toBeVisible();
   await expect(box(page)).toHaveValue("5'11");
-  await expect(box(page)).toHaveAttribute('placeholder', 'Feet and inches');
+  await expect(box(page)).toHaveAttribute('placeholder', 'Number');
   // No quiet line: the chip and the table say what was read (the ninety-eighth pass).
   await expect(page.locator('[data-read]')).toHaveCount(0);
-  // The pair's row sits under Mixed units, its value in the marks people write, no symbol and no
-  // name beside it; the single units read as before.
+  // The pair's row sits under Mixed units, its value in the marks people write, no symbol (the
+  // marks are the value's) and its name in the names' column, a column of its own to the fit,
+  // which gives way before the names do: the single units read as before, their names kept.
   await expect(row(page, 'foot-inch')).toContainText('5′ 11.00″');
   await expect(row(page, 'foot-inch').locator('[data-symbol]')).toHaveText('');
-  await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveCount(0);
+  await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveText('feet and inches');
+  await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveAttribute(
+    'data-column',
+    'pair',
+  );
+  await expect(row(page, 'inch').locator('[data-name]')).toBeVisible();
   expect(await sectionIds(page)).toEqual(['us', 'metric', 'other', 'mixed']);
   await expect(page.locator('[data-row]').first()).toHaveAttribute('data-row', 'inch');
   await expect(row(page, 'centimeter')).toContainText('180.34');
@@ -2051,6 +2061,9 @@ test('a height: "5\'11" offers feet and inches by name, Enter takes it, and the 
   await expect(row(page, 'foot-inch')).toContainText('5′ 10.87″');
   await unitCell(page, 'foot-inch').click();
   await expect(box(page)).toHaveValue('5′ 10.86614173″');
+  // The chip keeps its symbol where the long number takes the name's room: never a blank chip
+  // (Sean's iPhone, 2026-10-19).
+  await expect(chip.getByText('ft in', { exact: true }).first()).toBeVisible();
   await expect(row(page, 'centimeter')).toContainText('180.00');
   // A duration as a stopwatch writes it: 1h30 is 1:30:00.
   await box(page).fill('1h30');

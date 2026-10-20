@@ -158,8 +158,8 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * the spare width, on the right, the symbol right-aligned in its column, an exponent hanging after
  * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
  * left-aligned in its own; the copied check flashing over its end. The names keep to one
- * line: where one would not fit beside its value (a long value on a phone), the names give way in
- * every row (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the
+ * line: where one would not fit beside its value (a long value on a phone), the pairs' names give
+ * way first, then every name (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the
  * value's columns, the symbol and the name centred beside both lines. The unit's cell has no column gap,
  * since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2). Seven
  * columns, so a row spans col-span-7.
@@ -167,8 +167,12 @@ export interface ConversionTableProps<T extends ConversionRow> {
 const ROWS =
   'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
 
-/** The columns that give way when a row has no room for them, in that order (useColumnsFit). */
-const GIVE_WAY = ['name', 'second'] as const;
+/**
+ * The columns that give way when a row has no room for them, in that order (useColumnsFit): the
+ * pairs' names first, the table's longest (hours, minutes, and seconds), so the single units keep
+ * theirs; then every name; then Both's fraction (Sean, 2026-10-19).
+ */
+const GIVE_WAY = ['pair', 'name', 'second'] as const;
 
 /** A symbol's trailing exponent, set in a column of its own: "km²" is "km" and "²". */
 const EXPONENT = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+$/u;
@@ -429,6 +433,7 @@ export function ConversionTable<T extends ConversionRow>({
   const gridRef = useRef<HTMLDivElement>(null);
   const fitted = useColumnsFit(gridRef, GIVE_WAY);
   const namesHidden = fitted.includes('name');
+  const pairNamesHidden = fitted.includes('pair');
   const secondHidden = fitted.includes('second');
   const withNames = display.names === 'both';
   const both = display.format === 'both';
@@ -572,15 +577,16 @@ export function ConversionTable<T extends ConversionRow>({
           {exponent}
         </span>
         {!row.pair && <span className="sr-only">{row.symbol}</span>}
-        {/* A pair's value names itself (5′ 11″, 11 st 4 lb): no name in the table, so the
-            pairs' long names never widen the column every section shares (ADR 0026). */}
-        {withNames && !row.pair ? (
+        {/* A pair's name sits in the names' column as every row's does, and gives way first: the
+            table's longest, it goes before the single units' names do, the value then its own
+            label (5′ 11″, 11 st 4 lb) (ADR 0026; Sean, 2026-10-19). */}
+        {withNames ? (
           <span
             aria-hidden="true"
-            hidden={namesHidden}
+            hidden={row.pair ? pairNamesHidden : namesHidden}
             className={cx(NAME_CELL, 'text-ink', tall)}
             data-name
-            data-column="name"
+            data-column={row.pair ? 'pair' : 'name'}
           >
             {row.name}
           </span>
@@ -666,13 +672,23 @@ export function ConversionTable<T extends ConversionRow>({
         {stack((row) => splitExponent(row.pair ? '' : row.symbol)[1])}
       </span>
       {withNames && (
-        <span
-          hidden={namesHidden}
-          className={cx(NAME_CELL, 'col-start-7 row-start-1')}
-          data-column="name"
-        >
-          {stack((row) => (row.pair ? '' : row.name))}
-        </span>
+        <>
+          <span
+            hidden={namesHidden}
+            className={cx(NAME_CELL, 'col-start-7 row-start-1')}
+            data-column="name"
+          >
+            {stack((row) => (row.pair ? '' : row.name))}
+          </span>
+          {/* The pairs' names, a column of their own, which gives way before the names do. */}
+          <span
+            hidden={pairNamesHidden}
+            className={cx(NAME_CELL, 'col-start-7 row-start-1')}
+            data-column="pair"
+          >
+            {stack((row) => (row.pair ? row.name : ''))}
+          </span>
+        </>
       )}
     </div>
   );

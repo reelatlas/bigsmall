@@ -1163,15 +1163,9 @@ export function TableLayout({
               locale={env.locale}
               unit={box.unit}
               ingredient={box.ingredient}
-              // What the field takes, never a value it might be mistaken for; a pair, by its
-              // name, since it takes its parts ("Feet and inches").
-              placeholder={
-                box.unit
-                  ? box.unit.pair
-                    ? box.unit.plural.charAt(0).toUpperCase() + box.unit.plural.slice(1)
-                    : 'Number'
-                  : 'Number or unit'
-              }
+              // What the field takes, never a value it might be mistaken for; a pair's box says
+              // Number as any unit's does, the chip naming the pair (Sean, 2026-10-19).
+              placeholder={box.unit ? 'Number' : 'Number or unit'}
               describedBy={describedBy}
               popup={{
                 expanded: rowCount > 0,

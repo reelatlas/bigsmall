@@ -684,13 +684,16 @@ describe('shoe sizes (ADR 0027)', () => {
     expect(row(table, 'eu')).toMatchObject({ text: '44', value: 44, approx: true, stepped: true });
     expect(row(table, 'mondopoint')).toMatchObject({ text: '280', approx: true });
     expect(row(table, 'japan')).toMatchObject({ text: '28', approx: true });
-    // An adult's foot is outside the children's table.
+    // An adult's foot is beyond the children's table: the row says where each scale ends, in
+    // place of a size no shoe is marked in (Sean, 2026-10-20; "Out of range" until then).
     expect(row(table, 'us-children')).toMatchObject({
-      text: 'Out of range',
-      tone: 'message',
+      text: '> 13.5',
+      tone: 'beyond',
       value: null,
+      approx: false,
     });
-    expect(row(table, 'eu-children')).toMatchObject({ tone: 'message' });
+    expect(row(table, 'uk-children')).toMatchObject({ text: '> 13.5', tone: 'beyond' });
+    expect(row(table, 'eu-children')).toMatchObject({ text: '> 38', tone: 'beyond' });
     expect(table.sections.map((section) => section.label)).toEqual([
       'US (customary)',
       'Metric',
@@ -713,9 +716,17 @@ describe('shoe sizes (ADR 0027)', () => {
     expect(row(child, 'eu')).toMatchObject({ text: '24.5', approx: true });
     const between = units(type('151 mm'), { type: 'use', unit: 'mondopoint', text: '151' });
     expect(row(between, 'us-children')).toMatchObject({ text: '8', approx: true });
+    // A small foot is below the scales: where each begins.
+    const small = units(type('100 mm'), { type: 'use', unit: 'mondopoint', text: '100' });
+    expect(row(small, 'us-children')).toMatchObject({ text: '< 4', tone: 'beyond', value: null });
+    expect(row(small, 'uk-children')).toMatchObject({ text: '< 3.5', tone: 'beyond' });
+    expect(row(small, 'eu-children')).toMatchObject({ text: '< 19.5', tone: 'beyond' });
+    // A size outside its own scale: the box's row as typed, the others waiting with dashes, and
+    // the live region saying the scale's span.
     const outside = units(type('20'), { type: 'use', unit: 'us-children', text: '20' });
     expect(row(outside, 'us-children')).toMatchObject({ text: '20', inBox: true });
-    expect(row(outside, 'us-men')).toMatchObject({ text: 'Out of range', tone: 'message' });
-    expect(row(outside, 'mondopoint')).toMatchObject({ tone: 'message' });
+    expect(row(outside, 'us-men')).toMatchObject({ text: NO_VALUE, tone: 'empty', value: null });
+    expect(row(outside, 'mondopoint')).toMatchObject({ tone: 'empty' });
+    expect(outside.announcement).toBe('US children runs 4 to 13.5');
   });
 });

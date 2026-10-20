@@ -873,8 +873,8 @@ export function TableLayout({
   /**
    * Enter or a click on what the cursor is on. A row of the units moves into the box with its
    * value, to the 10 digits a box shows, as if it had been typed, or with the number as typed
-   * while the rows are dashes; a match moves in with the number as typed; a category, a tile or
-   * a match, opens it.
+   * while the rows are dashes, or, beyond its scale, with the number cleared; a match moves in
+   * with the number as typed; a category, a tile or a match, opens it.
    */
   const takeRow = (index: number) => {
     if (table.kind === 'start') {
@@ -901,6 +901,9 @@ export function TableLayout({
       const row = table.rows[index];
       if (!row || row.tone === 'message') return;
       if (row.inBox) setPosition(null);
+      // A row beyond its scale (ADR 0027): its scale comes into the box with the number cleared,
+      // for a size of its own to be typed.
+      else if (row.tone === 'beyond') take(row.unit.id, '');
       // Its unit: a change row's is its scale's (Temperature's As a change).
       else if (row.value === null) take(row.unit.id, number);
       // A pace comes into the box as the row writes it, minutes and seconds (5:30).

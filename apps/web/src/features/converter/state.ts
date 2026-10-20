@@ -9,6 +9,7 @@ import {
   formatClock,
   formatNumber,
   formatPair,
+  fromBase,
   getCategory,
   getIngredient,
   getUnit,
@@ -285,7 +286,7 @@ export function pairText(
  * Why a conversion has no answer to show: beyond what a double holds, rounded to zero, arithmetic
  * with no answer (a division by zero, a power with no real value), or 0 in a reciprocal unit.
  */
-type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real' | 'zero' | 'range';
+type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real' | 'zero';
 
 /**
  * What the converter says when there is no answer to show (docs/UX-SPEC.md §1, §8): in full in
@@ -297,7 +298,6 @@ export const NO_ANSWER_MESSAGES: Record<NoAnswer, { long: string; short: string 
   'divide-by-zero': { long: 'Can’t divide by zero', short: 'Can’t divide by zero' },
   'not-real': { long: 'No real answer', short: 'No real answer' },
   zero: { long: 'Undefined for 0', short: 'Undefined for 0' },
-  range: { long: 'Outside its range', short: 'Out of range' },
 };
 
 /** What the matches say when a typed unit matches nothing (docs/UX-SPEC.md §1). */
@@ -334,10 +334,13 @@ export interface TableRow {
   /** As the row shows it: TABLE_PRECISION significant digits, "Too large" or "Too small", or NO_VALUE. */
   text: string;
   /**
-   * What the text is: a value; a dash, while there is no number or no unit to convert from; or a
-   * message, when a double cannot hold the value and there is nothing to copy or move.
+   * What the text is: a value; a dash, while there is no number or no unit to convert from; a
+   * message, when a double cannot hold the value and there is nothing to copy or move; or
+   * beyond, where the value lies past the row's scale (a children's table, ADR 0027): the text
+   * says where the scale ends ("> 13.5"), and taking the row brings its unit with the number
+   * cleared, for a size of its own.
    */
-  tone: 'value' | 'empty' | 'message';
+  tone: 'value' | 'empty' | 'message' | 'beyond';
   /** The unit in the box. */
   inBox: boolean;
   /** A pace's value, in minutes and seconds (5:30), whatever the display's places or fractions. */
@@ -816,14 +819,26 @@ function selectUnits(
   }
 
   const value = parsed.value;
-  const view = arranged(listed.map((target) => valueRow(target, unit, value, options.locale)));
+  // A size outside its own scale (US C 20; ADR 0027): the other rows wait with dashes, a click on
+  // one taking its unit with the number as typed, and the live region says the scale's span.
+  const span = beyondOwnScale(unit, value) ? scaleSpan(unit, options.locale) : null;
+  const view = arranged(
+    listed.map((target) =>
+      span !== null && target.id !== unit.id
+        ? emptyRow(target, unit)
+        : valueRow(target, unit, value, options.locale),
+    ),
+  );
   const from = spokenAmount(parsed, unit, options.locale);
   return {
     ...base,
     ...withChange(view),
     message: null,
     note,
-    announcement: `${from} in ${view.rows.length} units of ${kind}`,
+    announcement:
+      span !== null
+        ? `${unit.name} runs ${span}`
+        : `${from} in ${view.rows.length} units of ${kind}`,
   };
 }
 
@@ -885,6 +900,10 @@ function valueRow(
   locale: string | undefined,
   converter: Converter = safeConvert,
 ): TableRow {
+  // A foot beyond the row's scale (a children's table, ADR 0027): the row says where the scale
+  // ends, "> 13.5" or "< 4", in place of a size no shoe is marked in.
+  const beyond = target.id === from.id ? null : beyondScale(from, target, value, locale);
+  if (beyond !== null) return { ...emptyRow(target, from), text: beyond, tone: 'beyond' };
   const exact = target.id === from.id ? value : converter(value, from, target);
   // A size is written to its scale's step, ≈ where that moved it (ADR 0027): the row's value is
   // the size itself, so it copies and moves into the box as it shows; the box's own row echoes
@@ -905,17 +924,8 @@ function valueRow(
   const tooSmall = converted === 0 && value !== 0;
   const shown = text && !tooSmall ? (converted ?? null) : null;
   // 0 in a reciprocal unit has no value in the others: 0 mpg is no distance at all, so no L/100 km.
-  // A foot outside a children's table, or a size outside its scale, has no size in it (ADR 0027).
   const problem: NoAnswer | null =
-    target.id !== from.id && outsideRange(from, target, value)
-      ? 'range'
-      : shown !== null
-        ? null
-        : tooSmall
-          ? 'small'
-          : value === 0
-            ? 'zero'
-            : 'large';
+    shown !== null ? null : tooSmall ? 'small' : value === 0 ? 'zero' : 'large';
   return {
     unit: target,
     id: target.id,
@@ -936,22 +946,58 @@ function valueRow(
 }
 
 /**
- * Whether the value, in the base unit, lies outside the span a table defines a unit over (ADR
- * 0027): the row's unit's, or the box's unit's, whose size then has no foot to convert from.
+ * Where a scale ends (ADR 0027): the size at its range's low or high end, read through the unit
+ * and rounded inward to its step, since the range lies half a row past the table (US children's
+ * 4 and 13.5), written for the locale.
  */
-function outsideRange(from: Unit, target: Unit, value: number): boolean {
-  if (!from.range && !target.range) return false;
-  let base: number;
+function scaleEnd(unit: Unit, end: 'low' | 'high', locale: string | undefined): string {
+  const at = unit.range
+    ? fromBase(unit, end === 'low' ? unit.range[0] : unit.range[1])
+    : Number.NaN;
+  const marked =
+    unit.step === undefined
+      ? at
+      : (roundToStep(at, unit.step, end === 'low' ? 'up' : 'down')?.value ?? at);
+  return formatNumber(marked, { precision: TABLE_PRECISION, locale });
+}
+
+/** A scale's span, "4 to 13.5", for the live region. */
+function scaleSpan(unit: Unit, locale: string | undefined): string {
+  return `${scaleEnd(unit, 'low', locale)} to ${scaleEnd(unit, 'high', locale)}`;
+}
+
+/** The value in the base unit, or null where the unit cannot read it. */
+function baseOf(unit: Unit, value: number): number | null {
   try {
-    base = toBase(from, value);
+    return toBase(unit, value);
   } catch {
-    return false;
+    return null;
   }
-  const beyond = (range: readonly [number, number]) => base < range[0] || base > range[1];
-  return (
-    (from.range !== undefined && beyond(from.range)) ||
-    (target.range !== undefined && beyond(target.range))
-  );
+}
+
+/** Whether a size lies outside its own unit's scale (US C 20). */
+function beyondOwnScale(unit: Unit, value: number): boolean {
+  if (!unit.range) return false;
+  const base = baseOf(unit, value);
+  return base !== null && (base < unit.range[0] || base > unit.range[1]);
+}
+
+/**
+ * Where the row's scale ends, for a value beyond it (ADR 0027): "> 13.5" past its largest size,
+ * "< 4" below its smallest, in the form a value under a step takes ("< 0.01"); null for a value
+ * within it, or a unit with no range.
+ */
+function beyondScale(
+  from: Unit,
+  target: Unit,
+  value: number,
+  locale: string | undefined,
+): string | null {
+  if (!target.range) return null;
+  const base = baseOf(from, value);
+  if (base === null || (base >= target.range[0] && base <= target.range[1])) return null;
+  const past = base > target.range[1];
+  return `${past ? '>' : '<'} ${scaleEnd(target, past ? 'high' : 'low', locale)}`;
 }
 
 function emptyRow(target: Unit, inBox: Unit | null): TableRow {

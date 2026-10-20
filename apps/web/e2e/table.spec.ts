@@ -1444,8 +1444,8 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await expect(row(page, 'eu')).toContainText('≈');
   await expect(row(page, 'eu')).toContainText('44');
   await expect(row(page, 'mondopoint')).toContainText('280');
-  // An adult's foot is outside the children's table.
-  await expect(row(page, 'us-children')).toContainText('Out of range');
+  // An adult's foot is beyond the children's table: the row says where the scale ends.
+  await expect(row(page, 'us-children')).toContainText('> 13.5');
   await expect(page.getByText(/^ISO 19407/)).toBeVisible();
   // A size moves into the box as the row writes it.
   await unitCell(page, 'eu').click();
@@ -1472,6 +1472,13 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
       }),
     );
   expect(new Set(rights).size).toBe(1);
+  // A row beyond its scale, taken, brings the scale into the box with the number cleared, for a
+  // size of its own, the rows waiting with dashes (Sean, 2026-10-20).
+  await expect(row(page, 'us-children')).toContainText('> 13.5');
+  await unitCell(page, 'us-children').click();
+  await expect(page.getByRole('button', { name: 'Remove US children' })).toBeVisible();
+  await expect(box(page)).toHaveValue('');
+  await expect(row(page, 'us-men')).toContainText('—');
 });
 
 test('a temperature is said as a change too, after the readings: 5 °C warmer is 9 °F warmer', async ({

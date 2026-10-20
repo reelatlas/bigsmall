@@ -50,10 +50,12 @@ interface ConversionRow {
   value: number | null;
   symbol: string;
   /**
-   * What the text is: a value; a dash, while there is no number or no unit to convert from; or a
-   * message, in the danger color. Only a value can be copied.
+   * What the text is: a value; a dash, while there is no number or no unit to convert from; a
+   * message, in the danger color; or beyond, a value past the row's scale (ADR 0027), its text
+   * where the scale ends ("> 13.5") in the muted ink, written across as a message is. Only a
+   * value can be copied; a row beyond its scale is taken, as the layout decides.
    */
-  tone: 'value' | 'empty' | 'message';
+  tone: 'value' | 'empty' | 'message' | 'beyond';
   /** The unit in the box: marked in the accent's soft fill. */
   inBox: boolean;
   /**
@@ -201,6 +203,7 @@ const TONE: Record<ConversionRow['tone'], string> = {
   value: 'text-ink',
   empty: 'text-ink-muted',
   message: NO_ANSWER,
+  beyond: 'text-ink-muted',
 };
 
 /** A decimal's whole part, and the rest from its decimal mark; a value written whole spans both. */

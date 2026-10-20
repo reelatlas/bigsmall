@@ -37,7 +37,7 @@ import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
 import { useKept } from '../../lib/keeping';
 import { useRefit } from '../../lib/fit-step';
-import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID, QUIET_LINK } from '../../lib/recipes';
+import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
 import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
@@ -108,12 +108,6 @@ const TABLE_LEADING = 'flex shrink-0 items-center gap-1';
 const TABLE_TOOLS = 'ml-auto flex shrink-0 items-center gap-1';
 /** The box's row in the head. */
 const TABLE_BOX_CELL = 'md:row-start-2';
-/**
- * The quiet line under the box (docs/UX-SPEC.md §5; ADR 0026): what a compound was read as, 8 px
- * under the box, set in to the box's text, in the muted ink at the small size; the other reading,
- * where there is one, a quiet link after it. Part of the head, so it stays with the box.
- */
-const READ_LINE = 'mt-2 flex flex-wrap items-baseline gap-x-3 px-4 text-sm text-ink-muted';
 /**
  * 8 px under the box, its popup, as the toolbar sits 8 px over it; a container, so the categories
  * go four across once it has the room. Under an open side panel (below md) the panel's own 16 px
@@ -258,7 +252,6 @@ export function TableLayout({
 }: TableLayoutProps) {
   const listId = useId();
   const hiddenListId = `${listId}-hidden`;
-  const readId = `${listId}-read`;
   const itemId = (index: number) => `${listId}-item-${index}`;
   /**
    * Cooking's ingredients, listed in the table's place while the ingredient's pill holds them open
@@ -1182,8 +1175,7 @@ export function TableLayout({
                     : 'Number'
                   : 'Number or unit'
               }
-              // The quiet line describes the field too, so a screen reader hears the reading.
-              describedBy={box.read ? `${describedBy} ${readId}` : describedBy}
+              describedBy={describedBy}
               popup={{
                 expanded: rowCount > 0,
                 controls,
@@ -1238,26 +1230,6 @@ export function TableLayout({
                 if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
               }}
             />
-            {/* The quiet line (ADR 0026): what was read, and the other reading one press away, as
-                one undoable step, the caret back in the box after a click. */}
-            {box.read && (
-              <p id={readId} className={READ_LINE} data-read>
-                <span>Read as {box.read.text}</span>
-                {box.read.alternate && (
-                  <button
-                    type="button"
-                    className={QUIET_LINK}
-                    onClick={() => {
-                      const { text, unit } = box.read!.alternate!;
-                      take(unit, text);
-                      if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
-                    }}
-                  >
-                    Read as {box.read.alternate.text} instead
-                  </button>
-                )}
-              </p>
-            )}
           </div>
         </div>
         {side && (

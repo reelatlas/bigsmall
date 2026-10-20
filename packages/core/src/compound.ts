@@ -401,6 +401,8 @@ export interface PairFormat {
   sizes?: ReadonlySet<FractionSize> | undefined;
   /** With neither, the whole quantity to these significant digits, trailing zeros trimmed. */
   significant?: number | undefined;
+  /** The parts' symbols with spaces whatever the pair's notation ("5 ft 11 in"): for speech. */
+  words?: boolean | undefined;
 }
 
 /** A pair split into its parts after rounding, for a writer to spell. */
@@ -492,6 +494,38 @@ function withSymbol(number: string, unit: Unit): string {
   return ATTACHED_SYMBOL.test(unit.symbol) ? `${number}${unit.symbol}` : `${number} ${unit.symbol}`;
 }
 
+/** A number of a part as the pair writes it: its mark attached where the pair has marks, else its symbol. */
+function withNotation(number: string, unit: Unit, mark: string | undefined): string {
+  return mark === undefined ? withSymbol(number, unit) : `${number}${mark}`;
+}
+
+/**
+ * A pair written as a clock: the first part, then two digits for each part after it, to the whole
+ * last part (1:30:00), whatever places or sizes are chosen, as a pace is written to the second;
+ * the sign before it, and a value under a second said as below it ("< 0:00:01").
+ */
+function clockText(
+  value: number,
+  parts: readonly Unit[],
+  rounding: Rounding,
+  locale: string | undefined,
+): Rounded | null {
+  const split = splitPair(value, parts, { rounding, places: 0 });
+  if (!split) return null;
+  const two = numberFormat(locale, { minimumIntegerDigits: 2, useGrouping: false });
+  const one = numberFormat(locale, { useGrouping: false });
+  const written = (counts: readonly number[]) =>
+    counts.map((count, at) => (at === 0 ? one.format(count) : two.format(count))).join(':');
+  if (split.below !== null) {
+    const step = written(parts.map((_, at) => (at === parts.length - 1 ? 1 : 0)));
+    return { text: value > 0 ? `< ${step}` : `> ${minusSign(locale)}${step}`, approx: false };
+  }
+  return {
+    text: `${split.negative ? minusSign(locale) : ''}${written(split.counts)}`,
+    approx: false,
+  };
+}
+
 /**
  * A pair's value written as its parts (docs/UX-SPEC.md §7): the total rounded to the display's
  * step in the last part, then split, so 71.996 in reads "6 ft 0 in", never 5 ft 12 in; every
@@ -499,32 +533,46 @@ function withSymbol(number: string, unit: Unit): string {
  * before the whole ("−5 ft 11 in"); the last part to the places chosen, as a fraction in the
  * sizes chosen ("5 ft 10 7/8 in", "≈" where it rounds), or, with neither, to the significant
  * digits asked for (the table's six, the box's ten). A nonzero total that rounds to zero reads
- * below the step ("< 0.01 in"). Null for a unit that is no pair, a value too large for places to
- * mean anything, or no fraction size chosen.
+ * below the step ("< 0.01 in"). Written in the pair's own notation where it has one (Sean,
+ * 2026-10-19): the marks attached ("5′ 11″", "5′ 10 7/8″") or a clock ("1:30:00"), the symbols
+ * with spaces otherwise ("11 st 4 lb") and with `words` (for speech). Null for a unit that is no
+ * pair, a value too large for places to mean anything, or no fraction size chosen.
  */
 export function formatPair(value: number, unit: Unit, options: PairFormat): Rounded | null {
   const parts = pairParts(unit);
   if (parts.length < 2 || !Number.isFinite(value)) return null;
+  const { locale } = options;
+  const notation = options.words ? undefined : unit.notation;
+  if (notation === 'clock') return clockText(value, parts, options.rounding, locale);
+  const mark = (at: number) =>
+    notation === undefined ? undefined : (notation[at] ?? parts[at]!.symbol);
   const split = splitPair(value, parts, options);
   if (!split) return null;
-  const { locale } = options;
   const last = parts[parts.length - 1]!;
   if (split.below !== null) {
-    const step = withSymbol(split.below.replace('.', decimalMark(locale)), last);
+    const step = withNotation(
+      split.below.replace('.', decimalMark(locale)),
+      last,
+      mark(parts.length - 1),
+    );
     return { text: value > 0 ? `< ${step}` : `> ${minusSign(locale)}${step}`, approx: false };
   }
   const whole = numberFormat(locale, { useGrouping: true });
   const words = parts.map((part, at) => {
     const count = whole.format(split.counts[at]!);
-    if (at < parts.length - 1) return withSymbol(count, part);
+    if (at < parts.length - 1) return withNotation(count, part, mark(at));
     if (split.rest.kind === 'decimals') {
       const digits = split.rest.digits;
-      return withSymbol(digits ? `${count}${decimalMark(locale)}${digits}` : count, part);
+      return withNotation(
+        digits ? `${count}${decimalMark(locale)}${digits}` : count,
+        part,
+        mark(at),
+      );
     }
     const { n, d } = split.rest;
     const fraction = n ? `${n}/${d}` : '';
     const number = [split.counts[at] ? count : '', fraction].filter(Boolean).join(' ') || count;
-    return withSymbol(number, part);
+    return withNotation(number, part, mark(at));
   });
   const sign = split.negative ? minusSign(locale) : '';
   return { text: `${sign}${words.join(' ')}`, approx: split.approx };

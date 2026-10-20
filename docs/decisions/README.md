@@ -31,7 +31,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0023](0023-toolbar-one-row.md)                 | The toolbar is one row: a touch screen scrolls it, a pointer gets More                         | accepted                                                                          |
 | [0024](0024-feedback-through-a-form-service.md) | Feedback through a form service (Formspark): the About page's form posts to it, which mails us | accepted                                                                          |
 | [0025](0025-scroll-anchoring-opt-out.md)        | The page opts out of scroll anchoring: what must stay put is kept by hand, in every engine     | accepted                                                                          |
-| [0026](0026-compound-quantities.md)             | Compound quantities: one grammar reads them, and a pair is a unit of its own                   | accepted; amends 0011 and 0019                                                    |
+| [0026](0026-compound-quantities.md)             | Compound quantities: one grammar reads them, and a pair is a unit of its own                   | accepted; amends 0011 and 0019; amended 2026-10-19                                |
 
 ## Template
 

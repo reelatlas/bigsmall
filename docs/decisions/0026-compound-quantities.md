@@ -1,7 +1,7 @@
 # 0026 — Compound quantities: one grammar reads them, and a pair is a unit of its own
 
 Date: 2026-10-19
-Status: accepted
+Status: accepted; amended 2026-10-19 (the ninety-eighth pass)
 
 ## Context
 
@@ -31,3 +31,7 @@ People type a height as `5'11`, `5 ft 11 in`, or `5ft11`, a body weight as `11 s
 - The URL's `v` may now hold spaces and a unit's words (`v=5+ft+11+in`); a link read back takes the visitor's decimal mark in every part.
 - The connective form (`5 ml to cups`, docs/UX-SPEC.md §14) stays planned: a compound's trailing `to cm` is a query that matches nothing until it lands.
 - The pair pages of the SEO plan (docs/SEO.md §5) can open on a pair (`/feet-and-inches-to-cm/`, the heights grid), the box reading what the page's visitor types.
+
+## Amendments
+
+- **2026-10-19** (the ninety-eighth pass, Sean's feedback on the built page). The pair row draws no symbol and writes its value in the pair's own notation (`notation` on the unit: marks attached, `5′ 11″`, or a clock, `1:30:00`; the weights with their spaced symbols), so the value column reads as numbers and nothing on the right repeats it; the chip and the match show the pair's name alone; speech and the URL keep the parts' words. The quiet line under the box was taken out: the chip and the table say what was read, and the decimal-feet offer waits on feedback (docs/UX-SPEC.md §14). Open with Sean: where the pair rows sit (their own section, "Mixed units", recommended) and how a row is copied (a double-tap, his lean).

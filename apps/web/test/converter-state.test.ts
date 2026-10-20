@@ -542,7 +542,6 @@ describe('compound quantities (ADR 0026)', () => {
     if (shown.kind !== 'matches') throw new Error(`expected matches, got ${shown.kind}`);
     return shown;
   };
-  const box = (...actions: Action[]) => selectBox(run(...actions), options);
 
   it('offers a compound’s pair as the match to take, first, with whatever a trailing query matches', () => {
     const height = matches(type("5'11"));
@@ -563,11 +562,11 @@ describe('compound quantities (ADR 0026)', () => {
     ).toMatchObject({ kind: 'unit', unit: { id: 'stone-pound' } });
   });
 
-  it('converts a compound from its pair, the pair’s row written as its parts, leading its section', () => {
+  it('converts a compound from its pair, the pair’s row written in its own marks, leading its section', () => {
     const t = units({ type: 'use', unit: 'foot-inch', text: "5'11" });
     const row = (id: string) => t.rows.find((each) => each.id === id)!;
     expect(row('foot-inch')).toMatchObject({
-      text: '5 ft 11 in',
+      text: '5′ 11″',
       inBox: true,
       pair: { id: 'foot-inch' },
     });
@@ -587,10 +586,10 @@ describe('compound quantities (ADR 0026)', () => {
 
   it('writes a pair row from any unit, the total rounded and split, six digits in the table’s own text', () => {
     const cm = units({ type: 'use', unit: 'centimeter', text: '180' });
-    expect(cm.rows.find((row) => row.id === 'foot-inch')?.text).toBe('5 ft 10.8661 in');
+    expect(cm.rows.find((row) => row.id === 'foot-inch')?.text).toBe('5′ 10.8661″');
     // A plain number in a pair's box is its first part: 6 in feet and inches is 6 ft.
     const six = units({ type: 'use', unit: 'foot-inch', text: '6' });
-    expect(six.rows.find((row) => row.id === 'foot-inch')?.text).toBe('6 ft 0 in');
+    expect(six.rows.find((row) => row.id === 'foot-inch')?.text).toBe('6′ 0″');
     expect(six.rows.find((row) => row.id === 'inch')?.text).toBe('72');
     // 11 st 4 is 158 lb: pounds and ounces in the US section, stone and pounds in the UK's.
     const stone = selectTable(run({ type: 'use', unit: 'stone-pound', text: '11 st 4' }), {
@@ -599,6 +598,10 @@ describe('compound quantities (ADR 0026)', () => {
     });
     if (stone.kind !== 'units') throw new Error(stone.kind);
     expect(stone.rows.find((row) => row.id === 'pound-ounce')?.text).toBe('158 lb 0 oz');
+    // A duration as a stopwatch writes it, spoken in its words.
+    const time = units({ type: 'use', unit: 'hour-minute-second', text: '1h30' });
+    expect(time.rows.find((row) => row.id === 'hour-minute-second')?.text).toBe('1:30:00');
+    expect(time.announcement).toBe(`1 h 30 min 0 s in ${time.rows.length} units of time`);
     expect(stone.rows.find((row) => row.id === 'kilogram')?.text).toBe('71.6676');
     expect(stone.sections.map((section) => section.label).slice(0, 2)).toEqual([
       'UK (imperial)',
@@ -607,36 +610,10 @@ describe('compound quantities (ADR 0026)', () => {
     expect(stone.sections[0]!.rows[0]!.id).toBe('stone-pound');
   });
 
-  it('reads the quiet line: what a compound was read as, normalised, and a decimal of feet’s other reading', () => {
-    expect(box(type("5'11")).read).toEqual({ text: '5 ft 11 in', alternate: null });
-    expect(box(type(`5' 14"`)).read).toEqual({ text: '6 ft 2 in', alternate: null });
-    expect(box(type('5 ft 11 1/2 in')).read?.text).toBe('5 ft 11.5 in');
-    // 5.11 ft is decimal feet, the pair one press away; in the pair's box too, where a plain
-    // number is feet.
-    const decimal = {
-      text: '5.11 ft, decimal feet',
-      alternate: { text: '5 ft 11 in', unit: 'foot-inch' },
-    };
-    expect(box({ type: 'use', unit: 'foot', text: '5.11' }).read).toEqual(decimal);
-    expect(box({ type: 'use', unit: 'foot-inch', text: '5.11' }).read).toEqual(decimal);
-    expect(box({ type: 'use', unit: 'foot', text: '5.5' }).read?.alternate?.text).toBe('5 ft 5 in');
-    expect(box({ type: 'use', unit: 'foot', text: '-5.11' }).read?.alternate?.text).toBe(
-      '-5 ft 11 in',
-    );
-    // Not where the decimals cannot be inches, nor in another unit, nor for arithmetic.
-    expect(box({ type: 'use', unit: 'foot', text: '5.50' }).read).toBeNull();
-    expect(box({ type: 'use', unit: 'foot', text: '5.12' }).read).toBeNull();
-    expect(box({ type: 'use', unit: 'foot', text: '6' }).read).toBeNull();
-    expect(box({ type: 'use', unit: 'centimeter', text: '5.11' }).read).toBeNull();
-    expect(box({ type: 'use', unit: 'foot', text: '5.11 + 1' }).read).toBeNull();
-    expect(box(type('180 cm')).read).toBeNull();
-  });
-
   it('keeps the compound as typed in the box, and the pair as the unit, through use and the URL’s hydrate', () => {
     const s = run(type("5'11"), { type: 'use', unit: 'foot-inch', text: "5'11" });
     expect(s).toMatchObject({ text: "5'11", unit: 'foot-inch', category: 'length' });
     const back = run({ type: 'hydrate', state: { text: '5 ft 11 in', unit: 'foot-inch' } });
     expect(selectBox(back, options).parsed.value).toBeCloseTo(5 + 11 / 12, 12);
-    expect(selectBox(back, options).read?.text).toBe('5 ft 11 in');
   });
 });

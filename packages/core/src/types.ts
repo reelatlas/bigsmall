@@ -111,6 +111,13 @@ interface UnitMeta {
    */
   pair?: readonly string[];
   /**
+   * How a pair is written where not by its parts' symbols (ADR 0026; Sean, 2026-10-19): a mark
+   * after each part, attached, in the parts' order (feet and inches: ′ ″, so 5′ 11″), or as a
+   * clock, the first part then two digits for each after it (hours, minutes, and seconds:
+   * 1:30:00). The URL and speech keep the parts' symbols ("5 ft 11 in").
+   */
+  notation?: readonly string[] | 'clock';
+  /**
    * A unit of one ingredient alone, as people count it (a stick of butter, a large egg; ADR 0021):
    * listed only with that ingredient, and taking it brings the ingredient.
    */

@@ -89,6 +89,8 @@ export const timeUnits: readonly Unit[] = [
     exact: true,
     source: SI_ACCEPTED,
     pair: ['hour', 'minute', 'second'],
+    // Written as a stopwatch writes it (1:30:00), which the box reads as a clock.
+    notation: 'clock',
     note: 'A duration in hours, minutes, and seconds, as a clock counts it.',
   },
   {

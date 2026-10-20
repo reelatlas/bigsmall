@@ -232,39 +232,21 @@ export interface NumberEnv {
   locale?: string | undefined;
 }
 
-/**
- * What the quiet line under the box says (docs/UX-SPEC.md §5; ADR 0026): how the text was read,
- * normalised ("5 ft 11 in" for "5'11", "6 ft 2 in" for 5' 14"), and, where another reading is
- * plausible, that reading one press away: a decimal number of feet whose decimals read as inches
- * (5.11 ft) offers 5 ft 11 in.
- */
-export interface BoxReading {
-  /** The reading, after "Read as": "5 ft 11 in"; "5.11 ft, decimal feet". */
-  text: string;
-  /** The other reading: the text and the unit a press puts in the box, as one step. */
-  alternate: { text: string; unit: string } | null;
-}
-
-/** The box as the field shows it: its text, its unit, the text as parsed, and how it was read. */
+/** The box as the field shows it: its text, its unit, and the text as parsed. */
 export interface BoxView {
   text: string;
   unit: Unit | null;
   /** The ingredient beside the unit, Cooking's second pill (ADR 0021). */
   ingredient: Ingredient | null;
   parsed: ParsedInput;
-  /** The quiet line's reading, where the text calls for one. */
-  read: BoxReading | null;
 }
 
 export function selectBox(state: ConverterState, options: NumberEnv): BoxView {
-  const unit = state.unit ? (getUnit(state.unit) ?? null) : null;
-  const parsed = parse(state.text, options.separators);
   return {
     text: state.text,
-    unit,
+    unit: state.unit ? (getUnit(state.unit) ?? null) : null,
     ingredient: state.ingredient ? (getIngredient(state.ingredient) ?? null) : null,
-    parsed,
-    read: boxReading(parsed, unit, options.locale),
+    parsed: parse(state.text, options.separators),
   };
 }
 
@@ -272,50 +254,27 @@ export function selectBox(state: ConverterState, options: NumberEnv): BoxView {
 export const BOX_PRECISION = 10;
 
 /**
- * A pair's value as its parts, to significant digits of the whole (formatPair): the table's six,
- * or the box's ten for the quiet line and a pair row moved into the box. Where the total is past
- * what places mean, the value in the pair's first part alone.
+ * A pair's value as its parts, to significant digits of the whole (formatPair), in the pair's own
+ * notation (5′ 11″), or in its parts' words for speech (`words`): the table's six, or the box's
+ * ten for a pair row moved into the box. Where the total is past what places mean, the value in
+ * the pair's first part alone.
  */
 export function pairText(
   value: number,
   unit: Unit,
   locale: string | undefined,
   digits: number = TABLE_PRECISION,
+  words = false,
 ): string {
-  const written = formatPair(value, unit, { rounding: 'nearest', significant: digits, locale });
+  const written = formatPair(value, unit, {
+    rounding: 'nearest',
+    significant: digits,
+    locale,
+    words,
+  });
   if (written) return written.text;
   const first = pairParts(unit)[0];
   return `${formatNumber(value, { precision: digits, locale })}${first ? ` ${first.symbol}` : ''}`;
-}
-
-/** The units a decimal of feet is read in: feet, and the pair, whose plain number is feet. */
-const FEET: ReadonlySet<string> = new Set(['foot', 'foot-inch']);
-/** A decimal whose decimals could be inches: one or two digits after the point. */
-const DECIMAL_FEET = /^(-?)([0-9]+)\.([0-9]{1,2})$/;
-
-function boxReading(
-  parsed: ParsedInput,
-  unit: Unit | null,
-  locale: string | undefined,
-): BoxReading | null {
-  if (parsed.compound) {
-    const pair = getUnit(parsed.compound.unit);
-    if (!pair || parsed.value === undefined) return null;
-    return { text: pairText(parsed.value, pair, locale, BOX_PRECISION), alternate: null };
-  }
-  // 5.11 ft is decimal feet, as Google reads it (the compound worker's pitfall, 2026-10-19), the
-  // pair one press away where the decimals read as 1 to 11 inches.
-  if (!unit || !FEET.has(unit.id) || parsed.expression || parsed.canonical === undefined) {
-    return null;
-  }
-  const match = DECIMAL_FEET.exec(parsed.canonical);
-  if (!match) return null;
-  const inches = Number(match[3]);
-  if (inches < 1 || inches > 11 || !getUnit('foot-inch')) return null;
-  return {
-    text: `${parsed.valueText ?? ''} ft, decimal feet`,
-    alternate: { text: `${match[1]}${Number(match[2])} ft ${inches} in`, unit: 'foot-inch' },
-  };
 }
 
 /**
@@ -1068,7 +1027,7 @@ function unitName(unit: Unit, value: number): string {
 function spokenAmount(parsed: ParsedInput, unit: Unit, locale: string | undefined): string {
   // A compound by its reading, which names its units already: "5 ft 11 in in 13 units of length".
   if (parsed.compound && parsed.value !== undefined && unit.pair) {
-    return pairText(parsed.value, unit, locale, BOX_PRECISION);
+    return pairText(parsed.value, unit, locale, BOX_PRECISION, true);
   }
   const typed =
     parsed.expression && parsed.value !== undefined

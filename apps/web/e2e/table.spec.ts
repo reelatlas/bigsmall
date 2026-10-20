@@ -2035,44 +2035,40 @@ test('a side panel opened under a stuck head sticks beside it from md, and below
   }
 });
 
-test('a height: "5\'11" offers feet and inches, the quiet line says what was read, Enter takes it, and the pair row writes the total split (ADR 0026)', async ({
+test('a height: "5\'11" offers feet and inches by name, Enter takes it, and the pair row writes the total split in the pair’s own marks (ADR 0026)', async ({
   page,
 }) => {
   await page.goto('/');
   await ready(page);
   await box(page).fill("5'11");
-  // The compound names its pair: the one match, and the quiet line under the box, while typing.
+  // The compound names its pair: the one match, by its name alone.
   await expect(matches(page).getByRole('option')).toHaveCount(1);
   await expect(matches(page).getByRole('option').first()).toContainText('feet and inches');
-  await expect(page.locator('[data-read]')).toHaveText('Read as 5 ft 11 in');
+  await expect(matches(page).getByRole('option').first()).not.toContainText('ft in');
   await box(page).press('Enter');
   await expect(page.getByRole('button', { name: 'Remove feet and inches' })).toBeVisible();
   await expect(box(page)).toHaveValue("5'11");
   await expect(box(page)).toHaveAttribute('placeholder', 'Feet and inches');
-  // The pair's row leads its section, written as its parts to Display's two places; the rest convert.
-  await expect(row(page, 'foot-inch')).toContainText('5 ft 11.00 in');
+  // No quiet line: the chip and the table say what was read (the ninety-eighth pass).
+  await expect(page.locator('[data-read]')).toHaveCount(0);
+  // The pair's row leads its section, its value in the marks people write, no symbol beside it.
+  await expect(row(page, 'foot-inch')).toContainText('5′ 11.00″');
+  await expect(row(page, 'foot-inch').locator('[data-symbol]')).toHaveText('');
   await expect(page.locator('[data-row]').first()).toHaveAttribute('data-row', 'foot-inch');
   await expect(row(page, 'centimeter')).toContainText('180.34');
   await expect(row(page, 'inch')).toContainText('71.00');
   // The URL carries the compound in the pair's words.
   await expect.poll(() => page.evaluate(() => location.search)).toBe('?a=foot-inch&v=5+ft+11+in');
-  // A decimal of feet is read as written, the pair one press away, one undoable step.
-  await box(page).fill('5.11 ft');
-  await box(page).press('Enter');
-  await expect(page.getByRole('button', { name: 'Remove feet' })).toBeVisible();
-  await expect(page.locator('[data-read]')).toContainText('Read as 5.11 ft, decimal feet');
-  await page.getByRole('button', { name: 'Read as 5 ft 11 in instead' }).click();
-  await expect(box(page)).toHaveValue('5 ft 11 in');
-  await expect(page.getByRole('button', { name: 'Remove feet and inches' })).toBeVisible();
-  await expect(row(page, 'centimeter')).toContainText('180.34');
-  await expect(page.locator('[data-read]')).toHaveText('Read as 5 ft 11 in');
-  await pressTool(page, 'Undo');
-  await expect(box(page)).toHaveValue('5.11');
-  // A pair row moved into the box comes as its parts: 180 cm is 5 ft 10.86614173 in.
+  // A pair row moved into the box comes as its parts, in the marks, which the box reads back.
   await box(page).fill('180 cm');
   await box(page).press('Enter');
-  await expect(row(page, 'foot-inch')).toContainText('5 ft 10.87 in');
+  await expect(row(page, 'foot-inch')).toContainText('5′ 10.87″');
   await unitCell(page, 'foot-inch').click();
-  await expect(box(page)).toHaveValue('5 ft 10.86614173 in');
+  await expect(box(page)).toHaveValue('5′ 10.86614173″');
   await expect(row(page, 'centimeter')).toContainText('180.00');
+  // A duration as a stopwatch writes it: 1h30 is 1:30:00.
+  await box(page).fill('1h30');
+  await box(page).press('Enter');
+  await expect(row(page, 'hour-minute-second')).toContainText('1:30:00');
+  await expect(row(page, 'minute')).toContainText('90.00');
 });

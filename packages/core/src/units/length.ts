@@ -127,6 +127,8 @@ export const lengthUnits: readonly Unit[] = [
     exact: true,
     source: FOOT_INCH,
     pair: ['foot', 'inch'],
+    // Written with the marks people write (5′ 11″), which the box reads back.
+    notation: ['′', '″'],
     note: 'A height or a length as the US and the UK write it: the feet, then the inches left over.',
   },
   {

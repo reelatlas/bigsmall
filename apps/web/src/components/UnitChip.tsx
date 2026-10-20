@@ -82,8 +82,9 @@ export function UnitChip({
       >
         {unit ? (
           <span className={BODY}>
-            <span className={unitSymbol(compact)}>{unit.symbol}</span>
-            <span ref={nameRef ?? null} hidden={compact}>
+            {/* A pair shows its name alone (ADR 0026): its symbol would only repeat the value's words. */}
+            {!unit.pair && <span className={unitSymbol(compact)}>{unit.symbol}</span>}
+            <span ref={nameRef ?? null} hidden={compact && !unit.pair}>
               {name}
             </span>
           </span>

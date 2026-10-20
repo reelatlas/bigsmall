@@ -348,7 +348,9 @@ function writtenText(row: ConversionRow, written: Rounded | null): ReactNode {
  * decimal point lines up; screen readers hear it whole, from `text`. A fraction, whose parts are
  * not digits after a point, a dash, and a message are written whole across both, right-aligned.
  */
-type ValueParts = { text: string; whole: string; decimals: string } | { across: ReactNode };
+type ValueParts =
+  | { text: string; whole: string; decimals: string }
+  | { across: ReactNode; spoken?: string | undefined };
 
 function valueParts(
   row: ConversionRow,
@@ -360,10 +362,16 @@ function valueParts(
   if (row.tone !== 'value') return { across: row.text };
   const written =
     row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
-  // A fraction, and a pair, have no decimal point to line up on: written whole, right-aligned.
-  if ((display.format === 'fraction' && !row.clock) || row.pair) {
-    return { across: writtenText(row, written) };
+  // A fraction, and a pair, have no decimal point to line up on: written whole, right-aligned; a
+  // pair in its own notation (5′ 11″), and in its parts' words for screen readers.
+  if (row.pair && row.value !== null) {
+    const spoken = formatPair(row.value, row.pair, {
+      ...pairOptions(display, locale, significant, display.format === 'fraction'),
+      words: true,
+    });
+    return { across: writtenText(row, written), spoken: spoken?.text };
   }
+  if (display.format === 'fraction' && !row.clock) return { across: writtenText(row, written) };
   const text = written?.text ?? row.text;
   let at = text.indexOf(mark);
   if (at < 0) at = text.indexOf('E');
@@ -498,7 +506,8 @@ export function ConversionTable<T extends ConversionRow>({
 
   /** A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and name. */
   const cells = (row: T) => {
-    const [base, exponent] = splitExponent(row.symbol);
+    // A pair draws no symbol: its value is its notation, its name the row's label (ADR 0026).
+    const [base, exponent] = splitExponent(row.pair ? '' : row.symbol);
     const written = both ? secondOf(row) : null;
     const fraction = written ? writtenText(row, written) : null;
     const stacked = written ? splitFraction(written) : null;
@@ -510,7 +519,14 @@ export function ConversionTable<T extends ConversionRow>({
       <>
         {'across' in value ? (
           <span className={cx(ACROSS_CELL, 'text-right', tone)}>
-            {value.across}
+            {value.spoken !== undefined ? (
+              <>
+                <span aria-hidden="true">{value.across}</span>
+                <span className="sr-only">{value.spoken}</span>
+              </>
+            ) : (
+              value.across
+            )}
             {row.tone === 'empty' && <span className="sr-only">no value</span>}
           </span>
         ) : (
@@ -565,7 +581,7 @@ export function ConversionTable<T extends ConversionRow>({
         <span aria-hidden="true" className={cx(unitSymbol(), tall)}>
           {exponent}
         </span>
-        <span className="sr-only">{row.symbol}</span>
+        {!row.pair && <span className="sr-only">{row.symbol}</span>}
         {withNames ? (
           <span
             aria-hidden="true"
@@ -652,10 +668,10 @@ export function ConversionTable<T extends ConversionRow>({
         </>
       )}
       <span className={cx(SYMBOL_CELL, 'row-start-1')}>
-        {stack((row) => splitExponent(row.symbol)[0])}
+        {stack((row) => splitExponent(row.pair ? '' : row.symbol)[0])}
       </span>
       <span className={cx('col-start-6 row-start-1', unitSymbol())}>
-        {stack((row) => splitExponent(row.symbol)[1])}
+        {stack((row) => splitExponent(row.pair ? '' : row.symbol)[1])}
       </span>
       {withNames && (
         <span
@@ -826,10 +842,12 @@ export function ConversionTable<T extends ConversionRow>({
       )}
     >
       {checkbox(row, list === 'shown', list)}
-      {/* The symbol on one line and a long name wrapping, as the matches write them, never cut short. */}
-      <span className={unitSymbol()} data-symbol>
-        {row.symbol}
-      </span>
+      {/* The symbol on one line and a long name wrapping, as the matches write them, never cut short; a pair by its name alone. */}
+      {!row.pair && (
+        <span className={unitSymbol()} data-symbol>
+          {row.symbol}
+        </span>
+      )}
       <span className={unitName(withNames)} data-name>
         {row.name}
       </span>

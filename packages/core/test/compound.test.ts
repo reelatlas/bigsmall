@@ -359,36 +359,36 @@ describe('formatPair', () => {
   const sizes = (...each: FractionSize[]) => new Set(each);
   const en = { locale: 'en-US' } as const;
 
-  it('writes every part, the last to the places chosen, the total rounded before it is split', () => {
+  it('writes every part, the last to the places chosen, the total rounded before it is split, in the pair’s marks', () => {
     expect(formatPair(71 / 12, ft, { ...en, rounding: 'nearest', places: 2 })).toEqual({
-      text: '5 ft 11.00 in',
+      text: '5′ 11.00″',
       approx: false,
     });
     // 71.996 in is 6 ft 0.00 in at two places, never 5 ft 12.00 in.
     expect(formatPair(71.996 / 12, ft, { ...en, rounding: 'nearest', places: 2 })?.text).toBe(
-      '6 ft 0.00 in',
+      '6′ 0.00″',
     );
     expect(formatPair(71.996 / 12, ft, { ...en, rounding: 'nearest', places: 0 })?.text).toBe(
-      '6 ft 0 in',
+      '6′ 0″',
     );
     expect(formatPair(70.866141732 / 12, ft, { ...en, rounding: 'nearest', places: 2 })?.text).toBe(
-      '5 ft 10.87 in',
+      '5′ 10.87″',
     );
-    expect(formatPair(0, ft, { ...en, rounding: 'nearest', places: 2 })?.text).toBe('0 ft 0.00 in');
+    expect(formatPair(0, ft, { ...en, rounding: 'nearest', places: 2 })?.text).toBe('0′ 0.00″');
   });
 
   it('writes the last part as a fraction in the sizes chosen, ≈ where it rounds', () => {
     expect(
       formatPair(70.866141732 / 12, ft, { ...en, rounding: 'nearest', sizes: sizes(2, 4, 8, 16) }),
-    ).toEqual({ text: '5 ft 10 7/8 in', approx: true });
+    ).toEqual({ text: '5′ 10 7/8″', approx: true });
     expect(
       formatPair(71.5 / 12, ft, { ...en, rounding: 'nearest', sizes: sizes(2, 4, 8) }),
-    ).toEqual({ text: '5 ft 11 1/2 in', approx: false });
+    ).toEqual({ text: '5′ 11 1/2″', approx: false });
     expect(formatPair(71 / 12, ft, { ...en, rounding: 'nearest', sizes: sizes(8) })?.text).toBe(
-      '5 ft 11 in',
+      '5′ 11″',
     );
     expect(formatPair(0.99 / 12, ft, { ...en, rounding: 'nearest', sizes: sizes(2) })?.text).toBe(
-      '0 ft 1 in',
+      '0′ 1″',
     );
     expect(formatPair(1, ft, { ...en, rounding: 'nearest', sizes: new Set() })).toBeNull();
   });
@@ -396,52 +396,52 @@ describe('formatPair', () => {
   it('writes significant digits of the whole with neither, trailing zeros trimmed', () => {
     expect(
       formatPair(70.866141732 / 12, ft, { ...en, rounding: 'nearest', significant: 6 })?.text,
-    ).toBe('5 ft 10.8661 in');
+    ).toBe('5′ 10.8661″');
     expect(
       formatPair(70.866141732 / 12, ft, { ...en, rounding: 'nearest', significant: 10 })?.text,
-    ).toBe('5 ft 10.86614173 in');
+    ).toBe('5′ 10.86614173″');
     expect(formatPair(71 / 12, ft, { ...en, rounding: 'nearest', significant: 6 })?.text).toBe(
-      '5 ft 11 in',
+      '5′ 11″',
     );
     expect(
       formatPair(1.5, unit('hour-minute-second'), { ...en, rounding: 'nearest', significant: 6 })
         ?.text,
-    ).toBe('1 h 30 min 0 s');
+    ).toBe('1:30:00');
   });
 
   it('rounds up toward larger values and down toward smaller, below zero too, the sign before the pair', () => {
     expect(formatPair(71.996 / 12, ft, { ...en, rounding: 'down', places: 2 })?.text).toBe(
-      '5 ft 11.99 in',
+      '5′ 11.99″',
     );
     expect(formatPair(71.996 / 12, ft, { ...en, rounding: 'up', places: 2 })?.text).toBe(
-      '6 ft 0.00 in',
+      '6′ 0.00″',
     );
     expect(formatPair(-71.996 / 12, ft, { ...en, rounding: 'up', places: 2 })?.text).toBe(
-      '-5 ft 11.99 in',
+      '-5′ 11.99″',
     );
     expect(formatPair(-71.996 / 12, ft, { ...en, rounding: 'down', places: 2 })?.text).toBe(
-      '-6 ft 0.00 in',
+      '-6′ 0.00″',
     );
     expect(formatPair(-71 / 12, ft, { ...en, rounding: 'nearest', places: 2 })?.text).toBe(
-      '-5 ft 11.00 in',
+      '-5′ 11.00″',
     );
   });
 
   it('says a value under the step as below it, in the last part, never 0 ft 0.00 in', () => {
     expect(formatPair(0.0001 / 12, ft, { ...en, rounding: 'nearest', places: 2 })?.text).toBe(
-      '< 0.01 in',
+      '< 0.01″',
     );
     expect(formatPair(-0.0001 / 12, ft, { ...en, rounding: 'nearest', places: 2 })?.text).toBe(
-      '> -0.01 in',
+      '> -0.01″',
     );
     expect(formatPair(0.0001 / 12, ft, { ...en, rounding: 'nearest', sizes: sizes(8) })?.text).toBe(
-      '< 1/8 in',
+      '< 1/8″',
     );
   });
 
   it('groups a large first part, attaches the marks of an angle, and takes the locale’s marks', () => {
     expect(formatPair(5280, ft, { ...en, rounding: 'nearest', places: 2 })?.text).toBe(
-      '5,280 ft 0.00 in',
+      '5,280′ 0.00″',
     );
     expect(
       formatPair(45 + 30 / 60 + 15 / 3600, unit('degree-arcminute-arcsecond'), {
@@ -455,7 +455,28 @@ describe('formatPair', () => {
     ).toBe('11 st 4.00 lb');
     expect(
       formatPair(70.866141732 / 12, ft, { locale: 'de-DE', rounding: 'nearest', places: 2 })?.text,
-    ).toBe('5 ft 10,87 in');
+    ).toBe('5′ 10,87″');
+  });
+
+  it('writes a clock to the second whatever is chosen, and the parts’ words for speech', () => {
+    const hms = unit('hour-minute-second');
+    expect(formatPair(1.5, hms, { ...en, rounding: 'nearest', places: 3 })?.text).toBe('1:30:00');
+    expect(formatPair(1.5, hms, { ...en, rounding: 'nearest', sizes: sizes(8) })?.text).toBe(
+      '1:30:00',
+    );
+    expect(
+      formatPair(1 + 5 / 60 + 30.4 / 3600, hms, { ...en, rounding: 'nearest', places: 2 })?.text,
+    ).toBe('1:05:30');
+    expect(formatPair(-1.5, hms, { ...en, rounding: 'nearest', places: 2 })?.text).toBe('-1:30:00');
+    expect(formatPair(0.1 / 3600, hms, { ...en, rounding: 'nearest', places: 2 })?.text).toBe(
+      '< 0:00:01',
+    );
+    expect(formatPair(1.5, hms, { ...en, rounding: 'nearest', places: 2, words: true })?.text).toBe(
+      '1 h 30 min 0.00 s',
+    );
+    expect(
+      formatPair(71 / 12, ft, { ...en, rounding: 'nearest', places: 2, words: true })?.text,
+    ).toBe('5 ft 11.00 in');
   });
 
   it('is null for no pair, a value past what places mean, or no finite value', () => {

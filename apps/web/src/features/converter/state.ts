@@ -20,8 +20,10 @@ import {
   pairsOpenedBy,
   parse,
   resolveExact,
+  roundToStep,
   search,
   splitIngredient,
+  toBase,
   unitListGroup,
   type Category,
   type CategoryId,
@@ -283,7 +285,7 @@ export function pairText(
  * Why a conversion has no answer to show: beyond what a double holds, rounded to zero, arithmetic
  * with no answer (a division by zero, a power with no real value), or 0 in a reciprocal unit.
  */
-type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real' | 'zero';
+type NoAnswer = 'large' | 'small' | 'divide-by-zero' | 'not-real' | 'zero' | 'range';
 
 /**
  * What the converter says when there is no answer to show (docs/UX-SPEC.md §1, §8): in full in
@@ -295,6 +297,7 @@ export const NO_ANSWER_MESSAGES: Record<NoAnswer, { long: string; short: string 
   'divide-by-zero': { long: 'Can’t divide by zero', short: 'Can’t divide by zero' },
   'not-real': { long: 'No real answer', short: 'No real answer' },
   zero: { long: 'Undefined for 0', short: 'Undefined for 0' },
+  range: { long: 'Outside its range', short: 'Out of range' },
 };
 
 /** What the matches say when a typed unit matches nothing (docs/UX-SPEC.md §1). */
@@ -339,8 +342,17 @@ export interface TableRow {
   inBox: boolean;
   /** A pace's value, in minutes and seconds (5:30), whatever the display's places or fractions. */
   clock: boolean;
-  /** Measured, not exact: converted through an ingredient's density (Cooking's ≈, ADR 0021). */
+  /**
+   * Not exact: converted through an ingredient's density (Cooking's ≈, ADR 0021), or rounded to
+   * a scale's step (a shoe size's, ADR 0027).
+   */
   approx: boolean;
+  /**
+   * A size on a scale marked in steps (ADR 0027): its value and text are the step the conversion
+   * rounds to, ≈ where that moved it, whatever Display's places or fractions, and it copies and
+   * moves into the box as it shows.
+   */
+  stepped: boolean;
   /**
    * A pair (ADR 0026), the unit itself: its value is written as its parts, the total rounded and
    * then split (core's formatPair), whatever Display's places or fractions, and copies as it shows.
@@ -393,7 +405,10 @@ interface UnitsView extends TableViewBase {
   all: TableRow[];
   /** In place of the rows when the box's value has no answer: "Too large to convert". */
   message: string | null;
-  /** A line under the table: Cooking's, what a cup of its ingredient weighs and where that comes from. */
+  /**
+   * A line under the table: Cooking's, how its ingredient's cup is filled, or a category's own,
+   * what its figures rest on (the shoe sizes'; ADR 0027).
+   */
   note: string | null;
 }
 
@@ -723,6 +738,8 @@ function selectUnits(
     tier: EVERY_TIER,
   }).results.flatMap((result) => (result.kind === 'unit' ? [result.unit] : []));
   const kind = getCategory(category)?.name.toLowerCase() ?? '';
+  // A category's line under its table, what its figures rest on (the shoe sizes'; ADR 0027).
+  const note = getCategory(category)?.note ?? null;
   const base = { ...shared, kind: 'units', category } as const;
   const rule = options.rule ?? SHOW_ALL;
   /** The rows as the settings arrange them: the shown ones in their sections, the hidden apart. */
@@ -760,12 +777,13 @@ function selectUnits(
   }
 
   /**
-   * A category of readings on scales with zero points (temperature's) says the box's number as a
-   * change too, in a section after the readings (Sean, 2026-10-16): every shown scale but the
-   * box's own, by their degree sizes alone, so 5 °C warmer is 9 °F warmer.
+   * Temperature, readings on scales with zero points, says the box's number as a change too, in
+   * a section after the readings (Sean, 2026-10-16): every shown scale but the box's own, by their
+   * degree sizes alone, so 5 °C warmer is 9 °F warmer. A shoe scale is affine too, but a size is
+   * no reading to take a difference of (ADR 0027).
    */
   const withChange = (view: ReturnType<typeof arranged>) => {
-    if (!listed.some((each) => each.kind === 'affine')) return view;
+    if (category !== 'temperature') return view;
     const value = unit ? parsed.value : undefined;
     const rows = view.rows
       .filter((row) => row.unit.id !== unit?.id)
@@ -792,7 +810,7 @@ function selectUnits(
       ...base,
       ...withChange(view),
       message: null,
-      note: null,
+      note,
       announcement: `${view.rows.length} units of ${kind}`,
     };
   }
@@ -804,7 +822,7 @@ function selectUnits(
     ...base,
     ...withChange(view),
     message: null,
-    note: null,
+    note,
     announcement: `${from} in ${view.rows.length} units of ${kind}`,
   };
 }
@@ -838,6 +856,7 @@ function changeRow(
     inBox: false,
     clock: false,
     approx: false,
+    stepped: false,
   };
 }
 
@@ -866,7 +885,15 @@ function valueRow(
   locale: string | undefined,
   converter: Converter = safeConvert,
 ): TableRow {
-  const converted = target.id === from.id ? value : converter(value, from, target);
+  const exact = target.id === from.id ? value : converter(value, from, target);
+  // A size is written to its scale's step, ≈ where that moved it (ADR 0027): the row's value is
+  // the size itself, so it copies and moves into the box as it shows; the box's own row echoes
+  // what was typed.
+  const stepped =
+    target.step !== undefined && target.id !== from.id && exact !== undefined
+      ? roundToStep(exact, target.step)
+      : null;
+  const converted = stepped ? stepped.value : exact;
   const text =
     converted === undefined
       ? ''
@@ -878,22 +905,53 @@ function valueRow(
   const tooSmall = converted === 0 && value !== 0;
   const shown = text && !tooSmall ? (converted ?? null) : null;
   // 0 in a reciprocal unit has no value in the others: 0 mpg is no distance at all, so no L/100 km.
+  // A foot outside a children's table, or a size outside its scale, has no size in it (ADR 0027).
   const problem: NoAnswer | null =
-    shown !== null ? null : tooSmall ? 'small' : value === 0 ? 'zero' : 'large';
+    target.id !== from.id && outsideRange(from, target, value)
+      ? 'range'
+      : shown !== null
+        ? null
+        : tooSmall
+          ? 'small'
+          : value === 0
+            ? 'zero'
+            : 'large';
   return {
     unit: target,
     id: target.id,
-    name: unitName(target, shown ?? Number.NaN),
+    name: unitName(target, problem ? Number.NaN : (shown ?? Number.NaN)),
     symbol: target.symbol,
-    value: shown,
+    value: problem ? null : shown,
     text: problem ? NO_ANSWER_MESSAGES[problem].short : text,
     tone: problem ? 'message' : 'value',
     inBox: target.id === from.id,
     clock: target.pace === true,
-    // Converted through an ingredient's density: measured, not exact (Cooking's ≈).
-    approx: converter !== safeConvert && target.id !== from.id && crossesDensity(from, target),
+    // Converted through an ingredient's density (Cooking's ≈), or rounded to a scale's step.
+    approx:
+      stepped?.approx === true ||
+      (converter !== safeConvert && target.id !== from.id && crossesDensity(from, target)),
+    stepped: stepped !== null,
     pair: target.pair ? target : undefined,
   };
+}
+
+/**
+ * Whether the value, in the base unit, lies outside the span a table defines a unit over (ADR
+ * 0027): the row's unit's, or the box's unit's, whose size then has no foot to convert from.
+ */
+function outsideRange(from: Unit, target: Unit, value: number): boolean {
+  if (!from.range && !target.range) return false;
+  let base: number;
+  try {
+    base = toBase(from, value);
+  } catch {
+    return false;
+  }
+  const beyond = (range: readonly [number, number]) => base < range[0] || base > range[1];
+  return (
+    (from.range !== undefined && beyond(from.range)) ||
+    (target.range !== undefined && beyond(target.range))
+  );
 }
 
 function emptyRow(target: Unit, inBox: Unit | null): TableRow {
@@ -908,6 +966,7 @@ function emptyRow(target: Unit, inBox: Unit | null): TableRow {
     inBox: target.id === inBox?.id,
     clock: target.pace === true,
     approx: false,
+    stepped: false,
     pair: target.pair ? target : undefined,
   };
 }

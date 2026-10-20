@@ -82,9 +82,7 @@ const SUMMARY = cx(
               <span>{line.name}</span>
               <span class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
                 <span class="font-numeric wrap-anywhere">{line.formula}</span>
-                <span class={line.exact ? EXACT : MEASURED}>
-                  {line.exact ? 'exact' : 'measured'}
-                </span>
+                <span class={line.exact ? EXACT : MEASURED}>{line.basis}</span>
               </span>
               <p class="text-xs text-ink-muted wrap-anywhere @lg:col-start-2">{line.source}</p>
             </li>

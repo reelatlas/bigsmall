@@ -40,11 +40,19 @@ describe('formulas', () => {
     expect(writtenFactor(1e-9)).toBe('1E-9');
   });
 
-  it('gives each line its source, exact or measured, as plain text too', () => {
+  it('gives each line its source and its basis, exact, measured, or by convention, as plain text too', () => {
     for (const line of lines) {
       expect(line.source.length, line.id).toBeGreaterThan(10);
       expect(line.plain, line.id).toContain(line.formula);
-      expect(line.plain, line.id).toContain(line.exact ? ', exact.' : ', measured.');
+      expect(line.plain, line.id).toContain(`, ${line.basis}.`);
+      expect(line.basis === 'exact', line.id).toBe(line.exact);
     }
+    // A shoe scale is a body's convention (ADR 0027); its children's table says its span.
+    const uk = lines.find((line) => line.id === 'uk');
+    expect(uk?.basis).toBe('by convention');
+    expect(lines.find((line) => line.id === 'mondopoint')?.basis).toBe('exact');
+    expect(lines.find((line) => line.id === 'us-children')?.formula).toBe(
+      'mm from US C by a table, 118.5 to 194 mm',
+    );
   });
 });

@@ -25,9 +25,14 @@ interface FormulaLine {
   /** "1 mi = 1609.344 m"; "K = (°F + 459.67) × 5/9"; "km/L = 100 ÷ (L/100 km)". */
   formula: string;
   exact: boolean;
+  /**
+   * What the figure is: "exact" by its definition, "measured", or "by convention", a body's table
+   * (docs/RESEARCH.md §1; ADR 0027).
+   */
+  basis: 'exact' | 'measured' | 'by convention';
   /** The standard the factor was checked against (ADR 0020). */
   source: string;
-  /** The line as plain text, for Copy all: name, formula, exact or measured, and source. */
+  /** The line as plain text, for Copy all: name, formula, its basis, and source. */
   plain: string;
 }
 
@@ -93,7 +98,10 @@ function formulaOf(unit: Unit, base: Unit): string {
     case 'reciprocal':
       return `${base.symbol} = ${writtenFactor(unit.factor)} ÷ (${unit.symbol})`;
     case 'functional':
-      return `${base.symbol} from ${unit.symbol} by a function of its own`;
+      // A scale from a table (ISO 19407's children's; ADR 0027), over the feet it covers.
+      return unit.range
+        ? `${base.symbol} from ${unit.symbol} by a table, ${writtenFactor(unit.range[0])} to ${writtenFactor(unit.range[1])} ${base.symbol}`
+        : `${base.symbol} from ${unit.symbol} by a function of its own`;
   }
 }
 
@@ -135,6 +143,7 @@ function ingredientLine(ingredient: Ingredient): FormulaLine {
     symbol: '',
     formula,
     exact: false,
+    basis: 'measured',
     source,
     plain: `${ingredient.name}: ${formula}, measured. Source: ${source}`,
   };
@@ -162,15 +171,16 @@ export function formulaGroups(): FormulaGroup[] {
     }
     const lines = unitsIn(category.id).map((unit): FormulaLine => {
       const formula = formulaOf(unit, base);
-      const kind = unit.exact ? 'exact' : 'measured';
+      const basis = unit.exact ? 'exact' : unit.conventional ? 'by convention' : 'measured';
       return {
         id: unit.id,
         name: unit.name,
         symbol: unit.symbol,
         formula,
         exact: unit.exact,
+        basis,
         source: unit.source,
-        plain: `${unit.name} (${unit.symbol}): ${formula}, ${kind}. Source: ${unit.source}`,
+        plain: `${unit.name} (${unit.symbol}): ${formula}, ${basis}. Source: ${unit.source}`,
       };
     });
     return [

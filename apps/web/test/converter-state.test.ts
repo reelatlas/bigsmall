@@ -658,3 +658,64 @@ describe('compound quantities (ADR 0026)', () => {
     expect(selectBox(back, options).parsed.value).toBeCloseTo(5 + 11 / 12, 12);
   });
 });
+
+describe('shoe sizes (ADR 0027)', () => {
+  const options = { ...EN, locale: 'en-US', system: 'us' as const };
+  const units = (...actions: Action[]) => {
+    const shown = selectTable(run(...actions), options);
+    if (shown.kind !== 'units') throw new Error(`expected units, got ${shown.kind}`);
+    return shown;
+  };
+  const row = (table: ReturnType<typeof units>, id: string) =>
+    table.rows.find((each) => each.id === id)!;
+
+  it('writes every row to its scale’s step, ≈ where that moved it, the box’s own as typed', () => {
+    const table = units(type('us 11'), { type: 'use', unit: 'us-men', text: '11' });
+    expect(table.category).toBe('shoe-size');
+    expect(row(table, 'us-men')).toMatchObject({
+      text: '11',
+      inBox: true,
+      approx: false,
+      stepped: false,
+    });
+    // UK is exactly one size down; the European size rounds, as does the foot in Mondopoint.
+    expect(row(table, 'uk')).toMatchObject({ text: '10', value: 10, approx: false, stepped: true });
+    expect(row(table, 'us-women')).toMatchObject({ text: '12', approx: false });
+    expect(row(table, 'eu')).toMatchObject({ text: '44', value: 44, approx: true, stepped: true });
+    expect(row(table, 'mondopoint')).toMatchObject({ text: '280', approx: true });
+    expect(row(table, 'japan')).toMatchObject({ text: '28', approx: true });
+    // An adult's foot is outside the children's table.
+    expect(row(table, 'us-children')).toMatchObject({
+      text: 'Out of range',
+      tone: 'message',
+      value: null,
+    });
+    expect(row(table, 'eu-children')).toMatchObject({ tone: 'message' });
+    expect(table.sections.map((section) => section.label)).toEqual([
+      'US (customary)',
+      'Metric',
+      'UK (imperial)',
+    ]);
+    expect(table.sections[0]!.rows.map((each) => each.id)).toEqual([
+      'us-men',
+      'us-women',
+      'us-children',
+    ]);
+    expect(table.note).toMatch(/^ISO 19407/);
+    expect(table.announcement).toBe('11 US men’s in 9 units of shoe size');
+  });
+
+  it('reads a child’s foot from its table, and a size outside a scale has no foot to convert', () => {
+    const child = units(type('150 mm'), { type: 'use', unit: 'mondopoint', text: '150' });
+    expect(row(child, 'us-children')).toMatchObject({ text: '8', approx: false });
+    expect(row(child, 'uk-children')).toMatchObject({ text: '7.5', approx: false });
+    expect(row(child, 'eu-children')).toMatchObject({ text: '24.5', approx: false });
+    expect(row(child, 'eu')).toMatchObject({ text: '24.5', approx: true });
+    const between = units(type('151 mm'), { type: 'use', unit: 'mondopoint', text: '151' });
+    expect(row(between, 'us-children')).toMatchObject({ text: '8', approx: true });
+    const outside = units(type('20'), { type: 'use', unit: 'us-children', text: '20' });
+    expect(row(outside, 'us-children')).toMatchObject({ text: '20', inBox: true });
+    expect(row(outside, 'us-men')).toMatchObject({ text: 'Out of range', tone: 'message' });
+    expect(row(outside, 'mondopoint')).toMatchObject({ tone: 'message' });
+  });
+});

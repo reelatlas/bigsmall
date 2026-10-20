@@ -1425,6 +1425,35 @@ test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds
   await expect(box(page)).toHaveValue('8:51');
 });
 
+test('shoe sizes: "us 11" reads the scale before its number; the rows to the half size, ≈ where they round, and the note under the table', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('us 11');
+  // A bare "us" is men's, the first match (ADR 0027).
+  await expect(matches(page).getByRole('option').first()).toContainText('US men’s');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove US men’s' })).toBeVisible();
+  await expect(box(page)).toHaveValue('11');
+  const table = page.getByRole('region', { name: 'Shoe size' });
+  await expect(table).toBeVisible();
+  // UK is exactly one size down, no "≈"; the European size and the foot's length round.
+  await expect(row(page, 'uk')).toContainText('10');
+  await expect(row(page, 'uk')).not.toContainText('≈');
+  await expect(row(page, 'eu')).toContainText('≈');
+  await expect(row(page, 'eu')).toContainText('44');
+  await expect(row(page, 'mondopoint')).toContainText('280');
+  // An adult's foot is outside the children's table.
+  await expect(row(page, 'us-children')).toContainText('Out of range');
+  await expect(page.getByText(/^ISO 19407/)).toBeVisible();
+  // A size moves into the box as the row writes it.
+  await unitCell(page, 'eu').click();
+  await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
+  await expect(box(page)).toHaveValue('44');
+  await expect(row(page, 'us-men')).toContainText('11');
+});
+
 test('a temperature is said as a change too, after the readings: 5 °C warmer is 9 °F warmer', async ({
   page,
 }) => {

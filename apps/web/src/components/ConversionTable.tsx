@@ -62,8 +62,13 @@ interface ConversionRow {
    */
   clock?: boolean;
   /**
-   * Measured rather than exact: converted through an ingredient's density (Cooking, ADR 0021). It
-   * reads "≈" before its value, and "about" for screen readers.
+   * A size on a scale marked in steps (ADR 0027): its text is the step the conversion rounds to,
+   * whatever the display's places or fractions, and it copies as it shows.
+   */
+  stepped?: boolean;
+  /**
+   * Not exact: converted through an ingredient's density (Cooking, ADR 0021), or rounded to a
+   * scale's step (ADR 0027). It reads "≈" before its value, and "about" for screen readers.
    */
   approx?: boolean;
   /**
@@ -279,7 +284,9 @@ export function copiedText(
 ): string | null {
   if (row.tone !== 'value') return null;
   const written =
-    row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
+    row.value === null || row.clock || row.stepped
+      ? null
+      : firstWritten(row, display, locale, significant);
   return (written?.text ?? row.text).replaceAll(MINUS, '-');
 }
 
@@ -392,7 +399,9 @@ function valueParts(
 ): ValueParts {
   if (row.tone !== 'value') return { across: row.text };
   const written =
-    row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
+    row.value === null || row.clock || row.stepped
+      ? null
+      : firstWritten(row, display, locale, significant);
   // A fraction, and a pair, have no decimal point to line up on: written whole, right-aligned; a
   // pair in its own notation (5′ 11″), and in its parts' words for screen readers.
   if (row.pair && row.value !== null) {
@@ -402,7 +411,9 @@ function valueParts(
     });
     return { across: writtenText(row, written), spoken: spoken?.text };
   }
-  if (display.format === 'fraction' && !row.clock) return { across: writtenText(row, written) };
+  if (display.format === 'fraction' && !row.clock && !row.stepped) {
+    return { across: writtenText(row, written) };
+  }
   const text = written?.text ?? row.text;
   let at = text.indexOf(mark);
   if (at < 0) at = text.indexOf('E');
@@ -519,7 +530,7 @@ export function ConversionTable<T extends ConversionRow>({
   const parts = (row: T, under: TableDisplay = display) =>
     valueParts(row, under, locale, mark, significant);
   const secondOf = (row: T, under: TableDisplay = display) =>
-    row.tone !== 'value' || row.value === null || row.clock
+    row.tone !== 'value' || row.value === null || row.clock || row.stepped
       ? null
       : secondWritten(row, under, locale);
   const second = (row: T, under: TableDisplay = display): ReactNode => {

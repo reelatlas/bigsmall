@@ -2067,6 +2067,14 @@ test('a height: "5\'11" offers feet, inches, Enter takes it, and the pair row wr
   await expect(page.locator('[data-row]').first()).toHaveAttribute('data-row', 'inch');
   await expect(row(page, 'centimeter')).toContainText('180.34');
   await expect(row(page, 'inch')).toContainText('71.00');
+  // In Edit, and so in Hidden, the pair's line is every line's: the symbol, then the name
+  // (the tidy of 2026-10-20; the name alone had left it blank with Symbol only).
+  const region = page.getByRole('region', { name: 'Length' });
+  await region.getByRole('button', { name: 'Edit', exact: true }).click();
+  const pairLine = region.locator('label[data-unit="foot-inch"]');
+  await expect(pairLine.locator('[data-symbol]')).toHaveText('ft in');
+  await expect(pairLine.locator('[data-name]')).toHaveText('feet, inches');
+  await region.getByRole('button', { name: 'Done' }).click();
   // The URL carries the compound in the pair's words.
   await expect.poll(() => page.evaluate(() => location.search)).toBe('?a=foot-inch&v=5+ft+11+in');
   // A pair row moved into the box comes as its parts, in the marks, which the box reads back.

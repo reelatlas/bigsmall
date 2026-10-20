@@ -888,12 +888,13 @@ export function ConversionTable<T extends ConversionRow>({
       )}
     >
       {checkbox(row, list === 'shown', list)}
-      {/* The symbol on one line and a long name wrapping, as the matches write them, never cut short; a pair by its name alone. */}
-      {!row.pair && (
-        <span className={unitSymbol()} data-symbol>
-          {row.symbol}
-        </span>
-      )}
+      {/* The symbol on one line and a long name wrapping, as the matches write them, never cut
+          short; a pair's too (ADR 0026; the tidy of 2026-10-20: the ninety-eighth pass's
+          exception had left a pair's line blank with Symbol only, its name being for screen
+          readers alone). */}
+      <span className={unitSymbol()} data-symbol>
+        {row.symbol}
+      </span>
       <span className={unitName(withNames)} data-name>
         {row.name}
       </span>

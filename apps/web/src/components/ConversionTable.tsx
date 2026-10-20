@@ -1,5 +1,6 @@
 import {
   formatFraction,
+  formatPair,
   formatPlaces,
   formatSignificant,
   localeSeparators,
@@ -7,6 +8,7 @@ import {
   type FractionSize,
   type Rounded,
   type Rounding,
+  type Unit,
 } from '@bigsmall/core';
 import {
   useId,
@@ -71,6 +73,12 @@ interface ConversionRow {
    * reads "≈" before its value, and "about" for screen readers.
    */
   approx?: boolean;
+  /**
+   * A pair (ADR 0026), the unit itself: its value is written as its parts by core's formatPair,
+   * the total rounded to the display's step and then split ("5 ft 10.87 in", "5 ft 10 7/8 in"),
+   * across the value's columns as a fraction is, and copies as it shows.
+   */
+  pair?: Unit | undefined;
 }
 
 /** A section of rows under its name ("US (customary)"). */
@@ -243,8 +251,21 @@ export function copiedText(
 ): string | null {
   if (row.tone !== 'value') return null;
   const written =
-    row.value === null || row.clock ? null : firstWritten(row.value, display, locale, significant);
+    row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
   return (written?.text ?? row.text).replaceAll(MINUS, '-');
+}
+
+/** How a pair is written under the display: the last part to its places or sizes, else the significant digits. */
+function pairOptions(
+  display: TableDisplay,
+  locale: string | undefined,
+  significant: number,
+  fraction: boolean,
+) {
+  const { rounding } = display;
+  if (fraction) return { locale, rounding, sizes: display.fractions };
+  if (display.places !== null) return { locale, rounding, places: display.places };
+  return { locale, rounding, significant };
 }
 
 /**
@@ -254,11 +275,20 @@ export function copiedText(
  * places mean (1e15), which falls through to those six digits.
  */
 function firstWritten(
-  value: number,
+  row: ConversionRow,
   display: TableDisplay,
   locale: string | undefined,
   significant: number,
 ) {
+  const value = row.value;
+  if (value === null) return null;
+  if (row.pair) {
+    return formatPair(
+      value,
+      row.pair,
+      pairOptions(display, locale, significant, display.format === 'fraction'),
+    );
+  }
   const { rounding } = display;
   if (display.format === 'fraction') {
     return formatFraction(value, { sizes: display.fractions, rounding, locale });
@@ -272,10 +302,15 @@ function firstWritten(
   return text === null ? null : { text, approx: false };
 }
 
-/** Both's fraction, after the decimal. */
-function secondWritten(value: number, display: TableDisplay, locale: string | undefined) {
-  if (display.format !== 'both') return null;
-  return formatFraction(value, { sizes: display.fractions, rounding: display.rounding, locale });
+/** Both's fraction, after the decimal; a pair's whole, its last part the fraction. */
+function secondWritten(row: ConversionRow, display: TableDisplay, locale: string | undefined) {
+  if (display.format !== 'both' || row.value === null) return null;
+  if (row.pair) return formatPair(row.value, row.pair, pairOptions(display, locale, 0, true));
+  return formatFraction(row.value, {
+    sizes: display.fractions,
+    rounding: display.rounding,
+    locale,
+  });
 }
 
 /**
@@ -324,8 +359,11 @@ function valueParts(
 ): ValueParts {
   if (row.tone !== 'value') return { across: row.text };
   const written =
-    row.value === null || row.clock ? null : firstWritten(row.value, display, locale, significant);
-  if (display.format === 'fraction' && !row.clock) return { across: writtenText(row, written) };
+    row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
+  // A fraction, and a pair, have no decimal point to line up on: written whole, right-aligned.
+  if ((display.format === 'fraction' && !row.clock) || row.pair) {
+    return { across: writtenText(row, written) };
+  }
   const text = written?.text ?? row.text;
   let at = text.indexOf(mark);
   if (at < 0) at = text.indexOf('E');
@@ -447,7 +485,7 @@ export function ConversionTable<T extends ConversionRow>({
   const secondOf = (row: T, under: TableDisplay = display) =>
     row.tone !== 'value' || row.value === null || row.clock
       ? null
-      : secondWritten(row.value, under, locale);
+      : secondWritten(row, under, locale);
   const second = (row: T, under: TableDisplay = display): ReactNode => {
     const fraction = secondOf(row, under);
     return fraction ? writtenText(row, fraction) : null;

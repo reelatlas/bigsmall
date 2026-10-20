@@ -13,6 +13,8 @@ const SI = 'BIPM SI Brochure, 9th ed. (2019), §2.3.1 (metre) and Table 7 (SI pr
 const YARD_POUND =
   'International Yard and Pound Agreement (1959): 1 yd = 0.9144 m exactly; NIST SP 811 (2008) Appendix B.8';
 
+const FOOT_INCH =
+  'NIST Handbook 44, Appendix C: 1 ft = 12 in; the foot per the 1959 agreement (0.3048 m)';
 const MIL = 'NIST SP 811 (2008) Appendix B.8: mil (0.001 in) = 2.54E-05 m (exact)';
 const FOOT_MULTIPLES =
   'NIST Handbook 44, Appendix C: 1 fathom = 6 ft, 1 furlong = 660 ft; the international foot (0.3048 m), the US survey foot retired at the end of 2022 (NIST/NGS notice)';
@@ -108,6 +110,24 @@ export const lengthUnits: readonly Unit[] = [
     factor: 0.3048,
     exact: true,
     source: YARD_POUND,
+  },
+  {
+    // A height as the US and the UK write it (ADR 0026): read from "5'11" and written back as
+    // 5 ft 11 in, the total rounded and then split (compound.ts).
+    kind: 'linear',
+    id: 'foot-inch',
+    category: 'length',
+    name: 'feet and inches',
+    plural: 'feet and inches',
+    symbol: 'ft in',
+    aliases: ['foot and inch', 'feet inches', 'ft-in'],
+    system: 'imperial',
+    tier: 'standard',
+    factor: 0.3048,
+    exact: true,
+    source: FOOT_INCH,
+    pair: ['foot', 'inch'],
+    note: 'A height or a length as the US and the UK write it: the feet, then the inches left over.',
   },
   {
     kind: 'linear',

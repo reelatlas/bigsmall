@@ -42,7 +42,7 @@ function noiseAt(value: number): number {
 const FRACTION_LIMIT = 1e6;
 
 /** Past this, places would only repeat the significant digits' scientific form. */
-const PLACES_LIMIT = 1e15;
+export const PLACES_LIMIT = 1e15;
 
 /**
  * A scaled value rounded as chosen: the number itself, except that a difference within a few of
@@ -71,6 +71,15 @@ function ulpOf(x: number): number {
   return 2 ** (exponent - 52);
 }
 
+/**
+ * A value times `scale`, rounded as chosen to a whole number: the count of the step that places or
+ * significant digits write it in (formatPlaces, formatSignificant), and what a pair's last part is
+ * split from (compound.ts).
+ */
+export function roundedScaled(value: number, scale: number, rounding: Rounding): number {
+  return rounded(value * scale, rounding);
+}
+
 function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
@@ -96,7 +105,7 @@ export function formatPlaces(
 ): Rounded | null {
   if (!Number.isFinite(value)) return null;
   const scale = 10 ** options.places;
-  const result = rounded(value * scale, options.rounding) / scale;
+  const result = roundedScaled(value, scale, options.rounding) / scale;
   if (Math.abs(result) >= PLACES_LIMIT) return null;
   const written = numberFormat(options.locale, {
     minimumFractionDigits: options.places,
@@ -123,7 +132,7 @@ export function formatSignificant(
   // The exponent from the value's own scientific form, exact where a logarithm might not be.
   const exponent = Number(value.toExponential().split('e')[1]);
   const scale = 10 ** (digits - 1 - exponent);
-  const result = rounded(value * scale, rounding) / scale;
+  const result = roundedScaled(value, scale, rounding) / scale;
   // At the ends of what a double holds the scale or the result overflows: the nearest digits then.
   const written = Number.isFinite(scale) && Number.isFinite(result) && scale !== 0 ? result : value;
   return formatNumber(written, { precision: digits, locale });
@@ -147,26 +156,19 @@ export function fractionsOf(sizes: ReadonlySet<FractionSize>): Fraction[] {
 }
 
 /**
- * A value in the sizes chosen, as a mixed number ("6 5/16"), and whether it rounds, small values
- * rounded as chosen too (0.07 to eighths is ≈ 1/8). One that is not zero but rounds to zero reads
- * "< 1/8", the smallest size chosen. Past a million it is the whole number, rounded as chosen
- * ("≈ 1,043,262"), so no row's fraction is left blank (Sean, 2026-10-15). Null with no size
- * chosen, or past where places stop meaning anything. A tie rounds away from zero: 2 1/16 to
- * eighths is 2 1/8, and −2 1/16 is −2 1/8.
+ * A value rounded to the fractions of the sizes chosen, as a count of the step that writes it: 2 7/8
+ * to eighths is 23 of 8 (`count`, signed, and `d`), and past a million the whole number alone (d 1).
+ * What formatFraction writes, and what a pair's last part is split from (compound.ts). A tie rounds
+ * away from zero: 2 1/16 to eighths is 2 1/8, and −2 1/16 is −2 1/8. Null with no size chosen, or
+ * past where places stop meaning anything.
  */
-export function formatFraction(
+export function roundToFraction(
   value: number,
-  options: { sizes: ReadonlySet<FractionSize>; rounding: Rounding; locale?: string | undefined },
-): Rounded | null {
-  const { sizes, rounding, locale } = options;
+  options: { sizes: ReadonlySet<FractionSize>; rounding: Rounding },
+): { count: number; d: number } | null {
+  const { sizes, rounding } = options;
   if (!Number.isFinite(value) || sizes.size === 0 || Math.abs(value) >= PLACES_LIMIT) return null;
-  if (Math.abs(value) >= FRACTION_LIMIT) {
-    const whole = rounded(value, rounding);
-    return {
-      text: (whole < 0 ? minusSign(locale) : '') + numberFormat(locale).format(Math.abs(whole)),
-      approx: Math.abs(value - whole) > noiseAt(value),
-    };
-  }
+  if (Math.abs(value) >= FRACTION_LIMIT) return { count: rounded(value, rounding), d: 1 };
   const base = Math.floor(value);
   const rest = value - base;
   const steps: Fraction[] = [{ n: 0, d: 1 }, ...fractionsOf(sizes), { n: 1, d: 1 }];
@@ -182,7 +184,24 @@ export function formatFraction(
             return gap < -NOISE || (gap <= NOISE && value > 0) ? fraction : best;
           });
   if (!pick) return null;
-  const count = base * pick.d + pick.n;
+  return { count: base * pick.d + pick.n, d: pick.d };
+}
+
+/**
+ * A value in the sizes chosen, as a mixed number ("6 5/16"), and whether it rounds, small values
+ * rounded as chosen too (0.07 to eighths is ≈ 1/8). One that is not zero but rounds to zero reads
+ * "< 1/8", the smallest size chosen. Past a million it is the whole number, rounded as chosen
+ * ("≈ 1,043,262"), so no row's fraction is left blank (Sean, 2026-10-15). Null with no size
+ * chosen, or past where places stop meaning anything (roundToFraction).
+ */
+export function formatFraction(
+  value: number,
+  options: { sizes: ReadonlySet<FractionSize>; rounding: Rounding; locale?: string | undefined },
+): Rounded | null {
+  const { sizes, rounding, locale } = options;
+  const step = roundToFraction(value, { sizes, rounding });
+  if (!step) return null;
+  const { count, d } = step;
   if (count === 0) {
     return value === 0
       ? { text: '0', approx: false }
@@ -191,13 +210,13 @@ export function formatFraction(
   // Written in the fraction's own size, never reduced past it: a below-zero part (d − n) has the
   // same lowest terms as n/d, so the same smallest size chosen writes it.
   const size = Math.abs(count);
-  const whole = Math.floor(size / pick.d);
-  const part = size % pick.d;
-  const text = [whole ? numberFormat(locale).format(whole) : '', part ? `${part}/${pick.d}` : '']
+  const whole = Math.floor(size / d);
+  const part = size % d;
+  const text = [whole ? numberFormat(locale).format(whole) : '', part ? `${part}/${d}` : '']
     .filter(Boolean)
     .join(' ');
   return {
     text: (count < 0 ? minusSign(locale) : '') + text,
-    approx: Math.abs(value - count / pick.d) > noiseAt(value),
+    approx: Math.abs(value - count / d) > noiseAt(value),
   };
 }

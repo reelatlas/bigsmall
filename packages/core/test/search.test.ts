@@ -28,7 +28,9 @@ describe('search: idle lists', () => {
   });
 
   it('lists a category’s units with the visitor’s own system first, each system smallest first', () => {
+    // A pair leads its group, the way its system writes the quantity (ADR 0026).
     expect(ids(search('', { category: 'length', system: 'us' }))).toEqual([
+      'foot-inch',
       'inch',
       'foot',
       'yard',
@@ -49,6 +51,7 @@ describe('search: idle lists', () => {
       'centimeter',
       'meter',
       'kilometer',
+      'foot-inch',
       'inch',
       'foot',
       'yard',
@@ -105,7 +108,9 @@ describe('search: idle lists', () => {
     ]);
     // The stone is British and the short ton American: each with its own visitors' units, and
     // after metric for the other's.
+    // Stone and pounds lead the British units, pounds and ounces the American (ADR 0026).
     expect(ids(search('', { category: 'mass', system: 'imperial' }))).toEqual([
+      'stone-pound',
       'ounce',
       'pound',
       'stone',
@@ -115,10 +120,12 @@ describe('search: idle lists', () => {
       'gram',
       'kilogram',
       'tonne',
+      'pound-ounce',
       'troy-ounce',
       'short-ton',
     ]);
     expect(ids(search('', { category: 'mass', system: 'us' }))).toEqual([
+      'pound-ounce',
       'ounce',
       'pound',
       'short-ton',
@@ -128,6 +135,7 @@ describe('search: idle lists', () => {
       'gram',
       'kilogram',
       'tonne',
+      'stone-pound',
       'troy-ounce',
       'stone',
     ]);
@@ -159,6 +167,7 @@ describe('search: idle lists', () => {
 
   it('lists the specialty units after every standard one, smallest to largest', () => {
     expect(ids(search('', { category: 'length', system: 'us', tier: 'all' }))).toEqual([
+      'foot-inch',
       'inch',
       'foot',
       'yard',
@@ -269,6 +278,7 @@ describe('search: idle lists', () => {
     ]);
     // Angles have no customary system: degrees and radians, the gradian, then the specialty ones.
     expect(ids(search('', { category: 'angle', system: 'us', tier: 'all' }))).toEqual([
+      'degree-arcminute-arcsecond',
       'degree',
       'radian',
       'gradian',
@@ -388,7 +398,12 @@ describe('search: categories and scope', () => {
   });
 
   it('a locked category scopes results to its units and hides categories', () => {
-    expect(ids(search('m', { category: 'time' }))).toEqual(['millisecond', 'minute', 'month']);
+    expect(ids(search('m', { category: 'time' }))).toEqual([
+      'millisecond',
+      'minute',
+      'month',
+      'hour-minute-second',
+    ]);
     expect(ids(search('oz', { category: 'volume' }))).toEqual([
       'us-fluid-ounce',
       'imperial-fluid-ounce',
@@ -411,7 +426,11 @@ describe('search: categories and scope', () => {
     // Units only: "p" also starts Pressure and Power, "f" Fuel economy, and categories lead their
     // class.
     const unitIds = (response: SearchResponse) => ids(response).filter((id) => !id.startsWith('#'));
-    expect(unitIds(search('p', { system: 'us' })).slice(0, 2)).toEqual(['pound', 'us-pint']);
+    expect(unitIds(search('p', { system: 'us' })).slice(0, 3)).toEqual([
+      'pound',
+      'pound-ounce',
+      'us-pint',
+    ]);
     expect(unitIds(search('p', { system: 'us', prefer: 'volume' })).slice(0, 3)).toEqual([
       'us-pint',
       'imperial-pint',
@@ -539,6 +558,7 @@ describe('resolveExact', () => {
       'degree',
       'celsius',
       'fahrenheit',
+      'degree-arcminute-arcsecond',
       'rankine',
     ]);
     expect(ids(search('F', { tier: 'all' }))[0]).toBe('fahrenheit');

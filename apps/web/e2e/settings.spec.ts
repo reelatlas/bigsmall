@@ -655,7 +655,8 @@ test('a word and its count share a baseline in every theme: Units\u2019 reset an
   const region = page.getByRole('region', { name: 'Length' });
   await region.getByRole('button', { name: 'Edit', exact: true }).click();
   await pressControl(
-    region.getByRole('group', { name: 'US (customary)', exact: true }).getByLabel(/inches/),
+    // The inch's own line: "feet and inches" sits in the same group since ADR 0026.
+    region.getByRole('group', { name: 'US (customary)', exact: true }).getByLabel(/^in\s?inches$/),
   );
   await region.getByRole('button', { name: 'Done' }).click();
   await settingsButton(page, 'Units').click();

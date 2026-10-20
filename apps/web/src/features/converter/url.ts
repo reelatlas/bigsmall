@@ -5,7 +5,8 @@ import type { ConverterState, Restorable } from './state';
  * The conversion in the URL, so links and bookmarks reproduce it (docs/UX-SPEC.md §11):
  *   ?a=milliliter&v=5
  * a: the box's unit id · v: the number as typed, in canonical form, so digits a double would round
- * come back whole (or arithmetic's value) · i: Cooking's ingredient, by id (ADR 0021). Links from the two-box converter
+ * come back whole (or arithmetic's value; a compound in its pair's words, "5 ft 11 in", ADR 0026) ·
+ * i: Cooking's ingredient, by id (ADR 0021). Links from the two-box converter
  * (ADR 0013) may also carry b, the second box's unit, and s, which box held v; they open on the
  * box that held the number.
  */
@@ -60,7 +61,8 @@ export function paramsToState(
   const ingredient = named && getIngredient(named) ? named : null;
   if (!unit && number === undefined && !ingredient) return null;
   return {
-    text: number === undefined ? '' : number.replace('.', separators.decimal),
+    // A compound's parts each may carry a decimal ("5 ft 11.5 in"), so every mark is the visitor's.
+    text: number === undefined ? '' : number.replaceAll('.', separators.decimal),
     unit,
     ingredient,
   };

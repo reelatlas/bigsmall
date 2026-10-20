@@ -1,7 +1,7 @@
 # 0011 — Units listed the visitor's way: their own system first, smallest to largest
 
 Date: 2026-10-07
-Status: accepted; amended by 0016 and 0018 (see Amendments)
+Status: accepted; amended by 0016, 0018, and 0026 (see Amendments)
 
 ## Context
 
@@ -33,3 +33,4 @@ The rule lives in core (`orderUnits`, `src/order.ts`); the suggestion list, the 
 
 - **2026-10-08** (ADR 0016): the rule orders the everyday units, and the specialist units every category gained come after them all, in a group of their own, smallest to largest.
 - **2026-10-11, and 2026-10-15** (ADR 0017, superseded by ADR 0018): the order is grouped into sections by system, under fixed names; since 2026-10-15 the visitor can reorder the systems in Units, and the visitor's own first is a fresh visit's order (docs/UX-SPEC.md §3).
+- **2026-10-19** (ADR 0026): a pair (feet and inches, stone and pounds, pounds and ounces, hours, minutes, and seconds, degrees, minutes, and seconds) leads its group, the way its system writes the quantity, ahead of the size order; the size order stands for the rest.

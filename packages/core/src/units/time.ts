@@ -74,6 +74,24 @@ export const timeUnits: readonly Unit[] = [
     source: SI_ACCEPTED,
   },
   {
+    // A duration as a clock counts it (ADR 0026): read from "1h30" or "1 h 30 min 15 s" and
+    // written back as 1 h 30 min 0 s (compound.ts).
+    kind: 'linear',
+    id: 'hour-minute-second',
+    category: 'time',
+    name: 'hours, minutes, and seconds',
+    plural: 'hours, minutes, and seconds',
+    symbol: 'h min s',
+    aliases: ['hours minutes seconds', 'hms'],
+    system: 'metric',
+    tier: 'standard',
+    factor: 3600,
+    exact: true,
+    source: SI_ACCEPTED,
+    pair: ['hour', 'minute', 'second'],
+    note: 'A duration in hours, minutes, and seconds, as a clock counts it.',
+  },
+  {
     kind: 'linear',
     id: 'day',
     category: 'time',

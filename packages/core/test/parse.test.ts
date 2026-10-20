@@ -192,8 +192,9 @@ describe('parse in other scripts and conventions', () => {
   it('reads an apostrophe as grouping only before a group of three', () => {
     expect(parse(`1${RIGHT_QUOTE}234${RIGHT_QUOTE}567.891`).value).toBe(1234567.891);
     expect(parse("12'345 ft")).toMatchObject({ value: 12345, query: 'ft' });
-    // Feet and inches keep their apostrophe for the query.
-    expect(parse(`5'10"`)).toMatchObject({ value: 5, query: `'10"` });
+    // Feet and inches keep their apostrophe, and read as one quantity (compound.test.ts).
+    expect(parse(`5'10"`)).toMatchObject({ value: 5 + 10 / 12, valueText: `5'10"` });
+    expect(parse(`5'10"`).compound?.unit).toBe('foot-inch');
   });
 
   it('reads digits typed in any script, and fullwidth forms, keeping what was typed', () => {

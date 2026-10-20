@@ -103,6 +103,14 @@ interface UnitMeta {
    */
   pace?: true;
   /**
+   * A pair, or a triple: a quantity written in two or three units of one kind, largest first
+   * (feet and inches, stone and pounds, hours, minutes, and seconds; ADR 0026), by its parts' ids.
+   * The unit's own factor is its first part's, so a plain number in it is that part (6 in feet and
+   * inches is 6 ft); its value is read from and written as its parts (compound.ts), and it leads
+   * its section in the table (order.ts).
+   */
+  pair?: readonly string[];
+  /**
    * A unit of one ingredient alone, as people count it (a stick of butter, a large egg; ADR 0021):
    * listed only with that ingredient, and taking it brings the ingredient.
    */

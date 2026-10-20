@@ -32,6 +32,24 @@ export const angleUnits: readonly Unit[] = [
     source: SI_ACCEPTED,
   },
   {
+    // An angle as coordinates write it (ADR 0026): read from "45° 30′ 15″" or "45d 30m 15s" and
+    // written back as 45° 30′ 15″ (compound.ts).
+    kind: 'linear',
+    id: 'degree-arcminute-arcsecond',
+    category: 'angle',
+    name: 'degrees, minutes, and seconds',
+    plural: 'degrees, minutes, and seconds',
+    symbol: '° ′ ″',
+    aliases: ['degrees minutes seconds', 'dms'],
+    system: 'metric',
+    tier: 'standard',
+    factor: Math.PI / 180,
+    exact: true,
+    source: SI_ACCEPTED,
+    pair: ['degree', 'arcminute', 'arcsecond'],
+    note: 'An angle in degrees, minutes, and seconds of arc, as coordinates are written.',
+  },
+  {
     kind: 'linear',
     id: 'radian',
     category: 'angle',

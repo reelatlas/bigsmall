@@ -12,6 +12,9 @@ export const URL_WRITE_MS = 250;
 /** How long after the last change the result is announced to screen readers (§7). */
 export const ANNOUNCE_MS = 600;
 
+/** How long an input the box could not read stands before its shape is counted (§11, ADR 0019). */
+export const UNREAD_SETTLE_MS = 1500;
+
 /** The copy check shows at least this long, so a quick click-and-move still shows it (§7). */
 export const COPIED_MIN_MS = 1000;
 

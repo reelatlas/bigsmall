@@ -4,6 +4,14 @@ const SI = 'BIPM SI Brochure, 9th ed. (2019), Table 8';
 const GREG = 'Gregorian calendar: mean year 365.2425 d (146,097 d / 400 y); mean month = year / 12';
 
 export const time: GoldenRow[] = [
+  // The pair is its first part's size: one of it is 3600 of its last part (ADR 0026).
+  {
+    value: 1,
+    from: 'hour-minute-second',
+    to: 'second',
+    expected: 3600,
+    source: 'BIPM SI Brochure, 9th ed. (2019), Table 8: 1 h = 3600 s',
+  },
   { value: 1, from: 'minute', to: 'second', expected: 60, source: `${SI}: 1 min = 60 s` },
   { value: 1, from: 'hour', to: 'minute', expected: 60, source: `${SI}: 1 h = 60 min` },
   { value: 1, from: 'day', to: 'hour', expected: 24, source: `${SI}: 1 d = 24 h` },

@@ -66,7 +66,7 @@ Wave 3 (2026-10-19), numbered for Sean: where to see it, what changes, one recom
 
 **The order after the yeses:** compound input; shoe sizes; the five defined-fact categories; Blood sugar; the start and the menu at 23 with the folded sections; the pair template and the hubs; the batch; launch. Keyword Planner later, ads after launch (Sean, 2026-10-19).
 
-**Sean's answers** (2026-10-19, the ninety-seventh pass in the findings log): decision 2 yes, the flat 23 with the hairline; decision 3 yes, with the symbol column sized to the table's widest symbol, the pair's included, rather than a wrap; decision 5 yes, with his review of every page's description and presentation before it ships, and the breadcrumb settled as the pair pages' and the hubs' quiet line only, conversion never loading a page; the formula and example rendered from core's data; decisions 1, 4, 6, and 7 not spoken to, the recommendations standing.
+**Sean's answers** (2026-10-19, the ninety-seventh pass in the findings log): decision 2 yes, the flat 23 with the hairline; decision 3 yes, with the symbol column sized to the table's widest symbol, the pair's included, rather than a wrap; decision 5 yes, with his review of every page's description and presentation before it ships, and the breadcrumb settled as the pair pages' and the hubs' quiet line only, conversion never loading a page; the formula and example rendered from core's data; decisions 1, 4, 6, and 7 not spoken to, the recommendations standing. **Built** the same day: decision 3, the compound build, with decision 7's count of unread inputs (ADR 0026; docs/UX-SPEC.md §2, §5, §7, §11).
 
 ## 6. Cost and learnings
 

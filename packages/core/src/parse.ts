@@ -1,5 +1,20 @@
+import { readCompound, type Compound } from './compound';
 import { MINUS } from './format';
 import { DEFAULT_SEPARATORS, type Separators } from './locale';
+import {
+  canonicalNumber,
+  DIVIDE,
+  EXPONENT_MARK,
+  numberAt,
+  readable,
+  readableSeparators,
+  SIGNS,
+  skipSpace,
+  TIMES,
+  toNumber,
+} from './number';
+
+export { NBSP } from './number';
 
 /**
  * What the user typed, split into the number or arithmetic (if any) and the unit query (if any).
@@ -7,10 +22,14 @@ import { DEFAULT_SEPARATORS, type Separators } from './locale';
 export interface ParsedInput {
   raw: string;
   /**
-   * The number the text starts with, or the value of the arithmetic it starts with ("5+3" is 8).
+   * The number the text starts with, or the value of the arithmetic it starts with ("5+3" is 8),
+   * or of the compound it starts with, in its pair's first part ("5 ft 11 in" is 5.916… feet).
    */
   value?: number;
-  /** The exact substring read as the number or the arithmetic, a trailing operator included. */
+  /**
+   * The exact substring read as the number, the arithmetic (a trailing operator included), or the
+   * compound.
+   */
   valueText?: string;
   /**
    * Whatever followed the number, trimmed, original case. The whole text when there is no
@@ -25,7 +44,7 @@ export interface ParsedInput {
   outOfRange?: 'large' | 'small';
   /**
    * Set when the arithmetic has no answer, and `value` is then absent: 'divide-by-zero' ("5 ÷ 0",
-   * "0^-1"), or 'not-real' for a power with no real value ("(-8)^0.5").
+   * "0^-1"), or 'not-real' for a power with no real value ("(−8)^0.5").
    */
   invalid?: 'divide-by-zero' | 'not-real';
   /** Set when the value comes from arithmetic rather than one number, so the UI can show it. */
@@ -38,30 +57,17 @@ export interface ParsedInput {
   /**
    * The number exactly as typed, when the text is one number rather than arithmetic: its digits in
    * canonical form, a period decimal, no grouping, and an E exponent ("1,000.50" is "1000.50"), so
-   * a URL can keep digits a double would round ("123456789012345678"); a clock as typed ("5:30").
+   * a URL can keep digits a double would round ("123456789012345678"); a clock as typed ("5:30");
+   * a compound in its pair's own words ("5 ft 11 in"), which reads back as the same value.
    */
   canonical?: string;
+  /**
+   * Set when the text starts with a quantity in two or three units of one kind (ADR 0026;
+   * compound.ts): "5'11", "5 ft 11 in", "11 st 4", "1h30", "45° 30′ 15″". The value is then in the
+   * pair's first part, and the pair is the unit the text names.
+   */
+  compound?: Compound;
 }
-
-// Characters that are easy to get wrong as escapes, so they are named once (the minus in
-// format.ts).
-/** The no-break space, named once (an amount and its symbol stay on one line in the web). */
-export const NBSP = String.fromCharCode(0x00a0);
-const NARROW_NBSP = String.fromCharCode(0x202f);
-const TIMES = String.fromCharCode(0x00d7);
-const DIVIDE = String.fromCharCode(0x00f7);
-const RIGHT_QUOTE = String.fromCharCode(0x2019);
-const ARABIC_DECIMAL = String.fromCharCode(0x066b);
-const ARABIC_GROUP = String.fromCharCode(0x066c);
-/** The marks that set a run's direction, which Intl writes around a minus sign in some scripts. */
-const DIRECTION_MARKS = new Set([0x200e, 0x200f, 0x061c].map((code) => String.fromCharCode(code)));
-
-/** Fullwidth forms, as a Japanese or Chinese keyboard types them, sit this far above ASCII. */
-const FULLWIDTH = { first: 0xff01, last: 0xff5e, offset: 0xfee0 } as const;
-const DECIMAL_DIGIT = /\p{Nd}/u;
-const LETTERS = /^\p{L}+$/u;
-/** An apostrophe between a digit and a group of exactly three: grouping, as Swiss numbers write. */
-const GROUPING_APOSTROPHE = new RegExp(`([0-9])['${RIGHT_QUOTE}](?=[0-9]{3}(?![0-9]))`, 'g');
 
 type Operator = 'add' | 'subtract' | 'multiply' | 'divide' | 'power';
 
@@ -77,31 +83,19 @@ const OPERATORS: Readonly<Record<string, Operator>> = {
   '^': 'power',
 };
 
-const SIGNS = new Set(['+', '-', MINUS]);
-const DIGITS = '[0-9]+';
-const SEPARATOR = `[.,${NBSP}${NARROW_NBSP}]`;
-const ENDS_A_NUMBER = `[ ${NBSP}${NARROW_NBSP})+*/^${TIMES}${DIVIDE}${MINUS}-]`;
+const NONZERO_DIGIT = /[1-9]/;
 
 /**
- * One unsigned number (arithmetic reads the signs): digit groups split by ".", ",", or a
- * non-breaking space, an optional exponent, and a decimal mark still waiting for its digits
- * ("5." on the way to 5.5) when only space, an operator, or the end follows it.
+ * Words people type around a quantity that name no unit (docs/UX-SPEC.md §2; the demand map's
+ * compound worker, 2026-10-19): a question's start before a number ("how tall is 180 cm",
+ * "convert 5 ft 11 in"), and "tall" or "high" after it ("5'11 tall"), with a question mark. Each
+ * is dropped only beside a number, so a word still being typed on its own stays a query.
  */
-const NUMBER = new RegExp(
-  `(?:${DIGITS}(?:${SEPARATOR}${DIGITS})*|[.,]${DIGITS})(?:[eE][+${MINUS}-]?${DIGITS})?(?:[.,](?=$|${ENDS_A_NUMBER}))?`,
-  'y',
+const LEADING_NOISE = new RegExp(
+  `^(?:how\\s+(?:tall|heavy|far|long|much|big|hot|cold|fast|old)\\s+is|what\\s+is|what's|convert)\\s+(?=[0-9.,+(${MINUS}-])`,
+  'iu',
 );
-/**
- * A time written as a clock writes it, each part sixtieths of the one before: "5:30" is 5 and 30
- * sixtieths, a pace's minutes and seconds ("5:30 /km") or an hour and a half ("1:30 h"), and
- * "1:05:30" has three parts. Every part after the first is two digits under 60. Read before a
- * plain number, so its digits are not taken for one.
- */
-const CLOCK = /[0-9]+(?::[0-5][0-9]){1,2}(?![0-9])/y;
-const ANY_SEPARATOR = new RegExp(SEPARATOR, 'g');
-const TRAILING_MARK = /[.,]$/;
-const EXPONENT_MARK = /[eE]/;
-const NONZERO_DIGIT = /[1-9]/;
+const TRAILING_NOISE = /\s+(?:tall|high)$/iu;
 
 type NumberToken = { kind: 'number'; text: string; start: number; value: number };
 type Token =
@@ -114,22 +108,42 @@ type Token =
 /**
  * Parse one box's text. Lenient by design (docs/UX-SPEC.md §2): spacing never matters, both
  * "1,000.5" and "1.000,5" work, a lone separator is read the way the locale would write it unless
- * the digits make that reading impossible ("1,5" is 1.5 everywhere), and the number can be
- * arithmetic ("2 × 3 ft", "(5 + 7) / 2 cm", "2^10 bytes").
+ * the digits make that reading impossible ("1,5" is 1.5 everywhere), the number can be
+ * arithmetic ("2 × 3 ft", "(5 + 7) / 2 cm", "2^10 bytes"), and a quantity in two or three units
+ * of one kind is read as one ("5'11", "11 st 4", "1h30"; compound.ts).
  */
 export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS): ParsedInput {
   const trimmed = text.trim();
   if (!trimmed) return { raw: text };
+  const body = trimmed
+    .replace(/\s*\?$/u, '')
+    .replace(TRAILING_NOISE, '')
+    .replace(LEADING_NOISE, '')
+    .trim();
+  if (!body) return { raw: text, query: trimmed };
+
+  const compound = readCompound(body, separators);
+  if (compound) {
+    const result: ParsedInput = { raw: text, valueText: body.slice(0, compound.end) };
+    if (Number.isFinite(compound.value)) {
+      result.value = compound.value;
+      result.canonical = compound.canonical;
+    } else result.outOfRange = 'large';
+    result.compound = { unit: compound.unit, parts: compound.parts };
+    const rest = body.slice(compound.end).trim();
+    if (rest) result.query = rest;
+    return result;
+  }
 
   // Scanned in a readable copy, mapped back to the typed text, so the number and the query keep
   // the characters that were typed.
-  const read = readable(trimmed, separators.exponent);
+  const read = readable(body, separators.exponent);
   const marked = readableSeparators(separators);
   const scanned = scan(read.text, marked);
-  if (!scanned) return { raw: text, query: trimmed };
+  if (!scanned) return { raw: text, query: body };
 
-  const end = read.at[scanned.end] ?? trimmed.length;
-  const result: ParsedInput = { raw: text, valueText: trimmed.slice(0, end) };
+  const end = read.at[scanned.end] ?? body.length;
+  const result: ParsedInput = { raw: text, valueText: body.slice(0, end) };
   const numbers = scanned.tokens.filter((token): token is NumberToken => token.kind === 'number');
   const marks = numbers.flatMap((token) => {
     const at = token.text.search(EXPONENT_MARK);
@@ -157,7 +171,7 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
     result.canonical = `${signs.length % 2 === 1 ? '-' : ''}${digits}`;
   }
 
-  const rest = trimmed.slice(end).trim();
+  const rest = body.slice(end).trim();
   if (rest) result.query = rest;
   return result;
 }
@@ -224,82 +238,6 @@ function scan(text: string, separators: Separators): { tokens: Token[]; end: num
   }
 
   return tokens.some((token) => token.kind === 'number') ? { tokens, end } : null;
-}
-
-/** A readable copy of typed text, and where each of its characters was typed. */
-interface Readable {
-  text: string;
-  /** The typed index of each character of `text`, then the typed text's length. */
-  at: number[];
-}
-
-/**
- * The text as the scanner reads it, each character mapped back to where it was typed: any
- * script's digits as ASCII (١٢٣ and १२३ are 123), fullwidth forms as ASCII (１２．５ is 12.5), the
- * Arabic decimal and group marks as a period and a comma, direction marks dropped, a locale's
- * exponent written in letters (Arabic's أس) as E, and an apostrophe between digit groups of three
- * as grouping (1'234'567), while 5'10 keeps its own.
- */
-function readable(typed: string, exponent: string | undefined): Readable {
-  let text = '';
-  const at: number[] = [];
-  let index = 0;
-  for (const char of typed) {
-    const read = DIRECTION_MARKS.has(char) ? '' : readableChar(char);
-    for (let unit = 0; unit < read.length; unit += 1) at.push(index + unit);
-    text += read;
-    index += char.length;
-  }
-  at.push(typed.length);
-  if (exponent && exponent.toUpperCase() !== 'E' && LETTERS.test(exponent)) {
-    for (let from = text.indexOf(exponent); from >= 0; from = text.indexOf(exponent, from + 1)) {
-      if (from === 0 || !/[0-9.,]/.test(text[from - 1] ?? '')) continue;
-      text = `${text.slice(0, from)}E${text.slice(from + exponent.length)}`;
-      at.splice(from + 1, exponent.length - 1);
-    }
-  }
-  text = text.replace(GROUPING_APOSTROPHE, (_, digit: string) => `${digit}${NARROW_NBSP}`);
-  return { text, at };
-}
-
-function readableChar(char: string): string {
-  const code = char.charCodeAt(0);
-  // A character outside the basic plane is two units long, and stays as typed to keep the length.
-  if (code < 0x80 || char.length > 1) return char;
-  if (code >= FULLWIDTH.first && code <= FULLWIDTH.last) {
-    return String.fromCharCode(code - FULLWIDTH.offset);
-  }
-  if (char === ARABIC_DECIMAL) return '.';
-  if (char === ARABIC_GROUP) return ',';
-  return DECIMAL_DIGIT.test(char) ? String(digitValue(code)) : char;
-}
-
-/** A decimal digit's value: how far it sits from the zero that starts its run of ten. */
-function digitValue(code: number): number {
-  let zero = code;
-  while (DECIMAL_DIGIT.test(String.fromCharCode(zero - 1))) zero -= 1;
-  return (code - zero) % 10;
-}
-
-/** The locale's marks as readable() writes them: the Arabic ones as a period and a comma. */
-function readableSeparators(separators: Separators): Separators {
-  const read = (mark: string) =>
-    mark === ARABIC_DECIMAL ? '.' : mark === ARABIC_GROUP ? ',' : mark;
-  return { decimal: read(separators.decimal), group: read(separators.group) };
-}
-
-function skipSpace(text: string, from: number): number {
-  let i = from;
-  while (i < text.length && text[i]!.trim() === '') i += 1;
-  return i;
-}
-
-function numberAt(text: string, at: number): string | null {
-  CLOCK.lastIndex = at;
-  const clock = CLOCK.exec(text)?.[0];
-  if (clock) return clock;
-  NUMBER.lastIndex = at;
-  return NUMBER.exec(text)?.[0] ?? null;
 }
 
 function startsOperand(text: string, at: number): boolean {
@@ -419,59 +357,4 @@ function evaluate(scanned: readonly Token[]): Evaluation {
 
   result.value = sum();
   return result;
-}
-
-/**
- * The number the text spells, which may be Infinity or a zero that underflowed; parse() judges
- * the range.
- */
-function toNumber(text: string, separators: Separators): number {
-  if (text.includes(':')) {
-    // A clock: each part sixtieths of the one before ("5:30" is 5.5, "1:05:30" 1.0916…).
-    return text.split(':').reduce((value, part, at) => value + Number(part) / 60 ** at, 0);
-  }
-  return Number(canonicalNumber(text, separators));
-}
-
-/** A typed number's digits in canonical form: a period decimal, no grouping, an E exponent. */
-function canonicalNumber(text: string, separators: Separators): string {
-  let body = text.replace(TRAILING_MARK, '').split(MINUS).join('-');
-  let exponent = '';
-  const expIndex = body.search(EXPONENT_MARK);
-  if (expIndex >= 0) {
-    exponent = body.slice(expIndex + 1);
-    body = body.slice(0, expIndex);
-  }
-
-  const decimalIndex = findDecimal(body, separators);
-  const integerPart = (decimalIndex >= 0 ? body.slice(0, decimalIndex) : body).replace(
-    ANY_SEPARATOR,
-    '',
-  );
-  const fractionPart =
-    decimalIndex >= 0 ? body.slice(decimalIndex + 1).replace(ANY_SEPARATOR, '') : '';
-
-  return `${integerPart || '0'}${fractionPart ? `.${fractionPart}` : ''}${exponent ? `E${exponent}` : ''}`;
-}
-
-/**
- * Index of the decimal separator in `body`, or -1 when every separator is a group separator.
- * - Two different separator characters: the last one is the decimal ("1,234.5" and "1.234,5").
- * - One character used more than once: grouping ("1,000,000").
- * - One character used once: the locale decides, except that a tail that is not exactly 3 digits
- *   can only be a fraction ("1,5" is 1.5 even in en-US), and non-breaking spaces always group.
- */
-function findDecimal(body: string, separators: Separators): number {
-  const found = [...body.matchAll(ANY_SEPARATOR)].map((m) => ({ char: m[0], index: m.index }));
-  if (found.length === 0) return -1;
-
-  const last = found[found.length - 1]!;
-  const distinct = new Set(found.map((f) => f.char));
-  if (distinct.size > 1) return last.index;
-  if (found.length > 1) return -1;
-
-  const tailLength = body.length - last.index - 1;
-  if (last.char === NBSP || last.char === NARROW_NBSP) return -1;
-  if (last.char === separators.decimal) return last.index;
-  return tailLength === 3 ? -1 : last.index;
 }

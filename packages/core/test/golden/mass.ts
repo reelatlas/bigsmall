@@ -4,6 +4,21 @@ const YP = 'International Yard and Pound Agreement (1959)';
 const SP811 = 'NIST SP 811 (2008) Appendix B.8';
 
 export const mass: GoldenRow[] = [
+  // The pairs are their first part's size: a stone of 14 lb, a pound of 16 oz (ADR 0026).
+  {
+    value: 1,
+    from: 'stone-pound',
+    to: 'pound',
+    expected: 14,
+    source: 'UK Weights and Measures Act 1985, Schedule 1: 1 stone = 14 lb',
+  },
+  {
+    value: 1,
+    from: 'pound-ounce',
+    to: 'ounce',
+    expected: 16,
+    source: 'NIST Handbook 44, Appendix C: 1 lb = 16 oz (avoirdupois)',
+  },
   {
     value: 1,
     from: 'pound',

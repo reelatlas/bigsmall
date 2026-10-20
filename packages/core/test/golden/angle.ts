@@ -4,6 +4,14 @@ const SI_TABLE_8 = 'BIPM SI Brochure, 9th ed. (2019), Table 8';
 const SP811 = 'NIST SP 811 (2008) Appendix B.8';
 
 export const angle: GoldenRow[] = [
+  // The pair is its first part's size: one of it is 3600 of its last part (ADR 0026).
+  {
+    value: 1,
+    from: 'degree-arcminute-arcsecond',
+    to: 'arcsecond',
+    expected: 3600,
+    source: 'BIPM SI Brochure, 9th ed. (2019), Table 8: 1° = 60′, 1′ = 60″',
+  },
   {
     value: 180,
     from: 'degree',

@@ -12,6 +12,8 @@ export { DEFAULT_SEPARATORS, localeSeparators } from './locale';
 export type { Separators } from './locale';
 export { NBSP, parse } from './parse';
 export type { ParsedInput } from './parse';
+export { formatPair, pairCanonical, pairFormula, pairParts, readCompound } from './compound';
+export type { Compound, CompoundPart, CompoundRead, PairFormat } from './compound';
 export { normalizeKey, compactKey, compactKeyWithDegree } from './normalize';
 export { search, resolveExact, suggest } from './search';
 export type {
@@ -51,5 +53,6 @@ export {
   formatSignificant,
   fractionsOf,
   FRACTION_SIZES,
+  roundToFraction,
 } from './rounded';
 export type { Fraction, FractionSize, Rounded, Rounding } from './rounded';

@@ -16,6 +16,8 @@ const YARD_POUND =
 const STONE =
   'UK Weights and Measures Act 1985, Schedule 1: 1 stone = 14 lb; pound per the 1959 agreement';
 
+const POUND_OUNCE =
+  'NIST Handbook 44, Appendix C: 1 lb = 16 oz (avoirdupois); the pound per the 1959 agreement';
 const CARAT = 'NIST SP 811 (2008) Appendix B.8: carat, metric = 2.0E-04 kg (exact)';
 const GRAIN = 'NIST SP 811 (2008) Appendix B.8: grain = 6.479891E-05 kg (exact); 7000 gr = 1 lb';
 const TROY =
@@ -124,6 +126,42 @@ export const massUnits: readonly Unit[] = [
     exact: true,
     source: STONE,
     note: '14 pounds. Used for body weight in the UK and Ireland.',
+  },
+  {
+    // Body weight as the UK writes it (ADR 0026): read from "11 st 4" and written back as
+    // 11 st 4 lb (compound.ts).
+    kind: 'linear',
+    id: 'stone-pound',
+    category: 'mass',
+    name: 'stone and pounds',
+    plural: 'stone and pounds',
+    symbol: 'st lb',
+    aliases: ['stone and pound', 'stones and pounds', 'st-lb'],
+    system: 'uk',
+    tier: 'standard',
+    factor: 6.35029318,
+    exact: true,
+    source: STONE,
+    pair: ['stone', 'pound'],
+    note: 'Body weight as the UK writes it: the stone, then the pounds left over.',
+  },
+  {
+    // A weight as the US writes it, a newborn's (ADR 0026): read from "6 lb 3" and written back as
+    // 6 lb 3 oz (compound.ts).
+    kind: 'linear',
+    id: 'pound-ounce',
+    category: 'mass',
+    name: 'pounds and ounces',
+    plural: 'pounds and ounces',
+    symbol: 'lb oz',
+    aliases: ['pound and ounce', 'lbs and oz', 'lb-oz'],
+    system: 'us',
+    tier: 'standard',
+    factor: 0.45359237,
+    exact: true,
+    source: POUND_OUNCE,
+    pair: ['pound', 'ounce'],
+    note: 'A weight as the US writes it, a newborn\u2019s: the pounds, then the ounces left over.',
   },
   {
     kind: 'linear',

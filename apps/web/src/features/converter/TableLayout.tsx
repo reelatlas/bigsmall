@@ -1,4 +1,12 @@
-import { formatClock, formatNumber, getUnit, ingredients, type CategoryId } from '@bigsmall/core';
+import {
+  convert,
+  formatClock,
+  formatNumber,
+  getUnit,
+  ingredients,
+  type CategoryId,
+  type Unit,
+} from '@bigsmall/core';
 import {
   Fragment,
   useEffect,
@@ -29,13 +37,15 @@ import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
 import { useKept } from '../../lib/keeping';
 import { useRefit } from '../../lib/fit-step';
-import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
+import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID, QUIET_LINK } from '../../lib/recipes';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
 import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
 import {
+  BOX_PRECISION,
   ingredientList,
   noMatchMessage,
+  pairText,
   TABLE_PRECISION,
   type BoxView,
   type HistoryAction,
@@ -98,6 +108,12 @@ const TABLE_LEADING = 'flex shrink-0 items-center gap-1';
 const TABLE_TOOLS = 'ml-auto flex shrink-0 items-center gap-1';
 /** The box's row in the head. */
 const TABLE_BOX_CELL = 'md:row-start-2';
+/**
+ * The quiet line under the box (docs/UX-SPEC.md §5; ADR 0026): what a compound was read as, 8 px
+ * under the box, set in to the box's text, in the muted ink at the small size; the other reading,
+ * where there is one, a quiet link after it. Part of the head, so it stays with the box.
+ */
+const READ_LINE = 'mt-2 flex flex-wrap items-baseline gap-x-3 px-4 text-sm text-ink-muted';
 /**
  * 8 px under the box, its popup, as the toolbar sits 8 px over it; a container, so the categories
  * go four across once it has the room. Under an open side panel (below md) the panel's own 16 px
@@ -242,6 +258,7 @@ export function TableLayout({
 }: TableLayoutProps) {
   const listId = useId();
   const hiddenListId = `${listId}-hidden`;
+  const readId = `${listId}-read`;
   const itemId = (index: number) => `${listId}-item-${index}`;
   /**
    * Cooking's ingredients, listed in the table's place while the ingredient's pill holds them open
@@ -564,6 +581,12 @@ export function TableLayout({
           .filter(Boolean)
           .join(' ')
       : listId;
+  /** The matches lead with a compound's pair, which Enter takes as it takes a typed unit's best match. */
+  const offersPair =
+    table.kind === 'matches' &&
+    box.parsed.compound !== undefined &&
+    table.rows[0]?.kind === 'unit' &&
+    table.rows[0].unit.id === box.parsed.compound.unit;
   const rest = table.kind === 'units' && box.unit ? table.rows.findIndex((row) => row.inBox) : -1;
   const at = position === null ? rest : Math.min(position, rowCount - 1);
   /** The arrows have moved the cursor into the table's place: Escape first brings it back. */
@@ -798,6 +821,22 @@ export function TableLayout({
       ),
     );
 
+  /**
+   * The text a unit taken from the matches brings: the number as typed, or, with a compound in the
+   * box, the compound converted into the unit ("5'11 cm" taken as centimeters is 180.34; ADR
+   * 0026), since a quantity in two units cannot be re-read in a third.
+   */
+  const textFor = (unit: Unit): string => {
+    const { compound, value } = box.parsed;
+    if (!compound || value === undefined || unit.id === compound.unit) return number;
+    const pair = getUnit(compound.unit);
+    if (!pair || pair.category !== unit.category) return number;
+    const converted = convert(value, pair, unit);
+    return unit.pair
+      ? pairText(converted, unit, env.locale, BOX_PRECISION)
+      : formatNumber(converted, { locale: env.locale });
+  };
+
   /** A unit taken into the box, with its new text; the category follows, and the cursor rests on its row. */
   const take = (unitId: string, text: string, ingredient?: string) => {
     dispatch(
@@ -850,13 +889,13 @@ export function TableLayout({
       const hiddenMatch = revealed ? table.hidden[index - table.rows.length] : undefined;
       if (!match && !hiddenMatch) return;
       showBox.current = true;
-      if (match?.kind === 'unit') take(match.unit.id, number);
+      if (match?.kind === 'unit') take(match.unit.id, textFor(match.unit));
       else if (match?.kind === 'ingredient') {
         takeIngredient(match.ingredient.id, match.unit?.id ?? null);
       } else if (match) chooseCategory(match.category.id);
       else if (hiddenMatch) {
         choose([hiddenMatch], true);
-        take(hiddenMatch.unit.id, number);
+        take(hiddenMatch.unit.id, textFor(hiddenMatch.unit));
       }
     } else {
       const row = table.rows[index];
@@ -866,6 +905,9 @@ export function TableLayout({
       else if (row.value === null) take(row.unit.id, number);
       // A pace comes into the box as the row writes it, minutes and seconds (5:30).
       else if (row.clock) take(row.unit.id, formatClock(row.value, { locale: env.locale }));
+      // A pair comes as its parts, the last to the ten digits a box shows (ADR 0026).
+      else if (row.pair)
+        take(row.unit.id, pairText(row.value, row.pair, env.locale, BOX_PRECISION));
       else take(row.unit.id, formatNumber(row.value, { locale: env.locale }));
     }
   };
@@ -945,9 +987,9 @@ export function TableLayout({
         event.preventDefault();
         const worked = evaluatedText(box.text, env);
         if (browsing) takeRow(at);
-        // A typed unit takes its best match; Cooking's ingredients, listed to choose from, are
-        // gone into, as a category's units are.
-        else if (table.kind === 'matches' && table.query !== '') takeRow(0);
+        // A typed unit takes its best match, and a compound its pair (ADR 0026); Cooking's
+        // ingredients, listed to choose from, are gone into, as a category's units are.
+        else if (table.kind === 'matches' && (table.query !== '' || offersPair)) takeRow(0);
         else if (table.kind === 'matches') setPosition(0);
         else if (worked !== null) dispatch({ type: 'replace', text: worked });
         else if (box.unit) setPosition(null);
@@ -1131,9 +1173,17 @@ export function TableLayout({
               locale={env.locale}
               unit={box.unit}
               ingredient={box.ingredient}
-              // What the field takes, never a value it might be mistaken for.
-              placeholder={box.unit ? 'Number' : 'Number or unit'}
-              describedBy={describedBy}
+              // What the field takes, never a value it might be mistaken for; a pair, by its
+              // name, since it takes its parts ("Feet and inches").
+              placeholder={
+                box.unit
+                  ? box.unit.pair
+                    ? box.unit.plural.charAt(0).toUpperCase() + box.unit.plural.slice(1)
+                    : 'Number'
+                  : 'Number or unit'
+              }
+              // The quiet line describes the field too, so a screen reader hears the reading.
+              describedBy={box.read ? `${describedBy} ${readId}` : describedBy}
               popup={{
                 expanded: rowCount > 0,
                 controls,
@@ -1143,8 +1193,9 @@ export function TableLayout({
               symbolOnly={display.names === 'symbol'}
               // With a unit in the chip the box takes a number alone, so a phone brings up its
               // number pad; with none, letters type a unit ("2 cups"), and the chip's × brings
-              // them back (Sean, 2026-10-15).
-              numberPad={box.unit !== null && !SIGNED.has(box.unit.category)}
+              // them back (Sean, 2026-10-15). A pair takes its parts' marks and words (5'11,
+              // 11 st 4), so it keeps the full keyboard (ADR 0026).
+              numberPad={box.unit !== null && !SIGNED.has(box.unit.category) && !box.unit.pair}
               onChange={onChange}
               onKeyDown={onKeyDown}
               // The field's ×: its text goes and its unit stays, one undoable step, the caret back
@@ -1187,6 +1238,26 @@ export function TableLayout({
                 if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
               }}
             />
+            {/* The quiet line (ADR 0026): what was read, and the other reading one press away, as
+                one undoable step, the caret back in the box after a click. */}
+            {box.read && (
+              <p id={readId} className={READ_LINE} data-read>
+                <span>Read as {box.read.text}</span>
+                {box.read.alternate && (
+                  <button
+                    type="button"
+                    className={QUIET_LINK}
+                    onClick={() => {
+                      const { text, unit } = box.read!.alternate!;
+                      take(unit, text);
+                      if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+                    }}
+                  >
+                    Read as {box.read.alternate.text} instead
+                  </button>
+                )}
+              </p>
+            )}
           </div>
         </div>
         {side && (

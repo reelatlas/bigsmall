@@ -120,6 +120,23 @@ describe('paramsToState', () => {
     expect(paramsToState(new URLSearchParams('a=us-cup&i=moon-dust'))?.ingredient).toBeNull();
   });
 
+  it('carries a compound in its pair’s words, and reads it back in the visitor’s decimal mark (ADR 0026)', () => {
+    const height = stateToParams(holding("5'11", 'foot-inch'), EN);
+    expect(height.toString()).toBe('a=foot-inch&v=5+ft+11+in');
+    expect(paramsToState(height)).toEqual({
+      text: '5 ft 11 in',
+      unit: 'foot-inch',
+      ingredient: null,
+    });
+    const half = stateToParams(holding('5 ft 11,5 in', 'foot-inch'), DE);
+    expect(half.toString()).toBe('a=foot-inch&v=5+ft+11.5+in');
+    expect(paramsToState(half, DE)?.text).toBe('5 ft 11,5 in');
+    expect(paramsToState(half, EN)?.text).toBe('5 ft 11.5 in');
+    // An angle's marks travel too.
+    const angle = stateToParams(holding('45° 30′ 15″', 'degree-arcminute-arcsecond'), EN);
+    expect(paramsToState(angle)?.text).toBe('45° 30′ 15″');
+  });
+
   it('ignores a bad value but keeps the unit', () => {
     expect(paramsToState(new URLSearchParams('a=meter&v=abc'))).toEqual({
       text: '',

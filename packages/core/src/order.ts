@@ -46,9 +46,10 @@ export function unitListGroup(unit: Unit, preference: UnitPreference = 'metric')
  * then of neither, then the specialty units of every system, each group smallest to largest;
  * units of one size keep the catalog's order, most common first. Size orders
  * only units with a plain factor: where a unit has an offset (temperature) or is a reciprocal
- * (fuel economy), the catalog's order stands, the visitor's own standard unit first. Paces come
- * after the rest, the visitor's own first. With no preference, metric leads, as the international
- * default.
+ * (fuel economy), the catalog's order stands, the visitor's own standard unit first. A pair (feet
+ * and inches, ADR 0026) leads its group, the way its system writes the quantity, ahead of the size
+ * order. Paces come after the rest, the visitor's own first. With no preference, metric leads, as
+ * the international default.
  */
 export function orderUnits(units: readonly Unit[], preference: UnitPreference = 'metric'): Unit[] {
   // Paces read the other way, a smaller one faster, and are listed apart, after the units they
@@ -71,7 +72,13 @@ export function orderUnits(units: readonly Unit[], preference: UnitPreference = 
   if (linear.length === units.length) {
     return linear
       .map((unit, index) => ({ unit, index, group: listGroup(unit, preference) }))
-      .sort((a, b) => a.group - b.group || a.unit.factor - b.unit.factor || a.index - b.index)
+      .sort(
+        (a, b) =>
+          a.group - b.group ||
+          Number(!a.unit.pair) - Number(!b.unit.pair) ||
+          a.unit.factor - b.unit.factor ||
+          a.index - b.index,
+      )
       .map(({ unit }) => unit);
   }
   const own = units.find((unit) => listGroup(unit, preference) === 0);

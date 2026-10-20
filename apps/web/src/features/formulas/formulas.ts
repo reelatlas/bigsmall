@@ -3,6 +3,7 @@ import {
   cupBasis,
   getUnit,
   ingredients,
+  pairFormula,
   unitsIn,
   type Category,
   type CupSource,
@@ -78,6 +79,8 @@ export function writtenFactor(value: number): string {
 /** A unit's formula in its category's base unit, by its kind. */
 function formulaOf(unit: Unit, base: Unit): string {
   if (unit.id === base.id) return `${unit.symbol}, the base unit`;
+  // A pair by its parts' ratio (ADR 0026): "1 ft = 12 in".
+  if (unit.pair) return pairFormula(unit);
   switch (unit.kind) {
     case 'linear':
       return `1 ${unit.symbol} = ${writtenFactor(unit.factor)} ${base.symbol}`;

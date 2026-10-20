@@ -7,6 +7,7 @@ import {
   crossesDensity,
   formatClock,
   formatNumber,
+  formatPair,
   getCategory,
   getIngredient,
   getUnit,
@@ -14,6 +15,7 @@ import {
   ingredients,
   matchIngredients,
   NBSP,
+  pairParts,
   parse,
   resolveExact,
   search,
@@ -230,21 +232,89 @@ export interface NumberEnv {
   locale?: string | undefined;
 }
 
-/** The box as the field shows it: its text, its unit, and the text as parsed. */
+/**
+ * What the quiet line under the box says (docs/UX-SPEC.md §5; ADR 0026): how the text was read,
+ * normalised ("5 ft 11 in" for "5'11", "6 ft 2 in" for 5' 14"), and, where another reading is
+ * plausible, that reading one press away: a decimal number of feet whose decimals read as inches
+ * (5.11 ft) offers 5 ft 11 in.
+ */
+export interface BoxReading {
+  /** The reading, after "Read as": "5 ft 11 in"; "5.11 ft, decimal feet". */
+  text: string;
+  /** The other reading: the text and the unit a press puts in the box, as one step. */
+  alternate: { text: string; unit: string } | null;
+}
+
+/** The box as the field shows it: its text, its unit, the text as parsed, and how it was read. */
 export interface BoxView {
   text: string;
   unit: Unit | null;
   /** The ingredient beside the unit, Cooking's second pill (ADR 0021). */
   ingredient: Ingredient | null;
   parsed: ParsedInput;
+  /** The quiet line's reading, where the text calls for one. */
+  read: BoxReading | null;
 }
 
 export function selectBox(state: ConverterState, options: NumberEnv): BoxView {
+  const unit = state.unit ? (getUnit(state.unit) ?? null) : null;
+  const parsed = parse(state.text, options.separators);
   return {
     text: state.text,
-    unit: state.unit ? (getUnit(state.unit) ?? null) : null,
+    unit,
     ingredient: state.ingredient ? (getIngredient(state.ingredient) ?? null) : null,
-    parsed: parse(state.text, options.separators),
+    parsed,
+    read: boxReading(parsed, unit, options.locale),
+  };
+}
+
+/** The digits a box shows a value moved into it to (docs/UX-SPEC.md §7). */
+export const BOX_PRECISION = 10;
+
+/**
+ * A pair's value as its parts, to significant digits of the whole (formatPair): the table's six,
+ * or the box's ten for the quiet line and a pair row moved into the box. Where the total is past
+ * what places mean, the value in the pair's first part alone.
+ */
+export function pairText(
+  value: number,
+  unit: Unit,
+  locale: string | undefined,
+  digits: number = TABLE_PRECISION,
+): string {
+  const written = formatPair(value, unit, { rounding: 'nearest', significant: digits, locale });
+  if (written) return written.text;
+  const first = pairParts(unit)[0];
+  return `${formatNumber(value, { precision: digits, locale })}${first ? ` ${first.symbol}` : ''}`;
+}
+
+/** The units a decimal of feet is read in: feet, and the pair, whose plain number is feet. */
+const FEET: ReadonlySet<string> = new Set(['foot', 'foot-inch']);
+/** A decimal whose decimals could be inches: one or two digits after the point. */
+const DECIMAL_FEET = /^(-?)([0-9]+)\.([0-9]{1,2})$/;
+
+function boxReading(
+  parsed: ParsedInput,
+  unit: Unit | null,
+  locale: string | undefined,
+): BoxReading | null {
+  if (parsed.compound) {
+    const pair = getUnit(parsed.compound.unit);
+    if (!pair || parsed.value === undefined) return null;
+    return { text: pairText(parsed.value, pair, locale, BOX_PRECISION), alternate: null };
+  }
+  // 5.11 ft is decimal feet, as Google reads it (the compound worker's pitfall, 2026-10-19), the
+  // pair one press away where the decimals read as 1 to 11 inches.
+  if (!unit || !FEET.has(unit.id) || parsed.expression || parsed.canonical === undefined) {
+    return null;
+  }
+  const match = DECIMAL_FEET.exec(parsed.canonical);
+  if (!match) return null;
+  const inches = Number(match[3]);
+  if (inches < 1 || inches > 11 || !getUnit('foot-inch')) return null;
+  return {
+    text: `${parsed.valueText ?? ''} ft, decimal feet`,
+    alternate: { text: `${match[1]}${Number(match[2])} ft ${inches} in`, unit: 'foot-inch' },
   };
 }
 
@@ -310,6 +380,11 @@ export interface TableRow {
   clock: boolean;
   /** Measured, not exact: converted through an ingredient's density (Cooking's ≈, ADR 0021). */
   approx: boolean;
+  /**
+   * A pair (ADR 0026), the unit itself: its value is written as its parts, the total rounded and
+   * then split (core's formatPair), whatever Display's places or fractions, and copies as it shows.
+   */
+  pair?: Unit | undefined;
 }
 
 /** A match while a unit is typed: a unit, or a category whose name matched, to open. */
@@ -415,6 +490,25 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       result.kind === 'category' ? [result.category] : [],
     ),
   };
+  // A compound names its pair (ADR 0026): offered as the match to take, first, with whatever a
+  // trailing query matches ("5'11 cm"), until it is the unit in the box.
+  const pair = parsed.compound ? getUnit(parsed.compound.unit) : undefined;
+  if (pair && pair.id !== unit?.id) {
+    const typed = parsed.query ?? '';
+    const rest: MatchesView = typed
+      ? selectMatches(base, typed, unit, category, options)
+      : {
+          ...base,
+          kind: 'matches',
+          category,
+          query: '',
+          rows: [],
+          counts: {},
+          hidden: [],
+          announcement: null,
+        };
+    return withPairFirst(rest, pair);
+  }
   if (typingUnit(parsed)) return selectMatches(base, parsed.query ?? '', unit, category, options);
   if (!category) return { ...base, kind: 'start', announcement: null };
   if (category === 'cooking') {
@@ -423,6 +517,33 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       : ingredientList(base);
   }
   return selectUnits(base, category, unit, parsed, options);
+}
+
+/** The matches with a compound's pair leading them, its category's group first, counted once. */
+function withPairFirst(view: MatchesView, pair: Unit): MatchesView {
+  const category = getCategory(pair.category);
+  if (!category) return view;
+  const rest = view.rows.filter((row) => !(row.kind === 'unit' && row.unit.id === pair.id));
+  const own = rest.filter((row) => row.category.id === pair.category);
+  const others = rest.filter((row) => row.category.id !== pair.category);
+  const rows: MatchRow[] = [
+    { kind: 'unit', unit: pair, category, inBox: false },
+    ...own,
+    ...others,
+  ];
+  const counts: Partial<Record<CategoryId, number>> = {};
+  for (const row of rows) {
+    counts[row.category.id] = (counts[row.category.id] ?? 0) + (row.kind === 'category' ? 0 : 1);
+  }
+  // A pair the settings hide is still the compound's own, offered here; taking it shows it.
+  const hidden = view.hidden.filter((each) => each.unit.id !== pair.id);
+  return {
+    ...view,
+    rows,
+    counts,
+    hidden,
+    announcement: `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`,
+  };
 }
 
 /** Each kind's heading, by its id. */
@@ -715,7 +836,9 @@ function valueRow(
       ? ''
       : target.pace
         ? formatClock(converted, { locale })
-        : formatNumber(converted, { precision: TABLE_PRECISION, locale });
+        : target.pair
+          ? pairText(converted, target, locale)
+          : formatNumber(converted, { precision: TABLE_PRECISION, locale });
   const tooSmall = converted === 0 && value !== 0;
   const shown = text && !tooSmall ? (converted ?? null) : null;
   // 0 in a reciprocal unit has no value in the others: 0 mpg is no distance at all, so no L/100 km.
@@ -733,6 +856,7 @@ function valueRow(
     clock: target.pace === true,
     // Converted through an ingredient's density: measured, not exact (Cooking's ≈).
     approx: converter !== safeConvert && target.id !== from.id && crossesDensity(from, target),
+    pair: target.pair ? target : undefined,
   };
 }
 
@@ -748,6 +872,7 @@ function emptyRow(target: Unit, inBox: Unit | null): TableRow {
     inBox: target.id === inBox?.id,
     clock: target.pace === true,
     approx: false,
+    pair: target.pair ? target : undefined,
   };
 }
 
@@ -941,6 +1066,10 @@ function unitName(unit: Unit, value: number): string {
  * milliliters"), not by what was typed ("5+3").
  */
 function spokenAmount(parsed: ParsedInput, unit: Unit, locale: string | undefined): string {
+  // A compound by its reading, which names its units already: "5 ft 11 in in 13 units of length".
+  if (parsed.compound && parsed.value !== undefined && unit.pair) {
+    return pairText(parsed.value, unit, locale, BOX_PRECISION);
+  }
   const typed =
     parsed.expression && parsed.value !== undefined
       ? formatNumber(parsed.value, { locale })

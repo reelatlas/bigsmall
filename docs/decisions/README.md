@@ -16,7 +16,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0008](0008-hosting-and-domains.md)             | Hosting on Vercel, with bigsmall.work as the main domain                                       | accepted; amended 2026-10-18 (CI no longer gates a deploy)                        |
 | [0009](0009-two-layouts.md)                     | One converter, two layouts: the table by default, two boxes behind a switch                    | superseded by 0013                                                                |
 | [0010](0010-table-without-headline.md)          | The table shows every unit alike; the second box's unit is kept, not shown                     | superseded by 0013                                                                |
-| [0011](0011-listed-order.md)                    | Units listed the visitor's way: their own system first, smallest to largest                    | accepted; amended by 0016 and 0018 (see Amendments)                               |
+| [0011](0011-listed-order.md)                    | Units listed the visitor's way: their own system first, smallest to largest                    | accepted; amended by 0016, 0018, and 0026 (see Amendments)                        |
 | [0012](0012-table-as-unit-list.md)              | The table is the unit list: a category menu, and a cursor in the field                         | accepted; partly supersedes 0009; decision 3 replaced by 0014, decision 6 by 0013 |
 | [0013](0013-one-layout.md)                      | One layout: the table; two boxes and the layout switch retire                                  | accepted; supersedes 0009, 0010                                                   |
 | [0014](0014-planes.md)                          | The arrow keys move between the page's planes: two toolbars and the box                        | accepted; amended (see Amendments)                                                |
@@ -31,6 +31,7 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0023](0023-toolbar-one-row.md)                 | The toolbar is one row: a touch screen scrolls it, a pointer gets More                         | accepted                                                                          |
 | [0024](0024-feedback-through-a-form-service.md) | Feedback through a form service (Formspark): the About page's form posts to it, which mails us | accepted                                                                          |
 | [0025](0025-scroll-anchoring-opt-out.md)        | The page opts out of scroll anchoring: what must stay put is kept by hand, in every engine     | accepted                                                                          |
+| [0026](0026-compound-quantities.md)             | Compound quantities: one grammar reads them, and a pair is a unit of its own                   | accepted; amends 0011 and 0019                                                    |
 
 ## Template
 

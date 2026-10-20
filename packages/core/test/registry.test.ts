@@ -115,6 +115,35 @@ describe('registry integrity', () => {
     }
   });
 
+  it('a pair names two or three parts of its category, largest first, each a whole number of the next (ADR 0026)', () => {
+    const pairs = units.filter((u) => u.pair);
+    expect(pairs.map((u) => u.id)).toEqual([
+      'foot-inch',
+      'stone-pound',
+      'pound-ounce',
+      'hour-minute-second',
+      'degree-arcminute-arcsecond',
+    ]);
+    for (const pair of pairs) {
+      const parts = (pair.pair ?? []).map((id) => getUnit(id));
+      expect(parts.length, pair.id).toBeGreaterThanOrEqual(2);
+      expect(parts.length, pair.id).toBeLessThanOrEqual(3);
+      for (const part of parts) {
+        expect(part, pair.id).toBeDefined();
+        expect(part?.category, pair.id).toBe(pair.category);
+        expect(part?.kind, pair.id).toBe('linear');
+      }
+      const factors = parts.map((part) => (part?.kind === 'linear' ? part.factor : Number.NaN));
+      // The pair's own factor is its first part's: a plain number in it is that part.
+      expect(pair.kind === 'linear' && pair.factor, pair.id).toBe(factors[0]);
+      for (let at = 1; at < factors.length; at += 1) {
+        const ratio = factors[at - 1]! / factors[at]!;
+        expect(Math.abs(ratio - Math.round(ratio)), `${pair.id} part ${at}`).toBeLessThan(1e-9);
+        expect(Math.round(ratio), `${pair.id} part ${at}`).toBeGreaterThan(1);
+      }
+    }
+  });
+
   it('linear, affine, and reciprocal factors are positive finite numbers', () => {
     for (const u of units) {
       if (u.kind === 'functional') continue;

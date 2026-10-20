@@ -26,6 +26,11 @@ describe('formulas', () => {
     expect(formula('liter-per-100-kilometers')).toBe('km/L = 100 ÷ (L/100 km)');
     expect(formula('degree')).toBe('1 ° = π/180 rad');
     expect(formula('pound-force')).toBe('1 lbf = 4.4482216152605 N');
+    // A pair by its parts' ratio, from core (ADR 0026).
+    expect(formula('foot-inch')).toBe('1 ft = 12 in');
+    expect(formula('stone-pound')).toBe('1 st = 14 lb');
+    expect(formula('hour-minute-second')).toBe('1 h = 60 min, 1 min = 60 s');
+    expect(formula('degree-arcminute-arcsecond')).toBe('1° = 60′, 1′ = 60″');
   });
 
   it('writes a factor to 16 digits, so float noise never shows', () => {

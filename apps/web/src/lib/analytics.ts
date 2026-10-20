@@ -17,7 +17,25 @@ type AnalyticsEvent =
   | 'Calculator sent'
   | 'Units opened'
   | 'Display opened'
-  | 'Setting changed';
+  | 'Setting changed'
+  | 'Input unread';
+
+/**
+ * The shape of what was typed, and nothing of it (ADR 0019, 2026-10-19): every run of digits a 9,
+ * every run of letters an a, spaces one space, the marks a quantity is written with kept
+ * (' " ′ ″ ° : / . , -), anything else an x, at most 24 characters. "5'11 cm" is "9'9 a", "five
+ * eleven" is "a a": what the box could not read, so the grammar grows from what people type into
+ * it, never the text itself.
+ */
+export function inputShape(text: string): string {
+  return text
+    .trim()
+    .replace(/\p{Nd}+/gu, '9')
+    .replace(/\p{L}+/gu, 'a')
+    .replace(/\s+/gu, ' ')
+    .replace(/[^9a '"′″°:/.,\-−]/gu, 'x')
+    .slice(0, 24);
+}
 
 interface Umami {
   track: (name: string, data?: Record<string, string>) => unknown;

@@ -15,13 +15,14 @@ import {
 import { Calculator, SendButton, type CalculatorKey } from '../../components/Calculator';
 import { copiedText } from '../../components/ConversionTable';
 import { NumberText, runningValue } from '../../components/NumberText';
-import { track } from '../../lib/analytics';
+import { inputShape, track } from '../../lib/analytics';
 import { useCopied } from '../../lib/copied';
 import { useIsHydrated } from '../../lib/hydrated';
 import { pressedByTouch } from '../../lib/modality';
 import { isApplePlatform } from '../../lib/platform';
 import { COLUMN_CELL, CONTENT_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
 import { INTRO } from '../../lib/site';
+import { UNREAD_SETTLE_MS } from '../../lib/timing';
 import { SLOTS, useSlot } from '../../lib/slots';
 import { entryMessage, isStepKey, placeNumber, pressKey } from './calculator';
 import { glide } from './glide';
@@ -108,6 +109,24 @@ export function Converter() {
   // Why the entry has no value to use or send, said in the display: "Too large".
   const calcMessage = entryMessage(entryParsed);
   const isEmpty = !state.text && !state.unit && !state.category;
+
+  // An input the box could not read, counted by its shape alone once it has stood a moment, each
+  // shape once in a row (ADR 0019, 2026-10-19), so the grammar grows from what people type.
+  const unread =
+    table.kind === 'matches' && table.rows.length === 0 && table.hidden.length === 0
+      ? state.text
+      : null;
+  const countedShape = useRef<string | null>(null);
+  useEffect(() => {
+    if (unread === null) return;
+    const timer = window.setTimeout(() => {
+      const shape = inputShape(unread);
+      if (!shape || shape === countedShape.current) return;
+      countedShape.current = shape;
+      track('Input unread', { shape });
+    }, UNREAD_SETTLE_MS);
+    return () => window.clearTimeout(timer);
+  }, [unread]);
 
   /**
    * Clear all (undoable like any other step), and the caret back in the box after a click or a

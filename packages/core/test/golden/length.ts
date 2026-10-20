@@ -37,6 +37,15 @@ export const length: GoldenRow[] = [
   { value: 1, from: 'kilometer', to: 'meter', expected: 1000, source: 'SI prefix kilo = 10^3' },
   { value: 1, from: 'mile', to: 'foot', expected: 5280, source: `${HB44}: 1 mi = 5280 ft` },
   { value: 5, from: 'foot', to: 'inch', expected: 60, source: `${HB44}: 1 ft = 12 in` },
+  // Feet and inches, the pair, is the foot's size: one of it is 12 inches (ADR 0026).
+  { value: 1, from: 'foot-inch', to: 'inch', expected: 12, source: `${HB44}: 1 ft = 12 in` },
+  {
+    value: 5 + 11 / 12,
+    from: 'foot-inch',
+    to: 'centimeter',
+    expected: 180.34,
+    source: `Derived: 5 ft 11 in = 71 in × 2.54 cm (${YP})`,
+  },
   {
     value: 1,
     from: 'kilometer',

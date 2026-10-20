@@ -6,3 +6,6 @@ playwright-report
 test-results
 pnpm-lock.yaml
 .claude/worktrees
+# A research record kept as delivered (docs/research/shoe-sizes-2.md §7, the manual capture)
+docs/research/shoe-sizes-2/manual/brand-charts.json
+docs/research/shoe-sizes-2/manual/brand-charts-check.html

@@ -1,0 +1,162 @@
+# Pasted by Sean from vans.com Clothing & Shoe Fit Guide, 2026-10-20. Tab-separated. Men's and women's tabs show the same "Unisex Shoes" table.
+
+## Men's / Women's tab, inches
+US Men	US Women	US Boy	UK	EU	JP	Foot Length
+-	5	3.5	2.5	34.5	21.5	8.5
+-	5.5	4	3	35	22	8.7
+-	6	4.5	3.5	36	22.5	8.9
+-	6.5	5	4	36.5	23	9.1
+-	7	5.5	4.5	37	23.5	9.3
+-	7.5	6	5	38	24	9.4
+6.5	8	-	5.5	38.5	24.5	9.6
+7	8.5	-	6	39	25	9.8
+7.5	9	-	6.5	40	25.5	10.0
+8	9.5	-	7	40.5	26	10.2
+8.5	10	-	7.5	41	26.5	10.4
+9	10.5	-	8	42	27	10.6
+9.5	11	-	8.5	42.5	27.5	10.8
+10	11.5	-	9	43	28	11.0
+10.5	-	-	9.5	44	28.5	11.2
+11	-	-	10	44.5	29	11.4
+11.5	-	-	10.5	45	29.5	11.6
+12	-	-	11	46	30	11.8
+13	-	-	12	47	31	12.2
+14	-	-	13	48	32	12.6
+15	-	-	14	49	33	13.0
+16	-	-	15	50	34	13.4
+
+How to measure yourself for a great fit?
+Foot Length:
+Put your foot on a flat surface with your heel against a wall or straight edge. Use a ruler to measure the length in millimeters from the tip of your longest toe to your heel. Keep in mind that your longest toe isn't necessarily your big toe!
+Free 30-Day Returns
+
+## Men's / Women's tab, cm
+US Men	US Women	US Boy	UK	EU	JP	Foot Length
+-	5	3.5	2.5	34.5	21.5	21.5
+-	5.5	4	3	35	22	22
+-	6	4.5	3.5	36	22.5	22.5
+-	6.5	5	4	36.5	23	23
+-	7	5.5	4.5	37	23.5	23.5
+-	7.5	6	5	38	24	24
+6.5	8	-	5.5	38.5	24.5	24.5
+7	8.5	-	6	39	25	25
+7.5	9	-	6.5	40	25.5	25.5
+8	9.5	-	7	40.5	26	26
+8.5	10	-	7.5	41	26.5	26.5
+9	10.5	-	8	42	27	27
+9.5	11	-	8.5	42.5	27.5	27.5
+10	11.5	-	9	43	28	28
+10.5	-	-	9.5	44	28.5	28.5
+11	-	-	10	44.5	29	29
+11.5	-	-	10.5	45	29.5	29.5
+12	-	-	11	46	30	30
+13	-	-	12	47	31	31
+14	-	-	13	48	32	32
+15	-	-	14	49	33	33
+16	-	-	15	50	34	34
+
+## Kids' Shoes, inches
+US	UK	EU	Foot Length
+10.5C	10	27	6.5
+11C	10.5	27.5	6.5
+11.5C	11	28	6.7
+12C	11.5	29	6.9
+12.5C	12	30	7.1
+13C	12.5	30.5	7.3
+13.5C	13	31	7.3
+1Y	13.5	31.5	7.5
+1.5Y	1	32	7.7
+2Y	1.5	32.5	7.9
+2.5Y	2	33	8.1
+3Y	2.5	34	8.3
+
+## Kids' Shoes, cm
+US	UK	EU	Foot Length
+10.5C	10	27	16.5
+11C	10.5	27.5	16.5
+11.5C	11	28	17.0
+12C	11.5	29	17.5
+12.5C	12	30	18.0
+13C	12.5	30.5	18.5
+13.5C	13	31	18.5
+1Y	13.5	31.5	19.0
+1.5Y	1	32	19.5
+2Y	1.5	32.5	20.0
+2.5Y	2	33	20.5
+3Y	2.5	34	21.0
+
+## Toddlers' Shoes, inches
+US	UK	EU	Foot Length
+2C	1.5	17	3.5
+2.5C	2	17.5	3.7
+3C	2.5	18	3.9
+3.5C	3	18.5	4.1
+4C	3.5	19	4.1
+4.5C	4	20	4.3
+5C	4.5	21	4.5
+5.5C	5	21.5	4.7
+6C	5.5	22	4.7
+6.5C	6	22.5	4.9
+7C	6.5	23.5	5.1
+7.5C	7	24	5.3
+8C	7.5	24.5	5.5
+8.5C	8	25	5.7
+9C	8.5	25.5	5.9
+9.5C	9	26	6.0
+10C	9.5	26.5	6.2
+
+## Toddlers' Shoes, cm
+US	UK	EU	Foot Length
+2C	1.5	17	9
+2.5C	2	17.5	9.5
+3C	2.5	18	10
+3.5C	3	18.5	10.5
+4C	3.5	19	10.5
+4.5C	4	20	11
+5C	4.5	21	11.5
+5.5C	5	21.5	12
+6C	5.5	22	12
+6.5C	6	22.5	12.5
+7C	6.5	23.5	13
+7.5C	7	24	13.5
+8C	7.5	24.5	14
+8.5C	8	25	14.5
+9C	8.5	25.5	15
+9.5C	9	26	15.5
+10C	9.5	26.5	16
+
+## Infants' Shoes, inches
+Age	US	UK	EU	Foot Length
+0 - 6 weeks	1C	0.5	16	3.3
+6 - 12 weeks	2C	1.5	17	3.5
+3 - 6 months	3C	2.5	18	3.9
+6 - 9 months	4C	3.5	19	4.1
+
+## Infants' Shoes, cm
+Age	US	UK	EU	Foot Length
+0 - 6 weeks	1C	0.5	16	8.5
+6 - 12 weeks	2C	1.5	17	9
+3 - 6 months	3C	2.5	18	10
+6 - 9 months	4C	3.5	19	10.5
+
+## Youth Shoes, inches
+US	UK	EU	Foot Length
+3.5	2.5	34.5	8.4
+4	3	35	8.6
+4.5	3.5	36	8.8
+5	4	36.5	9.0
+5.5	4.5	37	9.2
+6	5	38	9.4
+-	5.5	38.5	9.6
+-	6	39	9.8
+
+## Youth Shoes, cm
+US	UK	EU	Foot Length
+3.5	2.5	34.5	21.5
+4	3	35	22
+4.5	3.5	36	22.5
+5	4	36.5	23
+5.5	4.5	37	23.5
+6	5	38	24
+-	5.5	38.5	24.5
+-	6	39	25

@@ -1,0 +1,37 @@
+# Pasted by Sean from on.com product Size & Fit panel, 2026-10-20. Tab-separated.
+
+## Kids Shoes, cm
+cm	16.7	17.1	17.6	18	18.4	18.8	19.2	19.7	20.1	20.5	20.9	21.4
+us	10.5	11	11.5	12	12.5	13	13.5	1	1.5	2	2.5	3
+eu	27.5	28.5	29	29.5	30	31	31.5	32	33	33.5	34	35
+uk	10	10.5	11	11.5	12	12.5	13	13.5	1	1.5	2	2.5
+jp	16.7	17.1	17.6	18	18.4	18.8	19.2	19.7	20.1	20.5	20.9	21.4
+br	25.5	26.5	27	27.5	28	29	29.5	30	31	31.5	32	33
+mx	16.7	17.1	17.6	18	18.4	18.8	19.2	19.7	20.1	20.5	20.9	21.4
+
+## Kids Shoes, inches
+in	6.6	6.7	6.9	7.1	7.2	7.4	7.6	7.8	7.9	8.1	8.2	8.4
+us	10.5	11	11.5	12	12.5	13	13.5	1	1.5	2	2.5	3
+eu	27.5	28.5	29	29.5	30	31	31.5	32	33	33.5	34	35
+uk	10	10.5	11	11.5	12	12.5	13	13.5	1	1.5	2	2.5
+jp	16.7	17.1	17.6	18	18.4	18.8	19.2	19.7	20.1	20.5	20.9	21.4
+br	25.5	26.5	27	27.5	28	29	29.5	30	31	31.5	32	33
+mx	16.7	17.1	17.6	18	18.4	18.8	19.2	19.7	20.1	20.5	20.9	21.4
+
+Kids panel text: "True to size." / How to measure your kid's feet: 1. Find a wall and a piece of paper — Place a piece of paper flat on the ground. One edge should be perpendicular to the wall. Ask your child to stand on top of the paper with their heels touching the wall. 2. Trace and measure — Trace around their toes with a pen or pencil – tickles optional. Next, grab a ruler or tape measure and measure the length from the very top of their toes to the end of the paper. 3. Consult our size guide — Take the measurement of their longest foot and use our size guide to find the corresponding On size. "Little feet don't stay little for long, so if you're unsure, we recommend sizing up."
+
+## Mens Shoes ("True to size.")
+us	7	7.5	8	8.5	9	9.5	10	10.5	11	11.5	12	12.5	13	13.5	14	15
+br	37	38	39	N/A	40	41	N/A	42	N/A	43	44	45	46	47	N/A	47
+mx	25	25.5	26	26.5	27	27.5	28	28.5	29	29.5	30	30.5	31	31.5	32	33
+eu	40	40.5	41	42	42.5	43	44	44.5	45	46	47	47.5	48	48.5	49	50
+jp	25	25.5	26	26.5	27	27.5	28	28.5	29	29.5	30	30.5	31	31.5	32	33
+uk	6.5	7	7.5	8	8.5	9	9.5	10	10.5	11	11.5	12	12.5	13	13.5	14.5
+
+## Womens Shoes ("True to size.")
+us	5	5.5	6	6.5	7	7.5	8	8.5	9	9.5	10	10.5	11	12
+br	33	34	N/A	35	36	37	N/A	38	39	N/A	40	41	42	43
+mx	22	22.5	23	23.5	24	24.5	25	25.5	26	26.5	27	27.5	28	29
+eu	36	36.5	37	37.5	38	38.5	39	40	40.5	41	42	42.5	43	44
+jp	22	22.5	23	23.5	24	24.5	25	25.5	26	26.5	27	27.5	28	29
+uk	3	3.5	4	4.5	5	5.5	6	6.5	7	7.5	8	8.5	9	10

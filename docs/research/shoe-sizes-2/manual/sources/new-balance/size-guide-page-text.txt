@@ -1,0 +1,133 @@
+Men's/Unisex
+Find your size
+Find your width
+Men's US Size	Women's US Size	Length (cm)	Length (in)	UK size	EU size
+2.5	4	20.5	8 1/8	2	34
+3	4.5	21	8 1/4	2.5	35
+3.5	5	21.5	8 1/2	3	35.5
+4	5.5	22	8 5/8	3.5	36
+4.5	6	22.5	8 7/8	4	37
+5	6.5	23	9	4.5	37.5
+5.5	7	23.5	9 1/4	5	38
+6	7.5	24	9 1/2	5.5	38.5
+6.5	8	24.5	9 5/8	6	39.5
+7	8.5	25	9 7/8	6.5	40
+7.5	9	25.5	10	7	40.5
+8	9.5	26	10 1/4	7.5	41.5
+8.5	10	26.5	10 3/8	8	42
+9	10.5	27	10 5/8	8.5	42.5
+9.5	11	27.5	10 7/8	9	43
+10	11.5	28	11	9.5	44
+10.5	12	28.5	11 1/4	10	44.5
+11	12.5	29	11 3/8	10.5	45
+11.5	13	29.5	11 5/8	11	45.5
+12	13.5	30	11 3/4	11.5	46.5
+12.5	14	30.5	12	12	47
+13	14.5	31	12 1/4	12.5	47.5
+13.5	15	31.5	12 3/8	13	48.5
+14	15.5	32	12 5/8	13.5	49
+15	16.5	33	13	14.5	50
+16	17.5	34	13 3/8	15.5	51
+17	18.5	35	13 3/4	16.5	52
+18	19.5	36	14 1/8	17.5	53
+19	-	37	14 5/8	18.5	54
+20	-	38	15	19.5	55
+Download Our Men's Printable Measuring Tool
+
+Women's
+Find your size
+Find your width
+Women's US Size	Men's US Size	Length (cm)	Length (in)	UK size	EU size
+3	1.5	20	7  7/8	1	33
+3.5	2	20.5	8  1/8	1.5	33.5
+4	2.5	21	8  1/4	2	34
+4.5	3	21.5	8  1/2	2.5	34.5
+5	3.5	22	8  5/8	3	35
+5.5	4	22.5	8  7/8	3.5	36
+6	4.5	23	9	4	36.5
+6.5	5	23.5	9  1/4	4.5	37
+7	5.5	24	9  1/2	5	37.5
+7.5	6	24.5	9  5/8	5.5	38
+8	6.5	25	9  7/8	6	39
+8.5	7	25.5	10	6.5	40
+9	7.5	26	10  1/4	7	40.5
+9.5	8	26.5	10  3/8	7.5	41
+10	8.5	27	10  5/8	8	41.5
+10.5	9	27.5	10  7/8	8.5	42.5
+11	9.5	28	11	9	43
+11.5	10	28.5	11  1/4	9.5	43.5
+12	10.5	29	11  3/8	10	44
+12.5	11	29.5	11  5/8	10.5	45
+13	11.5	30	11  3/4	11	45.5
+13.5	12	30.5	12	11.5	46
+14	12.5	31	12  1/4	12	46.5
+15	13.5	32	12  5/8	13	48
+16	14.5	32.5	12  3/4	14	49
+Download Our Women's Printable Measuring Tool
+
+Babies and Toddlers | 0-4 Years
+Find your size
+Find your width
+Kids US Size	Length (cm)	Length (in)	UK Size	EU Size
+0	8	3 1/8	0	15
+1	8.5	3 1/8	0.5	16
+1.5	9	3 1/2	1	16.5
+2	9.5	3 3/4	1.5	17
+2.5	10	3 7/8	2	18
+3	10	3 7/8	2.5	18.5
+3.5	10.5	4 1/8	3	19
+4	11	4 3/8	3.5	20
+4.5	11.5	4 1/2	4	20.5
+5	12	4 3/4	4.5	21
+5.5	12	4 3/4	5	21.5
+6	12.5	4 7/8	5.5	22.5
+6.5	13	5 1/8	6	23
+7	13.5	5 3/8	6.5	23.5
+7.5	14	5 1/2	7	24
+8	14.5	5 3/4	7.5	25
+8.5	15	5 7/8	8	25.5
+9	15	5 7/8	8.5	26
+9.5	15.5	6 1/8	9	26.5
+10	16	6 1/4	9.5	27.5
+Little Kid | 4-8 Years
+Find your size
+Find your width
+Kids US Size	Length (cm)	Length (in)	UK Size	EU Size	US Men	US Women
+10.5	16.5	6 1/2	10	28	-	-
+11	17	6 3/4	10.5	28.5	-	-
+11.5	17.5	6 7/8	11	29	-	-
+12	17.5	6 7/8	11.5	30	-	-
+12.5	18	7 1/8	12	30.5	-	-
+13	18.5	7 1/4	12.5	31	-	-
+13.5	19	7 1/2	13	32	-	-
+1	19	7 1/2	13.5	32.5	-	-
+1.5	19.5	7 5/8	1	33	1.5	3
+2	20	7 5/8	1.5	33.5	2	3.5
+2.5	20.5	8 1/8	5	34.5	2.5	4
+3	21	8 1/4	2.5	35	3	4.5
+Big Kid | 8-12 Years
+Find your size
+Find your width
+Kids US Size	Length (cm)	Length (in)	UK Size	EU Size	US Men	US Women
+3.5	21.5	8 1/2	3	35.5	3.5	5
+4	22	8 5/8	3.5	36	4	5.5
+4.5	22.5	8 7/8	4	37	4.5	6
+5	23	9	4.5	37.5	5	6.5
+5.5	23.5	9 1/4	5	38	5.5	7
+6	24	9 1/2	5.5	38.5	6	7.5
+6.5	24.5	9 5/8	6	39	6.5	8
+7	25	9 7/8	6.5	40	7	8.5
+Download Our Kids' Printable Measuring Tool
+
+Tips For Finding Your Perfect Size
+Try shoes on in the late afternoon when your feet are at their largest due to normal swelling.
+
+Check that your heel fits snug with no slipping. The midfoot of the shoe under your arch and over the top of your foot should be snug but not tight. You should have enough room in the toe box to wiggle your toes.
+
+Choose the larger size if your feet are between sizes. You can adjust for a better fit with socks, insoles and lacing patterns.
+
+Have your feet re-measured every year. Feet typically get bigger with age and women’s feet often become a half size or more larger after pregnancy.
+
+Be sure to try shoes on both feet. Your left and right feet may differ in length or width as much as a full size. Always buy shoes that fit your larger foot.
+
+Watch out for signs that your shoes are too small or narrow: feet cramping and falling asleep while running or the formation of calluses and blisters in between or on your toes. People are more than twice as likely to buy a shoe that is too small than too big.

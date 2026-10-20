@@ -153,6 +153,13 @@ interface UnitMeta {
    */
   prefix?: true;
   /**
+   * Keys too short to claim the start ("m" and "w" for US men's and women's; ADR 0027): matched
+   * exactly, and only where the category is named, the converter in it or a query's target
+   * naming it ("11m to eu", "11 w e"), never at the start ("11m" is the meter alone, "8w" the
+   * watt), and never read as a prefix before a number (search.ts, parse.ts).
+   */
+  shorthand?: readonly string[];
+  /**
    * Agreed by a body's table rather than defined by a standard or measured (docs/RESEARCH.md §1):
    * a shoe scale by ISO 19407. The formulas page says so in place of "measured".
    */

@@ -24,6 +24,12 @@ export interface UnitMatch {
   /** The key that matched, as written in the registry. */
   matchedKey: string;
   field: MatchField;
+  /**
+   * The unit the query names after this match ("11 w e": US women with "e"; ADR 0027), set on the
+   * matches a split reads, so the converter rests its cursor on the target's row once the match
+   * is taken (docs/UX-SPEC.md §5); none on a match of the whole query.
+   */
+  target?: string;
 }
 
 export interface CategoryMatch {
@@ -73,9 +79,11 @@ export interface SearchResponse {
    * ("km to miles", "us 11 in eu"), empty while it is still to come ("km to"); the last words
    * where they name a unit of a category the head matches in, with no connective ("us eu"); or
    * all that follows a leading connective ("to cm"), the results then the whole's, usually none.
-   * The results are the head's, the target's category ranked first among them (`withTarget`);
-   * the converter rests its cursor on the target's row once the head's match is taken
-   * (docs/UX-SPEC.md §5).
+   * The results are the head's, the target's category ranked first among them (`withTarget`),
+   * and the converter rests its cursor on the target's row once the head's match is taken
+   * (docs/UX-SPEC.md §5). Where the whole matches by a prefix or a part, its reading leads and
+   * the split's follows it, those matches carrying the target themselves (UnitMatch.target),
+   * and this stays unset.
    */
   target?: string;
 }
@@ -91,6 +99,8 @@ interface UnitKey {
   field: MatchField;
   raw: string;
   compact: string;
+  /** A key of the unit's `shorthand`: exact only, and only where its category is named. */
+  shorthand: boolean;
 }
 
 interface CategoryKey {
@@ -113,14 +123,26 @@ const DEFAULT_LIMIT = 20;
 const FUZZY_MIN_LENGTH = 3;
 
 const unitKeys: readonly UnitKey[] = units.flatMap((unit, index) => {
-  const keys: Array<{ field: MatchField; raw: string }> = [
+  const keys: Array<{ field: MatchField; raw: string; shorthand?: true }> = [
     { field: 'symbol', raw: unit.symbol },
     { field: 'name', raw: unit.name },
     { field: 'plural', raw: unit.plural },
     ...unit.aliases.map((raw) => ({ field: 'alias' as const, raw })),
+    ...(unit.shorthand ?? []).map((raw) => ({
+      field: 'alias' as const,
+      raw,
+      shorthand: true as const,
+    })),
   ];
   return keys.flatMap((k) => {
-    const key = { unit, index, field: k.field, raw: k.raw, compact: compactKey(k.raw) };
+    const key = {
+      unit,
+      index,
+      field: k.field,
+      raw: k.raw,
+      compact: compactKey(k.raw),
+      shorthand: k.shorthand === true,
+    };
     // "°C" is also found by a typed "°", which starts it.
     const withDegree = compactKeyWithDegree(k.raw);
     return withDegree ? [key, { ...key, compact: withDegree }] : [key];
@@ -300,24 +322,37 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
   if (!q.compact) return idleResults(options);
   const whole = searchKeys(q, options);
   const [first] = whole.results;
-  if (first && first.matchClass < 6) return whole;
+  if (first && first.matchClass <= 2) return whole;
+  // The whole matches by a prefix or a part (class 3 to 5): its reading leads, and a split's
+  // joins it after (`merged`); one typo away (class 6) is a last resort, read after the splits.
+  const partial = first !== undefined && first.matchClass < 6;
   const tail = TAIL.exec(q.raw);
-  if (tail) return withTarget(tail[1]!, (tail[2] ?? '').trim(), options, true) ?? whole;
+  if (tail) {
+    const split = withTarget(tail[1]!, (tail[2] ?? '').trim(), options, true);
+    if (!split) return whole;
+    return partial ? merged(whole, split, options) : split.response;
+  }
   const leading = leadingTarget(q.raw);
   if (leading !== null) return { ...whole, target: leading };
   // No connective: the last words as the target, where they name a unit of a category the head
   // matches in ("us eu", "fluid ounce ml"), the longest head first.
   const words = q.raw.split(' ');
   for (let at = words.length - 1; at > 0; at -= 1) {
-    const found = withTarget(
+    const split = withTarget(
       words.slice(0, at).join(' '),
       words.slice(at).join(' '),
       options,
       false,
     );
-    if (found) return found;
+    if (split) return partial ? merged(whole, split, options) : split.response;
   }
   return whole;
+}
+
+/** A query read as a head and a target: the head's matches, and the target's category among the head's. */
+interface Split {
+  response: SearchResponse;
+  category: CategoryId | null;
 }
 
 /**
@@ -325,28 +360,60 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
  * (`prefer`): of the categories the head matches in, the one whose units the target names best,
  * ties to the head's own order, so "11m to eu" offers US men ahead of the meter, "10 oz to ml"
  * the fluid ounce ahead of the ounce, and "10 oz to g" the ounce; a weaker match is never lifted
- * over a stronger one, as `prefer` never does. Null when the head matches nothing, or, with no
- * connective, when the target names no unit of those categories.
+ * over a stronger one, as `prefer` never does. Every shorthand key counts in finding the head's
+ * categories, so a head of one letter names its scale too ("w"), and the ranked results keep the
+ * target's category's. Null when the head matches nothing, or, with no connective, when the
+ * target names no unit of those categories.
  */
 function withTarget(
   headText: string,
   target: string,
   options: SearchOptions,
   connective: boolean,
-): SearchResponse | null {
+): Split | null {
   const head = toQuery(headText);
   if (!head.compact) return null;
-  const ranked = searchKeys(head, { ...options, limit: EVERY });
+  const ranked = searchKeys(head, { ...options, limit: EVERY }, true);
   if (ranked.results.length === 0) return null;
   const category = targetCategory(toQuery(target), ranked.results, options);
   if (category === null && !connective) return null;
   const found =
-    category === null ? ranked : searchKeys(head, { ...options, prefer: category, limit: EVERY });
-  return {
-    results: found.results.slice(0, options.limit ?? DEFAULT_LIMIT),
-    escalated: found.escalated,
-    target,
-  };
+    category === null
+      ? searchKeys(head, { ...options, limit: EVERY })
+      : searchKeys(head, { ...options, prefer: category, limit: EVERY });
+  if (found.results.length === 0) return null;
+  const results = found.results
+    .slice(0, options.limit ?? DEFAULT_LIMIT)
+    .map((result) => (result.kind === 'unit' ? { ...result, target } : result));
+  return { response: { results, escalated: found.escalated, target }, category };
+}
+
+/**
+ * The whole's matches, which lead, with the split's shorthand reading after them: the head's
+ * exact matches of the target's category ("11 w e": Weight and the week, then US women with "e"
+ * as its target; "11 us e": the microsecond's µsec, then US men), added within the limit, room
+ * made, or, where the whole lists one already by another key ("11 m e" finds US men by "men"),
+ * given the target where it stands. The whole alone where the split names no category.
+ */
+function merged(whole: SearchResponse, split: Split, options: SearchOptions): SearchResponse {
+  if (split.category === null) return whole;
+  const targeted = new Map<string, UnitMatch>();
+  for (const r of split.response.results) {
+    if (r.kind === 'unit' && r.matchClass <= 2 && r.unit.category === split.category) {
+      targeted.set(r.unit.id, r);
+    }
+  }
+  if (targeted.size === 0) return whole;
+  const results = whole.results.map((r): SearchResult => {
+    if (r.kind !== 'unit') return r;
+    const own = targeted.get(r.unit.id);
+    if (!own || own.target === undefined) return r;
+    targeted.delete(r.unit.id);
+    return { ...r, target: own.target };
+  });
+  const extra = [...targeted.values()];
+  const limit = options.limit ?? DEFAULT_LIMIT;
+  return { ...whole, results: [...results.slice(0, Math.max(0, limit - extra.length)), ...extra] };
 }
 
 /**
@@ -374,8 +441,12 @@ function targetCategory(
   return best?.category ?? null;
 }
 
-/** The matches for a query that is not empty. */
-function searchKeys(q: Query, options: SearchOptions): SearchResponse {
+/**
+ * The matches for a query that is not empty. A shorthand key ("m", "w"; a unit's `shorthand`)
+ * counts only exactly and only where its category is named, the one the search is in or
+ * prefers, or every one (`allShorthand`) where the categories a head matches in are wanted.
+ */
+function searchKeys(q: Query, options: SearchOptions, allShorthand = false): SearchResponse {
   const scopedUnitKeys = options.category
     ? unitKeys.filter((k) => k.unit.category === options.category)
     : unitKeys;
@@ -408,9 +479,13 @@ function searchKeys(q: Query, options: SearchOptions): SearchResponse {
     });
   };
 
+  const named = (category: CategoryId) =>
+    allShorthand || options.prefer === category || options.category === category;
   for (const key of scopedUnitKeys) {
     const matchClass = classifyUnit(q, key);
-    if (matchClass !== null) offerUnit(key, matchClass);
+    if (matchClass === null) continue;
+    if (key.shorthand && (matchClass > 2 || !named(key.unit.category))) continue;
+    offerUnit(key, matchClass);
   }
   for (const key of scopedCategoryKeys) {
     const matchClass = classifyCategory(q, key);
@@ -420,7 +495,7 @@ function searchKeys(q: Query, options: SearchOptions): SearchResponse {
   // Fuzzy matching is for units only: a no-match list shows every category anyway.
   if (bestUnit.size === 0 && bestCategory.size === 0 && q.compact.length >= FUZZY_MIN_LENGTH) {
     for (const key of scopedUnitKeys) {
-      if (withinOneEdit(q.compact, key.compact)) offerUnit(key, 6);
+      if (!key.shorthand && withinOneEdit(q.compact, key.compact)) offerUnit(key, 6);
     }
   }
 

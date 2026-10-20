@@ -753,6 +753,14 @@ describe('shoe sizes (ADR 0027)', () => {
     const table = units(type('us 11'), { type: 'use', unit: 'us-men', text: '11' });
     expect(targetRow(table, 'eu')).toBe(table.rows.findIndex((each) => each.id === 'eu'));
     expect(targetRow(table, 'eur')).toBe(targetRow(table, 'eu'));
+    expect(targetRow(table, 'e')).toBe(targetRow(table, 'eu'));
+    // A shorthand reading listed after the as-typed one carries its own target ("11 w e").
+    const we = selectTable(run(type('11 w e')), options);
+    if (we.kind !== 'matches') throw new Error('expected matches');
+    expect(we.rows[0]).toMatchObject({ kind: 'category' });
+    expect(
+      we.rows.find((each) => each.kind === 'unit' && each.unit.id === 'us-women'),
+    ).toMatchObject({ target: 'e' });
     expect(targetRow(table, 'EU C')).toBe(
       table.rows.findIndex((each) => each.id === 'eu-children'),
     );

@@ -916,8 +916,14 @@ export function TableLayout({
       const hiddenMatch = revealed ? table.hidden[index - table.rows.length] : undefined;
       if (!match && !hiddenMatch) return;
       showBox.current = true;
-      // The query's target rests the cursor on its row once the unit is in the box (ADR 0027).
-      restOn.current = match?.kind === 'unit' || hiddenMatch ? (table.target ?? null) : null;
+      // The query's target rests the cursor on its row once the unit is in the box (ADR 0027):
+      // the match's own where a split read it ("11 w e"), else the query's.
+      restOn.current =
+        match?.kind === 'unit'
+          ? (match.target ?? table.target ?? null)
+          : hiddenMatch
+            ? (hiddenMatch.target ?? table.target ?? null)
+            : null;
       if (match?.kind === 'unit') take(match.unit.id, textFor(match.unit));
       else if (match?.kind === 'ingredient') {
         takeIngredient(match.ingredient.id, match.unit?.id ?? null);

@@ -189,9 +189,8 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
     expect(parse('kids 30')).toMatchObject({ value: 30, query: 'kids' });
     expect(parse('jp 27.5')).toMatchObject({ value: 27.5, query: 'jp' });
     expect(parse('us')).toEqual({ raw: 'us', query: 'us' });
-    // "m" is men's key too, so "m 11" reads as a scale before its number; a word that is no key stays a query.
-    expect(parse('m 11')).toMatchObject({ value: 11, query: 'm' });
-    expect(parse('x 11')).toEqual({ raw: 'x 11', query: 'x 11' });
+    // A shorthand key is no prefix key: "m 11" stays a query, as a word that is no key does.
+    expect(parse('m 11')).toEqual({ raw: 'm 11', query: 'm 11' });
     expect(parse('11 us')).toMatchObject({ value: 11, query: 'us' });
     expect(suggest('us 11').exact?.id).toBe('us-men');
     expect(suggest('us w 8').exact?.id).toBe('us-women');
@@ -243,10 +242,22 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
   });
 
   it('ranks the target’s category first, reads a target with no connective, and a connective alone', () => {
-    // "11m to eu": the meter leads a bare "m", US men once the target names a shoe scale.
+    // "m" and "w" are shorthand keys: nothing at the start, where the meter and the watt lead
+    // alone, the US scales in Shoe size or where a target names it ("11m to eu", "8 w to m").
+    const exactly = (query: string, id: string) =>
+      search(query, { tier: 'all', limit: 100 }).results.some(
+        (r) => r.kind === 'unit' && r.unit.id === id && r.matchClass <= 2,
+      );
     expect(ids(search('m'))[0]).toBe('meter');
+    expect(exactly('m', 'us-men')).toBe(false);
+    expect(ids(search('w'))[0]).toBe('watt');
+    expect(exactly('w', 'us-women')).toBe(false);
+    expect(resolveExact('w')?.id).toBe('watt');
     expect(ids(search('m', { prefer: 'shoe-size' }))[0]).toBe('us-men');
+    expect(ids(search('w', { prefer: 'shoe-size' }))[0]).toBe('us-women');
     expect(ids(search('m to eu')).slice(0, 2)).toEqual(['us-men', 'meter']);
+    expect(ids(search('w to m'))[0]).toBe('us-women');
+    expect(search('w to m').target).toBe('m');
     expect(search('m to eu').target).toBe('eu');
     expect(ids(search('m to e'))[0]).toBe('us-men');
     expect(ids(search('oz to ml'))[0]).toBe('us-fluid-ounce');
@@ -260,9 +271,29 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
     const bare = search('us eu');
     expect(ids(bare)[0]).toBe('us-men');
     expect(bare.target).toBe('eu');
-    // A whole that matches, by prefix even, is never split: 'us e' starts the microsecond's µsec.
-    expect(ids(search('us e'))[0]).toBe('microsecond');
-    expect(search('us e').target).toBeUndefined();
+    // A whole that matches by a prefix leads, and the split's shorthand reading follows it, its
+    // matches carrying the target: "us e" is the microsecond's µsec first, then US men to "e";
+    // "w e" Weight and the week, then US women; "m e" the meter, then US men, room made.
+    const use = search('us e');
+    expect(ids(use)[0]).toBe('microsecond');
+    expect(ids(use)).toContain('us-men');
+    expect(use.results.find((r) => r.kind === 'unit' && r.unit.id === 'us-men')).toMatchObject({
+      target: 'e',
+    });
+    expect(use.results[0]).not.toHaveProperty('target');
+    expect(use.target).toBeUndefined();
+    const we = search('w e');
+    expect(ids(we)[0]).toBe('#mass');
+    expect(ids(we)).toContain('us-women');
+    expect(ids(we)).not.toContain('watt');
+    const me = search('m e');
+    expect(ids(me)[0]).toBe('meter');
+    // Listed already by another key ("men" holds "me"), US men is given the target where it is.
+    expect(me.results.find((r) => r.kind === 'unit' && r.unit.id === 'us-men')).toMatchObject({
+      target: 'e',
+    });
+    expect(ids(search('m e', { limit: 3 }))).toHaveLength(3);
+    expect(ids(search('m e', { limit: 3 }))[2]).toBe('us-men');
     expect(ids(search('m eu'))[0]).toBe('us-men');
     expect(ids(search('fluid ounce ml'))[0]).toBe('us-fluid-ounce');
     expect(search('fluid ounce ml').target).toBe('ml');

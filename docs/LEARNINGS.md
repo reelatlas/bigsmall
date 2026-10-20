@@ -1262,9 +1262,9 @@ Entries are cited by their titles, which stay as written; this index finds them.
 ## 2026-10-20 — A one-letter alias cannot lose to the symbol it folds to for everyone: the family tiebreak decides, so `w` stays the watt's
 
 **What happened.** `m` could join US men's keys (for `11m to eu`) because the meter's symbol `m` is an exact symbol match (class 1) and the alias an exact alias match (class 2), so the meter leads at the start whoever types. `w` could not: the watt's symbol is `W`, so a typed `w` matches it only with case folded, as it would the alias, and the tie then goes to the key written as typed (a lowercase alias wins outright) or, with an uppercase `W` alias, to the tier and then the visitor's own unit family, which puts a US scale ahead of an SI unit for a US visitor. No spelling keeps the watt first for everyone at the start, so `w` is not an alias (docs/UNITS-CATALOG.md §0).
-**Rule.** Before adding a one-letter alias, check the symbol it folds to and its case: only a lowercase symbol can keep its place against a lowercase alias.
+**Rule.** Before adding a one-letter alias, check the symbol it folds to and its case: only a lowercase symbol can keep its place against a lowercase alias. Resolved the same day: a key that must not compete at the start is a `shorthand` key, matched only where the category is named (the hundred-and-ninth pass; docs/UX-SPEC.md §4).
 
 ## 2026-10-20 — A key of a prefix unit is a prefix key: `m` as US men's alias made `m 11` a number
 
 **What happened.** The parser reads a scale written before its number from every key of a unit marked `prefix` (`readPrefixed`), so an alias added for matching (`m`) also made `m 11` read as 11 and `m`, a query before; the test that pinned the old reading changed with it.
-**Rule.** An alias on a prefix unit is a grammar change too: check what it reads before a number, and pin it.
+**Rule.** An alias on a prefix unit is a grammar change too: check what it reads before a number, and pin it. The same day `m` became a shorthand key, which is no prefix key, and `m 11` a query again.

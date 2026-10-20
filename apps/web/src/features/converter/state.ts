@@ -366,7 +366,8 @@ export interface TableRow {
 
 /** A match while a unit is typed: a unit, or a category whose name matched, to open. */
 type MatchRow =
-  | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean }
+  /** A unit, with the target the query names after it where a split read it ("11 w e": "e"). */
+  | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean; target?: string | undefined }
   | { kind: 'category'; category: Category }
   /**
    * An ingredient, under Cooking (ADR 0021), with the unit typed before it when there was one
@@ -450,6 +451,8 @@ interface HiddenMatch {
   unit: Unit;
   category: Category;
   section: string;
+  /** The target the query names after it, as a unit row's. */
+  target?: string | undefined;
 }
 
 export type TableView = StartView | UnitsView | MatchesView;
@@ -1069,10 +1072,10 @@ function selectMatches(
     // A hidden unit leaves the matches and is offered apart, under its section's name.
     if (!inBox && !shows(result.unit, rule, options.system)) {
       const section = SECTION_LABEL[sectionOf(result.unit, options.system)];
-      hidden.push({ unit: result.unit, category, section });
+      hidden.push({ unit: result.unit, category, section, target: result.target });
       return [];
     }
-    return [{ kind: 'unit', unit: result.unit, category, inBox }];
+    return [{ kind: 'unit', unit: result.unit, category, inBox, target: result.target }];
   });
   // Ingredients under Cooking (ADR 0021): one the query ends with first, with the unit typed
   // before it ("2 cups flour"), then those whose names match, the group placed by its best match.

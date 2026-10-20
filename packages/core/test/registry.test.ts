@@ -80,7 +80,7 @@ describe('registry integrity', () => {
     for (const c of categories) {
       const owner = new Map<string, string>();
       for (const u of unitsIn(c.id)) {
-        for (const key of [u.name, u.plural, u.symbol, ...u.aliases]) {
+        for (const key of [u.name, u.plural, u.symbol, ...u.aliases, ...(u.shorthand ?? [])]) {
           const k = compactKey(key);
           expect(k.length, `${u.id} key "${key}" normalizes to nothing`).toBeGreaterThan(0);
           const existing = owner.get(k);
@@ -112,7 +112,7 @@ describe('registry integrity', () => {
       for (const key of new Set([u.name, u.plural])) {
         if (key !== u.symbol) check(key, compactKey(key));
       }
-      for (const alias of u.aliases) check(alias, compactKey(alias));
+      for (const alias of [...u.aliases, ...(u.shorthand ?? [])]) check(alias, compactKey(alias));
     }
   });
 

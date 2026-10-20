@@ -1502,6 +1502,15 @@ test('a query’s target: "us 11 to eu" rests the cursor on the EU row, which En
   await expect(matches(page).getByRole('option').first()).toContainText('US men');
   await box(page).fill('11 us eu');
   await expect(matches(page).getByRole('option').first()).toContainText('US men');
+  // A shorthand reading is listed after the as-typed one: "11 w e" is Weight and the week first,
+  // US women after them, taken with the cursor on the EU row (Sean, 2026-10-20).
+  await box(page).fill('11 w e');
+  await expect(matches(page).getByRole('option').first()).not.toContainText('US women');
+  const women = matches(page).getByRole('option').filter({ hasText: 'US women' });
+  await expect(women).toHaveCount(1);
+  await women.click();
+  await expect(page.getByRole('button', { name: 'Remove US women' })).toBeVisible();
+  await expectCursor(page, 'EU');
   // Enter takes the head's match, and the cursor rests on the target's row, its value in view;
   // Enter again takes that row into the box (Sean, 2026-10-20).
   await box(page).fill('us 11 to eu');

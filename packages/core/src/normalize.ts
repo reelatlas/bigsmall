@@ -10,6 +10,11 @@ const DEGREE_LOOKALIKES = /[º˚]/g;
 const DEGREE_BEFORE_LETTER = /°\s*(?=\p{L})/gu;
 const COMBINING_MARKS = /\p{M}+/gu;
 const PERIODS = /\./g;
+/**
+ * An apostrophe inside a word, or a quote standing in for one ("men's", "children’s"): typed
+ * with or without it. Alone, or at a word's end, it stays: a lone foot mark is a key of its own.
+ */
+const APOSTROPHE_IN_WORD = /(?<=\p{L})['’‘´](?=\p{L})/gu;
 const WHITESPACE = /\s+/g;
 
 /**
@@ -18,7 +23,8 @@ const WHITESPACE = /\s+/g;
  *   degree ("45°"), and its look-alikes become it ("º" → "°")
  * - Unicode compatibility decomposition ("²" → "2", "µ" → "μ"), then accents stripped
  * - lowercased, "μ" → "u" ("µm" → "um")
- * - abbreviation periods removed ("fl. oz." → "fl oz")
+ * - abbreviation periods removed ("fl. oz." → "fl oz"), and an apostrophe inside a word
+ *   ("men's" → "mens", typed with or without one; a lone mark stays; ADR 0027)
  * - whitespace collapsed to single spaces and trimmed
  */
 export function normalizeKey(input: string): string {
@@ -33,6 +39,7 @@ function fold(input: string, dropDegreeBeforeLetter: boolean): string {
     .toLowerCase()
     .replace(/μ/g, 'u')
     .replace(PERIODS, '')
+    .replace(APOSTROPHE_IN_WORD, '')
     .replace(WHITESPACE, ' ')
     .trim();
 }
@@ -59,4 +66,13 @@ export function compactKeyWithDegree(input: string): string | null {
  */
 export function degreeBeforeLetter(text: string, at: number): boolean {
   return /^[°º˚]\s*\p{L}/u.test(text.slice(at));
+}
+
+/**
+ * True when the character at `at` is an apostrophe inside a word ("men's"), which normalizeKey
+ * folds away by its neighbours, the other rule that looks past a single character: highlighting
+ * folds it to nothing where it folds each character alone (highlight.ts).
+ */
+export function apostropheInWord(text: string, at: number): boolean {
+  return /\p{L}$/u.test(text.slice(0, at)) && /^['’‘´]\p{L}/u.test(text.slice(at));
 }

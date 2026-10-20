@@ -1,6 +1,7 @@
 import { readCompound, type Compound } from './compound';
 import { MINUS } from './format';
 import { DEFAULT_SEPARATORS, type Separators } from './locale';
+import { compactKey } from './normalize';
 import {
   canonicalNumber,
   DIVIDE,
@@ -13,6 +14,7 @@ import {
   TIMES,
   toNumber,
 } from './number';
+import { categories, units } from './units';
 
 /**
  * What the user typed, split into the number or arithmetic (if any) and the unit query (if any).
@@ -109,11 +111,51 @@ type Token =
   | { kind: 'close' };
 
 /**
+ * The keys written before their number (ADR 0027; docs/UX-SPEC.md §2): a shoe scale's symbol and
+ * spellings ("US 11", "EU 45", "us m 11") and a category's name and aliases ("size 11"), each
+ * compacted as search folds a query (normalize.ts).
+ */
+const PREFIX_KEYS: ReadonlySet<string> = new Set(
+  [
+    ...units
+      .filter((unit) => unit.prefix)
+      .flatMap((unit) => [unit.symbol, unit.name, unit.plural, ...unit.aliases]),
+    ...categories
+      .filter((category) => category.prefix)
+      .flatMap((category) => [category.name, ...category.aliases]),
+  ].map(compactKey),
+);
+
+/** Where a number can begin, after any space: a digit of any script, a sign, a mark, or "(". */
+const NUMBER_START = new RegExp(`^\\s*[\\p{Nd}.,+(${MINUS}-]`, 'u');
+
+/**
+ * A unit or category written before its number ("US 11", "size 11"; ADR 0027): the longest
+ * leading run of the text that is such a key, followed by a number, read as that number and the
+ * key, whatever follows the number joining the query ("us 11 to eu" is 11 and "us to eu", whose
+ * tail search reads). Null when the text starts with no such key, or no number follows it: the
+ * whole text is then the query, as before.
+ */
+function readPrefixed(text: string, body: string, separators: Separators): ParsedInput | null {
+  for (let end = body.length - 1; end > 0; end -= 1) {
+    const rest = body.slice(end);
+    if (!NUMBER_START.test(rest)) continue;
+    if (!PREFIX_KEYS.has(compactKey(body.slice(0, end)))) continue;
+    const inner = parse(rest, separators);
+    if (inner.valueText === undefined) continue;
+    const head = body.slice(0, end).trim();
+    return { ...inner, raw: text, query: inner.query ? `${head} ${inner.query}` : head };
+  }
+  return null;
+}
+
+/**
  * Parse one box's text. Lenient by design (docs/UX-SPEC.md §2): spacing never matters, both
  * "1,000.5" and "1.000,5" work, a lone separator is read the way the locale would write it unless
  * the digits make that reading impossible ("1,5" is 1.5 everywhere), the number can be
- * arithmetic ("2 × 3 ft", "(5 + 7) / 2 cm", "2^10 bytes"), and a quantity in two or three units
- * of one kind is read as one ("5'11", "11 st 4", "1h30"; compound.ts).
+ * arithmetic ("2 × 3 ft", "(5 + 7) / 2 cm", "2^10 bytes"), a quantity in two or three units
+ * of one kind is read as one ("5'11", "11 st 4", "1h30"; compound.ts), and a scale written
+ * before its number is read with it ("US 11"; readPrefixed).
  */
 export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS): ParsedInput {
   const trimmed = text.trim();
@@ -143,7 +185,7 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
   const read = readable(body, separators.exponent);
   const marked = readableSeparators(separators);
   const scanned = scan(read.text, marked);
-  if (!scanned) return { raw: text, query: body };
+  if (!scanned) return readPrefixed(text, body, separators) ?? { raw: text, query: body };
 
   const end = read.at[scanned.end] ?? body.length;
   const result: ParsedInput = { raw: text, valueText: body.slice(0, end) };

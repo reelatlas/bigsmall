@@ -10,6 +10,7 @@ import { length, lengthUnits } from './length';
 import { mass, massUnits } from './mass';
 import { power, powerUnits } from './power';
 import { pressure, pressureUnits } from './pressure';
+import { shoeSize, shoeSizeUnits } from './shoe-size';
 import { speed, speedUnits } from './speed';
 import { temperature, temperatureUnits } from './temperature';
 import { time, timeUnits } from './time';
@@ -34,6 +35,7 @@ export const categories: readonly Category[] = [
   force,
   torque,
   angle,
+  shoeSize,
 ];
 
 /** Every unit the engine knows. Order within a category is display order (most common first). */
@@ -56,6 +58,7 @@ export const units: readonly Unit[] = [
   ...forceUnits,
   ...torqueUnits,
   ...angleUnits,
+  ...shoeSizeUnits,
 ];
 
 const unitById: ReadonlyMap<string, Unit> = new Map(units.map((u) => [u.id, u]));

@@ -62,5 +62,6 @@ export {
   fractionsOf,
   FRACTION_SIZES,
   roundToFraction,
+  roundToStep,
 } from './rounded';
-export type { Fraction, FractionSize, Rounded, Rounding } from './rounded';
+export type { Fraction, FractionSize, Rounded, Rounding, Stepped } from './rounded';

@@ -80,6 +80,32 @@ export function roundedScaled(value: number, scale: number, rounding: Rounding):
   return rounded(value * scale, rounding);
 }
 
+/** A value written to a step: the nearest multiple, and whether that moved it beyond float noise. */
+export interface Stepped {
+  value: number;
+  approx: boolean;
+}
+
+/**
+ * A value to the nearest multiple of `step`, as a size is marked (a shoe scale's half size,
+ * Mondopoint's 5 mm; ADR 0027), rounded as chosen, a tie away from zero: 9.89 to halves is 10,
+ * and 271.04 to fives is 270. `approx` says the rounding moved the value by more than float
+ * noise, so a row can mark it ≈. Null for a value that is not finite, or a step that is not
+ * positive.
+ */
+export function roundToStep(
+  value: number,
+  step: number,
+  rounding: Rounding = 'nearest',
+): Stepped | null {
+  if (!Number.isFinite(value) || !(step > 0)) return null;
+  const result = roundedScaled(value, 1 / step, rounding) * step;
+  return {
+    value: Object.is(result, -0) ? 0 : result,
+    approx: Math.abs(value - result) > noiseAt(value),
+  };
+}
+
 function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }

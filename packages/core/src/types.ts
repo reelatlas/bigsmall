@@ -20,7 +20,8 @@ export type CategoryId =
   | 'power'
   | 'force'
   | 'torque'
-  | 'angle';
+  | 'angle'
+  | 'shoe-size';
 
 /**
  * Standard or specialty, the words the screen uses, so code, docs, and screen share one
@@ -47,7 +48,8 @@ export type UnitSystem = 'si' | 'metric' | 'imperial' | 'us' | 'uk' | 'other';
 
 /**
  * A category's field, for grouping categories once there are many (docs/PLAN.md §2): the common
- * ones people convert every day, then the fields. Not a tier.
+ * ones people convert every day, then the fields, and the sizes people wear (ADR 0027). Not a
+ * tier.
  */
 export type CategoryGroup =
   | 'common'
@@ -57,7 +59,8 @@ export type CategoryGroup =
   | 'electromagnetism'
   | 'light'
   | 'radiation'
-  | 'digital';
+  | 'digital'
+  | 'sizes';
 
 export interface Category {
   id: CategoryId;
@@ -74,6 +77,16 @@ export interface Category {
    * ADR 0021): its base unit is one of theirs, and an ingredient converts across them.
    */
   over?: readonly CategoryId[];
+  /**
+   * A line under the category's table: what its figures rest on and where they can differ (the
+   * shoe sizes' rule and the brands' charts; ADR 0027). Cooking's line is its ingredient's instead.
+   */
+  note?: string;
+  /**
+   * Its name and aliases are written before a number too ("size 11"; ADR 0027): the parser reads
+   * them as a prefix, as it reads a unit's keys with `prefix`.
+   */
+  prefix?: true;
 }
 
 interface UnitMeta {
@@ -122,6 +135,28 @@ interface UnitMeta {
    * listed only with that ingredient, and taking it brings the ingredient.
    */
   ingredient?: string;
+  /**
+   * The step the unit is marked in, where a value is only ever a whole or half one (a shoe
+   * scale's half size, Mondopoint's 5 mm; ADR 0027): a converted value is written to it, rounded
+   * to the nearest, and marked ≈ where that moved it, whatever Display's places or fractions.
+   */
+  step?: number;
+  /**
+   * The span of base values the unit covers, where a table rather than a formula defines it
+   * (ISO 19407's children's table, 120 to 236 mm of foot): outside it a row says so rather than
+   * carrying a line past the table into sizes no shoe is marked in.
+   */
+  range?: readonly [number, number];
+  /**
+   * Written before its number ("US 11", "EU 45"; ADR 0027): the parser reads a leading key of
+   * the unit followed by a number as that number and the key (parse.ts).
+   */
+  prefix?: true;
+  /**
+   * Agreed by a body's table rather than defined by a standard or measured (docs/RESEARCH.md §1):
+   * a shoe scale by ISO 19407. The formulas page says so in place of "measured".
+   */
+  conventional?: true;
 }
 
 /** base = value × factor. Nearly every unit. */

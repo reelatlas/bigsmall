@@ -1,4 +1,4 @@
-import { compactKey, degreeBeforeLetter } from './normalize';
+import { apostropheInWord, compactKey, degreeBeforeLetter } from './normalize';
 
 /** A run of characters in a label, as UTF-16 offsets: `text.slice(start, end)`. */
 export interface TextSpan {
@@ -14,9 +14,10 @@ export interface TextSpan {
  * starts at a letter joins it, so "f" marks all of "°F"; a typed "°" marks the sign itself.
  *
  * Each character is folded on its own and remembers where it came from, which is exact because
- * normalizeKey's only rules that span characters are whitespace, which compactKey drops, and a
+ * normalizeKey's only rules that span characters are whitespace, which compactKey drops, a
  * degree sign before a letter, which a query never holds (compactKey drops it) and which is
- * pulled into the match here instead.
+ * pulled into the match here instead, and an apostrophe inside a word, folded to nothing here by
+ * its neighbours as there.
  */
 export function matchSpan(text: string, query: string): TextSpan | null {
   const target = compactKey(query);
@@ -29,7 +30,7 @@ export function matchSpan(text: string, query: string): TextSpan | null {
   const ignorable = new Set<number>();
   for (let i = 0; i < text.length;) {
     const char = String.fromCodePoint(text.codePointAt(i) ?? 0);
-    const piece = compactKey(char);
+    const piece = apostropheInWord(text, i) ? '' : compactKey(char);
     if (piece === '') ignorable.add(i);
     for (let k = 0; k < piece.length; k += 1) origin.push(i);
     folded += piece;

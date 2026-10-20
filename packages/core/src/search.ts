@@ -67,6 +67,12 @@ export interface SearchResponse {
    * Settings' Specialty switch instead (ADR 0018).
    */
   escalated: boolean;
+  /**
+   * What follows a trailing "to" or "in" in the query ("km to miles", "us 11 in eu"), when the
+   * whole matched nothing and its head did (ADR 0027; docs/UX-SPEC.md §4): the unit the visitor
+   * is after, as typed, empty while it is still to come ("km to"). Nothing reads it yet.
+   */
+  target?: string;
 }
 
 interface Query {
@@ -252,13 +258,31 @@ function idleResults(options: SearchOptions): SearchResponse {
 }
 
 /**
+ * A query's tail, "to" or "in" and what follows ("km to miles", "us 11 in eu"; ADR 0027): the
+ * last such word, so "ft in to cm" keeps the pair's "ft in" as its head.
+ */
+const TAIL = /^(.*\S)\s+(?:to|in)(?:\s+(.*))?$/iu;
+
+/**
  * Rank units and categories against a typed query. An empty query lists what the box could hold:
- * the categories, or the locked category's units.
+ * the categories, or the locked category's units. A query that matches nothing as a whole and
+ * ends in "to" or "in" and a target is matched by its head, the target returned beside the
+ * results ("km to miles" lists the kilometer, "us 11 in eu" the US scales), so a conversion typed
+ * as a question finds its unit (docs/UX-SPEC.md §4); "ft in" matches whole, as the pair.
  */
 export function search(text: string, options: SearchOptions = {}): SearchResponse {
   const q = toQuery(text);
   if (!q.compact) return idleResults(options);
+  const whole = searchKeys(q, options);
+  if (whole.results.length > 0) return whole;
+  const tail = TAIL.exec(q.raw);
+  if (!tail) return whole;
+  const head = searchKeys(toQuery(tail[1]!), options);
+  return head.results.length > 0 ? { ...head, target: (tail[2] ?? '').trim() } : whole;
+}
 
+/** The matches for a query that is not empty. */
+function searchKeys(q: Query, options: SearchOptions): SearchResponse {
   const scopedUnitKeys = options.category
     ? unitKeys.filter((k) => k.unit.category === options.category)
     : unitKeys;

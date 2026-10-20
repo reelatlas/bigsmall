@@ -8,6 +8,7 @@ import { length } from './length';
 import { mass } from './mass';
 import { power } from './power';
 import { pressure } from './pressure';
+import { shoeSize } from './shoe-size';
 import { speed } from './speed';
 import { temperature } from './temperature';
 import { time } from './time';
@@ -32,4 +33,5 @@ export const golden: Record<string, GoldenRow[]> = {
   force,
   torque,
   angle,
+  'shoe-size': shoeSize,
 };

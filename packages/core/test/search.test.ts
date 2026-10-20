@@ -24,6 +24,7 @@ describe('search: idle lists', () => {
       '#pressure',
       '#power',
       '#angle',
+      '#shoe-size',
     ]);
   });
 

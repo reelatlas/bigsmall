@@ -31,6 +31,7 @@ describe('registry integrity', () => {
       'force',
       'torque',
       'angle',
+      'shoe-size',
     ]);
   });
 

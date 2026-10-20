@@ -72,3 +72,12 @@ export function getCategory(id: string): Category | undefined {
 export function unitsIn(category: CategoryId): Unit[] {
   return units.filter((u) => u.category === category);
 }
+
+/**
+ * The units written as a clock (ADR 0026): the pairs whose notation is a clock first (hours,
+ * minutes, seconds), then the paces, each in the catalog's order, so a clock typed alone can offer
+ * them (Sean, 2026-10-20).
+ */
+export function clockUnits(): Unit[] {
+  return [...units.filter((u) => u.notation === 'clock'), ...units.filter((u) => u.pace === true)];
+}

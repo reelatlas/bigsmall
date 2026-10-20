@@ -53,9 +53,10 @@ const cases: Case[] = [
   { text: '5:30 min/mi', value: 5.5, query: 'min/mi' },
   { text: '1:30 h', value: 1.5, query: 'h' },
   { text: '1:05:30', value: 1 + 5 / 60 + 30 / 3600 },
-  // Seconds are two digits under 60: anything else is no clock, and "5:" or "5:3" is on its way.
+  // A part after the first is under 60, one digit or two: 5:3 is 5:03, on its way to 5:30 or not,
+  // never 5 alone (Sean, 2026-10-20); 60 and over is no clock, and "5:" is on its way.
   { text: '5:75 km', value: 5, query: ':75 km' },
-  { text: '5:3', value: 5, query: ':3' },
+  { text: '5:3', value: 5.05, valueText: '5:3' },
   { text: '5:', value: 5, query: ':' },
 ];
 
@@ -95,6 +96,13 @@ describe('parse', () => {
     expect(parse('-1e400').outOfRange).toBe('large');
     expect(parse('9'.repeat(400)).outOfRange).toBe('large');
     expect(parse('1e-400')).toMatchObject({ valueText: '1e-400', outOfRange: 'small' });
+  });
+
+  it('marks a clock as typed, which alone names the units written so (ADR 0026)', () => {
+    expect(parse('5:30')).toMatchObject({ clock: true, value: 5.5 });
+    expect(parse('5:30 min/mi')).toMatchObject({ clock: true, query: 'min/mi' });
+    expect(parse('5.5')).not.toHaveProperty('clock');
+    expect(parse('5:30 + 1')).not.toHaveProperty('clock');
     expect(parse('1e-400').value).toBeUndefined();
   });
 

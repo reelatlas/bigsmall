@@ -48,7 +48,9 @@ const NUMBER = new RegExp(
  * "1:05:30" has three parts. Every part after the first is two digits under 60. Read before a
  * plain number, so its digits are not taken for one.
  */
-const CLOCK = /[0-9]+(?::[0-5][0-9]){1,2}(?![0-9])/y;
+// A part after the first is under 60, one digit or two: 5:3 is 5:03, on its way to 5:30 or not,
+// never 5 alone with ":3" left over (Sean, 2026-10-20).
+const CLOCK = /[0-9]+(?::[0-5]?[0-9]){1,2}(?![0-9])/y;
 const ANY_SEPARATOR = new RegExp(SEPARATOR, 'g');
 const TRAILING_MARK = /[.,]$/;
 export const EXPONENT_MARK = /[eE]/;

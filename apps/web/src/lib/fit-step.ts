@@ -210,9 +210,12 @@ function fitColumns(
     for (const cell of cells(column)) cell.hidden = !shown;
     for (const cell of standIns(column)) cell.hidden = shown;
   };
-  // A hidden cell is 0 by 0, so every column's cells can be asked at once.
-  const fits = () =>
-    columns.every((column) => cells(column).every((cell) => cell.scrollWidth <= cell.clientWidth));
+  // A hidden cell is 0 by 0, so every column's cells can be asked at once; a cell marked
+  // `data-fits` must fit in every state and never hides itself (a pair's symbol over the spare
+  // width), so the columns give way for it as for a wide value (Sean, 2026-10-20).
+  const whole = (cell: HTMLElement) => cell.scrollWidth <= cell.clientWidth;
+  const mustFit = [...element.querySelectorAll<HTMLElement>('[data-fits]')];
+  const fits = () => columns.every((column) => cells(column).every(whole)) && mustFit.every(whole);
   const hidden: string[] = [];
   for (const column of [...columns].reverse()) {
     for (const before of columns.slice(0, columns.indexOf(column))) show(before, false);
@@ -230,7 +233,8 @@ function fitColumns(
  * that may hide, named in the order they give way, each cell marked `data-column` with its
  * column's name and kept to one line, clipped. A column shows while each of its cells fits whole
  * with every column before it hidden; otherwise it hides in every row at once, never one cell, so
- * the rows keep reading alike, and it comes back once a later column's going makes its room. A
+ * the rows keep reading alike, and it comes back once a later column's going makes its room; a
+ * cell marked `data-fits` never hides and must fit whole, the columns giving way for it. A
  * column may have stand-ins, marked `data-instead` with its name, which show exactly where it
  * hides (Both's fraction, under the decimal). The measurement hides and shows the cells itself, as
  * useFieldFit does the chip's name, and the grid renders them with the same `hidden`; `grid` is

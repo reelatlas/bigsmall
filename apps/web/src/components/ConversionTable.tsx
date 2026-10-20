@@ -160,12 +160,13 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * left-aligned in its own; the copied check flashing over its end, a grid item laid on the
  * row's own area (never a positioned child: WebKit lays a nested subgrid out wrong under one,
  * docs/LEARNINGS.md, 2026-10-20). The names keep to one line: where one would not fit beside
- * its value (a long value on a phone), the pairs' symbols give way first, then every name
- * (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
- * columns, the symbol and the name centred beside both lines; a column comes back once a later
- * one's going makes its room. The single units size the columns and a pair reacts to the room
- * they leave (Sean, 2026-10-20): its symbol takes the spare width before the symbols, its name
- * is cut short in the names' column. The unit's cell has no column gap, since the symbol and
+ * its value (a long value on a phone), every name gives way first (GIVE_WAY), then Both's
+ * fraction moves under the decimal, on a second line in the value's columns, the symbol and the
+ * name centred beside both lines; a column comes back once a later one's going makes its room.
+ * The single units size the columns and a pair reacts to the room they leave (Sean, 2026-10-20):
+ * its symbol takes the spare width before the symbols and must fit there, the names going for it
+ * as for a wide value, and its name is cut short in the names' column. The unit's cell has no
+ * column gap, since the symbol and
  * its exponent touch: its parts space themselves (pr-2, pl-2). Seven columns, so a row spans
  * col-span-7.
  */
@@ -173,11 +174,13 @@ const ROWS =
   'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
 
 /**
- * The columns that give way when a row has no room for them, in that order (useColumnsFit): the
- * pairs' symbols first (h:m:s, the widest, whose value carries its units), then every name, then
- * Both's fraction; each comes back once a later one's going makes its room (Sean, 2026-10-20).
+ * The columns that give way when a row has no room for them, in that order (useColumnsFit): every
+ * name, then Both's fraction; each comes back once a later one's going makes its room. A pair's
+ * symbol never gives way: it must fit (`data-fits`) over the spare width before the symbols, and
+ * the names go for it as for a wide value, so nothing of a pair drops before the single units'
+ * equivalent would (Sean, 2026-10-20).
  */
-const GIVE_WAY = ['pair-symbol', 'name', 'second'] as const;
+const GIVE_WAY = ['name', 'second'] as const;
 
 /** A symbol's trailing exponent, set in a column of its own: "km²" is "km" and "²". */
 const EXPONENT = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+$/u;
@@ -209,8 +212,9 @@ const STACKED_PART_CELL = 'col-start-2 pr-2 pl-1 text-sm font-numeric whitespace
 const SYMBOL_CELL = cx('col-start-5 pl-2 text-right', unitSymbol());
 /**
  * A pair's symbol, wider than any single unit's (h:m:s): right-aligned with the symbols, it takes
- * the spare width before them rather than widening their column, and gives way where even that
- * lacks the room (Sean, 2026-10-20: the single units size the columns, a pair reacts).
+ * the spare width before them rather than widening their column, and must fit there: where it
+ * lacks the room, the names give way for it, as for a wide value, and it never goes itself (Sean,
+ * 2026-10-20: the single units size the columns, a pair reacts, and a symbol is every row's).
  */
 const PAIR_SYMBOL_CELL = cx(
   'col-start-4 col-end-6 min-w-0 overflow-hidden pl-2 text-right',
@@ -461,7 +465,6 @@ export function ConversionTable<T extends ConversionRow>({
   const gridRef = useRef<HTMLDivElement>(null);
   const fitted = useColumnsFit(gridRef, GIVE_WAY);
   const namesHidden = fitted.includes('name');
-  const pairSymbolsHidden = fitted.includes('pair-symbol');
   const secondHidden = fitted.includes('second');
   const withNames = display.names === 'both';
   const both = display.format === 'both';
@@ -599,15 +602,13 @@ export function ConversionTable<T extends ConversionRow>({
             </span>
           </>
         )}
-        {/* A pair's symbol takes the spare width before the symbols and gives way first, before
-            any single unit's name, its value carrying its units; it comes back once the names have
-            gone. The cells after it keep their columns while it is hidden. */}
+        {/* A pair's symbol takes the spare width before the symbols and must fit there: the names
+            give way for it, as for a wide value, and it never goes itself (Sean, 2026-10-20). */}
         <span
           aria-hidden="true"
-          hidden={row.pair ? pairSymbolsHidden : undefined}
           className={cx(row.pair ? PAIR_SYMBOL_CELL : SYMBOL_CELL, tall)}
           data-symbol
-          data-column={row.pair ? 'pair-symbol' : undefined}
+          data-fits={row.pair ? '' : undefined}
         >
           {base}
         </span>
@@ -707,13 +708,9 @@ export function ConversionTable<T extends ConversionRow>({
       <span className={cx(SYMBOL_CELL, 'row-start-1')}>
         {stack((row) => splitExponent(row.pair ? '' : row.symbol)[0])}
       </span>
-      {/* The pairs' symbols, a column of their own and the first to give way, over the spare
-          width and the symbols' column, never widening the latter. */}
-      <span
-        hidden={pairSymbolsHidden}
-        className={cx(PAIR_SYMBOL_CELL, 'row-start-1')}
-        data-column="pair-symbol"
-      >
+      {/* The pairs' symbols over the spare width and the symbols' column, never widening the
+          latter and never hidden: they must fit, the names giving way for them. */}
+      <span className={cx(PAIR_SYMBOL_CELL, 'row-start-1')} data-fits>
         {stack((row) => (row.pair ? splitExponent(row.symbol)[0] : ''))}
       </span>
       <span className={cx('col-start-6 row-start-1', unitSymbol())}>

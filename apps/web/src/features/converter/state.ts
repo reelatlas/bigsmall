@@ -1,4 +1,5 @@
 import {
+  clockUnits,
   convert,
   convertChange,
   convertWith,
@@ -468,6 +469,10 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
         };
     return withPairFirst(rest, pair);
   }
+  // A clock names its units (ADR 0026; Sean, 2026-10-20): typed alone, "5:55" offers the units
+  // written as a clock, the time pair first, then the paces, until one is in the box; a unit
+  // typed after it, or in the box, takes the clock as a number.
+  if (parsed.clock && !unit && !typingUnit(parsed)) return withClockUnits(base, category);
   if (typingUnit(parsed)) return selectMatches(base, parsed.query ?? '', unit, category, options);
   if (!category) return { ...base, kind: 'start', announcement: null };
   if (category === 'cooking') {
@@ -476,6 +481,26 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       : ingredientList(base);
   }
   return selectUnits(base, category, unit, parsed, options);
+}
+
+/** The units written as a clock, offered for a clock typed alone: the time pair, then the paces. */
+function withClockUnits(base: ViewBase, current: CategoryId | null): MatchesView {
+  const rows: MatchRow[] = clockUnits().flatMap((clock) => {
+    const category = getCategory(clock.category);
+    return category ? [{ kind: 'unit', unit: clock, category, inBox: false }] : [];
+  });
+  const counts: Partial<Record<CategoryId, number>> = {};
+  for (const row of rows) counts[row.category.id] = (counts[row.category.id] ?? 0) + 1;
+  return {
+    ...base,
+    kind: 'matches',
+    category: current,
+    query: '',
+    rows,
+    counts,
+    hidden: [],
+    announcement: `${rows.length} ${rows.length === 1 ? 'unit' : 'units'} written as a clock`,
+  };
 }
 
 /** The matches with a compound's pair leading them, its category's group first, counted once. */

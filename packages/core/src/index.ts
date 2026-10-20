@@ -5,7 +5,7 @@
 export type * from './types';
 export { convert, convertChange, toBase, fromBase, ConversionError } from './convert';
 export type { ConversionErrorCode } from './convert';
-export { categories, units, getUnit, getCategory, unitsIn } from './units';
+export { categories, units, getUnit, getCategory, unitsIn, clockUnits } from './units';
 export { regionDefaults } from './region';
 export type { RegionDefaults, UnitPreference } from './region';
 export { DEFAULT_SEPARATORS, localeSeparators } from './locale';

@@ -578,6 +578,9 @@ export function TableLayout({
     box.parsed.compound !== undefined &&
     table.rows[0]?.kind === 'unit' &&
     table.rows[0].unit.id === box.parsed.compound.unit;
+  /** A clock typed alone offers the units written as one, the first of which Enter takes too. */
+  const offersClock =
+    table.kind === 'matches' && box.parsed.clock === true && table.rows[0]?.kind === 'unit';
   const rest = table.kind === 'units' && box.unit ? table.rows.findIndex((row) => row.inBox) : -1;
   const at = position === null ? rest : Math.min(position, rowCount - 1);
   /** The arrows have moved the cursor into the table's place: Escape first brings it back. */
@@ -978,9 +981,11 @@ export function TableLayout({
         event.preventDefault();
         const worked = evaluatedText(box.text, env);
         if (browsing) takeRow(at);
-        // A typed unit takes its best match, and a compound its pair (ADR 0026); Cooking's
-        // ingredients, listed to choose from, are gone into, as a category's units are.
-        else if (table.kind === 'matches' && (table.query !== '' || offersPair)) takeRow(0);
+        // A typed unit takes its best match, a compound its pair, and a clock the first unit
+        // written as one (ADR 0026); Cooking's ingredients, listed to choose from, are gone into,
+        // as a category's units are.
+        else if (table.kind === 'matches' && (table.query !== '' || offersPair || offersClock))
+          takeRow(0);
         else if (table.kind === 'matches') setPosition(0);
         else if (worked !== null) dispatch({ type: 'replace', text: worked });
         else if (box.unit) setPosition(null);

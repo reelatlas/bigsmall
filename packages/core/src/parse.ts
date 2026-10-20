@@ -47,6 +47,11 @@ export interface ParsedInput {
    * "0^-1"), or 'not-real' for a power with no real value ("(−8)^0.5").
    */
   invalid?: 'divide-by-zero' | 'not-real';
+  /**
+   * Set when the number is a clock as typed ("5:30"), which, alone, names the units written so
+   * (the time pair, the paces; ADR 0026).
+   */
+  clock?: true;
   /** Set when the value comes from arithmetic rather than one number, so the UI can show it. */
   expression?: true;
   /**
@@ -169,6 +174,7 @@ export function parse(text: string, separators: Separators = DEFAULT_SEPARATORS)
     const signs = scanned.tokens.filter((token) => token.kind === 'sign' && token.negative);
     const digits = only.text.includes(':') ? only.text : canonicalNumber(only.text, marked);
     result.canonical = `${signs.length % 2 === 1 ? '-' : ''}${digits}`;
+    if (only.text.includes(':')) result.clock = true;
   }
 
   const rest = body.slice(end).trim();

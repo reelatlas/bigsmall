@@ -2018,7 +2018,7 @@ test('a side panel opened under a stuck head sticks beside it from md, and below
   }
 });
 
-test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row writes the total split in the pair’s own marks, its name beside it (ADR 0026)', async ({
+test('a height: "5\'11" offers feet, inches, Enter takes it, and the pair row writes the total split in the pair’s own marks, its name beside it (ADR 0026)', async ({
   page,
   isMobile,
 }) => {
@@ -2027,13 +2027,13 @@ test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row
   await box(page).fill("5'11");
   // The compound names its pair: the one match, its symbol and its name as every match.
   await expect(matches(page).getByRole('option')).toHaveCount(1);
-  await expect(matches(page).getByRole('option').first()).toContainText('feet and inches');
+  await expect(matches(page).getByRole('option').first()).toContainText('feet, inches');
   await expect(matches(page).getByRole('option').first()).toContainText('ft in');
   await box(page).press('Enter');
-  await expect(page.getByRole('button', { name: 'Remove feet and inches' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove feet, inches' })).toBeVisible();
   // The chip is every unit's: the symbol, then the name where the box has the room; the
   // placeholder says Number as for any unit (the hundredth pass).
-  const chip = page.getByRole('button', { name: 'Unit: feet and inches' });
+  const chip = page.getByRole('button', { name: 'Unit: feet, inches' });
   await expect(chip.getByText('ft in', { exact: true }).first()).toBeVisible();
   await expect(box(page)).toHaveValue("5'11");
   await expect(box(page)).toHaveAttribute('placeholder', 'Number');
@@ -2044,7 +2044,7 @@ test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row
   // way before the names do: the single units read as before, their names kept.
   await expect(row(page, 'foot-inch')).toContainText('5′ 11.00″');
   await expect(row(page, 'foot-inch').locator('[data-symbol]')).toHaveText('ft in');
-  await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveText('feet and inches');
+  await expect(row(page, 'foot-inch').locator('[data-name]')).toHaveText('feet, inches');
   await expect(row(page, 'foot-inch').locator('[data-name]')).not.toHaveAttribute(
     'data-column',
     'name',
@@ -2083,10 +2083,32 @@ test('a height: "5\'11" offers feet and inches, Enter takes it, and the pair row
   if (isMobile) {
     expect(await pairName.evaluate((cell) => cell.scrollWidth > cell.clientWidth)).toBe(true);
   }
-  // At 320 px the names give way; the pair's symbol, hidden before them for the room, comes back
-  // once they have gone (the fit decides from the last column to give way).
+  // At 320 px the names give way; the pair's symbol, which never gives way, stands beside its
+  // value as before.
   await windowOf(page, 320, 800);
   await expect(row(page, 'minute').locator('[data-name]')).toBeHidden();
   await expect(row(page, 'hour-minute-second').locator('[data-symbol]')).toBeVisible();
   await expect(row(page, 'hour-minute-second').locator('[data-symbol]')).toHaveText('h:m:s');
+});
+
+test('a clock names its units: "5:55" offers the time pair, then the paces, Enter takes the pair, and a part of one digit reads as that many (ADR 0026)', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('5:55');
+  const options = matches(page).getByRole('option');
+  await expect(options).toHaveCount(3);
+  await expect(options.nth(0)).toContainText('hours, minutes, seconds');
+  await expect(options.nth(1)).toContainText('min/km');
+  await expect(options.nth(2)).toContainText('min/mi');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove hours, minutes, seconds' })).toBeVisible();
+  await expect(box(page)).toHaveValue('5:55');
+  await expect(row(page, 'hour-minute-second')).toContainText('5:55:00');
+  await expect(row(page, 'minute')).toContainText('355.00');
+  // 5:5 is 5:05, never 5 alone with ":5" left over (Sean, 2026-10-20).
+  await box(page).fill('5:5');
+  await expect(row(page, 'hour-minute-second')).toContainText('5:05:00');
+  await expect(row(page, 'minute')).toContainText('305.00');
 });

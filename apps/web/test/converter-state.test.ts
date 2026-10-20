@@ -562,6 +562,22 @@ describe('compound quantities (ADR 0026)', () => {
     ).toMatchObject({ kind: 'unit', unit: { id: 'stone-pound' } });
   });
 
+  it('offers the units written as a clock for a clock typed alone: the time pair, then the paces', () => {
+    const clock = matches(type('5:55'));
+    expect(clock.rows.map((row) => row.kind === 'unit' && row.unit.id)).toEqual([
+      'hour-minute-second',
+      'minute-per-kilometer',
+      'minute-per-mile',
+    ]);
+    expect(clock.counts).toEqual({ time: 1, speed: 2 });
+    expect(clock.announcement).toBe('3 units written as a clock');
+    // A unit typed after it is the match, as for any number; in the box, a unit takes the clock.
+    expect(matches(type('5:55 min/mi')).rows[0]).toMatchObject({ unit: { id: 'minute-per-mile' } });
+    expect(view(type('5:55'), { type: 'use', unit: 'hour-minute-second', text: '5:55' }).kind).toBe(
+      'units',
+    );
+  });
+
   it('converts a compound from its pair, the pair’s row written in its own marks under Mixed units', () => {
     const t = units({ type: 'use', unit: 'foot-inch', text: "5'11" });
     const row = (id: string) => t.rows.find((each) => each.id === id)!;

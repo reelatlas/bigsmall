@@ -56,7 +56,7 @@ The checker's brief is written at wave 2 from the kept charts: `check.csv` with 
 
 ## 5. Decisions
 
-To come at wave 3: numbered for Sean, each with where to see it, what changes, and one recommendation.
+To come at wave 3: numbered for Sean, each with where to see it, what changes, and one recommendation. A first look for him (2026-10-20, before wave 2, the hundred-and-ninth pass): the shoe data page, https://claude.ai/artifact/Q5ekQR2R9pnkD7Wd6n9z3Q, its HTML and generator in `shoe-sizes-2/mocks/` (`shoe-chart.py` writes it from the workers' cells): ISO's chart as the engine holds it, one size across every chart, the deltas as strips by foot length, and the two shapes mocked, a hint under the table and the brand's chart as the second value. The chart is recommended: the deltas are stair steps (a 5 mm grid against ISO's 4.2) and slopes, not constants, so a hint is true on average and wrong at the ends.
 
 ## 6. Cost and learnings
 

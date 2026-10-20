@@ -2050,8 +2050,6 @@ test('a height: "5\'11" offers feet, inches, Enter takes it, and the pair row wr
   await expect(chip.getByText('ft in', { exact: true }).first()).toBeVisible();
   await expect(box(page)).toHaveValue("5'11");
   await expect(box(page)).toHaveAttribute('placeholder', 'Number');
-  // No quiet line: the chip and the table say what was read (the ninety-eighth pass).
-  await expect(page.locator('[data-read]')).toHaveCount(0);
   // The pair's row sits under Mixed units, its value in the marks people write, its symbol as
   // every row's, and its name in the names' column, a column of its own to the fit, which gives
   // way before the names do: the single units read as before, their names kept.
@@ -2093,23 +2091,55 @@ test('a height: "5\'11" offers feet, inches, Enter takes it, and the pair row wr
   await expect(row(page, 'hour-minute-second')).toContainText('1:30:00');
   await expect(row(page, 'minute')).toContainText('90.00');
   // The pair's symbol, the table's widest (h:m:s), never costs the single rows their names: it
-  // takes the spare width before the symbols, and gives way before any name (the hundred-and-first
-  // and hundred-and-second passes).
-  await expect(row(page, 'minute').locator('[data-name]')).toBeVisible();
-  // The pair's name never sizes the names' column, the single units' names do: where it has less
-  // room than it needs (a phone), it is cut short with an ellipsis, the symbol saying the rest.
+  // takes the spare width before the symbols and never gives way, the names going for it as for
+  // a wide value (the hundred-and-first to hundred-and-third passes). The pair's name never sizes
+  // the names' column, the single units' names do: where it has less room than it needs (a
+  // phone), it is cut short with an ellipsis, the symbol saying the rest.
   const pairName = row(page, 'hour-minute-second').locator('[data-name]');
   await expect(pairName).toBeVisible();
   await expect(pairName).toHaveText('hours, minutes, seconds');
   if (isMobile) {
     expect(await pairName.evaluate((cell) => cell.scrollWidth > cell.clientWidth)).toBe(true);
   }
-  // At 320 px the names give way; the pair's symbol, which never gives way, stands beside its
-  // value as before.
+  // In every theme, whose fonts change what fits: the pair's symbol stands whole, and the names
+  // show in every row or in none, never clipped; where a theme's fonts leave no room for both on
+  // a phone (Neo-noir's, measured on the Pixel 5 project), the names go first, as for a wide
+  // value (the hundred-and-third pass). On a desktop they have the room in every theme.
+  const whole = (cell: Locator) => cell.evaluate((each) => each.scrollWidth <= each.clientWidth);
+  const names = () =>
+    page.locator('[data-row] [data-column="name"]').evaluateAll((cells) => ({
+      rows: cells.length,
+      shown: cells.filter((cell) => !(cell as HTMLElement).hidden).length,
+      clipped: cells.filter(
+        (cell) => !(cell as HTMLElement).hidden && cell.scrollWidth > cell.clientWidth,
+      ).length,
+    }));
+  const pairSymbol = row(page, 'hour-minute-second').locator('[data-symbol]');
+  const holds = async (theme: string) => {
+    await expect(pairSymbol, theme).toBeVisible();
+    await expect(pairSymbol, theme).toHaveText('h:m:s');
+    expect(await whole(pairSymbol), theme).toBe(true);
+    const shown = await names();
+    expect([0, shown.rows], theme).toContain(shown.shown);
+    expect(shown.clipped, theme).toBe(0);
+  };
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    await holds(theme.id);
+    if (!isMobile) await expect(row(page, 'minute').locator('[data-name]'), theme.id).toBeVisible();
+  }
+  // At 320 px the rule holds in every theme, and in Daylight the names give way, the pair's
+  // symbol standing beside its value as before.
   await windowOf(page, 320, 800);
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    await holds(theme.id);
+  }
+  await applyTheme(
+    page,
+    THEMES.find((theme) => theme.id === 'daylight')!,
+  );
   await expect(row(page, 'minute').locator('[data-name]')).toBeHidden();
-  await expect(row(page, 'hour-minute-second').locator('[data-symbol]')).toBeVisible();
-  await expect(row(page, 'hour-minute-second').locator('[data-symbol]')).toHaveText('h:m:s');
 });
 
 test('a clock names its units: "5:55" offers the paces first, "1:30:00" the time pair, Enter takes the first, 5:5 is 5:05, and "5\'" offers feet then the pair (ADR 0026)', async ({

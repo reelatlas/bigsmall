@@ -9,6 +9,7 @@ import {
   selectBox,
   selectTable,
   TABLE_PRECISION,
+  targetRow,
   type Action,
   type ConverterState,
   type History,
@@ -728,5 +729,47 @@ describe('shoe sizes (ADR 0027)', () => {
     expect(row(outside, 'us-men')).toMatchObject({ text: NO_VALUE, tone: 'empty', value: null });
     expect(row(outside, 'mondopoint')).toMatchObject({ tone: 'empty' });
     expect(outside.announcement).toBe('US children runs 4 to 13.5');
+  });
+
+  it('keeps a query’s target beside the matches, and names the row it rests the cursor on', () => {
+    const typed = selectTable(run(type('us 11 to eu')), options);
+    expect(typed.kind).toBe('matches');
+    if (typed.kind !== 'matches') throw new Error('expected matches');
+    expect(typed.target).toBe('eu');
+    expect(typed.rows[0]).toMatchObject({ kind: 'unit', unit: { id: 'us-men' } });
+    // "11m to eu" offers US men ahead of the meter; "11 us eu" needs no "to".
+    const meter = selectTable(run(type('11m')), options);
+    if (meter.kind !== 'matches') throw new Error('expected matches');
+    expect(meter.rows[0]).toMatchObject({ kind: 'unit', unit: { id: 'meter' } });
+    expect(meter.target).toBeUndefined();
+    const named = selectTable(run(type('11m to eu')), options);
+    if (named.kind !== 'matches') throw new Error('expected matches');
+    expect(named.rows[0]).toMatchObject({ kind: 'unit', unit: { id: 'us-men' } });
+    const bare = selectTable(run(type('11 us eu')), options);
+    if (bare.kind !== 'matches') throw new Error('expected matches');
+    expect(bare.rows[0]).toMatchObject({ kind: 'unit', unit: { id: 'us-men' } });
+    expect(bare.target).toBe('eu');
+    // The row a target names, among the rows the cursor moves through.
+    const table = units(type('us 11'), { type: 'use', unit: 'us-men', text: '11' });
+    expect(targetRow(table, 'eu')).toBe(table.rows.findIndex((each) => each.id === 'eu'));
+    expect(targetRow(table, 'eur')).toBe(targetRow(table, 'eu'));
+    expect(targetRow(table, 'EU C')).toBe(
+      table.rows.findIndex((each) => each.id === 'eu-children'),
+    );
+    expect(targetRow(table, 'kg')).toBe(-1);
+    expect(targetRow(table, '')).toBe(-1);
+    // With a unit in the box, a connective and a target typed after the number keep the table,
+    // converting, and carry the target; a connective alone carries an empty one.
+    const after = units({ type: 'use', unit: 'us-men', text: '11' }, type('11 to eu'));
+    expect(after.target).toBe('eu');
+    expect(row(after, 'eu')).toMatchObject({ text: '44', tone: 'value' });
+    expect(units({ type: 'use', unit: 'us-men', text: '11' }, type('11 to')).target).toBe('');
+    expect(units({ type: 'use', unit: 'us-men', text: '11' }, type('11 in')).target).toBe('');
+    expect(units({ type: 'use', unit: 'us-men', text: '11' }, type('11')).target).toBeUndefined();
+    // Without a unit, a connective alone is a query that matches nothing, its target kept.
+    const alone = selectTable(run(type('11 to eu')), options);
+    if (alone.kind !== 'matches') throw new Error('expected matches');
+    expect(alone.rows).toEqual([]);
+    expect(alone.target).toBe('eu');
   });
 });

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   convert,
   getUnit,
+  leadingTarget,
   matchSpan,
   parse,
   resolveExact,
@@ -188,7 +189,9 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
     expect(parse('kids 30')).toMatchObject({ value: 30, query: 'kids' });
     expect(parse('jp 27.5')).toMatchObject({ value: 27.5, query: 'jp' });
     expect(parse('us')).toEqual({ raw: 'us', query: 'us' });
-    expect(parse('m 11')).toEqual({ raw: 'm 11', query: 'm 11' });
+    // "m" is men's key too, so "m 11" reads as a scale before its number; a word that is no key stays a query.
+    expect(parse('m 11')).toMatchObject({ value: 11, query: 'm' });
+    expect(parse('x 11')).toEqual({ raw: 'x 11', query: 'x 11' });
     expect(parse('11 us')).toMatchObject({ value: 11, query: 'us' });
     expect(suggest('us 11').exact?.id).toBe('us-men');
     expect(suggest('us w 8').exact?.id).toBe('us-women');
@@ -237,5 +240,44 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
     expect(ids(search('ft in to cm'))[0]).toBe('foot-inch');
     expect(search('xyz to abc').results).toEqual([]);
     expect(search('xyz to abc').target).toBeUndefined();
+  });
+
+  it('ranks the target’s category first, reads a target with no connective, and a connective alone', () => {
+    // "11m to eu": the meter leads a bare "m", US men once the target names a shoe scale.
+    expect(ids(search('m'))[0]).toBe('meter');
+    expect(ids(search('m', { prefer: 'shoe-size' }))[0]).toBe('us-men');
+    expect(ids(search('m to eu')).slice(0, 2)).toEqual(['us-men', 'meter']);
+    expect(search('m to eu').target).toBe('eu');
+    expect(ids(search('m to e'))[0]).toBe('us-men');
+    expect(ids(search('oz to ml'))[0]).toBe('us-fluid-ounce');
+    expect(ids(search('oz to g'))[0]).toBe('ounce');
+    expect(ids(search('c to f'))[0]).toBe('celsius');
+    // The target's category never lifts a weaker match: "m to s" is still the meter.
+    expect(ids(search('m to s'))[0]).toBe('meter');
+    expect(suggest('11m to eu').search.results[0]).toMatchObject({ unit: { id: 'us-men' } });
+    // No connective: the last words as the target, where they name a unit of a category the head
+    // matches in; a word that names none leaves the query unsplit.
+    const bare = search('us eu');
+    expect(ids(bare)[0]).toBe('us-men');
+    expect(bare.target).toBe('eu');
+    // A whole that matches, by prefix even, is never split: 'us e' starts the microsecond's µsec.
+    expect(ids(search('us e'))[0]).toBe('microsecond');
+    expect(search('us e').target).toBeUndefined();
+    expect(ids(search('m eu'))[0]).toBe('us-men');
+    expect(ids(search('fluid ounce ml'))[0]).toBe('us-fluid-ounce');
+    expect(search('fluid ounce ml').target).toBe('ml');
+    expect(search('us xyz').results).toEqual([]);
+    expect(search('us xyz').target).toBeUndefined();
+    expect(parse('11 us eu')).toMatchObject({ value: 11, query: 'us eu' });
+    // A connective alone: a target with the whole's matches, usually none; "in" alone is the inch.
+    expect(search('to cm')).toMatchObject({ results: [], target: 'cm' });
+    expect(ids(search('in'))[0]).toBe('inch');
+    expect(search('in').target).toBeUndefined();
+    expect(search('in cm').target).toBe('cm');
+    expect(leadingTarget('to eu')).toBe('eu');
+    expect(leadingTarget('to')).toBe('');
+    expect(leadingTarget('in cm')).toBe('cm');
+    expect(leadingTarget('eu')).toBeNull();
+    expect(leadingTarget('us to eu')).toBeNull();
   });
 });

@@ -23,7 +23,7 @@ export {
 } from './compound';
 export type { Compound, CompoundPart, CompoundRead, PairFormat } from './compound';
 export { normalizeKey, compactKey, compactKeyWithDegree } from './normalize';
-export { search, resolveExact, suggest } from './search';
+export { search, resolveExact, suggest, leadingTarget } from './search';
 export type {
   MatchClass,
   MatchField,

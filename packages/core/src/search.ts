@@ -68,9 +68,14 @@ export interface SearchResponse {
    */
   escalated: boolean;
   /**
-   * What follows a trailing "to" or "in" in the query ("km to miles", "us 11 in eu"), when the
-   * whole matched nothing and its head did (ADR 0027; docs/UX-SPEC.md §4): the unit the visitor
-   * is after, as typed, empty while it is still to come ("km to"). Nothing reads it yet.
+   * The unit the visitor is after, as typed, when the query matches nothing as a whole and names
+   * a head and a target (ADR 0027; docs/UX-SPEC.md §4): what follows a trailing "to" or "in"
+   * ("km to miles", "us 11 in eu"), empty while it is still to come ("km to"); the last words
+   * where they name a unit of a category the head matches in, with no connective ("us eu"); or
+   * all that follows a leading connective ("to cm"), the results then the whole's, usually none.
+   * The results are the head's, the target's category ranked first among them (`withTarget`);
+   * the converter rests its cursor on the target's row once the head's match is taken
+   * (docs/UX-SPEC.md §5).
    */
   target?: string;
 }
@@ -263,22 +268,110 @@ function idleResults(options: SearchOptions): SearchResponse {
  */
 const TAIL = /^(.*\S)\s+(?:to|in)(?:\s+(.*))?$/iu;
 
+/** A query that is only a connective and what follows ("to cm", "in eu"), its head still to come or in the box already. */
+const LEADING = /^(?:to|in)(?:\s+(.*))?$/iu;
+
+/** Every match, where the categories a head matches in are wanted, not a list's worth. */
+const EVERY = 1000;
+
+/**
+ * What a query names after a leading "to" or "in" ("to eu" is "eu", "to" alone ""), or null for
+ * any other query (ADR 0027): the converter reads a target typed after the number with a unit in
+ * the box so ("11 to eu"; docs/UX-SPEC.md §5), by the grammar search's own tail uses.
+ */
+export function leadingTarget(query: string): string | null {
+  const found = LEADING.exec(toQuery(query).raw);
+  return found ? (found[1] ?? '').trim() : null;
+}
+
 /**
  * Rank units and categories against a typed query. An empty query lists what the box could hold:
  * the categories, or the locked category's units. A query that matches nothing as a whole and
- * ends in "to" or "in" and a target is matched by its head, the target returned beside the
- * results ("km to miles" lists the kilometer, "us 11 in eu" the US scales), so a conversion typed
- * as a question finds its unit (docs/UX-SPEC.md §4); "ft in" matches whole, as the pair.
+ * names a head and a target is matched by its head, the target returned beside the results and
+ * its category ranked first among them ("km to miles" lists the kilometer, "us 11 in eu" the US
+ * scales, "11m to eu" US men ahead of the meter; "us eu" with no connective, where "eu" names a
+ * unit of a category "us" matches in), so a conversion typed as a question finds its unit
+ * (docs/UX-SPEC.md §4); "ft in" matches whole, as the pair, and "to cm" alone is a target with
+ * the whole's matches, usually none, its head in the box already or still to come. A match one
+ * typo away is a last resort, read after the splits ("in cm" is "in" and "cm", not the inch).
  */
 export function search(text: string, options: SearchOptions = {}): SearchResponse {
   const q = toQuery(text);
   if (!q.compact) return idleResults(options);
   const whole = searchKeys(q, options);
-  if (whole.results.length > 0) return whole;
+  const [first] = whole.results;
+  if (first && first.matchClass < 6) return whole;
   const tail = TAIL.exec(q.raw);
-  if (!tail) return whole;
-  const head = searchKeys(toQuery(tail[1]!), options);
-  return head.results.length > 0 ? { ...head, target: (tail[2] ?? '').trim() } : whole;
+  if (tail) return withTarget(tail[1]!, (tail[2] ?? '').trim(), options, true) ?? whole;
+  const leading = leadingTarget(q.raw);
+  if (leading !== null) return { ...whole, target: leading };
+  // No connective: the last words as the target, where they name a unit of a category the head
+  // matches in ("us eu", "fluid ounce ml"), the longest head first.
+  const words = q.raw.split(' ');
+  for (let at = words.length - 1; at > 0; at -= 1) {
+    const found = withTarget(
+      words.slice(0, at).join(' '),
+      words.slice(at).join(' '),
+      options,
+      false,
+    );
+    if (found) return found;
+  }
+  return whole;
+}
+
+/**
+ * The head's matches with the target beside them, the target's category ranked first among them
+ * (`prefer`): of the categories the head matches in, the one whose units the target names best,
+ * ties to the head's own order, so "11m to eu" offers US men ahead of the meter, "10 oz to ml"
+ * the fluid ounce ahead of the ounce, and "10 oz to g" the ounce; a weaker match is never lifted
+ * over a stronger one, as `prefer` never does. Null when the head matches nothing, or, with no
+ * connective, when the target names no unit of those categories.
+ */
+function withTarget(
+  headText: string,
+  target: string,
+  options: SearchOptions,
+  connective: boolean,
+): SearchResponse | null {
+  const head = toQuery(headText);
+  if (!head.compact) return null;
+  const ranked = searchKeys(head, { ...options, limit: EVERY });
+  if (ranked.results.length === 0) return null;
+  const category = targetCategory(toQuery(target), ranked.results, options);
+  if (category === null && !connective) return null;
+  const found =
+    category === null ? ranked : searchKeys(head, { ...options, prefer: category, limit: EVERY });
+  return {
+    results: found.results.slice(0, options.limit ?? DEFAULT_LIMIT),
+    escalated: found.escalated,
+    target,
+  };
+}
+
+/**
+ * The category, among those the results are in, whose units a target names best (the strongest
+ * match class), ties to the results' own order; null when the target is empty or names none.
+ */
+function targetCategory(
+  target: Query,
+  results: readonly SearchResult[],
+  options: SearchOptions,
+): CategoryId | null {
+  if (!target.compact) return null;
+  const seen: CategoryId[] = [];
+  for (const result of results) {
+    const id = categoryOf(result);
+    if (!seen.includes(id)) seen.push(id);
+  }
+  let best: { category: CategoryId; matchClass: MatchClass } | null = null;
+  for (const category of seen) {
+    const [first] = searchKeys(target, { ...options, category, tier: 'all', limit: 1 }).results;
+    if (first && (best === null || first.matchClass < best.matchClass)) {
+      best = { category, matchClass: first.matchClass };
+    }
+  }
+  return best?.category ?? null;
 }
 
 /** The matches for a query that is not empty. */

@@ -15,6 +15,7 @@ import {
   getUnit,
   INGREDIENT_KINDS,
   ingredients,
+  leadingTarget,
   matchIngredients,
   NBSP,
   pairParts,
@@ -398,7 +399,7 @@ interface StartView extends TableViewBase {
  * then. Those the settings show are in their sections (docs/UX-SPEC.md §3), and `rows` is them in
  * that order, the order the cursor moves in; those they hide wait in `hidden`, in theirs.
  */
-interface UnitsView extends TableViewBase {
+export interface UnitsView extends TableViewBase {
   kind: 'units';
   category: CategoryId;
   rows: TableRow[];
@@ -413,6 +414,12 @@ interface UnitsView extends TableViewBase {
    * what its figures rest on (the shoe sizes'; ADR 0027).
    */
   note: string | null;
+  /**
+   * A target typed after the number with the unit in the box ("11 to eu"; ADR 0027;
+   * docs/UX-SPEC.md §5), as typed: the row the cursor rests on (`targetRow`), empty while it is
+   * still to come ("11 to").
+   */
+  target?: string | undefined;
 }
 
 /** While a unit is typed: matches from every category, under their category, without values. */
@@ -431,6 +438,11 @@ interface MatchesView extends TableViewBase {
   counts: Partial<Record<CategoryId, number>>;
   /** The units that match but the settings hide, with their section's name, offered apart. */
   hidden: HiddenMatch[];
+  /**
+   * The unit the query names after its head ("us 11 to eu": "eu"; ADR 0027; docs/UX-SPEC.md §4),
+   * as typed, for the cursor to rest on its row once a match is taken; none without one.
+   */
+  target?: string | undefined;
 }
 
 /** A hidden unit that matches, with the name of the section it would show in. */
@@ -502,6 +514,15 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       : [];
   if (opened.length > 0) {
     return withPairsAfter(selectMatches(base, parsed.query ?? '', unit, category, options), opened);
+  }
+  // A target typed after the number with a unit in the box ("11 to eu", "11 in"; ADR 0027): the
+  // table stays, converting, and the target names the row the cursor rests on (TableLayout).
+  const typed =
+    unit !== null && parsed.value !== undefined && parsed.query !== undefined
+      ? leadingTarget(parsed.query)
+      : null;
+  if (typed !== null && category && category !== 'cooking') {
+    return selectUnits(base, category, unit, parsed, options, typed);
   }
   if (typingUnit(parsed)) return selectMatches(base, parsed.query ?? '', unit, category, options);
   if (!category) return { ...base, kind: 'start', announcement: null };
@@ -734,6 +755,7 @@ function selectUnits(
   unit: Unit | null,
   parsed: ParsedInput,
   options: TableOptions,
+  target?: string,
 ): UnitsView {
   const listed = search('', {
     category,
@@ -814,6 +836,7 @@ function selectUnits(
       ...withChange(view),
       message: null,
       note,
+      target,
       announcement: `${view.rows.length} units of ${kind}`,
     };
   }
@@ -835,6 +858,7 @@ function selectUnits(
     ...withChange(view),
     message: null,
     note,
+    target,
     announcement:
       span !== null
         ? `${unit.name} runs ${span}`
@@ -1029,7 +1053,7 @@ function selectMatches(
   current: CategoryId | null,
   options: TableOptions,
 ): MatchesView {
-  const { results } = search(query, {
+  const { results, target } = search(query, {
     system: options.system,
     tier: EVERY_TIER,
     prefer: current,
@@ -1079,8 +1103,21 @@ function selectMatches(
     rows,
     counts,
     hidden,
+    target,
     announcement,
   };
+}
+
+/**
+ * The row a target names (ADR 0027; docs/UX-SPEC.md §5): the unit of the view's category the
+ * target matches best, by index into the rows the cursor moves through, or -1 where it names
+ * none, or one the settings hide; "" names none.
+ */
+export function targetRow(view: UnitsView, target: string): number {
+  if (!target.trim()) return -1;
+  const [found] = search(target, { category: view.category, tier: EVERY_TIER, limit: 1 }).results;
+  if (!found || found.kind !== 'unit') return -1;
+  return view.rows.findIndex((row) => row.id === found.unit.id);
 }
 
 /**

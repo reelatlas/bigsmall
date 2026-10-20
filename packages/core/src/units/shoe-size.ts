@@ -104,7 +104,10 @@ function childrenScale(
  * the shoe being two sizes longer than the foot (ISO/TS 19407:2015 §2.2); the children's scales
  * are ISO's Table 3. The US scales split by gender as the standard does, a bare "US 11" being
  * men's, and youth sizes (1Y to 7Y) are men's sizes, as Nike's chart and ISO's Table 3 agree.
- * The names carry no possessive (US men, British children; Sean, 2026-10-20).
+ * The names carry no possessive (US men, British children; Sean, 2026-10-20). "m" is men's key
+ * too, as people type it ("m11", "us m 11"): the meter's own symbol leads it at the start, and in
+ * Shoe size, or with a target naming a shoe scale ("11m to eu"), US men lead; "w" is not, since
+ * the watt could not keep a typed "w" against it (docs/UNITS-CATALOG.md §0).
  */
 export const shoeSizeUnits: readonly Unit[] = [
   {
@@ -114,7 +117,7 @@ export const shoeSizeUnits: readonly Unit[] = [
     name: 'US men',
     plural: 'US men',
     symbol: 'US M',
-    aliases: ['us', 'm us', 'men', "men's", 'usa', 'us size', 'us youth', 'youth', 'us y'],
+    aliases: ['us', 'm', 'm us', 'men', "men's", 'usa', 'us size', 'us youth', 'youth', 'us y'],
     system: 'us',
     tier: 'standard',
     factor: UK_STEP,

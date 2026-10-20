@@ -1481,6 +1481,39 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await expect(row(page, 'us-men')).toContainText('—');
 });
 
+test('a query’s target: "us 11 to eu" rests the cursor on the EU row, which Enter takes; the target names the category and needs no "to"; typed after the number, it moves the cursor', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  // The target names the category: a bare "m" is the meter until "to eu" says a shoe scale, and
+  // no "to" is needed where the last word names a unit of a category the head matches in.
+  await box(page).fill('11m');
+  await expect(matches(page).getByRole('option').first()).toContainText('meter');
+  await box(page).fill('11m to eu');
+  await expect(matches(page).getByRole('option').first()).toContainText('US men');
+  await box(page).fill('11 us eu');
+  await expect(matches(page).getByRole('option').first()).toContainText('US men');
+  // Enter takes the head's match, and the cursor rests on the target's row, its value in view;
+  // Enter again takes that row into the box (Sean, 2026-10-20).
+  await box(page).fill('us 11 to eu');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await expect(box(page)).toHaveValue('11');
+  await expectCursor(page, 'EU');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
+  await expect(box(page)).toHaveValue('44');
+  // With a unit in the box, a target typed after the number moves the cursor to its row as it is
+  // typed, the table staying; Escape rests the cursor, the text staying.
+  await box(page).fill('10 to uk');
+  await expectCursor(page, 'UK');
+  await expect(box(page)).toHaveValue('10 to uk');
+  await box(page).press('Escape');
+  await expectCursor(page, null);
+  await expect(box(page)).toHaveValue('10 to uk');
+});
+
 test('a temperature is said as a change too, after the readings: 5 °C warmer is 9 °F warmer', async ({
   page,
 }) => {

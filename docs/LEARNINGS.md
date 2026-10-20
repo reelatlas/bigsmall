@@ -1258,3 +1258,13 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** "US men’s" and the spellings people type ("mens", "men's", "children's") needed one key. Dropping every apostrophe in `compactKey` would also have dropped the foot's own alias `'` (and `’`), which "5'" matches to offer feet, and the registry test rejects a key that folds to nothing.
 **Rule.** A folding rule that spans characters needs a condition that says where it applies (between two letters) and a twin in the highlighter, which folds each character alone (`apostropheInWord` in normalize.ts, used by `matchSpan`); a key of one character stays a key.
+
+## 2026-10-20 — A one-letter alias cannot lose to the symbol it folds to for everyone: the family tiebreak decides, so `w` stays the watt's
+
+**What happened.** `m` could join US men's keys (for `11m to eu`) because the meter's symbol `m` is an exact symbol match (class 1) and the alias an exact alias match (class 2), so the meter leads at the start whoever types. `w` could not: the watt's symbol is `W`, so a typed `w` matches it only with case folded, as it would the alias, and the tie then goes to the key written as typed (a lowercase alias wins outright) or, with an uppercase `W` alias, to the tier and then the visitor's own unit family, which puts a US scale ahead of an SI unit for a US visitor. No spelling keeps the watt first for everyone at the start, so `w` is not an alias (docs/UNITS-CATALOG.md §0).
+**Rule.** Before adding a one-letter alias, check the symbol it folds to and its case: only a lowercase symbol can keep its place against a lowercase alias.
+
+## 2026-10-20 — A key of a prefix unit is a prefix key: `m` as US men's alias made `m 11` a number
+
+**What happened.** The parser reads a scale written before its number from every key of a unit marked `prefix` (`readPrefixed`), so an alias added for matching (`m`) also made `m 11` read as 11 and `m`, a query before; the test that pinned the old reading changed with it.
+**Rule.** An alias on a prefix unit is a grammar change too: check what it reads before a number, and pin it.

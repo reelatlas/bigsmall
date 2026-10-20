@@ -48,6 +48,7 @@ import {
   noMatchMessage,
   pairText,
   TABLE_PRECISION,
+  targetRow,
   type BoxView,
   type HistoryAction,
   type TableRow,
@@ -317,6 +318,13 @@ export function TableLayout({
   const tappedIn = useRef(false);
   /** The row Enter took last, and when: a second Enter within the window copies it (§7). */
   const lastEnter = useRef<{ id: string; at: number } | null>(null);
+  /**
+   * The target of a query whose match was just taken ("us 11 to eu": "eu"; ADR 0027), for the
+   * cursor to rest on its row once the table shows it (docs/UX-SPEC.md §5).
+   */
+  const restOn = useRef<string | null>(null);
+  /** The box's text a typed target was last applied for, so Escape's rest and the arrows hold. */
+  const targetAppliedFor = useRef<string | null>(null);
   /** Edit, in the category it was started in: a new category ends it. */
   const [editingIn, setEditingIn] = useState<string | null>(null);
   const editing = table.kind === 'units' && editingIn === table.category;
@@ -797,6 +805,25 @@ export function TableLayout({
     if (behind < 0) window.scrollBy(0, behind);
   });
 
+  // The cursor on the target's row (ADR 0027; docs/UX-SPEC.md §5): the query's target once its
+  // match is taken ("us 11 to eu": the EU row), or one typed after the number with a unit in the
+  // box ("11 to eu"), applied once per text, so Escape rests the cursor and the arrows move on;
+  // Enter then takes the row, and Ctrl/⌘+C copies it.
+  useLayoutEffect(() => {
+    if (table.kind !== 'units') {
+      targetAppliedFor.current = null;
+      return;
+    }
+    const taken = restOn.current;
+    restOn.current = null;
+    const fresh = targetAppliedFor.current !== box.text;
+    targetAppliedFor.current = box.text;
+    const target = taken ?? (fresh ? (table.target ?? null) : null);
+    if (target === null) return;
+    const index = targetRow(table, target);
+    if (index >= 0) setPosition(index);
+  });
+
   /**
    * A category chosen: the box keeps its number and its units list with none chosen and none
    * highlighted, the caret waiting in the field for ↓, Enter, or a click; the box's own category
@@ -889,6 +916,8 @@ export function TableLayout({
       const hiddenMatch = revealed ? table.hidden[index - table.rows.length] : undefined;
       if (!match && !hiddenMatch) return;
       showBox.current = true;
+      // The query's target rests the cursor on its row once the unit is in the box (ADR 0027).
+      restOn.current = match?.kind === 'unit' || hiddenMatch ? (table.target ?? null) : null;
       if (match?.kind === 'unit') take(match.unit.id, textFor(match.unit));
       else if (match?.kind === 'ingredient') {
         takeIngredient(match.ingredient.id, match.unit?.id ?? null);
@@ -930,6 +959,7 @@ export function TableLayout({
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (editing) endEdit();
     setChoosingFor(null);
+    restOn.current = null;
     dispatch({
       type: 'input',
       text: event.currentTarget.value,

@@ -27,6 +27,7 @@ import { Button } from '../../components/Button';
 import { CategoryMenu } from '../../components/CategoryMenu';
 import { CategoryTiles } from '../../components/CategoryTiles';
 import { ConversionTable } from '../../components/ConversionTable';
+import { glide } from './glide';
 import { MoreMenu } from '../../components/MoreMenu';
 import { ToolbarDivider } from '../../components/ToolbarDivider';
 import { UnitMatches } from '../../components/UnitMatches';
@@ -1058,29 +1059,28 @@ export function TableLayout({
       // 2026-10-20). A brand's row (ADR 0028) brings its brand with its size.
       const sized = box.unit !== null && box.parsed.value !== undefined;
       const brand = row.brand !== undefined ? row.brand.id : box.brand && sized ? null : undefined;
-      if (row.inBox) setPosition(null);
-      // A row beyond its scale (ADR 0027): its scale comes into the box with the number cleared,
-      // for a size of its own to be typed; so does a brand's dash, the brand having no size for
-      // the foot in play (Sean, 2026-10-20: the number carried over read as the brand's size).
-      else if (row.tone === 'beyond') take(row.unit.id, '', undefined, brand);
-      else if (row.value === null && row.brand !== undefined && sized) {
-        take(row.unit.id, '', undefined, brand);
+      if (row.inBox) {
+        setPosition(null);
+        return;
       }
-      // Its unit: a change row's is its scale's (Temperature's As a change).
-      else if (row.value === null) take(row.unit.id, number, undefined, brand);
-      // A pace comes into the box as the row writes it, minutes and seconds (5:30).
-      else if (row.clock) {
-        take(row.unit.id, formatClock(row.value, { locale: env.locale }), undefined, brand);
-      }
-      // A pair comes as its parts, the last to the ten digits a box shows (ADR 0026).
-      else if (row.pair) {
-        take(
-          row.unit.id,
-          pairText(row.value, row.pair, env.locale, BOX_PRECISION),
-          undefined,
-          brand,
-        );
-      } else take(row.unit.id, formatNumber(row.value, { locale: env.locale }), undefined, brand);
+      // What the row brings into the box. A row beyond its scale (ADR 0027): its scale with the
+      // number cleared, for a size of its own to be typed; so does a brand's dash, the brand
+      // having no size for the foot in play (Sean, 2026-10-20: the number carried over read as
+      // the brand's size). A dash row's unit with the number as typed (a change row's is its
+      // scale's, Temperature's As a change). A pace as the row writes it, minutes and seconds
+      // (5:30). A pair as its parts, the last to the ten digits a box shows (ADR 0026).
+      let text: string;
+      if (row.tone === 'beyond') text = '';
+      else if (row.value === null) text = row.brand !== undefined && sized ? '' : number;
+      else if (row.clock) text = formatClock(row.value, { locale: env.locale });
+      else if (row.pair) text = pairText(row.value, row.pair, env.locale, BOX_PRECISION);
+      else text = formatNumber(row.value, { locale: env.locale });
+      // A brand's row taken brings its section first, and ISO's row taken with a brand in the box
+      // sends it back after the scales (ADR 0028): the rows glide to their places, the row taken
+      // with them, as a unit checked in Hidden travels to its row, so the eye follows what moved
+      // (Sean, 2026-10-21: the switch in place was too jarring). Where nothing moves, nothing
+      // glides.
+      glide(rootRef.current, () => take(row.unit.id, text, undefined, brand));
     }
   };
 

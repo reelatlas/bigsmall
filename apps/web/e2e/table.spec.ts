@@ -18,6 +18,7 @@ import {
   pressControl,
   pressTool,
   ready,
+  recordAnimations,
   rightEdges,
   row,
   sectionIds,
@@ -27,6 +28,8 @@ import {
   shortcutsButton,
   showEverything,
   sidewaysOverflow,
+  startedAnimations,
+  themeTime,
   unitCell,
   windowOf,
 } from './support';
@@ -104,9 +107,8 @@ const firstCellRights = (page: Page) =>
   );
 
 /**
- * Where the marks sit (the hundred-and-twenty-fifth pass): for every row with a drawn mark (≈, <,
- * >), the row's own and not Both's second form's, the mark's edges and the left edge of the row's
- * whole number's text. The marks line up when their left edges are one, at the whole numbers'
+ * Where the marks sit (the hundred-and-twenty-fifth pass): for every row with a drawn ≈, the
+ * mark's edges and the left edge of the row's whole number's text. The marks line up when their left edges are one, at the whole numbers'
  * start, and a mark never meets its own number when it ends before that number starts; a wider
  * number without a mark starts where the marks end, as it did when the mark was written with the
  * number.
@@ -121,7 +123,7 @@ const marks = (page: Page) =>
       return { left: Math.round(rect.left), right: Math.round(rect.right) };
     };
     return units.flatMap((unit) => {
-      const mark = edges(unit.querySelector(':scope > [data-mark]:not([data-column])'));
+      const mark = edges(unit.querySelector(':scope > [data-mark]'));
       const whole = edges(unit.querySelector(':scope > [data-whole]'));
       return mark && whole ? [{ mark, whole }] : [];
     });
@@ -2490,12 +2492,13 @@ test('the brand’s pill (ADR 0028): its body lists every brand with the one in 
   await expect(page).not.toHaveURL(/brand=/);
 });
 
-test('the sizes’ first cells end on one edge in every theme, and the marks (≈, <, >) lined up at the whole numbers’ start, each clear of its own number: a brand’s range with the sizes, and, with Fraction, a row beyond its scale with the whole numbers', async ({
+test('the sizes’ first cells end on one edge in every theme, and the ≈ marks lined up at the whole numbers’ start, each clear of its own number: a brand’s range with the sizes, and, with Fraction, a row beyond its scale, its > with the digits, with the whole numbers', async ({
   page,
 }) => {
-  // The marks at the whole numbers' start, so the ≈ before a 9 starts where the ≈ before a 42.5
-  // does, and the children's row's ">" with them, each ending before its own number (Sean,
-  // 2026-10-21: written with the number, ≈ floated left by a digit for 10 against 9).
+  // The ≈ at the whole numbers' start, so the ≈ before a 9 starts where the ≈ before a 42.5
+  // does, each ending before its own number (Sean, 2026-10-21: written with the number, ≈ floated
+  // left by a digit for 10 against 9); the children's row's ">" with its digits, as a sign (Sean,
+  // later that day: apart from its number a < was harder to read).
   const linedUp = async (id: string) => {
     expect(new Set(await firstCellRights(page)).size, id).toBe(1);
     const drawn = await marks(page);
@@ -2566,4 +2569,35 @@ test('the brands’ charts are data fetched once Shoe size opens (ADR 0029): the
   await expect(page.getByText(/^Brand charts not loaded/)).toBeVisible();
   await expect(row(page, 'eu')).toContainText('—');
   await expect(row(page, 'brand:nike')).toContainText('—');
+});
+
+test('a brand’s row taken from under the scales glides to the top with its section, and ISO’s row taken with a brand in the box sends the brands gliding back (the hundred-and-twenty-sixth pass)', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-men&v=10');
+  await ready(page);
+  const slow = await themeTime(page, '--motion-slow');
+  const animated = async (selector: string) =>
+    Math.max(0, ...(await startedAnimations(page, selector, 'transform')));
+  // Without a brand the brands sit after the scales; Nike's row taken brings its section first,
+  // the rows sliding to their places at the theme's slow motion, as a unit checked in Hidden
+  // travels to its row (Sean, 2026-10-21: the switch in place was too jarring).
+  expect((await sectionIds(page)).at(-1)).toBe('brands');
+  await recordAnimations(page);
+  await unitCell(page, 'brand:nike').click();
+  await expect(page.getByRole('button', { name: 'Remove Nike' })).toBeVisible();
+  expect((await sectionIds(page))[0]).toBe('brands');
+  expect(await animated('[data-row="brand:nike"]')).toBe(slow);
+  expect(await animated('[data-row="uk"]')).toBe(slow);
+  // ISO's UK row taken takes the brand out, the brands going back after the scales the same way.
+  await recordAnimations(page);
+  await unitCell(page, 'uk').click();
+  await expect(page.getByRole('button', { name: 'Remove Nike' })).toHaveCount(0);
+  expect((await sectionIds(page)).at(-1)).toBe('brands');
+  expect(await animated('[data-row="brand:nike"]')).toBe(slow);
+  // A row taken that moves nothing glides nothing: EU, a scale's row with no brand in the box.
+  await recordAnimations(page);
+  await unitCell(page, 'eu').click();
+  await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
+  expect(await animated('[data-row="eu"]')).toBe(0);
 });

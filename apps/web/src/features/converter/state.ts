@@ -1596,8 +1596,9 @@ function brandNote(
 /**
  * The brand's scales, to choose from, under one heading: the list the unit's chip opens with a
  * brand in the box (ADR 0028, 2026-10-20; Sean: "a more immediate way to flip the reading").
- * Every scale its chart prints, in the table's order, and the foot's units where the chart gives
- * the foot, the one in the box marked, each carrying the same row's size on that scale (a range's
+ * Every scale its chart prints, in the table's order, never the foot's units, which are ISO's
+ * rows, read in the table from the chart (a foot taken here put ISO's row in the box, the brand's
+ * row unfilled below twenty brands; Sean, 2026-10-21), the one in the box marked, each carrying the same row's size on that scale (a range's
  * lower end; none where the brand has no row for the box, so the number as typed goes with the
  * scale) with the line the row was read on; so a size is read on another scale without leaving
  * the brand, which the scale rows, ISO's, cannot do, since taking one takes the brand out. Where
@@ -1639,7 +1640,6 @@ export function scaleList(
   const reading = unit && value !== undefined ? readBrand(brand, unit, value, women) : null;
   const chart = reading?.chart ?? brandChart(brand, women);
   const row = reading?.row ?? null;
-  const mondopoint = getUnit('mondopoint');
   const group = `${poss(brand.name)} chart${chart.line === 'unisex' ? '' : `, the ${LINE_POSS[chart.line]}`}${choose ? ': choose the scale to read it on' : ''}`;
   // The other line's chart, where the brand prints its lines apart: its own scales after the
   // chart's, under its heading, read at the foot the box stands for, where there is one.
@@ -1678,12 +1678,6 @@ export function scaleList(
       }
       const cell = row ? brandCell(row, scale.id, women) : null;
       text = cell ? sizeOf(cell.value, locale) : undefined;
-    } else if (scale.id === 'mondopoint' || scale.id === 'foot-cm') {
-      if (chart.basis !== 'foot' || !mondopoint) continue;
-      text =
-        row?.foot === undefined
-          ? undefined
-          : formatNumber(convert(row.foot, mondopoint, scale), { locale });
     } else continue;
     rows.push({
       kind: 'brand',
@@ -1791,10 +1785,13 @@ function selectShoe(
     brand && unit && value !== undefined && ready
       ? `${spokenAmount(parsed, unit, options.locale)} at ${brand.name} in ${read.rows.length} units of shoe size`
       : view.announcement;
-  // With a brand in the box its row is the one in focus: the brands' section comes first, right
-  // under the box with the other brands beside it, the scales after (Sean, 2026-10-21: the row
-  // chosen sat below ten scale rows).
-  const first = brand !== null;
+  // The section holding the box's row comes first: the brands' while the box holds a size on a
+  // brand's scale with a brand, its row the one in focus, right under the box with the other
+  // brands beside it and the scales after (Sean, 2026-10-21: the row chosen sat below ten scale
+  // rows); the scales' while the box holds a length, which is the foot, ISO's value, so ISO's row
+  // is the one filled (Sean, later that day: a foot taken from the chip's list left the brand's
+  // row unfilled and the filled row below twenty brands).
+  const first = brand !== null && unit !== null && isBrandScale(unit.id) && value !== undefined;
   return {
     ...read,
     rows: first ? [...section.rows, ...read.rows] : [...read.rows, ...section.rows],

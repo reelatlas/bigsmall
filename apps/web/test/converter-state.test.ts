@@ -1102,6 +1102,10 @@ describe('brands (ADR 0028)', () => {
     expect(row(length, 'brand:asics')).toMatchObject({ text: '9', approx: false });
     expect(row(length, 'brand:nike')).toMatchObject({ text: '10', approx: true, inBox: false });
     expect(length.rows.filter((each) => each.inBox).map((each) => each.id)).toEqual(['foot-cm']);
+    // The section holding the box's row comes first: the scales' with a length in the box, the
+    // foot being ISO's value (Sean, 2026-10-21); the brands' with a size on a brand's scale.
+    expect(length.sections[0]?.key).not.toBe('brands');
+    expect(units(type('nike 10'), nike()).sections[0]?.key).toBe('brands');
     const puma = units(type('27 cm puma'), {
       type: 'use',
       unit: 'foot-cm',
@@ -1193,7 +1197,7 @@ describe('brands (ADR 0028)', () => {
     expect(selectBox(eu, EN).line).toBe('women');
   });
 
-  it('lists the brand’s scales to choose from (the chip’s list): every scale its chart prints with the row’s size, the foot’s units where it gives the foot, the one in the box marked, the line carried, and the other line’s scales from the brand’s other chart under its heading, at the same foot or with the number cleared', () => {
+  it('lists the brand’s scales to choose from (the chip’s list): every scale its chart prints with the row’s size, never the foot’s units, which are ISO’s rows, the one in the box marked, the line carried, and the other line’s scales from the brand’s other chart under its heading, at the same foot or with the number cleared', () => {
     const table = units(type('nike 10'), nike());
     const nikeBrand = getShoeBrand('nike')!;
     const nikeRow = brandRowAt(brandChart(nikeBrand, false), 'us-men', 10, false)!;
@@ -1213,14 +1217,15 @@ describe('brands (ADR 0028)', () => {
       true,
     )!;
     expect(womenAtFoot.value).not.toBe(nikeRow.usWomen);
+    // The foot's units are ISO's rows, read in the table from the brand's chart, never scales of
+    // the brand's to choose: a foot taken here put ISO's row in the box, the brand's row no longer
+    // filled (Sean, 2026-10-21).
     expect(cells).toEqual({
       'us-men': '10',
       'us-women': String(womenAtFoot.value),
       uk: String(nikeRow.uk),
       eu: String(nikeRow.eu),
       japan: String(nikeRow.jp),
-      mondopoint: String(nikeRow.foot),
-      'foot-cm': String(nikeRow.foot! / 10),
     });
     expect(list.rows.filter((each) => each.kind === 'brand' && each.inBox)).toHaveLength(1);
     expect(list.rows[0]).toMatchObject({
@@ -1234,8 +1239,8 @@ describe('brands (ADR 0028)', () => {
       line: 'women',
       group: 'Nike’s chart, the women’s',
     });
-    expect(list.announcement).toBe('7 scales of Nike’s charts to choose from');
-    // Reebok prints US sizes and inches: the two US scales and the foot's units, no EU or UK.
+    expect(list.announcement).toBe('5 scales of Nike’s charts to choose from');
+    // Reebok prints US sizes and inches: the two US scales, no EU or UK.
     const reebok = units(type('reebok 10'), {
       type: 'use',
       unit: 'us-men',
@@ -1252,8 +1257,8 @@ describe('brands (ADR 0028)', () => {
     );
     expect(
       reebokList.rows.map((each) => (each.kind === 'brand' ? each.unit?.id : '')).sort(),
-    ).toEqual(['foot-cm', 'mondopoint', 'us-men', 'us-women']);
-    // Puma gives no foot: its scales alone. A women's reading carries its line.
+    ).toEqual(['us-men', 'us-women']);
+    // A women's reading carries its line.
     const puma = units(type('puma 10'), { type: 'use', unit: 'us-men', text: '10', brand: 'puma' });
     const pumaList = scaleList(puma, getShoeBrand('puma')!, getUnit('us-men')!, 10, null, 'en-US');
     expect(pumaList.rows.some((each) => each.kind === 'brand' && each.unit?.id === 'foot-cm')).toBe(
@@ -1320,7 +1325,7 @@ describe('brands (ADR 0028)', () => {
         (each) => each.kind === 'brand' && each.group === 'Asics’ chart, the men’s',
       ),
     ).toHaveLength(1);
-    expect(asicsList.announcement).toBe('6 scales of Asics’ charts to choose from');
+    expect(asicsList.announcement).toBe('4 scales of Asics’ charts to choose from');
     // And back: a men's 10, a 28 cm foot, reaches the women's 11.5.
     const asicsMen = units(type('asics 10'), {
       type: 'use',

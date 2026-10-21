@@ -2319,6 +2319,29 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   expect(new Set(await firstCellRights(page)).size).toBe(1);
   // A row beyond its scale says where the foot stands (Sean, 2026-10-20).
   await expect(row(page, 'us-children')).toContainText('above its range');
+  // The unit's chip with a brand opens the brand's scales (2026-10-20): EU taken reads Nike's
+  // own 44 for the same row, the brand staying, the brands' rows in EU, and ISO's EU ≈ 42.5
+  // beside it showing the difference; the chip again brings US men back.
+  const chip = page.getByRole('button', { name: 'Unit: US men' });
+  await expect(chip).toHaveAttribute('aria-expanded', 'false');
+  await chip.click();
+  await expect(chip).toHaveAttribute('aria-expanded', 'true');
+  const scales = matches(page);
+  await expect(scales.getByRole('option', { selected: true })).toHaveText(/US men · Nike/);
+  await scales.getByRole('option', { name: /European · Nike/ }).click();
+  await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove Nike' })).toBeVisible();
+  await expect(box(page)).toHaveValue('44');
+  await expect(row(page, 'eu')).toContainText('≈ 42.5');
+  await expect(row(page, 'brand:nike')).toContainText('in the box');
+  await expect(page.getByText('Brands, the same foot in EU')).toBeVisible();
+  await expect(page).toHaveURL(/[?&]a=eu/);
+  await page.getByRole('button', { name: 'Unit: European' }).click();
+  await matches(page)
+    .getByRole('option', { name: /US men · Nike/ })
+    .click();
+  await expect(box(page)).toHaveValue('10');
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
   await expect(
     page.getByText(/^Nike’s size chart, the men’s, nike\.com, read Oct 2026\./),
   ).toBeVisible();

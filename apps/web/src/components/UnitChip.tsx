@@ -27,11 +27,13 @@ interface ChipProps {
  * ingredient (ADR 0021) or Shoe size's brand (ADR 0028), its name, which gives way to the number
  * by truncating where the box is narrow, and never goes compact, then a chevron: its body opens
  * every ingredient, or every brand, to choose from, and `expanded` turns the chevron over while
- * they show (a trial, Sean, 2026-10-16).
+ * they show (a trial, Sean, 2026-10-16). The unit's chip draws the same chevron where `expanded`
+ * is set: in Shoe size with a brand in the box, its body opens the brand's scales (ADR 0028,
+ * 2026-10-20); a readout otherwise, the table being the list.
  */
 type UnitChipProps = ChipProps &
   (
-    | { unit: Unit; ingredient?: undefined; brand?: undefined; expanded?: undefined }
+    | { unit: Unit; ingredient?: undefined; brand?: undefined; expanded?: boolean | undefined }
     | { ingredient: Ingredient; unit?: undefined; brand?: undefined; expanded?: boolean }
     | { brand: ShoeBrand; unit?: undefined; ingredient?: undefined; expanded?: boolean }
   );
@@ -53,7 +55,7 @@ export function UnitChip({
   unit,
   ingredient,
   brand,
-  expanded = false,
+  expanded,
   compact,
   nameRef,
   chevronRef,
@@ -78,9 +80,10 @@ export function UnitChip({
       <button
         type="button"
         // What it is, not a picker it would open: a press puts the caret in the box, whose keys
-        // and table change the unit (the full tidy, 2026-10-15).
+        // and table change the unit (the full tidy, 2026-10-15); with a brand beside it the unit's
+        // chip opens the brand's scales, `aria-expanded` saying so (ADR 0028, 2026-10-20).
         aria-label={`${what}: ${name}`}
-        aria-expanded={unit ? undefined : expanded}
+        aria-expanded={expanded}
         tabIndex={tabIndex}
         onMouseDown={keepFocus}
         onClick={onOpen}
@@ -95,6 +98,19 @@ export function UnitChip({
             <span ref={nameRef ?? null} hidden={compact}>
               {name}
             </span>
+            {expanded !== undefined && (
+              // The pill's chevron: the chip opens the brand's scales (ADR 0028, 2026-10-20).
+              <span className="shrink-0 self-center">
+                <ChevronDownIcon
+                  width="16"
+                  height="16"
+                  className={cx(
+                    'block text-ink-muted transition-transform',
+                    expanded && 'rotate-180',
+                  )}
+                />
+              </span>
+            )}
           </span>
         ) : (
           <span className={cx(BODY, 'min-w-0')}>

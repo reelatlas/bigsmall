@@ -57,6 +57,15 @@ interface ValueFieldProps {
   onChipOpen: () => void;
   /** The chip's × was clicked or tapped. */
   onChipRemove: () => void;
+  /**
+   * The chip opens a list: in Shoe size with a brand in the box, the brand's scales (ADR 0028,
+   * 2026-10-20), so it draws the pill's chevron; otherwise it is a readout.
+   */
+  unitPicks?: boolean;
+  /** Whether the unit's chip holds the brand's scales open in the table's place. */
+  unitOpen?: boolean;
+  /** The chip's body was clicked or tapped while it opens a list. */
+  onUnitOpen?: () => void;
   /** Whether the ingredient's pill holds every ingredient open in the table's place. */
   ingredientOpen?: boolean;
   /** The ingredient's pill was clicked or tapped. */
@@ -130,6 +139,9 @@ export function ValueField({
   onClear,
   onChipOpen,
   onChipRemove,
+  unitPicks = false,
+  unitOpen = false,
+  onUnitOpen,
   ingredientOpen = false,
   onIngredientOpen,
   onIngredientRemove,
@@ -233,9 +245,10 @@ export function ValueField({
             // screen readers still reach both buttons.
             <UnitChip
               unit={unit}
+              expanded={unitPicks ? unitOpen : undefined}
               compact={symbolOnly || fit.gaveWay > 0}
               nameRef={chipNameRef}
-              onOpen={onChipOpen}
+              onOpen={unitPicks && onUnitOpen ? onUnitOpen : onChipOpen}
               onRemove={onChipRemove}
             />
           );

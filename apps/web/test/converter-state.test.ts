@@ -1,3 +1,4 @@
+import { brandChart, brandRowAt, getShoeBrand, getUnit } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import {
   brandList,
@@ -7,6 +8,7 @@ import {
   NO_VALUE,
   reduce,
   reduceWithHistory,
+  scaleList,
   selectBox,
   selectTable,
   TABLE_PRECISION,
@@ -1102,6 +1104,110 @@ describe('brands (ADR 0028)', () => {
     const waiting = units({ type: 'chooseCategory', category: 'shoe-size' });
     expect(row(waiting, 'brand:nike')).toMatchObject({ tone: 'empty' });
     expect(waiting.note).toMatch(/^ISO 19407/);
+  });
+
+  it('keeps the women’s charts on a genderless scale while the line is women’s: set by a US women’s size, kept on EU, cleared by a US men’s size or another category', () => {
+    const w = run({ type: 'use', unit: 'us-women', text: '8', brand: 'nike' });
+    expect(w.line).toBe('women');
+    const eu = reduce(w, { type: 'use', unit: 'eu', text: '39', brand: 'nike' });
+    expect(eu).toMatchObject({ line: 'women', brand: 'nike', unit: 'eu' });
+    const table = selectTable(eu, options);
+    if (table.kind !== 'units') throw new Error('units');
+    expect(row(table, 'brand:nike')).toMatchObject({
+      text: '39',
+      inBox: true,
+      brand: { id: 'nike', line: 'women' },
+      detail: 'women',
+    });
+    expect(row(table, 'foot-cm')).toMatchObject({ text: '24.5' });
+    expect(table.sections.at(-1)?.label).toBe('Brands, the same foot in EU');
+    expect(table.note).toContain('the women’s');
+    expect(reduce(eu, { type: 'use', unit: 'us-men', text: '7', brand: 'nike' }).line).toBeNull();
+    expect(reduce(eu, { type: 'use', unit: 'meter', text: '1' })).toMatchObject({
+      line: null,
+      brand: null,
+    });
+    expect(
+      reduce(eu, { type: 'use', unit: 'uk', text: '5.5', brand: 'nike', line: null }).line,
+    ).toBe(null);
+    expect(reduce(eu, { type: 'removeBrand' }).line).toBe('women');
+    expect(reduce(eu, { type: 'chooseCategory', category: 'length' }).line).toBeNull();
+    expect(
+      run({ type: 'hydrate', state: { text: '39', unit: 'eu', brand: 'nike', line: 'women' } })
+        .line,
+    ).toBe('women');
+    expect(
+      run({ type: 'hydrate', state: { text: '7', unit: 'us-men', brand: 'nike', line: 'women' } })
+        .line,
+    ).toBeNull();
+    expect(selectBox(eu, EN).line).toBe('women');
+  });
+
+  it('lists the brand’s scales to choose from (the chip’s list): every scale its chart prints with the row’s size, the foot’s units where it gives the foot, the one in the box marked, the line carried', () => {
+    const table = units(type('nike 10'), nike());
+    const nikeRow = brandRowAt(brandChart(getShoeBrand('nike')!, false), 'us-men', 10, false)!;
+    const list = scaleList(table, getShoeBrand('nike')!, getUnit('us-men')!, 10, null, 'en-US');
+    const cells = Object.fromEntries(
+      list.rows.map((each) => (each.kind === 'brand' ? [each.unit?.id, each.text] : ['', ''])),
+    );
+    expect(cells).toEqual({
+      'us-men': '10',
+      'us-women': String(nikeRow.usWomen),
+      uk: String(nikeRow.uk),
+      eu: String(nikeRow.eu),
+      japan: String(nikeRow.jp),
+      mondopoint: String(nikeRow.foot),
+      'foot-cm': String(nikeRow.foot! / 10),
+    });
+    expect(list.rows.filter((each) => each.kind === 'brand' && each.inBox)).toHaveLength(1);
+    expect(list.rows[0]).toMatchObject({
+      kind: 'brand',
+      group: 'Nike’s chart, the men’s',
+      line: null,
+    });
+    expect(list.announcement).toBe('7 scales of Nike’s chart to choose from');
+    // Reebok prints US sizes and inches: the two US scales and the foot's units, no EU or UK.
+    const reebok = units(type('reebok 10'), {
+      type: 'use',
+      unit: 'us-men',
+      text: '10',
+      brand: 'reebok',
+    });
+    const reebokList = scaleList(
+      reebok,
+      getShoeBrand('reebok')!,
+      getUnit('us-men')!,
+      10,
+      null,
+      'en-US',
+    );
+    expect(
+      reebokList.rows.map((each) => (each.kind === 'brand' ? each.unit?.id : '')).sort(),
+    ).toEqual(['foot-cm', 'mondopoint', 'us-men', 'us-women']);
+    // Puma gives no foot: its scales alone. A women's reading carries its line.
+    const puma = units(type('puma 10'), { type: 'use', unit: 'us-men', text: '10', brand: 'puma' });
+    const pumaList = scaleList(puma, getShoeBrand('puma')!, getUnit('us-men')!, 10, null, 'en-US');
+    expect(pumaList.rows.some((each) => each.kind === 'brand' && each.unit?.id === 'foot-cm')).toBe(
+      false,
+    );
+    const women = units(type('women 8'), {
+      type: 'use',
+      unit: 'us-women',
+      text: '8',
+      brand: 'nike',
+    });
+    const womenList = scaleList(
+      women,
+      getShoeBrand('nike')!,
+      getUnit('us-women')!,
+      8,
+      'women',
+      'en-US',
+    );
+    expect(womenList.rows[0]).toMatchObject({ line: 'women', group: 'Nike’s chart, the women’s' });
+    expect(
+      womenList.rows.find((each) => each.kind === 'brand' && each.unit?.id === 'eu'),
+    ).toMatchObject({ text: '39' });
   });
 
   it('lists every brand to choose from, the one in the box marked (the pill’s list)', () => {

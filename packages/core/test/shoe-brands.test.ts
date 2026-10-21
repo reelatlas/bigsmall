@@ -167,6 +167,14 @@ describe('a brand read at the box (ADR 0028)', () => {
     expect(brandScale(reading, unit('us-men')).value).toBe(6.5);
   });
 
+  it('reads the women’s chart on a scale that does not say the line when asked: a Nike EU 39 is the women’s 8', () => {
+    expect(readBrand(brand('nike'), unit('eu'), 39, true)).toMatchObject({
+      chart: { line: 'women' },
+      foot: 245,
+    });
+    expect(readBrand(brand('nike'), unit('eu'), 39).chart.line).toBe('men');
+  });
+
   it('a scale the chart lacks is ISO’s from the brand’s foot; none where the brand gives no foot', () => {
     const reebok = readBrand(brand('reebok'), unit('us-men'), 10);
     expect(reebok.foot).toBeCloseTo(271.78, 2);

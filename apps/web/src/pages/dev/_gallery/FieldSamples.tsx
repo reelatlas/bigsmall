@@ -76,6 +76,8 @@ function FieldSample({
       onClear={noop}
       onChipOpen={noop}
       onChipRemove={noop}
+      unitPicks={brandId !== undefined}
+      onUnitOpen={noop}
     />
   );
 }

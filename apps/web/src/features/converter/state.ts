@@ -4,6 +4,7 @@ import {
   brandCell,
   brandChart,
   brandsAtFoot,
+  brandSpan,
   clockUnits,
   convert,
   convertChange,
@@ -75,6 +76,12 @@ export interface CalculatorState {
   fresh: boolean;
 }
 
+/**
+ * The chart line a brand is read on where the scale does not say it (ADR 0028, 2026-10-20): the
+ * women's charts, from a US women's size, kept as the box moves across the genderless scales.
+ */
+export type ShoeLine = 'women';
+
 export interface ConverterState {
   /** What the user typed into the box: a number, a unit's name, or both. */
   text: string;
@@ -98,6 +105,13 @@ export interface ConverterState {
    */
   brand: string | null;
   /**
+   * The chart line a brand is read on where the scale does not say it (ADR 0028, 2026-10-20):
+   * women's, from a US women's size, kept while the box moves across the genderless scales (EU,
+   * UK, JP, mm, cm), so a women's reading stays women's; null is men's, or the brand's one chart.
+   * A US men's size clears it, as does any other category. Null outside Shoe size.
+   */
+  line: ShoeLine | null;
+  /**
    * The calculator's scratch entry. It lives here, outside the conversion, so one history holds
    * everything: undo goes from a send back into the arithmetic that produced it.
    */
@@ -108,7 +122,9 @@ export interface ConverterState {
 type TextTarget = 'box' | 'calc';
 
 /** The part of the state a URL or a later persistence layer restores, through the `hydrate` action. */
-export type Restorable = Partial<Pick<ConverterState, 'text' | 'unit' | 'ingredient' | 'brand'>>;
+export type Restorable = Partial<
+  Pick<ConverterState, 'text' | 'unit' | 'ingredient' | 'brand' | 'line'>
+>;
 
 export const EMPTY_CALC: CalculatorState = { text: '', fresh: false };
 
@@ -118,6 +134,7 @@ export const initialState: ConverterState = {
   category: null,
   ingredient: null,
   brand: null,
+  line: null,
   calc: EMPTY_CALC,
 };
 
@@ -126,6 +143,24 @@ const COOKING_OVER: ReadonlySet<CategoryId> = new Set(getCategory('cooking')?.ov
 
 /** A brand stays in the box beside a shoe scale alone (ADR 0028). */
 const SHOE: CategoryId = 'shoe-size';
+
+/**
+ * The chart line after a unit comes into the box (ADR 0028): a US women's size says women's, a
+ * US men's size men's, the other shoe scales keep the line, any other unit leaves it; no unit
+ * keeps it.
+ */
+function lineAfter(unit: Unit | undefined, line: ShoeLine | null): ShoeLine | null {
+  if (!unit) return line;
+  if (unit.category !== SHOE) return null;
+  if (unit.id === 'us-women') return 'women';
+  if (unit.id === 'us-men') return null;
+  return line;
+}
+
+/** Whether the women's charts answer: a US women's size, or the women's line kept on a scale that does not say it. */
+function readsWomen(unit: Unit | null, line: ShoeLine | null): boolean {
+  return unit?.id === 'us-women' || (line === 'women' && unit?.id !== 'us-men');
+}
 
 export type Action =
   /** A keystroke or paste in the box. `at` is a monotonic time in ms; only gaps between inputs matter. */
@@ -138,9 +173,17 @@ export type Action =
   | { type: 'calcSet'; text: string; fresh: boolean }
   /**
    * A unit taken into the box, from a row or a match: the unit, and the box's new text (the row's
-   * value, or the number as typed); with the ingredient a match brought ("2 cups flour"), by id.
+   * value, or the number as typed); with the ingredient a match brought ("2 cups flour"), by id;
+   * the brand a match or a row brought (ADR 0028), and the chart line the chip's list read it on.
    */
-  | { type: 'use'; unit: string; text: string; ingredient?: string | null; brand?: string | null }
+  | {
+      type: 'use';
+      unit: string;
+      text: string;
+      ingredient?: string | null;
+      brand?: string | null;
+      line?: ShoeLine | null;
+    }
   /**
    * An ingredient taken into the box (a match, or a choice in Cooking's list): Cooking, the box
    * keeping a weight or a volume, and its new text, the number as typed.
@@ -189,6 +232,7 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
         unit: unit.id,
         ingredient: cooks ? ingredient : null,
         brand: unit.category === SHOE && brand && getShoeBrand(brand) ? brand : null,
+        line: lineAfter(unit, action.line === undefined ? state.line : action.line),
         category: cooks ? 'cooking' : unit.category,
       };
     }
@@ -253,6 +297,7 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
         // Cooking keeps its ingredient, Shoe size its brand; any other category leaves them.
         ingredient: action.category === 'cooking' ? state.ingredient : null,
         brand: action.category === SHOE ? state.brand : null,
+        line: action.category === SHOE ? state.line : null,
       };
     }
 
@@ -283,6 +328,7 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
         ...next,
         ingredient: cooks ? ingredient : null,
         brand,
+        line: lineAfter(unit, next.line === 'women' ? 'women' : null),
         category: cooks ? 'cooking' : (unit?.category ?? (brand ? SHOE : null)),
       };
     }
@@ -307,6 +353,8 @@ export interface BoxView {
   ingredient: Ingredient | null;
   /** The brand beside the unit, Shoe size's second pill (ADR 0028). */
   brand: ShoeBrand | null;
+  /** The chart line a brand is read on where the scale does not say it (ADR 0028). */
+  line: ShoeLine | null;
   parsed: ParsedInput;
 }
 
@@ -316,6 +364,7 @@ export function selectBox(state: ConverterState, options: NumberEnv): BoxView {
     unit: state.unit ? (getUnit(state.unit) ?? null) : null,
     ingredient: state.ingredient ? (getIngredient(state.ingredient) ?? null) : null,
     brand: state.brand ? (getShoeBrand(state.brand) ?? null) : null,
+    line: state.line,
     parsed: parse(state.text, options.separators),
   };
 }
@@ -478,6 +527,8 @@ type MatchRow =
       inBox: boolean;
       text?: string | undefined;
       target?: string | undefined;
+      /** The chart line to read the brand on, from the chip's list (ADR 0028, 2026-10-20); null the scale's own. */
+      line?: ShoeLine | null | undefined;
       group?: string;
     };
 
@@ -629,7 +680,7 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       : null;
   if (typed !== null && category && category !== 'cooking') {
     return category === SHOE
-      ? selectShoe(base, unit, parsed, options, brand, typed)
+      ? selectShoe(base, unit, parsed, options, brand, state.line, typed)
       : selectUnits(base, category, unit, parsed, options, typed);
   }
   if (typingUnit(parsed)) {
@@ -642,7 +693,7 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       : ingredientList(base);
   }
   // Shoe size with or without a brand (ADR 0028): the brands' rows under the scales either way.
-  if (category === SHOE) return selectShoe(base, unit, parsed, options, brand);
+  if (category === SHOE) return selectShoe(base, unit, parsed, options, brand, state.line);
   return selectUnits(base, category, unit, parsed, options);
 }
 
@@ -1392,6 +1443,69 @@ function brandNote(
 }
 
 /**
+ * The brand's scales, to choose from, under one heading: the list the unit's chip opens with a
+ * brand in the box (ADR 0028, 2026-10-20; Sean: "a more immediate way to flip the reading").
+ * Every scale its chart prints, in the table's order, and the foot's units where the chart gives
+ * the foot, the one in the box marked, each carrying the same row's size on that scale (a range's
+ * lower end; nothing while the size is off the chart) with the line the row was read on; so a
+ * size is read on another scale without leaving the brand, which the scale rows, ISO's, cannot
+ * do, since taking one takes the brand out.
+ */
+export function scaleList(
+  view: UnitsView,
+  brand: ShoeBrand,
+  unit: Unit | null,
+  value: number | undefined,
+  line: ShoeLine | null,
+  locale: string | undefined,
+): MatchesView {
+  const shoe = getCategory(SHOE);
+  const women = readsWomen(unit, line);
+  const reading = unit && value !== undefined ? readBrand(brand, unit, value, women) : null;
+  const chart = reading?.chart ?? brandChart(brand, women);
+  const row = reading?.row ?? null;
+  const mondopoint = getUnit('mondopoint');
+  const group = `${poss(brand.name)} chart${chart.line === 'unisex' ? '' : `, the ${LINE_POSS[chart.line]}`}`;
+  const rows: MatchRow[] = [];
+  for (const each of view.rows) {
+    if (!shoe || each.brand !== undefined || each.tone === 'message') continue;
+    const scale = each.unit;
+    let text: string;
+    if (isBrandScale(scale.id)) {
+      if (brandSpan(chart, scale.id, women) === null) continue;
+      const cell = row ? brandCell(row, scale.id, women) : null;
+      text = cell ? sizeOf(cell.value, locale) : '';
+    } else if (scale.id === 'mondopoint' || scale.id === 'foot-cm') {
+      if (chart.basis !== 'foot' || !mondopoint) continue;
+      text =
+        row?.foot === undefined
+          ? ''
+          : formatNumber(convert(row.foot, mondopoint, scale), { locale });
+    } else continue;
+    rows.push({
+      kind: 'brand',
+      brand,
+      unit: scale,
+      category: shoe,
+      inBox: scale.id === unit?.id,
+      text,
+      line: women ? 'women' : null,
+      group,
+    });
+  }
+  return {
+    categories: view.categories,
+    kind: 'matches',
+    category: SHOE,
+    query: '',
+    rows,
+    counts: { [SHOE]: rows.length },
+    hidden: [],
+    announcement: `${rows.length} scales of ${poss(brand.name)} chart to choose from`,
+  };
+}
+
+/**
  * Shoe size (ADR 0027, ADR 0028): ISO's scales as every category's rows, and under them one row
  * per brand at the same foot. One value is in focus (Sean, 2026-10-20): a size on ISO's scales,
  * or a brand's size, whose row is then the box's own and whose chart gives the foot the scale rows
@@ -1404,19 +1518,22 @@ function selectShoe(
   parsed: ParsedInput,
   options: TableOptions,
   brand: ShoeBrand | null,
+  line: ShoeLine | null,
   target?: string,
 ): UnitsView {
   const view = selectUnits(shared, SHOE, unit, parsed, options, target);
   if (view.message !== null) return view;
   const value = unit ? parsed.value : undefined;
-  const women = unit?.id === 'us-women';
+  // The women's charts: a US women's size, or the line kept on a scale that does not say it.
+  const women = readsWomen(unit, line);
   // The scale the brands' rows are written on: the box's, or US men's for a length (women's with
   // a women's size).
   const scaleUnit = getUnit(
     unit && isBrandScale(unit.id) ? unit.id : women ? 'us-women' : BRAND_DEFAULT_SCALE,
   );
   if (!scaleUnit) return view;
-  const reading = brand && unit && value !== undefined ? readBrand(brand, unit, value) : null;
+  const reading =
+    brand && unit && value !== undefined ? readBrand(brand, unit, value, women) : null;
   // A brand with no foot length: its size read as ISO's label on the same scale.
   const labelled =
     reading !== null && !reading.length && reading.row !== null && reading.foot === null;

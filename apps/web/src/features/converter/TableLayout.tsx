@@ -49,10 +49,12 @@ import {
   ingredientList,
   noMatchMessage,
   pairText,
+  scaleList,
   TABLE_PRECISION,
   targetRow,
   type BoxView,
   type HistoryAction,
+  type ShoeLine,
   type TableRow,
   type TableView,
 } from './state';
@@ -159,6 +161,12 @@ function typesIntoField(event: globalThis.KeyboardEvent): boolean {
 const SIGNED: ReadonlySet<CategoryId> = new Set(['temperature', 'angle']);
 
 /** Which list the table's place shows, for a cursor to belong to: the start, the matches, or one category's units. */
+/**
+ * What a pill of the box holds open in the table's place: the second pill's list, by its thing's
+ * id, or the unit's chip's, the brand's scales, by the unit's id (ADR 0028).
+ */
+type Choosing = { pill: 'second' | 'unit'; id: string };
+
 function viewKeyOf(view: TableView): string {
   return view.kind === 'units' ? `units:${view.category}` : view.kind;
 }
@@ -260,20 +268,38 @@ export function TableLayout({
    * (a trial, Sean, 2026-10-16): the box's popup lists them under their kinds, as it lists the
    * units, the one in the box marked. Taking one, typing, Escape, or the pill again closes it.
    */
-  const [choosingFor, setChoosingForState] = useState<string | null>(null);
+  const [choosingFor, setChoosingForState] = useState<Choosing | null>(null);
   // The second pill's thing: Cooking's ingredient, or Shoe size's brand, whose pill opens every
   // brand the same way (ADR 0028).
   const second = box.ingredient?.id ?? box.brand?.id ?? null;
   const choosing =
     choosingFor !== null &&
-    choosingFor === second &&
+    choosingFor.pill === 'second' &&
+    choosingFor.id === second &&
     selected.kind === 'units' &&
     (selected.category === 'cooking' || selected.category === 'shoe-size');
-  const table: TableView = !choosing
-    ? selected
-    : box.ingredient
+  /**
+   * The brand's scales, listed in the table's place while the unit's chip holds them open (ADR
+   * 0028, 2026-10-20): with a brand in the box the scale rows are ISO's and taking one takes the
+   * brand out, so the chip is where a brand's size is read on another scale, the same row.
+   */
+  const choosingScale =
+    choosingFor !== null &&
+    choosingFor.pill === 'unit' &&
+    box.unit !== null &&
+    choosingFor.id === box.unit.id &&
+    box.brand !== null &&
+    selected.kind === 'units' &&
+    selected.category === 'shoe-size';
+  /** A list held open in the table's place, by either pill. */
+  const listing = choosing || choosingScale;
+  const table: TableView = choosing
+    ? box.ingredient
       ? ingredientList(selected, box.ingredient)
-      : brandList(selected, box.brand);
+      : brandList(selected, box.brand)
+    : choosingScale && box.brand && selected.kind === 'units'
+      ? scaleList(selected, box.brand, box.unit, box.parsed.value, box.line, env.locale)
+      : selected;
   const rootRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -293,7 +319,7 @@ export function TableLayout({
     holdBox();
     send(action);
   };
-  const setChoosingFor = (value: string | null) => {
+  const setChoosingFor = (value: Choosing | null) => {
     holdBox();
     setChoosingForState(value);
   };
@@ -757,7 +783,7 @@ export function TableLayout({
         if (editing) {
           endEdit();
           event.preventDefault();
-        } else if (choosing) {
+        } else if (listing) {
           setChoosingFor(null);
           event.preventDefault();
         } else if (clearStep()) event.preventDefault();
@@ -877,15 +903,23 @@ export function TableLayout({
   /**
    * A unit taken into the box, with its new text; the category follows, and the cursor rests on
    * its row. With the ingredient a match brought, or the brand a match or a brand's row brought
-   * (null from ISO's row, taking the brand out; ADR 0028).
+   * (null from ISO's row, taking the brand out; ADR 0028), and the chart line the chip's list read
+   * it on.
    */
-  const take = (unitId: string, text: string, ingredient?: string, brand?: string | null) => {
+  const take = (
+    unitId: string,
+    text: string,
+    ingredient?: string,
+    brand?: string | null,
+    line?: ShoeLine | null,
+  ) => {
     dispatch({
       type: 'use',
       unit: unitId,
       text,
       ...(ingredient === undefined ? {} : { ingredient }),
       ...(brand === undefined ? {} : { brand }),
+      ...(line === undefined ? {} : { line }),
     });
     // Which units people convert in, counted as each is taken (ADR 0019).
     track('Unit chosen', { category: getUnit(unitId)?.category ?? '', unit: unitId });
@@ -898,20 +932,31 @@ export function TableLayout({
    * and the number the query carried, or the number as typed: Shoe size's table, read from its
    * chart.
    */
-  const takeBrand = (brand: string, unitId: string | null, text: string) => {
+  const takeBrand = (
+    brand: string,
+    unitId: string | null,
+    text: string,
+    line?: ShoeLine | null,
+  ) => {
     setChoosingFor(null);
-    // The one in the box, taken again from the list its pill opened: nothing changes.
+    // The one in the box, taken again from the list its pill opened, or the scale already in the
+    // box taken from the chip's list: nothing changes.
     if (choosing && !unitId && brand === box.brand?.id) {
       setPosition(null);
       return;
     }
-    if (unitId) take(unitId, text, undefined, brand);
+    if (choosingScale && unitId === box.unit?.id) {
+      setPosition(null);
+      return;
+    }
+    if (unitId) take(unitId, text, undefined, brand, line);
     else {
       dispatch({ type: 'useBrand', brand, text });
       setPosition(null);
       caretToEnd.current = true;
     }
-    track('Brand chosen', { brand });
+    // A scale taken from the chip's list is the same brand: a unit chosen, which `take` counts.
+    if (!choosingScale) track('Brand chosen', { brand });
   };
 
   /**
@@ -965,7 +1010,7 @@ export function TableLayout({
       else if (match?.kind === 'ingredient') {
         takeIngredient(match.ingredient.id, match.unit?.id ?? null);
       } else if (match?.kind === 'brand') {
-        takeBrand(match.brand.id, match.unit?.id ?? null, match.text ?? number);
+        takeBrand(match.brand.id, match.unit?.id ?? null, match.text ?? number, match.line);
       } else if (match) chooseCategory(match.category.id);
       else if (hiddenMatch) {
         choose([hiddenMatch], true);
@@ -1125,7 +1170,7 @@ export function TableLayout({
         // Escape already clears.
         event.preventDefault();
         if (editing) endEdit();
-        else if (choosing) {
+        else if (listing) {
           setChoosingFor(null);
           setPosition(null);
         } else if (browsing) {
@@ -1332,6 +1377,34 @@ export function TableLayout({
                 setPosition(null);
                 if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
               }}
+              // The unit's chip with a brand in the box (ADR 0028, 2026-10-20): its body opens the
+              // brand's scales in the table's place, the cursor on the one in the box, and closes
+              // them again, as the pills do; one taken reads the same row on that scale, the brand
+              // staying. Without a brand it is a readout, the table being the list.
+              unitPicks={box.brand !== null && box.unit !== null}
+              unitOpen={choosingScale}
+              onUnitOpen={() => {
+                const current = box.unit?.id ?? null;
+                if (choosingScale || !current || !box.brand || selected.kind !== 'units') {
+                  setChoosingFor(null);
+                } else {
+                  holdScroll.current = true;
+                  setChoosingFor({ pill: 'unit', id: current });
+                  const list = scaleList(
+                    selected,
+                    box.brand,
+                    box.unit,
+                    box.parsed.value,
+                    box.line,
+                    env.locale,
+                  );
+                  setCursor({
+                    view: 'matches',
+                    position: list.rows.findIndex((each) => each.kind === 'brand' && each.inBox),
+                  });
+                }
+                if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+              }}
               // The ingredient's pill: its body opens every ingredient in the table's place, the
               // cursor on the one in the box, and closes them again (a trial, Sean, 2026-10-16); the
               // caret goes into the field after a click, not a tap, as the chip's does. Its × takes
@@ -1342,7 +1415,7 @@ export function TableLayout({
                 if (choosing || !current) setChoosingFor(null);
                 else {
                   holdScroll.current = true;
-                  setChoosingFor(current);
+                  setChoosingFor({ pill: 'second', id: current });
                   setCursor({
                     view: 'matches',
                     position: ingredients.findIndex((each) => each.id === current),
@@ -1365,7 +1438,7 @@ export function TableLayout({
                 if (choosing || !current) setChoosingFor(null);
                 else {
                   holdScroll.current = true;
-                  setChoosingFor(current);
+                  setChoosingFor({ pill: 'second', id: current });
                   setCursor({
                     view: 'matches',
                     position: shoeBrands.findIndex((each) => each.id === current),

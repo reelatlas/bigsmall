@@ -13,7 +13,8 @@ import type { ConverterState, Restorable } from './state';
  *   ?a=milliliter&v=5
  * a: the box's unit id · v: the number as typed, in canonical form, so digits a double would round
  * come back whole (or arithmetic's value; a compound in its pair's words, "5 ft 11 in", ADR 0026) ·
- * i: Cooking's ingredient, by id (ADR 0021) · brand: Shoe size's brand, by id (ADR 0028). Links
+ * i: Cooking's ingredient, by id (ADR 0021) · brand: Shoe size's brand, by id (ADR 0028) · line:
+ * the chart line a brand is read on where the scale does not say it, `women` (2026-10-20). Links
  * from the two-box converter (ADR 0013) may also carry b, the second box's unit, and s, which box
  * held v; they open on the box that held the number.
  */
@@ -23,6 +24,7 @@ const PARAM = {
   value: 'v',
   ingredient: 'i',
   brand: 'brand',
+  line: 'line',
   secondUnit: 'b',
   source: 's',
 } as const;
@@ -40,6 +42,7 @@ export function stateToParams(state: ConverterState, separators: Separators): UR
   if (parsed.value !== undefined) params.set(PARAM.value, parsed.canonical ?? String(parsed.value));
   if (state.ingredient) params.set(PARAM.ingredient, state.ingredient);
   if (state.brand) params.set(PARAM.brand, state.brand);
+  if (state.line) params.set(PARAM.line, state.line);
   return params;
 }
 
@@ -76,6 +79,8 @@ export function paramsToState(
   const ingredient = named && getIngredient(named) ? named : null;
   const branded = params.get(PARAM.brand);
   const brand = branded && getShoeBrand(branded) ? branded : null;
+  // The line stands only with a shoe scale, which the hydrate action decides.
+  const line = params.get(PARAM.line) === 'women' ? 'women' : null;
   if (!unit && number === undefined && !ingredient && !brand) return null;
   return {
     // A compound's parts each may carry a decimal ("5 ft 11.5 in"), so every mark is the visitor's.
@@ -83,6 +88,7 @@ export function paramsToState(
     unit,
     ingredient,
     brand,
+    line,
   };
 }
 

@@ -266,9 +266,17 @@ export interface BrandReading {
   beyond: readonly [number, number] | null;
 }
 
-/** The brand's chart read at the box's unit and value. */
-export function readBrand(brand: ShoeBrand, unit: Unit, value: number): BrandReading {
-  const women = unit.id === 'us-women';
+/**
+ * The brand's chart read at the box's unit and value; `women` reads the women's chart on a scale
+ * that does not say the line (EU, UK, JP, a length), where the web app keeps the line from a US
+ * women's size (ADR 0028, 2026-10-20).
+ */
+export function readBrand(
+  brand: ShoeBrand,
+  unit: Unit,
+  value: number,
+  women = unit.id === 'us-women',
+): BrandReading {
   const chart = brandChart(brand, women);
   const base = { brand, chart, women, row: null, foot: null, length: false, beyond: null };
   if (LENGTH_UNITS.has(unit.id)) {

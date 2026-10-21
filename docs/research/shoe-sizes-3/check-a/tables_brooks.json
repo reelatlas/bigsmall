@@ -1,0 +1,212 @@
+{
+  "u1": [
+    {
+      "rows": [
+        ["Foot Length (CM)", "US", "UK", "EU"],
+        ["21.17", "5", "3", "35.5"],
+        ["21.59", "5.5", "3.5", "36"],
+        ["22.01", "6", "4", "36.5"],
+        ["22.44", "6.5", "4.5", "37.5"],
+        ["22.86", "7", "5", "38"],
+        ["23.28", "7.5", "5.5", "38.5"],
+        ["23.71", "8", "6", "39"],
+        ["24.13", "8.5", "6.5", "40"],
+        ["24.55", "9", "7", "40.5"],
+        ["24.98", "9.5", "7.5", "41"],
+        ["25.4", "10", "8", "42"],
+        ["25.82", "10.5", "8.5", "42.5"],
+        ["26.25", "11", "9", "43"],
+        ["26.67", "11.5", "9.5", "44"],
+        ["27.09", "12", "10", "44.5"],
+        ["27.52", "12.5", "10.5", "45"],
+        ["27.94", "13", "11", "45.5"]
+      ],
+      "before": "Women's accessories / Questions about accessories for running? We’ve got you cover / Size chart / Need help? Read our foot measurement guide to find your perf / View guide. / Shoe size comparison"
+    },
+    {
+      "rows": [
+        ["", "Men's", "Women's"],
+        ["Narrow", "B", "2A"],
+        ["Medium", "D", "B"],
+        ["Wide", "2E", "D"],
+        ["Extra Wide", "4E", "2E"]
+      ],
+      "before": "Questions about accessories for running? We’ve got you cover / Size chart / Need help? Read our foot measurement guide to find your perf / View guide. / Shoe size comparison / Shoe width comparison"
+    }
+  ],
+  "u2": [
+    {
+      "rows": [
+        ["Fußlänge (CM)", "US", "UK", "Europa"],
+        ["22.44", "5", "4", "37.5"],
+        ["22.86", "5.5", "4.5", "38"],
+        ["23.28", "6", "5", "38.5"],
+        ["23.71", "6.5", "5.5", "39"],
+        ["24.13", "7", "6", "40"],
+        ["24.55", "7.5", "6.5", "40.5"],
+        ["24.98", "8", "7", "41"],
+        ["25.4", "8.5", "7.5", "42"],
+        ["25.82", "9", "8", "42.5"],
+        ["26.25", "9.5", "8.5", "43"],
+        ["26.67", "10", "9", "44"],
+        ["27.09", "10.5", "9.5", "44.5"],
+        ["27.52", "11", "10", "45"],
+        ["27.94", "11.5", "10.5", "45.5"],
+        ["28.36", "12", "11", "46"],
+        ["28.79", "12.5", "11.5", "46.5"],
+        ["29.21", "13", "12", "47.5"],
+        ["30.06", "14", "13", "48.5"],
+        ["30.9", "15", "14", "49.5"],
+        ["31.75", "16", "15", "50.5"]
+      ],
+      "before": "Accessoires für Männer / Hast du Fragen zum Laufsport-Zubehör? Wir haben das Richtige / Größentabelle / Brauchen Sie Hilfe? Lies unseren Leitfaden zur Fußmessung, u / Anleitung ansehen. / Schuhgrößenvergleich"
+    },
+    {
+      "rows": [
+        ["", "Für Herren", "Für Damen"],
+        ["Schmal", "B", "2A"],
+        ["Medium", "D", "B"],
+        ["Breit", "2E", "D"],
+        ["Extra breit", "4E", "2E"]
+      ],
+      "before": "Hast du Fragen zum Laufsport-Zubehör? Wir haben das Richtige / Größentabelle / Brauchen Sie Hilfe? Lies unseren Leitfaden zur Fußmessung, u / Anleitung ansehen. / Schuhgrößenvergleich / Schuhweitenvergleich"
+    }
+  ],
+  "u57": [
+    {
+      "rows": [
+        ["Foot Length (CM)", "US", "UK", "Europe"],
+        ["22.44", "5", "4", "37.5"],
+        ["22.86", "5.5", "4.5", "38"],
+        ["23.28", "6", "5", "38.5"],
+        ["23.71", "6.5", "5.5", "39"],
+        ["24.13", "7", "6", "40"],
+        ["24.55", "7.5", "6.5", "40.5"],
+        ["24.98", "8", "7", "41"],
+        ["25.4", "8.5", "7.5", "42"],
+        ["25.82", "9", "8", "42.5"],
+        ["26.25", "9.5", "8.5", "43"],
+        ["26.67", "10", "9", "44"],
+        ["27.09", "10.5", "9.5", "44.5"],
+        ["27.52", "11", "10", "45"],
+        ["27.94", "11.5", "10.5", "45.5"],
+        ["28.36", "12", "11", "46"],
+        ["28.79", "12.5", "11.5", "46.5"],
+        ["29.21", "13", "12", "47.5"],
+        ["30.06", "14", "13", "48.5"],
+        ["30.9", "15", "14", "49.5"],
+        ["31.75", "16", "15", "50.5"]
+      ],
+      "before": "Men's accessories / Questions about accessories for running? We’ve got you cover / Size Chart / Need help? Read our foot measurement guide to find your perf / View guide. / Shoe size comparison"
+    },
+    {
+      "rows": [
+        ["", "Men's", "Women's"],
+        ["Narrow", "B", "2A"],
+        ["Medium", "D", "B"],
+        ["Wide", "2E", "D"],
+        ["Extra Wide", "4E", "2E"]
+      ],
+      "before": "Questions about accessories for running? We’ve got you cover / Size Chart / Need help? Read our foot measurement guide to find your perf / View guide. / Shoe size comparison / Shoe width comparison"
+    }
+  ],
+  "u58": [
+    {
+      "rows": [
+        ["Foot Length (CM)", "EU", "Men's UK", "Women's UK"],
+        ["22.44", "37.5", "4", "4.5"],
+        ["22.86", "38", "4.5", "5"],
+        ["23.28", "38.5", "5", "5.5"],
+        ["23.71", "39", "5.5", "6"],
+        ["24.13", "40", "6", "6.5"],
+        ["24.55", "40.5", "6.5", "7"],
+        ["24.98", "41", "7", "7.5"],
+        ["25.4", "42", "7.5", "8"],
+        ["25.82", "42.5", "8", "8.5"],
+        ["26.25", "43", "8.5", "9"],
+        ["26.67", "44", "9", "9.5"],
+        ["27.09", "44.5", "9.5", "10"],
+        ["27.52", "45", "10", "10.5"],
+        ["27.94", "45.5", "10.5", "11"],
+        ["28.36", "46", "11", "X"],
+        ["28.79", "46.5", "11.5", "X"],
+        ["29.21", "47.5", "12", "X"],
+        ["30.06", "48.5", "13", "X"],
+        ["30.9", "49.5", "14", "X"],
+        ["31.75", "50.5", "15", "X"]
+      ],
+      "before": "All gender tops / Questions about tops for running? We've got you covered. Che / Size chart / Need help? Read our foot measurement guide to find your perf / View guide. / EU Shoe size comparison"
+    },
+    {
+      "rows": [
+        ["Foot Length (CM)", "All Gender US", "Men's US", "Women's US"],
+        ["22.44", "5", "5", "6.5"],
+        ["22.86", "5.5", "5.5", "7"],
+        ["23.28", "6", "6", "7.5"],
+        ["23.71", "6.5", "6.5", "8"],
+        ["24.13", "7", "7", "8.5"],
+        ["24.55", "7.5", "7.5", "9"],
+        ["24.98", "8", "8", "9.5"],
+        ["25.4", "8.5", "8.5", "10"],
+        ["25.82", "9", "9", "10.5"],
+        ["26.25", "9.5", "9.5", "11"],
+        ["26.67", "10", "10", "11.5"],
+        ["27.09", "10.5", "10.5", "12"],
+        ["27.52", "11", "11", "12.5"],
+        ["27.94", "11.5", "11.5", "13"],
+        ["28.36", "12", "12", "X"],
+        ["28.79", "12.5", "12.5", "X"],
+        ["29.21", "13", "13", "X"],
+        ["30.06", "14", "14", "X"],
+        ["30.9", "15", "15", "X"],
+        ["31.75", "16", "16", "X"]
+      ],
+      "before": "Questions about tops for running? We've got you covered. Che / Size chart / Need help? Read our foot measurement guide to find your perf / View guide. / EU Shoe size comparison / US Shoe size comparison"
+    },
+    {
+      "rows": [
+        ["", "Men's", "Women's"],
+        ["Narrow", "B", "2A"],
+        ["Medium", "D", "B"],
+        ["Wide", "2E", "D"],
+        ["Extra Wide", "4E", "2E"]
+      ],
+      "before": "Size chart / Need help? Read our foot measurement guide to find your perf / View guide. / EU Shoe size comparison / US Shoe size comparison / Shoe width comparison"
+    }
+  ],
+  "u4": [
+    {
+      "rows": [
+        ["US", "UK", "Europe"],
+        ["5", "3", "35.5"],
+        ["5.5", "3.5", "36"],
+        ["6", "4", "36.5"],
+        ["6.5", "4.5", "37.5"],
+        ["7", "5", "38"],
+        ["7.5", "5.5", "38.5"],
+        ["8", "6", "39"],
+        ["8.5", "6.5", "40"],
+        ["9", "7", "40.5"],
+        ["9.5", "7.5", "41"],
+        ["10", "8", "42"],
+        ["10.5", "8.5", "42.5"],
+        ["11", "9", "43"],
+        ["11.5", "9.5", "44"],
+        ["12", "10", "44.5"],
+        ["12.5", "10.5", "45"],
+        ["13", "11", "45.5"]
+      ],
+      "before": "ask a guru. / Women's accessories / Questions about accessories for running? We’ve got you cover / ask a guru. / Size chart / Shoe size comparison"
+    },
+    {
+      "rows": [
+        ["", "Men's", "Women's"],
+        ["Narrow", "B", "2A"],
+        ["Medium", "D", "B"],
+        ["Wide", "2E", "D"],
+        ["Extra Wide", "4E", "2E"]
+      ],
+      "before": "Women's accessories / Questions about accessories for running? We’ve got you cover / ask a guru. / Size chart / Shoe size comparison / Shoe width comparison"
+    }
+  ]
+}

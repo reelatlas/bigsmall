@@ -1,0 +1,1643 @@
+{
+  "A-C001": {
+    "url": {
+      "tag": "u1",
+      "frags": [
+        {
+          "f": "Foot Length (CM) | US | UK | EU",
+          "st": "OK-vis",
+          "sent": "Shoe size comparison Foot Length (CM) US UK EU 21."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u2",
+      "frags": [
+        {
+          "f": "Foot Length (CM) | US | UK | EU",
+          "st": "PART 1/3",
+          "ctx": "orm und unsere Anleitung zum Messen an. Größentabelle Brauchen Sie Hilfe? Lies unseren Leitfaden zur Fußmessung, um deine perfekte Passform zu finden. Anleitung ansehen. Schuhgrößenvergleich Fußlänge (CM) US UK Europa 22.44 5 4 37.5 22.86 5.5 4.5 38 23.28 6 5 38.5 23.71 6.5 5.5 39 24.13 7 6 40 24.55 7.5 6.5 40.5 24.98 8 7 41 25.4 8.5 7.5 42 25.82 9 8 42.5 26.25 9.5 8.5 43 26.67 10 9 44 27.09 10.5 9.5 44.5 27.52 11 10 45 27.94 11.5 10.5 45.5 28.36 12 11 46 28.79 12.5 11.5 46.5 29.21 13 12 47.5 30.06 14 13 48.5 30.9 15 14 49.5 31.75 16 15 50.5 Schuhweitenvergleich Für Herren Für Damen Schmal B 2"
+        }
+      ]
+    }
+  },
+  "A-C002": {
+    "url": {
+      "tag": "u2",
+      "frags": [
+        {
+          "f": "Schuhgrößenvergleich | Fußlänge (CM) | US | UK | Europa",
+          "st": "OK-vis",
+          "sent": "Schuhgrößenvergleich Fußlänge (CM) US UK Europa 22."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u1",
+      "frags": [
+        {
+          "f": "Schuhgrößenvergleich | Fußlänge (CM) | US | UK | Europa",
+          "st": "PART 0/3",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C003": {
+    "url": {
+      "tag": "u1",
+      "frags": [
+        {
+          "f": "Need help? Read our foot measurement guide to find your perf",
+          "st": "OK-vis",
+          "sent": "Size chart Need help? Read our foot measurement guide to find your perfect fit. View guide. Shoe size comparison Foot Length (CM) US UK EU 21."
+        }
+      ]
+    }
+  },
+  "A-C004": {
+    "url": {
+      "tag": "u3",
+      "frags": [
+        {
+          "f": "Stand on the paper with your heel touching the wall and your",
+          "st": "OK-vis",
+          "sent": "Stand on the paper with your heel touching the wall and your toes pointing forward. 3."
+        },
+        {
+          "f": "Use the ruler to measure from the back of your heel to the t",
+          "st": "OK-vis",
+          "sent": "Use the ruler to measure from the back of your heel to the tip of your longest toe in centimeters. Write down this number-this is your foot length! You can use these measurements to find the perfect shoe size! Was this article helpful?"
+        }
+      ]
+    }
+  },
+  "A-C005": {
+    "url": {
+      "tag": "u4",
+      "frags": [
+        {
+          "f": "We recommend a thumb's width of space between your longest t",
+          "st": "OK-vis",
+          "sent": "SAR India 日本 (Japan) Malaysia New Zealand Philippines Singapore 대한민국 (South Korea) ประเทศไทย (Thailand) 台灣 (Taiwan) Vietnam My Account Log in Become a member My Account Log out My Account Order history Recommended products ACCOUNT DETAILS Addresses Payment methods Settings Sign out Women Men All gender Women's size guide Shoes Bras Tops Bottoms Socks Accessories Women's running shoes size guides We recommend a thumb's width of space between your longest toe and the tip of your shoe. Consider buying a shoe that is a half size up from your measured size. Bras Questions about bras for running?"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u1",
+      "frags": [
+        {
+          "f": "We recommend a thumb's width of space between your longest t",
+          "st": "PART 24/28",
+          "ctx": "LS Addresses Payment methods Brooks Run Club Settings Sign out Women Men All gender Women's size guide Shoes Bras Tops Bottoms Socks Accessories Women's running shoes size guides We recommend a thumb width of space between your longest toe and the tip of your shoe. Consider buying a shoe that is a half size up from your measured size. Bras Questions about bras for running? We've got you covered. Check out our size chart, fit tips, and measuring guide below. You can also get started with our bra finder . Women's tops Questions about tops for running? We've got you covered. Check out our size ch"
+        }
+      ]
+    }
+  },
+  "A-C006": {
+    "url": {
+      "tag": "u1",
+      "frags": [
+        {
+          "f": "We recommend a thumb width of space between your longest toe",
+          "st": "OK-vis",
+          "sent": "Japan) Malaysia New Zealand Philippines Singapore 대한민국 (South Korea) ประเทศไทย (Thailand) 台灣 (Taiwan) Vietnam My Account Log in Create account My Account Log out My Account Order history Recommended products ACCOUNT DETAILS Addresses Payment methods Brooks Run Club Settings Sign out Women Men All gender Women's size guide Shoes Bras Tops Bottoms Socks Accessories Women's running shoes size guides We recommend a thumb width of space between your longest toe and the tip of your shoe. Consider buying a shoe that is a half size up from your measured size. Bras Questions about bras for running?"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u4",
+      "frags": [
+        {
+          "f": "We recommend a thumb width of space between your longest toe",
+          "st": "PART 25/28",
+          "ctx": "ry Recommended products ACCOUNT DETAILS Addresses Payment methods Settings Sign out Women Men All gender Women's size guide Shoes Bras Tops Bottoms Socks Accessories Women's running shoes size guides We recommend a thumb's width of space between your longest toe and the tip of your shoe. Consider buying a shoe that is a half size up from your measured size. Bras Questions about bras for running? We've got you covered. Check out our size chart, fit tips, and measuring guide below. You can also get started with our bra finder or ask a guru . Women's tops Questions about tops for running? We've g"
+        }
+      ]
+    }
+  },
+  "A-C007": {
+    "url": {
+      "tag": "u5",
+      "frags": [
+        {
+          "f": "we recommend sizing so that you have approximately 1/2\" to 1",
+          "st": "OK-vis",
+          "sent": "In addition to the length of your shoes (we recommend sizing so that you have approximately 1/2\" to 1\" - about a thumbnail's width - of space from your longest toe to the end of the shoe), finding the proper width to best accommodate your feet can make or break the comfort of your shoes."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u6",
+      "frags": [
+        {
+          "f": "we recommend sizing so that you have approximately 1/2\" to 1",
+          "st": "PART 10/26",
+          "ctx": "will start to wear down the soft technical materials used in the upper of our shoes. Here are some other reasons you might experience holes in the upper material: Size: We recommend about 1/2\" to 1\" (about a thumbnail's width) of space from your longest toe to the end of the shoe. If you are experiencing holes at the end of the toe box of your shoes, consider sizing up a half-size to ensure you have enough room. Width: If you are experiencing holes in the fabric on the sides of your shoes, particularly at the widest point of your foot, it's possible you would benefit from a wider shoe. Stride:"
+        }
+      ]
+    }
+  },
+  "A-C008": {
+    "url": {
+      "tag": "u6",
+      "frags": [
+        {
+          "f": "Size: We recommend about 1/2\" to 1\" (about a thumbnail's wid",
+          "st": "OK-vis",
+          "sent": "Here are some other reasons you might experience holes in the upper material: Size: We recommend about 1/2\" to 1\" (about a thumbnail's width) of space from your longest toe to the end of the shoe. If you are experiencing holes at the end of the toe box of your shoes, consider sizing up a half-size to ensure you have enough room. Width: If you are experiencing holes in the fabric on the sides of your shoes, particularly at the widest point of your foot, it's possible you would benefit from a wider shoe."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u7",
+      "frags": [
+        {
+          "f": "Size: We recommend about 1/2\" to 1\" (about a thumbnail's wid",
+          "st": "PART 3/46",
+          "ctx": "ences so you can choose the perfect shoe for the fit, feel, and ride you prefer. Here are some tips: You will always want approx. 1/2 in. of space (a thumbs width) between the end of your big toe and the end of the shoe. Shoes will give in width, but not in length. The width can be important. If you've never had a professional fitting, it might be a great idea - especially if you've ever felt shoes were too narrow or too wide for you. We carry many of our styles in Wide and Narrow width options, although colours are sometimes more limited. If you want to match a pair of your current shoes to o"
+        }
+      ]
+    }
+  },
+  "A-C009": {
+    "url": {
+      "tag": "u7",
+      "frags": [
+        {
+          "f": "You will always want approx. 1/2 in. of space (a thumbs widt",
+          "st": "OK-vis",
+          "sent": "Here are some tips: You will always want approx. 1/2 in. of space (a thumbs width) between the end of your big toe and the end of the shoe. Shoes will give in width, but not in length. The width can be important."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u5",
+      "frags": [
+        {
+          "f": "You will always want approx. 1/2 in. of space (a thumbs widt",
+          "st": "PART 1/31",
+          "ctx": "your next run, walk, or workout. In addition to the length of your shoes (we recommend sizing so that you have approximately 1/2\" to 1\" - about a thumbnail's width - of space from your longest toe to the end of the shoe), finding the proper width to best accommodate your feet can make or break the comfort of your shoes. We offer four widths in our lineup - narrow, medium, wide, and extra-wide, as depicted below for women's and men's sizing: Narrow Medium Wide Extra-wide Women's 2A B D 2E Men's B D 2E 4E To see the models produced in specialty widths (narrow, wide, and extra-wide), check out th"
+        }
+      ]
+    }
+  },
+  "A-C010": {
+    "url": {
+      "tag": "u8",
+      "frags": [
+        {
+          "f": "Compared to other brands, we most often find our shoes fit s",
+          "st": "OK-vis",
+          "sent": "See more Shoe sizing compared to other brands Compared to other brands, we most often find our shoes fit slightly shorter. We recommend ordering Brooks running shoes a half size to one size larger than what you wear in casual or dress shoes. Some other brands also run a little small, so it can be best to be fitted when trying out new models or versions to make sure they will work well for you."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u9",
+      "frags": [
+        {
+          "f": "Compared to other brands, we most often find our shoes fit s",
+          "st": "PART 22/32",
+          "ctx": "Extra-Wide Width Shoes How do I know which width to choose? Shoe Sizing Compared to Other Brands Pronation Supination Waterproof shoes Shoes for Plantar Fasciitis Shoe Sizing Compared to Other Brands Compared to other brands, we most often find that our shoes to fit slightly shorter. We recommend ordering Brooks running shoes 1/2 size to one size larger than what you wear in casual or dress shoes. Some other brands also run a little small, so it may be best to be fitted when trying out new models or versions to make sure they will work well for you. Use our Store Finder tool below to help find"
+        }
+      ]
+    }
+  },
+  "A-C011": {
+    "url": {
+      "tag": "u9",
+      "frags": [
+        {
+          "f": "We recommend ordering Brooks running shoes 1/2 size to one s",
+          "st": "OK-vis",
+          "sent": "We recommend ordering Brooks running shoes 1/2 size to one size larger than what you wear in casual or dress shoes. Some other brands also run a little small, so it may be best to be fitted when trying out new models or versions to make sure they will work well for you."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u8",
+      "frags": [
+        {
+          "f": "We recommend ordering Brooks running shoes 1/2 size to one s",
+          "st": "PART 14/18",
+          "ctx": "r? Shoe sizing compared to other brands What is the size of my current shoe? See more Shoe sizing compared to other brands Compared to other brands, we most often find our shoes fit slightly shorter. We recommend ordering Brooks running shoes a half size to one size larger than what you wear in casual or dress shoes. Some other brands also run a little small, so it can be best to be fitted when trying out new models or versions to make sure they will work well for you. Use our Store Locator tool to help find a local retailer in your area to help get you fitted. Was this article helpful? 388 ou"
+        }
+      ]
+    }
+  },
+  "A-C012": {
+    "url": {
+      "tag": "u5",
+      "frags": [
+        {
+          "f": "Length conversion is adding 1.5 sizes when going from men’s ",
+          "st": "OK-vis",
+          "sent": "Length conversion is adding 1.5 sizes when going from men's to women's or subtracting 1.5 sizes when going from women's to men's. For example, if you wear a women's 10.0 wide (D), you would wear a men's 8.5 wide (2E). A note about color selection in specialty widths While we would love to be able to produce all colors in all widths across our brand, our shoes are produced on a large scale and the current manufacturing process limits how many colors in widths we're able to produce."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u4",
+      "frags": [
+        {
+          "f": "Length conversion is adding 1.5 sizes when going from men’s ",
+          "st": "PART 0/37",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C013": {
+    "url": {
+      "tag": "u4",
+      "frags": [
+        {
+          "f": "All gender (\"unisex\") sizes match men's sizes per industry s",
+          "st": "OK-vis",
+          "sent": "All gender (\"unisex\") sizes match men's sizes per industry standards. All gender socks Questions about socks for running?"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u5",
+      "frags": [
+        {
+          "f": "All gender (\"unisex\") sizes match men's sizes per industry s",
+          "st": "PART 0/7",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C014": {
+    "url": {
+      "tag": "u10",
+      "frags": [
+        {
+          "f": "Children’s shoes run off of the men’s sizing scale for lengt",
+          "st": "OK-vis",
+          "sent": "Children's shoes run off of the men's sizing scale for length. Most of our men's shoes start at a size 7 (equivalent to a big kid's size 7), but you can find some of our spikes and racing shoes in as small as a size 5 (a big kid's size 5)."
+        },
+        {
+          "f": "Our women’s shoes start at a size 5, which is equivalent to ",
+          "st": "OK-vis",
+          "sent": "Our women's shoes start at a size 5, which is equivalent to a big kid's size 3.5 in length. To find your child's size in women's, add 1.5 to the big kid's size. We recommend bringing your child to a local store to be fitted properly, but we have provided a chart below to approximate your child's shoe size in Brooks shoes for an idea of where to start (please note that both men's and women's sizing may run wider than a traditional kid's shoe)."
+        }
+      ]
+    }
+  },
+  "A-C015": {
+    "url": {
+      "tag": "u5",
+      "frags": [
+        {
+          "f": "We do not offer exact measurements for the dimensions of our",
+          "st": "OK-vis",
+          "sent": "A note about exact measurements of our shoes We do not offer exact measurements for the dimensions of our footwear, as it is difficult to communicate that information in a way that is helpful. Measurements by themselves cannot take into account things like foot shape, individual biomechanics, personal preferences, and design intention."
+        },
+        {
+          "f": "Narrow, medium, and wide shoes within the same model are bui",
+          "st": "OK-vis",
+          "sent": "Narrow, medium, and wide shoes within the same model are built on the same size footbed. The difference comes in the amount of upper material used, and therefore volume, present in the shoe."
+        }
+      ]
+    }
+  },
+  "A-C016": {
+    "url": {
+      "tag": "u11",
+      "frags": [
+        {
+          "f": "Because the foot is three-dimensional, any two-dimensional m",
+          "st": "OK-vis",
+          "sent": "February 10, 2026 23:08 Updated If you are unsure of your shoe size, please click here for shoe size chart Because the foot is three-dimensional, any two-dimensional measuring tool, such as a ruler or Brannock device® can only approximate your true shoe size. Please also keep in mind that manufacturers use different lasts to construct their shoes, and sizing may vary accordingly."
+        },
+        {
+          "f": "Note that the Brooks running shoes are all in US sizes.",
+          "st": "OK-vis",
+          "sent": "Note that the Brooks running shoes are all in US sizes. Running Shoe Sizing When deciding on size, it is important to consider the length, width and depth of your foot, as well as the shape of your foot/arch."
+        }
+      ]
+    }
+  },
+  "A-C017": {
+    "url": {
+      "tag": "u12",
+      "frags": [
+        {
+          "f": "US Men | US Women | UK Men | UK Women | Europe Unisex | Japa",
+          "st": "OK-vis",
+          "sent": "US Men US Women UK Men UK Women Europe Unisex Japan Men (cm) Japan Women (cm) 3."
+        }
+      ]
+    }
+  },
+  "A-C018": {
+    "url": {
+      "tag": "u13",
+      "frags": [
+        {
+          "f": "Skechers Performance running and walking footwear sizes may ",
+          "st": "OK-vis",
+          "sent": "Skechers Performance running and walking footwear sizes may vary Find Your Perfect Fit Every foot is unique so we've developed a signature fit system to help you find your favorite style in the best size to ensure the greatest comfort possible."
+        }
+      ]
+    }
+  },
+  "A-C019": {
+    "url": {
+      "tag": "u14",
+      "frags": [
+        {
+          "f": "Print this Guide on 8.5\" x 11\" (letter-size) paper scaled at",
+          "st": "OK-vis",
+          "sent": "SHOE FIT GUIDE INSTRUCTIONS Print this Guide on 8.5\" x 11\" (letter-size) paper scaled at 100%. Do not select \"Fit to Page\" or any similar option. With a ruler, check to see if the inch marks along the right side of the Guide are accurate. If so, you printed this correctly at 100% scale."
+        },
+        {
+          "f": "PLACE HEEL AT ZERO MARKER",
+          "st": "OK-vis",
+          "sent": "2\" 1\" PLACE HEEL AT ZERO MARKER"
+        },
+        {
+          "f": "If the child's foot goes past the dotted line, a wide-width ",
+          "st": "OK-vis",
+          "sent": "A UK 10.5 9.5 11 10 11.5 10.5 12 11 12.5 11.5 13 12 13.5 12.5 1 13 1.5 13.5 2 1 2.5 1.5 3 2 3.5 2.5 Big Kids (8-10 years old) USA UK 4 3 4.5 3.5 5 4 5.5 4.5 6 5 6.5 5.5 7 6 EU n/a 16 17 19 EU 20 21 22 23 24 25 26 EU 27 27 28 28 29 30 31 32 33 33.5 34 35 35.5 EU 36 36.5 37 37.5 38 39 40 10\" 7 7 6 6 9\" 5 5 4 4 3 3 8\" 2 2 1 1 13 13 7\" 12 12 11 11 10 10 9 9 6\" 8 8 7 7 6 6 5\" 5 5 4 4 3 3 4\" 2 2 1 1 3\" If the child's foot goes past the dotted line, a wide-width style may be a better fit. 2\" 1\" PLACE HEEL AT ZERO MARKER"
+        }
+      ]
+    }
+  },
+  "A-C020": {
+    "url": {
+      "tag": "u15",
+      "frags": [
+        {
+          "f": "For ease, you can switch between US, UK, EU sizing, and cent",
+          "st": "OK-vis",
+          "sent": "SIZE SELECTION For ease, you can switch between US, UK, EU sizing, and centimeters, using the \"choose size\" dropdown above the size selector. This feature allows you to shop in the format that is easiest for you."
+        },
+        {
+          "f": "AUSTRALIAN SIZING Is the same as US sizing.",
+          "st": "OK-vis",
+          "sent": "AUSTRALIAN SIZING Is the same as US sizing. TRUFIT Is a tool that provides tailored sizing recommendations based on footwear already in your wardrobe."
+        }
+      ]
+    }
+  },
+  "A-C021": {
+    "url": {
+      "tag": "u15",
+      "frags": [
+        {
+          "f": "Remembering that a properly fitting shoe should feel snug at",
+          "st": "OK-vis",
+          "sent": "TRY THEM ON Remembering that a properly fitting shoe should feel snug at the heel and midfoot, with wiggle room around the toes. Was this article helpful?"
+        }
+      ]
+    }
+  },
+  "A-C022": {
+    "url": {
+      "tag": "u16",
+      "frags": [
+        {
+          "f": "Download our printer-friendly fit guide to find your best fi",
+          "st": "OK-vis",
+          "sent": "Download our printer-friendly fit guide to find your best fit! Women's Fit Guide Men's Fit Guide We carry a great selection of medium width shoes, as well as wide width shoes for Women and Men."
+        }
+      ]
+    }
+  },
+  "A-C023": {
+    "url": {
+      "tag": "u17",
+      "frags": [
+        {
+          "f": "Unisex sizes are the same as men's standard sizes. Women sho",
+          "st": "OK-vis",
+          "sent": "nisex shoes AU US Men US Women UK FR 4 4 5.5 3 35.5 4.5 4.5 6 3.5 36 5 5 6.5 4 37 5.5 5.5 7 4.5 37.5 6 6 7.5 5 38 6.5 6.5 8 5.5 38.5 7 7 8.5 6 39 7.5 7.5 9 6.5 40 8 8 9.5 7 40.5 9 9 10.5 8 42 9.5 9.5 11 8.5 42.5 10 10 11.5 9 43 10.5 10.5 12 9.5 44 11 11 12.5 10 44.5 11.5 11.5 13 10.5 45 12 12 13.5 11 46 12.5 12.5 14 11.5 46.5 13 13 14.5 12 47 14 14 15.5 13 48.5 15 15 16.5 14 49.5 16 16 17.5 15 51 Unisex sizes are the same as men's standard sizes. Women should order 1.5 sizes smaller than their usual size. For easy size selection, please use the size selector on product page and simply choose men's or women's size, then choose your usual size. Men's shoes US UK EU Length cm 4 3 36 22 4."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u18",
+      "frags": [
+        {
+          "f": "Unisex sizes are the same as men's standard sizes. Women sho",
+          "st": "PART 2/40",
+          "ctx": "ur belly button). 3 - Hips Measure around the fullest part of your hips. 4 - Inseam Measure the length from your hip to your ankle. Unisex Sizing Unisex Shoes Unisex products run in men's sizes only. Women should order 1.5 sizes down from their usual size. MEN WOMEN 4 5.5 4.5 6 5 6.5 5.5 7 6 7.5 6.5 8 7 8.5 7.5 9 8 9.5 Kids' Sizing Toddler Shoes US Length DE UK FR IT ES 4 4.75 in 19 3 19 19 19 5 5 in 20 4 20 20 20 6 5.5 in 22 5 22 22 22 7 5.75 in 23 6 23 23 23 8 6.125 in 24 7 24 24 24 9 6.25 in 25 8 25 25 25 10 6.5 in 27 9 27 27 27 Little Kids' Shoes US Length DE UK FR IT ES 10.5 6.625 in 27.5"
+        }
+      ]
+    }
+  },
+  "A-C024": {
+    "url": {
+      "tag": "u18",
+      "frags": [
+        {
+          "f": "Unisex products run in men’s sizes only. Women should order ",
+          "st": "OK-vis",
+          "sent": "Unisex Sizing Unisex Shoes Unisex products run in men's sizes only. Women should order 1.5 sizes down from their usual size. MEN WOMEN 4 5."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u19",
+      "frags": [
+        {
+          "f": "Unisex products run in men’s sizes only. Women should order ",
+          "st": "OK-vis",
+          "sent": "Unisex Shoes Unisex products run in men's sizes only. Women should order 1.5 sizes down from their usual size. MEN WOMEN 4 5."
+        }
+      ]
+    }
+  },
+  "A-C025": {
+    "url": {
+      "tag": "u19",
+      "frags": [
+        {
+          "f": "Unisex products run in men’s sizes only. Women should order ",
+          "st": "OK-vis",
+          "sent": "Unisex Shoes Unisex products run in men's sizes only. Women should order 1.5 sizes down from their usual size. MEN WOMEN 4 5."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u17",
+      "frags": [
+        {
+          "f": "Unisex products run in men’s sizes only. Women should order ",
+          "st": "PART 2/14",
+          "ctx": "11 12.5 10 44.5 11.5 11.5 13 10.5 45 12 12 13.5 11 46 12.5 12.5 14 11.5 46.5 13 13 14.5 12 47 14 14 15.5 13 48.5 15 15 16.5 14 49.5 16 16 17.5 15 51 Unisex sizes are the same as men's standard sizes. Women should order 1.5 sizes smaller than their usual size. For easy size selection, please use the size selector on product page and simply choose men's or women's size, then choose your usual size. Men's shoes US UK EU Length cm 4 3 36 22 4.5 3.5 36.5 22.5 5 4 37 23 5.5 4.5 37.5 23.5 6 5 38 24 6.5 5.5 38.5 24.5 7 6 39 25 7.5 6.5 40 25.5 8 7 40.5 26 8.5 7.5 41 26.5 9 8 42 27 9.5 8.5 42.5 27.5 10 "
+        }
+      ]
+    }
+  },
+  "A-C026": {
+    "url": {
+      "tag": "u17",
+      "frags": [
+        {
+          "f": "Men's shoes US UK EU Length cm",
+          "st": "OK-vis",
+          "sent": "Men's shoes US UK EU Length cm 4 3 36 22 4."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u19",
+      "frags": [
+        {
+          "f": "Men's shoes US UK EU Length cm",
+          "st": "PART 0/4",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C027": {
+    "url": {
+      "tag": "u19",
+      "frags": [
+        {
+          "f": "Product Measurements Size Length (cm)",
+          "st": "OK-vis",
+          "sent": "3 - 4Y 3 - 4Y 4 104 4 4T Little Kids' Clothing EU UK FR IT ES US 3 - 4Y 3 - 4Y 4 104 4 4 4 - 5Y 4 - 5Y 5 110 5 XXS 4 - 5Y 4 - 5Y 5 110 5 5 5 - 6Y 5 - 6Y 6 116 6 6 7 - 8Y 7 - 8Y 8 128 8 6X/7 7 - 8Y 7 - 8Y 8 128 8 XS Junior Clothing EU UK FR IT ES US 9 - 10Y 9 - 10Y 10 140 10 S 11 - 12Y 11 - 12Y 12 152 12 M 13 - 14Y 13 - 14Y 14 164 14 L 15 - 16Y 15 - 16Y 16 176 16 XL 16 - 17Y 16 - 17Y 18 188 18 XXL Product Measurements Size Length (cm) 5."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u17",
+      "frags": [
+        {
+          "f": "Product Measurements Size Length (cm)",
+          "st": "PART 0/2",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C028": {
+    "url": {
+      "tag": "u18",
+      "frags": [
+        {
+          "f": "Kids' Sizing Toddler Shoes US Length DE UK FR IT ES 4.75 in ",
+          "st": "PART 8/14",
+          "ctx": "our ankle. Unisex Sizing Unisex Shoes Unisex products run in men's sizes only. Women should order 1.5 sizes down from their usual size. MEN WOMEN 4 5.5 4.5 6 5 6.5 5.5 7 6 7.5 6.5 8 7 8.5 7.5 9 8 9.5 Kids' Sizing Toddler Shoes US Length DE UK FR IT ES 4 4.75 in 19 3 19 19 19 5 5 in 20 4 20 20 20 6 5.5 in 22 5 22 22 22 7 5.75 in 23 6 23 23 23 8 6.125 in 24 7 24 24 24 9 6.25 in 25 8 25 25 25 10 6.5 in 27 9 27 27 27 Little Kids' Shoes US Length DE UK FR IT ES 10.5 6.625 in 27.5 9.5 27.5 27.5 27.5 11 6.75 in 28 10 28 28 28 12 7.125 in 29 11 29 29 29 13 7.5 in 31 12 31 31 31 1 7.75 in 32 13 32 32 3"
+        }
+      ]
+    }
+  },
+  "A-C029": {
+    "url": {
+      "tag": "u20",
+      "frags": [
+        {
+          "f": "JPN/CM = Japanese Sizing / CM Measurements",
+          "st": "OK-vis",
+          "sent": "Size Labels: UK = United Kingdom Sizing US = United States Sizing FR/EUR = European Sizing JPN/CM = Japanese Sizing / CM Measurements International Size Conversions 1."
+        }
+      ]
+    }
+  },
+  "A-C030": {
+    "url": {
+      "tag": "u21",
+      "frags": []
+    }
+  },
+  "A-C031": {
+    "url": {
+      "tag": "u22",
+      "frags": [
+        {
+          "f": "Size chart True to size",
+          "st": "OK-vis",
+          "sent": "White Glacier Select a size US Men's Sizes Close 7No items left in stock Notify me 7.5No items left in stock Notify me 8No items left in stock Notify me 8.5No items left in stock Notify me 9No items left in stock Notify me 9.5No items left in stock Notify me 10No items left in stock Notify me 10.5 11 11.5 12 12.5Only 2 left 13Only 2 left 14Only 3 left Size chart True to size Add to bag Add to bag Size & Fit True to size."
+        },
+        {
+          "f": "Size & Fit True to size.",
+          "st": "OK-vis",
+          "sent": "White Glacier Select a size US Men's Sizes Close 7No items left in stock Notify me 7.5No items left in stock Notify me 8No items left in stock Notify me 8.5No items left in stock Notify me 9No items left in stock Notify me 9.5No items left in stock Notify me 10No items left in stock Notify me 10.5 11 11.5 12 12.5Only 2 left 13Only 2 left 14Only 3 left Size chart True to size Add to bag Add to bag Size & Fit True to size. Shipping & Returns Free shipping on all orders over $50 Free returns within 90 days Limited editions and last-season items can only be refunded, but are not exchangeable due to limited stock Materials & Transparency Materials Recycled Polyester"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u23",
+      "frags": [
+        {
+          "f": "Size chart True to size",
+          "st": "OK-vis",
+          "sent": "All Black Select a size US Kids' shoe sizes Close 10.5No items left in stock Notify me 11 11.5Only 1 left 12 12.5No items left in stock Notify me 13 13.5No items left in stock Notify me 1 1.5 2 2.5 3 Size chart True to size Add to bag Add to bag Size & Fit True to size."
+        },
+        {
+          "f": "Size & Fit True to size.",
+          "st": "OK-vis",
+          "sent": "All Black Select a size US Kids' shoe sizes Close 10.5No items left in stock Notify me 11 11.5Only 1 left 12 12.5No items left in stock Notify me 13 13.5No items left in stock Notify me 1 1.5 2 2.5 3 Size chart True to size Add to bag Add to bag Size & Fit True to size. How to measure your kid's feet Use the steps below to find the right size for your kid/s."
+        }
+      ]
+    }
+  },
+  "A-C032": {
+    "url": {
+      "tag": "u23",
+      "frags": [
+        {
+          "f": "True to size. How to measure your kid's feet Use the steps b",
+          "st": "OK-vis",
+          "sent": "All Black Select a size US Kids' shoe sizes Close 10.5No items left in stock Notify me 11 11.5Only 1 left 12 12.5No items left in stock Notify me 13 13.5No items left in stock Notify me 1 1.5 2 2.5 3 Size chart True to size Add to bag Add to bag Size & Fit True to size. How to measure your kid's feet Use the steps below to find the right size for your kid/s. Little feet don't stay little for long, so if you're unsure, we recommend sizing up. 1."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u22",
+      "frags": [
+        {
+          "f": "True to size. How to measure your kid's feet Use the steps b",
+          "st": "PART 27/33",
+          "ctx": "kles optional. Next, grab a ruler or tape measure and measure the length from the very top of their toes to the end of the paper.\",{\"value\":2720},\"1. Find a wall and a piece of paper\",{\"value\":2722},\"How to measure your kid's feet\",{\"value\":2724},\"Use the steps below to find the right size for your kid/s. Little feet don't stay little for long, so if you're unsure, we recommend sizing up.\",{\"value\":2726},\"On Collection\",{\"value\":2728},\"Place a piece of paper flat on the ground. One edge should be perpendicular to the wall. Ask your child to stand on top of the paper with their heels touching t"
+        }
+      ]
+    }
+  },
+  "A-C033": {
+    "url": {
+      "tag": "u23",
+      "frags": [
+        {
+          "f": "Place a piece of paper flat on the ground. One edge should b",
+          "st": "OK-vis",
+          "sent": "Find a wall and a piece of paper Place a piece of paper flat on the ground. One edge should be perpendicular to the wall. Ask your child to stand on top of the paper with their heels touching the wall. 2."
+        },
+        {
+          "f": "measure the length from the very top of their toes to the en",
+          "st": "OK-vis",
+          "sent": "Next, grab a ruler or tape measure and measure the length from the very top of their toes to the end of the paper. 3."
+        },
+        {
+          "f": "Take the measurement of their longest foot and use our size ",
+          "st": "OK-vis",
+          "sent": "Consult our size guide Take the measurement of their longest foot and use our size guide to find the corresponding On size. Shipping & Returns Free shipping on all orders over $50 Free returns within 90 days Limited editions and last-season items can only be refunded, but are not exchangeable due to limited stock Materials & Transparency Materials Polyester Country of origin Vietnam"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u24",
+      "frags": [
+        {
+          "f": "Place a piece of paper flat on the ground. One edge should b",
+          "st": "OK-raw",
+          "sent": "Little feet don't stay little for long, so if you're unsure, we recommend sizing up.\",{\"value\":2767},\"On Collection\",{\"value\":2769},\"Place a piece of paper flat on the ground. One edge should be perpendicular to the wall. Ask your child to stand on top of the paper with their heels touching the wall.\",{\"value\":2771},\"3."
+        },
+        {
+          "f": "measure the length from the very top of their toes to the en",
+          "st": "OK-raw",
+          "sent": "Next, grab a ruler or tape measure and measure the length from the very top of their toes to the end of the paper.\",{\"value\":2761},\"1."
+        },
+        {
+          "f": "Take the measurement of their longest foot and use our size ",
+          "st": "OK-raw",
+          "sent": "Consult our size guide\",{\"value\":2773},\"Climate\",{\"value\":130},{\"value\":2776},\"purchase pod\",{\"value\":2778},\"Dimensions\",{\"value\":2780},\"Take the measurement of their longest foot and use our size guide to find the corresponding On size. \",{\"value\":2782},\"Hiking style\",{\"value\":2784},\"Condition\",{\"value\":390},{\"value\":2787},\"Quick facts\",{\"value\":2789},\"Waterproofness\",{\"value\":136},{\"value\":2792},\"Sizes\",{\"value\":2794},\"How to measure\",{\"value\":2796},\"{{sizeSystem}} Youth shoe sizes\",{\"value\":2798},\"Close virtual try on\",{\"value\":2800},\"VAT included\",{\"value\":2802},\"Launch virtual try on\",{\"value\":2804},\"Supplier Transparency\",{\""
+        }
+      ]
+    }
+  },
+  "A-C034": {
+    "url": {
+      "tag": "u24",
+      "frags": [
+        {
+          "f": "Best practice is to go to a footwear store and ask for a foo",
+          "st": "OK-vis",
+          "sent": "Best practice is to go to a footwear store and ask for a foot measurement using a Brannock Device (most footwear retailers will have these available). Alternatively place a ruler or tape measure perpendicular to a wall, place your foot on top of the measuring device with your heel pushed against the wall & take the measurement of where your longest toe ends. Please indicate the length of your longer foot. Can I keep the products I work with?"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u23",
+      "frags": [
+        {
+          "f": "Best practice is to go to a footwear store and ask for a foo",
+          "st": "PART 4/68",
+          "ctx": "endicular to the wall. Ask your child to stand on top of the paper with their heels touching the wall. 2. Trace and measure Trace around their toes with a pen or pencil - tickles optional. Next, grab a ruler or tape measure and measure the length from the very top of their toes to the end of the paper. 3. Consult our size guide Take the measurement of their longest foot and use our size guide to find the corresponding On size. Shipping & Returns Free shipping on all orders over $50 Free returns within 90 days Limited editions and last-season items can only be refunded, but are not exchangeable"
+        }
+      ]
+    }
+  },
+  "A-C035": {
+    "url": {
+      "tag": "u25",
+      "frags": []
+    }
+  },
+  "A-C036": {
+    "url": {
+      "tag": "u26",
+      "frags": [
+        {
+          "f": "Men's Footwear US UK EU CM INCH",
+          "st": "OK-vis",
+          "sent": "eckout Recently Viewed recently-viewed Shop Our Categories Casual Shoes Running Shoes Womens Shoes Mens Shoes Casual Shoes Running Shoes Womens Shoes Mens Shoes Size Guide Special Unisex Size Guide US Mens US Womens 2 3 2.5 3.5 3 4 3.5 4.5 4 5 4.5 5.5 5 6 5.5 6.5 6 7 6.5 7.5 7 8 7.5 8.5 8 9 8.5 9.5 9 10 9.5 10.5 10 11 10.5 11.5 11 12 11.5 12.5 12 13 12.5 13.5 13 14 13.5 14.5 14 15 14.5 15.5 15 16 Men's Footwear US UK EU CM INCH 3."
+        },
+        {
+          "f": "This measurement represents the length of the foot.",
+          "st": "OK-vis",
+          "sent": "This measurement represents the length of the foot. Repeat the process with the other foot."
+        },
+        {
+          "f": "Apply the longer of the two measurements to our size chart t",
+          "st": "OK-vis",
+          "sent": "Apply the longer of the two measurements to our size chart to find the right correlating size for the recorded foot length. If the measurement is between sizes, we recommend sizing up."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u27",
+      "frags": [
+        {
+          "f": "Men's Footwear US UK EU CM INCH",
+          "st": "PART 0/4",
+          "ctx": ""
+        },
+        {
+          "f": "This measurement represents the length of the foot.",
+          "st": "PART 0/5",
+          "ctx": ""
+        },
+        {
+          "f": "Apply the longer of the two measurements to our size chart t",
+          "st": "PART 0/19",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C037": {
+    "url": {
+      "tag": "u26",
+      "frags": [
+        {
+          "f": "With a pen or pencil pointed straight down, have a friend or",
+          "st": "OK-vis",
+          "sent": "With a pen or pencil pointed straight down, have a friend or partner assist you by marking the tip of the big toe and the outermost part of the heel. Once the marks are recorded, step off the paper and use a ruler or tape measure to measure the distance between the two points. This measurement represents the length of the foot. Repeat the process with the other foot. Please note that it is common for one foot to be a slightly different length to the other. Apply the longer of the two measurements to our size chart to find the right correlating size for the recorded foot length."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u27",
+      "frags": [
+        {
+          "f": "With a pen or pencil pointed straight down, have a friend or",
+          "st": "PART 0/84",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C038": {
+    "url": {
+      "tag": "u26",
+      "frags": [
+        {
+          "f": "If the measurement is between sizes, we recommend sizing up.",
+          "st": "OK-vis",
+          "sent": "If the measurement is between sizes, we recommend sizing up. How to Measure Chest, Waist & Hips CHEST Measure around the fullest part of your chest, keeping the tape measure horizontal WAIST Measure around the narrowest part (typically where your body bends side to side), keeping the tape measure horizontal HIPS Measure around the fullest part of your hips, keeping the tape measure horizontal Women's Size Guides Women's Footwear Tops Bottoms Sports Bras US"
+        }
+      ]
+    }
+  },
+  "A-C039": {
+    "url": {
+      "tag": "u26",
+      "frags": [
+        {
+          "f": "Fit Note Club Cs tend to be more narrower so we recommend si",
+          "st": "OK-vis",
+          "sent": "32 - 34\" S 34 - 37\" 30 - 32\" 35 - 37\" M 37 - 40\" 32 - 35\" 37 - 40\" L 40 - 44\" 35 - 39\" 40 - 44\" XL 44 - 48\" 39 - 43\" 44 - 48\" 2XL 48 - 52\" 43 - 47\" 48 - 51\" 3XL 53 - 58\" 48 - 53\" 51 - 56\" Label WAIST HIP INSEAM XS 27 - 29\" 32 - 34\" 31.9\" S 30 - 32\" 35 - 37\" 32.1\" M 32 - 35\" 37 - 40\" 32.3\" L 35 - 39\" 40 - 44\" 32.5\" XL 39 - 43\" 44 - 48\" 32.7\" 2XL 43 - 47\" 48 - 51\" 32.5\" 3XL 48 - 53\" 51 - 56\" 32.3\" Fit Note Club Cs tend to be more narrower so we recommend sizing up 0.5. All other ranges are true to size and we recommend picking your usual size. How to Measure Your Foot Length Tape a piece of paper to a hard, flat surface, ensuring the paper doesn't slip."
+        }
+      ]
+    }
+  },
+  "A-C040": {
+    "url": {
+      "tag": "u27",
+      "frags": [
+        {
+          "f": "Place a piece of paper on a hard floor with one end to the w",
+          "st": "OK-vis",
+          "sent": "5.5 8.7\" 4.5 6 8.8\" 5 6.5 9\" 5.5 7 9.2\" 6 7.5 9.3\" 6.5 8 9.5\" 7 8.5 9.7\" 7.5 9 9.8\" 8 9.5 10\" 8.5 10 10.2\" 9 10.5 10.3\" 9.5 11 10.5\" 10 11.5 10.7\" 10.5 12 10.8\" 11 12.5 11\" 11.5 13 11.2\" 12 13.5 11.3\" 12.5 14 11.5\" 13 14.5 11.7\" 13.5 15 11.8\" 14 - 12\" 14.5 - 12.2\" 15 - 12.3 \" 15.5 - 12.5 \" 16 - 12.6 \" 16.5 - 12.8 \" 17 - 13\" 17.5 - 13.1\" 18 - 13.3\" 18.5 - 13.5\" How to Measure Step 1 Step 2 Step 3 Place a piece of paper on a hard floor with one end to the wall. Stand on the piece of paper with the heel slightly touching the wall. Mark the end of your longest toe with a pencil for both feet."
+        },
+        {
+          "f": "Mark the end of your longest toe with a pencil for both feet",
+          "st": "OK-vis",
+          "sent": "Mark the end of your longest toe with a pencil for both feet. Tip: it's easier if you let someone help you with this."
+        },
+        {
+          "f": "Measure your markings in inches. Take the larger of the two ",
+          "st": "OK-vis",
+          "sent": "Measure your markings in inches. Take the larger of the two foot length values and compare it with our sizing chart. BE THE FIRST TO KNOW Sign up to get all the latest news and exclusive offers."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u28",
+      "frags": [
+        {
+          "f": "Place a piece of paper on a hard floor with one end to the w",
+          "st": "OK-vis",
+          "sent": "Winter Boots Sizing Women's Boots Euro Canada/US 36 5 - 5 1⁄2 37 6 - 6 1⁄2 38 7 39 8 40 8 1⁄2 41 9 - 9 1⁄2 42 10 Men's Boots Euro Canada/US 40 7 41 8 42 8 1⁄2 - 9 43 9 1⁄2 44 10 45 11 46 12 47 13 HOW TO MEASURE HEEL-TOE MEASUREMENT 1/3 HEEL-TOE MEASUREMENT 2/3 HEEL-TOE MEASUREMENT 3/3 Place a piece of paper on a hard floor with one end to the wall. Stand on the piece of paper with the heel slightly touching the wall. Mark the end of your longest toe with a pencil for both feet."
+        },
+        {
+          "f": "Mark the end of your longest toe with a pencil for both feet",
+          "st": "OK-vis",
+          "sent": "Mark the end of your longest toe with a pencil for both feet. Tip: It's easier if you let someone help you with this."
+        },
+        {
+          "f": "Measure your markings in inches. Take the larger of the two ",
+          "st": "PART 12/18",
+          "ctx": "ll. Mark the end of your longest toe with a pencil for both feet. Tip: It's easier if you let someone help you with this. Measure your marketing from the wall (heel) to the longest toe for both feet. Take the larger of the two foot length values and compare it with our sizing chart, to define your Reebok shoe size. STAY CONNECTED Sign up for exclusive drops, new arrivals, and 20% off your first order. SIGN UP STAY IN THE KNOW SIGN UP *Terms and Conditions Apply. By submitting this form, you agree to receive email marketing emails from Reebok Canada at the submitted email address. You can withd"
+        }
+      ]
+    }
+  },
+  "A-C041": {
+    "url": {
+      "tag": "u28",
+      "frags": [
+        {
+          "f": "Measure your marketing from the wall (heel) to the longest t",
+          "st": "OK-vis",
+          "sent": "Measure your marketing from the wall (heel) to the longest toe for both feet. Take the larger of the two foot length values and compare it with our sizing chart, to define your Reebok shoe size. STAY CONNECTED Sign up for exclusive drops, new arrivals, and 20% off your first order."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u27",
+      "frags": [
+        {
+          "f": "Measure your marketing from the wall (heel) to the longest t",
+          "st": "PART 12/33",
+          "ctx": " paper with the heel slightly touching the wall. Mark the end of your longest toe with a pencil for both feet. Tip: it's easier if you let someone help you with this. Measure your markings in inches. Take the larger of the two foot length values and compare it with our sizing chart. BE THE FIRST TO KNOW Sign up to get all the latest news and exclusive offers. This customer is already subscribed Email By entering your email, you agree to Terms & Conditions and acknowledge having read the Privacy Policy . Discover & Shop Coming Soon E-Gift Cards Reebok Nutrition Reebok Shopping App Reebok Fitnes"
+        }
+      ]
+    }
+  },
+  "A-C042": {
+    "url": {
+      "tag": "u28",
+      "frags": [
+        {
+          "f": "Winter Boots Sizing Women's Boots Euro Canada/US 36 5 - 5 ½",
+          "st": "OK-vis",
+          "sent": "Winter Boots Sizing Women's Boots Euro Canada/US 36 5 - 5 1⁄2 37 6 - 6 1⁄2 38 7 39 8 40 8 1⁄2 41 9 - 9 1⁄2 42 10 Men's Boots Euro Canada/US 40 7 41 8 42 8 1⁄2 - 9 43 9 1⁄2 44 10 45 11 46 12 47 13 HOW TO MEASURE HEEL-TOE MEASUREMENT 1/3 HEEL-TOE MEASUREMENT 2/3 HEEL-TOE MEASUREMENT 3/3 Place a piece of paper on a hard floor with one end to the wall."
+        },
+        {
+          "f": "M en's Boots Euro Canada/US 40 7",
+          "st": "OK-vis",
+          "sent": "Winter Boots Sizing Women's Boots Euro Canada/US 36 5 - 5 1⁄2 37 6 - 6 1⁄2 38 7 39 8 40 8 1⁄2 41 9 - 9 1⁄2 42 10 Men's Boots Euro Canada/US 40 7 41 8 42 8 1⁄2 - 9 43 9 1⁄2 44 10 45 11 46 12 47 13 HOW TO MEASURE HEEL-TOE MEASUREMENT 1/3 HEEL-TOE MEASUREMENT 2/3 HEEL-TOE MEASUREMENT 3/3 Place a piece of paper on a hard floor with one end to the wall."
+        },
+        {
+          "f": "42 8 ½ - 9",
+          "st": "OK-vis",
+          "sent": "Winter Boots Sizing Women's Boots Euro Canada/US 36 5 - 5 1⁄2 37 6 - 6 1⁄2 38 7 39 8 40 8 1⁄2 41 9 - 9 1⁄2 42 10 Men's Boots Euro Canada/US 40 7 41 8 42 8 1⁄2 - 9 43 9 1⁄2 44 10 45 11 46 12 47 13 HOW TO MEASURE HEEL-TOE MEASUREMENT 1/3 HEEL-TOE MEASUREMENT 2/3 HEEL-TOE MEASUREMENT 3/3 Place a piece of paper on a hard floor with one end to the wall."
+        }
+      ]
+    }
+  },
+  "A-C043": {
+    "url": {
+      "tag": "u29",
+      "status": "NOFILE"
+    }
+  },
+  "A-C044": {
+    "url": {
+      "tag": "u30",
+      "frags": [
+        {
+          "f": "Find your size in the chart below. If you do not know your s",
+          "st": "OK-vis",
+          "sent": "ball Shorts Bras Hijabs Skirts and Dresses Swimwear Unisex Unisex Shoes Alpha Sized Shoes Converse Kids Shoes Boys' and Unisex Clothing Boys' Swimwear Girls' Clothing Girls' Swimwear Girls' Bras Little Kids' Clothing Baby and Toddler Clothing Jordan Big Kids' Clothing Hijabs Accessories Belts Hats Kids' Hats Kids' Socks Unisex Socks Apple Watch Nike Nike Size Charts Nike Men's Footwear Size Chart Find your size in the chart below. If you do not know your size, use the How To Measure Foot Length prompts at the bottom of the size guide to help you find the right size. Please note the CM size displayed on shoe boxes and labels is different than Foot Length (cm). Wide shoes have approximately 1/4\" (6."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u31",
+      "frags": [
+        {
+          "f": "Find your size in the chart below. If you do not know your s",
+          "st": "OK-vis",
+          "sent": "ll Jerseys Basketball Shorts Bras Hijabs Skirts and Dresses Swimwear Unisex Unisex Shoes Alpha Sized Shoes Converse Kids Shoes Boys' and Unisex Clothing Boys' Swimwear Girls' Clothing Girls' Swimwear Girls' Bras Little Kids' Clothing Baby and Toddler Clothing Jordan Big Kids' Clothing Hijabs Accessories Belts Hats Kids' Hats Kids' Socks Unisex Socks Apple Watch Nike Nike Size Charts Women's Shoes Find your size in the chart below. If you do not know your size, use the How To Measure Foot Length prompts at the bottom of the size guide to help you find the right size. Please note the CM size displayed on shoe boxes and labels is different than Foot Length (cm). Wide shoes have approximately 1/4\" (6."
+        }
+      ]
+    }
+  },
+  "A-C045": {
+    "url": {
+      "tag": "u31",
+      "frags": [
+        {
+          "f": "Please note the CM size displayed on shoe boxes and labels i",
+          "st": "OK-vis",
+          "sent": "Please note the CM size displayed on shoe boxes and labels is different than Foot Length (cm). Wide shoes have approximately 1/4\" (6."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u30",
+      "frags": [
+        {
+          "f": "Please note the CM size displayed on shoe boxes and labels i",
+          "st": "OK-vis",
+          "sent": "Please note the CM size displayed on shoe boxes and labels is different than Foot Length (cm). Wide shoes have approximately 1/4\" (6."
+        }
+      ]
+    }
+  },
+  "A-C046": {
+    "url": {
+      "tag": "u30",
+      "frags": [
+        {
+          "f": "With a pen or pencil pointed straight down, have a friend or",
+          "st": "OK-vis",
+          "sent": "With a pen or pencil pointed straight down, have a friend or partner assist you by marking the tip of the big toe and the outermost part of the heel. Once the marks are recorded, step off the paper and use a ruler or measuring tape to measure the distance between the two points. This measurement represents the length of the foot. Repeat the process with the other foot."
+        },
+        {
+          "f": "Apply the longer of the two measurements to our size chart t",
+          "st": "OK-vis",
+          "sent": "Apply the longer of the two measurements to our size chart to find the right correlating size for the recorded foot length. If the measurement is between sizes, we recommend sizing up. Resources Gift Cards Corporate Sales Find a Store Membership Product News Magazine Site Feedback Help Get Help Order Status Shipping and Delivery Returns Order Cancellation Payment Options Gift Card Balance Contact Us Company About Nike News Careers Investors Purpose Sustainability Accessibility Promotions & Discounts Student Military Teacher First Responders & Medical Professionals Birthday Resou"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u31",
+      "frags": [
+        {
+          "f": "With a pen or pencil pointed straight down, have a friend or",
+          "st": "OK-vis",
+          "sent": "With a pen or pencil pointed straight down, have a friend or partner assist you by marking the tip of the big toe and the outermost part of the heel. Once the marks are recorded, step off the paper and use a ruler or measuring tape to measure the distance between the two points. This measurement represents the length of the foot. Repeat the process with the other foot."
+        },
+        {
+          "f": "Apply the longer of the two measurements to our size chart t",
+          "st": "OK-vis",
+          "sent": "Apply the longer of the two measurements to our size chart to find the right correlating size for the recorded foot length. If the measurement is between sizes, we recommend sizing up. Resources Gift Cards Corporate Sales Find a Store Membership Product News Magazine Site Feedback Help Get Help Order Status Shipping and Delivery Returns Order Cancellation Payment Options Gift Card Balance Contact Us Company About Nike News Careers Investors Purpose Sustainability Accessibility Promotions & Discounts Student Military Teacher First Responders & Medical Professionals Birthday Resou"
+        }
+      ]
+    }
+  },
+  "A-C047": {
+    "url": {
+      "tag": "u31",
+      "frags": [
+        {
+          "f": "This measurement represents the length of the foot.",
+          "st": "OK-vis",
+          "sent": "This measurement represents the length of the foot. Repeat the process with the other foot."
+        },
+        {
+          "f": "If the measurement is between sizes, we recommend sizing up.",
+          "st": "OK-vis",
+          "sent": "If the measurement is between sizes, we recommend sizing up. Resources Gift Cards Corporate Sales Find a Store Membership Product News Magazine Site Feedback Help Get Help Order Status Shipping and Delivery Returns Order Cancellation Payment Options Gift Card Balance Contact Us Company About Nike News Careers Investors Purpose Sustainability Accessibility Promotions & Discounts Student Military Teacher First Responders & Medical Professionals Birthday Resou"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u30",
+      "frags": [
+        {
+          "f": "This measurement represents the length of the foot.",
+          "st": "OK-vis",
+          "sent": "This measurement represents the length of the foot. Repeat the process with the other foot."
+        },
+        {
+          "f": "If the measurement is between sizes, we recommend sizing up.",
+          "st": "OK-vis",
+          "sent": "If the measurement is between sizes, we recommend sizing up. Resources Gift Cards Corporate Sales Find a Store Membership Product News Magazine Site Feedback Help Get Help Order Status Shipping and Delivery Returns Order Cancellation Payment Options Gift Card Balance Contact Us Company About Nike News Careers Investors Purpose Sustainability Accessibility Promotions & Discounts Student Military Teacher First Responders & Medical Professionals Birthday Resou"
+        }
+      ]
+    }
+  },
+  "A-C048": {
+    "url": {
+      "tag": "u32",
+      "frags": [
+        {
+          "f": "Men's and women's adidas footwear sizing HOW TO MEASURE Inch",
+          "st": "OK-vis",
+          "sent": "YES Cancel SIZE GUIDE MEN Product categories Shoes Shirts & Tops Pants & Shorts WOMEN Product categories Shoes Bras Shirts & Tops Pants & Shorts KIDS Product categories Shoes Clothing Men's and women's adidas footwear sizing HOW TO MEASURE Inches Heel-toe (INCH) 8."
+        },
+        {
+          "f": "Heel-toe (cm) 22.1 cm",
+          "st": "OK-vis",
+          "sent": "14 14.5 15 16 17 18 19 EU 36 36 2/3 37 1/3 38 38 2/3 39 1/3 40 40 2/3 41 1/3 42 42 2/3 43 1/3 44 44 2/3 45 1/3 46 46 2/3 47 1/3 48 48 2/3 49 1/3 50 50 2/3 51 1/3 52 2/3 53 1/3 54 2/3 55 2/3 US - Men 4 4.5 5 5.5 6 6.5 7 7.5 8 8.5 9 9.5 10 10.5 11 11.5 12 12.5 13 13.5 14 14.5 15 16 17 18 19 20 US - Women 5 5.5 6 6.5 7 7.5 8 8.5 9 9.5 10 10.5 11 11.5 12 12.5 13 13.5 14 14.5 15 15.5 -- -- -- -- -- -- Heel-toe (cm) 22.1 cm 22."
+        }
+      ]
+    }
+  },
+  "A-C049": {
+    "url": {
+      "tag": "u32",
+      "frags": [
+        {
+          "f": "For the best fit, measure your feet at the end of the day. 1",
+          "st": "PART 64/72",
+          "ctx": "15.5 -- -- -- -- -- -- Scroll horizontally to see more. IN BETWEEN SIZES? For tight fit, go one size down. For loose fit, go one size up. HOW TO MEASURE Follow these easy steps to get the right size. For the best fit, measure your feet at the end of the day. 1.Step on Ð° piece of paper with your heel slightly touching a wall behind. 2.Ðœark the end of your longest toe on the paper (you might need a friend to help you) and measure from the wall to the marking. 3.Do the same for the other foot and compare measurements with our size chart to get the right size. Not the right size or colour? No pr"
+        }
+      ]
+    }
+  },
+  "A-C050": {
+    "url": {
+      "tag": "u32",
+      "frags": [
+        {
+          "f": "IN BETWEEN SIZES? For tight fit, go one size down. For loose",
+          "st": "OK-vis",
+          "sent": "IN BETWEEN SIZES? For tight fit, go one size down. For loose fit, go one size up. HOW TO MEASURE Follow these easy steps to get the right size."
+        }
+      ]
+    }
+  },
+  "A-C051": {
+    "url": {
+      "tag": "u33",
+      "frags": [
+        {
+          "f": "With the outline, measure a straight line from your heel to ",
+          "st": "OK-vis",
+          "sent": "STEP 2 With the outline, measure a straight line from your heel to the longest toe. This gives you the length of your foot in centimeters. STEP 3 Lastly, add 1-1.5 centimeters to the length. This will give you the correct length to match with our shoe size guide. This extra space gives your feet room to warm up and expand during your run. Now you know your foot measurements, find the right size with our helpful shoe size guide ."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u34",
+      "frags": [
+        {
+          "f": "With the outline, measure a straight line from your heel to ",
+          "st": "OK-vis",
+          "sent": "Step 2 With the outline, measure a straight line from your heel to the longest toe. This gives you the length of your foot in centimeters. Step 3 Lastly, add 1-1.5 centimeters to the length. This will give you the correct length to match with our shoe size guide. This extra space gives your feet room to warm up and expand during your run. Finding the right fit for kids shoes ASICS' kids range caters for young growing feet requiring good cushioning, stability and protection across every day activities, running, jumping and sports."
+        }
+      ]
+    }
+  },
+  "A-C052": {
+    "url": {
+      "tag": "u34",
+      "frags": [
+        {
+          "f": "Step 3 Lastly, add 1-1.5 centimeters to the length. This wil",
+          "st": "OK-vis",
+          "sent": "Step 3 Lastly, add 1-1.5 centimeters to the length. This will give you the correct length to match with our shoe size guide. This extra space gives your feet room to warm up and expand during your run. Finding the right fit for kids shoes ASICS' kids range caters for young growing feet requiring good cushioning, stability and protection across every day activities, running, jumping and sports."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u33",
+      "frags": [
+        {
+          "f": "Step 3 Lastly, add 1-1.5 centimeters to the length. This wil",
+          "st": "OK-vis",
+          "sent": "STEP 3 Lastly, add 1-1.5 centimeters to the length. This will give you the correct length to match with our shoe size guide. This extra space gives your feet room to warm up and expand during your run. Now you know your foot measurements, find the right size with our helpful shoe size guide ."
+        }
+      ]
+    }
+  },
+  "A-C053": {
+    "url": {
+      "tag": "u35",
+      "frags": [
+        {
+          "f": "Make sure you are wearing the same socks that you would norm",
+          "st": "PART 88/92",
+          "ctx": "ck search Cart Your cart is currently empty. Continue shopping Total S$0 Checkout Home / Men's Footwear Sizing Guide Men's Footwear Sizing Guide Place a sheet of paper on the floor and against a wall Make sure you are wearing the same socks that you would normally wear with this type of shoe Wearing these socks, stand on the sheet of paper with your foot perpendicular to the wall and your heel against the wall. Then use a pen to draw a line just before your big toe. Repeat this for both feet and take the longer distance to determine your size. Using a ruler, measure the distance between the wa"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u36",
+      "frags": [
+        {
+          "f": "Make sure you are wearing the same socks that you would norm",
+          "st": "PART 80/92",
+          "ctx": "earch Cart Your cart is currently empty. Continue shopping Total S$0 Checkout Home / Women's Footwear Sizing Guide Women's Footwear Sizing Guide Place a sheet of paper on the floor and against a wall Make sure you are wearing the same socks that you would normally wear with this type of shoe Wearing these socks, stand on the sheet of paper with your foot perpendicular to the wall and your heel against the wall. Then use a pen to draw a line just in front of your big toe. Repeat for both feet and take the longer distance to determine your size. Using a ruler, measure the distance between the wa"
+        }
+      ]
+    }
+  },
+  "A-C054": {
+    "url": {
+      "tag": "u36",
+      "frags": [
+        {
+          "f": "Using a ruler, measure the distance between the wall and the",
+          "st": "OK-vis",
+          "sent": "Using a ruler, measure the distance between the wall and the line you drew to find your size. UK EUR JP US FOOT LENGTH (CM) FOOT LENGTH (INCH) 3."
+        },
+        {
+          "f": "FOOT LENGTH (CM) FOOT LENGTH (INCH)",
+          "st": "OK-vis",
+          "sent": "UK EUR JP US FOOT LENGTH (CM) FOOT LENGTH (INCH) 3."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u35",
+      "frags": [
+        {
+          "f": "Using a ruler, measure the distance between the wall and the",
+          "st": "OK-vis",
+          "sent": "Using a ruler, measure the distance between the wall and the line you drew to find your size. UK EUR JP US FOOT LENGTH (CM) FOOT LENGTH (INCH) 3."
+        },
+        {
+          "f": "FOOT LENGTH (CM) FOOT LENGTH (INCH)",
+          "st": "OK-vis",
+          "sent": "UK EUR JP US FOOT LENGTH (CM) FOOT LENGTH (INCH) 3."
+        }
+      ]
+    }
+  },
+  "A-C055": {
+    "url": {
+      "tag": "u37",
+      "frags": [
+        {
+          "f": "Measure in the late afternoon when feet are largest due to s",
+          "st": "PART 17/26",
+          "ctx": "to page\" turned OFF. 13 Check scale accuracy here using any credit card. 12 ALIGN & SECURE page 1 to page 2 using the paper alignment guides. Fold 11 page 2 up at the dotted line. 10 9 8 FIT TIPS 7 � Measure in the late afternoon when feet are 6 largest due to swelling. � Choose the larger size if feet are between 5 sizes or one foot is bigger than the other. 4 � Re-measure your feet each year. Your size and width can change over time and the correct fit is important for comfort and performance. PER ALIGNMEN GUIDE P T T 4 FIND YOUR WIDTH by measuring the widest part of each foot horizontally. "
+        },
+        {
+          "f": "FIND YOUR SIZE by placing your heel on the semicircle below ",
+          "st": "OK-vis",
+          "sent": "N GUIDE 3 FIND YOUR SIZE by placing your heel on the semicircle below and aligning the back of your heel with the paper or a wall. Measure each foot separately and be sure to put your full weight on your foot. For the most accuracy, measure with the back of your heel against a wall."
+        }
+      ]
+    }
+  },
+  "A-C056": {
+    "url": {
+      "tag": "u38",
+      "frags": [
+        {
+          "f": "Stand with your heel against a wall on a piece of paper tape",
+          "st": "OK-vis",
+          "sent": "How to Measure Feet Stand with your heel against a wall on a piece of paper taped to the floor. Mark the longest part of your foot (heel to toe), then measure that distance with a ruler. Measure both feet in the afternoon (when slightly swollen), wearing the socks you'll pair with your sneakers, and use the larger measurement. Body Chest / bust: measure around the fullest part."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u39",
+      "frags": [
+        {
+          "f": "Stand with your heel against a wall on a piece of paper tape",
+          "st": "PART 4/52",
+          "ctx": "r Size Step 1 Find a hard flat surface, tape a piece of blank paper, flush against a wall. Place your foot on the paper, with your heel flush against the wall, stand up straight. Step 2 Have a friend mark the longest part of your foot (referred to as heel-to-toe length) on the paper with a pen or pencil, or measure yourself if necessary. Repeat with the other foot, as right and left sizes may be different. Step 3 Use a ruler to measure the heel-to-toe length you marked for each foot. Colour: Steely Pine Steely Pine Men's 3 / Women's 5 Size Men's 3 / Women's 5 Men's 3.5 / Women's 5.5 Men's 4 / "
+        }
+      ]
+    }
+  },
+  "A-C057": {
+    "url": {
+      "tag": "u38",
+      "frags": [
+        {
+          "f": "Chuck Taylor All Star These sneakers run large — we recommen",
+          "st": "OK-vis",
+          "sent": "Women Men Gender-Free Kids Footwear Chuck Taylor All Star These sneakers run large - we recommend going down a half size. US Women's UK EU cm in 5 3 35 22 8."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u39",
+      "frags": [
+        {
+          "f": "Chuck Taylor All Star These sneakers run large — we recommen",
+          "st": "PART 1/13",
+          "ctx": "ops Platforms Easy-On / Easy-Off Kids' Prints Limited Tyler, The Creator Collina Strada MadHappy Converse x Minions My Melody & Kuromi Dragon Ball Z 0 Your cart is empty Continue shopping Clear Close Chuck Taylor All Star Canvas Sale price$80.00 Unisex Low Top Shoe 4.6 (55) All Chuck Taylor Shoes Chuck Taylor All Star Canvas Zoom Zoom Zoom Zoom Zoom Go to item 1 Go to item 2 Go to item 3 Go to item 4 Chuck Taylor All Star Canvas Sale price$80.00 Unisex Low Top Shoe 4.6 (55) The shoe that needs no introduction More info Colour: Steely Pine Loading colors... This style runs large. Order a half s"
+        }
+      ]
+    }
+  },
+  "A-C058": {
+    "url": {
+      "tag": "u39",
+      "frags": [
+        {
+          "f": "This style runs large. Order a half size down.",
+          "st": "OK-vis",
+          "sent": "This style runs large. Order a half size down. Size Guide Chuck Taylor All Star Canvas Shoe Fit Runs Small True to Size Runs Large Size Chart inches cm US WOMEN UK EU LENGTH (IN) 5 3 35 8 2/3 5."
+        },
+        {
+          "f": "Have a friend mark the longest part of your foot (referred t",
+          "st": "PART 35/38",
+          "ctx": "ow to Find Your Size Step 1 Find a hard flat surface, tape a piece of blank paper, flush against a wall. Place your foot on the paper, with your heel flush against the wall, stand up straight. Step 2 Have a friend mark the longest part of your foot (referred to as heel-to-toe length) on the paper with a pen or pencil, or measure yourself if necessary. Repeat with the other foot, as right and left sizes may be different. Step 3 Use a ruler to measure the heel-to-toe length you marked for each foot. Colour: Steely Pine Steely Pine Men's 3 / Women's 5 Size Men's 3 / Women's 5 Men's 3.5 / Women's "
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u38",
+      "frags": [
+        {
+          "f": "This style runs large. Order a half size down.",
+          "st": "PART 0/6",
+          "ctx": ""
+        },
+        {
+          "f": "Have a friend mark the longest part of your foot (referred t",
+          "st": "PART 4/38",
+          "ctx": "ng Clear Close Size Guide Find your perfect fit. Choose a category below, then open the chart you need. How to Measure Feet Stand with your heel against a wall on a piece of paper taped to the floor. Mark the longest part of your foot (heel to toe), then measure that distance with a ruler. Measure both feet in the afternoon (when slightly swollen), wearing the socks you'll pair with your sneakers, and use the larger measurement. Body Chest / bust: measure around the fullest part. Waist: measure around your natural waistline. Hips: measure around the fullest part. If you're between sizes, we ge"
+        }
+      ]
+    }
+  },
+  "A-C059": {
+    "url": {
+      "tag": "u38",
+      "frags": [
+        {
+          "f": "If you're between sizes, we generally recommend sizing up.",
+          "st": "OK-vis",
+          "sent": "If you're between sizes, we generally recommend sizing up. Women Men Gender-Free Kids Footwear Chuck Taylor All Star These sneakers run large - we recommend going down a half size."
+        }
+      ]
+    }
+  },
+  "A-C060": {
+    "url": {
+      "tag": "u40",
+      "frags": [
+        {
+          "f": "FOOT: We start with the true foot, which means we measure fr",
+          "st": "PART 65/68",
+          "ctx": " & Tops Shoes Shorts Sports Bras Extra 30% Off UA Outlet. Use Code EXTRA30. See details. Size and Fit Guide Men Women Boys Girls Tops Bottoms Footwear Gloves Headwear Socks Men's Shoes HOW TO MEASURE FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes. To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe. If your measurement is between chart numbers, we recommend sizing up. Be sure you're putting your full weight on your foot while trac"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u41",
+      "frags": [
+        {
+          "f": "FOOT: We start with the true foot, which means we measure fr",
+          "st": "PART 65/68",
+          "ctx": "n Women Boys Girls Unisex Men Select a sub-category: Tops Bottoms Footwear Headwear Gloves Socks Bras Men Tops Bottoms Footwear Headwear Gloves Socks Bras Men's Footwear Men's Footwear HOW TO MEASURE FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes. To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe. If your measurement is between chart numbers, we recommend sizing up. Be sure you're putting your full weight on your foot while trac"
+        }
+      ]
+    }
+  },
+  "A-C061": {
+    "url": {
+      "tag": "u41",
+      "frags": [
+        {
+          "f": "FOOT: We start with the true foot, which means we measure fr",
+          "st": "OK-vis",
+          "sent": "Shop Now Size and Fit Guide (US) Select a category: Men Women Boys Girls Unisex Men Select a sub-category: Tops Bottoms Footwear Headwear Gloves Socks Bras Men Tops Bottoms Footwear Headwear Gloves Socks Bras Men's Footwear Men's Footwear HOW TO MEASURE FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes. To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe."
+        },
+        {
+          "f": "Measurements are desired standards, some variability may occ",
+          "st": "OK-vis",
+          "sent": "9 3⁄4 25.5 40.5 6.5 8 9 15/16 26 41 7 8.5 10 1/16 26.5 42 7.5 9 10 1⁄4 27 42.5 8 9.5 10 7⁄16 27.5 43 8.5 10 10 9⁄16 28 44 9 10.5 10 3⁄4 28.5 44.5 9.5 11 10 15⁄16 29 45 10 11.5 111⁄16 29.5 45.5 10.5 12 11 1⁄4 30 46 11 12.5 11 1⁄2 30.5 47 11.5 13 11 11⁄16 31 47.5 12 13.5 11 3⁄4 31.5 48 12.5 14 12 32 48.5 13 14.5 12 3⁄16 32.5 49 13.5 15 12 1⁄4 33 49.5 14 15.5 13 1⁄8 33.5 50 14.5 16 13 1⁄4 34 50.5 15 Measurements are desired standards, some variability may occur. Stay in the loop."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u40",
+      "frags": [
+        {
+          "f": "FOOT: We start with the true foot, which means we measure fr",
+          "st": "OK-vis",
+          "sent": "Size and Fit Guide Men Women Boys Girls Tops Bottoms Footwear Gloves Headwear Socks Men's Shoes HOW TO MEASURE FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes. To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe."
+        },
+        {
+          "f": "Measurements are desired standards, some variability may occ",
+          "st": "PART 0/5",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C062": {
+    "url": {
+      "tag": "u42",
+      "frags": [
+        {
+          "f": "* Please note: there is no true conversion available. Theref",
+          "st": "OK-vis",
+          "sent": "Tape Measure A Piece of A4 Paper Pencil or Pen START MEASURING * Please note: there is no true conversion available. Therefore this chart is an approximate only. CM Measurements are for Foot Length, not Shoe Length. THE PERFECT WIDTH MENS WIDTH F: Narrow Fit WIDTH G: Standard Fit WIDTH H: Wide Fit WOMENS WIDTH C: Narrow Fit WIDTH D: Standard Fit WIDTH E: Wide Fit WIDTH EE: Extra Wide Fit KIDS WIDTH D: Narrow Fit WIDTH E: Standard Fit WIDTH F: Wide Fit WIDTH G: Extra Wide Fit HOW TO MEASURE YOUR FOOT MANUALLY STEP 1 Stand up straight on a hard surface with your heel against the wall and a piece of blank paper"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u43",
+      "frags": [
+        {
+          "f": "* Please note: there is no true conversion available. Theref",
+          "st": "PART 0/22",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C063": {
+    "url": {
+      "tag": "u43",
+      "frags": [
+        {
+          "f": "Measure foot length Using a tape measure or ruler, measure f",
+          "st": "OK-vis",
+          "sent": "Measure foot length Using a tape measure or ruler, measure from the back of the heel to the tip of your longest toe on the tracing. Measure foot width: Measure across the widest part of the foot on the tracing."
+        },
+        {
+          "f": "Use Clarks’ handy shoe size charts to identify your size by ",
+          "st": "OK-vis",
+          "sent": "Use Clarks' handy shoe size charts to identify your size by simply finding your foot length on the table (in the right-hand column) and moving your finger left to find your US shoe size. To make things as easy as possible, we have separate charts for men, women, and kids, so you can find the perfect pair of shoes in no time."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u42",
+      "frags": [
+        {
+          "f": "Measure foot length Using a tape measure or ruler, measure f",
+          "st": "PART 0/23",
+          "ctx": ""
+        },
+        {
+          "f": "Use Clarks’ handy shoe size charts to identify your size by ",
+          "st": "PART 0/31",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C064": {
+    "url": {
+      "tag": "u44",
+      "frags": [
+        {
+          "f": "Mark the longest toe and heel, then measure the distance in ",
+          "st": "OK-vis",
+          "sent": "Mark the longest toe and heel, then measure the distance in mm-this is their length. Step 2: Width Place the tape under their foot, mm side up."
+        },
+        {
+          "f": "If you found a slight difference between feet, enter the lar",
+          "st": "OK-vis",
+          "sent": "Enter Your Measurements If you found a slight difference between feet, enter the largest length and width measurements. Measurements Length (mm) Width (mm) Calculate size Expert Shoe Fitting If you need more help or just aren't sure, book an appointment with an expert shoe fitter at your local store or try using our expertly designed foot gauges for peace of mind."
+        }
+      ]
+    }
+  },
+  "A-C065": {
+    "url": {
+      "tag": "u45",
+      "frags": [
+        {
+          "f": "Women's and Men's Kid's Sizing cm in How to Measure Size gui",
+          "st": "OK-vis",
+          "sent": "Explore the guide or head straight to our FAQs Women's and Men's Kid's Sizing cm in How to Measure Size guide Foot length Foot width UK EU US Women's 22 8."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u46",
+      "frags": [
+        {
+          "f": "Women's and Men's Kid's Sizing cm in How to Measure Size gui",
+          "st": "PART 16/17",
+          "ctx": "further than our size guide. We've covered everything you need, from finding your size to knowing the difference between men's, women's and unisex fits. Explore the guide or head straight to our FAQs Women's and Men's Kid's Sizing cm in How to Measure Size guide Foot length Foot width UK EU US Men's US Women's 22 8.4 3 36 4 5 23 8.7 4 37 5 6 24 8.9 5 38 6 7 25 9.1 6 39 7 8 25.5 9.2 6.5 40 8.5 26 9.3 7 41 8 9 27 9.5 8 42 9 10 28 9.7 9 43 10 11 28.5 9.8 9.5 44 11.5 29 9.9 10 45 11 12 30 10.1 11 46 12 13 31 10.3 12 47 13 14 32 10.6 13 48 14 15 33 10.8 14 49 15 16 34 11 15 50 16 17 Socks How to Me"
+        }
+      ]
+    }
+  },
+  "A-C066": {
+    "url": {
+      "tag": "u46",
+      "frags": [
+        {
+          "f": "How to Measure Size guide Foot length",
+          "st": "OK-vis",
+          "sent": "Explore the guide or head straight to our FAQs Women's and Men's Kid's Sizing cm in How to Measure Size guide Foot length Foot width UK EU US Men's US Women's 22 8."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u45",
+      "frags": [
+        {
+          "f": "How to Measure Size guide Foot length",
+          "st": "OK-vis",
+          "sent": "Explore the guide or head straight to our FAQs Women's and Men's Kid's Sizing cm in How to Measure Size guide Foot length Foot width UK EU US Women's 22 8."
+        }
+      ]
+    }
+  },
+  "A-C067": {
+    "url": {
+      "tag": "u45",
+      "frags": [
+        {
+          "f": "The size of our boots, shoes and sandals can differ between ",
+          "st": "OK-vis",
+          "sent": "The size of our boots, shoes and sandals can differ between silhouettes, but we'd say that most run true to size. Our standard sizes are UK 3-9 for women's, UK 6-12 for men's and UK 3-12 for unisex."
+        },
+        {
+          "f": "If you are in-between sizes, you might find that using an in",
+          "st": "OK-vis",
+          "sent": "If you are in-between sizes, you might find that using an insole in the larger size is the way to go. Looking for some tried-and-tested ways to break in your Doc's?"
+        },
+        {
+          "f": "If you go with a larger size, try using an insole which adds",
+          "st": "OK-vis",
+          "sent": "If you go with a larger size, try using an insole which adds half a size. That way, you can make sure your DM's fit more comfortably."
+        },
+        {
+          "f": "And if you're still unsure, try ordering your usual size as ",
+          "st": "OK-vis",
+          "sent": "And if you're still unsure, try ordering your usual size as a starting point. Do Dr."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u46",
+      "frags": [
+        {
+          "f": "The size of our boots, shoes and sandals can differ between ",
+          "st": "OK-vis",
+          "sent": "The size of our boots, shoes and sandals can differ between silhouettes, but we'd say that most run true to size. Our standard sizes are US 5-11 for women's, US 7-13 for men's and US 4-13 for unisex."
+        },
+        {
+          "f": "If you are in-between sizes, you might find that using an in",
+          "st": "OK-vis",
+          "sent": "If you are in-between sizes, you might find that using an insole in the larger size is the way to go. Looking for some tried-and-tested ways to break in your Doc's?"
+        },
+        {
+          "f": "If you go with a larger size, try using an insole which adds",
+          "st": "OK-vis",
+          "sent": "If you go with a larger size, try using an insole which adds half a size. That way, you can make sure your DM's fit more comfortably."
+        },
+        {
+          "f": "And if you're still unsure, try ordering your usual size as ",
+          "st": "PART 7/11",
+          "ctx": "s and their experiences with certain styles. Most of our styles also have fit recommendations just above where you'd select your shoe faq on each product page which we generate from customer reviews. And if you're still unsure, try ordering your usual faq as a starting point. Do Dr. Martens run big? The size of our boots, shoes and sandals can differ between silhouettes, but we'd say that most run true to size. Our standard sizes are US 5-11 for women's, US 7-13 for men's and US 4-13 for unisex. If you're looking for a wider fit with a more rounded toe, we'd suggest looking at men's and unisex"
+        }
+      ]
+    }
+  },
+  "A-C068": {
+    "url": {
+      "tag": "u46",
+      "frags": [
+        {
+          "f": "we'd say that most run true to size. If you are in-between s",
+          "st": "PART 23/26",
+          "ctx": "rom customer reviews. And if you're still unsure, try ordering your usual faq as a starting point. Do Dr. Martens run big? The size of our boots, shoes and sandals can differ between silhouettes, but we'd say that most run true to size. Our standard sizes are US 5-11 for women's, US 7-13 for men's and US 4-13 for unisex. If you're looking for a wider fit with a more rounded toe, we'd suggest looking at men's and unisex styles. Or if you want a narrower, more tapered fit, try our women's styles. Customer reviews are always a good way to get a sense on fit, too. You can find them on most product"
+        },
+        {
+          "f": "If you go with a larger size, try using an insole which adds",
+          "st": "OK-vis",
+          "sent": "If you go with a larger size, try using an insole which adds half a size. That way, you can make sure your DM's fit more comfortably."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u45",
+      "frags": [
+        {
+          "f": "we'd say that most run true to size. If you are in-between s",
+          "st": "PART 23/26",
+          "ctx": "om customer reviews. And if you're still unsure, try ordering your usual size as a starting point. Do Dr. Martens run big? The size of our boots, shoes and sandals can differ between silhouettes, but we'd say that most run true to size. Our standard sizes are UK 3-9 for women's, UK 6-12 for men's and UK 3-12 for unisex. If you're looking for a wider fit with a more rounded toe, we'd suggest looking at men's and unisex styles. Or if you want a narrower, more tapered fit, try our women's styles. Customer reviews are always a good way to get a sense on fit, too. You can find them on most product "
+        },
+        {
+          "f": "If you go with a larger size, try using an insole which adds",
+          "st": "OK-vis",
+          "sent": "If you go with a larger size, try using an insole which adds half a size. That way, you can make sure your DM's fit more comfortably."
+        }
+      ]
+    }
+  },
+  "A-C069": {
+    "url": {
+      "tag": "u47",
+      "frags": [
+        {
+          "f": "All our footwear is listed in European sizes. To find yours,",
+          "st": "OK-vis",
+          "sent": "Email us at info@support.birkenstockusa.com FIT AND SIZE GUIDE BEFORE YOU BUY FIND YOUR EUROPEAN SIZE All our footwear is listed in European sizes. To find yours, use the formula below or reference your U.S. shoe size in our conversion chart. Women's: U.S. size + 31 = EU size Men's: U.S. size + 33 = EU size You can also use measure your foot using our template: Download the foot measurement template Size Conversion Chart Women Men Kids U."
+        }
+      ]
+    }
+  },
+  "A-C070": {
+    "url": {
+      "tag": "u48",
+      "frags": [
+        {
+          "f": "US sizes and measurements (in mm) Size Width Length Width Fr",
+          "st": "OK-vis",
+          "sent": "LEARN MORE Adults Kids US sizes and measurements (in mm) Size Width Length Width From To From To 4-4.5 Narrow 221 225 81 84 Regular 221 225 85 89 5-5."
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u49",
+      "frags": [
+        {
+          "f": "US sizes and measurements (in mm) Size Width Length Width Fr",
+          "st": "PART 0/17",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C071": {
+    "url": {
+      "tag": "u49",
+      "frags": [
+        {
+          "f": "To determine the perfect size, please choose whether the cal",
+          "st": "OK-vis",
+          "sent": "Size calculator for you To determine the perfect size, please choose whether the calculation is for kids' or adults' feet and enter the measurements for each foot. You can find more information in our Size chart ."
+        },
+        {
+          "f": "If are unsure about your size, we recommend choosing the nex",
+          "st": "OK-vis",
+          "sent": "Your ideal sandal size and width are: Size: Width: Narrow Regular Left foot Length: Width: Right foot Length: Width: If are unsure about your size, we recommend choosing the next size up, as feet expand slightly during the day. This calculation is based on our size chart BROWSE SHOP Show Products Recalculate Back to top Footer Newsletter Sign-up and get a 15% discount voucher for your next purchase!"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u48",
+      "frags": [
+        {
+          "f": "To determine the perfect size, please choose whether the cal",
+          "st": "PART 0/20",
+          "ctx": ""
+        },
+        {
+          "f": "If are unsure about your size, we recommend choosing the nex",
+          "st": "PART 0/25",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C072": {
+    "url": {
+      "tag": "u50",
+      "frags": [
+        {
+          "f": "If your kid's feet are different sizes, choose the larger si",
+          "st": "PART 22/28",
+          "ctx": "your kid's measurements with a pencil in the below chart. 2 3 4 PLACE CREDIT CARD HERE 5 MONTH LENGTH 6 LEFT 7 8 RIGHT 9 10 SIZE CHART ACCURACY CHECK REPRINT AT 100% IF INCORRECT. 11 12 13 PRO TIPS 1 If your kid's feet are different sizes, 2 choose the larger size. If your kid's feet fall between two sizes, go a size up. 3 4 Only measure the length. Don't measure the width. A kid's foot can grow up a half size every three 5 months, so be sure to re-measure every two months. 6 PUT HEEL HERE US SIZES ONLY KIDS TODDLERS INFANTS"
+        },
+        {
+          "f": "Have your kid stand on the size chart with their heel agains",
+          "st": "OK-vis",
+          "sent": "3 Have your kid stand on the size chart with their heel against the wall and measure their right foot. Then, measure their left foot. 0 1 4 Record your kid's measurements with a pencil in the below chart."
+        }
+      ]
+    }
+  },
+  "A-C073": {
+    "url": {
+      "tag": "u51",
+      "frags": [
+        {
+          "f": "Put your foot on a flat surface with your heel against a wal",
+          "st": "OK-vis",
+          "sent": "Put your foot on a flat surface with your heel against a wall or straight edge. Use a ruler to measure the length in millimetres from the tip of your longest toe to your heel. Keep in mind that your longest toe isn't necessarily your big toe! Foot Width (for Wide Fit products only) Wide width sizes provide a spacious platform by a bottom width that is 5mm wider and a ball girth that is 10mm longer than our regular width sizes."
+        },
+        {
+          "f": "Unisex Shoes: US Men | US Women | US Boy | UK | EU | JP | Fo",
+          "st": "PART 8/10",
+          "ctx": "rms & Policies Family Terms of Use Accessibility Privacy Policy Privacy Choices Price Adjustment Policy Vans Clothing & Shoe Fit Guide Men Women Kids Shoes InchCm How to measure yourself Unisex Shoes US Men US Women US Boy UK EU JP Foot Length - 5 3.5 2.5 34.5 21.5 8.5 - 5.5 4 3 35 22 8.7 - 6 4.5 3.5 36 22.5 8.9 - 6.5 5 4 36.5 23 9.1 - 7 5.5 4.5 37 23.5 9.3 - 7.5 6 5 38 24 9.4 6.5 8 - 5.5 38.5 24.5 9.6 7 8.5 - 6 39 25 9.8 7.5 9 - 6.5 40 25.5 10.0 8 9.5 - 7 40.5 26 10.2 8.5 10 - 7.5 41 26.5 10.4 9 10.5 - 8 42 27 10.6 9.5 11 - 8.5 42.5 27.5 10.8 10 11.5 - 9 43 28 11.0 10.5 - - 9.5 44 28.5 11.2 1"
+        }
+      ]
+    }
+  },
+  "A-C074": {
+    "url": {
+      "tag": "u52",
+      "frags": [
+        {
+          "f": "Our shoes are sized according to the US standard; the size c",
+          "st": "OK-vis",
+          "sent": "Our shoes are sized according to the US standard; the size conversion from women's to men's shoes is 1.5 sizes down. For example, if you were a size 8 in women's, you'd be a size 6.5 in men's. If you fall below men's 6."
+        },
+        {
+          "f": "Please note, by design, our high performance skate shoes ten",
+          "st": "OK-vis",
+          "sent": "Please note, by design, our high performance skate shoes tend to fit snug, so you may want to select a half size larger. Alternatively, if you have a wide foot, you may purchase one size larger to compensate for the width or check out designing your own pair of wide Customs!"
+        }
+      ]
+    }
+  },
+  "A-C075": {
+    "url": {
+      "tag": "u53",
+      "frags": [
+        {
+          "f": "Place a piece of paper that's larger than your foot against ",
+          "st": "PART 60/69",
+          "ctx": "9 10.6 43.5 9 9.5 10.8 44 9.5 10 11 44.5 10 10.5 11.2 45 10.5 11 11.4 45.5 11 11.5 11.6 46 11.5 12 11.8 47.5 12.5 13 12.2 49 13.5 14 12.6 50 14.5 15 13 Slide 1 of 0 How to Measure for the Right Fit 1 Place a piece of paper that's larger than your foot against the wall. 2 Stand with one foot on the paper, with your heel just up against the wall. 3 Mark the end of your longest toe on the paper (you may need a friend to help) and measure from the wall to the marking. 4 Do the same for the other foot and compare measurements with our size chart to get the right size! Clothing InchCm How to Measure"
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u54",
+      "frags": [
+        {
+          "f": "Place a piece of paper that's larger than your foot against ",
+          "st": "PART 0/69",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C076": {
+    "url": {
+      "tag": "u54",
+      "frags": [
+        {
+          "f": "For the most accurate measurement, put your full weight on y",
+          "st": "PART 0/35",
+          "ctx": ""
+        },
+        {
+          "f": "Once you know how to measure boot size, all you need to do i",
+          "st": "PART 0/22",
+          "ctx": ""
+        }
+      ]
+    },
+    "second_url": {
+      "tag": "u53",
+      "frags": [
+        {
+          "f": "For the most accurate measurement, put your full weight on y",
+          "st": "PART 2/35",
+          "ctx": "ur waist about 2 inches below your belly button. 4 Hip: Measure around the fullest part of your hips, keeping the tape parallel to the floor. 5 Arm Length: With your elbow slightly bent, measure from the center back of your neck, across your shoulder, down to your elbow, and then to your wrist bone. 6 Inseam: Lay a pair of pants that fit you well flat on a surface. Measure from the crotch seam down the inside leg to the bottom of the hem. Accessories CmInch Mens/Unisex Headwear Mens/Unisex Headwear S/M M/L L/XL Circumference 22.4 23.2 24 CmInch Men's One Size Headwear Men's One Size Headwear O"
+        },
+        {
+          "f": "Once you know how to measure boot size, all you need to do i",
+          "st": "PART 0/22",
+          "ctx": ""
+        }
+      ]
+    }
+  },
+  "A-C077": {
+    "url": {
+      "tag": "u55",
+      "frags": []
+    }
+  },
+  "A-C078": {
+    "url": {
+      "tag": "u56",
+      "frags": []
+    }
+  }
+}

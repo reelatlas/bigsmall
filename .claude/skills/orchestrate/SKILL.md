@@ -40,7 +40,7 @@ Estimates come from precedent and are written before the wave: Cooking's checker
 
 ## 5. The brief
 
-Every brief carries, in this order: the goal in one sentence; what is ruled out; the files to read, by section, and nothing else (the reading lists below); the method (docs/RESEARCH.md §1 for a figure, §8's layers for a practice, each finding with its layer and evidence level); the output files and their shape; the budget; the safety rules (docs/RESEARCH.md §4: downloads in their own folder, `python -I`, nothing personal in any request, no bot check or paywall bypassed, a figure a page carries in its HTML but marks members-only being paywalled too, nothing posted, the repo read and never written); and what comes back in the reply: the report itself as text, then ten lines of summary (the answer, the three strongest findings with their evidence level, what could not be reached, the tool-call count, the file paths).
+Every brief carries, in this order: the goal in one sentence; what is ruled out; the files to read, by section, and nothing else (the reading lists below); the method (docs/RESEARCH.md §1 for a figure, §8's layers for a practice, each finding with its layer and evidence level; every quote exact, a gap marked with an ellipsis); the output files and their shape; the budget; the safety rules (docs/RESEARCH.md §4: downloads in their own folder, `python -I`, nothing personal in any request, no bot check or paywall bypassed, a figure a page carries in its HTML but marks members-only being paywalled too, nothing posted, the repo read and never written); and what comes back in the reply: the report itself as text, then ten lines of summary (the answer, the three strongest findings with their evidence level, what could not be reached, the tool-call count, the file paths).
 
 Reading lists by job, sections rather than whole docs, so an agent is not drowned (and so the docs need no splitting yet):
 
@@ -71,6 +71,7 @@ Reading lists by job, sections rather than whole docs, so an agent is not drowne
 - **A figure a page carries for search engines but marks members-only is paywalled** (RTINGS, the sources pass, 2026-10-21): a worker that has scraped one deletes the rows and the saved pages and logs the URL as paywalled, as worker B did; the brief says so up front.
 - **A brand's regional site prints what its home site lacks** (Brooks UK's foot lengths, Reebok AU's UK and EU, 2026-10-21): a column the home chart lacks is sought on every region's site and in the help centre, not only where the home site refused.
 - **Forums refuse every fetch** (Reddit three ways, communities behind Cloudflare, 2026-10-21): no budget for them; a thread wanted is Sean's browser.
+- **A page that shows "Loading…" is read in its embedded data before it is called browser-built** (Crocs' size chart, 2026-10-21: the worker called it unreachable, the checker found its words and its column's label in the page's data).
 
 ## 7. Tools
 

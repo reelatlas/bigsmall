@@ -1,0 +1,79 @@
+# id¦result¦tool¦found_value¦note   (tool empty = script default)
+A-C001¦confirmed¦¦¦The en_gb page's women's chart (its default) is headed 'Foot Length (CM) | US | UK | EU' under 'Shoe size comparison'; the en_gb men's chart (u57: Foot Length (CM) | US | UK | Europe) and all-gender charts (u58: Foot Length (CM) | EU | Men's UK | Women's UK; Foot Length (CM) | All Gender US | Men's US | Women's US) carry the column too. The en_us page's women's chart (u4) is 'US | UK | Europe', no foot-length column; the en_us men's and all-gender charts are not in the file and were not fetched. 2nd (u2, de_de men's chart): 'Fußlänge (CM) | US | UK | Europa' - agrees.
+A-C002¦confirmed¦¦¦Heading 'Schuhgrößenvergleich' and header 'Fußlänge (CM) | US | UK | Europa' as recorded; its 20 rows equal the en_gb men's chart (u57) cell for cell (compared by script). The en_ie page is not in the file and was not checked. 2nd (u1, en_gb): its default chart carries 'Foot Length (CM)' - agrees on the column, though that chart is the women's, not the men's.
+A-C003¦confirmed¦¦¦The 'View guide' link's href is https://emea-support.brooksrunning.com/hc/en-us/articles/39248610872091-How-to-measure-your-foot (the EMEA help centre's measuring article, u3); the sentence sits directly above 'Shoe size comparison'.
+A-C004¦confirmed¦¦¦Read from the article's HTML. The worker's U+FFFD stands for the dash the page prints between 'number' and 'this' (quoted as printed).
+A-C005¦confirmed¦¦¦2nd (u1, en_gb): 'We recommend a thumb width of space between your longest toe and the tip of your shoe. Consider buying a shoe that is a half size up from your measured size.' - agrees ('thumb width' for 'thumb's width').
+A-C006¦confirmed¦¦¦u1 prints 'thumb width' as recorded. The German words are on the de_de men's chart fragment (u2): 'Wir empfehlen eine Daumenbreite Platz zwischen der längsten Zehe und der Schuhspitze. Du kannst auch einen Schuh kaufen, der eine halbe Nummer größer als deine gemessene Größe ist.' 2nd (u4, en_us): 'thumb's width' - agrees.
+A-C007¦confirmed¦¦¦Read from the article's own HTML, not the Zendesk search JSON; the sentence sits in parentheses and the worker's U+FFFD marks are the dashes the page prints. 2nd (u6): 'We recommend about 1/2" to 1" (about a thumbnail's width) of space from your longest toe to the end of the shoe.' - agrees.
+A-C008¦confirmed¦¦¦Read from the article's own HTML. 2nd (u7, AU sizing tips): 'approx. 1/2 in. of space (a thumbs width)' and no half-size-up advice for holes - differs (half an inch, not 1/2" to 1").
+A-C009¦confirmed¦¦¦Read from the article's own HTML (the worker read Zendesk search JSON). 2nd (u5, US): 'approximately 1/2" to 1"' - differs: the US help centre gives a range to an inch, the AU page about half an inch.
+A-C010¦confirmed¦¦¦2nd (u9, CA): 'Compared to other brands, we most often find that our shoes to fit slightly shorter. We recommend ordering Brooks running shoes 1/2 size to one size larger than what you wear in casual or dress shoes.' - agrees ('that our shoes to fit' is the CA page's).
+A-C011¦confirmed¦¦¦2nd (u8, EMEA): 'a half size to one size larger than what you wear in casual or dress shoes' - agrees. The Swiss unisex chart page (en_ch) the summary cites is not in the file and was not checked.
+A-C012¦confirmed¦¦¦Read from the article's own HTML. 2nd (u4, en_us size guide): no men's-to-women's conversion sentence in its HTML - it does not repeat the statement.
+A-C013¦confirmed¦¦¦2nd (u5): no all-gender or unisex sentence - it does not repeat the statement. The en_gb all-gender fragment (u58) prints the same sentence ending 'per industry standard.' (singular).
+A-C014¦confirmed¦¦¦Read from the article's own HTML; the worker's U+FFFD marks are apostrophes on the page. The page opens 'While we currently do not manufacture shoes in children's sizes, ...'.
+A-C015¦confirmed¦¦¦Read from the article's own HTML.
+A-C016¦confirmed¦¦¦The worker's U+FFFD is '®' on the page ('Brannock device®'). The page also prints 'manufacturers use different lasts to construct their shoes, and sizing may vary accordingly' and 'There is no "Australian" sizing, however people often mean UK sizing then referring to "Australian".' - the summary's other parts hold.
+A-C017¦confirmed¦¦¦Read from the article's own HTML, under '... please see conversion chart, below.'; the columns are named as Japan sizes and no word calls them foot lengths.
+A-C018¦confirmed¦¦¦The sentence runs into the next heading with no full stop.
+A-C019¦confirmed¦script (curl; pdftotext)¦¦The text layer shows inch marks 1" to 10" and USA/UK marks for Infant, Toddler (1-3 years old), Little Kids (4-8 years old), and Big Kids (8-10 years old), with an EU row.
+A-C020¦confirmed¦¦¦
+A-C021¦confirmed¦¦¦
+A-C022¦confirmed¦¦¦The page text loaded in full to the script although its HTML embeds a bot-check script.
+A-C023¦confirmed¦¦¦2nd (u18, US): 'Unisex products run in men's sizes only. Women should order 1.5 sizes down from their usual size.' - agrees in substance.
+A-C024¦confirmed¦¦¦The worker's U+FFFD is a right single quote on the page. 2nd (u19, AE): the same two sentences - agrees.
+A-C025¦confirmed¦¦¦2nd (u17, AU): 'Unisex sizes are the same as men's standard sizes. Women should order 1.5 sizes smaller than their usual size.' - agrees in substance.
+A-C026¦confirmed¦¦¦The page prints 'Men's shoes US UK EU Length cm' and 'Women's shoes US UK EU Length cm'; no visible word says whose length; 'Product Measurements' occurs only in the page's embedded translation strings. 2nd (u19, AE): its shoe charts carry no length column ('Men's Shoes EU UK US ...'); its only length table is headed 'Product Measurements Size Length (cm)' - differs.
+A-C027¦confirmed¦¦¦The table runs 5.5 -> 22 to 11 -> 27.5. 2nd (u17, AU): its charts head the column 'Length cm' with no visible 'Product Measurements' heading - differs.
+A-C028¦confirmed¦¦¦The recorded words leave out the other columns' cells, which interleave on the page: US 4 -> 4.75 in, 5 -> 5 in, 6 -> 5.5 in under 'US | Length | DE | UK | FR | IT | ES'.
+A-C029¦confirmed¦¦¦
+A-C030¦confirmed¦¦¦Reached by script (HTTP 200). The page's measuring sections are for clothing (inseam, sleeve, shoulder): no foot-measuring method, fit allowance, or between-sizes advice for shoes; 'length' occurs only as 'Sleeve length'. The AU (u17), US (u18), AE (u19), and VN (u20) pages in the file hold no 'toe', 'foot length', or 'between sizes' either, and 'heel' only in the inseam step. The SG guide is not in the file and was not checked.
+A-C031¦confirmed¦¦¦2nd (u23): the same 'Size chart True to size' and 'Size & Fit True to size.' - agrees.
+A-C032¦confirmed¦¦¦2nd (u22, adult Cloudmonster): 'True to size.' only, no kids' measuring or size-up words - agrees on True to size.
+A-C033¦confirmed¦¦¦2nd (u24, product tester page): the same three passages sit in the page's embedded data, not its visible HTML - agrees.
+A-C034¦confirmed¦¦¦2nd (u23, kids' page): the kids' paper-and-wall method, no Brannock advice - differs (another audience).
+A-C035¦could not reach¦script; fetcher; worker copy (empty shell)¦¦Script: HTTP 200 but an empty shell (2,125 bytes, no visible text, no title). Fetcher: an empty page. Worker copies on-us-faq-sizing.html and on-us-faq-product.html: 4,348-byte shells with no text, refusals rather than copies.
+A-C036¦confirmed¦¦¦2nd (u27, US unisex guide): its chart is 'U.S. Men Size | U.S. Women Size | Heel-Toe Measurement (in)' and its method compares 'the larger of the two foot length values' with the chart; it does not print 'This measurement represents the length of the foot' and has no CM column - agrees that the length is the foot's, in other words.
+A-C037¦confirmed¦¦¦2nd (u27): another method (heel against a wall, mark the longest toe, measure in inches) - differs.
+A-C038¦confirmed¦¦¦
+A-C039¦confirmed¦¦¦'more narrower' is the page's.
+A-C040¦confirmed¦¦¦The chart header 'U.S. Men Size | U.S. Women Size | Heel-Toe Measurement (in)' is on the page. 2nd (u28, CA): the same first two steps; the third reads 'Measure your marketing from the wall (heel) to the longest toe for both feet. Take the larger of the two foot length values and compare it with our sizing chart, to define your Reebok shoe size.' - agrees (no 'in inches').
+A-C041¦confirmed¦¦¦'marketing' is the page's. The chart's top row is 'Heel-toe measurement | 8" | 8.2" ...'. Seen in passing: the chart's US - Women row prints 7.5 between 6 and 7, where 6.5 would fall. 2nd (u27): 'Measure your markings in inches. Take the larger of the two foot length values and compare it with our sizing chart.' - agrees.
+A-C042¦confirmed¦¦¦The page splits the heading as 'M' / 'en's Boots'. Women's 36 -> 5 - 5 ½ ... 42 -> 10; men's 40 -> 7 ... 47 -> 13.
+A-C043¦could not reach¦script; fetcher¦¦Script: connect timeout twice (curl 28). Fetcher: connect ECONNREFUSED 3.33.139.32:443. The worker holds no copy of this page (reebok-eu-home.html is reebok.eu's home, another page, not opened).
+A-C044¦confirmed¦¦¦2nd (u31, women's guide): the same sentences - agrees.
+A-C045¦confirmed¦¦¦2nd (u30, men's guide): the same sentence - agrees.
+A-C046¦confirmed¦¦¦2nd (u31, women's guide): the same method and size-up sentence - agrees.
+A-C047¦confirmed¦¦¦2nd (u30, men's guide): the same sentences - agrees.
+A-C048¦confirmed¦¦¦The chart sits in the HTML as rows: Heel-toe (INCH) 8.7" ... 14.0"; UK 3.5 ... 19; EU 36, 36 2/3, 37 1/3 ...; US - Men 4 ... 20; US - Women 5 ... 15.5 then --; Heel-toe (cm) 22.1 cm ... 35.2 cm.
+A-C049¦confirmed¦¦¦The page prints '1.Step', '2.Ðœark', '3.Do' with no space after the numbers, and 'Ð°' and 'Ðœ' (Cyrillic а and М double-encoded) where the worker's text has Cyrillic а and М; the words are otherwise identical.
+A-C050¦confirmed¦¦¦
+A-C051¦confirmed¦¦¦2nd (u34, AU): the same sentences - agrees.
+A-C052¦confirmed¦¦¦2nd (u33, NZ): the same sentences - agrees.
+A-C053¦confirmed¦¦¦The page runs 'this type of shoe Wearing these socks' with no full stop; otherwise as recorded. The chart's foot-length cells use comma decimals (21,5). 2nd (u36, women's): '... draw a line just in front of your big toe. Repeat for both feet ...' - agrees in substance.
+A-C054¦confirmed¦¦¦2nd (u35): the same sentence and columns - agrees.
+A-C055¦confirmed¦script (curl; pdftotext)¦¦Stray scale numbers and bullet glyphs interleave in the text layer. Also printed: 'PRINT on 8.5" x 11" paper, landscape at 100% scale with "fit to page" turned OFF.' and 'Check scale accuracy here using any credit card.' Caveat on the summary's last clause: in the text layer 'US Men's Standard Running Size' heads the WIDTH GUIDE's size row (section B); the heel scale shows the numbers 4 to 20 and a cm ruler by 'PLACE HEEL HERE'; the conversion guide's column is 'Length in cm'.
+A-C056¦confirmed¦¦¦2nd (u39, product page): a friend marks the longest part ('heel-to-toe length') and each foot is measured; no afternoon, socks, or larger-measurement words - agrees in part.
+A-C057¦confirmed¦¦¦2nd (u39): 'This style runs large. Order a half size down.' - agrees.
+A-C058¦confirmed¦¦¦Between the two recorded sentences the page prints 'Repeat with the other foot, as right and left sizes may be different. Step 3', left out without an ellipsis. 2nd (u38): 'These sneakers run large - we recommend going down a half size.' - agrees; its measuring words differ.
+A-C059¦confirmed¦¦¦Position as stated: after 'Hips: measure around the fullest part.' and before the 'Women Men Gender-Free Kids' chart tabs.
+A-C060¦confirmed¦¦¦Between 'we recommend sizing up.' and 'Please note:' the page prints 'Be sure you're putting your full weight on your foot while tracing.', left out without an ellipsis. 2nd (u41, AU): the same paragraph, that sentence included - agrees.
+A-C061¦confirmed¦¦¦2nd (u40, US): the same FOOT paragraph but no 'Measurements are desired standards, some variability may occur.' - agrees except that sentence.
+A-C062¦confirmed¦¦¦2nd (u43, US editorial): no CM-is-foot-length or approximate note; it measures 'from the back of the heel to the tip of your longest toe' - does not repeat the statement.
+A-C063¦confirmed¦¦¦2nd (u42, AU size guide): no measuring method in its HTML ('Measure & Fit' is a menu link) - does not repeat it.
+A-C064¦confirmed¦¦¦
+A-C065¦confirmed¦¦¦2nd (u46, US): 'Foot length Foot width UK EU US Men's US Women's' - agrees, with a US Men's column added.
+A-C066¦confirmed¦¦¦2nd (u45, UK): the same headings - agrees.
+A-C067¦confirmed¦¦¦2nd (u46, US): the same sentences but 'try ordering your usual faq as a starting point' (sic) - agrees in substance.
+A-C068¦confirmed¦¦¦On the page 'most run true to size.' is followed by 'Our standard sizes are US 5-11 for women's, US 7-13 for men's and US 4-13 for unisex. ...'; the in-between sentence sits further down (the recorded words join sentences that are apart, without an ellipsis). 2nd (u45, UK): the same sentences in the same arrangement - agrees.
+A-C069¦confirmed¦¦¦
+A-C070¦confirmed¦¦¦The chart words as recorded. The fit-calculator half of the summary is not in this page's HTML (no 'calculat'); it rests on the MY page (u49): 'This calculation is based on our size chart'. 2nd (u49): the calculator words, no mm chart - agrees on the calculator.
+A-C071¦confirmed¦¦¦'If are unsure' is the page's. 2nd (u48, US chart page): no calculator or next-size-up words in its HTML - does not repeat them.
+A-C072¦confirmed¦script (curl; pdftotext)¦¦Step numbers interleave in the text layer. Also printed: 'Make sure your printout size chart is accurate by placing a credit card in the outline below.' and 'US SIZES ONLY'.
+A-C073¦confirmed¦¦¦The page prints 'Unisex Shoes' with no colon; it carries the measuring sentence twice, once with 'millimetres' (quoted) and once 'millimeters'.
+A-C074¦confirmed¦¦¦
+A-C075¦confirmed¦¦¦Step numbers 2 to 4 interleave. The chart reads 'Men's Footwear EU UK USA Inch'. 2nd (u54, FAQ): refused to the script (HTTP 403 'Access to this page has been denied') and the fetcher (403); the worker's copy (tim-us-howtomeasure.html) traces the foot in socks and measures 'from the point of your big toe to the center back of your heel' - differs.
+A-C076¦confirmed¦worker copy (live page refused script and fetcher)¦¦Live page: script HTTP 403 bot page ('Access to this page has been denied'), fetcher 403. Read from the worker's saved copy tim-us-howtomeasure.html (title 'How to Measure Boots for the Best Fit? | Timberland'). Between the first two recorded sentences the copy prints 'This will help you determine your foot size.', left out without an ellipsis. 2nd (u53, size chart): a wall-and-paper method, not these words - differs.
+A-C077¦could not reach¦script; fetcher; worker copy (refusal page)¦¦Script: HTTP 410 with the site's page 'We're Sorry... The page you have requested does not exist or is no longer available.' Fetcher: 'Parse Error: Header overflow'. Worker copy hoka-us-sizechart.html is an 'Access Denied' page, a refusal.
+A-C078¦corrected¦script (curl; embedded data)¦Tip: If you're in between sizes, round up . For wide feet order your normal size.¦Reached by script (HTTP 200). The chart's values are built in the browser (visible HTML: 'Size Chart Find your perfect fit with Crocs' shoe size chart. Adult Kids' Socks Loading...'), but the page's embedded data carries sizing words: the adult tip, the kids' tip, and the length column's label 'Heel to Toe Length' (adultLength, kidsLength, footLength) with an Inches/Centimeters toggle. crocs.com.au, crocs.co.uk, and the US FAQ are not in the file and were not checked.

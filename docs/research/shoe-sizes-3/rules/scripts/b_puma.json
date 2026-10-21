@@ -1,0 +1,118 @@
+{
+  "claims": [
+    {
+      "key": "pu-w15-au",
+      "brand": "Puma",
+      "kind": "declared relation between labels",
+      "claim": "Unisex sizes are men's sizes; women order 1.5 sizes smaller than their usual size.",
+      "exact_words": "Unisex sizes are the same as men's standard sizes. Women should order 1.5 sizes smaller than their usual size. For easy size selection, please use the size selector on product page and simply choose men's or women's size, then choose your usual size.",
+      "url": "https://au.puma.com/au/en/sizecharts/sizecharts.html",
+      "site_region": "au.puma.com (AU)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "pu-w15-us",
+      "notes": ""
+    },
+    {
+      "key": "pu-w15-us",
+      "brand": "Puma",
+      "kind": "declared relation between labels",
+      "claim": "Unisex products run in men's sizes only; women order 1.5 sizes down.",
+      "exact_words": "Unisex products run in men’s sizes only. Women should order 1.5 sizes down from their usual size.",
+      "url": "https://production-pna-sfcc.puma.com/us/en/size-charts.html",
+      "site_region": "puma.com (US, served from the production-pna-sfcc host; us.puma.com's URL gave 404)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "pu-w15-ae",
+      "notes": ""
+    },
+    {
+      "key": "pu-w15-ae",
+      "brand": "Puma",
+      "kind": "declared relation between labels",
+      "claim": "Same sentence on the UAE guide.",
+      "exact_words": "Unisex products run in men’s sizes only. Women should order 1.5 sizes down from their usual size.",
+      "url": "https://ae.puma.com/ae/en/size-guide.html",
+      "site_region": "ae.puma.com (AE)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "pu-w15-au",
+      "notes": ""
+    },
+    {
+      "key": "pu-len-au",
+      "brand": "Puma",
+      "kind": "length column: unstated",
+      "claim": "The AU men's and women's shoe charts carry a column headed Length cm, with no word on whose length (foot, shoe, insole) it is.",
+      "exact_words": "Men's shoes US UK EU Length cm",
+      "url": "https://au.puma.com/au/en/sizecharts/sizecharts.html",
+      "site_region": "au.puma.com (AU)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "pu-len-ae",
+      "notes": "No measuring method for feet on the page; its 'How to measure yourself' covers the body for clothing only."
+    },
+    {
+      "key": "pu-len-ae",
+      "brand": "Puma",
+      "kind": "length column: product",
+      "claim": "The UAE guide's length table is headed Product Measurements, Size and Length (cm).",
+      "exact_words": "Product Measurements Size Length (cm)",
+      "url": "https://ae.puma.com/ae/en/size-guide.html",
+      "site_region": "ae.puma.com (AE)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "pu-len-au",
+      "notes": "The heading calls it the product's measurement; the cells are built in the browser (the saved HTML has the heading, no rows)."
+    },
+    {
+      "key": "pu-len-us-kids",
+      "brand": "Puma",
+      "kind": "length column: unstated",
+      "claim": "The US kids' charts (toddler on) carry a Length column in inches, unlabelled as to whose length.",
+      "exact_words": "Kids' Sizing Toddler Shoes US Length DE UK FR IT ES 4.75 in 5 in 5.5 in ...",
+      "url": "https://production-pna-sfcc.puma.com/us/en/size-charts.html",
+      "site_region": "puma.com (US)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "Kids' charts: not transcribed (not a lacking scale named in the brief)."
+    },
+    {
+      "key": "pu-jpcm",
+      "brand": "Puma",
+      "kind": "length column: label",
+      "claim": "The Vietnam guide names its JPN/CM column as Japanese sizing / CM measurements.",
+      "exact_words": "JPN/CM = Japanese Sizing / CM Measurements",
+      "url": "https://vn.puma.com/vn/en/VN-size-guide-footer-2025.html",
+      "site_region": "vn.puma.com (VN)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": ""
+    },
+    {
+      "key": "pu-none",
+      "brand": "Puma",
+      "kind": "absence",
+      "claim": "No foot-measuring method, fit allowance, or between-sizes advice for shoes was found on Puma's AU, AE, DE (EU), SG, VN, or US guides; their measuring sections are for clothing.",
+      "exact_words": "",
+      "url": "https://eu.puma.com/de/en/help/size-guide",
+      "site_region": "eu.puma.com, au, ae, sg, vn, us",
+      "page_kind": "size guides",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "sa.puma.com's guide is built in the browser (no words). A product page's panel was not read (budget)."
+    }
+  ],
+  "sources": [
+    "puma-au-sizeguide (au.puma.com/au/en/size-guide): 404.",
+    "puma-eu-de-sizeguide (eu.puma.com/de/en/help/size-guide): body measuring for clothing only. Saved page.",
+    "puma-au-sizecharts (au.puma.com/au/en/sizecharts/sizecharts.html): unisex = men's, women 1.5 smaller; Length cm column. Saved page holds the words.",
+    "puma-ae-sizeguide (ae.puma.com): women 1.5 down; Product Measurements, Size, Length (cm). Saved page holds the words.",
+    "puma-sa-sizeguide (sa.puma.com): built in the browser, no shoe words.",
+    "puma-vn-sizeguide (vn.puma.com): JPN/CM named.",
+    "puma-us-sizecharts (us.puma.com/us/en/size-charts.html): 404; puma-us-pna-sizecharts (production-pna-sfcc.puma.com, the same site's host from search): women 1.5 down; kids' Length in inches. Saved page holds the words.",
+    "puma-sg-sizeguide (sg.puma.com): body measuring only."
+  ]
+}

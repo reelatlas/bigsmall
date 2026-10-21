@@ -1,0 +1,9 @@
+reddit_birk_old	https://old.reddit.com/r/Birkenstocks/search.json?q=sizing&restrict_sr=on&limit=25
+stridewise_timberland	https://stridewise.com/do-timberland-boots-run-big/
+qvc_birkenstock	https://community.qvc.com/t5/Shoes/Birkenstock-Sizing/td-p/7481383
+scheels_birk_guide	https://www.scheels.com/e/post/birkenstock-footwear-guide.html
+captaincreps_nb	https://captaincreps.com/new-balance-sizing-compared-to-nike-adidas-vans-converse/
+slickdeals_crocs	https://slickdeals.net/f/17683221-crocs-baya-clogs-men-s-and-women-s-slip-on-waterproof-sandals-extra-20-off-27-99
+solefeed_timb	https://solefeed.com/guide/timberland/6-inch-premium
+bstore_birk	https://www.bstore.com.au/blogs/everything-birkenstock/what-size-birkenstock-should-i-get
+fwm_hoka_nike	https://footwearmagazine.com/hoka-size-chart-vs-nike-size-chart/

@@ -1,0 +1,141 @@
+{
+  "claims": [
+    {
+      "key": "nb-tool",
+      "brand": "New Balance",
+      "kind": "measuring method (printable gauge) / between sizes",
+      "claim": "Men's printable Size & Width Tool: print at 100% (check with a credit card), heel on the semicircle against the paper or a wall, full weight, each foot; late afternoon; between sizes or one foot bigger, choose the larger size; the length scale is marked in US Men's Standard Running Size with cm.",
+      "exact_words": "Measure in the late afternoon when feet are largest due to swelling. Choose the larger size if feet are between sizes or one foot is bigger than the other. ... FIND YOUR SIZE by placing your heel on the semicircle below and aligning the back of your heel with the paper or a wall. Measure each foot separately and be sure to put your full weight on your foot.",
+      "url": "https://www.newbalance.com/on/demandware.static/-/Library-Sites-NBUS-NBCA/default/dwc8002a8d/pdf/Mens_Printable_Sizing_Tool.pdf",
+      "site_region": "newbalance.com (US/CA library)",
+      "page_kind": "printable PDF gauge",
+      "tool": "script (pdftotext)",
+      "agrees_with": "",
+      "notes": "A gauge: size marks placed along a ruler, no length per size in figures (readable only by the drawing's geometry; not done). Its width table gives inches and cm per size and width (widths: out of scope). Every newbalance.com, .co.uk, .com.au, .ca HTML page refused (403); support.newbalance.com refused TLS to both script and fetcher."
+    },
+    {
+      "key": "cv-measure",
+      "brand": "Converse",
+      "kind": "measuring method",
+      "claim": "Heel against a wall on taped paper; mark the longest part; measure; both feet, afternoon, in the socks you will wear; use the larger.",
+      "exact_words": "Stand with your heel against a wall on a piece of paper taped to the floor. Mark the longest part of your foot (heel to toe), then measure that distance with a ruler. Measure both feet in the afternoon (when slightly swollen), wearing the socks you'll pair with your sneakers, and use the larger measurement.",
+      "url": "https://converse.ca/pages/size-guide",
+      "site_region": "converse.ca (CA)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "cv-pdp",
+      "notes": "The chart columns are US, UK, EU, cm, in; the page does not name the cm column the foot's or the shoe's."
+    },
+    {
+      "key": "cv-ctas",
+      "brand": "Converse",
+      "kind": "fit direction / allowance by line",
+      "claim": "Chuck Taylor All Star runs large: go down a half size.",
+      "exact_words": "Chuck Taylor All Star These sneakers run large — we recommend going down a half size.",
+      "url": "https://converse.ca/pages/size-guide",
+      "site_region": "converse.ca (CA)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "cv-pdp",
+      "notes": "Printed above both the women's and the men's Chuck Taylor charts; the guide's summary line: 'Chuck Taylor All Star runs about a half size large.'"
+    },
+    {
+      "key": "cv-pdp",
+      "brand": "Converse",
+      "kind": "fit direction / measuring method",
+      "claim": "Chuck Taylor product page: runs large, order a half size down; heel-to-toe length marked and measured for each foot.",
+      "exact_words": "This style runs large. Order a half size down. ... Have a friend mark the longest part of your foot (referred to as heel-to-toe length) on the paper with a pen or pencil, or measure yourself if necessary. Use a ruler to measure the heel-to-toe length you marked for each foot.",
+      "url": "https://converse.ca/products/chuck-taylor-all-star-canvas-unisex-low-top-shoe-a18101c-347",
+      "site_region": "converse.ca (CA)",
+      "page_kind": "product page (Chuck Taylor All Star Canvas)",
+      "tool": "script",
+      "agrees_with": "cv-ctas",
+      "notes": "The page also holds customer reviews (not the brand's words; ignored)."
+    },
+    {
+      "key": "cv-between",
+      "brand": "Converse",
+      "kind": "between-sizes advice (scope unclear)",
+      "claim": "Between sizes, size up: printed after the body-measuring list, before the category charts.",
+      "exact_words": "If you're between sizes, we generally recommend sizing up.",
+      "url": "https://converse.ca/pages/size-guide",
+      "site_region": "converse.ca (CA)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "Placement suggests it belongs to the body (apparel) section; recorded with that doubt."
+    },
+    {
+      "key": "ua-true",
+      "brand": "Under Armour",
+      "kind": "length column: foot / measuring method / between sizes",
+      "claim": "UA starts from the true foot, heel to toe, in centimetres, translated into its sizes; trace the whole foot and measure heel to toe; between chart numbers, size up; measure later in the day.",
+      "exact_words": "FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes. To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe. If your measurement is between chart numbers, we recommend sizing up. Please note: for the best results, measuring later in the day is recommended.",
+      "url": "https://www.underarmour.com/en-us/t/size-guide/mens-footwear/",
+      "site_region": "underarmour.com (US)",
+      "page_kind": "size guide (men's footwear)",
+      "tool": "script",
+      "agrees_with": "ua-true-au",
+      "notes": "Same words on underarmour.co.uk (UK)."
+    },
+    {
+      "key": "ua-true-au",
+      "brand": "Under Armour",
+      "kind": "length column: foot / disclaimer",
+      "claim": "Australia: the same words, plus measurements are desired standards.",
+      "exact_words": "FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes. ... Measurements are desired standards, some variability may occur.",
+      "url": "https://www.underarmour.com.au/en-au/t/sizechart-men-footwear.html",
+      "site_region": "underarmour.com.au (AU)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "ua-true",
+      "notes": "UK: https://www.underarmour.co.uk/en-gb/t/size-guide/mens-footwear/ (same sentences)."
+    },
+    {
+      "key": "cl-au-fl",
+      "brand": "Clarks",
+      "kind": "length column: foot",
+      "claim": "Clarks Australia: the chart's CM is foot length, not shoe length; the conversion is approximate.",
+      "exact_words": "* Please note: there is no true conversion available. Therefore this chart is an approximate only. CM Measurements are for Foot Length, not Shoe Length.",
+      "url": "https://clarks.com.au/pages/size-guide",
+      "site_region": "clarks.com.au (AU)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "cl-us-col",
+      "notes": "Method on the same page: heel against the wall, mark the longest part, measure heel-to-toe in CM, 'You can then match your size to the above!'"
+    },
+    {
+      "key": "cl-us-col",
+      "brand": "Clarks",
+      "kind": "length column: foot / measuring method",
+      "claim": "US guide: trace with heel to a wall, measure heel to longest toe, both feet, in socks if worn, late in the day; find the foot length in the chart's right-hand column and read the US size to its left.",
+      "exact_words": "Measure foot length Using a tape measure or ruler, measure from the back of the heel to the tip of your longest toe on the tracing. ... Use Clarks’ handy shoe size charts to identify your size by simply finding your foot length on the table (in the right-hand column) and moving your finger left to find your US shoe size.",
+      "url": "https://www.clarks.com/en-us/editorial/how-to-measure-feet-for-shoes",
+      "site_region": "clarks.com/en-us (US)",
+      "page_kind": "editorial guide",
+      "tool": "script",
+      "agrees_with": "cl-au-fl",
+      "notes": ""
+    },
+    {
+      "key": "cl-gb-mm",
+      "brand": "Clarks",
+      "kind": "measuring method (kids, mm) / larger foot",
+      "claim": "UK tape-measure guide (children): mark longest toe and heel, measure in mm; enter the larger foot's length and width into the size calculator.",
+      "exact_words": "Mark the longest toe and heel, then measure the distance in mm—this is their length. ... If you found a slight difference between feet, enter the largest length and width measurements.",
+      "url": "https://www.clarks.com/en-gb/measure-at-home-with-tape-measure",
+      "site_region": "clarks.com/en-gb (UK)",
+      "page_kind": "measuring guide with calculator",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "Children's; the calculator takes Length (mm)."
+    }
+  ],
+  "sources": [
+    "nb-au-sizeguide, nb-ca-sizeguide: 403. nb-mens-tool-pdf (newbalance.com demandware static PDF): the men's printable tool. Saved PDF holds the words. Fetcher on support.newbalance.com: TLS error.",
+    "converse-ca-sizeguide (converse.ca/pages/size-guide): how to measure, Chuck Taylor runs large, charts US/UK/EU/cm/in. Saved page holds the words.",
+    "converse-ca-pdp-ctas (converse.ca Chuck Taylor product page): runs large, half size down, heel-to-toe. Saved page holds the words.",
+    "ua-us-mens, ua-au-mens, ua-uk-mens (Under Armour size guides): the true foot in cm. Saved pages hold the words.",
+    "clarks-us-measure (clarks.com/en-us editorial): foot length in the right-hand column. clarks-au-sizeguide (clarks.com.au): CM is foot length. clarks-gb-tape (clarks.com/en-gb): mm. clarks-is-fitguide: built in the browser, no words. Saved pages hold the words."
+  ]
+}

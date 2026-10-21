@@ -1,0 +1,12 @@
+outsole_adidas	https://www.outsole.nl/en/shoe-size-charts/adidas-shoes-size-chart-women-men/
+outsole_asics	https://www.outsole.nl/en/shoe-size-charts/asics-shoes-size-chart-women-men/
+outsole_converse	https://www.outsole.nl/en/shoe-size-charts/converse-shoes-size-chart-women-men/
+outsole_hoka	https://www.outsole.nl/en/shoe-size-charts/hoka-shoes-size-chart-women-men/
+outsole_nike	https://www.outsole.nl/en/shoe-size-charts/nike-shoes-size-chart-women-men/
+outsole_on-running	https://www.outsole.nl/en/shoe-size-charts/on-running-shoes-size-chart-women-men/
+outsole_puma	https://www.outsole.nl/en/shoe-size-charts/puma-shoes-size-chart-women-men/
+outsole_reebok	https://www.outsole.nl/en/shoe-size-charts/reebok-shoes-size-chart-women-men/
+outsole_salomon	https://www.outsole.nl/en/shoe-size-charts/salomon-shoes-size-chart-women-men/
+outsole_skechers	https://www.outsole.nl/en/shoe-size-charts/skechers-shoes-size-chart-women-men/
+outsole_under-armour	https://www.outsole.nl/en/shoe-size-charts/under-armour-shoes-size-chart-women-men/
+outsole_vans	https://www.outsole.nl/en/shoe-size-charts/vans-shoes-size-chart-women-men/

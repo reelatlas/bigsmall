@@ -1,0 +1,10 @@
+bootspy_clarks	https://bootspy.com/clarks-sizing-guide/
+zappos_desert_rev7	https://www.zappos.com/product/review/105990/page/7
+solefeed_wallabee	https://solefeed.com/guide/clarks/wallabee-boot
+opumo_converse	https://www.opumo.com/magazine/converse-sizing-guide
+looksize_crocs	https://www.looksize.com/brand-size-chart/crocs
+looksize_clarks	https://www.looksize.com/brand-size-chart/clarks
+captaincreps_converse	https://captaincreps.com/how-do-converse-fit-compared-to-nike/
+alpinstore_ugg	https://www.alpinstore.com/en/content/555-size-guide-ugg
+solefeed_ugg	https://solefeed.com/guide/ugg/classic-mini
+stadiumgoods_sizeguide	https://www.stadiumgoods.com/pages/size-guide

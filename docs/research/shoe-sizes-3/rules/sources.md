@@ -1,0 +1,59 @@
+# Sources opened, in order (shoe-sizes-3, rules worker, 2026-10-21)
+
+- brooks-us-sizechart, brooks-uk-sizechart, brooks-au-sizeguide, brooks-au-sizechart: guessed URLs, 404 pages (saved files are the sites' 404 pages, refusals by absence).
+- brooks-au-support-shoesize (support.brooksrunning.com.au article 360046951054): the 2D-tool disclaimer, US sizes. Saved page holds the words.
+- brooks-au-support-search.json (AU Zendesk search API, query size): Sizing tips (1/2 in), Australian sizing, Size Conversion Chart (Japan cm columns), holes article. Saved JSON holds the words.
+- brooks-us-main-size-guide (brooksrunning.com/en_us/main-size-guide/): thumb's width, half size up; chart US/UK/Europe, no foot column. Saved page holds the words.
+- brooks-us-women-ajax, brooks-us-men-ajax: the US panels; same sentences; no foot column.
+- brooks-us-support-search.json (support.brooksrunning.com Zendesk search API): other brands, children's shoes, widths (1/2 to 1 in, +1.5 men to women, no exact measurements), holes.
+- brooks-emea-support-other, brooks-ca-support-other: 'fit slightly shorter', half to one size larger. Saved pages hold the words.
+- brooks-us-blog-fit (blog): thumb's width, wiggle room.
+- brooks-ch-unisex (en_ch unisex chart page): 1/2 to one size larger than a dress shoe.
+- brooks-emea-support-search-measure.json and brooks-emea-measure-article: How to measure your foot (cm, heel to longest toe). Saved page holds the words.
+- brooks-gb-main-size-guide, brooks-gb-men-ajax, brooks-gb-unisex-ajax: the UK charts with Foot Length (CM); transcribed into charts.csv (4 charts, 308 cells).
+- brooks-ie-men-ajax, brooks-de-men-ajax: the same men's chart with the foot column, cells equal to the UK's.
+- brooks-au-main-size-guide: 404.
+- skechers-us-sizechart (skechers.com/size-chart/): US/UK/EU charts; 'Performance ... sizes may vary'; commented-out links to the kids' printable PDF. Saved page holds the words.
+- skechers-uk-sizeguide (skechers.com/uk/size-guide/): 410 Gone, a refusal.
+- skechers-kids-pdf-old, skechers-kids-pdf-us: the kids' printable Shoe Fit Guide (same bytes): instructions, heel at zero, inch scale. Saved PDFs hold the words.
+- skechers-au-sizeguide (skechers.com.au/size-guide): built in the browser, an empty shell; fetcher saw only 'Skechers'. Could not reach.
+- skechers-au-help-rightsize, skechers-au-help-search.json (help.skechers.com.au): size selector with centimetres, AU = US, snug heel, wiggle room. Saved files hold the words.
+- skechers-us-direct-sizing (skechers.com/direct/shoe-sizing-and-care): links to women's and men's fit guide PDFs.
+- skechers-womens-pdf, skechers-mens-uk-pdf, skechers-kids-uk-pdf (sh.skechers.com): 520; skechers-womens-pdf, skechers-mens-pdf (digital-assets.skechers.com): 403; fetcher 520. Refusals; the saved files are error pages.
+- puma-au-sizeguide (au.puma.com/au/en/size-guide): 404.
+- puma-eu-de-sizeguide (eu.puma.com/de/en/help/size-guide): body measuring for clothing only. Saved page.
+- puma-au-sizecharts (au.puma.com/au/en/sizecharts/sizecharts.html): unisex = men's, women 1.5 smaller; Length cm column. Saved page holds the words.
+- puma-ae-sizeguide (ae.puma.com): women 1.5 down; Product Measurements, Size, Length (cm). Saved page holds the words.
+- puma-sa-sizeguide (sa.puma.com): built in the browser, no shoe words.
+- puma-vn-sizeguide (vn.puma.com): JPN/CM named.
+- puma-us-sizecharts (us.puma.com/us/en/size-charts.html): 404; puma-us-pna-sizecharts (production-pna-sfcc.puma.com, the same site's host from search): women 1.5 down; kids' Length in inches. Saved page holds the words.
+- puma-sg-sizeguide (sg.puma.com): body measuring only.
+- on-us-sizeguide (on.com/en-us/size-guide), on-us-faq-sizing (on.com/en-us/faq), on-us-faq-product (faq/product-advice-sizing-stock), on-cs-sizeguide (customer-service.on-running.com size_guide, 301 to the FAQ): 4,348-byte Nuxt shells with a Cloudflare challenge script; fetcher read nothing. Could not reach.
+- on-help-search, on-help-search2: guessed Zendesk APIs, 404.
+- on-us-tester (on.com explore page, product tester FAQ): How do I measure my foot length? Saved page holds the words.
+- on-us-pdp-cloudplay, on-us-pdp-cloudsky (kids, youth product pages): True to size, size up if unsure, how to measure your kid's feet. Saved pages hold the words.
+- on-us-pdp-cloudmonster-m (adult product page): True to size. Saved page holds the words; size chart not in the HTML.
+- reebok-us-sizechart (reebok.com/size-chart), reebok-ca-sizechart (reebok.ca/en/size-chart): guessed URLs, 404.
+- reebok-ca-footwear-chart (reebok.ca/pages/mens-and-womens-footwear-size-chart): heel-toe inches chart, winter boots Euro charts (transcribed), how to measure. Saved page holds the words.
+- reebok-eu-home (reebok.eu): built in the browser, no words. reebok-uk-home (reebok.co.uk): connection timed out; fetcher ECONNREFUSED on its help page. Could not reach.
+- reebok-us-unisex-guide (reebok.com/pages/unisex-shoe-size-guide): measuring in inches, larger foot to the chart. Saved page holds the words.
+- reebok-au-sizeguides (reebok.com.au/pages/size-guides): US/UK/EU/CM/INCH charts (transcribed), foot length method, size up between sizes, Club C fit note. Saved page holds the words.
+- reebok-us-old-include (m.reebok.com demandware include): host does not resolve.
+- salomon-sg-mens, salomon-sg-womens (sg.salomon.com pages): measuring in socks, FOOT LENGTH (CM)/(INCH). Saved pages hold the words.
+- nike-us-sizefit-mens, nike-us-sizefit-womens (nike.com/size-fit): Foot Length rows; box CM differs from foot length; measuring; size up between sizes. Saved pages hold the words.
+- newbalance-us-sizechart, nb-us-faq-sizing, nb-uk-sizechart: 403 (634 bytes). nb-support-fit: TLS refused. Could not reach.
+- drmartens-us-sizeguide: 404. ugg-us-sizechart, hoka-us-sizechart: 406 (bot wall). clarks-uk-sizeguide: 404. vans-us-sizechart, timberland-us-sizechart: 500 (bot wall).
+- adidas-us-help-men, adidas-us-blog-measure, adidas-uk-blog-measure: 403. adidas-bh-men (adidas.com/bh): heel-toe inch and cm chart, how to measure, in between sizes. Saved page holds the words.
+- asics-nz-measure, asics-au-measure: add 1-1.5 cm. Saved pages hold the words. asics-my-guide: built in the browser, no words.
+- nb-au-sizeguide, nb-ca-sizeguide: 403. nb-mens-tool-pdf (newbalance.com demandware static PDF): the men's printable tool. Saved PDF holds the words. Fetcher on support.newbalance.com: TLS error.
+- converse-ca-sizeguide (converse.ca/pages/size-guide): how to measure, Chuck Taylor runs large, charts US/UK/EU/cm/in. Saved page holds the words.
+- converse-ca-pdp-ctas (converse.ca Chuck Taylor product page): runs large, half size down, heel-to-toe. Saved page holds the words.
+- ua-us-mens, ua-au-mens, ua-uk-mens (Under Armour size guides): the true foot in cm. Saved pages hold the words.
+- clarks-us-measure (clarks.com/en-us editorial): foot length in the right-hand column. clarks-au-sizeguide (clarks.com.au): CM is foot length. clarks-gb-tape (clarks.com/en-gb): mm. clarks-is-fitguide: built in the browser, no words. Saved pages hold the words.
+- drm-us-sizeguide (drmartens.com/us/en/size-guide), drm-us-sizeinfo: 404. drm-support-between, drm-support-runbig, drm-ca-support-between: 401. drm-uk-shoesizeguide, drm-us-about-sizeguide: Foot length heading, FAQ. Saved pages hold the words.
+- birk-us-fitguide: US+31/+33 formula. birk-us-sizechart: mm ranges. birk-my-fit: calculator, next size up. Saved pages hold the words.
+- ugg-us-sizechart, ugg-us-sizinginfo: 406; fetcher header overflow. ugg-au-coloursizes: 404. ugg-kids-pdf: kids' printable chart. Saved PDF holds the words.
+- crocs-uk-include-men, crocs-uk-include-fit, crocs-au-fitguide, crocs-us-sizechart: built in the browser (no words); fetcher on crocs.com/size-chart: 'Loading...'. crocs-us-faqs: no sizing words. Could not reach.
+- hoka-us-sizechart: 406; fetcher header overflow. Could not reach.
+- tim-us-howtomeasure, tim-us-sizechart (timberland.com): measuring. Saved pages hold the words. tim-help-adult (help.timberland.com): TLS handshake failure. timberland-us-sizechart (en-us/size-chart): 500.
+- vans-us-helpsize, vans-us-faq (vans.com): mm measuring, Foot Length column, skate half size. Saved pages hold the words. vans-au-help: no words. vans-us-sizechart: 500.

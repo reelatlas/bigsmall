@@ -1,0 +1,16 @@
+footlockeruk_nike	https://www.footlocker.co.uk/en/inspiration/a/nike-size-guide.html
+footlockeruk_adidas	https://www.footlocker.co.uk/en/inspiration/a/adidas-size-guide.html
+footlockeruk_new-balance	https://www.footlocker.co.uk/en/inspiration/a/new-balance-size-guide.html
+footlockeruk_puma	https://www.footlocker.co.uk/en/inspiration/a/puma-size-guide.html
+footlockeruk_asics	https://www.footlocker.co.uk/en/inspiration/a/asics-size-guide.html
+footlockeruk_converse	https://www.footlocker.co.uk/en/inspiration/a/converse-size-guide.html
+footlockeruk_vans	https://www.footlocker.co.uk/en/inspiration/a/vans-size-guide.html
+footlockeruk_ugg	https://www.footlocker.co.uk/en/inspiration/a/ugg-size-guide.html
+footlockeruk_crocs	https://www.footlocker.co.uk/en/inspiration/a/crocs-size-guide.html
+footlockeruk_hoka	https://www.footlocker.co.uk/en/inspiration/a/hoka-size-guide.html
+footlockeruk_on	https://www.footlocker.co.uk/en/inspiration/a/on-size-guide.html
+footlockeruk_timberland	https://www.footlocker.co.uk/en/inspiration/a/timberland-size-guide.html
+footlockeruk_dr-martens	https://www.footlocker.co.uk/en/inspiration/a/dr-martens-size-guide.html
+footlockeruk_salomon	https://www.footlocker.co.uk/en/inspiration/a/salomon-size-guide.html
+footlockeruk_clarks	https://www.footlocker.co.uk/en/inspiration/a/clarks-size-guide.html
+footlockeruk_jordan	https://www.footlocker.co.uk/en/inspiration/a/jordan-size-guide.html

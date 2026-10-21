@@ -1,0 +1,6 @@
+rw_fittips	https://www.runningwarehouse.com/learningcenter/gear_guides/footwear/fittips.html
+rrs_women_men	https://www.roadrunnersports.com/blog/women-to-men-shoe-size.md
+dor_fit	https://www.doctorsofrunning.com/?p=537
+outsole_nb	https://www.outsole.nl/en/shoe-size-charts/new-balance-shoes-size-chart-women-men/
+outsole_index	https://www.outsole.nl/en/shoe-size-charts/
+advnture_sizeup	https://www.advnture.com/features/should-you-size-up-on-running-shoes

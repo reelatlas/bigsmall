@@ -1,0 +1,142 @@
+name,url,status,bytes,bot_markers,title,verdict,error,date
+stockx_help,https://stockx.com/help/articles/i-dont-know-how-an-item-fits-can-you-make-a-size-recommendation,200,94959,,I don’t know how an item fits. Can you make a size recommendation?,ok,,2026-10-21
+runrepeat_hoka,https://runrepeat.com/size-charts/hoka,200,278231,,HOKA men's and women's size chart | RunRepeat,ok,,2026-10-21
+scheels_hoka,https://www.scheels.com/size-chart/hoka-adults-footwear-size-chart.html,200,368975,,Hoka Adults' Footwear Size Chart,ok,,2026-10-21
+looksize_drmartens,https://www.looksize.com/brand-size-chart/dr-martens,200,29552,,Dr. Martens size chart | LookSize,ok,,2026-10-21
+bergfreunde_drmartens,https://www.bergfreunde.eu/dr-martens-size-chart/,200,565305,blocked,Dr. Martens Size Guide for shoes | Men - Women - Kids | Bergfreunde,ok,,2026-10-21
+hibbett_nike,https://www.hibbett.com/blog-expert-advice/do-nike-shoes-run-small.html,200,327526,,Do Nike Shoes Run Small? Fit Guide for New Buyers,ok,,2026-10-21
+manofmany_sizing,https://manofmany.com/style/one-size-not-fit-definitive-guide-sneaker-sizing,200,435550,,One Size Does Not Fit All - Guide to Sneaker Sizing | Man of Many,ok,,2026-10-21
+fwm_hoka_brooks,https://footwearmagazine.com/hoka-sizing-vs-brooks-running-shoe-sizes/,200,79284,,Hoka Sizing vs Brooks Running Shoe Sizes | Footwear Magazine,ok,,2026-10-21
+goat_sizeguide,https://www.goat.com/size-guide,404,75606,,"Buy and Sell Authentic Sneakers, Apparel, and Accessories  | GOAT",refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+zappos_conv,https://www.zappos.com/c/shoe-size-conversion,200,619355,,Shoe Size Conversion | Zappos.com,ok,,2026-10-21
+flightclub_sizing,https://www.flightclub.com/size-guide,200,219273,,Size Guide | Flight Club,ok,,2026-10-21
+runrepeat_hub,https://runrepeat.com/size-charts,200,224539,,Size charts | RunRepeat,ok,,2026-10-21
+runrepeat_nike,https://runrepeat.com/size-charts/nike,200,281706,,Nike men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_adidas,https://runrepeat.com/size-charts/adidas,200,276493,,adidas men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_new-balance,https://runrepeat.com/size-charts/new-balance,200,292913,,New Balance men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_puma,https://runrepeat.com/size-charts/puma,200,257257,,PUMA men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_asics,https://runrepeat.com/size-charts/asics,200,285955,,ASICS men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_converse,https://runrepeat.com/size-charts/converse,200,251841,,Converse men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_vans,https://runrepeat.com/size-charts/vans,200,250942,,Vans men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_skechers,https://runrepeat.com/size-charts/skechers,200,256119,,Skechers men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_reebok,https://runrepeat.com/size-charts/reebok,200,263062,,Reebok men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_under-armour,https://runrepeat.com/size-charts/under-armour,200,274837,,Under Armour men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_brooks,https://runrepeat.com/size-charts/brooks,200,279373,,Brooks men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_on,https://runrepeat.com/size-charts/on,200,264585,,On men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_salomon,https://runrepeat.com/size-charts/salomon,200,257682,,Salomon men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_timberland,https://runrepeat.com/size-charts/timberland,200,244964,,Timberland men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_jordan,https://runrepeat.com/size-charts/jordan,200,253699,,Jordan men's and women's size chart | RunRepeat,ok,,2026-10-21
+runrepeat_birkenstock,https://runrepeat.com/size-charts/birkenstock,404,127882,,,refused-or-thin,HTTP Error 404: We can't find this page,2026-10-21
+runrepeat_crocs,https://runrepeat.com/size-charts/crocs,404,127876,,,refused-or-thin,HTTP Error 404: We can't find this page,2026-10-21
+runrepeat_ugg,https://runrepeat.com/size-charts/ugg,404,127874,,,refused-or-thin,HTTP Error 404: We can't find this page,2026-10-21
+runrepeat_dr-martens,https://runrepeat.com/size-charts/dr-martens,404,127881,,,refused-or-thin,HTTP Error 404: We can't find this page,2026-10-21
+runrepeat_clarks,https://runrepeat.com/size-charts/clarks,404,127877,,,refused-or-thin,HTTP Error 404: We can't find this page,2026-10-21
+footlockeruk_birkenstock,https://www.footlocker.co.uk/en/inspiration/a/birkenstock-size-guide.html,200,854580,,Birkenstock Size Guide: Find Your Right Fit | Foot Locker UK,ok,,2026-10-21
+scheels_drmartens,https://www.scheels.com/size-chart/dr-martens-adults-footwear-size-chart.html,200,365687,,Dr Martens Adults Footwear Size Chart,ok,,2026-10-21
+scheels_index,https://www.scheels.com/size-charts/,404,181970,,,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+stridewise_drmartens,https://stridewise.com/do-dr-martens-run-big/,200,283917,,Do Dr Martens Run Big? How to Size the Punk Rock Icon | Stridewise,ok,,2026-10-21
+scheels_nike,https://www.scheels.com/size-chart/nike-adults-footwear-size-chart.html,200,350140,,Size Chart,ok,,2026-10-21
+scheels_adidas,https://www.scheels.com/size-chart/adidas-adults-footwear-size-chart.html,200,367456,,Adidas Adults' Footwear Size Chart,ok,,2026-10-21
+scheels_new-balance,https://www.scheels.com/size-chart/new-balance-adults-footwear-size-chart.html,200,370037,,New Balance Adults Size Chart,ok,,2026-10-21
+scheels_puma,https://www.scheels.com/size-chart/puma-adults-footwear-size-chart.html,200,361632,,Puma Adult Footwear Size Chart,ok,,2026-10-21
+scheels_asics,https://www.scheels.com/size-chart/asics-adults-footwear-size-chart.html,200,366690,,Asics Adults' Footwear Size Chart,ok,,2026-10-21
+scheels_converse,https://www.scheels.com/size-chart/converse-adults-footwear-size-chart.html,200,380730,,Converse Adults' Footwear Size Chart,ok,,2026-10-21
+scheels_vans,https://www.scheels.com/size-chart/vans-adults-footwear-size-chart.html,200,366112,,Vans Adults' Footwear Size Chart,ok,,2026-10-21
+scheels_skechers,https://www.scheels.com/size-chart/skechers-adults-footwear-size-chart.html,200,350172,,Size Chart,ok,,2026-10-21
+scheels_reebok,https://www.scheels.com/size-chart/reebok-adults-footwear-size-chart.html,200,350156,,Size Chart,ok,,2026-10-21
+scheels_under-armour,https://www.scheels.com/size-chart/under-armour-adults-footwear-size-chart.html,200,350204,,Size Chart,ok,,2026-10-21
+scheels_clarks,https://www.scheels.com/size-chart/clarks-adults-footwear-size-chart.html,200,366100,,Clarks Adult Footwear Size Chart,ok,,2026-10-21
+scheels_birkenstock,https://www.scheels.com/size-chart/birkenstock-adults-footwear-size-chart.html,200,350204,,Size Chart,ok,,2026-10-21
+scheels_timberland,https://www.scheels.com/size-chart/timberland-adults-footwear-size-chart.html,200,369280,,Timberland Adults' Footwear Size Chart,ok,,2026-10-21
+scheels_ugg,https://www.scheels.com/size-chart/ugg-adults-footwear-size-chart.html,200,350140,,Size Chart,ok,,2026-10-21
+scheels_crocs,https://www.scheels.com/size-chart/crocs-adults-footwear-size-chart.html,200,360634,,Crocs Adult Footwear Size Chart,ok,,2026-10-21
+scheels_on,https://www.scheels.com/size-chart/on-adults-footwear-size-chart.html,200,350124,,Size Chart,ok,,2026-10-21
+scheels_brooks,https://www.scheels.com/size-chart/brooks-adults-footwear-size-chart.html,200,367679,,Brooks Adults' Footwear Size Chart,ok,,2026-10-21
+scheels_salomon,https://www.scheels.com/size-chart/salomon-adults-footwear-size-chart.html,200,350164,,Size Chart,ok,,2026-10-21
+footlockeruk_nike,https://www.footlocker.co.uk/en/inspiration/a/nike-size-guide.html,200,603526,,Inspiration a nike size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_adidas,https://www.footlocker.co.uk/en/inspiration/a/adidas-size-guide.html,200,603542,,Inspiration a adidas size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_new-balance,https://www.footlocker.co.uk/en/inspiration/a/new-balance-size-guide.html,200,603582,,Inspiration a new balance size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_puma,https://www.footlocker.co.uk/en/inspiration/a/puma-size-guide.html,200,603526,,Inspiration a puma size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_asics,https://www.footlocker.co.uk/en/inspiration/a/asics-size-guide.html,200,603534,,Inspiration a asics size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_converse,https://www.footlocker.co.uk/en/inspiration/a/converse-size-guide.html,200,603558,,Inspiration a converse size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_vans,https://www.footlocker.co.uk/en/inspiration/a/vans-size-guide.html,200,603526,,Inspiration a vans size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_ugg,https://www.footlocker.co.uk/en/inspiration/a/ugg-size-guide.html,200,603518,,Inspiration a ugg size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_crocs,https://www.footlocker.co.uk/en/inspiration/a/crocs-size-guide.html,200,603534,,Inspiration a crocs size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_hoka,https://www.footlocker.co.uk/en/inspiration/a/hoka-size-guide.html,200,603526,,Inspiration a hoka size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_on,https://www.footlocker.co.uk/en/inspiration/a/on-size-guide.html,200,603510,,Inspiration a on size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_timberland,https://www.footlocker.co.uk/en/inspiration/a/timberland-size-guide.html,200,603574,,Inspiration a timberland size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_dr-martens,https://www.footlocker.co.uk/en/inspiration/a/dr-martens-size-guide.html,200,603574,,Inspiration a dr martens size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_salomon,https://www.footlocker.co.uk/en/inspiration/a/salomon-size-guide.html,200,603550,,Inspiration a salomon size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_clarks,https://www.footlocker.co.uk/en/inspiration/a/clarks-size-guide.html,200,603542,,Inspiration a clarks size guide.html | Foot Locker UK,ok,,2026-10-21
+footlockeruk_jordan,https://www.footlocker.co.uk/en/inspiration/a/jordan-size-guide.html,200,603542,,Inspiration a jordan size guide.html | Foot Locker UK,ok,,2026-10-21
+sportsshoes_nike,https://www.sportsshoes.com/size-guides/nike,200,1084066,,"Running Shoes, Clothing & Equipment | SportsShoes.com",ok,,2026-10-21
+sportsshoes_adidas,https://www.sportsshoes.com/size-guides/adidas,200,1128947,,"Running Shoes, Clothing & Equipment | SportsShoes.com",ok,,2026-10-21
+sportsshoes_new-balance,https://www.sportsshoes.com/size-guides/new-balance,200,1068365,,"Running Shoes, Clothing & Equipment | SportsShoes.com",ok,,2026-10-21
+sportsshoes_puma,https://www.sportsshoes.com/size-guides/puma,404,1060273,,SportsShoes - The UK's No 1 Running & Outdoor Fitness Retailer | SportsShoes.com,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+sportsshoes_asics,https://www.sportsshoes.com/size-guides/asics,200,1048797,,"Running Shoes, Clothing & Equipment | SportsShoes.com",ok,,2026-10-21
+sportsshoes_hoka,https://www.sportsshoes.com/size-guides/hoka,404,1060273,,SportsShoes - The UK's No 1 Running & Outdoor Fitness Retailer | SportsShoes.com,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+sportsshoes_on,https://www.sportsshoes.com/size-guides/on,404,1060259,,SportsShoes - The UK's No 1 Running & Outdoor Fitness Retailer | SportsShoes.com,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+sportsshoes_brooks,https://www.sportsshoes.com/size-guides/brooks,200,1050710,,"Running Shoes, Clothing & Equipment | SportsShoes.com",ok,,2026-10-21
+sportsshoes_salomon,https://www.sportsshoes.com/size-guides/salomon,200,1053481,,"Running Shoes, Clothing & Equipment | SportsShoes.com",ok,,2026-10-21
+sportsshoes_under-armour,https://www.sportsshoes.com/size-guides/under-armour,200,1113490,,"Running Shoes, Clothing & Equipment | SportsShoes.com",ok,,2026-10-21
+sportsshoes_skechers,https://www.sportsshoes.com/size-guides/skechers,200,1020672,,"Running Shoes, Clothing & Equipment | SportsShoes.com",ok,,2026-10-21
+sportsshoes_reebok,https://www.sportsshoes.com/size-guides/reebok,404,1060287,,SportsShoes - The UK's No 1 Running & Outdoor Fitness Retailer | SportsShoes.com,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+theiconic_ugg,https://www.theiconic.com.au/index/sizeguidemain/3740,403,5664,just a moment|enable javascript and cookies,Just a moment...,refused-or-thin,HTTP Error 403: Forbidden,2026-10-21
+fit2run_hoka,https://www.fit2run.com/blogs/news/fit-guide-how-do-hoka-running-shoes-fit,200,512304,,FIT GUIDE: HOW DO HOKA RUNNING SHOES FIT? – Fit2Run,ok,,2026-10-21
+reddit_rsg_search,https://www.reddit.com/r/RunningShoeGeeks/search.json?q=sizing%20brands&restrict_sr=1&sort=relevance&limit=25,403,189908,,,refused-or-thin,HTTP Error 403: Blocked,2026-10-21
+reddit_birk_old,https://old.reddit.com/r/Birkenstocks/search.json?q=sizing&restrict_sr=on&limit=25,200,337859,,Welcome to Reddit,ok,,2026-10-21
+stridewise_timberland,https://stridewise.com/do-timberland-boots-run-big/,200,270743,,Do Timberland Boots Run Big? | Stridewise,ok,,2026-10-21
+qvc_birkenstock,https://community.qvc.com/t5/Shoes/Birkenstock-Sizing/td-p/7481383,403,5709,just a moment|enable javascript and cookies,Just a moment...,refused-or-thin,HTTP Error 403: Forbidden,2026-10-21
+scheels_birk_guide,https://www.scheels.com/e/post/birkenstock-footwear-guide.html,200,381995,,A Guide to BIRKENSTOCK Footwear,ok,,2026-10-21
+captaincreps_nb,https://captaincreps.com/new-balance-sizing-compared-to-nike-adidas-vans-converse/,200,87621,,"New Balance Sizing Compared To Nike, Adidas, Vans & Converse",ok,,2026-10-21
+slickdeals_crocs,https://slickdeals.net/f/17683221-crocs-baya-clogs-men-s-and-women-s-slip-on-waterproof-sandals-extra-20-off-27-99,200,754808,,Crocs Baya Clogs Men's and Women's Slip-On Waterproof Sandals [Extra 20% Off] $27.99 - 2024-08-09,ok,,2026-10-21
+solefeed_timb,https://solefeed.com/guide/timberland/6-inch-premium,200,400446,,Timberland 6-Inch Premium Review & Sizing Guide | SoleFeed,ok,,2026-10-21
+bstore_birk,https://www.bstore.com.au/blogs/everything-birkenstock/what-size-birkenstock-should-i-get,200,485873,,"How Should a Birkenstock Actually Fit? Your Simple Checklist
+– Bstore",ok,,2026-10-21
+fwm_hoka_nike,https://footwearmagazine.com/hoka-size-chart-vs-nike-size-chart/,200,77991,,Hoka Size Chart vs Nike Size Chart | Footwear Magazine,ok,,2026-10-21
+rw_fittips,https://www.runningwarehouse.com/learningcenter/gear_guides/footwear/fittips.html,200,137824,,The Ultimate Guide to Find Your Running Shoe Size & Fit | Running Warehouse,ok,,2026-10-21
+rrs_women_men,https://www.roadrunnersports.com/blog/women-to-men-shoe-size.md,200,8399,,,ok,,2026-10-21
+dor_fit,https://www.doctorsofrunning.com/?p=537,200,268973,blocked,Footwear Science: Running Shoe Fit - Doctors of Running,ok,,2026-10-21
+outsole_nb,https://www.outsole.nl/en/shoe-size-charts/new-balance-shoes-size-chart-women-men/,200,286559,,New Balance Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_index,https://www.outsole.nl/en/shoe-size-charts/,200,416230,,Shoe Size Charts • Compare Brands • Outsole,ok,,2026-10-21
+advnture_sizeup,https://www.advnture.com/features/should-you-size-up-on-running-shoes,200,1192823,,Should you size up on running shoes? Experts weigh in | Advnture,ok,,2026-10-21
+outsole_adidas,https://www.outsole.nl/en/shoe-size-charts/adidas-shoes-size-chart-women-men/,200,283018,,Adidas Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_asics,https://www.outsole.nl/en/shoe-size-charts/asics-shoes-size-chart-women-men/,200,282725,,ASICS Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_converse,https://www.outsole.nl/en/shoe-size-charts/converse-shoes-size-chart-women-men/,200,284057,,Converse Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_hoka,https://www.outsole.nl/en/shoe-size-charts/hoka-shoes-size-chart-women-men/,200,283743,,HOKA Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_nike,https://www.outsole.nl/en/shoe-size-charts/nike-shoes-size-chart-women-men/,200,342247,,Nike Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_on-running,https://www.outsole.nl/en/shoe-size-charts/on-running-shoes-size-chart-women-men/,200,280505,,On Running Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_puma,https://www.outsole.nl/en/shoe-size-charts/puma-shoes-size-chart-women-men/,200,283923,,Puma Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_reebok,https://www.outsole.nl/en/shoe-size-charts/reebok-shoes-size-chart-women-men/,200,285609,,Reebok Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_salomon,https://www.outsole.nl/en/shoe-size-charts/salomon-shoes-size-chart-women-men/,200,284585,,Salomon Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_skechers,https://www.outsole.nl/en/shoe-size-charts/skechers-shoes-size-chart-women-men/,200,283951,,Skechers Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_under-armour,https://www.outsole.nl/en/shoe-size-charts/under-armour-shoes-size-chart-women-men/,200,282501,,Under Armour Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+outsole_vans,https://www.outsole.nl/en/shoe-size-charts/vans-shoes-size-chart-women-men/,200,282503,,Vans Shoe Size Chart • Men & Women • Outsole,ok,,2026-10-21
+bootspy_clarks,https://bootspy.com/clarks-sizing-guide/,200,490924,blocked,The Ultimate Clarks Sizing Guide (with Size Chart),ok,,2026-10-21
+zappos_desert_rev7,https://www.zappos.com/product/review/105990/page/7,200,589899,,Clarks Desert Boots Reviews | Zappos.com,ok,,2026-10-21
+solefeed_wallabee,https://solefeed.com/guide/clarks/wallabee-boot,200,316542,,Clarks Wallabee Boot Review & Sizing Guide | SoleFeed,ok,,2026-10-21
+opumo_converse,https://www.opumo.com/magazine/converse-sizing-guide,200,65393,,Converse sneakers sizing guide: Find your fit | OPUMO Magazine,ok,,2026-10-21
+looksize_crocs,https://www.looksize.com/brand-size-chart/crocs,200,34718,,Crocs size chart | LookSize,ok,,2026-10-21
+looksize_clarks,https://www.looksize.com/brand-size-chart/clarks,200,31810,,Clarks size chart | LookSize,ok,,2026-10-21
+captaincreps_converse,https://captaincreps.com/how-do-converse-fit-compared-to-nike/,200,84543,,How Do Converse Fit Compared To Nike? A Converse Sizing Guide,ok,,2026-10-21
+alpinstore_ugg,https://www.alpinstore.com/en/content/555-size-guide-ugg,200,146119,,UGG Size Guide - AlpinStore,ok,,2026-10-21
+solefeed_ugg,https://solefeed.com/guide/ugg/classic-mini,200,390076,,UGG Classic Mini Review & Sizing Guide | SoleFeed,ok,,2026-10-21
+stadiumgoods_sizeguide,https://www.stadiumgoods.com/pages/size-guide,404,695586,,404 Not Found – Stadium Goods,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+sizely_nike-to-skechers,https://www.size.ly/shoe-size-recommender/nike-to-skechers,200,559975,,Nike vs Skechers Sizing: Shoe Size Converter and Chart,ok,,2026-10-21
+sizely_under-armour-to-nike,https://www.size.ly/shoe-size-recommender/under-armour-to-nike,200,556851,,Under Armour vs Nike Sizing: Shoe Size Converter and Chart,ok,,2026-10-21
+sizely_puma-to-nike,https://www.size.ly/shoe-size-recommender/puma-to-nike,200,558017,,Puma vs Nike Sizing: Shoe Size Converter and Chart,ok,,2026-10-21
+sizely_nike-to-birkenstock,https://www.size.ly/shoe-size-recommender/nike-to-birkenstock,404,225308,,Not Found,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+sizely_nike-to-crocs,https://www.size.ly/shoe-size-recommender/nike-to-crocs,404,225296,,Not Found,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+sizely_nike-to-ugg,https://www.size.ly/shoe-size-recommender/nike-to-ugg,404,225292,,Not Found,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+sizely_nike-to-dr-martens,https://www.size.ly/shoe-size-recommender/nike-to-dr-martens,404,225306,,Not Found,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+sizely_nike-to-adidas,https://www.size.ly/shoe-size-recommender/nike-to-adidas,200,566557,,Nike vs Adidas Sizing: Shoe Size Converter and Chart,ok,,2026-10-21
+sizely_nike-to-new-balance,https://www.size.ly/shoe-size-recommender/nike-to-new-balance,200,566461,,Nike vs New Balance Sizing: Shoe Size Converter and Chart,ok,,2026-10-21
+captaincreps_puma,https://captaincreps.com/puma-shoes-run-smaller-than-nike/,200,76645,,Do Puma Shoes Run Smaller Than Nike? A Puma Sizing Guide,ok,,2026-10-21
+tomsguide_cloudmonster,https://www.tomsguide.com/opinion/i-ran-300-miles-in-the-on-cloudmonsters-heres-how-i-rate-them,200,2204065,,I ran 300 miles in the On Cloudmonsters — here's how I rate them | Tom's Guide,ok,,2026-10-21
+jd_sizeguide,https://www.jdsports.co.uk/page/size-guide/,404,6837,,404: This page could not be found.,refused-or-thin,HTTP Error 404: Not Found,2026-10-21
+nordstrom_sizecharts,https://www.nordstrom.com/browse/customer-service/size-charts,200,258264,,,ok,,2026-10-21
+rrs_md_check,https://www.roadrunnersports.com/blog/women-to-men-shoe-size.md,200,8399,,,ok,,2026-10-21
+goat_help_size,https://www.goat.com/faq,200,39304,,GOAT Support,ok,,2026-10-21
+ebay_sneaker_guide,https://www.ebay.com/sneakers,503,1695,,Error Page | eBay,refused-or-thin,HTTP Error 503: Service Unavailable,2026-10-21
+zappos_arizona_rev,https://www.zappos.com/product/review/7209856/page/4,200,620650,,Birkenstock Arizona - Birko-Flor® (Unisex) Reviews | Zappos.com,ok,,2026-10-21
+zappos_cloudmonster_rev,https://www.zappos.com/product/review/9700021,200,453182,,On Cloudmonster Reviews | Zappos.com,ok,,2026-10-21

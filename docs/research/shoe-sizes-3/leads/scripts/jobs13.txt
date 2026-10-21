@@ -1,0 +1,5 @@
+jd_sizeguide	https://www.jdsports.co.uk/page/size-guide/
+nordstrom_sizecharts	https://www.nordstrom.com/browse/customer-service/size-charts
+rrs_md_check	https://www.roadrunnersports.com/blog/women-to-men-shoe-size.md
+goat_help_size	https://www.goat.com/faq
+ebay_sneaker_guide	https://www.ebay.com/sneakers

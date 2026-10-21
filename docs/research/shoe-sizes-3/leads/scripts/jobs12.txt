@@ -1,0 +1,11 @@
+sizely_nike-to-skechers	https://www.size.ly/shoe-size-recommender/nike-to-skechers
+sizely_under-armour-to-nike	https://www.size.ly/shoe-size-recommender/under-armour-to-nike
+sizely_puma-to-nike	https://www.size.ly/shoe-size-recommender/puma-to-nike
+sizely_nike-to-birkenstock	https://www.size.ly/shoe-size-recommender/nike-to-birkenstock
+sizely_nike-to-crocs	https://www.size.ly/shoe-size-recommender/nike-to-crocs
+sizely_nike-to-ugg	https://www.size.ly/shoe-size-recommender/nike-to-ugg
+sizely_nike-to-dr-martens	https://www.size.ly/shoe-size-recommender/nike-to-dr-martens
+sizely_nike-to-adidas	https://www.size.ly/shoe-size-recommender/nike-to-adidas
+sizely_nike-to-new-balance	https://www.size.ly/shoe-size-recommender/nike-to-new-balance
+captaincreps_puma	https://captaincreps.com/puma-shoes-run-smaller-than-nike/
+tomsguide_cloudmonster	https://www.tomsguide.com/opinion/i-ran-300-miles-in-the-on-cloudmonsters-heres-how-i-rate-them

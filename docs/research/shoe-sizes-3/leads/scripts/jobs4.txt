@@ -1,0 +1,9 @@
+runrepeat_birkenstock	https://runrepeat.com/size-charts/birkenstock
+runrepeat_crocs	https://runrepeat.com/size-charts/crocs
+runrepeat_ugg	https://runrepeat.com/size-charts/ugg
+runrepeat_dr-martens	https://runrepeat.com/size-charts/dr-martens
+runrepeat_clarks	https://runrepeat.com/size-charts/clarks
+footlockeruk_birkenstock	https://www.footlocker.co.uk/en/inspiration/a/birkenstock-size-guide.html
+scheels_drmartens	https://www.scheels.com/size-chart/dr-martens-adults-footwear-size-chart.html
+scheels_index	https://www.scheels.com/size-charts/
+stridewise_drmartens	https://stridewise.com/do-dr-martens-run-big/

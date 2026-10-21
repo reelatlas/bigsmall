@@ -1,0 +1,84 @@
+{
+  "claims": [
+    {
+      "key": "on-tts-adult",
+      "brand": "On",
+      "kind": "fit direction",
+      "claim": "An adult main-line product page's Size & Fit says True to size.",
+      "exact_words": "Size chart True to size ... Size & Fit True to size.",
+      "url": "https://www.on.com/en-us/products/cloudmonster-61/mens",
+      "site_region": "on.com/en-us (US)",
+      "page_kind": "product page (Cloudmonster, men's)",
+      "tool": "script",
+      "agrees_with": "on-tts-kids",
+      "notes": "The size chart itself opens in the browser (not in the HTML): could not read it."
+    },
+    {
+      "key": "on-tts-kids",
+      "brand": "On",
+      "kind": "fit direction / between sizes",
+      "claim": "Kids' and youth product pages: True to size; if unsure, size up.",
+      "exact_words": "True to size. How to measure your kid's feet Use the steps below to find the right size for your kid/s. Little feet don't stay little for long, so if you're unsure, we recommend sizing up.",
+      "url": "https://www.on.com/en-us/products/cloud-play-3KD1143/unisex",
+      "site_region": "on.com/en-us (US)",
+      "page_kind": "product page (Cloud Play for Kids; same text on Cloud Sky for Youth)",
+      "tool": "script",
+      "agrees_with": "on-tts-adult",
+      "notes": "Second page: https://www.on.com/en-us/products/cloud-sky-3YD1144/unisex"
+    },
+    {
+      "key": "on-measure-kids",
+      "brand": "On",
+      "kind": "measuring method",
+      "claim": "Kids: paper against a wall, heels to the wall, trace the toes, measure to the top of the toes, take the longest foot, read the size guide.",
+      "exact_words": "Place a piece of paper flat on the ground. One edge should be perpendicular to the wall. Ask your child to stand on top of the paper with their heels touching the wall. ... measure the length from the very top of their toes to the end of the paper. ... Take the measurement of their longest foot and use our size guide to find the corresponding On size.",
+      "url": "https://www.on.com/en-us/products/cloud-play-3KD1143/unisex",
+      "site_region": "on.com/en-us (US)",
+      "page_kind": "product page",
+      "tool": "script",
+      "agrees_with": "on-measure-tester",
+      "notes": "Implies the size guide maps a foot length to a size; the guide's columns were not reachable."
+    },
+    {
+      "key": "on-measure-tester",
+      "brand": "On",
+      "kind": "measuring method",
+      "claim": "Best a Brannock device at a store; else a ruler against a wall, heel to the wall, read where the longest toe ends; give the longer foot.",
+      "exact_words": "Best practice is to go to a footwear store and ask for a foot measurement using a Brannock Device (most footwear retailers will have these available). Alternatively place a ruler or tape measure perpendicular to a wall, place your foot on top of the measuring device with your heel pushed against the wall & take the measurement of where your longest toe ends. Please indicate the length of your longer foot.",
+      "url": "https://www.on.com/en-us/explore/become-an-on-product-tester",
+      "site_region": "on.com/en-us (US)",
+      "page_kind": "product-tester programme FAQ",
+      "tool": "script",
+      "agrees_with": "on-measure-kids",
+      "notes": "Context is the tester application, not size choice; no allowance stated."
+    },
+    {
+      "key": "on-faq-unreached",
+      "brand": "On",
+      "kind": "could not reach",
+      "claim": "On's sizing FAQ (product-advice-sizing-stock, the old customer-service size_guide redirects there) and on.com/en-us/size-guide are built in the browser behind a Cloudflare script: the script got an empty Nuxt shell, the fetcher an empty page.",
+      "exact_words": "",
+      "url": "https://www.on.com/en-us/faq/product-advice-sizing-stock",
+      "site_region": "on.com (US; en-ca listed by search)",
+      "page_kind": "FAQ",
+      "tool": "script; fetcher",
+      "agrees_with": "",
+      "notes": "The FAQ's sentence the brief names (a foot length) is the earlier pass's; not re-read here."
+    }
+  ],
+  "leads": [
+    {
+      "brand": "On",
+      "publisher": "WebSearch summary of on.com/en-us/faq/product-advice-sizing-stock",
+      "claim": "Running shoe at least half a size bigger than street shoe; JP sizes in cm: measure barefoot against a wall and add about 1 cm; women's 1.5 sizes larger than men's (search snippet; page not readable)",
+      "url": "https://www.on.com/en-us/faq/product-advice-sizing-stock"
+    }
+  ],
+  "sources": [
+    "on-us-sizeguide (on.com/en-us/size-guide), on-us-faq-sizing (on.com/en-us/faq), on-us-faq-product (faq/product-advice-sizing-stock), on-cs-sizeguide (customer-service.on-running.com size_guide, 301 to the FAQ): 4,348-byte Nuxt shells with a Cloudflare challenge script; fetcher read nothing. Could not reach.",
+    "on-help-search, on-help-search2: guessed Zendesk APIs, 404.",
+    "on-us-tester (on.com explore page, product tester FAQ): How do I measure my foot length? Saved page holds the words.",
+    "on-us-pdp-cloudplay, on-us-pdp-cloudsky (kids, youth product pages): True to size, size up if unsure, how to measure your kid's feet. Saved pages hold the words.",
+    "on-us-pdp-cloudmonster-m (adult product page): True to size. Saved page holds the words; size chart not in the HTML."
+  ]
+}

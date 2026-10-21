@@ -1,0 +1,15 @@
+sportsshoes_nike	https://www.sportsshoes.com/size-guides/nike
+sportsshoes_adidas	https://www.sportsshoes.com/size-guides/adidas
+sportsshoes_new-balance	https://www.sportsshoes.com/size-guides/new-balance
+sportsshoes_puma	https://www.sportsshoes.com/size-guides/puma
+sportsshoes_asics	https://www.sportsshoes.com/size-guides/asics
+sportsshoes_hoka	https://www.sportsshoes.com/size-guides/hoka
+sportsshoes_on	https://www.sportsshoes.com/size-guides/on
+sportsshoes_brooks	https://www.sportsshoes.com/size-guides/brooks
+sportsshoes_salomon	https://www.sportsshoes.com/size-guides/salomon
+sportsshoes_under-armour	https://www.sportsshoes.com/size-guides/under-armour
+sportsshoes_skechers	https://www.sportsshoes.com/size-guides/skechers
+sportsshoes_reebok	https://www.sportsshoes.com/size-guides/reebok
+theiconic_ugg	https://www.theiconic.com.au/index/sizeguidemain/3740
+fit2run_hoka	https://www.fit2run.com/blogs/news/fit-guide-how-do-hoka-running-shoes-fit
+reddit_rsg_search	https://www.reddit.com/r/RunningShoeGeeks/search.json?q=sizing%20brands&restrict_sr=1&sort=relevance&limit=25

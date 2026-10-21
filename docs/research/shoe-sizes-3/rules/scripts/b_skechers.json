@@ -1,0 +1,98 @@
+{
+  "claims": [
+    {
+      "key": "sk-vary",
+      "brand": "Skechers",
+      "kind": "disclaimer",
+      "claim": "Sizes of Skechers Performance running and walking shoes may vary.",
+      "exact_words": "Skechers Performance running and walking footwear sizes may vary",
+      "url": "https://www.skechers.com/size-chart/",
+      "site_region": "skechers.com (US)",
+      "page_kind": "size chart",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "The page's 'Measure your feet' links are commented out in its HTML; they point to the kids' printable guide PDF."
+    },
+    {
+      "key": "sk-gauge",
+      "brand": "Skechers",
+      "kind": "measuring method (printable gauge)",
+      "claim": "The kids' Shoe Fit Guide is a printable gauge: print at 100% on letter paper, check its inch marks with a ruler, place the heel at the zero marker; the US and UK size marks (infant to big kids) run along an inch scale from 1\" to 10\". A foot past the dotted line may suit a wide style.",
+      "exact_words": "Print this Guide on 8.5\" x 11\" (letter-size) paper scaled at 100%. Do not select \"Fit to Page\" or any similar option. With a ruler, check to see if the inch marks along the right side of the Guide are accurate. ... PLACE HEEL AT ZERO MARKER ... If the child's foot goes past the dotted line, a wide-width style may be a better fit.",
+      "url": "https://www.skechers.com/on/demandware.static/-/Library-Sites-SkechersSharedLibrary/default/vd3d43f740ef85fd232780ff9d0956e184a35000f/pdf/kids%2Dsize%2Dchart%2Dus.pdf",
+      "site_region": "skechers.com (US); same file on digital-assets.skechers.com",
+      "page_kind": "printable PDF fit guide",
+      "tool": "script (pdftotext)",
+      "agrees_with": "",
+      "notes": "The gauge prints no length per size in figures: the marks' positions against the inch scale are the brand's own foot-to-size map for kids, readable only by the drawing's geometry (not done: no coordinate reader here). Both URLs give the same file (byte-equal)."
+    },
+    {
+      "key": "sk-au-cm",
+      "brand": "Skechers",
+      "kind": "regional difference / length column: label",
+      "claim": "The AU site's size selector offers US, UK, EU, and centimetres; Australian sizing is the same as US.",
+      "exact_words": "For ease, you can switch between US, UK, EU sizing, and centimeters, using the \"choose size\" dropdown above the size selector. ... AUSTRALIAN SIZING Is the same as US sizing.",
+      "url": "https://help.skechers.com.au/hc/en-us/articles/1500009182222-HOW-CAN-I-BE-SURE-I-M-SELECTING-THE-RIGHT-SIZE",
+      "site_region": "help.skechers.com.au (AU help centre)",
+      "page_kind": "help centre article",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "The centimetre scale itself is on skechers.com.au/size-guide and the product pages, both built in the browser: could not reach (script got an empty shell; the fetcher saw only the word Skechers). Whether the cm is the foot's or a label is not said here."
+    },
+    {
+      "key": "sk-au-fit",
+      "brand": "Skechers",
+      "kind": "fit allowance (qualitative)",
+      "claim": "A properly fitting shoe is snug at heel and midfoot with wiggle room around the toes.",
+      "exact_words": "Remembering that a properly fitting shoe should feel snug at the heel and midfoot, with wiggle room around the toes.",
+      "url": "https://help.skechers.com.au/hc/en-us/articles/1500009182222-HOW-CAN-I-BE-SURE-I-M-SELECTING-THE-RIGHT-SIZE",
+      "site_region": "help.skechers.com.au (AU help centre)",
+      "page_kind": "help centre article",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": ""
+    },
+    {
+      "key": "sk-guides",
+      "brand": "Skechers",
+      "kind": "measuring method (link)",
+      "claim": "The US sizing help page offers printable women's and men's fit guides.",
+      "exact_words": "Download our printer-friendly fit guide to find your best fit! Women's Fit Guide Men's Fit Guide",
+      "url": "https://www.skechers.com/direct/shoe-sizing-and-care",
+      "site_region": "skechers.com (US)",
+      "page_kind": "help page",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "Their PDFs (sh.skechers.com and digital-assets.skechers.com, womens-size-chart.pdf and mens-size-chart.pdf) refused: 520 and 403, and 520 to the fetcher. Could not reach."
+    }
+  ],
+  "leads": [
+    {
+      "brand": "Skechers",
+      "publisher": "Rebel Sport (rebelsport.com.au, retailer)",
+      "claim": "A 'Skechers SIZE GUIDE' panel on its product pages: measure middle of heel to longest toe, round to the closest 2 mm; foot length in cm differs from the CM size on the shoe box (per the search engine's summary; not read)",
+      "url": "https://www.rebelsport.com.au/p/skechers-uno-womens-walking-shoes-M68193001.html"
+    },
+    {
+      "brand": "Skechers",
+      "publisher": "WebSearch summary of skechers.com.au/size-guide",
+      "claim": "Stand with heel against a wall, measure to the tip of the biggest toe in centimetres, pick the size in a CM matrix (search snippet; the page itself could not be read)",
+      "url": "https://www.skechers.com.au/size-guide"
+    },
+    {
+      "brand": "Skechers",
+      "publisher": "WebSearch summary of sh.skechers.com womens-size-chart.pdf",
+      "claim": "Printable women's guide: foot on the grid without a shoe, instep on the line, wide if the outside reaches the purple border; kids' guide: size to the longest foot, between numbers move up (search snippet; PDFs refused)",
+      "url": "https://sh.skechers.com/skechers/new-site/womens-size-chart.pdf"
+    }
+  ],
+  "sources": [
+    "skechers-us-sizechart (skechers.com/size-chart/): US/UK/EU charts; 'Performance ... sizes may vary'; commented-out links to the kids' printable PDF. Saved page holds the words.",
+    "skechers-uk-sizeguide (skechers.com/uk/size-guide/): 410 Gone, a refusal.",
+    "skechers-kids-pdf-old, skechers-kids-pdf-us: the kids' printable Shoe Fit Guide (same bytes): instructions, heel at zero, inch scale. Saved PDFs hold the words.",
+    "skechers-au-sizeguide (skechers.com.au/size-guide): built in the browser, an empty shell; fetcher saw only 'Skechers'. Could not reach.",
+    "skechers-au-help-rightsize, skechers-au-help-search.json (help.skechers.com.au): size selector with centimetres, AU = US, snug heel, wiggle room. Saved files hold the words.",
+    "skechers-us-direct-sizing (skechers.com/direct/shoe-sizing-and-care): links to women's and men's fit guide PDFs.",
+    "skechers-womens-pdf, skechers-mens-uk-pdf, skechers-kids-uk-pdf (sh.skechers.com): 520; skechers-womens-pdf, skechers-mens-pdf (digital-assets.skechers.com): 403; fetcher 520. Refusals; the saved files are error pages."
+  ]
+}

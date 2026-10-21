@@ -1,0 +1,15 @@
+runrepeat_nike	https://runrepeat.com/size-charts/nike
+runrepeat_adidas	https://runrepeat.com/size-charts/adidas
+runrepeat_new-balance	https://runrepeat.com/size-charts/new-balance
+runrepeat_puma	https://runrepeat.com/size-charts/puma
+runrepeat_asics	https://runrepeat.com/size-charts/asics
+runrepeat_converse	https://runrepeat.com/size-charts/converse
+runrepeat_vans	https://runrepeat.com/size-charts/vans
+runrepeat_skechers	https://runrepeat.com/size-charts/skechers
+runrepeat_reebok	https://runrepeat.com/size-charts/reebok
+runrepeat_under-armour	https://runrepeat.com/size-charts/under-armour
+runrepeat_brooks	https://runrepeat.com/size-charts/brooks
+runrepeat_on	https://runrepeat.com/size-charts/on
+runrepeat_salomon	https://runrepeat.com/size-charts/salomon
+runrepeat_timberland	https://runrepeat.com/size-charts/timberland
+runrepeat_jordan	https://runrepeat.com/size-charts/jordan

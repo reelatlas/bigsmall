@@ -1,0 +1,227 @@
+{
+  "claims": [
+    {
+      "key": "dm-fl",
+      "brand": "Dr. Martens",
+      "kind": "length column: foot",
+      "claim": "The size guide's chart is headed Foot length and Foot width beside UK, EU, US Women's (cm and in tabs).",
+      "exact_words": "Women's and Men's Kid's Sizing cm in How to Measure Size guide Foot length Foot width UK EU US Women's",
+      "url": "https://www.drmartens.com/uk/en_gb/shoe-size-guide",
+      "site_region": "drmartens.com/uk (UK)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "dm-fl-us",
+      "notes": "The How to Measure steps are not in the HTML (built in the browser)."
+    },
+    {
+      "key": "dm-fl-us",
+      "brand": "Dr. Martens",
+      "kind": "length column: foot",
+      "claim": "The US size guide carries the same headings.",
+      "exact_words": "How to Measure Size guide Foot length",
+      "url": "https://www.drmartens.com/us/en/about/size-guide",
+      "site_region": "drmartens.com/us (US)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "dm-fl",
+      "notes": ""
+    },
+    {
+      "key": "dm-tts",
+      "brand": "Dr. Martens",
+      "kind": "fit direction / between sizes",
+      "claim": "Most styles run true to size; between sizes, take the larger with an insole that adds half a size; start from the usual size; product pages carry fit recommendations generated from customer reviews.",
+      "exact_words": "The size of our boots, shoes and sandals can differ between silhouettes, but we’d say that most run true to size. ... If you are in-between sizes, you might find that using an insole in the larger size is the way to go. ... If you go with a larger size, try using an insole which adds half a size. ... And if you're still unsure, try ordering your usual size as a starting point.",
+      "url": "https://www.drmartens.com/uk/en_gb/shoe-size-guide",
+      "site_region": "drmartens.com/uk (UK)",
+      "page_kind": "size guide FAQ",
+      "tool": "script",
+      "agrees_with": "dm-tts-us",
+      "notes": "Also: 'Some styles also have the inner length and inner width in the table, too, in case you want to measure up.' Standard sizes UK 3-9 women's, 6-12 men's, 3-12 unisex."
+    },
+    {
+      "key": "dm-tts-us",
+      "brand": "Dr. Martens",
+      "kind": "fit direction / between sizes",
+      "claim": "The US guide's FAQ says the same.",
+      "exact_words": "we'd say that most run true to size. If you are in-between sizes, you might find that using an insole in the larger size is the way to go. ... If you go with a larger size, try using an insole which adds half a size.",
+      "url": "https://www.drmartens.com/us/en/about/size-guide",
+      "site_region": "drmartens.com/us (US)",
+      "page_kind": "size guide FAQ",
+      "tool": "script",
+      "agrees_with": "dm-tts",
+      "notes": "support.drmartens.com and supportca help articles: 401 (could not reach)."
+    },
+    {
+      "key": "bk-formula",
+      "brand": "Birkenstock",
+      "kind": "declared relation between labels",
+      "claim": "Footwear is listed in European sizes; women's US + 31 = EU, men's US + 33 = EU.",
+      "exact_words": "All our footwear is listed in European sizes. To find yours, use the formula below or reference your U.S. shoe size in our conversion chart. Women’s: U.S. size + 31 = EU size Men’s: U.S. size + 33 = EU size",
+      "url": "https://www.birkenstock.com/us/us-service-fittingguide.html",
+      "site_region": "birkenstock.com/us (US)",
+      "page_kind": "fit guide",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "Points to a downloadable foot measurement template (PDF, not read)."
+    },
+    {
+      "key": "bk-mm",
+      "brand": "Birkenstock",
+      "kind": "length column: foot (by the calculator)",
+      "claim": "The US size chart gives, per US size pair, a length range From and To in mm with width ranges for narrow and regular; the fit calculator takes each foot's measured length and width and says its result is based on this chart.",
+      "exact_words": "US sizes and measurements (in mm) Size Width Length Width From To From To 4-4.5 Narrow 221 225 81 84 ...",
+      "url": "https://www.birkenstock.com/us/fit-guide-size-chart.html",
+      "site_region": "birkenstock.com/us (US)",
+      "page_kind": "size chart",
+      "tool": "script",
+      "agrees_with": "bk-calc",
+      "notes": "The page does not itself say 'foot'. As printed, 5-5.5 is 226-230 and 6-6.5 is 246-250 (a jump)."
+    },
+    {
+      "key": "bk-calc",
+      "brand": "Birkenstock",
+      "kind": "between-sizes advice / rule source",
+      "claim": "Malaysia fit calculator: enter each foot's length and width; unsure, choose the next size up; the calculation is based on the size chart.",
+      "exact_words": "To determine the perfect size, please choose whether the calculation is for kids’ or adults’ feet and enter the measurements for each foot. ... If are unsure about your size, we recommend choosing the next size up, as feet expand slightly during the day. This calculation is based on our size chart",
+      "url": "https://www.birkenstock.com/my/passform/knowledge-fit.html",
+      "site_region": "birkenstock.com/my (MY)",
+      "page_kind": "fit calculator",
+      "tool": "script",
+      "agrees_with": "bk-mm",
+      "notes": ""
+    },
+    {
+      "key": "ug-kids",
+      "brand": "UGG",
+      "kind": "measuring method (printable gauge, kids) / between sizes",
+      "claim": "Kids' printable size chart: credit-card scale check, heel against a wall, measure each foot; different sizes, choose the larger; between two sizes, go a size up; length only.",
+      "exact_words": "If your kid's feet are different sizes, choose the larger size. If your kid's feet fall between two sizes, go a size up. Only measure the length. Don't measure the width. ... Have your kid stand on the size chart with their heel against the wall and measure their right foot. Then, measure their left foot.",
+      "url": "https://www.ugg.com/on/demandware.static/-/Sites-UGG-CA-Library/default/dw700df518/images/landing/customerservice/UGG_K_Printable_Size_Chart.pdf",
+      "site_region": "ugg.com (CA library)",
+      "page_kind": "printable PDF gauge",
+      "tool": "script (pdftotext)",
+      "agrees_with": "",
+      "notes": "Kids only; US sizes only. Adult pages on ugg.com refused (406; fetcher: header overflow); ugg.com.au page 404."
+    },
+    {
+      "key": "vn-mm",
+      "brand": "Vans",
+      "kind": "measuring method / length column: foot",
+      "claim": "Measure in millimetres from longest toe to heel, heel against a wall; the unisex chart's last column is Foot Length.",
+      "exact_words": "Put your foot on a flat surface with your heel against a wall or straight edge. Use a ruler to measure the length in millimetres from the tip of your longest toe to your heel. Keep in mind that your longest toe isn't necessarily your big toe! ... Unisex Shoes: US Men | US Women | US Boy | UK | EU | JP | Foot Length",
+      "url": "https://www.vans.com/en-us/help/size-charts",
+      "site_region": "vans.com/en-us (US)",
+      "page_kind": "size charts",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "The US chart's Foot Length cells read as inches (8.5 ... 13.4)."
+    },
+    {
+      "key": "vn-skate",
+      "brand": "Vans",
+      "kind": "declared relation / fit direction",
+      "claim": "US standard sizes; women's to men's is 1.5 sizes down; high-performance skate shoes fit snug, so perhaps a half size larger; a wide foot may go one size larger.",
+      "exact_words": "Our shoes are sized according to the US standard; the size conversion from women's to men's shoes is 1.5 sizes down. For example, if you were a size 8 in women's, you'd be a size 6.5 in men's. ... Please note, by design, our high performance skate shoes tend to fit snug, so you may want to select a half size larger. Alternatively, if you have a wide foot, you may purchase one size larger to compensate for the width",
+      "url": "https://www.vans.com/en-us/help/faq",
+      "site_region": "vans.com/en-us (US)",
+      "page_kind": "FAQ",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": ""
+    },
+    {
+      "key": "tb-measure",
+      "brand": "Timberland",
+      "kind": "measuring method",
+      "claim": "Size chart: paper against the wall, heel to the wall, mark the longest toe, measure from the wall, both feet, compare with the chart (EU, UK, USA, Inch).",
+      "exact_words": "Place a piece of paper that's larger than your foot against the wall. Stand with one foot on the paper, with your heel just up against the wall. Mark the end of your longest toe on the paper (you may need a friend to help) and measure from the wall to the marking. Do the same for the other foot and compare measurements with our size chart to get the right size!",
+      "url": "https://www.timberland.com/en-us/customer-care/size-chart",
+      "site_region": "timberland.com/en-us (US)",
+      "page_kind": "size chart",
+      "tool": "script",
+      "agrees_with": "tb-measure2",
+      "notes": "Chart header: EU | UK | USA | Inch; the inch column is not named the foot's."
+    },
+    {
+      "key": "tb-measure2",
+      "brand": "Timberland",
+      "kind": "measuring method",
+      "claim": "FAQ: trace with full weight, pencil upright, measure from the big toe to the centre back of the heel; line your foot measurements up with the boots' measurements.",
+      "exact_words": "For the most accurate measurement, put your full weight on your foot and keep the pencil straight up and down. Measure your traced foot from the point of your big toe to the center back of your heel. ... Once you know how to measure boot size, all you need to do is line up your foot measurements with the measurements of our boots.",
+      "url": "https://www.timberland.com/en-us/customer-care/product-faqs/how-to-measure-boots",
+      "site_region": "timberland.com/en-us (US)",
+      "page_kind": "FAQ",
+      "tool": "script",
+      "agrees_with": "tb-measure",
+      "notes": "Big toe here, longest toe on the chart page. help.timberland.com refused (TLS)."
+    },
+    {
+      "key": "ho-unreached",
+      "brand": "HOKA",
+      "kind": "could not reach",
+      "claim": "hoka.com's size chart refused the script (406) and the fetcher (header overflow); no other HOKA page was tried within the budget.",
+      "exact_words": "",
+      "url": "https://www.hoka.com/en/us/size-chart.html",
+      "site_region": "hoka.com (US)",
+      "page_kind": "size chart",
+      "tool": "script; fetcher",
+      "agrees_with": "",
+      "notes": ""
+    },
+    {
+      "key": "cr-unreached",
+      "brand": "Crocs",
+      "kind": "could not reach",
+      "claim": "crocs.com/size-chart, crocs.com.au's fit guide, and crocs.co.uk's size-chart and fit-guide includes are built in the browser (the fetcher saw 'Loading...'); the US FAQ page holds no sizing words in its HTML.",
+      "exact_words": "",
+      "url": "https://www.crocs.com/size-chart",
+      "site_region": "crocs.com, crocs.co.uk, crocs.com.au",
+      "page_kind": "size chart / fit guide",
+      "tool": "script; fetcher",
+      "agrees_with": "",
+      "notes": ""
+    }
+  ],
+  "leads": [
+    {
+      "brand": "Dr. Martens",
+      "publisher": "WebSearch summary of drmartens.com size-info and support.drmartens.com",
+      "claim": "Whole sizes only; women's US half sizes size down, men's US half sizes size up; unisex half size down (search snippet; support pages 401)",
+      "url": "https://support.drmartens.com/hc/en-us/articles/41094106900115-What-should-I-do-if-I-am-between-sizes"
+    },
+    {
+      "brand": "UGG",
+      "publisher": "WebSearch summary of ugg.com sizing-information and ugg.com.au",
+      "claim": "Heel and longest toe marked, longer foot to the chart; between sizes try both; AU: runs true to size, a half size orders a size up, worn barefoot (search snippet; pages refused)",
+      "url": "https://www.ugg.com/sizing-information.html"
+    },
+    {
+      "brand": "Crocs",
+      "publisher": "WebSearch summary of crocs.co.uk and crocs.com FAQ",
+      "claim": "In between sizes round up; most shoes roomy; Crocs run true to size; a ruler gives an approximate measure; charts by foot length in inches and mm (search snippet; pages built in the browser)",
+      "url": "https://www.crocs.co.uk/size-chart"
+    },
+    {
+      "brand": "Timberland",
+      "publisher": "WebSearch summary of timberland.com blogs",
+      "claim": "Hiking boots a half or full size bigger; work boots snug (search snippet)",
+      "url": "https://www.timberland.com/en-gb/blog/faq/a-guide-to-finding-comfortable-boots"
+    },
+    {
+      "brand": "Vans",
+      "publisher": "WebSearch summary of vans.com.au size guide",
+      "claim": "Measure in cm with heel against a wall, use the CM matrix on the product page (search snippet; AU help article had no words)",
+      "url": "https://www.vans.com.au/size-guide"
+    }
+  ],
+  "sources": [
+    "drm-us-sizeguide (drmartens.com/us/en/size-guide), drm-us-sizeinfo: 404. drm-support-between, drm-support-runbig, drm-ca-support-between: 401. drm-uk-shoesizeguide, drm-us-about-sizeguide: Foot length heading, FAQ. Saved pages hold the words.",
+    "birk-us-fitguide: US+31/+33 formula. birk-us-sizechart: mm ranges. birk-my-fit: calculator, next size up. Saved pages hold the words.",
+    "ugg-us-sizechart, ugg-us-sizinginfo: 406; fetcher header overflow. ugg-au-coloursizes: 404. ugg-kids-pdf: kids' printable chart. Saved PDF holds the words.",
+    "crocs-uk-include-men, crocs-uk-include-fit, crocs-au-fitguide, crocs-us-sizechart: built in the browser (no words); fetcher on crocs.com/size-chart: 'Loading...'. crocs-us-faqs: no sizing words. Could not reach.",
+    "hoka-us-sizechart: 406; fetcher header overflow. Could not reach.",
+    "tim-us-howtomeasure, tim-us-sizechart (timberland.com): measuring. Saved pages hold the words. tim-help-adult (help.timberland.com): TLS handshake failure. timberland-us-sizechart (en-us/size-chart): 500.",
+    "vans-us-helpsize, vans-us-faq (vans.com): mm measuring, Foot Length column, skate half size. Saved pages hold the words. vans-au-help: no words. vans-us-sizechart: 500."
+  ]
+}

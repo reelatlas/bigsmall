@@ -1,0 +1,136 @@
+{
+  "claims": [
+    {
+      "key": "rb-au-chart",
+      "brand": "Reebok",
+      "kind": "lacking scale printed (UK, EU) / length column: foot",
+      "claim": "Reebok Australia's size guide prints men's and women's footwear charts with US, UK, EU, CM, and INCH columns; the same page says its measurement is the foot's length and to apply it to the size chart.",
+      "exact_words": "Men's Footwear US UK EU CM INCH ... This measurement represents the length of the foot. ... Apply the longer of the two measurements to our size chart to find the right correlating size for the recorded foot length.",
+      "url": "https://reebok.com.au/pages/size-guides",
+      "site_region": "reebok.com.au (AU)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "rb-us-measure",
+      "notes": "Cells in charts.csv (men's 24 rows, women's 14 rows). The CM column is not itself labelled 'foot length'; the page's measuring text ties the chart to the foot length. Reebok's AU site is run for the brand in Australia; flagged as a regional site."
+    },
+    {
+      "key": "rb-au-measure",
+      "brand": "Reebok",
+      "kind": "measuring method",
+      "claim": "Paper taped to a hard floor, stand with weight even, a helper marks big toe tip and outermost heel, measure between the marks; repeat for the other foot.",
+      "exact_words": "With a pen or pencil pointed straight down, have a friend or partner assist you by marking the tip of the big toe and the outermost part of the heel. Once the marks are recorded, step off the paper and use a ruler or tape measure to measure the distance between the two points. This measurement represents the length of the foot. Repeat the process with the other foot. Please note that it is common for one foot to be a slightly different length to the other.",
+      "url": "https://reebok.com.au/pages/size-guides",
+      "site_region": "reebok.com.au (AU)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "rb-us-measure",
+      "notes": "Big toe, not longest toe, in the AU words."
+    },
+    {
+      "key": "rb-au-between",
+      "brand": "Reebok",
+      "kind": "between-sizes advice",
+      "claim": "Between sizes, size up.",
+      "exact_words": "If the measurement is between sizes, we recommend sizing up.",
+      "url": "https://reebok.com.au/pages/size-guides",
+      "site_region": "reebok.com.au (AU)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "Not found on the US or CA pages."
+    },
+    {
+      "key": "rb-au-clubc",
+      "brand": "Reebok",
+      "kind": "fit direction (by line)",
+      "claim": "Club C runs narrower: size up 0.5; all other ranges true to size.",
+      "exact_words": "Fit Note Club Cs tend to be more narrower so we recommend sizing up 0.5. All other ranges are true to size and we recommend picking your usual size.",
+      "url": "https://reebok.com.au/pages/size-guides",
+      "site_region": "reebok.com.au (AU)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": ""
+    },
+    {
+      "key": "rb-us-measure",
+      "brand": "Reebok",
+      "kind": "measuring method / length column: foot",
+      "claim": "US unisex guide: heel against a wall, mark the longest toe on both feet, measure in inches, take the larger and compare with the chart, whose length column is Heel-Toe Measurement (in).",
+      "exact_words": "Place a piece of paper on a hard floor with one end to the wall. Stand on the piece of paper with the heel slightly touching the wall. ... Mark the end of your longest toe with a pencil for both feet. ... Measure your markings in inches. Take the larger of the two foot length values and compare it with our sizing chart.",
+      "url": "https://www.reebok.com/pages/unisex-shoe-size-guide",
+      "site_region": "reebok.com (US)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "rb-ca-measure",
+      "notes": "Chart columns: U.S. Men Size | U.S. Women Size | Heel-Toe Measurement (in) (read in the earlier pass)."
+    },
+    {
+      "key": "rb-ca-measure",
+      "brand": "Reebok",
+      "kind": "measuring method / length column: foot",
+      "claim": "Canada: the same three steps, the larger foot length compared with the chart; the chart's top row is Heel-toe measurement in inches.",
+      "exact_words": "Measure your marketing from the wall (heel) to the longest toe for both feet. Take the larger of the two foot length values and compare it with our sizing chart, to define your Reebok shoe size.",
+      "url": "https://reebok.ca/pages/mens-and-womens-footwear-size-chart",
+      "site_region": "reebok.ca (CA)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "rb-us-measure",
+      "notes": "'marketing' is the page's typo for 'markings'. The CA chart prints US women 7.5 then 7 at the 9\" and 9.2\" columns (as printed)."
+    },
+    {
+      "key": "rb-ca-boots",
+      "brand": "Reebok",
+      "kind": "lacking scale printed (EU)",
+      "claim": "Reebok Canada's Winter Boots Sizing prints Euro against Canada/US for women's and men's boots, some as ranges.",
+      "exact_words": "Winter Boots Sizing Women's Boots Euro Canada/US 36 5 - 5 ½ ... M en's Boots Euro Canada/US 40 7 ... 42 8 ½ - 9",
+      "url": "https://reebok.ca/pages/mens-and-womens-footwear-size-chart",
+      "site_region": "reebok.ca (CA)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "Cells in charts.csv. Scope: winter boots only, as printed."
+    },
+    {
+      "key": "rb-uk-unreached",
+      "brand": "Reebok",
+      "kind": "could not reach",
+      "claim": "reebok.co.uk (its help-section size charts page, which search lists with a cm/UK chart) refused the connection to the script (timeout) and to the fetcher (ECONNREFUSED); reebok.eu's home is built in the browser.",
+      "exact_words": "",
+      "url": "https://www.reebok.co.uk/help-section-size_charts.html",
+      "site_region": "reebok.co.uk (UK); reebok.eu",
+      "page_kind": "help page",
+      "tool": "script; fetcher",
+      "agrees_with": "",
+      "notes": ""
+    }
+  ],
+  "leads": [
+    {
+      "brand": "Reebok",
+      "publisher": "WebSearch summary of reebok.co.uk/help-section-size_charts.html",
+      "claim": "A cm chart from 21 to 33 cm against UK men's and UK women's sizes (21 cm = UK men's 1, women's 1.5) (search snippet; page refused)",
+      "url": "https://www.reebok.co.uk/help-section-size_charts.html"
+    },
+    {
+      "brand": "Reebok",
+      "publisher": "Weekend Offender (retailer)",
+      "claim": "Reebok size guide with UK, US, EU, Foot Length (cm), e.g. UK 7 / US 8 / EU 40.5 / 26.0 cm (search snippet)",
+      "url": "https://weekendoffender.com/pages/reebok-size-guide"
+    },
+    {
+      "brand": "Reebok",
+      "publisher": "Bergfreunde / Alpinetrek (retailers)",
+      "claim": "Reebok size charts (EU, UK) (search result)",
+      "url": "https://www.bergfreunde.eu/reebok-size-chart/"
+    }
+  ],
+  "sources": [
+    "reebok-us-sizechart (reebok.com/size-chart), reebok-ca-sizechart (reebok.ca/en/size-chart): guessed URLs, 404.",
+    "reebok-ca-footwear-chart (reebok.ca/pages/mens-and-womens-footwear-size-chart): heel-toe inches chart, winter boots Euro charts (transcribed), how to measure. Saved page holds the words.",
+    "reebok-eu-home (reebok.eu): built in the browser, no words. reebok-uk-home (reebok.co.uk): connection timed out; fetcher ECONNREFUSED on its help page. Could not reach.",
+    "reebok-us-unisex-guide (reebok.com/pages/unisex-shoe-size-guide): measuring in inches, larger foot to the chart. Saved page holds the words.",
+    "reebok-au-sizeguides (reebok.com.au/pages/size-guides): US/UK/EU/CM/INCH charts (transcribed), foot length method, size up between sizes, Club C fit note. Saved page holds the words.",
+    "reebok-us-old-include (m.reebok.com demandware include): host does not resolve."
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "claims": [
+    {
+      "key": "nk-fl",
+      "brand": "Nike",
+      "kind": "length column: foot / label vs foot",
+      "claim": "The chart's length rows are Foot Length (in) and (cm); the CM size on boxes and labels is not the foot length.",
+      "exact_words": "Find your size in the chart below. If you do not know your size, use the How To Measure Foot Length prompts at the bottom of the size guide to help you find the right size. Please note the CM size displayed on shoe boxes and labels is different than Foot Length (cm).",
+      "url": "https://www.nike.com/size-fit/mens-footwear",
+      "site_region": "nike.com (US)",
+      "page_kind": "size guide (men's footwear)",
+      "tool": "script",
+      "agrees_with": "nk-fl-w",
+      "notes": ""
+    },
+    {
+      "key": "nk-fl-w",
+      "brand": "Nike",
+      "kind": "length column: foot / label vs foot",
+      "claim": "Same sentences on the women's footwear guide.",
+      "exact_words": "Please note the CM size displayed on shoe boxes and labels is different than Foot Length (cm).",
+      "url": "https://www.nike.com/size-fit/womens-footwear",
+      "site_region": "nike.com (US)",
+      "page_kind": "size guide (women's footwear)",
+      "tool": "script",
+      "agrees_with": "nk-fl",
+      "notes": ""
+    },
+    {
+      "key": "nk-measure",
+      "brand": "Nike",
+      "kind": "measuring method / between sizes",
+      "claim": "Helper marks big toe tip and outermost heel on taped paper, weight even; the distance is the foot length; take the longer foot; between sizes, size up.",
+      "exact_words": "With a pen or pencil pointed straight down, have a friend or partner assist you by marking the tip of the big toe and the outermost part of the heel. Once the marks are recorded, step off the paper and use a ruler or measuring tape to measure the distance between the two points. This measurement represents the length of the foot. ... Apply the longer of the two measurements to our size chart to find the right correlating size for the recorded foot length. If the measurement is between sizes, we recommend sizing up.",
+      "url": "https://www.nike.com/size-fit/mens-footwear",
+      "site_region": "nike.com (US)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "nk-measure-w",
+      "notes": "Word for word the method on reebok.com.au (rb-au-measure)."
+    },
+    {
+      "key": "nk-measure-w",
+      "brand": "Nike",
+      "kind": "measuring method / between sizes",
+      "claim": "The same method and size-up advice on the women's guide.",
+      "exact_words": "This measurement represents the length of the foot. ... If the measurement is between sizes, we recommend sizing up.",
+      "url": "https://www.nike.com/size-fit/womens-footwear",
+      "site_region": "nike.com (US)",
+      "page_kind": "size guide",
+      "tool": "script",
+      "agrees_with": "nk-measure",
+      "notes": ""
+    },
+    {
+      "key": "ad-ht",
+      "brand": "adidas",
+      "kind": "length column: foot (heel-toe)",
+      "claim": "The Bahrain site's men's and women's footwear chart carries Heel-toe (INCH) and Heel-toe (cm) rows beside UK, EU (thirds), US men, US women, under HOW TO MEASURE.",
+      "exact_words": "Men's and women's adidas footwear sizing HOW TO MEASURE Inches Heel-toe (INCH) ... Heel-toe (cm) 22.1 cm ...",
+      "url": "https://www.adidas.com/bh/en/size-chart-men-shoes.html",
+      "site_region": "adidas.com/bh (Bahrain)",
+      "page_kind": "size chart",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "The US and UK pages refused (403)."
+    },
+    {
+      "key": "ad-measure",
+      "brand": "adidas",
+      "kind": "measuring method",
+      "claim": "Measure at day's end; heel lightly against a wall; mark the longest toe; measure wall to mark; both feet; compare with the chart.",
+      "exact_words": "For the best fit, measure your feet at the end of the day. 1. Step on а piece of paper with your heel slightly touching a wall behind. 2. Мark the end of your longest toe on the paper (you might need a friend to help you) and measure from the wall to the marking. 3. Do the same for the other foot and compare measurements with our size chart to get the right size.",
+      "url": "https://www.adidas.com/bh/en/size-chart-men-shoes.html",
+      "site_region": "adidas.com/bh (Bahrain)",
+      "page_kind": "size chart",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "The page's text uses Cyrillic а and М in two words (as printed)."
+    },
+    {
+      "key": "ad-between",
+      "brand": "adidas",
+      "kind": "between-sizes advice",
+      "claim": "Between sizes: one size down for a tight fit, one size up for a loose fit.",
+      "exact_words": "IN BETWEEN SIZES? For tight fit, go one size down. For loose fit, go one size up.",
+      "url": "https://www.adidas.com/bh/en/size-chart-men-shoes.html",
+      "site_region": "adidas.com/bh (Bahrain)",
+      "page_kind": "size chart",
+      "tool": "script",
+      "agrees_with": "",
+      "notes": "Search shows another adidas page saying 'If between sizes, we recommend you order 1/2 size up' (lead; not read)."
+    },
+    {
+      "key": "as-plus-nz",
+      "brand": "Asics",
+      "kind": "rule: measure and add",
+      "claim": "Measure heel to longest toe in cm, then add 1 to 1.5 cm to get the length to match with the size guide.",
+      "exact_words": "With the outline, measure a straight line from your heel to the longest toe. This gives you the length of your foot in centimeters. STEP 3 Lastly, add 1-1.5 centimeters to the length. This will give you the correct length to match with our shoe size guide. This extra space gives your feet room to warm up and expand during your run.",
+      "url": "https://www.asics.com/nz/en-nz/mk/running-shoe-fit-guide/how-to-measure-shoe-size",
+      "site_region": "asics.com/nz (NZ)",
+      "page_kind": "fit guide",
+      "tool": "script",
+      "agrees_with": "as-plus-au",
+      "notes": "So the size guide's CM is not the bare foot length: the rule matches foot + 1 to 1.5 cm to it."
+    },
+    {
+      "key": "as-plus-au",
+      "brand": "Asics",
+      "kind": "rule: measure and add",
+      "claim": "Australia: the same three steps, word for word, adding 1 to 1.5 cm.",
+      "exact_words": "Step 3 Lastly, add 1-1.5 centimeters to the length. This will give you the correct length to match with our shoe size guide. This extra space gives your feet room to warm up and expand during your run.",
+      "url": "https://www.asics.com/au/en-au/mk/how-to-measure-your-shoe-size",
+      "site_region": "asics.com/au (AU)",
+      "page_kind": "fit guide",
+      "tool": "script",
+      "agrees_with": "as-plus-nz",
+      "notes": "Also points to a printable Foot Measurement Tool for Kids."
+    },
+    {
+      "key": "sa-fl-sg",
+      "brand": "Salomon",
+      "kind": "measuring method / length column: foot",
+      "claim": "Singapore's footwear sizing guides: measure in the socks you wear with the shoe, heel to the wall, line just before the big toe, take the longer foot; the chart has FOOT LENGTH (CM) and (INCH) columns.",
+      "exact_words": "Make sure you are wearing the same socks that you would normally wear with this type of shoe. Wearing these socks, stand on the sheet of paper with your foot perpendicular to the wall and your heel against the wall. Then use a pen to draw a line just before your big toe. Repeat this for both feet and take the longer distance to determine your size. Using a ruler, measure the distance between the wall and the line you drew to find your size. UK EUR JP US FOOT LENGTH (CM) FOOT LENGTH (INCH)",
+      "url": "https://sg.salomon.com/pages/mens-footwear",
+      "site_region": "sg.salomon.com (SG)",
+      "page_kind": "size guide (men's)",
+      "tool": "script",
+      "agrees_with": "sa-fl-sg-w",
+      "notes": "The SG table's cells read out of order in the HTML (JP and foot cm share values); not transcribed (Salomon not named as lacking)."
+    },
+    {
+      "key": "sa-fl-sg-w",
+      "brand": "Salomon",
+      "kind": "measuring method / length column: foot",
+      "claim": "Same steps and columns on the women's guide.",
+      "exact_words": "Using a ruler, measure the distance between the wall and the line you drew to find your size. ... FOOT LENGTH (CM) FOOT LENGTH (INCH)",
+      "url": "https://sg.salomon.com/pages/womens-footwear",
+      "site_region": "sg.salomon.com (SG)",
+      "page_kind": "size guide (women's)",
+      "tool": "script",
+      "agrees_with": "sa-fl-sg",
+      "notes": ""
+    }
+  ],
+  "leads": [
+    {
+      "brand": "adidas",
+      "publisher": "WebSearch summary of an adidas sizing page",
+      "claim": "If between sizes, we recommend you order 1/2 size up (search snippet; adidas.com US pages refused)",
+      "url": "https://www.adidas.com/us/help-section-size_charts.html"
+    },
+    {
+      "brand": "Asics",
+      "publisher": "WebSearch summary of asics.com/my shoe-size-guide",
+      "claim": "The length of the shoe is about 1 cm longer than your foot (search snippet; the page is built in the browser)",
+      "url": "https://www.asics.com/my/en-my/shoe-size-guide"
+    },
+    {
+      "brand": "Asics",
+      "publisher": "WebSearch summary of asics.com/us blog Ensuring Your Running Shoes Fit",
+      "claim": "Between half and a full thumb's width of space; less than that, consider going up half a size (search snippet)",
+      "url": "https://www.asics.com/us/en-us/blog/ensuring-your-running-shoes-fit/"
+    }
+  ],
+  "sources": [
+    "salomon-sg-mens, salomon-sg-womens (sg.salomon.com pages): measuring in socks, FOOT LENGTH (CM)/(INCH). Saved pages hold the words.",
+    "nike-us-sizefit-mens, nike-us-sizefit-womens (nike.com/size-fit): Foot Length rows; box CM differs from foot length; measuring; size up between sizes. Saved pages hold the words.",
+    "newbalance-us-sizechart, nb-us-faq-sizing, nb-uk-sizechart: 403 (634 bytes). nb-support-fit: TLS refused. Could not reach.",
+    "drmartens-us-sizeguide: 404. ugg-us-sizechart, hoka-us-sizechart: 406 (bot wall). clarks-uk-sizeguide: 404. vans-us-sizechart, timberland-us-sizechart: 500 (bot wall).",
+    "adidas-us-help-men, adidas-us-blog-measure, adidas-uk-blog-measure: 403. adidas-bh-men (adidas.com/bh): heel-toe inch and cm chart, how to measure, in between sizes. Saved page holds the words.",
+    "asics-nz-measure, asics-au-measure: add 1-1.5 cm. Saved pages hold the words. asics-my-guide: built in the browser, no words."
+  ]
+}

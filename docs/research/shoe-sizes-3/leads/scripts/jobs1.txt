@@ -1,0 +1,11 @@
+stockx_help	https://stockx.com/help/articles/i-dont-know-how-an-item-fits-can-you-make-a-size-recommendation
+runrepeat_hoka	https://runrepeat.com/size-charts/hoka
+scheels_hoka	https://www.scheels.com/size-chart/hoka-adults-footwear-size-chart.html
+looksize_drmartens	https://www.looksize.com/brand-size-chart/dr-martens
+bergfreunde_drmartens	https://www.bergfreunde.eu/dr-martens-size-chart/
+hibbett_nike	https://www.hibbett.com/blog-expert-advice/do-nike-shoes-run-small.html
+manofmany_sizing	https://manofmany.com/style/one-size-not-fit-definitive-guide-sneaker-sizing
+fwm_hoka_brooks	https://footwearmagazine.com/hoka-sizing-vs-brooks-running-shoe-sizes/
+goat_sizeguide	https://www.goat.com/size-guide
+zappos_conv	https://www.zappos.com/c/shoe-size-conversion
+flightclub_sizing	https://www.flightclub.com/size-guide

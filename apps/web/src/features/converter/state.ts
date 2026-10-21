@@ -175,6 +175,11 @@ function readsWomen(unit: Unit | null, line: ShoeLine | null): boolean {
   return unit?.id === 'us-women' || (line === 'women' && unit?.id !== 'us-men');
 }
 
+/** The line a scale names (ADR 0028): US women's the women's, US men's the men's, the rest none. */
+function lineOfScale(scale: string): 'men' | 'women' | null {
+  return scale === 'us-women' ? 'women' : scale === 'us-men' ? 'men' : null;
+}
+
 export type Action =
   /**
    * A keystroke or paste in the box. `at` is a monotonic time in ms; only gaps between inputs
@@ -1596,10 +1601,13 @@ function brandNote(
  * lower end; none where the brand has no row for the box, so the number as typed goes with the
  * scale) with the line the row was read on; so a size is read on another scale without leaving
  * the brand, which the scale rows, ISO's, cannot do, since taking one takes the brand out. Where
- * the brand prints its lines apart, the scales its other chart alone prints follow under that
- * chart's own heading, each read at the foot in play, the nearest row, or with the number cleared
- * where the brand gives no foot (Sean, 2026-10-21, the hundred-and-twenty-third pass: Asics's
- * women's page prints no US men's column, so a women's reading offered no men's scale). With
+ * the brand prints its lines apart, the other line's own scale, and any scale its other chart
+ * alone prints, follow under that chart's own heading, since that chart is the one they read,
+ * each read at the foot in play, the nearest row, or with the number cleared where the brand
+ * gives no foot (Sean, 2026-10-21, the hundred-and-twenty-third pass: Asics's women's page prints
+ * no US men's column, so a women's reading offered no men's scale; and later that day: Nike's
+ * men's page prints a women's column, so its US W sat under the men's heading with the men's
+ * page's number, where taking it reads the women's chart). With
  * `choose`, the table's place while a brand has no scale (its chip emptied, or a brand alone),
  * the heading asking for one, as Cooking lists its ingredients until one is chosen (Sean,
  * 2026-10-21), the number as typed going with any scale there, the other chart's too.
@@ -1645,7 +1653,12 @@ export function scaleList(
     const scale = each.unit;
     let text: string | undefined;
     if (isBrandScale(scale.id)) {
-      if (brandSpan(chart, scale.id, women) === null) {
+      // The other line's own scale (US W beside the men's chart) reads the other chart, as a US
+      // women's size always does (lineAfter), whichever page prints the column: it sits under
+      // that chart's heading, read on it; a brand with one chart for everyone keeps every scale
+      // under its one heading (Sean, 2026-10-21).
+      const theirs = other !== null && lineOfScale(scale.id) === other.line;
+      if (theirs || brandSpan(chart, scale.id, women) === null) {
         if (!other || brandSpan(other, scale.id, otherWomen) === null) continue;
         // The nearest row of the other chart at the same foot; with no foot to read from (the
         // brand gives none, or the size is off its chart) the number is cleared, a women's 8

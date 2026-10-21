@@ -30,8 +30,10 @@ const PAGES = [
 for (const path of PAGES) {
   test(`${path} renders with no WCAG violations`, async ({ page }) => {
     // The gallery holds every component in every theme: axe takes its time over it, the more so
-    // on CI's dev server.
-    test.slow(path === '/dev/gallery', 'the gallery is every component in every theme');
+    // on CI's dev server, and WebKit lays the page out in twenty seconds first (docs/PLAN.md §2;
+    // a minute in Chromium with the suite's workers beside it, ninety seconds on the edge in
+    // WebKit, 2026-10-21).
+    if (path === '/dev/gallery') test.setTimeout(180_000);
     await page.goto(path);
     if (path === '/') await ready(page);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -52,6 +54,9 @@ test('no text field on any page is under 16 px, the size a phone zooms into', as
   isMobile,
 }) => {
   test.skip(!isMobile, 'the phone project reads the sizes');
+  // Every page in one test, the gallery among them, which WebKit lays out in twenty seconds or so
+  // (every component in every theme; docs/LEARNINGS.md, 2026-10-21): the budget is the slow one.
+  test.slow(true, 'every page, the gallery among them');
   // iOS zooms into a focused field whose text is under 16 px (docs/LEARNINGS.md, 2026-10-17):
   // every drawn text field on every page, the labs' and the gallery's too, is 16 or more.
   for (const path of PAGES) {

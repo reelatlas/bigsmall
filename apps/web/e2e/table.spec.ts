@@ -88,22 +88,44 @@ const scrollHeadingUnder = (page: Page, heading: string) =>
   }, heading);
 
 /**
- * The right edge of every row's first drawn cell, the whole number's: with Decimal the decimal
- * points line up on it, with Fraction the whole numbers; one edge for every row when the rows
- * line up.
+ * The right edge of every row's whole number's text, not its cell, which the column sizes alike:
+ * with Decimal the decimal points line up on it, with Fraction the whole numbers; one edge for
+ * every row when the rows line up.
  */
 // The rows with a whole number, a dash's and a brand's cell as printed among them: a pair, or a
 // message, is written across.
 const firstCellRights = (page: Page) =>
-  page
-    .locator('[data-row] > [role="gridcell"]:first-child:has([data-whole])')
-    .evaluateAll((units) =>
-      units.map((unit) => {
-        const range = document.createRange();
-        range.selectNodeContents(unit.firstElementChild!);
-        return Math.round(range.getBoundingClientRect().right);
-      }),
-    );
+  page.locator('[data-row] > [role="gridcell"] > [data-whole]').evaluateAll((wholes) =>
+    wholes.map((whole) => {
+      const range = document.createRange();
+      range.selectNodeContents(whole);
+      return Math.round(range.getBoundingClientRect().right);
+    }),
+  );
+
+/**
+ * Where the marks sit (the hundred-and-twenty-fifth pass): for every row with a drawn mark (≈, <,
+ * >), the row's own and not Both's second form's, the mark's edges and the left edge of the row's
+ * whole number's text. The marks line up when their left edges are one, at the whole numbers'
+ * start, and a mark never meets its own number when it ends before that number starts; a wider
+ * number without a mark starts where the marks end, as it did when the mark was written with the
+ * number.
+ */
+const marks = (page: Page) =>
+  page.locator('[data-row] > [role="gridcell"]').evaluateAll((units) => {
+    const edges = (element: Element | null) => {
+      if (!element?.textContent) return null;
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const rect = range.getBoundingClientRect();
+      return { left: Math.round(rect.left), right: Math.round(rect.right) };
+    };
+    return units.flatMap((unit) => {
+      const mark = edges(unit.querySelector(':scope > [data-mark]:not([data-column])'));
+      const whole = edges(unit.querySelector(':scope > [data-whole]'));
+      return mark && whole ? [{ mark, whole }] : [];
+    });
+  });
 
 /** What the field's cursor is on, as it reads, or null while it rests. */
 async function cursor(page: Page): Promise<string | null> {
@@ -688,15 +710,15 @@ test('a row reads the value on the left, on the decimal point, then symbol and n
   await page.setViewportSize({ width: 1280, height: 900 });
   // Where each row's text actually ends or starts, not its cell, which the column sizes alike.
   const columns = () =>
-    page.locator('[data-row] > [role="gridcell"]:first-child').evaluateAll((units) => {
+    page.locator('[data-row] > [role="gridcell"]:has([data-whole])').evaluateAll((units) => {
       const text = (element: Element) => {
         const range = document.createRange();
         range.selectNodeContents(element);
         return range.getBoundingClientRect();
       };
-      // The value's first cell holds its whole part: where it ends, the decimal point starts.
+      // The value's whole part: where its text ends, the decimal point starts.
       return units.map((unit) => ({
-        point: text(unit.firstElementChild!).right,
+        point: text(unit.querySelector('[data-whole]')!).right,
         symbolRight: text(unit.querySelector('[data-symbol]')!).right,
         nameLeft: text(unit.querySelector('[data-name]')!).left,
       }));
@@ -2343,6 +2365,12 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await expect(chip).toHaveAttribute('aria-expanded', 'true');
   const scales = matches(page);
   await expect(scales.getByRole('option', { selected: true })).toHaveText(/US men · Nike/);
+  // US women reads Nike's women's chart, as a women's size always does, so it sits under that
+  // chart's heading, the men's chart's scales under theirs (Sean, 2026-10-21: Nike's men's page
+  // prints a women's column, and US W sat under "the men's").
+  await expect(
+    scales.getByRole('group', { name: 'Nike’s chart, the women’s' }).getByRole('option'),
+  ).toHaveText([/US women · Nike/]);
   await scales.getByRole('option', { name: /European · Nike/ }).click();
   await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Remove Nike' })).toBeVisible();
@@ -2462,16 +2490,27 @@ test('the brand’s pill (ADR 0028): its body lists every brand with the one in 
   await expect(page).not.toHaveURL(/brand=/);
 });
 
-test('the sizes’ first cells end on one edge in every theme: a brand’s range with the sizes, and, with Fraction, a row beyond its scale with the whole numbers', async ({
+test('the sizes’ first cells end on one edge in every theme, and the marks (≈, <, >) lined up at the whole numbers’ start, each clear of its own number: a brand’s range with the sizes, and, with Fraction, a row beyond its scale with the whole numbers', async ({
   page,
 }) => {
+  // The marks at the whole numbers' start, so the ≈ before a 9 starts where the ≈ before a 42.5
+  // does, and the children's row's ">" with them, each ending before its own number (Sean,
+  // 2026-10-21: written with the number, ≈ floated left by a digit for 10 against 9).
+  const linedUp = async (id: string) => {
+    expect(new Set(await firstCellRights(page)).size, id).toBe(1);
+    const drawn = await marks(page);
+    expect(drawn.length, id).toBeGreaterThan(1);
+    expect(new Set(drawn.map(({ mark }) => mark.left)).size, id).toBe(1);
+    for (const { mark, whole } of drawn) expect(mark.right, id).toBeLessThanOrEqual(whole.left);
+  };
   await page.goto('/?a=us-men&v=10&brand=nike');
   await ready(page);
   await expect(row(page, 'brand:nike')).toContainText('in the box');
   await expect(row(page, 'brand:birkenstock')).toContainText(/\d(\.5)?–\d/);
+  await expect(row(page, 'us-children')).toContainText('> 13.5');
   for (const theme of THEMES) {
     await applyTheme(page, theme);
-    expect(new Set(await firstCellRights(page)).size, theme.id).toBe(1);
+    await linedUp(theme.id);
   }
   await page.goto('/?a=us-men&v=10.5');
   await ready(page);
@@ -2479,7 +2518,41 @@ test('the sizes’ first cells end on one edge in every theme: a brand’s range
   await expect(row(page, 'us-children')).toContainText('> 13 1/2');
   for (const theme of THEMES) {
     await applyTheme(page, theme);
-    expect(new Set(await firstCellRights(page)).size, theme.id).toBe(1);
+    await linedUp(theme.id);
+  }
+});
+
+test('Symbol only keeps the brands’ names, each its row’s label, and a brand’s name never gives way: whole at a phone’s width in every theme, names on or off', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-men&v=10&brand=nike');
+  await ready(page);
+  await setSettings(page, 'Symbol only');
+  // The scales' rows show their symbols alone; a brand's row its name, the scale's symbol beside
+  // it being every brand row's (Sean, 2026-10-21: Symbol only had left the brands' rows unnamed).
+  await expect(row(page, 'uk').locator('[data-name]')).toHaveCount(0);
+  await expect(row(page, 'brand:new-balance').locator('[data-name]')).toHaveText(/^New Balance/);
+  await expect(row(page, 'brand:puma').locator('[data-name]')).toContainText('by ISO’s label');
+  // Every brand's name shown and whole, never clipped: the rule, not a width.
+  const names = () =>
+    page.locator('[data-row^="brand:"] [data-name]').evaluateAll((cells) => ({
+      rows: cells.length,
+      shown: cells.filter((cell) => !(cell as HTMLElement).hidden).length,
+      clipped: cells.filter((cell) => cell.scrollWidth > cell.clientWidth).length,
+    }));
+  await windowOf(page, 320, 800);
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const drawn = await names();
+    expect(drawn.rows, theme.id).toBeGreaterThan(1);
+    expect(drawn, theme.id).toMatchObject({ shown: drawn.rows, clipped: 0 });
+  }
+  // With names on at that width too, whether or not the single units' names give way.
+  await setSettings(page, 'Symbol and name');
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const drawn = await names();
+    expect(drawn, theme.id).toMatchObject({ shown: drawn.rows, clipped: 0 });
   }
 });
 

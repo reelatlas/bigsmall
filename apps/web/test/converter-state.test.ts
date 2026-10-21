@@ -1,4 +1,11 @@
-import { brandChart, brandRowAt, getShoeBrand, getUnit, shoeBrands } from '@bigsmall/core';
+import {
+  brandChart,
+  brandRowAt,
+  chartAtFoot,
+  getShoeBrand,
+  getUnit,
+  shoeBrands,
+} from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import {
   brandList,
@@ -1188,14 +1195,27 @@ describe('brands (ADR 0028)', () => {
 
   it('lists the brand’s scales to choose from (the chip’s list): every scale its chart prints with the row’s size, the foot’s units where it gives the foot, the one in the box marked, the line carried, and the other line’s scales from the brand’s other chart under its heading, at the same foot or with the number cleared', () => {
     const table = units(type('nike 10'), nike());
-    const nikeRow = brandRowAt(brandChart(getShoeBrand('nike')!, false), 'us-men', 10, false)!;
-    const list = scaleList(table, getShoeBrand('nike')!, getUnit('us-men')!, 10, null, 'en-US');
+    const nikeBrand = getShoeBrand('nike')!;
+    const nikeRow = brandRowAt(brandChart(nikeBrand, false), 'us-men', 10, false)!;
+    const list = scaleList(table, nikeBrand, getUnit('us-men')!, 10, null, 'en-US');
     const cells = Object.fromEntries(
       list.rows.map((each) => (each.kind === 'brand' ? [each.unit?.id, each.text] : ['', ''])),
     );
+    // US women reads Nike's women's chart, as a women's size always does, so it is that chart's
+    // nearest row at the same foot, under its heading, never the men's page's own women's column
+    // (Sean, 2026-10-21: it sat under "the men's"; a 27.1 cm foot is the women's page's 11, the
+    // men's page's 11.5, Nike's two lasts).
+    const womenAtFoot = chartAtFoot(
+      nikeBrand,
+      brandChart(nikeBrand, true),
+      nikeRow.foot!,
+      'us-women',
+      true,
+    )!;
+    expect(womenAtFoot.value).not.toBe(nikeRow.usWomen);
     expect(cells).toEqual({
       'us-men': '10',
-      'us-women': String(nikeRow.usWomen),
+      'us-women': String(womenAtFoot.value),
       uk: String(nikeRow.uk),
       eu: String(nikeRow.eu),
       japan: String(nikeRow.jp),
@@ -1208,7 +1228,13 @@ describe('brands (ADR 0028)', () => {
       group: 'Nike’s chart, the men’s',
       line: null,
     });
-    expect(list.announcement).toBe('7 scales of Nike’s chart to choose from');
+    expect(list.rows.at(-1)).toMatchObject({
+      kind: 'brand',
+      unit: { id: 'us-women' },
+      line: 'women',
+      group: 'Nike’s chart, the women’s',
+    });
+    expect(list.announcement).toBe('7 scales of Nike’s charts to choose from');
     // Reebok prints US sizes and inches: the two US scales and the foot's units, no EU or UK.
     const reebok = units(type('reebok 10'), {
       type: 'use',
@@ -1251,12 +1277,18 @@ describe('brands (ADR 0028)', () => {
     expect(
       womenList.rows.find((each) => each.kind === 'brand' && each.unit?.id === 'eu'),
     ).toMatchObject({ text: '39' });
-    // Nike prints both US columns on both pages: one chart's scales, under one heading.
+    // Nike prints both US columns on both pages, and still US men reads the men's chart: it alone
+    // sits under the men's heading, read there at the same foot.
     expect(
-      womenList.rows.every(
+      womenList.rows.filter(
+        (each) => each.kind === 'brand' && each.group === 'Nike’s chart, the men’s',
+      ),
+    ).toMatchObject([{ unit: { id: 'us-men' }, line: null }]);
+    expect(
+      womenList.rows.filter(
         (each) => each.kind === 'brand' && each.group === 'Nike’s chart, the women’s',
       ),
-    ).toBe(true);
+    ).toHaveLength(womenList.rows.length - 1);
     // Asics prints its lines apart, each page its own US column (Sean, 2026-10-21): the other
     // line's scale comes from the other chart, under its heading after the chart's, read at the
     // same foot, the nearest row: a women's 8 is a 25 cm foot, the men's 6.5 on the men's page.

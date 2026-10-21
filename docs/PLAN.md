@@ -88,6 +88,7 @@ Real improvements the tidy found and left, each small enough to pick up cold:
 - **One `--side-top`** (2026-10-18). The side cell's inline `top` and its wrapper's `--side-max` are two inline styles from one measurement (`TableLayout.tsx`); one variable on the cell, read by a `top` utility and by `side-panel-room`'s calc, would write it once. Retires with the anchor-positioning item either way.
 - **Comment lines past 100 characters from before the last tidy** (2026-10-18): 31 one-line docblocks of 101 to 118 characters in `Calculator.tsx`, `ConversionTable.tsx`, `TableLayout.tsx`, `Formulas.astro`, `recipes.ts`, `wordmark.ts`, and `table.spec.ts`, untouched since; rewrap each as its file is next edited.
 - **findings-friends-1's open questions** (2026-10-18). Two of them ask about the second box and its switch, retired with ADR 0013: fold them when the five-person test is next planned (docs/research/usability-test-1.md).
+- **The gallery's weight in WebKit** (2026-10-21). The gallery renders every table sample in every theme (66 grids, 52k nodes after the hundred-and-twenty-fifth pass, 44k before it), which WebKit lays out in about twenty seconds where Chromium takes under one, so the smoke tests that visit it have budgets of their own (axe three minutes since 2026-10-21, ninety seconds since 2026-10-15; the 16 px test marked slow since 2026-10-21). A lighter gallery, the table samples once with a theme switch, or fewer rows per sample, would cut it.
 
 ### Out of scope
 

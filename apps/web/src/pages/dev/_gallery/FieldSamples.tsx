@@ -205,8 +205,9 @@ function TableSample({
  * hanging after it; a million square kilometers in a phone's width, the names given way in every
  * row and the exponent markers bold; 6.3 feet as decimals with their fractions (Both); a fresh
  * visit's volume with its Hidden list open, and in Edit; a value with no answer; Shoe size with
- * Nike's 10, the brands' section first, Puma's row by ISO's label, the same while the charts load, a half size with
- * Fraction, and Asics's scales to choose from, the men's under its own heading; and the matches
+ * Nike's 10, the brands' section first, Puma's row by ISO's label, the same while the charts load,
+ * the same with symbols only, every brand still named, a half size with Fraction, and Asics's
+ * scales to choose from, the men's under its own heading; and the matches
  * for "250 p" from every category, the hidden ones shown. The tables' titles are for screen
  * readers; on the page the category menu over the box names them.
  */
@@ -349,6 +350,14 @@ function TableSamples() {
         title="Shoe size, Nike 10, the charts loading"
         display={NAMED}
         itemId={itemIds('loading')}
+      />
+      {/* Symbol only keeps the brands' names, each the row's label (Sean, 2026-10-21): the
+          scales' symbols alone beside them, the single units' names gone. */}
+      <TableSample
+        view={nike}
+        title="Shoe size, Nike 10, symbols only"
+        display={SYMBOLS}
+        itemId={itemIds('nike-symbols')}
       />
       {/* A half size with Fraction: the children's row beyond its scale written as a size is. */}
       <TableSample

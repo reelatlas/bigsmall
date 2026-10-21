@@ -700,9 +700,54 @@ test('fractions, both, and rounding write the values and never move the columns'
     expect(await edges(), theme.id).toEqual(fractionEdges);
   }
 
-  // Both: the decimal first, its fraction after it.
+  // Both: the decimal first, its fraction after it, the ≈ its rounding earns once, before the
+  // decimal (Sean, 2026-10-21).
   await setSettings(page, 'Nearest', 'Both');
-  await expect(row(page, 'foot')).toContainText(/6\.30\s*≈ 6 1\/4/);
+  // A regex sees the no-break spaces after the mark and before the fraction as written (\s).
+  await expect(row(page, 'foot')).toContainText(/≈\s6\.30.*6\s1\/4/);
+  await expectNoA11yViolations(page);
+});
+
+test("Both's second form splits as the first does, its whole numbers on one edge in every theme, and a row's ≈ is drawn once, before the first form, its own < with the second", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/?a=foot&v=6.3');
+  await ready(page);
+  await setSettings(page, 'Both');
+  // 6.3 ft: 75.60 in and 75 5/8, 2.10 yd and 2 1/8, 1,920.24 mm and 1,920 1/4: the second whole
+  // numbers right-aligned in a column of their own, the parts hanging after them (Sean,
+  // 2026-10-21: in one right-aligned cell, 8 1/2 drifted against 10).
+  await expect(row(page, 'inch')).toContainText('75.60');
+  await expect(row(page, 'inch')).toContainText('75 5/8');
+  const secondWholes = () =>
+    page.locator('[data-row] [data-second-whole]:not([hidden])').evaluateAll((cells) =>
+      cells
+        .filter((cell) => cell.textContent)
+        .map((cell) => {
+          const range = document.createRange();
+          range.selectNodeContents(cell);
+          return Math.round(range.getBoundingClientRect().right);
+        }),
+    );
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const edges = await secondWholes();
+    expect(edges.length, theme.id).toBeGreaterThan(2);
+    expect(new Set(edges).size, theme.id).toBe(1);
+  }
+  await applyTheme(page, THEMES[0]!);
+  // The ≈ the fraction's rounding earns is drawn once a row, before the decimal, both forms being
+  // one value; a "<" of a form under its step stays with that form. Half an inch: its 1/2 exact,
+  // no mark; 1.27 cm and 1 1/4, ≈ once; 0.04 ft and < 1/8, the "<" with the fraction alone.
+  await page.goto('/?a=inch&v=0.5');
+  await ready(page);
+  const marksOf = (unitId: string) => row(page, unitId).locator('[data-mark]');
+  await expect(marksOf('inch')).toHaveText(['', '']);
+  await expect(marksOf('centimeter')).toHaveText([/^≈/, '']);
+  await expect(marksOf('foot')).toHaveText(['', /^</]);
+  await expect(row(page, 'foot')).toContainText('< 1/8');
+  await expect(unitCell(page, 'foot')).toHaveAccessibleName(/^0\.04 < 1\/8 ft feet/);
   await expectNoA11yViolations(page);
 });
 
@@ -736,13 +781,18 @@ test("where Both's fraction has no room beside the decimal, it sits under it, li
   await ready(page);
   await setSettings(page, 'Both');
   const ounce = row(page, 'ounce');
-  const under = ounce.locator('[data-instead="second"]').first();
+  const under = ounce.locator('[data-instead="second"][data-second-whole]');
   await expect(under).toBeVisible();
-  await expect(ounce.locator('[data-column="second"]')).toBeHidden();
-  await expect(ounce.getByRole('gridcell').first()).toHaveAccessibleName(/≈ 36 3\/4/);
+  for (const beside of await ounce.locator('[data-column="second"]').all()) {
+    await expect(beside).toBeHidden();
+  }
+  await expect(ounce.getByRole('gridcell').first()).toHaveAccessibleName(/about 36 3\/4/);
+  // The row's ≈ once, at the whole numbers' start on the first line; nothing on the second's.
+  await expect(ounce.locator('[data-mark]:not([data-column])')).toHaveText(/^≈/);
+  await expect(ounce.locator('[data-instead="second"]').first()).toHaveText('');
   const value = (await ounce.locator('[data-whole]').boundingBox())!;
   const fraction = (await under.boundingBox())!;
-  // "≈ 36" ends where "36" does, at the decimal point, on the line under it.
+  // Its "36" ends where the decimal's "36" does, at the decimal point, on the line under it.
   expect(Math.round(fraction.x + fraction.width)).toBe(Math.round(value.x + value.width));
   expect(fraction.y).toBeGreaterThanOrEqual(value.y + value.height - 1);
   expect(Math.round((await ounce.boundingBox())!.height)).toBe(44);
@@ -750,7 +800,8 @@ test("where Both's fraction has no room beside the decimal, it sits under it, li
   // In every theme, whose figures differ in width (monospace, serif), the rule holds where the
   // fraction falls: beside the decimal and whole, or under it on the point; the row keeps its
   // height.
-  const beside = ounce.locator('[data-column="second"]');
+  const beside = ounce.locator('[data-column="second"][data-second-whole]');
+  const besideCells = ounce.locator('[data-column="second"]');
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     await expect
@@ -764,16 +815,19 @@ test("where Both's fraction has no room beside the decimal, it sits under it, li
       );
       expect(stacked.y, theme.id).toBeGreaterThanOrEqual(whole.y + whole.height - 1);
     } else {
-      expect(await beside.evaluate((cell) => cell.scrollWidth <= cell.clientWidth), theme.id).toBe(
-        true,
-      );
+      expect(
+        await besideCells.evaluateAll((cells) =>
+          cells.every((cell) => cell.scrollWidth <= cell.clientWidth),
+        ),
+        theme.id,
+      ).toBe(true);
     }
     expect(Math.round((await ounce.boundingBox())!.height), theme.id).toBe(44);
   }
   await applyTheme(page, THEMES[0]!);
   // With the room, it goes back beside the decimal.
   await page.setViewportSize({ width: 1280, height: 900 });
-  await expect(ounce.locator('[data-column="second"]')).toBeVisible();
+  await expect(beside).toBeVisible();
   await expect(under).toBeHidden();
 });
 

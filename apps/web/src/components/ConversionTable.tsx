@@ -8,7 +8,6 @@ import {
   NBSP,
   RANGE_DASH,
   type FractionSize,
-  type Rounded,
   type Rounding,
   type Unit,
 } from '@bigsmall/core';
@@ -59,9 +58,10 @@ interface ConversionRow {
   /**
    * What the text is: a value; a dash, while there is no number or no unit to convert from; a
    * message, in the danger color; or beyond, a value past the row's scale (ADR 0027), its text
-   * the sign and where the scale ends ("> 13.5") in the muted ink, written in the value's columns
-   * as a size is, the end in the display's form ("> 13 1/2" with Fraction), so it lines up with
-   * the sizes. Only a value can be copied; a row beyond its scale is taken, as the layout decides.
+   * the sign and where the scale ends ("> 13.5") in the muted ink, the sign at the whole numbers'
+   * start as every mark and the end written in the value's columns as a size is, in the display's
+   * form ("> 13 1/2" with Fraction), so it lines up with the sizes. Only a value can be copied; a
+   * row beyond its scale is taken, as the layout decides.
    */
   tone: 'value' | 'empty' | 'message' | 'beyond';
   /** The unit in the box: marked in the accent's soft fill. */
@@ -80,7 +80,8 @@ interface ConversionRow {
   stepped?: boolean;
   /**
    * Not exact: converted through an ingredient's density (Cooking, ADR 0021), or rounded to a
-   * scale's step (ADR 0027). It reads "≈" before its value, and "about" for screen readers.
+   * scale's step (ADR 0027). It reads "≈" ahead of its whole number, at the column's start, and
+   * "about" for screen readers.
    */
   approx?: boolean;
   /**
@@ -90,9 +91,9 @@ interface ConversionRow {
    */
   pair?: Unit | undefined;
   /**
-   * A brand's row (ADR 0028), by the brand's id with the chart's line: its name is the brand's, in
-   * the names' column as a pair's is, sized as if empty and cut short rather than widening the
-   * column.
+   * A brand's row (ADR 0028), by the brand's id with the chart's line: its name is the brand's, the
+   * row's label, in the names' column whatever the names setting, since the scale's symbol beside
+   * it is every brand row's (Sean, 2026-10-21).
    */
   brand?: { id: string; line: string } | undefined;
   /**
@@ -191,31 +192,43 @@ interface ConversionTableProps<T extends ConversionRow> {
  * A row reads "250 … mL milliliters": the value on the left in equal-width digits, a decimal in two
  * columns, its whole part right-aligned and the rest left-aligned after it, so values line up on
  * the decimal point (96 beside 473.18), and a fraction split the same way at its fraction part, so
- * whole numbers line up (10 beside 10 1/2); with Both, its fraction beside it; past a column that
- * takes the spare width, on the right, the symbol right-aligned in its column, an exponent hanging
- * after it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
- * left-aligned in its own; the copied check flashing over its end, a grid item laid on the row's
- * own area (never a positioned child: WebKit lays a nested subgrid out wrong under one,
- * docs/LEARNINGS.md, 2026-10-20). The names keep to one line: where one would not fit beside its
- * value (a long value on a phone), the words after the names give way first, then every name
- * (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
- * columns, the symbol and the name centred beside both lines; a column comes back once a later
- * one's going makes its room. The single units size the columns and a pair reacts to the room they
- * leave (Sean, 2026-10-20): its symbol takes the spare width before the symbols and must fit there,
- * the names going for it as for a wide value, and its name is cut short in the names' column. The
- * unit's cell has no column gap, since the symbol and its exponent touch: its parts space
- * themselves (pr-2, pl-2). Seven columns, so a row spans col-span-7.
+ * whole numbers line up (10 beside 10 1/2); a mark that qualifies a value (≈, <, >) at the start
+ * of the whole numbers' column, a second item in the same cell, so every mark lines up down the
+ * table and never meets its own number, the column being as wide as the widest row's mark and
+ * number together (Sean, 2026-10-21: written with the number, ≈ floated left by a digit for 10
+ * against 9; a column of its own cost every table the mark's width, which took a pair's symbol
+ * its room on a phone), while a sign stays with its digits, part of the numeral
+ * (docs/DESIGN-SYSTEM.md, "Values line up on the decimal point"); with Both, the fraction beside
+ * the decimal in two columns of the same shape, its own mark at their start, the ≈ drawn once a
+ * row before the first value, since both forms are one value; past a column that takes the spare
+ * width, on the right, the symbol right-aligned in its column, an exponent hanging after it in a
+ * narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name left-aligned in
+ * its own; the copied check flashing over its end, a grid item laid on the row's own area (never a
+ * positioned child: WebKit lays a nested subgrid out wrong under one, docs/LEARNINGS.md,
+ * 2026-10-20). The names keep to one line: where one would not fit beside its value (a long value
+ * on a phone), the words after the names give way first, then every name (GIVE_WAY), then Both's
+ * fraction moves under the decimal, on a second line in the value's columns, the symbol and the
+ * name centred beside both lines; a column comes back once a later one's going makes its room.
+ * The single units size the columns and a pair reacts to the room they leave (Sean, 2026-10-20):
+ * its symbol takes the spare width before the symbols and must fit there, the names going for it
+ * as for a wide value, and its name is cut short in the names' column; a brand's name is its row's
+ * label, as a symbol is a unit's, so it shows whatever the names setting, sizes the column, and
+ * never gives way (Sean, 2026-10-21: Symbol only had lost the brands). The unit's cell has no
+ * column gap, since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2).
+ * Every cell names its place, since two share the whole numbers' cell and auto-placement would
+ * put the second in a row of its own. Eight columns, so a row spans col-span-8.
  */
 const ROWS =
-  'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
+  'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
 
 /**
  * The columns that give way when a row has no room for them, in that order (useColumnsFit): the
  * words after a name (a brand row's line or reason, a row beyond its scale's word; 2026-10-20:
- * inside the names' cells they cost a phone every name), then every name, then Both's fraction;
+ * inside the names' cells they cost a phone every name), then every name, then Both's second form;
  * each comes back once a later one's going makes its room. A pair's symbol never gives way: it must
  * fit (`data-fits`) over the spare width before the symbols, and the names go for it as for a wide
- * value, so nothing of a pair drops before the single units' equivalent would (Sean, 2026-10-20).
+ * value, so nothing of a pair drops before the single units' equivalent would (Sean, 2026-10-20);
+ * nor does a brand's name, its row's label (Sean, 2026-10-21).
  */
 const GIVE_WAY = ['detail', 'name', 'second'] as const;
 
@@ -235,20 +248,55 @@ const TONE: Record<ConversionRow['tone'], string> = {
   beyond: 'text-ink-muted',
 };
 
-/** A decimal's whole part, and the rest from its decimal mark; a value written whole spans both. */
-const WHOLE_CELL = 'text-right font-numeric whitespace-nowrap';
-const DECIMALS_CELL = 'pr-2 font-numeric whitespace-nowrap';
-const ACROSS_CELL = 'col-span-2 pr-2 font-numeric whitespace-nowrap';
-const SECOND_CELL = 'min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric whitespace-nowrap';
 /**
- * Both's fraction where its column has no room (a phone): on a second line under the value, a step
- * smaller so the row keeps its 44 px, lined up on the decimal point as the values are, its whole
- * number (and "≈") under the value's whole part and the fraction after the point (Sean,
- * 2026-10-15), split as every fraction is (splitAtFraction), the space between them in the text.
+ * A decimal's whole part, right-aligned, and the rest from its decimal mark; a value written whole
+ * spans the whole and the rest, right-aligned. The mark that qualifies a value shares the whole
+ * numbers' cell, a second item set at its start (`justify-self-start`), in the muted ink whatever
+ * the row's tone, a no-break space after it for the space a mark takes before its number (a
+ * cell's end space would be stripped, as its first is; docs/LEARNINGS.md, 2026-10-20): the sizer
+ * writes each row's mark and whole number as one line, so the column is as wide as the widest of
+ * them and a mark never meets its own number, while a mark costs no width where a wider number already
+ * gives the room (the hundred-and-twenty-fifth pass; a column of its own took 19 px from every
+ * table whose hidden rows held a "< 0.01").
  */
+const MARK_CELL =
+  'col-start-1 row-start-1 justify-self-start font-numeric whitespace-nowrap text-ink-muted';
+const WHOLE_CELL = 'col-start-1 row-start-1 text-right font-numeric whitespace-nowrap';
+const DECIMALS_CELL = 'col-start-2 row-start-1 pr-2 font-numeric whitespace-nowrap';
+const ACROSS_CELL =
+  'col-start-1 col-end-3 row-start-1 pr-2 text-right font-numeric whitespace-nowrap';
+/**
+ * Both's second form beside the first, in two columns of the same shape: its whole right-aligned,
+ * its own mark at the cell's start (a "<" of one under its step; the ≈ of one that rounds is the
+ * row's, drawn once before the first value), and its part after it, so its whole numbers line up
+ * as the first's do (Sean, 2026-10-21: one right-aligned cell drifted, 8 1/2 against 10); a pair's,
+ * in its notation, written across both. The cells give way together (`second`) and are clipped
+ * where they lack the room, so the fit can tell; the sizer's line of mark and whole is among them,
+ * so a mark overrunning a number is told too.
+ */
+const SECOND_MARK_CELL =
+  'col-start-3 row-start-1 justify-self-start pl-3 font-numeric whitespace-nowrap text-ink-muted';
+const SECOND_WHOLE_CELL =
+  'col-start-3 row-start-1 min-w-0 overflow-hidden pl-3 text-right font-numeric whitespace-nowrap';
+const SECOND_PART_CELL =
+  'col-start-4 row-start-1 min-w-0 overflow-hidden pr-2 font-numeric whitespace-nowrap';
+const SECOND_ACROSS_CELL =
+  'col-start-3 col-end-5 row-start-1 min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric whitespace-nowrap';
+/**
+ * Both's second form where its columns have no room (a phone): on a second line under the value, a
+ * step smaller so the row keeps its 44 px, lined up as the values are, its mark at the whole
+ * numbers' start, its whole number under the value's whole part, and its part after the point
+ * (Sean, 2026-10-15), split as every value is, the space between them in the text; a pair's
+ * across the whole and the rest. The row is the cell's to say: the second where it shows, the
+ * sizer's first.
+ */
+const STACKED_MARK_CELL =
+  'col-start-1 justify-self-start text-sm font-numeric whitespace-nowrap text-ink-muted';
 const STACKED_WHOLE_CELL = 'col-start-1 text-right text-sm font-numeric whitespace-nowrap';
 const STACKED_PART_CELL = 'col-start-2 pr-2 text-sm font-numeric whitespace-nowrap';
-const SYMBOL_CELL = cx('col-start-5 pl-2 text-right', unitSymbol());
+const STACKED_ACROSS_CELL =
+  'col-start-1 col-end-3 pr-2 text-right text-sm font-numeric whitespace-nowrap';
+const SYMBOL_CELL = cx('col-start-6 pl-2 text-right', unitSymbol());
 /**
  * A pair's symbol, wider than any single unit's (h:m:s): right-aligned with the symbols, it takes
  * the spare width before them rather than widening their column, and must fit there: where it
@@ -256,10 +304,10 @@ const SYMBOL_CELL = cx('col-start-5 pl-2 text-right', unitSymbol());
  * 2026-10-20: the single units size the columns, a pair reacts, and a symbol is every row's).
  */
 const PAIR_SYMBOL_CELL = cx(
-  'col-start-4 col-end-6 min-w-0 overflow-hidden pl-2 text-right',
+  'col-start-5 col-end-7 min-w-0 overflow-hidden pl-2 text-right',
   unitSymbol(),
 );
-const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
+const NAME_CELL = 'col-start-8 min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
 /**
  * A pair's name in the names' column, which the single units' names size: sized as if empty
  * (`contain: inline-size`, the platform's size containment), it never widens the column, and what
@@ -297,7 +345,7 @@ function sectionEdge(at: number, kind: 'heading' | 'row'): string {
  * (docs/LEARNINGS.md, 2026-10-20).
  */
 const COPY_CELL =
-  'pointer-events-none col-start-1 col-end-8 row-start-1 flex self-stretch justify-self-end';
+  'pointer-events-none col-start-1 col-end-9 row-start-1 flex self-stretch justify-self-end';
 
 /**
  * What shows behind the copied check: the row's fill, the accent's soft tint for the box's unit.
@@ -328,7 +376,20 @@ export function copiedText(
 /** A size's own step as a fraction: a half (ADR 0027). */
 const HALVES: ReadonlySet<FractionSize> = new Set([2]);
 /** The mark ahead of a value that rounds, is measured, or is a chart's nearest row. */
-const APPROX = '≈ ';
+const APPROX = '≈';
+/** The marks that may lead a value's text, "< 0.01" for one under its step, "> 13.5" for one past its scale. */
+const LEADING_MARK = /^([<>])\s+/u;
+
+/** A value's leading mark apart from its digits: "< 0.01" is "<" and "0.01"; none, the text whole. */
+function takeMark(text: string): [mark: string, rest: string] {
+  const found = LEADING_MARK.exec(text);
+  return found ? [found[1]!, text.slice(found[0].length)] : ['', text];
+}
+
+/** A mark as its cell draws it: the mark and the space before its number; nothing for none. */
+function markText(mark: string): string {
+  return mark ? mark + NBSP : '';
+}
 
 /**
  * How a pair is written under the display: the last part to its places or sizes, else the
@@ -389,7 +450,7 @@ function firstWritten(
   return text === null ? null : { text, approx: false };
 }
 
-/** Both's fraction, after the decimal; a pair's whole, its last part the fraction. */
+/** Both's second form, the fraction after the decimal; a pair's whole, its last part the fraction. */
 function secondWritten(row: ConversionRow, display: TableDisplay, locale: string | undefined) {
   if (display.format !== 'both' || row.value === null || row.printed) return null;
   if (row.pair) return formatPair(row.value, row.pair, pairOptions(display, locale, 0, true));
@@ -402,81 +463,65 @@ function secondWritten(row: ConversionRow, display: TableDisplay, locale: string
 }
 
 /**
- * Both's fraction in two, to sit under the decimal: its whole number, "≈" ahead of one that
- * rounds, and the fraction after it ("≈ 36" and "3/4"), split as the Fraction display splits
- * every value (splitAtFraction).
+ * A row's value as the value's columns draw it: the mark that qualifies it apart, at the start
+ * of the whole numbers' column, and the rest in two. A decimal splits at its decimal mark, or at the exponent marker
+ * without one ("1E23"), so its whole part and the rest sit in two columns and every decimal point
+ * lines up; a fraction splits at its fraction part the same way, so every whole number lines up
+ * and the fractions hang in a column after them (10 beside 10 1/2; Sean, 2026-10-20:
+ * right-aligned across, a whole number sat under the fraction of the row above and the signs
+ * scattered). The mark is the text's own ("<" of one under its step, ">" of one past its scale),
+ * else "≈" where the value rounds or is measured, never both (one qualifier a value; "<" already
+ * says it is not exact); a sign (−) stays with its digits, part of the numeral. Screen readers
+ * hear it whole, from `text`, "about" ahead of one that rounds, in its words where its marks read
+ * badly (a pair's). A pair, in its own notation, and a message are written whole across the whole
+ * and the rest, right-aligned, their mark at the whole numbers' start as every row's; a dash sits in the
+ * whole column, lined up with the whole numbers.
  */
-function splitFraction(written: Rounded): { whole: string; part: string } {
-  const split = splitAtFraction(written.text, written.approx);
-  return { whole: (split.approx ? APPROX : '') + split.whole, part: split.decimals };
-}
-
-/**
- * A value as written, "≈" ahead of one that rounds or is measured; the row's own text where nothing
- * is.
- */
-function writtenText(row: ConversionRow, written: Rounded | null): ReactNode {
-  if (written) {
-    return (
-      <>
-        {(written.approx || row.approx) && <span className="text-ink-muted">≈ </span>}
-        {written.text}
-      </>
-    );
-  }
-  return row.tone === 'value' ? <FormattedNumber text={row.text} /> : row.text;
-}
-
-/**
- * A row's value as the first two columns draw it. A decimal splits at its decimal mark, or at the
- * exponent marker without one ("1E23"), so its whole part and the rest sit in two columns and every
- * decimal point lines up; a fraction splits at its fraction part the same way, so every whole
- * number lines up and the fractions hang in a column after them (10 beside 10 1/2; Sean,
- * 2026-10-20: right-aligned across, a whole number sat under the fraction of the row above and
- * the signs scattered); screen readers hear it whole, from `text`, "about" ahead of one that
- * rounds. A pair, in its own notation, and a message are written whole across both,
- * right-aligned; a dash sits in the whole column, lined up with the whole numbers.
- */
-interface SplitValue {
+interface ValueParts {
+  /** The value whole, as written. */
   text: string;
-  whole: string;
-  decimals: string;
-  /** Rounds: "≈" is drawn ahead of the whole part, and "about" read. */
+  /** The mark that qualifies it, drawn at the whole numbers' start: "≈", "<", or ">"; empty for none. */
+  mark: string;
+  /** Its whole part and the rest from its mark; null where it is written across (a pair, a message). */
+  split: { whole: string; decimals: string } | null;
+  /** Rounds, or is measured: "about" is read ahead of it. */
   approx: boolean;
+  /** Its words for screen readers, where the text's marks read badly (a pair's). */
+  spoken?: string | undefined;
 }
-
-type ValueParts = SplitValue | { across: ReactNode; spoken?: string | undefined };
 
 function valueParts(
   row: ConversionRow,
   display: TableDisplay,
   locale: string | undefined,
-  mark: string,
+  point: string,
   significant: number,
 ): ValueParts {
-  // A message is written across both columns; a dash sits in the whole column, lined up with the
-  // whole numbers (Sean, 2026-10-20: across both, it ended where the decimals do, under the
-  // fractions with Fraction and past the numbers with Decimal).
-  if (row.tone === 'message') return { across: row.text };
-  if (row.tone === 'empty') return { text: row.text, whole: row.text, decimals: '', approx: false };
+  // A message is written across; a dash sits in the whole column, lined up with the whole numbers
+  // (Sean, 2026-10-20: across both, it ended where the decimals do, under the fractions with
+  // Fraction and past the numbers with Decimal).
+  if (row.tone === 'message') return { text: row.text, mark: '', split: null, approx: false };
+  if (row.tone === 'empty') {
+    return { text: row.text, mark: '', split: { whole: row.text, decimals: '' }, approx: false };
+  }
   const fraction = display.format === 'fraction';
-  // A row beyond its scale (ADR 0027) is written as a size is: its sign, then the scale's end in
-  // the display's form, "> 13" in the whole column and ".5" after the mark, or "> 13" and "1/2"
-  // with Fraction, so it lines up with the sizes (Sean, 2026-10-20: written across, it sat past
-  // them, and in Fraction its decimal sat among their halves).
+  // A row beyond its scale (ADR 0027) is written as a size is: its sign apart as a mark, then the
+  // scale's end in the display's form, "13" in the whole column and ".5" after the mark, or
+  // "13" and "1/2" with Fraction, so it lines up with the sizes (Sean, 2026-10-20: written across,
+  // it sat past them, and in Fraction its decimal sat among their halves).
   if (row.tone === 'beyond') {
     const end =
       fraction && row.value !== null
         ? formatFraction(row.value, { sizes: HALVES, rounding: 'nearest', locale })
         : null;
     const text = end ? `${row.text.slice(0, 1)} ${end.text}` : row.text;
-    return fraction ? splitAtFraction(text, false) : splitAtMark(text, mark, false);
+    return fraction ? splitAtFraction(text, false) : splitAtPoint(text, point, false);
   }
   // A brand's cell as printed (ADR 0028), a range or a third: its text stands, split at its first
   // number's end as every value is at its mark, so the first number lines up with the whole
   // numbers and the rest hangs after it (the 10 of "10–10.5" under an 11; Sean, 2026-10-20:
   // written across, a range lined up with nothing).
-  if (row.printed) return splitPrinted(row.text, mark, row.approx === true);
+  if (row.printed) return splitPrinted(row.text, point, row.approx === true);
   const written =
     row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
   // A pair has no decimal point to line up on: written whole, right-aligned, in its own notation
@@ -486,35 +531,101 @@ function valueParts(
       ...pairOptions(display, locale, significant, fraction),
       words: true,
     });
-    return { across: writtenText(row, written), spoken: spoken?.text };
+    const approx = written?.approx === true || row.approx === true;
+    return {
+      text: written?.text ?? row.text,
+      mark: approx ? APPROX : '',
+      split: null,
+      approx,
+      spoken: spoken?.text,
+    };
   }
   if (fraction && !row.clock && written) {
     return splitAtFraction(written.text, written.approx || row.approx === true);
   }
-  return splitAtMark(written?.text ?? row.text, mark, row.approx === true);
-}
-
-/** A value in two, at its decimal mark, or at the exponent marker without one ("1E23"). */
-function splitAtMark(text: string, mark: string, approx: boolean): SplitValue {
-  let at = text.indexOf(mark);
-  if (at < 0) at = text.indexOf('E');
-  // A pace's colon lines up as a decimal point does: 5:30 over 10.91.
-  if (at < 0) at = text.indexOf(':');
-  if (at < 0) at = text.length;
-  return { text, whole: text.slice(0, at), decimals: text.slice(at), approx };
+  return splitAtPoint(written?.text ?? row.text, point, row.approx === true);
 }
 
 /**
- * A fraction in two, at its fraction part: the whole number with its sign ("−", "<", "> 13") in
- * the whole column, and the fraction after it a space off, as "10 1/2" is written, the space a
- * no-break one, since a cell's first space is stripped (docs/LEARNINGS.md, 2026-10-20). A
- * fraction with no whole number ("3/4", "< 1/8") has its sign alone before it, if any, and a whole
- * number alone ("≈ 1,043,262") nothing after.
+ * Both's second form as its columns draw it: its own mark ("<" of one under its step), its whole
+ * and its part at its fraction, a pair's across in its notation; "about" for screen readers where
+ * it rounds, in its words for a pair. Its ≈ is drawn once for the row, before the first form
+ * (the row's mark, `markOf`), both forms being one value (Sean, 2026-10-21).
  */
-function splitAtFraction(text: string, approx: boolean): SplitValue {
-  const at = text.search(/\d+\/\d+$/);
-  if (at < 0) return { text, whole: text, decimals: '', approx };
-  return { text, whole: text.slice(0, at).trimEnd(), decimals: NBSP + text.slice(at), approx };
+function secondParts(
+  row: ConversionRow,
+  display: TableDisplay,
+  locale: string | undefined,
+): ValueParts | null {
+  const written = secondWritten(row, display, locale);
+  if (!written) return null;
+  if (row.pair && row.value !== null) {
+    const spoken = formatPair(row.value, row.pair, {
+      ...pairOptions(display, locale, 0, true),
+      words: true,
+    });
+    return {
+      text: written.text,
+      mark: '',
+      split: null,
+      approx: written.approx,
+      spoken: spoken?.text,
+    };
+  }
+  return { ...splitAtFraction(written.text, false), approx: written.approx };
+}
+
+/**
+ * The row's one mark, before its first form: the value's own, else ≈ where its second form
+ * rounds, since both forms are one value and one ≈ says it (Sean, 2026-10-21: a mark on each
+ * repeats what is implied, and is harder to scan).
+ */
+function markOf(value: ValueParts, second: ValueParts | null): string {
+  return value.mark || (second?.approx ? APPROX : '');
+}
+
+/** A value for screen readers: "about" ahead of one that rounds, in its words where it has them. */
+function spokenText(value: ValueParts): string {
+  return `${value.approx ? 'about ' : ''}${value.spoken ?? value.text}`;
+}
+
+/**
+ * A value in two, at its decimal mark, or at the exponent marker without one ("1E23"), its leading
+ * mark apart.
+ */
+function splitAtPoint(text: string, point: string, approx: boolean): ValueParts {
+  const [lead, rest] = takeMark(text);
+  let at = rest.indexOf(point);
+  if (at < 0) at = rest.indexOf('E');
+  // A pace's colon lines up as a decimal point does: 5:30 over 10.91.
+  if (at < 0) at = rest.indexOf(':');
+  if (at < 0) at = rest.length;
+  return {
+    text,
+    mark: lead || (approx ? APPROX : ''),
+    split: { whole: rest.slice(0, at), decimals: rest.slice(at) },
+    approx,
+  };
+}
+
+/**
+ * A fraction in two, at its fraction part, its leading mark apart: the whole number with its sign
+ * ("−") in the whole column, and the fraction after it a space off, as "10 1/2" is written, the
+ * space a no-break one, since a cell's first space is stripped (docs/LEARNINGS.md, 2026-10-20). A
+ * fraction with no whole number ("3/4", "< 1/8") has nothing in the whole column, its mark alone
+ * before it, if any, and a whole number alone ("≈ 1,043,262") nothing after.
+ */
+function splitAtFraction(text: string, approx: boolean): ValueParts {
+  const [lead, rest] = takeMark(text);
+  const mark = lead || (approx ? APPROX : '');
+  const at = rest.search(/\d+\/\d+$/);
+  if (at < 0) return { text, mark, split: { whole: rest, decimals: '' }, approx };
+  return {
+    text,
+    mark,
+    split: { whole: rest.slice(0, at).trimEnd(), decimals: NBSP + rest.slice(at) },
+    approx,
+  };
 }
 
 /**
@@ -523,11 +634,16 @@ function splitAtFraction(text: string, approx: boolean): SplitValue {
  * "10" and "–10.5"), so the first number lines up with the whole numbers and the rest hangs after
  * it as a decimal part does.
  */
-function splitPrinted(text: string, mark: string, approx: boolean): SplitValue {
+function splitPrinted(text: string, point: string, approx: boolean): ValueParts {
   if (/\d+\/\d+$/.test(text)) return splitAtFraction(text, approx);
-  const ends = [text.indexOf(mark), text.indexOf(RANGE_DASH)].filter((at) => at >= 0);
+  const ends = [text.indexOf(point), text.indexOf(RANGE_DASH)].filter((at) => at >= 0);
   const at = ends.length > 0 ? Math.min(...ends) : text.length;
-  return { text, whole: text.slice(0, at), decimals: text.slice(at), approx };
+  return {
+    text,
+    mark: approx ? APPROX : '',
+    split: { whole: text.slice(0, at), decimals: text.slice(at) },
+    approx,
+  };
 }
 
 /** Which of the two lists a unit's line is in: the shown units in Edit, or Hidden. */
@@ -592,7 +708,7 @@ export function ConversionTable<T extends ConversionRow>({
   const both = display.format === 'both';
   const hiddenCount = hidden.reduce((sum, section) => sum + section.rows.length, 0);
   const allRows = every.flatMap((section) => section.rows);
-  const mark = useMemo(() => localeSeparators(locale).decimal, [locale]);
+  const point = useMemo(() => localeSeparators(locale).decimal, [locale]);
   const cardRef = useRef<HTMLDivElement>(null);
   const hiddenToggleRef = useRef<HTMLButtonElement>(null);
   /** The last row tapped or clicked, and when: a second within the window copies it. */
@@ -637,94 +753,127 @@ export function ConversionTable<T extends ConversionRow>({
   });
 
   const parts = (row: T, under: TableDisplay = display) =>
-    valueParts(row, under, locale, mark, significant);
+    valueParts(row, under, locale, point, significant);
   const secondOf = (row: T, under: TableDisplay = display) =>
-    row.tone !== 'value' || row.value === null || row.clock
+    row.tone !== 'value' || row.value === null || row.clock || under.format !== 'both'
       ? null
-      : secondWritten(row, under, locale);
-  const second = (row: T, under: TableDisplay = display): ReactNode => {
-    const fraction = secondOf(row, under);
-    return fraction ? writtenText(row, fraction) : null;
-  };
-  /** Both's fraction under the decimal, one of its two parts, under a rounding. */
-  const stackedPart = (pick: 'whole' | 'part') => (row: T, under: TableDisplay) => {
-    const fraction = secondOf(row, under);
-    return fraction ? splitFraction(fraction)[pick] : null;
-  };
+      : secondParts(row, under, locale);
 
   /**
-   * A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and name.
+   * A row's drawn cells: its mark, the value in its two columns, Both's second form in its three,
+   * symbol, exponent, and name.
    */
   const cells = (row: T) => {
     // A pair's row is every row's: its symbol (ft in) beside its value in the marks, then its
     // name (ADR 0026; Sean, 2026-10-20: the units in the table, as everywhere else).
     const [base, exponent] = splitExponent(row.symbol);
-    const written = both ? secondOf(row) : null;
-    const fraction = written ? writtenText(row, written) : null;
-    const stacked = written ? splitFraction(written) : null;
     const value = parts(row);
+    const second = secondOf(row);
     const tone = TONE[row.tone];
-    // A brand's row reacts to the columns the units size, as a pair's does (ADR 0026, ADR 0028).
-    const reacts = row.pair !== undefined || row.brand !== undefined;
-    // With Both's fraction under the value, the unit's columns span both lines, centred.
-    const tall = stacked !== null && secondHidden && 'row-span-2';
+    const muted = 'text-ink-muted';
+    const brand = row.brand !== undefined;
+    // With Both's second form under the value, the unit's columns span both lines, centred.
+    const tall = second !== null && secondHidden && 'row-span-2';
     return (
       <>
-        {'across' in value ? (
-          <span className={cx(ACROSS_CELL, 'text-right', tone)}>
-            {value.spoken !== undefined ? (
-              <>
-                <span aria-hidden="true">{value.across}</span>
-                <span className="sr-only">{value.spoken}</span>
-              </>
-            ) : (
-              value.across
-            )}
+        <span aria-hidden="true" className={MARK_CELL} data-mark>
+          {markText(markOf(value, second))}
+        </span>
+        {value.split === null ? (
+          <span aria-hidden="true" className={cx(ACROSS_CELL, tone)}>
+            {value.text}
           </span>
         ) : (
           <>
-            <span className={cx(WHOLE_CELL, tone)}>
-              <span aria-hidden="true" data-whole>
-                {value.approx && <span className="text-ink-muted">{APPROX}</span>}
-                <FormattedNumber text={value.whole} />
-              </span>
+            <span aria-hidden="true" className={cx(WHOLE_CELL, tone)} data-whole>
+              <FormattedNumber text={value.split.whole} />
             </span>
             <span aria-hidden="true" className={cx(DECIMALS_CELL, tone)} data-decimals>
-              <FormattedNumber text={value.decimals} />
-            </span>
-            <span className="sr-only">
-              {value.approx && 'about '}
-              {row.tone === 'empty' ? 'no value' : value.text}
+              <FormattedNumber text={value.split.decimals} />
             </span>
           </>
         )}
-        {both && (
-          <span
-            hidden={secondHidden}
-            className={cx(SECOND_CELL, 'text-ink-muted')}
-            data-column="second"
-          >
-            {fraction}
-          </span>
-        )}
-        {written && stacked && (
+        <span className="sr-only">{row.tone === 'empty' ? 'no value' : spokenText(value)}</span>
+        {second && (
           <>
-            <span
-              hidden={!secondHidden}
-              className={cx(STACKED_WHOLE_CELL, 'row-start-2 text-ink-muted')}
-              data-instead="second"
-            >
-              <span aria-hidden="true">{stacked.whole}</span>
-              <span className="sr-only">{fraction}</span>
-            </span>
-            <span
-              hidden={!secondHidden}
-              aria-hidden="true"
-              className={cx(STACKED_PART_CELL, 'row-start-2 text-ink-muted')}
-              data-instead="second"
-            >
-              {stacked.part}
-            </span>
+            {second.split === null ? (
+              <span
+                hidden={secondHidden}
+                aria-hidden="true"
+                className={cx(SECOND_ACROSS_CELL, muted)}
+                data-column="second"
+              >
+                {second.text}
+              </span>
+            ) : (
+              <>
+                <span
+                  hidden={secondHidden}
+                  aria-hidden="true"
+                  className={SECOND_MARK_CELL}
+                  data-column="second"
+                  data-mark
+                >
+                  {markText(second.mark)}
+                </span>
+                <span
+                  hidden={secondHidden}
+                  aria-hidden="true"
+                  className={cx(SECOND_WHOLE_CELL, muted)}
+                  data-column="second"
+                  data-second-whole
+                >
+                  {second.split.whole}
+                </span>
+                <span
+                  hidden={secondHidden}
+                  aria-hidden="true"
+                  className={cx(SECOND_PART_CELL, muted)}
+                  data-column="second"
+                >
+                  {second.split.decimals}
+                </span>
+              </>
+            )}
+            {second.split === null ? (
+              <span
+                hidden={!secondHidden}
+                aria-hidden="true"
+                className={cx(STACKED_ACROSS_CELL, 'row-start-2', muted)}
+                data-instead="second"
+              >
+                {second.text}
+              </span>
+            ) : (
+              <>
+                <span
+                  hidden={!secondHidden}
+                  aria-hidden="true"
+                  className={cx(STACKED_MARK_CELL, 'row-start-2')}
+                  data-instead="second"
+                >
+                  {markText(second.mark)}
+                </span>
+                <span
+                  hidden={!secondHidden}
+                  aria-hidden="true"
+                  className={cx(STACKED_WHOLE_CELL, 'row-start-2', muted)}
+                  data-instead="second"
+                  data-second-whole
+                >
+                  {second.split.whole}
+                </span>
+                <span
+                  hidden={!secondHidden}
+                  aria-hidden="true"
+                  className={cx(STACKED_PART_CELL, 'row-start-2', muted)}
+                  data-instead="second"
+                >
+                  {second.split.decimals}
+                </span>
+              </>
+            )}
+            <span className="sr-only">{spokenText(second)}</span>
           </>
         )}
         {/* A pair's symbol takes the spare width before the symbols and must fit there: the names
@@ -737,21 +886,25 @@ export function ConversionTable<T extends ConversionRow>({
         >
           {base}
         </span>
-        <span aria-hidden="true" className={cx('col-start-6', unitSymbol(), tall)}>
+        <span aria-hidden="true" className={cx('col-start-7', unitSymbol(), tall)}>
           {exponent}
         </span>
         {!row.pair && <span className="sr-only">{row.symbol}</span>}
         {/* A pair's name sits in the names' column as every row's does, the table's longest: it
             never sizes the column, and is cut short where the single units' names leave it less
             room, the symbol beside it saying the rest; it goes with the names (ADR 0026; Sean,
-            2026-10-19 and 2026-10-20). */}
-        {withNames ? (
+            2026-10-19 and 2026-10-20). A brand's name is its row's label, the scale's symbol
+            beside it being every brand row's: it shows whatever the names setting, sizes the
+            column (the sizer), and never gives way, the other columns going for it as for a
+            pair's symbol (Sean, 2026-10-21: Symbol only had left the brands' rows unnamed). */}
+        {withNames || brand ? (
           <span
             aria-hidden="true"
-            hidden={namesHidden}
-            className={cx(reacts ? PAIR_NAME_CELL : NAME_CELL, 'col-start-7 text-ink', tall)}
+            hidden={!brand && namesHidden}
+            className={cx(row.pair ? PAIR_NAME_CELL : NAME_CELL, 'text-ink', tall)}
             data-name
-            data-column={reacts ? undefined : 'name'}
+            data-column={row.pair || brand ? undefined : 'name'}
+            data-fits={brand ? '' : undefined}
           >
             {row.name}
             {row.detail && (
@@ -790,58 +943,72 @@ export function ConversionTable<T extends ConversionRow>({
       </span>
     ));
   /**
-   * One part of a row's value as drawn, under a rounding: its whole part, "≈" ahead of it where
-   * it rounds, the rest, or all of it across.
+   * One part of a value as drawn: its whole part with its mark ahead of it, as the row's two
+   * items draw them side by side, so the column is as wide as both; the rest; or all of it across,
+   * its mark ahead likewise.
    */
-  const part = (pick: 'whole' | 'decimals' | 'across') => (row: T, under: TableDisplay) => {
-    const value = parts(row, under);
-    if ('across' in value) return pick === 'across' ? value.across : null;
+  type Part = 'whole' | 'decimals' | 'across';
+  const partOf = (value: ValueParts | null, pick: Part, mark: string): ReactNode => {
+    if (!value) return null;
+    if (value.split === null) return pick === 'across' ? markText(mark) + value.text : null;
     if (pick === 'across') return null;
+    if (pick === 'decimals') return <FormattedNumber text={value.split.decimals} />;
     return (
       <>
-        {pick === 'whole' && value.approx && APPROX}
-        <FormattedNumber text={value[pick]} />
+        {markText(mark)}
+        <FormattedNumber text={value.split.whole} />
       </>
     );
+  };
+  /** One part of a row's value as drawn under a rounding, its mark the row's one (markOf). */
+  const part = (pick: Part) => (row: T, under: TableDisplay) => {
+    const value = parts(row, under);
+    return partOf(value, pick, markOf(value, secondOf(row, under)));
+  };
+  /** One part of Both's second form as drawn under a rounding, with its own mark. */
+  const secondPart = (pick: Part) => (row: T, under: TableDisplay) => {
+    const second = secondOf(row, under);
+    return partOf(second, pick, second?.mark ?? '');
   };
   const sizer = (
     <div
       aria-hidden="true"
-      className="invisible col-span-7 grid h-0 grid-cols-subgrid overflow-hidden px-2"
+      className="invisible col-span-8 grid h-0 grid-cols-subgrid overflow-hidden px-2"
     >
-      <span className={cx(WHOLE_CELL, 'col-start-1 row-start-1')}>
-        {stack(everyRounding(part('whole')))}
-      </span>
-      <span className={cx(DECIMALS_CELL, 'col-start-2 row-start-1')}>
-        {stack(everyRounding(part('decimals')))}
-      </span>
-      <span className={cx(ACROSS_CELL, 'col-start-1 row-start-1')}>
-        {stack(everyRounding(part('across')))}
-      </span>
-      {both && (
-        <span
-          hidden={secondHidden}
-          className={cx(SECOND_CELL, 'col-start-3 row-start-1')}
-          data-column="second"
-        >
-          {stack(everyRounding(second))}
-        </span>
-      )}
+      <span className={WHOLE_CELL}>{stack(everyRounding(part('whole')))}</span>
+      <span className={DECIMALS_CELL}>{stack(everyRounding(part('decimals')))}</span>
+      <span className={ACROSS_CELL}>{stack(everyRounding(part('across')))}</span>
       {both && (
         <>
+          <span hidden={secondHidden} className={SECOND_WHOLE_CELL} data-column="second">
+            {stack(everyRounding(secondPart('whole')))}
+          </span>
+          <span hidden={secondHidden} className={SECOND_PART_CELL} data-column="second">
+            {stack(everyRounding(secondPart('decimals')))}
+          </span>
+          <span hidden={secondHidden} className={SECOND_ACROSS_CELL} data-column="second">
+            {stack(everyRounding(secondPart('across')))}
+          </span>
           <span
             hidden={!secondHidden}
             className={cx(STACKED_WHOLE_CELL, 'row-start-1')}
             data-instead="second"
           >
-            {stack(everyRounding(stackedPart('whole')))}
+            {stack(everyRounding(secondPart('whole')))}
           </span>
           <span
             hidden={!secondHidden}
             className={cx(STACKED_PART_CELL, 'row-start-1')}
             data-instead="second"
           >
-            {stack(everyRounding(stackedPart('part')))}
+            {stack(everyRounding(secondPart('decimals')))}
+          </span>
+          <span
+            hidden={!secondHidden}
+            className={cx(STACKED_ACROSS_CELL, 'row-start-1')}
+            data-instead="second"
+          >
+            {stack(everyRounding(secondPart('across')))}
           </span>
         </>
       )}
@@ -853,18 +1020,23 @@ export function ConversionTable<T extends ConversionRow>({
       <span className={cx(PAIR_SYMBOL_CELL, 'row-start-1')} data-fits>
         {stack((row) => (row.pair ? splitExponent(row.symbol)[0] : ''))}
       </span>
-      <span className={cx('col-start-6 row-start-1', unitSymbol())}>
+      <span className={cx('col-start-7 row-start-1', unitSymbol())}>
         {stack((row) => splitExponent(row.symbol)[1])}
       </span>
-      {/* The single units' names alone: a pair's or a brand's never sizes the column
+      {/* The single units' names, which give way: a pair's never sizes the column
           (PAIR_NAME_CELL). */}
       {withNames && (
-        <span
-          hidden={namesHidden}
-          className={cx(NAME_CELL, 'col-start-7 row-start-1')}
-          data-column="name"
-        >
+        <span hidden={namesHidden} className={cx(NAME_CELL, 'row-start-1')} data-column="name">
           {stack((row) => (row.pair || row.brand !== undefined ? '' : row.name))}
+        </span>
+      )}
+      {/* The brands' names, whatever the setting and whether the names show: a brand's name is
+          its row's label, so its column is never narrower than it (Sean, 2026-10-21); only where
+          a brand's row exists, since the cell's padding alone would widen the column (Time's
+          pair symbol lost its room in the monospace themes, the browser suite found). */}
+      {allRows.some((row) => row.brand !== undefined) && (
+        <span className={cx(NAME_CELL, 'row-start-1')}>
+          {stack((row) => (row.brand !== undefined ? row.name : ''))}
         </span>
       )}
     </div>
@@ -1052,11 +1224,11 @@ export function ConversionTable<T extends ConversionRow>({
         <div
           key={section.key}
           role="rowgroup"
-          className="col-span-7 grid grid-cols-subgrid gap-y-0.5"
+          className="col-span-8 grid grid-cols-subgrid gap-y-0.5"
         >
           <div
             role="row"
-            className={cx('col-span-7', sectionEdge(at, 'heading'), stuck)}
+            className={cx('col-span-8', sectionEdge(at, 'heading'), stuck)}
             style={stickStyle}
             data-section={section.key}
           >
@@ -1073,7 +1245,7 @@ export function ConversionTable<T extends ConversionRow>({
                 role="row"
                 aria-selected={rowIndex === cursor}
                 data-row={row.id}
-                className="col-span-7 grid grid-cols-subgrid items-center"
+                className="col-span-8 grid grid-cols-subgrid items-center"
               >
                 {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events -- the field's keys act; a click keeps focus there */}
                 <div
@@ -1103,7 +1275,7 @@ export function ConversionTable<T extends ConversionRow>({
                   // by it, as a double-tap selects one where the zoom is off; pinch zoom stays.
                   className={cx(
                     CURSOR_ROW,
-                    'col-span-7 col-start-1 row-start-1 grid touch-manipulation grid-cols-subgrid items-center select-none',
+                    'col-span-8 col-start-1 row-start-1 grid touch-manipulation grid-cols-subgrid items-center select-none',
                     rowFill(row.inBox, rowIndex === cursor),
                   )}
                 >

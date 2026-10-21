@@ -108,10 +108,10 @@ const firstCellRights = (page: Page) =>
 
 /**
  * Where the marks sit (the hundred-and-twenty-fifth pass): for every row with a drawn ≈, the
- * mark's edges and the left edge of the row's whole number's text. The marks line up when their left edges are one, at the whole numbers'
- * start, and a mark never meets its own number when it ends before that number starts; a wider
- * number without a mark starts where the marks end, as it did when the mark was written with the
- * number.
+ * mark's edges and the left edge of the row's whole number's text. The marks line up when their
+ * left edges are one, at the whole numbers' start, and a mark never meets its own number when it
+ * ends before that number starts; a wider number without a mark starts where the marks end, as it
+ * did when the mark was written with the number.
  */
 const marks = (page: Page) =>
   page.locator('[data-row] > [role="gridcell"]').evaluateAll((units) => {

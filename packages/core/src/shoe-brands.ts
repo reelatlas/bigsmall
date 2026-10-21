@@ -282,7 +282,9 @@ export function ownScale(chart: BrandChart, women: boolean): BrandScale | null {
   return order.find((scale) => brandSpan(chart, scale, women) !== null) ?? null;
 }
 
-/** ISO's size on a scale for a foot, to the scale's step (ADR 0027); null where the scale has none. */
+/**
+ * ISO's size on a scale for a foot, to the scale's step (ADR 0027); null where the scale has none.
+ */
 function isoLabel(foot: number, scale: BrandScale): number | null {
   const unit = getUnit(scale);
   if (!unit || unit.step === undefined || !(unit.step > 0)) return null;

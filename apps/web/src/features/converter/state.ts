@@ -1598,17 +1598,17 @@ function brandNote(
  * brand in the box (ADR 0028, 2026-10-20; Sean: "a more immediate way to flip the reading").
  * Every scale its chart prints, in the table's order, never the foot's units, which are ISO's
  * rows, read in the table from the chart (a foot taken here put ISO's row in the box, the brand's
- * row unfilled below twenty brands; Sean, 2026-10-21), the one in the box marked, each carrying the same row's size on that scale (a range's
- * lower end; none where the brand has no row for the box, so the number as typed goes with the
- * scale) with the line the row was read on; so a size is read on another scale without leaving
- * the brand, which the scale rows, ISO's, cannot do, since taking one takes the brand out. Where
- * the brand prints its lines apart, the other line's own scale, and any scale its other chart
- * alone prints, follow under that chart's own heading, since that chart is the one they read,
- * each read at the foot in play, the nearest row, or with the number cleared where the brand
- * gives no foot (Sean, 2026-10-21, the hundred-and-twenty-third pass: Asics's women's page prints
- * no US men's column, so a women's reading offered no men's scale; and later that day: Nike's
- * men's page prints a women's column, so its US W sat under the men's heading with the men's
- * page's number, where taking it reads the women's chart). With
+ * row unfilled below twenty brands; Sean, 2026-10-21), the one in the box marked, each carrying
+ * the same row's size on that scale (a range's lower end; none where the brand has no row for the
+ * box, so the number as typed goes with the scale) with the line the row was read on; so a size
+ * is read on another scale without leaving the brand, which the scale rows, ISO's, cannot do,
+ * since taking one takes the brand out. Where the brand prints its lines apart, the other line's
+ * own scale, and any scale its other chart alone prints, follow under that chart's own heading,
+ * since that chart is the one they read, each read at the foot in play, the nearest row, or with
+ * the number cleared where the brand gives no foot (Sean, 2026-10-21, the hundred-and-twenty-third
+ * pass: Asics's women's page prints no US men's column, so a women's reading offered no men's
+ * scale; and later that day: Nike's men's page prints a women's column, so its US W sat under the
+ * men's heading with the men's page's number, where taking it reads the women's chart). With
  * `choose`, the table's place while a brand has no scale (its chip emptied, or a brand alone),
  * the heading asking for one, as Cooking lists its ingredients until one is chosen (Sean,
  * 2026-10-21), the number as typed going with any scale there, the other chart's too.

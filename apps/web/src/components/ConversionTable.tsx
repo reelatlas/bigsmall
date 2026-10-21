@@ -202,23 +202,24 @@ interface ConversionTableProps<T extends ConversionRow> {
  * (Sean, 2026-10-21: apart from its number a < was harder to read, where ≈ reads from afar;
  * docs/DESIGN-SYSTEM.md, "Values line up on the decimal point"); with Both, the fraction beside
  * the decimal in two columns of the same shape, the ≈ drawn once a row before the first value,
- * since both forms are one value, a form's own < with its digits; past a column that takes the spare
- * width, on the right, the symbol right-aligned in its column, an exponent hanging after it in a
- * narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name left-aligned in
- * its own; the copied check flashing over its end, a grid item laid on the row's own area (never a
- * positioned child: WebKit lays a nested subgrid out wrong under one, docs/LEARNINGS.md,
- * 2026-10-20). The names keep to one line: where one would not fit beside its value (a long value
- * on a phone), the words after the names give way first, then every name (GIVE_WAY), then Both's
- * fraction moves under the decimal, on a second line in the value's columns, the symbol and the
- * name centred beside both lines; a column comes back once a later one's going makes its room.
- * The single units size the columns and a pair reacts to the room they leave (Sean, 2026-10-20):
- * its symbol takes the spare width before the symbols and must fit there, the names going for it
- * as for a wide value, and its name is cut short in the names' column; a brand's name is its row's
- * label, as a symbol is a unit's, so it shows whatever the names setting, sizes the column, and
- * never gives way (Sean, 2026-10-21: Symbol only had lost the brands). The unit's cell has no
- * column gap, since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2).
- * Every cell names its place, since two share the whole numbers' cell and auto-placement would
- * put the second in a row of its own. Eight columns, so a row spans col-span-8.
+ * since both forms are one value, a form's own < with its digits; past a column that takes the
+ * spare width, on the right, the symbol right-aligned in its column, an exponent hanging after it
+ * in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
+ * left-aligned in its own; the copied check flashing over its end, a grid item laid on the row's
+ * own area (never a positioned child: WebKit lays a nested subgrid out wrong under one,
+ * docs/LEARNINGS.md, 2026-10-20). The names keep to one line: where one would not fit beside its
+ * value (a long value on a phone), the words after the names give way first, then every name
+ * (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
+ * columns, the symbol and the name centred beside both lines; a column comes back once a later
+ * one's going makes its room. The single units size the columns and a pair reacts to the room
+ * they leave (Sean, 2026-10-20): its symbol takes the spare width before the symbols and must fit
+ * there, the names going for it as for a wide value, and its name is cut short in the names'
+ * column; a brand's name is its row's label, as a symbol is a unit's, so it shows whatever the
+ * names setting, sizes the column, and never gives way (Sean, 2026-10-21: Symbol only had lost
+ * the brands). The unit's cell has no column gap, since the symbol and its exponent touch: its
+ * parts space themselves (pr-2, pl-2). Every cell names its place, since two share the whole
+ * numbers' cell and auto-placement would put the second in a row of its own. Eight columns, so a
+ * row spans col-span-8.
  */
 const ROWS =
   'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
@@ -439,7 +440,9 @@ function firstWritten(
   return text === null ? null : { text, approx: false };
 }
 
-/** Both's second form, the fraction after the decimal; a pair's whole, its last part the fraction. */
+/**
+ * Both's second form, the fraction after the decimal; a pair's whole, its last part the fraction.
+ */
 function secondWritten(row: ConversionRow, display: TableDisplay, locale: string | undefined) {
   if (display.format !== 'both' || row.value === null || row.printed) return null;
   if (row.pair) return formatPair(row.value, row.pair, pairOptions(display, locale, 0, true));
@@ -453,26 +456,29 @@ function secondWritten(row: ConversionRow, display: TableDisplay, locale: string
 
 /**
  * A row's value as the value's columns draw it: the ≈ that qualifies it apart, at the start of
- * the whole numbers' column, and the rest in two. A decimal splits at its decimal mark, or at the exponent marker
- * without one ("1E23"), so its whole part and the rest sit in two columns and every decimal point
- * lines up; a fraction splits at its fraction part the same way, so every whole number lines up
- * and the fractions hang in a column after them (10 beside 10 1/2; Sean, 2026-10-20:
- * right-aligned across, a whole number sat under the fraction of the row above and the signs
- * scattered). The mark is "≈" where the value rounds or is measured; a sign (−) stays with its
- * digits, part of the numeral, and so do the "<" of one under its step and the ">" of one past
- * its scale, which bound that number as a sign does (Sean, 2026-10-21: apart from its number a
- * "<" was harder to read, where "≈" reads from afar). Screen readers
- * hear it whole, from `text`, "about" ahead of one that rounds, in its words where its marks read
- * badly (a pair's). A pair, in its own notation, and a message are written whole across the whole
- * and the rest, right-aligned, their mark at the whole numbers' start as every row's; a dash sits in the
- * whole column, lined up with the whole numbers.
+ * the whole numbers' column, and the rest in two. A decimal splits at its decimal mark, or at the
+ * exponent marker without one ("1E23"), so its whole part and the rest sit in two columns and
+ * every decimal point lines up; a fraction splits at its fraction part the same way, so every
+ * whole number lines up and the fractions hang in a column after them (10 beside 10 1/2; Sean,
+ * 2026-10-20: right-aligned across, a whole number sat under the fraction of the row above and
+ * the signs scattered). The mark is "≈" where the value rounds or is measured; a sign (−) stays
+ * with its digits, part of the numeral, and so do the "<" of one under its step and the ">" of
+ * one past its scale, which bound that number as a sign does (Sean, 2026-10-21: apart from its
+ * number a "<" was harder to read, where "≈" reads from afar). Screen readers hear it whole, from
+ * `text`, "about" ahead of one that rounds, in its words where its marks read badly (a pair's). A
+ * pair, in its own notation, and a message are written whole across the whole and the rest,
+ * right-aligned, their mark at the whole numbers' start as every row's; a dash sits in the whole
+ * column, lined up with the whole numbers.
  */
 interface ValueParts {
   /** The value whole, as written. */
   text: string;
   /** The mark that qualifies it, drawn at the whole numbers' start: "≈"; empty for none. */
   mark: string;
-  /** Its whole part and the rest from its mark; null where it is written across (a pair, a message). */
+  /**
+   * Its whole part and the rest from its mark; null where it is written across (a pair, a
+   * message).
+   */
   split: { whole: string; decimals: string } | null;
   /** Rounds, or is measured: "about" is read ahead of it. */
   approx: boolean;
@@ -748,12 +754,12 @@ export function ConversionTable<T extends ConversionRow>({
       : secondParts(row, under, locale);
 
   /**
-   * A row's drawn cells: its mark, the value in its two columns, Both's second form in its three,
-   * symbol, exponent, and name.
+   * A row's drawn cells: its mark, the value in its two columns, Both's second form in two of the
+   * same shape, then the symbol, its exponent, and the name.
    */
   const cells = (row: T) => {
-    // A pair's row is every row's: its symbol (ft in) beside its value in the marks, then its
-    // name (ADR 0026; Sean, 2026-10-20: the units in the table, as everywhere else).
+    // A pair's row is every row's: its symbol (ft in) beside its value in its own notation, then
+    // its name (ADR 0026; Sean, 2026-10-20: the units in the table, as everywhere else).
     const [base, exponent] = splitExponent(row.symbol);
     const value = parts(row);
     const second = secondOf(row);

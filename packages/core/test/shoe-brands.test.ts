@@ -59,7 +59,9 @@ function idOf(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
-/** A record cell as core holds it: a range's two ends, adidas's JP in millimetres as centimetres. */
+/**
+ * A record cell as core holds it: a range's two ends, adidas's JP in millimetres as centimetres.
+ */
 function cellOf(row: RecordRow, key: string): number | readonly [number, number] | undefined {
   const value = row[key];
   if (typeof value !== 'number') return undefined;

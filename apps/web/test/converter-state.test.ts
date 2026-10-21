@@ -596,7 +596,8 @@ describe('compound quantities (ADR 0026)', () => {
     expect(ids(matches({ type: 'chooseCategory', category: 'speed' }, type('1:30:00')))[0]).toBe(
       'minute-per-mile',
     );
-    // A number and a lone foot mark are feet, the pair offered after them in case the inches follow.
+    // A number and a lone foot mark are feet, the pair offered after them in case the inches
+    // follow.
     expect(ids(matches(type("5'")))).toEqual(['foot', 'foot-inch']);
     expect(matches(type("5'")).announcement).toBe('2 matches');
     // A unit typed after it is the match, as for any number; in the box, a unit takes the clock.
@@ -863,7 +864,8 @@ describe('brands (ADR 0028)', () => {
       unit: 'us-men',
       category: 'shoe-size',
     });
-    // A brand alone keeps a shoe scale in the box and drops any other unit; an unknown brand does nothing.
+    // A brand alone keeps a shoe scale in the box and drops any other unit; an unknown brand does
+    // nothing.
     expect(
       run(
         type('10'),
@@ -1033,7 +1035,8 @@ describe('brands (ADR 0028)', () => {
     const eu = units(type('eu 43'), { type: 'use', unit: 'eu', text: '43' });
     expect(row(eu, 'brand:nike')).toMatchObject({ detail: 'men' });
     expect(row(eu, 'brand:adidas').detail).toBeUndefined();
-    // Reebok prints no EU: its size on its own scale, that symbol on the row; Brooks by ISO's label.
+    // Reebok prints no EU: its size on its own scale, that symbol on the row; Brooks by ISO's
+    // label.
     expect(row(eu, 'brand:reebok')).toMatchObject({
       tone: 'value',
       symbol: 'US M',

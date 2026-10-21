@@ -325,13 +325,6 @@ export const CURSOR_ROW = 'min-h-11 cursor-pointer rounded-nested px-2';
  * A cursor row's fill: the unit in the box in the accent's soft tint, the chip's color; the row
  * the cursor is on, or the pointer is over, in the muted tint of a hovered row. Never an outline.
  */
-/**
- * A small label in a pill (docs/DESIGN-SYSTEM.md, "Small labels"): the word trimmed to its cap
- * height so it sits centered; its fill and ink are the caller's (the formulas' exact and measured
- * tags, the table's ISO tag on a row derived from a brand's foot, ADR 0028).
- */
-export const TAG = 'rounded-sm px-2 text-xs font-medium text-trim-cap';
-
 export function rowFill(selected: boolean, current: boolean): string {
   if (selected) return 'bg-accent-soft';
   return current ? 'bg-surface-raised' : 'hover:bg-surface-raised';

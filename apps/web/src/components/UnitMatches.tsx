@@ -23,7 +23,7 @@ import { MatchedText } from './MatchedText';
  * under Cooking, with the unit typed before it when there was one (ADR 0021), or, in Cooking's
  * list with no ingredient, under its kind's heading (`group`).
  */
-export type UnitMatch =
+type UnitMatch =
   | { kind: 'unit'; unit: Unit; category: Category; inBox: boolean }
   | { kind: 'category'; category: Category }
   | {

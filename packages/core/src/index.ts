@@ -66,7 +66,6 @@ export {
   brandRowNear,
   brandSpan,
   readBrand,
-  brandScale,
   brandsAtFoot,
   chartAtFoot,
   isBrandScale,
@@ -88,7 +87,6 @@ export type {
   BrandMatch,
   BrandCell,
   BrandReading,
-  ScaleReading,
   BrandRowReading,
 } from './shoe-brands';
 export type { FormatOptions } from './format';

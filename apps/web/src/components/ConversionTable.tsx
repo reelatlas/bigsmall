@@ -121,7 +121,7 @@ interface TableDisplay {
   rounding: Rounding;
 }
 
-export interface ConversionTableProps<T extends ConversionRow> {
+interface ConversionTableProps<T extends ConversionRow> {
   /** The grid's id, which the field's combobox controls. */
   id: string;
   /**

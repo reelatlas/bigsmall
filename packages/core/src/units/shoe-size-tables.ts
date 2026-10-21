@@ -8,7 +8,7 @@
  * restarts at 1 after 13.5, and the US at 1 after its 13.5), and the typical last's length,
  * smallest and largest, in mm.
  */
-export interface ChildrenRow {
+interface ChildrenRow {
   foot: number;
   mondopoint: number | null;
   eu: number;

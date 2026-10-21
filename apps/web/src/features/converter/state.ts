@@ -1283,7 +1283,6 @@ function asPrinted(
 /** A row holding a brand's cell as printed: a size on a scale, as the brand prints it. */
 function brandCellRow(
   target: Unit,
-  from: Unit | null,
   value: number,
   range: readonly [number, number] | undefined,
   approx: boolean,
@@ -1291,7 +1290,7 @@ function brandCellRow(
 ): TableRow {
   const { text, printed } = asPrinted(value, range, locale);
   return {
-    ...emptyRow(target, from),
+    ...emptyRow(target, null),
     name: unitName(target, value),
     value,
     text,
@@ -1373,7 +1372,6 @@ function brandsSection(
   foot: number | null,
   scaleUnit: Unit,
   women: boolean,
-  from: Unit | null,
   value: number | undefined,
   baseline: BrandReading | null,
   locale: string | undefined,
@@ -1402,7 +1400,7 @@ function brandsSection(
       const cell =
         own.row && isBrandScale(scaleUnit.id) ? brandCell(own.row, scaleUnit.id, own.women) : null;
       rows.push({
-        ...brandCellRow(scaleUnit, from, value, cell?.range, false, locale),
+        ...brandCellRow(scaleUnit, value, cell?.range, false, locale),
         ...tag,
         detail: detailOf(own.chart.line, scaleUnit),
         inBox: true,
@@ -1411,7 +1409,7 @@ function brandsSection(
     }
     if (!read || read.value === null) {
       rows.push({
-        ...emptyRow(scaleUnit, from),
+        ...emptyRow(scaleUnit, null),
         ...tag,
         inBox: false,
         detail: chart
@@ -1421,7 +1419,7 @@ function brandsSection(
       return;
     }
     rows.push({
-      ...brandCellRow(scaleUnit, from, read.value, read.range, read.approx, locale),
+      ...brandCellRow(scaleUnit, read.value, read.range, read.approx, locale),
       ...tag,
       detail: detailOf(read.chart.line, scaleUnit),
     });
@@ -1674,7 +1672,6 @@ function selectShoe(
     foot,
     scaleUnit,
     women,
-    unit,
     value,
     reading,
     options.locale,
@@ -1780,7 +1777,7 @@ function valueRow(
     return {
       ...emptyRow(target, from),
       value: beyond.end,
-      text: `${beyond.past ? '>' : '<'} ${sizeText(beyond.end, locale)}`,
+      text: `${beyond.past ? '>' : '<'} ${sizeOf(beyond.end, locale)}`,
       tone: 'beyond',
       stepped: target.step !== undefined,
       detail: beyond.past ? 'above its range' : 'below its range',
@@ -1841,14 +1838,9 @@ function scaleEnd(unit: Unit, end: 'low' | 'high'): number {
     : (roundToStep(at, unit.step, end === 'low' ? 'up' : 'down')?.value ?? at);
 }
 
-/** A size written as the table writes one (13.5), for the locale. */
-function sizeText(size: number, locale: string | undefined): string {
-  return formatNumber(size, { precision: TABLE_PRECISION, locale });
-}
-
 /** A scale's span, "4 to 13.5", for the live region. */
 function scaleSpan(unit: Unit, locale: string | undefined): string {
-  return `${sizeText(scaleEnd(unit, 'low'), locale)} to ${sizeText(scaleEnd(unit, 'high'), locale)}`;
+  return `${sizeOf(scaleEnd(unit, 'low'), locale)} to ${sizeOf(scaleEnd(unit, 'high'), locale)}`;
 }
 
 /** The value in the base unit, or null where the unit cannot read it. */

@@ -5,9 +5,9 @@ import chartsFile from '../data/shoe-brands.json';
 import recordFile from '../../../docs/research/shoe-sizes-2/brands.json';
 import {
   BRAND_CHARTS_SCHEMA,
+  brandCell,
   brandChart,
   brandChartsOf,
-  brandScale,
   brandsAtFoot,
   chartAtFoot,
   convert,
@@ -201,21 +201,22 @@ describe('a brand read at the box (ADR 0028)', () => {
     expect(reading.row?.foot).toBe(271);
     expect(reading.foot).toBe(271);
     expect(reading.beyond).toBeNull();
-    expect(brandScale(reading, unit('uk'))).toMatchObject({ source: 'brand', value: 9 });
-    expect(brandScale(reading, unit('eu'))).toMatchObject({ source: 'brand', value: 44 });
-    expect(brandScale(reading, unit('us-women'))).toMatchObject({ source: 'brand', value: 11.5 });
-    expect(brandScale(reading, unit('japan'))).toMatchObject({ source: 'brand', value: 28 });
-    expect(brandScale(reading, unit('mondopoint'))).toMatchObject({ source: 'brand', value: 271 });
-    expect(brandScale(reading, unit('foot-cm')).value).toBeCloseTo(27.1, 9);
+    const row = reading.row!;
+    expect(brandCell(row, 'uk', false)).toMatchObject({ value: 9 });
+    expect(brandCell(row, 'eu', false)).toMatchObject({ value: 44 });
+    expect(brandCell(row, 'us-women', false)).toMatchObject({ value: 11.5 });
+    expect(brandCell(row, 'japan', false)).toMatchObject({ value: 28 });
+    expect(convert(reading.foot!, 'mondopoint', 'foot-cm')).toBeCloseTo(27.1, 9);
   });
 
   it('a Nike women’s 8 reads the women’s page, another last: UK 5.5, EU 39, a 24.5 cm foot', () => {
     const reading = readBrand(brand('nike'), unit('us-women'), 8);
     expect(reading.chart.line).toBe('women');
     expect(reading.foot).toBe(245);
-    expect(brandScale(reading, unit('uk')).value).toBe(5.5);
-    expect(brandScale(reading, unit('eu')).value).toBe(39);
-    expect(brandScale(reading, unit('us-men')).value).toBe(6.5);
+    const row = reading.row!;
+    expect(brandCell(row, 'uk', true)?.value).toBe(5.5);
+    expect(brandCell(row, 'eu', true)?.value).toBe(39);
+    expect(brandCell(row, 'us-men', true)?.value).toBe(6.5);
   });
 
   it('reads the women’s chart on a scale that does not say the line when asked: a Nike EU 39 is the women’s 8', () => {
@@ -226,18 +227,15 @@ describe('a brand read at the box (ADR 0028)', () => {
     expect(readBrand(brand('nike'), unit('eu'), 39).chart.line).toBe('men');
   });
 
-  it('a scale the chart lacks is ISO’s from the brand’s foot; none where the brand gives no foot', () => {
+  it('a scale the chart lacks has no cell, the foot standing for it (ISO’s rule, in the web’s rows); a brand with no foot length has cells and no foot', () => {
     const reebok = readBrand(brand('reebok'), unit('us-men'), 10);
     expect(reebok.foot).toBeCloseTo(271.78, 2);
-    const eu = brandScale(reebok, unit('eu'));
-    expect(eu.source).toBe('iso');
-    expect(eu.value).toBeCloseTo(271.78 / 6.67 + 2, 2);
-    expect(brandScale(reebok, unit('uk')).source).toBe('iso');
+    expect(brandCell(reebok.row!, 'eu', false)).toBeNull();
+    expect(brandCell(reebok.row!, 'uk', false)).toBeNull();
     const puma = readBrand(brand('puma'), unit('us-men'), 10);
     expect(puma.foot).toBeNull();
-    expect(brandScale(puma, unit('eu'))).toMatchObject({ source: 'brand', value: 43 });
-    expect(brandScale(puma, unit('mondopoint')).source).toBe('none');
-    expect(brandScale(puma, unit('us-women')).source).toBe('none');
+    expect(brandCell(puma.row!, 'eu', false)).toMatchObject({ value: 43 });
+    expect(brandCell(puma.row!, 'us-women', false)).toBeNull();
   });
 
   it('a length typed reads the nearest row where the length is the foot’s, ≈, and nothing where it is not', () => {
@@ -245,16 +243,11 @@ describe('a brand read at the box (ADR 0028)', () => {
     expect(nike.length).toBe(true);
     expect(nike.foot).toBe(270);
     expect(nike.row?.foot).toBe(271);
-    expect(brandScale(nike, unit('us-men'))).toMatchObject({
-      source: 'brand',
-      value: 10,
-      approx: true,
-    });
-    expect(brandScale(nike, unit('mondopoint'))).toMatchObject({ source: 'length', value: 270 });
+    expect(brandCell(nike.row!, 'us-men', false)).toMatchObject({ value: 10 });
+    expect(Math.abs(nike.row!.foot! - nike.foot!)).toBeGreaterThan(0.5);
     const puma = readBrand(brand('puma'), unit('foot-cm'), 27);
     expect(puma.row).toBeNull();
     expect(puma.foot).toBe(270);
-    expect(brandScale(puma, unit('us-men')).source).toBe('none');
   });
 
   it('a size off the chart says the chart’s span; a children’s size answers nothing', () => {
@@ -267,7 +260,7 @@ describe('a brand read at the box (ADR 0028)', () => {
 
   it('a range is read as printed: a Birkenstock EU 42 is US men’s 9 to 9.5', () => {
     const reading = readBrand(brand('birkenstock'), unit('eu'), 42);
-    expect(brandScale(reading, unit('us-men'))).toMatchObject({ value: 9, range: [9, 9.5] });
+    expect(brandCell(reading.row!, 'us-men', false)).toMatchObject({ value: 9, range: [9, 9.5] });
     expect(readBrand(brand('birkenstock'), unit('us-men'), 9.5).row).toBe(reading.row);
   });
 });

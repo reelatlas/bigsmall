@@ -1,4 +1,4 @@
-import { fromBase, toBase } from './convert';
+import { toBase } from './convert';
 import { compactKey } from './normalize';
 import type { MatchClass } from './search';
 import type { Unit } from './types';
@@ -79,8 +79,6 @@ export interface BrandMatch {
   brand: ShoeBrand;
   /** 2 an exact name or alias, 3 the start of one, 5 inside one. */
   matchClass: MatchClass;
-  /** The name or alias that matched, as written in the data. */
-  matchedKey: string;
 }
 
 /**
@@ -111,7 +109,7 @@ export function matchShoeBrands(query: string, named = false, limit = 8): BrandM
                 ? 5
                 : null;
       if (matchClass !== null && (!best || matchClass < best.matchClass)) {
-        best = { kind: 'brand', brand, matchClass, matchedKey: key };
+        best = { kind: 'brand', brand, matchClass };
       }
     }
     if (best) found.push(best);
@@ -311,46 +309,6 @@ export function readBrand(
   const row = brandRowAt(chart, unit.id, value, women);
   if (!row) return { ...base, beyond: brandSpan(chart, unit.id, women) };
   return { ...base, row, foot: chart.basis === 'foot' && row.foot !== undefined ? row.foot : null };
-}
-
-/**
- * What a scale row shows with a brand in the box: the chart's own cell, as printed (`brand`);
- * the same length in the other length unit (`length`); ISO's rule from the foot the brand gives,
- * where the chart lacks the scale (`iso`), for the row to step and mark as every converted size
- * is; or nothing (`none`).
- */
-export interface ScaleReading {
-  source: 'brand' | 'length' | 'iso' | 'none';
-  value: number | null;
-  range?: readonly [number, number] | undefined;
-  /** For a length typed, the row's foot is not the typed one: the cell is the nearest row's. */
-  approx: boolean;
-}
-
-export function brandScale(reading: BrandReading, unit: Unit): ScaleReading {
-  const none: ScaleReading = { source: 'none', value: null, approx: false };
-  const { chart, row, foot, women } = reading;
-  const off =
-    reading.length && row?.foot !== undefined && foot !== null && Math.abs(row.foot - foot) > 0.5;
-  if (LENGTH_UNITS.has(unit.id)) {
-    if (reading.length && foot !== null) {
-      return { source: 'length', value: fromBase(unit, foot), approx: false };
-    }
-    if (row?.foot !== undefined && chart.basis === 'foot') {
-      return { source: 'brand', value: fromBase(unit, row.foot), approx: false };
-    }
-    return none;
-  }
-  if (row && isBrandScale(unit.id)) {
-    const cell = brandCell(row, unit.id, women);
-    if (cell) return { source: 'brand', value: cell.value, range: cell.range, approx: off };
-  }
-  // ISO's rule from the foot: the brand's, or a typed length the chart could read a row from; a
-  // typed length that meets a chart with no feet answers nothing but the brands' rows.
-  if (foot !== null && (!reading.length || row !== null)) {
-    return { source: 'iso', value: fromBase(unit, foot), approx: false };
-  }
-  return none;
 }
 
 /** A brand's row under the table: its size for the foot in the box, by its own chart (ADR 0028). */

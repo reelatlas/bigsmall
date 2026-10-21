@@ -1,0 +1,13 @@
+URL: https://www.on.com/en-us/products/cloud-6-3wf1006/womens/barberry-ox-shoes-3WF10065455 (reached from https://www.on.com/en-us/shop/womens/shoes, the first women's product, since the Cloudmonster women's URL redirected to men's) -> "Size chart" button
+Read 2026-10-21 via Claude in Chrome (rendered DOM innerText)
+
+True to size.
+
+Size Guide - Womens Shoes
+SIZE GUIDE - WOMENS SHOES
+US	5	5.5	6	6.5	7	7.5	8	8.5	9	9.5	10	10.5	11	12
+BR	33	34	N/A	35	36	37	N/A	38	39	N/A	40	41	42	43
+MX	22	22.5	23	23.5	24	24.5	25	25.5	26	26.5	27	27.5	28	29
+EU	36	36.5	37	37.5	38	38.5	39	40	40.5	41	42	42.5	43	44
+JP	22	22.5	23	23.5	24	24.5	25	25.5	26	26.5	27	27.5	28	29
+UK	3	3.5	4	4.5	5	5.5	6	6.5	7	7.5	8	8.5	9	10

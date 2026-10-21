@@ -1,0 +1,40 @@
+URL: https://www.asics.com/us/en-us/aligned-size-charts/  (title: ASICS Size Guide | ASICS; reached from the footer link "ASICS Size Guide" after https://www.asics.com/us/en-us/shoe-size-guide/ gave "No Search Results")
+Read 2026-10-21 via Claude in Chrome (get_page_text)
+
+ASICS Size Guide
+Gender: Men | Product Types: Shoes, Clothing, Accessories
+How to Measure Your Shoe Size
+Follow these steps to determine your shoe size. Do this during or at the end of the day for accuracy, as feet swell throughout the day.
+1. Place a piece of paper under your foot. Stand up straight and have your heel lightly touching against a wall.
+2. Mark the tip of your longest toe and heel on the paper. Measure the length of your feet from heel to toe.
+3. Repeat the steps for your other foot and compare the measurements with our size chart below.
+Fit
+For running shoes, we generally recommend sizing up a half size from your casual shoe size.
+Men's Shoes Size Chart
+US UK EU CM
+4 3 36 22.5
+4.5 3.5 37 23
+5 4 37.5 23.5
+5.5 4.5 38 24
+6 5 39 24.5
+6.5 5.5 39.5 25
+7 6 40 25.25
+7.5 6.5 40.5 25.5
+8 7 41.5 26
+8.5 7.5 42 26.5
+9 8 42.5 27
+9.5 8.5 43.5 27.5
+10 9 44 28
+10.5 9.5 44.5 28.25
+11 10 45 28.5
+11.5 10.5 46 29
+12 11 46.5 29.5
+12.5 11.5 47 30
+13 12 48 30.5
+13.5 12.5 48.5 30.75
+14 13 49 31
+14.5 13.5 49.5 31.5
+15 14 50.5 32
+Men's Shoes Width Chart: Narrow B | Standard D | Wide 2E | Extra wide 4E
+Unsure on size or color? We offer returns for 90 days.
+(The US page says nothing about adding 1 to 1.5 cm to the foot; it says to compare the measurement with the chart.)

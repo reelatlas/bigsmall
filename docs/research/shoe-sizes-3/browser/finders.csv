@@ -1,0 +1,12 @@
+brand,finder_url,input_cm,output,exact_words,date_read
+Birkenstock,https://www.birkenstock.com/my/things-to-know/fit-guide/,24.0,not obtained,"Calculator selects (length and width per foot, mm) set by script did not register (the form answered 'Please select a width'); per-select clicks were beyond the call budget. Width input tried: 95 mm.",2026-10-21
+Birkenstock,https://www.birkenstock.com/my/things-to-know/fit-guide/,25.0,not obtained,"Calculator selects (length and width per foot, mm) set by script did not register (the form answered 'Please select a width'); per-select clicks were beyond the call budget. Width input tried: 95 mm.",2026-10-21
+Birkenstock,https://www.birkenstock.com/my/things-to-know/fit-guide/,26.0,not obtained,"Calculator selects (length and width per foot, mm) set by script did not register (the form answered 'Please select a width'); per-select clicks were beyond the call budget. Width input tried: 95 mm.",2026-10-21
+Birkenstock,https://www.birkenstock.com/my/things-to-know/fit-guide/,27.0,not obtained,"Calculator selects (length and width per foot, mm) set by script did not register (the form answered 'Please select a width'); per-select clicks were beyond the call budget. Width input tried: 95 mm.",2026-10-21
+Birkenstock,https://www.birkenstock.com/my/things-to-know/fit-guide/,28.0,not obtained,"Calculator selects (length and width per foot, mm) set by script did not register (the form answered 'Please select a width'); per-select clicks were beyond the call budget. Width input tried: 95 mm.",2026-10-21
+Clarks (kids),https://www.clarks.co.uk/,,not reached,Navigation to clarks.co.uk refused by the extension's site permission.,2026-10-21
+adidas,https://www.adidas.com/us/help/size_charts/men-shoes,,no finder,No size finder taking a foot length on the size chart or either blog page.,2026-10-21
+Reebok,https://www.reebok.eu/products/club-c-85-100074451-1536,,no finder,EU product Size guide is a table only; reebok.co.uk unreadable (permission).,2026-10-21
+Skechers,https://www.skechers.com/size-chart/,,no finder,US size chart has no finder; skechers.com.au refused (permission).,2026-10-21
+HOKA,https://www.hoka.com/en/us/sizing-information.html,,not probed,"True Fit link (FIND YOUR TRUE FIT); asks for shoes/personal profile, not a foot length.",2026-10-21
+UGG,https://www.ugg.com/sizing-information.html,,not probed,"True Fit: 'Get Started / Sign In', 'there’s no measuring!'; not a foot-length finder.",2026-10-21

@@ -1,0 +1,32 @@
+URL: https://www.crocs.com/size-chart  (title: Size Chart - Crocs)
+Read 2026-10-21 via Claude in Chrome (get_page_text; centimetres and the Kids' tab from the rendered table after clicking)
+
+Size Chart
+Find your perfect fit with Crocs' shoe size chart.
+Adult | Kids' | Socks
+Inches | Centimeters
+Tip: If you're in between sizes, round up. For wide feet order your normal size.
+
+[Adult, Inches]
+Heel to Toe Length 7 5/8″ 8″ 8 3/8″ 8 5/8″ 9″ 9 3/8″ 9 5/8″ 10″ 10 3/8″ 10 5/8″ 11″ 11 3/8″ 11 5/8″ 12″ 12 3/8″ 12 5/8″
+[Adult, Centimeters]
+Heel to Toe Length 20cm 21cm 22cm 23cm 24cm 25cm 26cm 27cm 28cm 29cm 30cm 31cm 32cm 33cm 34cm 35cm
+US Women 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+US Men 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+UK Women 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+UK Men 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+EU 33-34 34-35 36-37 37-38 38-39 39-40 41-42 42-43 43-44 45-46 46-47 48-49 49-50 50-51 51-52 52-53
+Japan 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+Korea 210mm 220mm 230mm 240mm 250mm 260mm 270mm 280mm 290mm 300mm 310mm 320mm 330mm 340mm 350mm 360mm
+
+[Kids']
+Tip: If your child is between sizes, round up. Juniors size 3 and up can also shop our adult sizes.
+Typical Age | Little Kids (Under 1) | (1-2 Years Old) | (2-5 Years Old) | Big Kids (5+ Years Old)
+Heel to Toe Length (in) 3 1/4″ 3 7/8″ 4 1/8″ 4 1/2″ 4 7/8″ 5 1/8″ 5 1/2″ 5 7/8″ 6 1/8″ 6 1/2″ 6 7/8″ 7 1/8″ 7 1/2″ 7 7/8″ 8 1/8″ 8 1/2″ 8 7/8″ 9 1/8″ 9 1/2″
+Heel to Toe Length (cm) 9cm 9.8cm 10.7cm 11.5cm 12.3cm 13.2cm 14cm 14.9cm 15.7cm 16.6cm 17.4cm 18.3cm 19.1cm 20cm 20.8cm 21.7cm 22.5cm 23.3cm 24.2cm
+US C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 J1 J2 J3 J4 J5 J6
+UK - 2 3 4 5 6 7 8 9 10 11 12 13 1 2 3 4 5 6
+EU - 17-18 18-19 19-20 20-21 21-22 22-23 23-24 24-25 25-26 26-27 27-28 28-29 29-30 30-31 31-32 32-33 33-34 35-36
+Japan - - - 12 13 14 15 15.5 16.5 17.5 18 18.5 19 19.5 20 21 22 23 24
+Korea - - - 115 120 130 140 150 155 165 175 180 190 200 210 220 230 240 250
+(Socks tab not read. A cookie notice was shown and left alone; nothing accepted.)

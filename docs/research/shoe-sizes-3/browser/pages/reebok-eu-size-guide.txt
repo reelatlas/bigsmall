@@ -1,0 +1,9 @@
+URL: https://www.reebok.eu/ (Shopify store; no size-guide link on the home page; /pages/size-guide is a 404; /pages/faqs has no sizing words beyond sold-out and returns)
+Size guide reached on a product page: https://www.reebok.eu/products/club-c-85-100074451-1536 ("Size guide" button; a "We don't ship to the United States" shipping-country modal overlaid it and was left alone)
+Read 2026-10-21 via Claude in Chrome (rendered DOM)
+
+Size guide (no title, no words):
+Europe|33|34|34.5|35|36|36.5|37.5|38.5|39|40|40.5|41|42|42.5|43|44|44.5|45|45.5|46|47|48|48.5|50|52|53.5
+UK|2|2.5|3|3.5|4|4.5|5|5.5|6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|11.5|12|12.5|13|14|15|16
+US|3|3.5|4|4.5|5|5.5|6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|11.5|12|12.5|13|13.5|14|15|16|17
+Product page: "Size: 34 / EU sizes / Size guide"; Details & Features: "Regular fit". No CM column, no measuring words.

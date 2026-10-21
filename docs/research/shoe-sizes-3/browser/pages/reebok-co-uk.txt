@@ -1,0 +1,2 @@
+URL: https://www.reebok.co.uk/
+2026-10-21: the page loaded but the extension refused to read it ("Permission denied for reading pages on this domain"; JavaScript also denied). Its size guide was not reached.

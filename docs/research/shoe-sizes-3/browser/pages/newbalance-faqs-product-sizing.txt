@@ -1,0 +1,15 @@
+URL: https://www.newbalance.com/faqs/product-sizing/  (title: Product & Fit - New Balance)
+Read 2026-10-21 via Claude in Chrome (get_page_text; the two answers below from the accordion's rendered DOM text)
+
+Product & Fit
+Finding the perfect fit is essential to feeling and performing your best. Below you’ll find more information about determining your size, choosing the right styles and more frequently asked questions about our products.
+For additional help with products and sizing, contact our Customer Care team or get fitted by a pro at your closest New Balance store.
+
+Do your shoes fit similarly to other brands?
+Our shoes generally run true to size and align with standard industry sizing. If a style runs smaller or larger, we note that on the product page to help you choose the best size.
+
+How do I determine my size?
+Download and print our sizing tools for men, women and kids to easily find your shoe size. These printable measuring charts help you find your size and width and offer tips for finding your best fit. Want to get fitted by one of our pros in person? Visit your closest New Balance store.
+
+(Other questions listed, not expanded: running/walking/training shoe; what widths mean; out of stock; wide widths; the "v" in style numbers; warranty; NDurance; heel drop; overpronation; slip-resistant; non-marking; lace length; vegan.)
+(The printable measuring tools are downloads (PDF); not downloaded, as downloads need the owner's yes.)

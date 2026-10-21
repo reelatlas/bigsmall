@@ -1,0 +1,2 @@
+URL: https://www.skechers.com.au/size-guide
+2026-10-21: not read. The Claude in Chrome extension refused the navigation: "Navigation to this domain is not allowed" (the extension's site permission for skechers.com.au is not granted).

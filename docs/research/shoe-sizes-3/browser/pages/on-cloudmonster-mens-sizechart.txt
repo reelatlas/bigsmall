@@ -1,0 +1,17 @@
+URL: https://www.on.com/en-us/products/cloudmonster-61/mens (Select size dialog -> "Size chart" button -> SIZE & FIT panel)
+Read 2026-10-21 via Claude in Chrome (get_page_text gave only the size list; the panel's text below via the rendered DOM innerText)
+
+SIZE & FIT
+True to size.
+
+Size Guide - Mens Shoes
+SIZE GUIDE - MENS SHOES
+US	7	7.5	8	8.5	9	9.5	10	10.5	11	11.5	12	12.5	13	13.5	14	15
+BR	37	38	39	N/A	40	41	N/A	42	N/A	43	44	45	46	47	N/A	47
+MX	25	25.5	26	26.5	27	27.5	28	28.5	29	29.5	30	30.5	31	31.5	32	33
+EU	40	40.5	41	42	42.5	43	44	44.5	45	46	47	47.5	48	48.5	49	50
+JP	25	25.5	26	26.5	27	27.5	28	28.5	29	29.5	30	30.5	31	31.5	32	33
+UK	6.5	7	7.5	8	8.5	9	9.5	10	10.5	11	11.5	12	12.5	13	13.5	14.5
+
+(No foot-length or CM column; no measuring words in the panel. Product attributes shown under it: ROAD RUNNING STYLE Responsive; LACING Standard; HEEL TO TOE DROP 6 mm; WEIGHT 275 g.)
+Note: https://www.on.com/en-us/products/cloudmonster-61/womens redirected to the men's page (.../mens/white-glacier-shoes-61.97654).

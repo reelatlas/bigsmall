@@ -1,0 +1,67 @@
+URL requested: https://www.hoka.com/en/us/size-chart.html -> rendered "We're Sorry... The page you have requested does not exist or is no longer available." Reached the live guide from the footer's "Sizing Guide": https://www.hoka.com/en/us/sizing-information.html
+Read 2026-10-21 via Claude in Chrome (get_page_text for the words; the tables per gender and unit via the rendered DOM after clicking the toggles)
+
+Sizing Information
+Select Gender: Women | Men | All Gender | Kids
+Select A Category: Footwear | Apparel | Accessories
+Width: Regular | Wide
+Measurements: in | cm
+
+[Women, Footwear, Regular, in]
+Foot Length (IN)	8" 21/32	8" 13/16	9" 1/64	9" 11/64	9" 21/64	9" 31/64	9" 41/64	9" 27/32	10"	10" 5/32	10" 5/16	10" 33/64	10" 43/64	10" 53/64	10" 63/64
+Regular Width Length (IN)	3" 27/64	3" 15/32	3" 1/2	3" 35/64	3" 37/64	3" 5/8	3" 21/32	3" 45/64	3" 47/64	3" 25/32	3" 13/16	3" 55/64	3" 57/64	3" 15/16	3" 31/32
+US	5	5.5	6	6.5	7	7.5	8	8.5	9	9.5	10	10.5	11	11.5	12
+UK	3.5	4	4.5	5	5.5	6	6.5	7	7.5	8	8.5	9	9.5	10	10.5
+Europe	36	36 2/3	37 1/3	38	38 2/3	39 1/3	40	40 2/3	41 1/3	42	42 2/3	43 1/3	44	44 2/3	45 1/3
+Japan (CM)	22	22.5	23	23.5	24	24.5	25	25.5	26	26.5	27	27.5	28	28.5	29
+Mexico (CM)	22	22.5	23	23.5	24	24.5	25	25.5	26	26.5	27	27.5	28	28.5	29
+China	220	225	230	235	240	245	250	255	260	265	270	275	280	285	290
+[Women, cm]
+Foot Length (CM)	22.0	22.4	22.9	23.3	23.7	24.1	24.5	25.0	25.4	25.8	26.2	26.7	27.1	27.5	27.9
+Regular Width Length (MM)	87	88	89	90	91	92	93	94	95	96	97	98	99	100	101
+
+[Men, Footwear, Regular, in]
+Foot Length (IN)	9" 1/16	9" 7/32	9" 13/32	9" 9/16	9" 23/32	9" 7/8	10" 5/64	10" 15/64	10" 25/64	10" 35/64	10" 45/64	10" 29/32	11" 1/16	11" 7/32	11" 3/8	11" 37/64	11" 47/64	11" 57/64	12" 3/64	12" 1/4	12" 13/32
+Regular Width Length (IN)	3" 25/32	3" 13/16	3" 55/64	3" 57/64	3" 15/16	3" 31/32	4" 1/64	4" 1/16	4" 3/32	4" 9/64	4" 11/64	4" 7/32	4" 1/4	4" 19/64	4" 3/8	4" 13/32	4" 29/64	4" 31/64	4" 17/32	4" 9/16	4" 39/64
+US	5	5.5	6	6.5	7	7.5	8	8.5	9	9.5	10	10.5	11	11.5	12	12.5	13	13.5	14	14.5	15
+UK	4.5	5	5.5	6	6.5	7	7.5	8	8.5	9	9.5	10	10.5	11	11.5	12	12.5	13	13.5	14	14.5
+Europe	37 1/3	38	38 2/3	39 1/3	40	40 2/3	41 1/3	42	42 2/3	43 1/3	44	44 2/3	45 1/3	46	46 2/3	47 1/3	48	48 2/3	49 1/3	50	50 2/3
+Japan (CM)	23	23.5	24	24.5	25	25.5	26	26.5	27	27.5	28	28.5	29	29.5	30	30.5	31	31.5	32	32.5	33
+Mexico (CM)	23	23.5	24	24.5	25	25.5	26	26.5	27	27.5	28	28.5	29	29.5	30	30.5	31	31.5	32	32.5	33
+China	230	235	240	245	250	255	260	265	270	275	280	285	290	295	300	305	310	315	320	325	330
+[Men, cm]
+Foot Length (CM)	23.0	23.4	23.9	24.3	24.7	25.1	25.6	26.0	26.4	26.8	27.2	27.7	28.1	28.5	28.9	29.4	29.8	30.2	30.6	31.1	31.5
+Regular Width Length (MM)	92	93	94	95	96	97	98	99	100	101	102	103	104	105	106	107	108	109	111	112	113
+
+[All Gender, Footwear, Regular, cm]  (as printed: the foot length and width rows carry 21 cells, the size rows 22)
+Foot Length (CM)	23.0	23.4	23.9	24.3	24.7	25.1	25.6	26.0	26.4	26.8	27.2	27.7	28.1	28.5	28.9	29.4	29.8	30.2	30.6	31.1	31.5
+Regular Width Length (MM)	92	93	94	95	96	97	98	99	100	101	102	103	104	105	106	107	108	109	111	112	113
+US	M4/W5	M4½/W5½	M5/W6	M5½/W6½	M6/W7	M6½/W7½	M7/W8	M7½/W88½	M8/W9	M8½/W9½	M9/W10	M9½/W10½	M10/W11	M10½/W11½	M11/W12	M11½/W12½	M12/W13	M12½/W13½	M13/W14	M13½/W14½	M14/W15	M15/W16
+UK	3½	4	4½	5	5½	6	6½	7	7½	8	8½	9	9½	10	10½	11	11½	12	12½	13	13½	14½
+Europe	36	36⅔	37⅓	38	38⅔	39⅓	40	40⅔	41⅓	42	42⅔	43⅓	44	44⅔	45⅓	46	46⅔	47⅓	48	48⅔	49⅓	50⅔
+Japan (CM)	22	22½	23	23½	24	24½	25	25½	26	26½	27	27½	28	28½	29	29½	30	30½	31	31½	32	33
+Mexico (CM)	22	22½	23	23½	24	24½	25	25½	26	26½	27	27½	28	28½	29	29½	30	30½	31	31½	32	33
+China	220	225	230	235	240	245	250	255	260	265	270	275	280	285	290	295	300	305	310	315	320	330
+
+[Kids, Footwear]  Category: Footwear; Measurements: in | cm
+Size	Foot Length (in)	Foot Length (cm)
+3.5 Youth	8.66''	22
+4 Youth	8.86''	22.5
+4.5 Youth	9.06''	23
+5 Youth	9.25''	23.5
+5.5 Youth	9.45''	24
+6 Youth	9.65''	24.5
+6.5 Youth	9.84''	25
+7 Youth	10.04''	25.5
+
+How To Measure
+
+If you are unsure which shoe size to purchase, please follow the below steps:
+
+Trace the outline of each foot on a piece of paper.
+In a straight line from the middle of the heel to the longest toe, measure the length of each foot.
+If one foot is longer than the other, take the larger measurement and compare to the chart on the next page. Foot length will determine your shoe size - round up or down to the closest size within 2mm.
+FIND YOUR TRUE FIT
+FIND OUT MORE
+
+(The Wide width tables were not read.)

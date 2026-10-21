@@ -1,0 +1,10 @@
+URL: https://www.crocs.com/customer-service/faqs  (title: FAQs - Crocs)
+Read 2026-10-21 via Claude in Chrome (rendered text and the page's embedded data)
+
+Crocs size chart (1)
+How do I find my size?
+Size charts can be found in the link under the size selections on each product page or on our size chart page below:
+Size chart Page
+
+In the page's embedded data (not visible text): "Shoe Size Chart", link "Learn how to measure", "Tip: If you're in between sizes, round up." "For wide feet order your normal size."; "Kids Size Chart", "Tip: If your child is between sizes, round up."; "Measure your foot and find the right size for your Crocs shoes."
+(No other sizing entry among the visible FAQs.)

@@ -10,12 +10,12 @@ A save leaves nothing only in the conversation: the next session, or the one aft
 
 ## 1. Write down what is pending
 
-- Every note of Sean's not yet built goes into `docs/research/findings-0-first-pass.md` as a new pass at the bottom: `## <Ordinal> pass: <what it covers> (saved before a compaction)`, its ordinal continuing the last heading's (read the last `## … pass` heading first, so no number is skipped), a line saying what it follows on and what is live (the last commit), then a table, `| Observation | Plan |`, one row per note, the plan concrete enough to build cold (files, the rule, the docs to update, the tests). Questions for Sean are rows too, with the recommendation first. The new pass gets its clause in the "Passes." index paragraph at the top of the log, in the same style, one clause per pass.
+- Every note of Sean's not yet built goes into `docs/research/findings-0-first-pass.md` as a new pass at the bottom: `## <Ordinal> pass: <what it covers> (<date>; saved before a compaction)`, its ordinal continuing the last heading's (read the last `## … pass` heading first, so no number is skipped), a line saying what it follows on and what is live (the last commit), then a table, `| Observation | Plan |`, one row per note, the plan concrete enough to build cold (files, the rule, the docs to update, the tests). Questions for Sean are rows too, with the recommendation first. The new pass gets its clause in the "Passes." index paragraph at the top of the log, in the same style, one clause per pass.
 - When a saved pass is later built, its heading says so ("built the same day", "built in the forty-third") and its rows' outcomes are recorded under it.
 
 ## 2. Pick up here
 
-Bring `CLAUDE.md`'s "Pick up here" list up to date, kept short:
+Bring `CLAUDE.md`'s "Current status" (its date, and what the stretch changed) and its "Pick up here" list up to date, kept short:
 
 - Trials awaiting Sean's verdict, each with the commit that reverts it.
 - Questions open with Sean, the recommendation first.

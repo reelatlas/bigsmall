@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Runs a task as waves of agents for bigsmall: an orchestrator's brief, parallel workers with one question or one part each, checkers kept apart from gatherers, handoffs as files, a budget and a stop at every wave, the record and the cost written. Use when a task has several independent parts of one shape (a research pass over candidates, a bounded build with independent pieces), or when Sean says orchestrate, delegate, fan out, or run agents; not for a handful of calls, a lookup with a known target, or a design judgment, which is Sean's with a mock. v1, completed from the demand map's run (2026-10-19) and amended by each run that teaches it.
+description: Runs a task as waves of agents for bigsmall: an orchestrator's brief, parallel workers with one question or one part each, checkers kept apart from gatherers, handoffs as files, a budget and a stop at every wave, the record and the cost written. Use when a task has several independent parts of one shape (a research pass over candidates, a bounded build with independent pieces), or when Sean says orchestrate, delegate, fan out, or run agents; not for a handful of calls, a lookup with a known target, or a design judgment, which is Sean's with a mock. v2, from the demand map's run and the brands' charts run (2026-10-19) and amended by each run that teaches it.
 argument-hint: '[the task, or the research doc that holds its briefs]'
 ---
 
@@ -34,7 +34,7 @@ Estimates come from precedent and are written before the wave: Cooking's checker
 
 ## 4. Handoffs are files, and sessions are interchangeable
 
-- A worker's data goes into its own folder under the session's scratchpad (`<scratchpad>/<pass>/<worker>/`, docs/LEARNINGS.md: an agent shares the session's scratchpad), written by its own scripts: `claims.csv` (claim, layer, evidence level, URL, exact words, date read), `sources.md` (every page opened, what it gave), downloads in `downloads/` and never a script beside them. Its report (`findings.md`: the answer first, at most 2,500 words) comes back as the text of its reply, and the orchestrator saves it to the folder: the harness refuses a subagent's report file from the Write tool ("Subagents should return findings as text", the demand map's first wave, 2026-10-19), and a worker told to write the file ends with a stub and no report, which costs a second sitting to deliver it. To try at the next run, since the saved report costs the orchestrator its length a second time: the report written by the agent's own script (the Write tool's rule may not cover a script's file; to confirm) with the ten-line summary as the reply, the orchestrator reading the file selectively.
+- A worker's data goes into its own folder under the session's scratchpad (`<scratchpad>/<pass>/<worker>/`, docs/LEARNINGS.md: an agent shares the session's scratchpad), written by its own scripts: `claims.csv` (claim, layer, evidence level, URL, exact words, date read), `sources.md` (every page opened, what it gave), downloads in `downloads/` and never a script beside them. Its report (`findings.md`: the answer first, at most 2,500 words) comes back as the text of its reply, and the orchestrator saves it to the folder: the harness refuses a subagent's report file from the Write tool ("Subagents should return findings as text", the demand map's first wave, 2026-10-19), and a worker told to write the file ends with a stub and no report, which costs a second sitting to deliver it. The brands' charts run (2026-10-20) kept the report as the reply's text; a report written by the agent's own script, with a ten-line summary as the reply and the orchestrator reading the file selectively, stays an option to try when a report's length costs twice.
 - At the wave's end the orchestrator copies the keepers into `docs/research/<pass>/<worker>/` and commits them, since a scratchpad belongs to one session and the next may run on another account (Sean has three): the report, the CSVs, the sources, the fetch logs, and the scripts, never the downloads or a worker's per-item duplicates of its CSV (the brands' charts wave, 2026-10-20: 49 MB of downloads and 2.4 MB of per-brand JSON dropped, the two CSVs of 1.7 and 1.3 MB kept). The briefs live in the pass's doc. "Pick up here" names the wave and what is next.
 - Never two sessions on one tree at once; a build wave runs its agents in worktrees (`isolation: "worktree"`) and the orchestrator merges, each piece through the gate.
 
@@ -64,6 +64,11 @@ Reading lists by job, sections rather than whole docs, so an agent is not drowne
 - **A wave runs long**: stop at the budget, keep what was written, report, and let Sean choose the next chunk.
 - **A build agent fails the gate**: it fixes its own piece inside its worktree; the orchestrator merges nothing that is red.
 
+- A chart lives in a page's data more often than in a table (a JSON per region, embedded data, a PDF, a product page's panel): the brief says to read those, and a worker's saved copy counts only where its parser found the chart in it (the brands' run, 2026-10-20).
+- Two pages of one brand join only on a column the brand shares, the join checked row by row (Clarks' GB and US pages on their UK size).
+- Screenshots Sean sends while a turn runs do not land as files: ask for them at a turn's start, and name where each is filed.
+- A checker over local sources is a role of its own: checker C of the brands' run read Sean's capture against his saved sources, given the capture and the sources, never the capturer's notes.
+
 ## 7. Tools
 
 The Agent tool for a handful of independent workers (model and effort per agent; SendMessage to continue one); the Workflow tool for a pipeline with per-item verification, when Sean has asked for orchestration in his own words; worktrees for builds. The `research` skill's steps decide a figure; this skill only arranges who does what.
@@ -74,7 +79,7 @@ The pass's doc (`docs/research/<pass>.md`): the decisions numbered, the cost per
 
 ## 9. A run, step by step
 
-What the demand map's run settled (2026-10-19), as the checklist a session follows; the sections above hold the reasons.
+What the demand map's run settled (2026-10-19) and the brands' charts run confirmed (2026-10-20), as the checklist a session follows; the sections above hold the reasons.
 
 0. **The plan.** The pass's doc with the questions, the method, every brief, and the budget table; `docs/RESEARCH.md` amended where the method grows; shipped before any agent runs.
 1. **Gather.** Workers in parallel from the doc's briefs (Opus 5.5, high; 150 calls; the report as the reply's text, the data by the worker's scripts into its own scratchpad folder; the safety rules in every brief). Save each report as `findings.md`, copy the keepers into `docs/research/<pass>/<worker>/`, write the headlines into the doc, the cost into its table, and save.

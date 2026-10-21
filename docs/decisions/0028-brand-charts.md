@@ -36,3 +36,12 @@ A brand's chart is a conventional fact (docs/RESEARCH.md §1, ADR 0022): the bra
 - Core gains `shoe-brands.ts`, the brands and their charts, and the foot's cm unit; the About page lists 33 charts under Shoe size with their pages and dates; `pnpm check` holds core to the record.
 - Easier: the next brand is a chart in the record and a line in `shoe-brands.ts`; apparel sizing (docs/PLAN.md §2) is the same shape, a body measurement as the base and a brand's chart as the pill.
 - To watch, in Sean's hands on the live site: a brand with no foot length read as ISO's label; a kid's size at a brand (nothing); a brand's labels on another scale reached from the chip (2026-10-20); the brands' section's length on a phone; a brand typed with a typo (no fuzzy match for brands).
+
+## Amendments
+
+The decisions above carry each amendment inline where it applies, marked by its date and pass; the list here is the index of them.
+
+- **2026-10-20** (the hundred-and-nineteenth pass). Decision 1: the unit's chip opens the brand's scales in the table's place, one taken reading the same row on that scale with the brand staying. Decision 2: the chart line is state, kept from a US women's size across the genderless scales and carried in the URL. Decision 3: the brand rows' words after the name are the line alone, no possessive and no plural, the foot dropped; a range or a third splits at its first number's end.
+- **2026-10-20** (the hundred-and-twentieth pass). Decision 3: a brand's dash row taken clears the number, and a scale's row taken while the rows are dashes keeps the brand. Decision 1: a brand's name begun at either end beside the scale words matches.
+- **2026-10-21** (the hundred-and-twenty-first pass). Decision 3: the brands' section comes first while a brand is in the box. Decision 1: while a brand has no scale, its scales take the table's place to choose from.
+- **2026-10-21** (the hundred-and-twenty-third pass). Decision 1: where a brand prints its lines apart, the chip's list and the list to choose from add the other chart's own scales under its heading, at the same foot or with the number cleared.

@@ -1,7 +1,7 @@
 # 0019 — Analytics: Umami Cloud, cookieless, through the site's own address
 
 Date: 2026-10-15
-Status: accepted; amended 2026-10-18
+Status: accepted; amended 2026-10-18, 2026-10-19, and 2026-10-20 (below)
 
 ## Context
 

@@ -18,6 +18,8 @@ Requested scope: `$ARGUMENTS`
 - For a **measured** fact, read `docs/RESEARCH.md` §2 and §6 and answer §6's questions at the top of the research doc: the condition fixed, the anchor source, the precision, the region.
 - For a **suggestion to weigh** (an outside list of sources, an AI tool's answer): it is a lead, never a source. Classify each item: what job it does (a defining standard, a measurement, a yield, a package rule), whether it is readable, and whether it would count under the screen. Record the verdicts in the research doc's "Sources considered and set aside" and say them plainly to Sean.
 - For a **report that a figure is wrong**: a lead; find the source behind it, then run steps 3 to 7 for that one figure.
+- For a **conventional** fact (a body's table, a brand's chart): `docs/RESEARCH.md` §1's third kind. The table is transcribed from the body's own pages into the data file and a checker transcribes the same pages blind, the two compared cell for cell (ISO's tables, docs/research/shoe-sizes-1; the brands' charts, shoe-sizes-2, by the orchestrate skill's waves).
+- A figure already decided is reopened by `docs/RESEARCH.md` §5's triggers (a thin figure, a source's new release, a measurement of our own), each a lead through steps 3 to 7.
 
 ## 2. Gather
 
@@ -34,7 +36,7 @@ Requested scope: `$ARGUMENTS`
 ## 4. Decide
 
 - The data file holds the figures and the rule as code (`docs/research/<topic>-N/figures.py`, after `cooking-2/`): the counted figures, the set-asides with reasons, the rule's output asserted. Generators write the code (`write_ingredients.py`) and the doc (`write_doc.py`) from it; nothing is typed in two places.
-- The rule: the median of what counts, rounded to the data's precision; fewer than three, the anchor; physics where it applies; the spread recorded.
+- The rule as `docs/RESEARCH.md` §2 writes it, applied as written, the spread recorded; the rule lives there, never restated here.
 
 ## 5. Check
 

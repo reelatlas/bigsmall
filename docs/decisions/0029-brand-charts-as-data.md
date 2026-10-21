@@ -1,7 +1,7 @@
 # 0029 — The brands' charts as data core is given: a JSON file fetched when Shoe size opens
 
 Date: 2026-10-20
-Status: accepted
+Status: accepted; amended 2026-10-21 (below)
 
 ## Context
 
@@ -28,3 +28,7 @@ ADR 0028 put the brands' 33 charts in core as a TypeScript file written from the
 - Web: `useBrandCharts`, the charts' state in `TableOptions` (`charts`, ready by default once core holds them, so the tests and the build pass nothing), `selectShoe` waiting with dashes and the two lines, the chip's list only once ready, the About page's build and the tests' setup handing the file over; a browser test blocks the file and reads the line.
 - The research script writes JSON (`write_brands.py`), one row a line, Prettier keeping it so; the About page still lists every chart; the budget script prints the data beside the budget.
 - Easier: the next charts are rows in the file, and apparel's charts a file of the same shape. To watch: the first open of Shoe size on a slow connection shows dashes for the fetch's length; a `<link rel="prefetch">` is one line if that ever shows.
+
+## Amendments
+
+- **2026-10-21** (the hundred-and-twenty-first and twenty-second passes). Decision 3: the loading and failed lines sit above the rows with a brand in the box and in the brands' heading without one, and read without commas ("Nike’s chart loading…", "Brand charts loading…", "Brand charts not loaded"); the decision's text carries it inline.

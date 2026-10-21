@@ -1,7 +1,7 @@
 # 0027 — Shoe sizes: ISO's foot-length model, gender and age as units, the chart as the second value later
 
 Date: 2026-10-20
-Status: accepted; amended 2026-10-20 (below)
+Status: accepted; amended 2026-10-20 (below); decision 6 built by 0028
 
 ## Context
 

@@ -1,7 +1,7 @@
 # 0018 — Settings as they stand: Units and Display, the visitor's own set and order, remembered
 
 Date: 2026-10-15
-Status: accepted; supersedes 0017, and with it amends 0011 and 0016
+Status: accepted; supersedes 0017, and with it amends 0011 and 0016; amended 2026-10-19 by 0026 (below)
 
 ## Context
 

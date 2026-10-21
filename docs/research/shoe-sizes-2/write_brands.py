@@ -1,9 +1,9 @@
 """Write the product's brand charts file, `packages/core/data/shoe-brands.json`, from `brands.json`,
 the record `brands.py` writes from the keepers (docs/research/shoe-sizes-2.md §9; ADR 0028, ADR
-0029): the 33 charts flagged `product: true`, one or two per brand, every cell as the brand prints
+0029): the charts flagged `product: true` by `brands.py`'s `RECOMMENDED`, one or two per brand, every cell as the brand prints
 it, keyed by brand id. Core is given the file (`setBrandCharts`): the web app fetches it once Shoe
 size opens, the tests and the About page's build hand it over directly. The brands' names, aliases,
-sites, and the facts the note carries are typed once in `packages/core/src/units/shoe-brands.ts`,
+shorthand keys, sites, and the facts the note carries are typed once in `packages/core/src/units/shoe-brands.ts`,
 never here. Run from the repository root: `python -I docs/research/shoe-sizes-2/write_brands.py`,
 then `pnpm format`; `packages/core/test/shoe-brands.test.ts` holds the file to the record cell for
 cell."""

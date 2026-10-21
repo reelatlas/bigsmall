@@ -2589,6 +2589,21 @@ test('a brand’s row taken from under the scales glides to the top with its sec
   expect((await sectionIds(page))[0]).toBe('brands');
   expect(await animated('[data-row="brand:nike"]')).toBe(slow);
   expect(await animated('[data-row="uk"]')).toBe(slow);
+  // The page follows the row it took, as little as it must: once the glide lands, the row sits in
+  // view, under the box and above the window's foot (Sean, 2026-10-21: the page stayed put).
+  await expect
+    .poll(async () => {
+      const taken = await unitCell(page, 'brand:nike').boundingBox();
+      const field = await box(page).boundingBox();
+      const height = page.viewportSize()!.height;
+      return (
+        taken &&
+        field &&
+        taken.y >= field.y + field.height - 1 &&
+        taken.y + taken.height <= height + 1
+      );
+    })
+    .toBe(true);
   // ISO's UK row taken takes the brand out, the brands going back after the scales the same way.
   await recordAnimations(page);
   await unitCell(page, 'uk').click();

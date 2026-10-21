@@ -91,7 +91,8 @@ const scrollHeadingUnder = (page: Page, heading: string) =>
  * points line up on it, with Fraction the whole numbers; one edge for every row when the rows
  * line up.
  */
-// The rows with a whole number: a dash, a pair, or a brand's cell as printed is written across.
+// The rows with a whole number, a dash's and a brand's cell as printed among them: a pair, or a
+// message, is written across.
 const firstCellRights = (page: Page) =>
   page
     .locator('[data-row] > [role="gridcell"]:first-child:has([data-whole])')
@@ -2312,6 +2313,10 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await expect(row(page, 'brand:new-balance')).toContainText('≈ 9');
   await expect(row(page, 'brand:new-balance')).toContainText('New Balance');
   await expect(row(page, 'brand:puma')).toContainText('no foot length');
+  // A dash sits in the whole column and a range splits at its first number, so every row's first
+  // cell ends on one edge, Puma's dash and Birkenstock's range with the sizes (Sean, 2026-10-20).
+  await expect(row(page, 'brand:birkenstock')).toContainText(/\d(\.5)?–\d/);
+  expect(new Set(await firstCellRights(page)).size).toBe(1);
   await expect(
     page.getByText(/^Nike’s size chart, the men’s, nike\.com, read Oct 2026\./),
   ).toBeVisible();

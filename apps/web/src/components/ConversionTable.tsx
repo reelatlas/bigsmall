@@ -95,8 +95,8 @@ interface ConversionRow {
   detail?: string | undefined;
   /**
    * A brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
-   * stands whatever the display's places or fractions, written across the value's columns, and
-   * copies as it shows.
+   * stands whatever the display's places or fractions, split at its first number's end as every
+   * value is at its mark (splitPrinted), and copies as it shows.
    */
   printed?: true | undefined;
 }
@@ -417,8 +417,8 @@ function writtenText(row: ConversionRow, written: Rounded | null): ReactNode {
  * number lines up and the fractions hang in a column after them (10 beside 10 1/2; Sean,
  * 2026-10-20: right-aligned across, a whole number sat under the fraction of the row above and
  * the signs scattered); screen readers hear it whole, from `text`, "about" ahead of one that
- * rounds. A pair, in its own notation, a dash, and a message are written whole across both,
- * right-aligned.
+ * rounds. A pair, in its own notation, and a message are written whole across both,
+ * right-aligned; a dash sits in the whole column, lined up with the whole numbers.
  */
 interface SplitValue {
   text: string;
@@ -437,8 +437,11 @@ function valueParts(
   mark: string,
   significant: number,
 ): ValueParts {
-  // A dash and a message are written across both columns.
-  if (row.tone === 'empty' || row.tone === 'message') return { across: row.text };
+  // A message is written across both columns; a dash sits in the whole column, lined up with the
+  // whole numbers (Sean, 2026-10-20: across both, it ended where the decimals do, under the
+  // fractions with Fraction and past the numbers with Decimal).
+  if (row.tone === 'message') return { across: row.text };
+  if (row.tone === 'empty') return { text: row.text, whole: row.text, decimals: '', approx: false };
   const fraction = display.format === 'fraction';
   // A row beyond its scale (ADR 0027) is written as a size is: its sign, then the scale's end in
   // the display's form, "> 13" in the whole column and ".5" after the mark, or "> 13" and "1/2"
@@ -452,18 +455,11 @@ function valueParts(
     const text = end ? `${row.text.slice(0, 1)} ${end.text}` : row.text;
     return fraction ? splitAtFraction(text, false) : splitAtMark(text, mark, false);
   }
-  // A brand's cell as printed (ADR 0028), a range or a third: its text stands, written across.
-  if (row.printed) {
-    return {
-      across: (
-        <>
-          {row.approx && <span className="text-ink-muted">≈ </span>}
-          <FormattedNumber text={row.text} />
-        </>
-      ),
-      spoken: `${row.approx ? 'about ' : ''}${row.text}`,
-    };
-  }
+  // A brand's cell as printed (ADR 0028), a range or a third: its text stands, split at its first
+  // number's end as every value is at its mark, so the first number lines up with the whole
+  // numbers and the rest hangs after it (the 10 of "10–10.5" under an 11; Sean, 2026-10-20:
+  // written across, a range lined up with nothing).
+  if (row.printed) return splitPrinted(row.text, mark, row.approx === true);
   const written =
     row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
   // A pair has no decimal point to line up on: written whole, right-aligned, in its own notation
@@ -502,6 +498,19 @@ function splitAtFraction(text: string, approx: boolean): SplitValue {
   const at = text.search(/\d+\/\d+$/);
   if (at < 0) return { text, whole: text, decimals: '', approx };
   return { text, whole: text.slice(0, at).trimEnd(), decimals: NBSP + text.slice(at), approx };
+}
+
+/**
+ * A brand's cell as printed in two (ADR 0028): a third at its fraction, as a fraction is; a range
+ * at its first number's end, its decimal mark or the dash to the second end ("9" and ".5–10",
+ * "10" and "–10.5"), so the first number lines up with the whole numbers and the rest hangs after
+ * it as a decimal part does.
+ */
+function splitPrinted(text: string, mark: string, approx: boolean): SplitValue {
+  if (/\d+\/\d+$/.test(text)) return splitAtFraction(text, approx);
+  const ends = [text.indexOf(mark), text.indexOf('–')].filter((at) => at >= 0);
+  const at = ends.length > 0 ? Math.min(...ends) : text.length;
+  return { text, whole: text.slice(0, at), decimals: text.slice(at), approx };
 }
 
 /** Which of the two lists a unit's line is in: the shown units in Edit, or Hidden. */
@@ -650,7 +659,6 @@ export function ConversionTable<T extends ConversionRow>({
             ) : (
               value.across
             )}
-            {row.tone === 'empty' && <span className="sr-only">no value</span>}
           </span>
         ) : (
           <>
@@ -665,7 +673,7 @@ export function ConversionTable<T extends ConversionRow>({
             </span>
             <span className="sr-only">
               {value.approx && 'about '}
-              {value.text}
+              {row.tone === 'empty' ? 'no value' : value.text}
             </span>
           </>
         )}

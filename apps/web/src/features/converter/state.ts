@@ -440,7 +440,8 @@ export interface TableRow {
   detail?: string | undefined;
   /**
    * The brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
-   * stands whatever Display's places or fractions, written across the value's columns.
+   * stands whatever Display's places or fractions, split at its first number's end as every value
+   * is at its mark, so the first number lines up with the whole numbers (Sean, 2026-10-20).
    */
   printed?: true | undefined;
 }

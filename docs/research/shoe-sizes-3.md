@@ -1,0 +1,125 @@
+# Shoe sizes 3: the sources pass, the brands' own rules, third-party measurements, and the leads
+
+v0.1, 2026-10-21; wave 0, the plan, written before any agent runs, so a fresh session on any account can pick it up (the `orchestrate` skill). It follows docs/research/shoe-sizes-2.md, which holds the brands' charts the product carries (ADR 0028, ADR 0029), and docs/RESEARCH.md §9, the tiers that fill a chart's gaps, and runs the data strategy Sean agreed on 2026-10-20 (the findings log, the hundred-and-eighteenth pass): tier 2, the brand's own stated rule; tier 5, third-party measurements and reports, each source paused with him for its reputability before it counts; and tier 3, a pattern in the record, decided with him once tier 5 corroborates it (Puma, shoe-sizes-2.md §5, decision 10).
+
+## 1. What it answers
+
+The gaps the charts leave (shoe-sizes-2.md §9; docs/RESEARCH.md §9): three brands print no foot length, Brooks and Skechers none at all and Puma the product's, so their rows are ISO's label read through their own rows, `by ISO’s label`; On's feet rest on one FAQ sentence, `by its own rule`; Reebok prints no UK or EU, `prints no EU`; and a brand's advice (size up between sizes, runs large) is known only where its chart's page said it.
+
+1. **The brands' own rules (tier 2).** For each brand, any statement of the brand's own, on a site of the brand's own, that ties its labels to the foot or says how to choose a size: a measuring method, what its length column is, a declared relation between a column and the foot (On's), a fit allowance or direction, a between-sizes advice, and a chart of a scale its main chart lacks (Reebok's UK or EU on another page or region; a foot length at Skechers or Brooks). The no-foot brands first.
+2. **Third-party measurements (tier 5).** Who measures shoes' length inside, at a stated size, by a stated method, and publishes the figures model by model; and those figures for the twenty brands, so the orchestrator can compute, by the measured-fact rule, a brand's median internal length at a size, calibrate the allowance between internal length and the foot on the brands whose charts give feet, read the no-foot brands' feet through it, and see whether Puma's product lengths are internal lengths, which would turn them into feet by the same allowance (tier 3, corroborated). A third party's size chart is a copy of the brands' (shoe-sizes-2.md §9 on RunRepeat's) and counts for nothing here; only what a source measured itself does.
+3. **The leads (tier 5, leads only).** What the resale sites' size guides, the big retailers' brand charts, the reviewers, and the forums say of each brand's sizing against the foot or against other brands, with each source profiled: who publishes it, what it measured or merely compiled, its method stated or not, its interest, its date. Never a figure that counts: a lead to a source to read, and a profile for Sean's judgement.
+4. **Reputability, Sean's pause.** At wave 1's close, every source presented with its profile and a recommendation (counts under docs/RESEARCH.md §2's rule, a lead only, set aside), numbered for him to admit or set aside before wave 2 checks a row or any figure reaches a decision (the hundred-and-eighteenth pass: "each paused together to judge whether it is reputable enough").
+
+What it feeds, each on Sean's go (§5): the no-foot brands' rows filled at a better tier than ISO's label, the row saying which; Puma's allowance decided or left; On's rule corroborated or qualified; a brand's advice into the note where its numbers cannot show it (the shape of the charts' pass, decision 3); Reebok's UK and EU where the brand prints them somewhere; and the apparel work's tiers inheriting the method. What it leaves to later passes: the kids' charts (70 in the record, a pass from the record with no agents), the second batch of brands (shoe-sizes-2.md §5, decision 7), widths (docs/PLAN.md §2).
+
+## 2. Method
+
+- **The kind of fact.** A brand's rule is conventional (docs/RESEARCH.md §1): the brand's own words, cited to its page, applied as written and never extended. A measurement is a measured fact (§2): the quantity fixed (the shoe's length inside, heel to toe, at a labelled size on a named line), the screen (a figure counts when its source measured the shoe itself, at a stated size, by a stated method, and we read it on the source's own page; set aside with its reason: a figure quoted, a compilation, a size or a line unstated, a length of the outsole, the box, or the last), each source once, the median, the spread, and as the anchor the source that states its method, its count, and its variance, if any does; fewer than three counted is thin and marked so. A lead is a lead (§3): a forum, a resale guide, a retailer's chart, a reviewer's "true to size"; it names a source to go and read and is never cited as one.
+- **Only the brand's own pages count for a rule.** A retailer's or a resale site's quote of a brand is a lead. A page that refuses is could not reach, never bypassed; the brand's regional sites and its help centre are the next try, and a page the harness's fetcher reads is flagged by tool (the `orchestrate` skill, §6). A home site every fetch refuses is read by Sean in his browser, by the manual capture's shape (shoe-sizes-2.md §7).
+- **Blind.** The workers are told nothing of ISO's figures, of the charts' cells, or of each other's work; the briefs name the brands and the things, never a number. The orchestrator gathers nothing itself.
+- **Sean's pause.** No tier-5 source counts before he admits it; the pause sits between waves 1 and 2, the profiles in §7 and his calls recorded there.
+- **The data file.** `docs/research/shoe-sizes-3/sources.py` reads the keepers (the workers' CSVs), screens by the rule, and writes §9's tables between markers: per brand the measurements counted and set aside, the median internal length per size and line with its spread; for the brands whose charts give feet (shoe-sizes-2.md §9), the allowance, the internal length less the chart's foot at the same size, and its median across brands; for the no-foot brands, the foot read through the allowance; Puma's product lengths beside the measured internal lengths. A rule admitted goes into `packages/core/src/units/shoe-brands.ts` as On's does (`labelMinusCm`); a figure admitted as a tier-5 reading reaches core through a generator and the registry (ADR 0029), the row saying its tier (docs/RESEARCH.md §9); nothing typed twice.
+
+## 3. Waves and budgets
+
+Workers run as Opus 5.5 at high effort, checkers at max (Sean, 2026-10-19; confirmed 2026-10-21, the hundred-and-twenty-seventh pass). Each wave stops at its end with the actuals here and a save, and the context gauge at every close (CLAUDE.md, Working habits).
+
+| Wave         | Who                                                                                                                                                         | Budget                                                            | Estimate                                                                                   | Actual               |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------- |
+| 0, the plan  | this session                                                                                                                                                | no agents                                                         | small                                                                                      | 2026-10-21: this doc |
+| 1, gather    | 3 workers, parallel: A the brands' rules, B the measurements, C the leads                                                                                   | 150 tool calls each, gathering stopped at 120, writing as they go | 0.7 to 1.1 million tokens (the charts' workers ran 0.23 million each over about 105 calls) |                      |
+| Sean's pause | this session with Sean                                                                                                                                      | no agents                                                         | small: the sources' profiles in §7, numbered, each with a recommendation                   |                      |
+| 2, verify    | 2 checkers: A over the rules' words and the lacking scales' cells, B over the measurements and the method statements, each re-read on the source's own page | 60 to 80 calls each, two a page                                   | 0.4 to 0.7 million                                                                         |                      |
+| 3, decide    | this session                                                                                                                                                | no agents                                                         | small: `sources.py`, the tables, the decisions for Sean, the record                        |                      |
+
+The workers' files live in the session's scratchpad while they work (`shoe-sizes-3/rules/`, `measurements/`, `leads/`: the CSVs, `sources.md`, `downloads/`, `scripts/`); each report comes back as the text of the reply and is saved as `findings.md`; at the wave's end the keepers are copied into `docs/research/shoe-sizes-3/<worker>/` and committed, never the downloads.
+
+## 4. The briefs
+
+The twenty brands, as the product names them, with the sites the charts' pass read them on, so a worker starts where a page answered (shoe-sizes-2.md §7; the home sites of Puma, Asics, Converse, and Brooks refused every fetch, their regional sites and help centres answered): Nike (nike.com), adidas (adidas.com), New Balance (newbalance.com), Puma (us.puma.com; puma.com in AU and NZ), Asics (asics.com; its NZ and SG sites), Converse (converse.com; converse.ca), Vans (vans.com), Skechers (skechers.com), Reebok (reebok.com; reebok.ca), Under Armour (underarmour.com), Clarks (clarks.com, clarks.co.uk), Dr. Martens (drmartens.com), Birkenstock (birkenstock.com), Timberland (timberland.com), UGG (ugg.com), Crocs (crocs.com), HOKA (hoka.com), On (on.com), Brooks (brooksrunning.com; brooksrunning.com.au), Salomon (salomon.com). Every brief carries the same safety rules and reply shape; each names its own goal, method, and files.
+
+**Worker A, the brands' rules.**
+
+> **Goal.** For each of the twenty brands, find and record, in the brand's own words on the brand's own sites, every statement that ties its size labels to the foot or says how to choose a size: how to measure, which column of its chart is the foot's and which the shoe's or a label's, a declared relation between a label and the foot, a fit allowance or direction ("runs large", "size up between sizes"), and any chart of a scale the brand's main size chart lacks, so bigsmall can fill the gaps its charts leave by the brand's own rule where one exists, and say so.
+>
+> **Ruled out.** The size charts' cells (read in an earlier pass; transcribe a chart only where it prints a scale named below as lacking); a retailer's, a resale site's, or a reviewer's quote of a brand (note it in leads.csv as a lead, never as the brand's words); anything inferred, averaged, or remembered; widths. Never edit a file of the repository, never run pnpm or git.
+>
+> **Read first, and nothing else from the repo:** docs/RESEARCH.md §1 to §4 (the kinds of fact, what a source is, the process).
+>
+> **Method, per brand**, in this order: Brooks, Skechers, Puma, On, Reebok, then the fifteen others. (1) On the brand's own domains (the home site, its regional sites, its help centre or FAQ, a product page's size-guide panel on one shoe of its main line), search and fetch the pages about sizing, fit, and measuring, and the help centre's entries for "size", "fit", "measure", "half size", and "wide". (2) Record every statement as printed, with its kind: a measuring method; what the length column is (the foot's, the shoe's, the insole's, the box's label); a relation of a column to the foot; a fit allowance or direction; a between-sizes advice; a disclaimer; a regional difference; the exact words, the page, the site and region, the date read, and which tool read it. (3) Where the brand prints, anywhere of its own, a scale named as lacking (Reebok: UK and EU; Skechers and Brooks: a foot length in cm, mm, or inches; On: a foot length beyond its FAQ's sentence), record that chart's cells exactly as printed into charts.csv, one row per cell with the chart's own column names and the row's index from 1, and save the page. (4) Where a statement is a rule (a label is the foot plus so much; measure and add so much; a column is the foot's), read a second page of the brand's for the same rule (another region, the help centre, a product page) and record whether it agrees, in its words. (5) A page that refuses (403, a bot check, a login, a page built in the browser with nothing in its HTML) is could not reach, never bypassed: try the brand's other regions and its help centre; a page the harness's fetcher reads after a script was refused is read and flagged by tool.
+>
+> **Output files**, in `<scratchpad>/shoe-sizes-3/rules/`, written by your own scripts as you go: `claims.csv` (id, brand, kind, claim, exact_words, url, site_region, page_kind, date_read, tool, agrees_with, notes: `agrees_with` the id of the second page's row where one was read); `charts.csv` (brand, site, chart, column, row, value, url, date_read, tool, notes), for a lacking scale's chart only; `leads.csv` (brand, publisher, claim, url, date_read) for a third party's quote met on the way; `sources.md` (every page opened, in order, what it gave, and what each saved file holds: a page, or a refusal); downloads in `downloads/` (the saved HTML or PDF of every page a claim rests on), scripts in `scripts/`, never beside them, every reader run with `python -I`.
+>
+> **Budget.** 150 tool calls; stop gathering at 120 and write.
+>
+> **Safety.** Nothing personal (no email address, no name) in any request, header, or form; no bot check, CAPTCHA, login wall, or paywall bypassed; nothing posted, submitted, or signed up for anywhere; downloads only in your downloads folder; the repository read and never written.
+>
+> **Reply with** the report itself as text (at most 2,500 words): the answer first (which brands state a rule, which say what their length column is, which print a lacking scale somewhere, which say nothing); then per brand, each statement in a line with its kind, its page, and whether a second page agrees; then what could not be reached. Then ten lines of summary: the answer, the three strongest findings with the page each rests on, what could not be reached, the tool-call count, the file paths.
+
+**Worker B, the measurements.**
+
+> **Goal.** Find who measures shoes' length inside, at a stated size, by a stated method, and publishes the figures model by model, and record those figures for the twenty brands, so bigsmall can compute, by its measured-fact rule, how long a brand's shoe is inside at a given size and which foot it fits.
+>
+> **Ruled out.** A source's size chart or conversion table (a copy of the brands' charts: note it in sources.md as a copy and record no cell of it); a figure quoted secondhand; a figure with its size or its line unstated; a length of the outsole, the box, or the last read as the inside; any average, median, or conversion of your own; a review's words read as a measurement ("fits true to size" is a lead, for leads.csv). Never edit a file of the repository, never run pnpm or git.
+>
+> **Read first, and nothing else from the repo:** docs/RESEARCH.md §1 to §4.
+>
+> **Method.** (1) The sources, by web search: the sites that publish a measured internal length (insole, or heel to toe inside) per shoe model at a stated size, with the method on the page (how measured, with what, which size, which pair). RunRepeat's lab pages are the first to screen, its reviews' lab data and never its size-chart pages; others may exist (a sneaker lab, a running magazine's lab, a retailer that measures, a fit-technology company's published data). For each source record, in sources.md, its method statement in its own words with the URL and the date, what it measures and how it names it, which size it measures (one size per line, or each shoe at its own), and whether it states how many pairs and how they varied. (2) For each brand, the measurements, as many models as the budget allows: the no-foot brands first (Brooks, Skechers, Puma, On: ten or more models each where the source has them), then five or more for each of the sixteen others, men's and women's lines both where measured; each as a row: the source, the brand, the model as named, the line, the size as labelled and on which scale (US men's, US women's, EU, UK), the figure and its unit, what was measured as the source names it, the page's URL, the date read, which tool read it. (3) Record as claims any sentence a source writes about a brand's sizing from its measurements ("this brand's shoes measure longer than most at the same size"), with the words, never as a figure of yours. (4) A page that refuses is could not reach, nothing bypassed; a page the harness's fetcher reads after a script was refused is flagged by tool.
+>
+> **Output files**, in `<scratchpad>/shoe-sizes-3/measurements/`, written by your own scripts as you go: `measurements.csv` (id, source, brand, model, line, size_label, size_scale, value, unit, measured_as, url, date_read, tool, notes); `sources.md` (each source's profile first: the publisher, what it measures, its method in its words, the size it measures, pairs and variance if stated, the URL and the date; then every page opened and what it gave); `claims.csv` (id, source, brand, claim, exact_words, url, date_read) for the sentences; `leads.csv` for anything met that is not a measurement; downloads in `downloads/`, scripts in `scripts/`, every reader run with `python -I`.
+>
+> **Budget.** 150 tool calls; stop gathering at 120 and write.
+>
+> **Safety.** As worker A's.
+>
+> **Reply with** the report as text (at most 2,500 words): the answer first (which sources measure, by what method, and how many models per brand you recorded); then each source's profile in a paragraph; then per brand the count of models, the sizes measured, and the lowest and highest figure as the rows show them, no median of yours; then what could not be reached. Then ten lines of summary, as worker A's.
+
+**Worker C, the leads.**
+
+> **Goal.** For each of the twenty brands, find what the resale sites' size guides, the big retailers' brand size charts, the reviewers, and the forums say of its sizing, against the foot or against other brands, and profile each source, so bigsmall can judge with Sean which are reputable enough to count, which are leads to a better source, and which to set aside.
+>
+> **Ruled out.** Counting anything: no figure of yours, no average, no verdict on a brand's sizing; the brands' own pages (another worker's); posting, replying, voting, logging in, or signing up anywhere; a page behind a login or a bot check (could not reach). Never edit a file of the repository, never run pnpm or git.
+>
+> **Read first, and nothing else from the repo:** docs/RESEARCH.md §1 to §3 (the kinds of fact, the measured rule's screen, what a source is and what a lead is).
+>
+> **Method.** (1) The sources, by kind: the resale sites' size guides (StockX, GOAT, Flight Club, Stadium Goods, eBay's sneaker guides); the big retailers' brand charts (Zappos, Foot Locker, JD Sports, Nordstrom, Running Warehouse, Road Runner Sports, Amazon's brand charts); the reviewers (Solereview, Believe in the Run, Doctors of Running, RoadTrailRun, Sneaker News, Complex); the forums (Reddit's r/RunningShoeGeeks, r/Sneakers, r/goodyearwelt, r/Birkenstocks, r/Crocs, and the brands' own subreddits; Slickdeals; a brand's own community pages); and the shoe-size conversion sites that print brand charts. For each source, before any claim, a profile in sources.md: the publisher; what the page is (a chart, a guide, a review, a thread); how it says it was made (measured, compiled from the brands, from customers' reports, unstated); whether it prints a foot length per brand size; its commercial interest (sells the shoes, affiliate links, none visible); its date; and how widely it is cited by the other sources you meet. (2) Per brand, the claims: each statement about the brand's sizing (runs large, runs small, true to size, half a size from another brand, a foot length per size) with the exact words, the URL, the date, the tool, the source, and, for a thread, how many agree and how many disagree as you count them, never a verdict. (3) Where a retailer's or a resale site's chart prints foot lengths per brand size, record its cells exactly as printed into charts.csv (brand, source, chart, column, row, value, url, date_read, tool), flagged as a third party's chart, since the orchestrator compares them with the brands' own. (4) Refusals are could not reach, nothing bypassed; a page the harness's fetcher reads is flagged by tool.
+>
+> **Output files**, in `<scratchpad>/shoe-sizes-3/leads/`, written by your own scripts as you go: `leads.csv` (id, brand, source, kind, claim, exact_words, url, date_read, tool, agree, disagree, foot_length_printed); `charts.csv` for the third-party charts; `sources.md` (the profiles first, then every page opened and what it gave); downloads in `downloads/`, scripts in `scripts/`, every reader run with `python -I`.
+>
+> **Budget.** 150 tool calls; stop gathering at 120 and write.
+>
+> **Safety.** As worker A's, and read only: nothing posted, replied, voted, or signed up for anywhere.
+>
+> **Reply with** the report as text (at most 2,500 words): the answer first (which sources say what they measured, which compile, which only opine); then each source's profile in a line; then per brand the claims that recur, with the words of the strongest; then what could not be reached. Then ten lines of summary, as worker A's.
+
+**The checkers' brief** (wave 2, written at Sean's pause). The orchestrator selects the load-bearing rows into `wave2-check.csv` by a script, each with a `check` note saying what to confirm: every rule's words and its second page; a lacking scale's chart at its first, middle, and last rows; every method statement; the measurements a decision would rest on (for each brand and size, the rows that make the median) from the sources Sean admitted. Two checkers at max, 60 to 80 calls each, two a page, told never to open the workers' files, re-downloading each source's own page with their own scripts and reporting row by row: confirmed, corrected, could not reach, wrong; the shape as shoe-sizes-2.md §4's checkers' brief, the leads not checked, since they are leads.
+
+## 5. Decisions
+
+Wave 3 writes them, numbered for Sean: where to see it, what changes, one recommendation, and his call. The questions, from the gaps:
+
+1. **Each no-foot brand's tier** (Brooks, Skechers, Puma): stays at tier 4, ISO's label; or a tier-2 rule the brand states; or a tier-5 reading, the foot through the measured internal length and the allowance, with the row's words for it.
+2. **Puma's allowance** (shoe-sizes-2.md §5, decision 10): corroborated or not by the measurements; tier 3 if so, said in the row.
+3. **On's rule**: corroborated on a second page of the brand's, qualified, or left on its one sentence.
+4. **The sources admitted** at Sean's pause (§7), and what each may count for.
+5. **A brand's advice into the note** where its own words add what its numbers cannot show, by the shape of the charts' pass (decision 3: facts only, never fit advice that a row's direction already shows).
+6. **Reebok's UK and EU** where the brand prints them somewhere of its own; else `prints no EU` stays.
+
+What comes after, each its own pass: the kids' charts from the record, the second batch of brands, the apparel work inheriting the tiers (docs/PLAN.md §2).
+
+## 6. Cost and learnings
+
+Filled at each wave's end: the actuals against §3's estimates, and what the briefs got wrong; the `orchestrate` skill amended in the same commit as the run that taught it.
+
+## 7. Wave 1: what the workers found, and the sources' profiles for Sean's pause
+
+To come.
+
+## 8. Wave 2: what the checkers found
+
+To come.
+
+## 9. Wave 3: the measurements, the allowance, and the files
+
+To come: `sources.py`'s tables between markers, the decisions' figures written from them, never typed.

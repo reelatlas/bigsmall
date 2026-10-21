@@ -1,0 +1,80 @@
+{
+  "B-C001": {
+    "result": "confirmed",
+    "found_value": "255 to 281 mm over 1000+ shoes, the same US size 9",
+    "exact_words": "Having measured the internal length of over 1000 shoes in our lab, we discovered that it can range from 255 to 281 mm in the same US size 9!",
+    "note": "In the guide's text. The sentence says 'US size 9', not 'men's'; the claim's 'US men's size 9' adds the word (the same guide's caption says 'men's US 9' of its three ASICS shoes, and its width passage says 'Having measured 850+ shoe molds in a men's US size 9 (Medium D width)')."
+  },
+  "B-C002": {
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "Different internal shoe length in three ASICS shoes of the same size (men's US 9)",
+    "note": "The caption (figcaption, in italics) under the guide's image 'internal shoe length comparison.jpg'; the next paragraph begins 'That's because brands use different shoe lasts and sometimes even shoes from the same brand can fit widely different.' Any lengths for the three shoes are in the image, which this check did not read."
+  },
+  "B-C003": {
+    "result": "confirmed",
+    "found_value": "at least 5 mm over the foot",
+    "exact_words": "TIP: Mondopoint or CM/CH/JP sizes are NOT the same as foot length. They refer to the shoe's insole length (or internal length), which should be at least 5 mm larger than your actual foot length.",
+    "note": "The guide's TIP paragraph; the recorded sentence is the second, and the claim's 'Mondopoint/CM' is the page's 'Mondopoint or CM/CH/JP'. It goes on: 'That's because you need the extra space for the toes. For example, if your foot is 263 mm long, it's going to feel most comfortable in a Mondo/CM/CH/JP size 270.' A statement, not a measurement, as the claim says."
+  },
+  "B-C004": {
+    "result": "confirmed",
+    "found_value": "260.1 mm to 280.4 mm at men's US size 9",
+    "exact_words": "Even though we always measured the internal length of adidas shoes in the same men's US size 9, we've gotten a wild range of numbers, from 260.1 mm to 280.4 mm!",
+    "note": "In the adidas size-chart page's text, after 'Having tested dozens of adidas shoes in our lab, we can subscribe to that 100%.'"
+  },
+  "B-C005": {
+    "result": "confirmed",
+    "found_value": "8-10 mm narrower in the big toe area",
+    "exact_words": "Please note that the Chuck 70 silhouette has an extremely tapered toebox which is 8-10 mm narrower in the big toe area than the average sneaker!",
+    "note": "In the Converse size-chart page's text; a width, not a length, as the claim says."
+  },
+  "B-C006": {
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "Some models can run shorter or longer than the expected internal length, others can have more tapered toebox shapes.",
+    "note": "In the Timberland size-chart page's text, after 'Please keep in mind that not all Timberland boots fit precisely as stated in the brand size chart.' The page goes on: 'To help you know exactly what kind of fit to expect from a given Timbs pair, we measure the internal length as well as the toebox dimensions of each model in our lab.'"
+  },
+  "B-C007": {
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "Note: Our testing shows that internal length is not a great measure of fit. But, as many users have requested this specific test, we've decided to add it for those interested.",
+    "note": "The note under the 'Internal length' heading of the Ghost 16 review's lab section; the recorded words leave out the page's 'Note:'. The same note heads the internal-length section on 167 of the 168 review pages checked (all but the Euro Hiker, which has no such section)."
+  },
+  "B-C008": {
+    "result": "confirmed",
+    "found_value": "257.9 mm at men's US size 7.5; true to Timberland's chart",
+    "exact_words": "In a men's US size 7.5, we measured the internal length of the boot at 257.9 mm. Provided that there should be a few millimeters of extra space between your toes and the edge of the shoe, the Euro Hiker runs true to the Timberland footwear size chart.",
+    "note": "The recorded sentence is the second; the first, just before it, gives the claim's 257.9 mm at men's US size 7.5."
+  },
+  "B-S001": {
+    "result": "confirmed",
+    "found_value": "men's US 9",
+    "exact_words": "We always test in men's US 9 ... We buy the shoes in men’s US 9. If not available in that size, we wait until it is.",
+    "note": "Two places joined by the worker's ellipsis: the first item of the list under the heading 'How we test shoes', and a paragraph of the section on which shoes are bought; the page's second men’s has a typographic apostrophe. The same page qualifies the waiting in its weight section: 'All shoe weights are presented in men’s US size 9' ... 'However, in the rare cases where we cannot get US 9, we buy US 8 or 8½ and use a proprietary formula to calculate for US 9.' (its example: 'Nike ZoomX Invincible Run Flyknit 3 was measured at 9.4 oz (267g) in a US 8. It corresponds to 10 oz (284g) in a US 9.'). The page gives no such conversion for internal length; its only mentions of internal length are in the stack-height passage."
+  },
+  "B-S002": {
+    "result": "confirmed",
+    "found_value": "20°C/68°F ± 1°C; 55% ± 5% humidity",
+    "exact_words": "Conditions are always 20°C/68°F ± 1°C and 55% ± 5% humidity, in both our lab and storage",
+    "note": "The second item of the list under 'How we test shoes' (no closing period on the page); the HTML writes the signs as entities (&deg;, &plusmn;), which render as ° and ±."
+  },
+  "B-S003": {
+    "result": "confirmed",
+    "found_value": "12% and 75% of the internal length",
+    "exact_words": "To achieve this, the shoe must be cut in half. After measuring the internal length, we mark both places on the foam itself at 12% and 75% of the length.",
+    "note": "In the stack-height passage, after 'Heel stack height is measured at 12% of the shoe’s internal length.' and 'Forefoot stack height is measured at 75% of the shoe’s internal length.'; it goes on: 'You can see the straight lines in our images, it’s where we pressed our caliper to measure the heel stack height and forefoot stack height.' The claim's 'measured on the cut shoe' is the sentences' order, not their words: this page says the shoe must be cut in half for the stack heights, then 'After measuring the internal length…'; the Converse size-chart page says it in words ('even cut it open to measure the internal length with a caliper', B-S004)."
+  },
+  "B-S004": {
+    "result": "confirmed",
+    "found_value": "",
+    "exact_words": "We create gel molds of each shoe's interior to measure its widest area, toebox width, and height, and even cut it open to measure the internal length with a caliper.",
+    "note": "The worker's ellipsis stands for 'to measure its widest area, toebox width, and height,'; the sentence follows 'Check out our in-depth lab reviews for more detailed information on the fit and sizing of various Converse sneakers.'"
+  },
+  "B-S005": {
+    "result": "confirmed",
+    "found_value": "255 to 281 mm over 1000+ shoes, the same US size 9",
+    "exact_words": "Having measured the internal length of over 1000 shoes in our lab, we discovered that it can range from 255 to 281 mm in the same US size 9!",
+    "note": "The same sentence as B-C001 (one sentence, two rows); it says 'US size 9', not 'men's'."
+  }
+}

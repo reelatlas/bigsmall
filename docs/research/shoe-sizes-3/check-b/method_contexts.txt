@@ -1,0 +1,115 @@
+################################################################################
+https://runrepeat.com/brooks-ghost-16
+  - Cut in half: Brooks Ghost 16 Review | RunRepeat
+  - In the forefoot, our measurements revealed a modest 22.8 mm stack height, which provides substantial ground feel during runs—take it or leave it.
+  - We measured a 12.4 mm drop from heel to toe, which is significant. This design particularly benefits heel strikers and those who often have calf issues. However, we believe it may be excessive for runners who strike the ground more forward.
+  - Note: Low measurement: softer. High measurement: firmer.
+  - We also put the midsole to the test using our durometer after cutting the shoe in half. The screen returned 41.5 AC, which is definitely firmer than the average shoe and far from the plush feel that some may expect from DNA Loft v3.
+  - Note: Our testing shows that internal length is not a great measure of fit. But, as many users have requested this specific test, we've decided to add it for those interested.
+  - The Ghost 16 exemplifies this shift, measuring 96.1 mm at the widest part based on our custom gel mold. While this measurement is close to average, it offers slightly more room than previous generations and many other daily trainers.
+  - On the flip side, the toebox retains a pointy design that, in our opinion, may not suit runners with wider feet. After testing, we discovered a measurement of 72.1 mm, which is slightly below average.
+  - After completing our width measurements, we used a vernier caliper to take the final one: toebox height.
+  - We used our calipers to measure the dimensions of the shoe, starting with the forefoot.
+  - Our findings indicate that Brooks continues to embrace a conventional approach, keeping the Ghost firmly within the average range. The forefoot measures 115.0 mm at its widest point, exemplifying a classic, risk-averse strategy for a standard shoe like no other.
+  - We then measured the heel, and we found a width of 94.7 mm—quite wide and logically designed.
+  - To conclude our analysis of the outsole, we utilized our vernier caliper to measure the thickness of the rubber.
+  - We measured the insole of the Ghost 16 and found it boasts a thickness of 5.0 mm, a minor increase from the previous model's 4.5 mm.
+  - The tongue of the Ghost 16 is a dream come true for those who appreciate a fluffy, plush instep area. We measured a generous 10.4 mm of foam from a single slab, a feature more commonly found in pricier daily trainers than in a $140 workhorse.
+################################################################################
+https://runrepeat.com/guides/how-to-measure-shoe-size
+  - How to measure shoe size | RunRepeat
+  - [alt: how-to-measure-shoe-size.JPG]
+  - How to measure shoe size at home
+  - Measure in the evening, when the foot is at its fullest shape
+  - Measure the distance between two most prominent points (from back of the heel to the end of the longest toe)
+  - Use measurements of the longer foot
+  - To get the most accurate size, input your longer foot’s measurements and the brand you plan to purchase from. Our conversion tool contains data from 40+ shoe brands:
+  - Having measured the internal length of over 1000 shoes in our lab, we discovered that it can range from 255 to 281 mm in the same US size 9!
+  - TIP: Mondopoint or CM/CH/JP sizes are NOT the same as foot length. They refer to the shoe's insole length (or internal length), which should be at least 5 mm larger than your actual foot length. That's because you need the extra space for the toes. For example, if your foot is 263 mm long, it's going to feel most comfortable in a Mondo/CM/CH/JP size 270.
+  - Only a few brands provide detailed guidelines and measurements of their shoe widths (i.e. HOKA, New Balance, Inov8). Some companies use proprietary names like "Original/Standard/Slim Footshape Fit" from Atra or "Widest/Wide/Medium Natural-Shape Fit" from Lems.
+  - The caveat of the table above is that we don't know exactly how the brands took these measurements.
+  - Once done, we use a digital caliper to measure the widest part of each mold in the ball of the foot area (between the big toe and the pinkie metatarsals).
+  - Having measured 850+ shoe molds in a men's US size 9 (Medium D width), we found that the average width comes in at 94.4 mm, but the range goes from 86.2 mm to 102.4 mm!
+  - [alt: measuring-internal-shoe-width-using-gel-mold-and-caliper.jpg]
+  - We also measure the width of each shoe mold at the big toe area to determine how tapered it is towards the toes.
+  - [alt: measuring-internal-toebox-width-using-gel-mold-and-caliper.jpg]
+  - Measure your feet every year
+################################################################################
+https://runrepeat.com/size-charts/adidas
+  - We compared shoe size charts from 40+ brands to find out how adidas footwear measures across the board. Verdict: adidas size chart is consistent with most other brands.
+  - But if you wore US 9 in your old adidas pair, it doesn't guarantee that it is still the right size for you. If it’s been a while since you last measured your foot length, we recommend doing it before going with your accustomed adidas shoe size.
+  - Based on our lab measurements, quite a few adidas shoes in various categories have pretty wide toebox dimensions, even in a standard D width.
+  - Having tested dozens of adidas shoes in our lab, we can subscribe to that 100%. Even though we always measured the internal length of adidas shoes in the same men's US size 9, we've gotten a wild range of numbers, from 260.1 mm to 280.4 mm!
+################################################################################
+https://runrepeat.com/size-charts/converse
+  - Converse sneakers can cause some confusion with their sizing scheme, so it is best to know your exact foot length measurements before trying to figure out the right size.
+  - Check out our in-depth lab reviews for more detailed information on the fit and sizing of various Converse sneakers. We create gel molds of each shoe's interior to measure its widest area, toebox width, and height, and even cut it open to measure the internal length with a caliper.
+################################################################################
+https://runrepeat.com/size-charts/timberland
+  - Please keep in mind that not all Timberland boots fit precisely as stated in the brand size chart. Some models can run shorter or longer than the expected internal length, others can have more tapered toebox shapes.
+  - To help you know exactly what kind of fit to expect from a given Timbs pair, we measure the internal length as well as the toebox dimensions of each model in our lab. You can find the details on size and fit in our comprehensive lab reviews below:
+################################################################################
+https://runrepeat.com/testing-methodology
+  - Here, you will learn how we decide which shoes we buy next, where we store them, why we cut them in half, why we freeze shoes, why it is important to stick to World Athletics’ guidelines, and much, much more.
+  - To ensure the highest level of objectivity, we personally test shoes in the appropriate surroundings - whether it’s a street road, gym, hiking trails, basketball courts, track, etc., and we also cut the shoes in half and put them through numerous tests in the lab.
+  - This way, we can discuss how the shoe actually feels and performs and back that up with 30+ lab data points. A caliper in the lab can tell us how thick a tongue is or how stiff a heel counter is, but it can’t tell us whether those materials itch. That’s where our personal experience comes in.
+  - Shoes come in pairs. One shoe we keep whole. The other one we tear apart by first cutting its upper so that it's completely detached from the bottom and then using a band saw to cut the midsole in half lengthwise. We do this because some tests need a shoe to be cut in half for them to be properly done. And because we are meticulous.
+  - When the upper is detached from the midsole, we perform the energy return and shock absorption tests. Once the midsole is cut in half, we measure the heel and forefoot stack heights (which allow us to calculate the heel drop) and the softness of the midsole. Measuring the stack heights on whole shoes would go against the World Athletics standards and common sense.
+  - The black lines visible on the midsole mark 12% and 75% of the shoe's internal length, which is exactly where we measure the heel and forefoot stack height and where we test the energy return and shock absorption.
+  - Tests that we perform on a shoe after its upper has been cut out or its midsole cut in half:
+  - Softness of the midsole at room temperature and in cold weather. We even wrote a comprehensive guide about this called Why cutting running shoes in half is key to measuring midsole softness
+  - How we measure stack height and heel drop in the lab
+  - To get accurate measurements of the forefoot and stack height, we honor the official guidelines from World Athletics. These guidelines are clear:
+  - Heel stack height is measured at 12% of the shoe’s internal length.
+  - Forefoot stack height is measured at 75% of the shoe’s internal length.
+  - To achieve this, the shoe must be cut in half. After measuring the internal length, we mark both places on the foam itself at 12% and 75% of the length. You can see the straight lines in our images, it’s where we pressed our caliper to measure the heel stack height and forefoot stack height.
+  - [alt: Forefoot and heel stack height measurements]
+  - The heel drop is simply calculated: (heel stack height) - (forefoot stack height) = heel drop. And for us, it is that simple, thanks to our accurate measurements of the forefoot and heel stack height explained above.
+  - We went down the rabbit hole, of course, and wrote a very in-depth guide: How brands' heel-to-toe drop measurements differ from reality. Spoiler alert: no brand provides accurate heel-to-toe drop measurements! This gives even more value to our test because you can always rely on it.
+  - The durability of the outsole is correlated with the depth of the dent the Dremel has made. We measure the depth using a tire tread depth gauge.
+  - With the new machine, we’re testing breathability following the SATRA TM376 methodology. We measure breathability in BR, and we focus specifically on how good the shoe is at moving sweat away from the skin; the drier the skin, the better the breathability. Technically speaking, the setup uses a footform held at body temperature inside an environmental chamber. We put a layer that simulates skin on it, then a performance sock, and finally the shoe. The test is performed for 3 hours, during which water is slowly released through the skin layer to simulate sweating during physical activity.
+  - Drying potential, measured in %, tells us how much moisture has evaporated from the shoe overall during our 3-hour test. Drying potential is important for long efforts, such as marathons and ultras, long and multi-day hikes, and similar activities where sweat or water (puddles, rain, snow) can accumulate in the shoes. High drying potential suggests the footwear will dry sooner rather than later, so you don’t have to deal with soaked socks and shoes.
+  - The measurement unit for R is m² K/W. Technically explained, it quantifies the temperature difference (K) when one unit of heat energy (W) flows through a surface (m²).
+  - All tests related to midsole softness are now measured with an Asker C durometer (AC) instead of the Shore A durometer (HA) to improve sensitivity in softer foam compounds:
+  - While there is a meaningful correlation between the new Asker C measurements (AC) and the previous Shore A measurements (HA), we advise against comparing the two methods because the variation in individual results can be substantial. On average, Asker C measurements (AC) are ~2x bigger (1.96x to be exact).
+  - We have implemented a new air conditioning system that maintains constant conditions, measures temperature and humidity, and notifies us of potential variations. In both our testing facility and storage, we now operate at a constant 20°C/68°F ± 1°C and 55% ± 5%.
+  - [alt: new rocker measurement RunRepeat]
+  - Measuring shoe dimensions with the help of gel molds.
+  - After several months of development, we achieved a more accurate approach to measuring shoe dimensions. We now pour a proprietary liquid into each shoe and put it in the fridge for 2 hours to retrieve a gel mold of the interiors.
+  - Instead of applying our caliper to the outside of the upper, we now get to measure its inner width and height. These measurements are more accurate because they no longer include the thickness of upper materials and overlays and take into account the stretchiness of the shoe’s upper material.
+  - Here are the three caliper measurements we take using the gel mold:
+  - [alt: methodology 1.8 toebox width - widest part using gel mold.jpg]
+  - For consistency, this measurement is always taken at the same distance from the tip of the mold. The line on our shoe holder is drawn precisely at 28.3 mm from the tip of the shoe. This measurement shows how wide the shoe’s toebox is in the area where the big toe normally ends. It also indicates how mild or aggressive the taper angle is (how rounded or pointy the toebox gets towards the toes).
+  - [alt: methodology 1.8 toebox width - big toe area using gel mold.jpg]
+  - This represents the vertical space available in the shoe’s toebox. It is measured at the same distance as the big toe - 28.3 mm from the tip of the shoe.
+  - [alt: methodology 1.8 toebox height using gel mold.jpg]
+  - Running shoes with pronounced toe rockers are put against our XY-axis ruler. While we do not take any numerical measurements of the rocker angle yet, these photos act as a visual demonstration of each shoe’s curvature and how it compares to similarly designed shoes.
+  - We measure and assess over 20 parameters for each shoe in our lab. These measurements are then compared to the average in a given shoe category.
+  - In the example below, we measure the heel stack height of a road running shoe and present it in a table and a graph in comparison to the average heel stack of road running shoes.
+  - We then measure the depth of the dent with the help of a tire tread depth gauge.
+  - To make our data consistent, we measure every shoe’s weight in a men’s US 9. That’s because it is the most common shoe size and brands often provide shoe weight in this particular size.
+  - [alt: shoe weight measurement]
+  - Nike ZoomX Invincible Run Flyknit 3 was measured at 9.4 oz (267g) in a US 8. It corresponds to 10 oz (284g) in a US 9.
+  - The formula we use is based on the weight measurement of 4 different shoes from different brands measured in 10 different sizes.
+  - The measurements were kindly provided to us by Running Warehouse.
+  - Improved toebox measurements (UPDATE: this test is no longer present and was updated with methodology 1.8)
+  - Previously, we only measured the toebox in its widest part (around the metatarsal joints).
+  - But now we also measure the width near the toes (at the top of the shoe).
+################################################################################
+https://runrepeat.com/timberland-euro-hiker
+  - Cut in half: Timberland Euro Hiker Review | RunRepeat
+  - [alt: Timberland Euro Hiker Cut In Half]
+  - [alt: timberland-euro-hiker-lab-measurements.JPG]
+  - We measured the boot's shock absorption at 72 SA, which is on the lower side of the spectrum and translates into a rather firm yet stable ride.
+  - We were utterly surprised to see some decent flexibility in the Euro Hiker's forefoot. But having cut the boot in half, we found that its metal shank doesn't extend to the forefoot.
+  - So when we measured the boot's resistance to bending in a specialized flexibility tester, we found that it takes a moderate amount of force (29.7N) to bend by 30 degrees. This is about the same as it takes an average hiking boot.
+  - Measuring the tongue thickness with calipers, we found that it is a whopping 22.3 mm thick! For reference, the average for hiking footwear is 15.5 mm.
+  - Sticking a durometer into the cushioning foam, we measured it to be 35%(!) firmer than the average. This is one of the firmest boots in our catalog.
+  - Disclaimer: We repeat the durometer measurement five times to minimize error. The photo above shows the final measurement.
+  - Based on our measurements, the Euro Hiker is considerably narrower than the average. In the widest part of the forefoot, our calipers show 96.3 mm (10.3 mm narrower than average).
+  - Based on our caliper measurements, the heel stack of the boot is 34.6 mm, nearly the same as the average 33.1 mm.
+  - Disclaimer: Our stack measurements are taken with the insole included.
+  - We measured the outsole thickness at 3.5 mm. This is a solid result, considering that the average is 3.3 mm.
+  - In a men's US size 7.5, we measured the internal length of the boot at 257.9 mm. Provided that there should be a few millimeters of extra space between your toes and the edge of the shoe, the Euro Hiker runs true to the Timberland footwear size chart.
+  - As for the toebox, we marked it as medium, based on our measurements. In its widest part, the toebox is 96.4 mm, a little narrower than the average 97.9 mm. It also gets narrower towards the big toe more than other hiking boots do (by 8%).
+  - [alt: timberland-euro-hiker-lab-measurements.JPG]

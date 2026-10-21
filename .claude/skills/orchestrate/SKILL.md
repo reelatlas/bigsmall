@@ -71,6 +71,7 @@ Reading lists by job, sections rather than whole docs, so an agent is not drowne
 - **A figure a page carries for search engines but marks members-only is paywalled** (RTINGS, the sources pass, 2026-10-21): a worker that has scraped one deletes the rows and the saved pages and logs the URL as paywalled, as worker B did; the brief says so up front.
 - **A brand's regional site prints what its home site lacks** (Brooks UK's foot lengths, Reebok AU's UK and EU, 2026-10-21): a column the home chart lacks is sought on every region's site and in the help centre, not only where the home site refused.
 - **Forums refuse every fetch** (Reddit three ways, communities behind Cloudflare, 2026-10-21): no budget for them; a thread wanted is Sean's browser.
+- **A free table can gate its columns** (RTINGS, 2026-10-21): a worker reads the table's column definitions and the page's structured data for members-only marks before any value, and stops where they say so, recording the definitions as the evidence.
 - **A page that shows "Loading…" is read in its embedded data before it is called browser-built** (Crocs' size chart, 2026-10-21: the worker called it unreachable, the checker found its words and its column's label in the page's data).
 
 ## 7. Tools

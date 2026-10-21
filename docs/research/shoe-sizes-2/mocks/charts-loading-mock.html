@@ -130,10 +130,6 @@
     flex: 1;
     min-width: 0;
   }
-  .box .placeholder {
-    color: var(--muted);
-    font-size: 1.1rem;
-  }
   .chip {
     display: inline-flex;
     align-items: baseline;
@@ -153,6 +149,14 @@
     border-radius: 16px;
     background: var(--surface);
     overflow: hidden;
+  }
+  .notice {
+    padding: 10px 12px 2px;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .notice:empty {
+    display: none;
   }
   .section {
     background: var(--head);
@@ -208,8 +212,8 @@
     font-size: 0.95rem;
     border-top: 1px solid var(--line);
   }
-  .note.failed {
-    color: var(--danger);
+  .note:empty {
+    display: none;
   }
   .more {
     padding: 4px 12px 10px;
@@ -226,9 +230,10 @@
     margin-left: 6px;
     vertical-align: middle;
   }
-  .pill.on {
-    border-color: var(--accent);
-    color: var(--accent);
+  .mark {
+    outline: 2px dashed var(--accent);
+    outline-offset: -2px;
+    border-radius: 6px;
   }
   @media (max-width: 420px) {
     .row {
@@ -242,11 +247,12 @@
 
 <main>
   <header>
-    <h1>The brands’ charts, loading and failed</h1>
+    <h1>The brand charts loading and not loaded</h1>
     <p>
       Since ADR 0029 the brands’ 33 charts are a 7 KB file the page fetches once it is wanted,
-      cached by a hash in its name. These are the only moments a visitor could see it being fetched;
-      the numbers below are illustrative.
+      cached by a hash in its name. These are the only moments a visitor could see it being fetched,
+      with each line where it now sits (dashed outline) and the wording without commas. The numbers
+      are illustrative.
     </p>
     <ul class="when">
       <li>
@@ -259,8 +265,9 @@
         two on a weak phone connection; then never again in that browser until the file changes.
       </li>
       <li>
-        <b>What you see meanwhile:</b> state 1 or 2 below. If the request fails, state 3, and the
-        next time Shoe size is wanted it tries again.
+        <b>Where the line goes:</b> with no brand only the Brands section waits, so its heading
+        carries the words (1, 4); with a brand in the box the whole table waits, so the line sits
+        above the rows and nothing shows under the table (2, 3).
       </li>
     </ul>
     <div class="controls">
@@ -270,11 +277,10 @@
   </header>
 
   <section class="state" id="state-a">
-    <h2>
-      1. Shoe size opened with a size, no brand <span class="pill on">ISO answers at once</span>
-    </h2>
+    <h2>1. Shoe size opened with a size, no brand <span class="pill">ISO answers at once</span></h2>
     <p class="muted">
-      The scales convert as ever; only the brands’ rows wait, dashes without a word, then fill.
+      The scales convert as ever; the Brands heading says the charts are loading, its rows dashes
+      without a word, then the heading and the rows fill. The ISO line stays under the table.
     </p>
     <div class="box">
       <span class="num">11</span><span class="chip"><b>US M</b> US men</span>
@@ -302,11 +308,12 @@
         <span class="v">280</span><span></span><span class="sym">mm</span
         ><span class="name">Mondopoint</span>
       </div>
-      <div class="row">
-        <span class="v"><span class="about">≈ </span>28</span><span></span
-        ><span class="sym">JP</span><span class="name">Japanese</span>
-      </div>
-      <div class="section">Brands, the same foot in US M</div>
+      <div
+        class="section mark"
+        data-head
+        data-loading="Brand charts loading…"
+        data-ready="Brands, the same foot in US M"
+      ></div>
       <div class="row" data-brand>
         <span class="v" data-v="≈ 11"></span><span></span><span class="sym">US M</span
         ><span class="name">adidas</span>
@@ -316,10 +323,6 @@
         ><span class="name">Asics</span>
       </div>
       <div class="row" data-brand>
-        <span class="v" data-v="≈ 10–10.5"></span><span></span><span class="sym">US M</span
-        ><span class="name">Birkenstock</span>
-      </div>
-      <div class="row" data-brand>
         <span class="v" data-v="—" data-why="no foot length"></span><span></span
         ><span class="sym">US M</span><span class="name">Brooks <small data-why-slot></small></span>
       </div>
@@ -327,11 +330,7 @@
         <span class="v" data-v="11"></span><span></span><span class="sym">US M</span
         ><span class="name">Nike</span>
       </div>
-      <div class="row" data-brand>
-        <span class="v" data-v="≈ 10"></span><span></span><span class="sym">US M</span
-        ><span class="name">New Balance</span>
-      </div>
-      <div class="more">… and 14 more brands</div>
+      <div class="more">… and 16 more brands</div>
       <div class="note">
         ISO 19407’s sizes from the foot’s length, to the half size. Each brand’s row is its own
         chart read at that foot.
@@ -345,14 +344,30 @@
       <span class="pill">a link with brand=nike, or Enter before the fetch lands</span>
     </h2>
     <p class="muted">
-      Nike’s 11 converts through Nike’s chart, so until it arrives nothing can be said: every row a
-      dash, the line saying why. Then everything fills at once.
+      Nike’s 11 converts through Nike’s chart, so until it arrives nothing can be said: the line
+      above the rows, every row a dash, the Brands section first as always with a brand. Then
+      everything fills and Nike’s citation takes the line under the table.
     </p>
     <div class="box">
       <span class="num">11</span><span class="chip"><b>US M</b> US men ⌄</span
       ><span class="chip">Nike ⌄</span>
     </div>
     <div class="card">
+      <div class="notice mark" data-notice data-loading="Nike’s chart loading…" data-ready=""></div>
+      <div class="section">Brands, the same foot in US M</div>
+      <div class="row" data-wait>
+        <span class="v" data-v="≈ 11"></span><span></span><span class="sym">US M</span
+        ><span class="name">adidas</span>
+      </div>
+      <div class="row" data-wait data-own>
+        <span class="v" data-v="11"></span><span></span><span class="sym">US M</span
+        ><span class="name">Nike</span>
+      </div>
+      <div class="row" data-wait>
+        <span class="v" data-v="≈ 10"></span><span></span><span class="sym">US M</span
+        ><span class="name">New Balance</span>
+      </div>
+      <div class="more">… and 17 more brands</div>
       <div class="section">US (customary)</div>
       <div class="row" data-wait>
         <span class="v" data-v="≈ 11"></span><span></span><span class="sym">US M</span
@@ -371,24 +386,10 @@
         <span class="v" data-v="27.9"></span><span></span><span class="sym">cm</span
         ><span class="name">Foot length</span>
       </div>
-      <div class="section">Brands, the same foot in US M</div>
-      <div class="row" data-wait>
-        <span class="v" data-v="≈ 11"></span><span></span><span class="sym">US M</span
-        ><span class="name">adidas</span>
-      </div>
-      <div class="row" data-wait data-own>
-        <span class="v" data-v="11"></span><span></span><span class="sym">US M</span
-        ><span class="name">Nike</span>
-      </div>
-      <div class="row" data-wait>
-        <span class="v" data-v="≈ 10"></span><span></span><span class="sym">US M</span
-        ><span class="name">New Balance</span>
-      </div>
-      <div class="more">… and 17 more brands</div>
       <div
         class="note"
         data-note
-        data-loading="Loading Nike’s chart…"
+        data-loading=""
         data-ready="Nike’s size chart, the men’s, nike.com, read Oct 2026."
       ></div>
     </div>
@@ -396,26 +397,19 @@
 
   <section class="state" id="state-c">
     <h2>
-      3. The fetch failed <span class="pill">offline, a blocked request, a bad response</span>
+      3. The fetch failed with a brand in the box
+      <span class="pill">offline, a blocked request, a bad response</span>
     </h2>
     <p class="muted">
-      The same rows stay dashes and the line says so. Leaving Shoe size and coming back tries again;
-      so does a reload.
+      The line above the rows says so; the rows stay dashes; nothing under the table. Leaving Shoe
+      size and coming back tries again; so does a reload.
     </p>
     <div class="box">
       <span class="num">11</span><span class="chip"><b>US M</b> US men ⌄</span
       ><span class="chip">Nike ⌄</span>
     </div>
     <div class="card">
-      <div class="section">US (customary)</div>
-      <div class="row">
-        <span class="v dash">—</span><span></span><span class="sym">US M</span
-        ><span class="name">US men</span>
-      </div>
-      <div class="row">
-        <span class="v dash">—</span><span></span><span class="sym">US W</span
-        ><span class="name">US women</span>
-      </div>
+      <div class="notice mark">Brand charts not loaded. Reload to try again.</div>
       <div class="section">Brands, the same foot in US M</div>
       <div class="row">
         <span class="v dash">—</span><span></span><span class="sym">US M</span
@@ -426,8 +420,50 @@
         ><span class="name">Nike</span>
       </div>
       <div class="more">… and 18 more brands</div>
-      <div class="note failed">
-        The brands’ charts could not be loaded. Reload the page to try again.
+      <div class="section">US (customary)</div>
+      <div class="row">
+        <span class="v dash">—</span><span></span><span class="sym">US M</span
+        ><span class="name">US men</span>
+      </div>
+      <div class="row">
+        <span class="v dash">—</span><span></span><span class="sym">US W</span
+        ><span class="name">US women</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="state" id="state-d">
+    <h2>4. The fetch failed with no brand <span class="pill">the scales still answer</span></h2>
+    <p class="muted">
+      Only the Brands section is affected, so only its heading says so; ISO converts as ever and its
+      line stays under the table.
+    </p>
+    <div class="box">
+      <span class="num">11</span><span class="chip"><b>US M</b> US men</span>
+    </div>
+    <div class="card">
+      <div class="section">US (customary)</div>
+      <div class="row own">
+        <span class="v">11</span><span></span><span class="sym">US M</span
+        ><span class="name">US men</span>
+      </div>
+      <div class="row">
+        <span class="v"><span class="about">≈ </span>12</span><span></span
+        ><span class="sym">US W</span><span class="name">US women</span>
+      </div>
+      <div class="section mark">Brand charts not loaded</div>
+      <div class="row">
+        <span class="v dash">—</span><span></span><span class="sym">US M</span
+        ><span class="name">adidas</span>
+      </div>
+      <div class="row">
+        <span class="v dash">—</span><span></span><span class="sym">US M</span
+        ><span class="name">Nike</span>
+      </div>
+      <div class="more">… and 18 more brands</div>
+      <div class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. Each brand’s row is its own
+        chart read at that foot.
       </div>
     </div>
   </section>
@@ -437,7 +473,7 @@
   const status = document.getElementById('status');
   const brandRows = [...document.querySelectorAll('#state-a [data-brand]')];
   const waitRows = [...document.querySelectorAll('#state-b [data-wait]')];
-  const note = document.querySelector('#state-b [data-note]');
+  const texts = [...document.querySelectorAll('[data-head], [data-notice], [data-note]')];
   const show = (span, text) => {
     const about = text.startsWith('≈ ');
     span.innerHTML = about ? '<span class="about">≈ </span>' + text.slice(2) : text;
@@ -450,7 +486,7 @@
       const slot = row.querySelector('[data-why-slot]');
       if (slot) slot.textContent = '';
     }
-    note.textContent = note.dataset.loading;
+    for (const each of texts) each.textContent = each.dataset.loading;
     status.textContent = 'Fetching…';
   }
   function ready() {
@@ -461,7 +497,7 @@
       const slot = row.querySelector('[data-why-slot]');
       if (slot && v.dataset.why) slot.textContent = '· ' + v.dataset.why;
     }
-    note.textContent = note.dataset.ready;
+    for (const each of texts) each.textContent = each.dataset.ready;
     status.textContent = 'Loaded';
   }
   let timer = null;

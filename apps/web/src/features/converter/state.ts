@@ -1427,12 +1427,13 @@ function brandsSection(
     key: 'brands',
     // With no brand in the box only this section waits for the charts: its heading says so
     // (ADR 0029; Sean, 2026-10-21).
+    // No commas in a status line: a pause the reader does not need (Sean, 2026-10-21).
     label:
       charts === 'failed'
-        ? `${SECTION_LABEL.brands}, charts not loaded`
+        ? 'Brand charts not loaded'
         : ready
           ? `${SECTION_LABEL.brands}, the same foot in ${scaleUnit.symbol}`
-          : `${SECTION_LABEL.brands}, loading their charts…`,
+          : 'Brand charts loading…',
     rows,
     repeats: true,
   };
@@ -1582,7 +1583,7 @@ export function scaleList(
 }
 
 /** The line under the table when the brands' charts could not be fetched (ADR 0029). */
-const CHARTS_FAILED = 'The brands’ charts could not be loaded. Reload the page to try again.';
+const CHARTS_FAILED = 'Brand charts not loaded. Reload to try again.';
 
 /**
  * Shoe size (ADR 0027, ADR 0028): ISO's scales as every category's rows, and under them one row
@@ -1652,7 +1653,7 @@ function selectShoe(
   const notice = waiting
     ? charts === 'failed'
       ? CHARTS_FAILED
-      : `Loading ${poss(brand.name)} chart…`
+      : `${poss(brand.name)} chart loading…`
     : undefined;
   const note = waiting
     ? null

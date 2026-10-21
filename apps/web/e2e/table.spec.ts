@@ -2407,7 +2407,7 @@ test('the brands’ charts are data fetched once Shoe size opens (ADR 0029): the
   await page.goto('/?a=us-men&v=10&brand=nike');
   await ready(page);
   await expect(page.getByRole('button', { name: 'Remove Nike' })).toBeVisible();
-  await expect(page.getByText(/^The brands’ charts could not be loaded/)).toBeVisible();
+  await expect(page.getByText(/^Brand charts not loaded/)).toBeVisible();
   await expect(row(page, 'eu')).toContainText('—');
   await expect(row(page, 'brand:nike')).toContainText('—');
 });

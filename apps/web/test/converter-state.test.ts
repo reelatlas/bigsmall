@@ -1237,12 +1237,12 @@ describe('brands (ADR 0028)', () => {
     if (loading.kind !== 'units') throw new Error('units');
     expect(row(loading, 'eu')).toMatchObject({ tone: 'empty' });
     expect(row(loading, 'brand:nike')).toMatchObject({ tone: 'empty', inBox: false });
-    expect(loading.notice).toBe('Loading Nike’s chart…');
+    expect(loading.notice).toBe('Nike’s chart loading…');
     expect(loading.note).toBeNull();
     const failed = selectTable(run(type('nike 10'), nike()), { ...options, charts: 'failed' });
     if (failed.kind !== 'units') throw new Error('units');
     expect(row(failed, 'eu')).toMatchObject({ tone: 'empty' });
-    expect(failed.notice).toMatch(/^The brands’ charts could not be loaded/);
+    expect(failed.notice).toBe('Brand charts not loaded. Reload to try again.');
     // Without a brand the scales convert as ever; the brands' rows wait.
     const iso = selectTable(run(type('us 10'), { type: 'use', unit: 'us-men', text: '10' }), {
       ...options,
@@ -1253,13 +1253,13 @@ describe('brands (ADR 0028)', () => {
     expect(row(iso, 'brand:nike')).toMatchObject({ tone: 'empty' });
     expect(iso.note).toMatch(/^ISO 19407/);
     expect(iso.notice).toBeUndefined();
-    expect(iso.sections.at(-1)?.label).toBe('Brands, loading their charts…');
+    expect(iso.sections.at(-1)?.label).toBe('Brand charts loading…');
     const isoFailed = selectTable(run(type('us 10'), { type: 'use', unit: 'us-men', text: '10' }), {
       ...options,
       charts: 'failed',
     });
     if (isoFailed.kind !== 'units') throw new Error('units');
-    expect(isoFailed.sections.at(-1)?.label).toBe('Brands, charts not loaded');
+    expect(isoFailed.sections.at(-1)?.label).toBe('Brand charts not loaded');
     expect(isoFailed.notice).toBeUndefined();
     // Given to core, as the tests' setup does, ready needs no word.
     expect(row(units(type('nike 10'), nike()), 'brand:nike')).toMatchObject({ text: '10' });

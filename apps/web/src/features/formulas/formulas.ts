@@ -4,10 +4,13 @@ import {
   getUnit,
   ingredients,
   pairFormula,
+  shoeBrands,
   unitsIn,
+  type BrandChart,
   type Category,
   type CupSource,
   type Ingredient,
+  type ShoeBrand,
   type Unit,
 } from '@bigsmall/core';
 
@@ -149,9 +152,53 @@ function ingredientLine(ingredient: Ingredient): FormulaLine {
   };
 }
 
+/** The scales a brand's chart can print, as the About page names them. */
+const CHART_SCALES: ReadonlyArray<readonly [keyof BrandChart['rows'][number], string]> = [
+  ['usMen', 'US men'],
+  ['usWomen', 'US women'],
+  ['uk', 'UK'],
+  ['ukWomen', 'UK women'],
+  ['eu', 'EU'],
+  ['jp', 'JP'],
+  ['foot', 'the foot in mm'],
+];
+
+const LENGTH_BASIS: Record<BrandChart['basis'], string> = {
+  foot: 'its length the foot’s',
+  product: 'its length the product’s',
+  label: 'size labels only',
+  none: 'no length printed',
+};
+
+/**
+ * A brand's chart under Shoe size (ADR 0028): the brand's own cells, by convention, the scales
+ * it prints and how many sizes; its page, the date read, what its length is, and the fact the
+ * line under the table carries (docs/research/shoe-sizes-2.md).
+ */
+function brandLine(brand: ShoeBrand, chart: BrandChart): FormulaLine {
+  const scales = CHART_SCALES.filter(([key]) =>
+    chart.rows.some((row) => row[key] !== undefined),
+  ).map(([, name]) => name);
+  const line = chart.line === 'unisex' ? 'one chart' : `the ${chart.line}’s chart`;
+  const name = `${brand.name}, ${line}`;
+  const formula = `${chart.rows.length} sizes: ${scales.join(', ')}`;
+  const source = `${chart.title}, ${chart.source}, read ${chart.read}; ${LENGTH_BASIS[chart.basis]}.${brand.fact ? ` ${brand.fact}` : ''}`;
+  return {
+    id: `brand:${brand.id}:${chart.line}`,
+    name,
+    symbol: '',
+    formula,
+    exact: false,
+    basis: 'by convention',
+    source,
+    plain: `${name}: ${formula}, by convention. Source: ${source}`,
+  };
+}
+
 /**
  * Every category's units with their formulas, in the catalog's order; Cooking, a lens with no
- * units of its own, lists its ingredients' weights by the cup instead.
+ * units of its own, lists its ingredients' weights by the cup instead; Shoe size lists the
+ * brands' charts after its scales (ADR 0028).
  */
 export function formulaGroups(): FormulaGroup[] {
   return categories.flatMap((category) => {
@@ -169,7 +216,7 @@ export function formulaGroups(): FormulaGroup[] {
         },
       ];
     }
-    const lines = unitsIn(category.id).map((unit): FormulaLine => {
+    const units = unitsIn(category.id).map((unit): FormulaLine => {
       const formula = formulaOf(unit, base);
       const basis = unit.exact ? 'exact' : unit.conventional ? 'by convention' : 'measured';
       return {
@@ -183,12 +230,19 @@ export function formulaGroups(): FormulaGroup[] {
         plain: `${unit.name} (${unit.symbol}): ${formula}, ${basis}. Source: ${unit.source}`,
       };
     });
+    const charts =
+      category.id === 'shoe-size'
+        ? shoeBrands.flatMap((brand) => brand.charts.map((chart) => brandLine(brand, chart)))
+        : [];
     return [
       {
         category,
         base,
-        lines,
-        summary: `${lines.length} units in ${base.plural}`,
+        lines: [...units, ...charts],
+        summary:
+          charts.length > 0
+            ? `${units.length} units in ${base.plural}, ${charts.length} brands’ charts`
+            : `${units.length} units in ${base.plural}`,
         plain: `## ${category.name} (base unit: ${base.name}, ${base.symbol})`,
       },
     ];

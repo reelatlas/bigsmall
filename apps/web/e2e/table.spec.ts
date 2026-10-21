@@ -91,14 +91,17 @@ const scrollHeadingUnder = (page: Page, heading: string) =>
  * points line up on it, with Fraction the whole numbers; one edge for every row when the rows
  * line up.
  */
+// The rows with a whole number: a dash, a pair, or a brand's cell as printed is written across.
 const firstCellRights = (page: Page) =>
-  page.locator('[data-row] > [role="gridcell"]:first-child').evaluateAll((units) =>
-    units.map((unit) => {
-      const range = document.createRange();
-      range.selectNodeContents(unit.firstElementChild!);
-      return Math.round(range.getBoundingClientRect().right);
-    }),
-  );
+  page
+    .locator('[data-row] > [role="gridcell"]:first-child:has([data-whole])')
+    .evaluateAll((units) =>
+      units.map((unit) => {
+        const range = document.createRange();
+        range.selectNodeContents(unit.firstElementChild!);
+        return Math.round(range.getBoundingClientRect().right);
+      }),
+    );
 
 /** What the field's cursor is on, as it reads, or null while it rests. */
 async function cursor(page: Page): Promise<string | null> {
@@ -2282,4 +2285,58 @@ test('a clock names its units: "5:55" offers the paces first, "1:30:00" the time
   await expect(options.nth(0)).toContainText('feet');
   await expect(options.nth(0)).not.toContainText('feet, inches');
   await expect(options.nth(1)).toContainText('feet, inches');
+});
+
+test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, the one value in focus, the scales ISO’s from Nike’s foot, every brand at that foot under them, a brand’s row taken into the box, a scale’s row taking the brand out, and the brand in the URL', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await ready(page);
+  await box(page).fill('nike 10');
+  // A bare size at a brand is US men's, one match with the brand, which Enter takes.
+  await expect(matches(page).getByRole('option').first()).toContainText('US men · Nike');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove Nike' })).toBeVisible();
+  await expect(box(page)).toHaveValue('10');
+  await expect(page).toHaveURL(/[?&]brand=nike/);
+  // Nike's 10 is a 27.1 cm foot by its chart: ISO's scales read from it, none the box's own.
+  await expect(row(page, 'uk')).toContainText('≈ 9');
+  await expect(row(page, 'eu')).toContainText('≈ 42.5');
+  await expect(row(page, 'foot-cm')).toContainText('27.1');
+  await expect(row(page, 'us-men')).not.toContainText('in the box');
+  // The brands' rows under the scales, by their own charts; Nike's the box's, the one filled.
+  expect(await sectionIds(page)).toContain('brands');
+  await expect(row(page, 'brand:iso')).toHaveCount(0);
+  await expect(row(page, 'brand:nike')).toContainText('in the box');
+  await expect(row(page, 'brand:new-balance')).toContainText('≈ 9');
+  await expect(row(page, 'brand:new-balance')).toContainText('New Balance');
+  await expect(row(page, 'brand:puma')).toContainText('no foot length');
+  await expect(
+    page.getByText(/^Nike’s size chart, the men’s, nike\.com, read Oct 2026\./),
+  ).toBeVisible();
+  // A brand's row taken: its size and the brand come into the box, the one value in focus, and
+  // ISO's US men says where that differs (New Balance's 9 is a 27 cm foot, ISO's ≈ 10).
+  await unitCell(page, 'brand:new-balance').click();
+  await expect(page.getByRole('button', { name: 'Remove New Balance' })).toBeVisible();
+  await expect(box(page)).toHaveValue('9');
+  await expect(row(page, 'brand:new-balance')).toContainText('in the box');
+  await expect(row(page, 'us-men')).toContainText('≈ 10');
+  await expect(row(page, 'brand:nike')).toContainText('≈ 10');
+  await expect(page).toHaveURL(/[?&]brand=new-balance/);
+  // A scale's row taken takes the brand out: the scales are ISO's; the URL drops it.
+  await unitCell(page, 'us-men').click();
+  await expect(page.getByRole('button', { name: /^Remove (Nike|New Balance)$/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await expect(box(page)).toHaveValue('10');
+  await expect(page).not.toHaveURL(/brand=/);
+  await expect(page.getByText(/^ISO 19407/)).toBeVisible();
+  // Backspace on an empty box takes the brand's pill out first, then the scale.
+  await box(page).fill('nike 10');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove Nike' })).toBeVisible();
+  await box(page).fill('');
+  await box(page).press('Backspace');
+  await expect(page.getByRole('button', { name: 'Remove Nike' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
 });

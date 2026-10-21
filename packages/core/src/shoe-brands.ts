@@ -1,0 +1,363 @@
+import { fromBase, toBase } from './convert';
+import { compactKey } from './normalize';
+import type { MatchClass } from './search';
+import type { Unit } from './types';
+import { shoeBrands, type ShoeBrand } from './units/shoe-brands';
+import type { BrandChart, BrandChartRow, BrandLine, LengthBasis } from './units/shoe-brands-data';
+
+/**
+ * The brands' shoe-size charts (ADR 0028; docs/research/shoe-sizes-2.md): a brand joins the box
+ * beside the unit, as Cooking's ingredient does, and its own chart answers the scale rows, while
+ * every brand's row reads its chart at the same foot. Pure, as the rest of core: the lookups here,
+ * the words and the rows in the web app.
+ */
+
+export { shoeBrands };
+export type { ShoeBrand, BrandChart, BrandChartRow, BrandLine, LengthBasis };
+
+const byId: ReadonlyMap<string, ShoeBrand> = new Map(shoeBrands.map((each) => [each.id, each]));
+
+interface Keyed {
+  brand: ShoeBrand;
+  shorthand: boolean;
+}
+
+/** Every key a brand answers to, compact, and whether it is a shorthand key. */
+const byKey: ReadonlyMap<string, Keyed> = new Map(
+  shoeBrands.flatMap((each): [string, Keyed][] => [
+    ...[each.name, ...each.aliases].map((key): [string, Keyed] => [
+      compactKey(key),
+      { brand: each, shorthand: false },
+    ]),
+    ...(each.shorthand ?? []).map((key): [string, Keyed] => [
+      compactKey(key),
+      { brand: each, shorthand: true },
+    ]),
+  ]),
+);
+
+export function getShoeBrand(id: string): ShoeBrand | undefined {
+  return byId.get(id);
+}
+
+/** The scales a brand's chart can print, by the unit's id. */
+export type BrandScale = 'us-men' | 'us-women' | 'uk' | 'eu' | 'japan';
+
+export const BRAND_SCALES: readonly BrandScale[] = ['us-men', 'us-women', 'uk', 'eu', 'japan'];
+
+/** The scale a bare size at a brand means ("nike 10"), as a bare "us" is men's (ADR 0027). */
+export const BRAND_DEFAULT_SCALE: BrandScale = 'us-men';
+
+/** The units that hold a foot's length, which a brand's chart answers where its length is the foot's. */
+const LENGTH_UNITS: ReadonlySet<string> = new Set(['mondopoint', 'foot-cm']);
+
+export function isBrandScale(id: string): id is BrandScale {
+  return (BRAND_SCALES as readonly string[]).includes(id);
+}
+
+const FIELD: Record<BrandScale, 'usMen' | 'usWomen' | 'uk' | 'eu' | 'jp'> = {
+  'us-men': 'usMen',
+  'us-women': 'usWomen',
+  uk: 'uk',
+  eu: 'eu',
+  japan: 'jp',
+};
+
+/** A brand matching a typed query, ranked as units and ingredients are (search.ts, cooking.ts). */
+export interface BrandMatch {
+  kind: 'brand';
+  brand: ShoeBrand;
+  /** 2 an exact name or alias, 3 the start of one, 5 inside one. */
+  matchClass: MatchClass;
+  /** The name or alias that matched, as written in the data. */
+  matchedKey: string;
+}
+
+/**
+ * Brands for a typed query, strongest first, then in the data's order: an exact name or alias,
+ * then the start of one, then, from three letters on, one that holds it. A shorthand key ("nb",
+ * "on") matches exactly and only where the category is named (`named`), as a unit's does.
+ */
+export function matchShoeBrands(query: string, named = false, limit = 8): BrandMatch[] {
+  const target = compactKey(query);
+  if (!target) return [];
+  const found: BrandMatch[] = [];
+  for (const brand of shoeBrands) {
+    let best: BrandMatch | null = null;
+    // A key that is a shorthand key, the name itself for On, matches exactly, and only when named.
+    const short = new Set((brand.shorthand ?? []).map(compactKey));
+    for (const key of [brand.name, ...brand.aliases, ...(brand.shorthand ?? [])]) {
+      const compact = compactKey(key);
+      const shorthand = short.has(compact);
+      if (shorthand && !named) continue;
+      const matchClass: MatchClass | null =
+        compact === target
+          ? 2
+          : shorthand
+            ? null
+            : compact.startsWith(target)
+              ? 3
+              : target.length >= 3 && compact.includes(target)
+                ? 5
+                : null;
+      if (matchClass !== null && (!best || matchClass < best.matchClass)) {
+        best = { kind: 'brand', brand, matchClass, matchedKey: key };
+      }
+    }
+    if (best) found.push(best);
+  }
+  return found
+    .map((match, index) => ({ match, index }))
+    .sort((a, b) => a.match.matchClass - b.match.matchClass || a.index - b.index)
+    .slice(0, limit)
+    .map(({ match }) => match);
+}
+
+/**
+ * A brand named exactly by a query's first words or its last, and the rest of the query: "nike
+ * 10" and "10 nike" are Nike and "10", "eu 43 new balance" is New Balance and "eu 43". The
+ * longest name that fits wins; a shorthand key counts only where the category is named
+ * (`named`). Null when neither end names a brand.
+ */
+export function splitShoeBrand(
+  query: string,
+  named = false,
+): { rest: string; brand: ShoeBrand } | null {
+  const words = query.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return null;
+  const found = (text: string) => {
+    const hit = byKey.get(compactKey(text));
+    return hit && (named || !hit.shorthand) ? hit.brand : null;
+  };
+  // The start, the longest run first, then the end, the longest run first.
+  for (let end = words.length; end > 0; end -= 1) {
+    const brand = found(words.slice(0, end).join(' '));
+    if (brand) return { rest: words.slice(end).join(' '), brand };
+  }
+  for (let start = 0; start < words.length; start += 1) {
+    const brand = found(words.slice(start).join(' '));
+    if (brand) return { rest: words.slice(0, start).join(' '), brand };
+  }
+  return null;
+}
+
+/**
+ * The chart a brand answers with: the women's where it prints one and the size is women's, else
+ * the men's, else its one chart for everyone.
+ */
+export function brandChart(brand: ShoeBrand, women: boolean): BrandChart {
+  const line: BrandLine = women ? 'women' : 'men';
+  const chart =
+    brand.charts.find((each) => each.line === line) ??
+    brand.charts.find((each) => each.line === 'unisex') ??
+    brand.charts[0];
+  if (!chart) throw new Error(`${brand.name} has no chart`);
+  return chart;
+}
+
+/** A row's size on a scale: the size, with the two ends where the brand prints a range. */
+export interface BrandCell {
+  /** The size; a range's lower end. */
+  value: number;
+  range?: readonly [number, number] | undefined;
+}
+
+/**
+ * A chart's cell on a scale, as the brand prints it; the British women's where the chart prints
+ * men's and women's UK apart (Crocs) and the size is women's. Null where the row prints none.
+ */
+export function brandCell(row: BrandChartRow, scale: BrandScale, women: boolean): BrandCell | null {
+  const cell =
+    scale === 'uk' && women && row.ukWomen !== undefined ? row.ukWomen : row[FIELD[scale]];
+  if (cell === undefined) return null;
+  return typeof cell === 'number' ? { value: cell } : { value: cell[0], range: cell };
+}
+
+/** The row whose cell on the scale is the size, a range holding it where the brand prints one. */
+export function brandRowAt(
+  chart: BrandChart,
+  scale: BrandScale,
+  size: number,
+  women: boolean,
+): BrandChartRow | null {
+  for (const row of chart.rows) {
+    const cell = brandCell(row, scale, women);
+    if (!cell) continue;
+    if (cell.range) {
+      if (size >= cell.range[0] - 1e-9 && size <= cell.range[1] + 1e-9) return row;
+    } else if (Math.abs(cell.value - size) < 1e-9) return row;
+  }
+  return null;
+}
+
+/** The lowest and highest size a chart prints on a scale, or null where it prints none. */
+export function brandSpan(
+  chart: BrandChart,
+  scale: BrandScale,
+  women: boolean,
+): readonly [number, number] | null {
+  let low = Number.POSITIVE_INFINITY;
+  let high = Number.NEGATIVE_INFINITY;
+  for (const row of chart.rows) {
+    const cell = brandCell(row, scale, women);
+    if (!cell) continue;
+    low = Math.min(low, cell.value);
+    high = Math.max(high, cell.range ? cell.range[1] : cell.value);
+  }
+  return low <= high ? [low, high] : null;
+}
+
+/** The feet a chart gives, in its rows' order, with each row. */
+function feetOf(chart: BrandChart): { foot: number; row: BrandChartRow }[] {
+  if (chart.basis !== 'foot') return [];
+  return chart.rows.flatMap((row) => (row.foot === undefined ? [] : [{ foot: row.foot, row }]));
+}
+
+/**
+ * The row nearest a foot, among the rows printing the scale (every row with a foot for a null
+ * scale), where the chart's length is the foot's: a tie goes to the longer foot, as brands
+ * advise sizing up between sizes. Null where the chart gives no feet, or the foot lies past its
+ * ends by more than half a row's step, as a shoe fits a foot half a step either way (ADR 0027).
+ */
+export function brandRowNear(
+  chart: BrandChart,
+  foot: number,
+  scale: BrandScale | null,
+  women: boolean,
+): BrandChartRow | null {
+  const feet = feetOf(chart).filter(
+    ({ row }) => scale === null || brandCell(row, scale, women) !== null,
+  );
+  if (feet.length === 0) return null;
+  const first = feet[0]!;
+  const last = feet[feet.length - 1]!;
+  const stepLow = feet.length > 1 ? (feet[1]!.foot - first.foot) / 2 : 2.5;
+  const stepHigh = feet.length > 1 ? (last.foot - feet[feet.length - 2]!.foot) / 2 : 2.5;
+  if (foot < first.foot - stepLow || foot > last.foot + stepHigh) return null;
+  let best = first;
+  for (const each of feet) {
+    const d = Math.abs(each.foot - foot);
+    const bestD = Math.abs(best.foot - foot);
+    if (d < bestD - 1e-9 || (Math.abs(d - bestD) < 1e-9 && each.foot > best.foot)) best = each;
+  }
+  return best.row;
+}
+
+/** What a brand's chart says of the size in the box (ADR 0028). */
+export interface BrandReading {
+  brand: ShoeBrand;
+  chart: BrandChart;
+  /** Women's: the box's size is on the US women's scale, so the women's chart answers where there is one. */
+  women: boolean;
+  /**
+   * The row the box's size names on its scale; for a length typed, the row nearest it where the
+   * chart's length is the foot's. Null where the size is off the chart, the scale is none the
+   * chart prints, or a length meets a chart with no feet.
+   */
+  row: BrandChartRow | null;
+  /**
+   * The foot in mm the box stands for: the row's, where the chart's length is the foot's; the
+   * length typed; else null, the brand giving no foot to read the other brands from.
+   */
+  foot: number | null;
+  /** The box holds a length, Mondopoint or centimetres, rather than a size. */
+  length: boolean;
+  /** The size is off the chart on its scale: the chart's span there; null otherwise. */
+  beyond: readonly [number, number] | null;
+}
+
+/** The brand's chart read at the box's unit and value. */
+export function readBrand(brand: ShoeBrand, unit: Unit, value: number): BrandReading {
+  const women = unit.id === 'us-women';
+  const chart = brandChart(brand, women);
+  const base = { brand, chart, women, row: null, foot: null, length: false, beyond: null };
+  if (LENGTH_UNITS.has(unit.id)) {
+    const foot = toBase(unit, value);
+    return { ...base, length: true, foot, row: brandRowNear(chart, foot, null, women) };
+  }
+  if (!isBrandScale(unit.id)) return base;
+  const row = brandRowAt(chart, unit.id, value, women);
+  if (!row) return { ...base, beyond: brandSpan(chart, unit.id, women) };
+  return { ...base, row, foot: chart.basis === 'foot' && row.foot !== undefined ? row.foot : null };
+}
+
+/**
+ * What a scale row shows with a brand in the box: the chart's own cell, as printed (`brand`);
+ * the same length in the other length unit (`length`); ISO's rule from the foot the brand gives,
+ * where the chart lacks the scale (`iso`), for the row to step and mark as every converted size
+ * is; or nothing (`none`).
+ */
+export interface ScaleReading {
+  source: 'brand' | 'length' | 'iso' | 'none';
+  value: number | null;
+  range?: readonly [number, number] | undefined;
+  /** For a length typed, the row's foot is not the typed one: the cell is the nearest row's. */
+  approx: boolean;
+}
+
+export function brandScale(reading: BrandReading, unit: Unit): ScaleReading {
+  const none: ScaleReading = { source: 'none', value: null, approx: false };
+  const { chart, row, foot, women } = reading;
+  const off =
+    reading.length && row?.foot !== undefined && foot !== null && Math.abs(row.foot - foot) > 0.5;
+  if (LENGTH_UNITS.has(unit.id)) {
+    if (reading.length && foot !== null) {
+      return { source: 'length', value: fromBase(unit, foot), approx: false };
+    }
+    if (row?.foot !== undefined && chart.basis === 'foot') {
+      return { source: 'brand', value: fromBase(unit, row.foot), approx: false };
+    }
+    return none;
+  }
+  if (row && isBrandScale(unit.id)) {
+    const cell = brandCell(row, unit.id, women);
+    if (cell) return { source: 'brand', value: cell.value, range: cell.range, approx: off };
+  }
+  // ISO's rule from the foot: the brand's, or a typed length the chart could read a row from; a
+  // typed length that meets a chart with no feet answers nothing but the brands' rows.
+  if (foot !== null && (!reading.length || row !== null)) {
+    return { source: 'iso', value: fromBase(unit, foot), approx: false };
+  }
+  return none;
+}
+
+/** A brand's row under the table: its size for the foot in the box, by its own chart (ADR 0028). */
+export interface BrandRowReading {
+  brand: ShoeBrand;
+  chart: BrandChart;
+  /** The size on the scale, as printed; a range's lower end. */
+  value: number | null;
+  range?: readonly [number, number] | undefined;
+  /** The foot the chart gives for that size. */
+  foot: number | null;
+  /** The chart's nearest foot is not the foot read from. */
+  approx: boolean;
+  /**
+   * Why there is no size: the chart gives no foot length to read from; it prints no such scale;
+   * the foot is off its chart.
+   */
+  why: 'no-length' | 'no-scale' | 'off-chart' | null;
+}
+
+/** Every brand's size on a scale for a foot, each by its own chart at the nearest row. */
+export function brandsAtFoot(foot: number, scale: BrandScale, women: boolean): BrandRowReading[] {
+  return shoeBrands.map((brand) => {
+    const chart = brandChart(brand, women);
+    const base = { brand, chart, value: null, foot: null, approx: false };
+    if (chart.basis !== 'foot') return { ...base, why: 'no-length' };
+    if (brandSpan(chart, scale, women) === null) return { ...base, why: 'no-scale' };
+    const row = brandRowNear(chart, foot, scale, women);
+    if (!row || row.foot === undefined) return { ...base, why: 'off-chart' };
+    const cell = brandCell(row, scale, women);
+    if (!cell) return { ...base, why: 'no-scale' };
+    return {
+      brand,
+      chart,
+      value: cell.value,
+      range: cell.range,
+      foot: row.foot,
+      approx: Math.abs(row.foot - foot) > 0.5,
+      why: null,
+    };
+  });
+}

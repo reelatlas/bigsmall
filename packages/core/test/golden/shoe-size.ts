@@ -20,6 +20,14 @@ export const shoeSize: GoldenRow[] = [
       'ISO/TS 19407:2015 §2.2 a): Japan expresses Mondopoint, the foot length in mm, in centimetres',
   },
   {
+    value: 27.1,
+    from: 'foot-cm',
+    to: 'mondopoint',
+    expected: 271,
+    source:
+      'ISO 9407:2019: Mondopoint is the foot length in mm; the foot measured in centimetres is ten times fewer (ADR 0028)',
+  },
+  {
     value: 9,
     from: 'uk',
     to: 'mondopoint',

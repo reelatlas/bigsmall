@@ -39,6 +39,7 @@ describe('paramsToState', () => {
       text: '2',
       unit: 'foot',
       ingredient: null,
+      brand: null,
     });
   });
 
@@ -49,6 +50,7 @@ describe('paramsToState', () => {
       text: '123456789012345678',
       unit: 'meter',
       ingredient: null,
+      brand: null,
     });
   });
 
@@ -63,11 +65,13 @@ describe('paramsToState', () => {
       text: '1234,567',
       unit: 'meter',
       ingredient: null,
+      brand: null,
     });
     expect(paramsToState(params, EN)).toEqual({
       text: '1234.567',
       unit: 'meter',
       ingredient: null,
+      brand: null,
     });
   });
 
@@ -76,17 +80,20 @@ describe('paramsToState', () => {
       text: '1',
       unit: 'mile',
       ingredient: null,
+      brand: null,
     });
     expect(paramsToState(new URLSearchParams('a=meter&b=foot&v=2&s=b'))).toEqual({
       text: '2',
       unit: 'foot',
       ingredient: null,
+      brand: null,
     });
     // The second box held the number with no unit of its own.
     expect(paramsToState(new URLSearchParams('a=meter&v=2&s=b'))).toEqual({
       text: '2',
       unit: null,
       ingredient: null,
+      brand: null,
     });
   });
 
@@ -95,6 +102,7 @@ describe('paramsToState', () => {
       text: '3',
       unit: null,
       ingredient: null,
+      brand: null,
     });
   });
 
@@ -111,11 +119,13 @@ describe('paramsToState', () => {
       text: '2',
       unit: 'us-cup',
       ingredient: 'all-purpose-flour',
+      brand: null,
     });
     expect(paramsToState(new URLSearchParams('i=butter'))).toEqual({
       text: '',
       unit: null,
       ingredient: 'butter',
+      brand: null,
     });
     expect(paramsToState(new URLSearchParams('a=us-cup&i=moon-dust'))?.ingredient).toBeNull();
   });
@@ -127,6 +137,7 @@ describe('paramsToState', () => {
       text: '5 ft 11 in',
       unit: 'foot-inch',
       ingredient: null,
+      brand: null,
     });
     const half = stateToParams(holding('5 ft 11,5 in', 'foot-inch'), DE);
     expect(half.toString()).toBe('a=foot-inch&v=5+ft+11.5+in');
@@ -142,6 +153,7 @@ describe('paramsToState', () => {
       text: '',
       unit: 'meter',
       ingredient: null,
+      brand: null,
     });
   });
 });
@@ -157,5 +169,26 @@ describe('urlFor', () => {
 
   it('is the bare page address when nothing is entered', () => {
     expect(urlFor(initialState, EN, page)).toBe('https://bigsmall.example/');
+  });
+});
+
+describe('the brand in the URL (ADR 0028)', () => {
+  it('carries the brand beside its scale, and drops an unknown one', () => {
+    const nike = { ...holding('10', 'us-men'), brand: 'nike' };
+    expect(stateToParams(nike, EN).toString()).toBe('a=us-men&v=10&brand=nike');
+    expect(paramsToState(stateToParams(nike, EN))).toEqual({
+      text: '10',
+      unit: 'us-men',
+      ingredient: null,
+      brand: 'nike',
+    });
+    expect(paramsToState(new URLSearchParams('a=us-men&v=10&brand=nope'))?.brand).toBeNull();
+    // A brand alone opens Shoe size with its pill, the scale to come.
+    expect(paramsToState(new URLSearchParams('brand=nike'))).toEqual({
+      text: '',
+      unit: null,
+      ingredient: null,
+      brand: 'nike',
+    });
   });
 });

@@ -11,6 +11,7 @@
 type AnalyticsEvent =
   | 'Unit chosen'
   | 'Ingredient chosen'
+  | 'Brand chosen'
   | 'Value copied'
   | 'URL copied'
   | 'Calculator opened'

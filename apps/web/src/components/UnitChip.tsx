@@ -1,4 +1,4 @@
-import type { Ingredient, Unit } from '@bigsmall/core';
+import type { Ingredient, ShoeBrand, Unit } from '@bigsmall/core';
 import type { MouseEvent, Ref } from 'react';
 import { cx, unitSymbol } from '../lib/recipes';
 import { ChevronDownIcon, CloseIcon } from './icons';
@@ -23,15 +23,17 @@ interface ChipProps {
 }
 
 /**
- * A unit's chip, its symbol and then its name, a pair's too; or, Cooking's second pill (ADR 0021),
- * an ingredient's, its name, which gives way to the number by truncating where the box is narrow,
- * and never goes compact, then a chevron: its body opens every ingredient to choose from, and
- * `expanded` turns the chevron over while they show (a trial, Sean, 2026-10-16).
+ * A unit's chip, its symbol and then its name, a pair's too; or the second pill, Cooking's
+ * ingredient (ADR 0021) or Shoe size's brand (ADR 0028), its name, which gives way to the number
+ * by truncating where the box is narrow, and never goes compact, then a chevron: its body opens
+ * every ingredient, or every brand, to choose from, and `expanded` turns the chevron over while
+ * they show (a trial, Sean, 2026-10-16).
  */
 type UnitChipProps = ChipProps &
   (
-    | { unit: Unit; ingredient?: undefined; expanded?: undefined }
-    | { ingredient: Ingredient; unit?: undefined; expanded?: boolean }
+    | { unit: Unit; ingredient?: undefined; brand?: undefined; expanded?: undefined }
+    | { ingredient: Ingredient; unit?: undefined; brand?: undefined; expanded?: boolean }
+    | { brand: ShoeBrand; unit?: undefined; ingredient?: undefined; expanded?: boolean }
   );
 
 // The chip lives inside a field: its corners nest inside the field's (docs/DESIGN-SYSTEM.md, "Fields").
@@ -50,6 +52,7 @@ const HOVER = 'transition-colors hover:bg-accent-soft-hover';
 export function UnitChip({
   unit,
   ingredient,
+  brand,
   expanded = false,
   compact,
   nameRef,
@@ -60,20 +63,23 @@ export function UnitChip({
   // Both buttons stay out of the Tab order: the field's own keys change and remove the unit
   // (docs/UX-SPEC.md §5). They stay clickable and visible to screen readers.
   const tabIndex = -1;
-  const name = unit ? unit.plural : ingredient.name;
+  /** The second pill's thing, an ingredient or a brand, which the chip names. */
+  const second = ingredient ?? brand ?? null;
+  const name = unit ? unit.plural : (second?.name ?? '');
+  const what = unit ? 'Unit' : ingredient ? 'Ingredient' : 'Brand';
   // A press moves focus nowhere: the caret stays in the field if it was there (a touch screen's
   // keyboard with it, until a choice is made), and a browser that gives a pressed button focus
   // never scrolls the page to center it, as WebKit does (docs/LEARNINGS.md, 2026-10-17). Cancelled
   // on mousedown, as the field's × does: cancelling pointerdown swallows the tap itself in WebKit.
   const keepFocus = (event: MouseEvent<HTMLButtonElement>) => event.preventDefault();
   return (
-    // A unit's chip keeps its size; an ingredient's gives way, its name cut short.
-    <span className={cx(CHIP, ingredient ? 'min-w-0' : 'shrink-0')}>
+    // A unit's chip keeps its size; an ingredient's or a brand's gives way, its name cut short.
+    <span className={cx(CHIP, second ? 'min-w-0' : 'shrink-0')}>
       <button
         type="button"
         // What it is, not a picker it would open: a press puts the caret in the box, whose keys
         // and table change the unit (the full tidy, 2026-10-15).
-        aria-label={unit ? `Unit: ${name}` : `Ingredient: ${name}`}
+        aria-label={`${what}: ${name}`}
         aria-expanded={unit ? undefined : expanded}
         tabIndex={tabIndex}
         onMouseDown={keepFocus}

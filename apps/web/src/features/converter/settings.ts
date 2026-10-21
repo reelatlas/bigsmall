@@ -44,7 +44,8 @@ export type SectionKey =
   | 'specialty'
   | 'change'
   | 'weight'
-  | 'volume';
+  | 'volume'
+  | 'brands';
 
 /**
  * Only headings take the parentheses; units keep their names and symbols. Specialty, for the units
@@ -62,6 +63,7 @@ export const SECTION_LABEL: Record<SectionKey, string> = {
   change: 'As a change',
   weight: 'Weight',
   volume: 'Volume',
+  brands: 'Brands',
 };
 
 /**

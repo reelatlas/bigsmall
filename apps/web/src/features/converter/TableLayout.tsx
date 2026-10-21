@@ -4,6 +4,7 @@ import {
   formatNumber,
   getUnit,
   ingredients,
+  shoeBrands,
   type CategoryId,
   type Unit,
 } from '@bigsmall/core';
@@ -44,6 +45,7 @@ import { evaluatedText } from './calculator';
 import { byHand, orderOf, sectionsOf, shows, withChoice, type Settings } from './settings';
 import {
   BOX_PRECISION,
+  brandList,
   ingredientList,
   noMatchMessage,
   pairText,
@@ -259,12 +261,19 @@ export function TableLayout({
    * units, the one in the box marked. Taking one, typing, Escape, or the pill again closes it.
    */
   const [choosingFor, setChoosingForState] = useState<string | null>(null);
+  // The second pill's thing: Cooking's ingredient, or Shoe size's brand, whose pill opens every
+  // brand the same way (ADR 0028).
+  const second = box.ingredient?.id ?? box.brand?.id ?? null;
   const choosing =
     choosingFor !== null &&
-    choosingFor === box.ingredient?.id &&
+    choosingFor === second &&
     selected.kind === 'units' &&
-    selected.category === 'cooking';
-  const table: TableView = choosing ? ingredientList(selected, box.ingredient) : selected;
+    (selected.category === 'cooking' || selected.category === 'shoe-size');
+  const table: TableView = !choosing
+    ? selected
+    : box.ingredient
+      ? ingredientList(selected, box.ingredient)
+      : brandList(selected, box.brand);
   const rootRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -660,6 +669,7 @@ export function TableLayout({
     else if (box.text !== '') dispatch({ type: 'replace', text: '' });
     // One pill a step, as Backspace and the pills' own × take them (Sean, 2026-10-16).
     else if (box.ingredient) dispatch({ type: 'removeIngredient' });
+    else if (box.brand) dispatch({ type: 'removeBrand' });
     // Cooking's ingredients to choose from count as its table.
     else if (box.unit || table.kind !== 'start') dispatch({ type: 'clear' });
     else return false;
@@ -864,17 +874,44 @@ export function TableLayout({
       : formatNumber(converted, { locale: env.locale });
   };
 
-  /** A unit taken into the box, with its new text; the category follows, and the cursor rests on its row. */
-  const take = (unitId: string, text: string, ingredient?: string) => {
-    dispatch(
-      ingredient === undefined
-        ? { type: 'use', unit: unitId, text }
-        : { type: 'use', unit: unitId, text, ingredient },
-    );
+  /**
+   * A unit taken into the box, with its new text; the category follows, and the cursor rests on
+   * its row. With the ingredient a match brought, or the brand a match or a brand's row brought
+   * (null from ISO's row, taking the brand out; ADR 0028).
+   */
+  const take = (unitId: string, text: string, ingredient?: string, brand?: string | null) => {
+    dispatch({
+      type: 'use',
+      unit: unitId,
+      text,
+      ...(ingredient === undefined ? {} : { ingredient }),
+      ...(brand === undefined ? {} : { brand }),
+    });
     // Which units people convert in, counted as each is taken (ADR 0019).
     track('Unit chosen', { category: getUnit(unitId)?.category ?? '', unit: unitId });
     setPosition(null);
     caretToEnd.current = true;
+  };
+
+  /**
+   * A brand taken into the box (ADR 0028), with the scale its match brought ("nike 10": US men)
+   * and the number the query carried, or the number as typed: Shoe size's table, read from its
+   * chart.
+   */
+  const takeBrand = (brand: string, unitId: string | null, text: string) => {
+    setChoosingFor(null);
+    // The one in the box, taken again from the list its pill opened: nothing changes.
+    if (choosing && !unitId && brand === box.brand?.id) {
+      setPosition(null);
+      return;
+    }
+    if (unitId) take(unitId, text, undefined, brand);
+    else {
+      dispatch({ type: 'useBrand', brand, text });
+      setPosition(null);
+      caretToEnd.current = true;
+    }
+    track('Brand chosen', { brand });
   };
 
   /**
@@ -919,7 +956,7 @@ export function TableLayout({
       // The query's target rests the cursor on its row once the unit is in the box (ADR 0027):
       // the match's own where a split read it ("11 w e"), else the query's.
       restOn.current =
-        match?.kind === 'unit'
+        match?.kind === 'unit' || match?.kind === 'brand'
           ? (match.target ?? table.target ?? null)
           : hiddenMatch
             ? (hiddenMatch.target ?? table.target ?? null)
@@ -927,6 +964,8 @@ export function TableLayout({
       if (match?.kind === 'unit') take(match.unit.id, textFor(match.unit));
       else if (match?.kind === 'ingredient') {
         takeIngredient(match.ingredient.id, match.unit?.id ?? null);
+      } else if (match?.kind === 'brand') {
+        takeBrand(match.brand.id, match.unit?.id ?? null, match.text ?? number);
       } else if (match) chooseCategory(match.category.id);
       else if (hiddenMatch) {
         choose([hiddenMatch], true);
@@ -935,18 +974,29 @@ export function TableLayout({
     } else {
       const row = table.rows[index];
       if (!row || row.tone === 'message') return;
+      // A brand's row (ADR 0028) brings its brand with its size (a dash, the number as typed);
+      // a scale's row taken with a brand in the box takes the brand out, since the scales are
+      // ISO's: one value in focus (Sean, 2026-10-20).
+      const brand = row.brand !== undefined ? row.brand.id : box.brand ? null : undefined;
       if (row.inBox) setPosition(null);
       // A row beyond its scale (ADR 0027): its scale comes into the box with the number cleared,
       // for a size of its own to be typed.
-      else if (row.tone === 'beyond') take(row.unit.id, '');
+      else if (row.tone === 'beyond') take(row.unit.id, '', undefined, brand);
       // Its unit: a change row's is its scale's (Temperature's As a change).
-      else if (row.value === null) take(row.unit.id, number);
+      else if (row.value === null) take(row.unit.id, number, undefined, brand);
       // A pace comes into the box as the row writes it, minutes and seconds (5:30).
-      else if (row.clock) take(row.unit.id, formatClock(row.value, { locale: env.locale }));
+      else if (row.clock) {
+        take(row.unit.id, formatClock(row.value, { locale: env.locale }), undefined, brand);
+      }
       // A pair comes as its parts, the last to the ten digits a box shows (ADR 0026).
-      else if (row.pair)
-        take(row.unit.id, pairText(row.value, row.pair, env.locale, BOX_PRECISION));
-      else take(row.unit.id, formatNumber(row.value, { locale: env.locale }));
+      else if (row.pair) {
+        take(
+          row.unit.id,
+          pairText(row.value, row.pair, env.locale, BOX_PRECISION),
+          undefined,
+          brand,
+        );
+      } else take(row.unit.id, formatNumber(row.value, { locale: env.locale }), undefined, brand);
     }
   };
 
@@ -1086,9 +1136,15 @@ export function TableLayout({
       case 'Backspace':
         // On an empty field, Backspace takes the last pill out, as its × does: the ingredient,
         // then the unit.
-        if ((box.ingredient || box.unit) && event.currentTarget.value === '') {
+        if ((box.ingredient || box.brand || box.unit) && event.currentTarget.value === '') {
           event.preventDefault();
-          dispatch(box.ingredient ? { type: 'removeIngredient' } : { type: 'unlock' });
+          dispatch(
+            box.ingredient
+              ? { type: 'removeIngredient' }
+              : box.brand
+                ? { type: 'removeBrand' }
+                : { type: 'unlock' },
+          );
           setPosition(null);
         }
         return;
@@ -1280,7 +1336,7 @@ export function TableLayout({
               // cursor on the one in the box, and closes them again (a trial, Sean, 2026-10-16); the
               // caret goes into the field after a click, not a tap, as the chip's does. Its × takes
               // the ingredient out, leaving a weight or a volume (ADR 0021).
-              ingredientOpen={choosing}
+              ingredientOpen={choosing && box.ingredient !== null}
               onIngredientOpen={() => {
                 const current = box.ingredient?.id ?? null;
                 if (choosing || !current) setChoosingFor(null);
@@ -1296,6 +1352,29 @@ export function TableLayout({
               }}
               onIngredientRemove={() => {
                 dispatch({ type: 'removeIngredient' });
+                setPosition(null);
+                if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+              }}
+              // The brand's pill (ADR 0028): its body opens every brand in the table's place, the
+              // cursor on the one in the box, as the ingredient's does; its × takes the brand
+              // out, the scale staying with ISO's chart answering.
+              brand={box.brand}
+              brandOpen={choosing && box.brand !== null}
+              onBrandOpen={() => {
+                const current = box.brand?.id ?? null;
+                if (choosing || !current) setChoosingFor(null);
+                else {
+                  holdScroll.current = true;
+                  setChoosingFor(current);
+                  setCursor({
+                    view: 'matches',
+                    position: shoeBrands.findIndex((each) => each.id === current),
+                  });
+                }
+                if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
+              }}
+              onBrandRemove={() => {
+                dispatch({ type: 'removeBrand' });
                 setPosition(null);
                 if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
               }}

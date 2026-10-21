@@ -54,6 +54,36 @@ export {
   MEASURED_CUPS,
 } from './cooking';
 export type { CupBasis, IngredientMatch } from './cooking';
+export {
+  shoeBrands,
+  getShoeBrand,
+  matchShoeBrands,
+  splitShoeBrand,
+  brandChart,
+  brandCell,
+  brandRowAt,
+  brandRowNear,
+  brandSpan,
+  readBrand,
+  brandScale,
+  brandsAtFoot,
+  isBrandScale,
+  BRAND_SCALES,
+  BRAND_DEFAULT_SCALE,
+} from './shoe-brands';
+export type {
+  ShoeBrand,
+  BrandChart,
+  BrandChartRow,
+  BrandLine,
+  LengthBasis,
+  BrandScale,
+  BrandMatch,
+  BrandCell,
+  BrandReading,
+  ScaleReading,
+  BrandRowReading,
+} from './shoe-brands';
 export type { FormatOptions } from './format';
 export {
   formatFraction,

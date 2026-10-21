@@ -1,4 +1,4 @@
-import type { Ingredient, ParsedInput, Unit } from '@bigsmall/core';
+import type { Ingredient, ParsedInput, ShoeBrand, Unit } from '@bigsmall/core';
 import {
   useId,
   useLayoutEffect,
@@ -63,6 +63,14 @@ interface ValueFieldProps {
   onIngredientOpen?: () => void;
   /** The ingredient's × was clicked or tapped. */
   onIngredientRemove?: () => void;
+  /** The brand beside the unit, Shoe size's second pill (ADR 0028), never beside an ingredient. */
+  brand?: ShoeBrand | null;
+  /** Whether the brand's pill holds every brand open in the table's place. */
+  brandOpen?: boolean;
+  /** The brand's pill was clicked or tapped. */
+  onBrandOpen?: () => void;
+  /** The brand's × was clicked or tapped. */
+  onBrandRemove?: () => void;
 }
 
 /**
@@ -125,11 +133,15 @@ export function ValueField({
   ingredientOpen = false,
   onIngredientOpen,
   onIngredientRemove,
+  brand = null,
+  brandOpen = false,
+  onBrandOpen,
+  onBrandRemove,
 }: ValueFieldProps) {
   const rowRef = useRef<HTMLDivElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
   const chipNameRef = useRef<HTMLSpanElement>(null);
-  /** The ingredient's name, which the unit chip's name gives way to where it would be cut short. */
+  /** The second pill's name (an ingredient's or a brand's), which the unit chip's name gives way to where it would be cut short. */
   const ingredientNameRef = useRef<HTMLSpanElement>(null);
   /** No name to measure: with Symbol only the chip never shows one, so the number has its room. */
   const noName = useRef<HTMLSpanElement>(null);
@@ -227,21 +239,34 @@ export function ValueField({
               onRemove={onChipRemove}
             />
           );
-          if (!ingredient) return unitChip;
-          // Cooking's second pill, after the unit's, each removable (ADR 0021); the two wrap as
-          // one, the ingredient's name cut short only where their own line is too narrow.
+          if (!ingredient && !brand) return unitChip;
+          // The second pill, after the unit's, each removable: Cooking's ingredient (ADR 0021) or
+          // Shoe size's brand (ADR 0028); the two wrap as one, the second's name cut short only
+          // where their own line is too narrow.
           return (
             <div className={PILLS}>
               {unitChip}
-              <UnitChip
-                ingredient={ingredient}
-                expanded={ingredientOpen}
-                compact={fit.gaveWay > 1}
-                nameRef={ingredientNameRef}
-                chevronRef={chevronRef}
-                onOpen={onIngredientOpen ?? onChipOpen}
-                onRemove={onIngredientRemove ?? onChipRemove}
-              />
+              {ingredient ? (
+                <UnitChip
+                  ingredient={ingredient}
+                  expanded={ingredientOpen}
+                  compact={fit.gaveWay > 1}
+                  nameRef={ingredientNameRef}
+                  chevronRef={chevronRef}
+                  onOpen={onIngredientOpen ?? onChipOpen}
+                  onRemove={onIngredientRemove ?? onChipRemove}
+                />
+              ) : brand ? (
+                <UnitChip
+                  brand={brand}
+                  expanded={brandOpen}
+                  compact={fit.gaveWay > 1}
+                  nameRef={ingredientNameRef}
+                  chevronRef={chevronRef}
+                  onOpen={onBrandOpen ?? onChipOpen}
+                  onRemove={onBrandRemove ?? onChipRemove}
+                />
+              ) : null}
             </div>
           );
         })()}

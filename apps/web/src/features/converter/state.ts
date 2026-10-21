@@ -1,4 +1,9 @@
 import {
+  BRAND_DEFAULT_SCALE,
+  BRAND_SCALES,
+  brandCell,
+  brandChart,
+  brandsAtFoot,
   clockUnits,
   convert,
   convertChange,
@@ -12,27 +17,37 @@ import {
   fromBase,
   getCategory,
   getIngredient,
+  getShoeBrand,
   getUnit,
   INGREDIENT_KINDS,
   ingredients,
+  isBrandScale,
   leadingTarget,
   matchIngredients,
+  matchShoeBrands,
   NBSP,
   pairParts,
   pairsOpenedBy,
   parse,
+  readBrand,
   resolveExact,
   roundToStep,
   search,
+  shoeBrands,
   splitIngredient,
+  splitShoeBrand,
   toBase,
   unitListGroup,
+  type BrandChart,
+  type BrandReading,
+  type BrandRowReading,
   type Category,
   type CategoryId,
   type Ingredient,
   type ListGroup,
   type ParsedInput,
   type Separators,
+  type ShoeBrand,
   type Unit,
   type UnitPreference,
 } from '@bigsmall/core';
@@ -77,6 +92,12 @@ export interface ConverterState {
    */
   ingredient: string | null;
   /**
+   * The brand in the box, by id, beside its shoe scale (ADR 0028): with one, the scale rows are
+   * its own chart's and every brand's row reads its chart at the same foot. Null outside Shoe
+   * size.
+   */
+  brand: string | null;
+  /**
    * The calculator's scratch entry. It lives here, outside the conversion, so one history holds
    * everything: undo goes from a send back into the arithmetic that produced it.
    */
@@ -87,7 +108,7 @@ export interface ConverterState {
 type TextTarget = 'box' | 'calc';
 
 /** The part of the state a URL or a later persistence layer restores, through the `hydrate` action. */
-export type Restorable = Partial<Pick<ConverterState, 'text' | 'unit' | 'ingredient'>>;
+export type Restorable = Partial<Pick<ConverterState, 'text' | 'unit' | 'ingredient' | 'brand'>>;
 
 export const EMPTY_CALC: CalculatorState = { text: '', fresh: false };
 
@@ -96,11 +117,15 @@ export const initialState: ConverterState = {
   unit: null,
   category: null,
   ingredient: null,
+  brand: null,
   calc: EMPTY_CALC,
 };
 
 /** The categories Cooking looks over (ADR 0021): a unit of these keeps the box's ingredient. */
 const COOKING_OVER: ReadonlySet<CategoryId> = new Set(getCategory('cooking')?.over ?? []);
+
+/** A brand stays in the box beside a shoe scale alone (ADR 0028). */
+const SHOE: CategoryId = 'shoe-size';
 
 export type Action =
   /** A keystroke or paste in the box. `at` is a monotonic time in ms; only gaps between inputs matter. */
@@ -115,7 +140,7 @@ export type Action =
    * A unit taken into the box, from a row or a match: the unit, and the box's new text (the row's
    * value, or the number as typed); with the ingredient a match brought ("2 cups flour"), by id.
    */
-  | { type: 'use'; unit: string; text: string; ingredient?: string | null }
+  | { type: 'use'; unit: string; text: string; ingredient?: string | null; brand?: string | null }
   /**
    * An ingredient taken into the box (a match, or a choice in Cooking's list): Cooking, the box
    * keeping a weight or a volume, and its new text, the number as typed.
@@ -123,6 +148,13 @@ export type Action =
   | { type: 'useIngredient'; ingredient: string; text: string }
   /** The ingredient taken out (its pill's ×, Backspace): a weight or a volume stays, in its own category. */
   | { type: 'removeIngredient' }
+  /**
+   * A brand taken into the box (a match, a brand's row, or a choice in the brands' list; ADR
+   * 0028): Shoe size, the box keeping a shoe scale, and its new text, the number as typed.
+   */
+  | { type: 'useBrand'; brand: string; text: string }
+  /** The brand taken out (its pill's ×, Backspace, ISO's row): the scale stays, ISO's chart answering. */
+  | { type: 'removeBrand' }
   /**
    * A category chosen (its menu, a start tile, or a category match): the box keeps its number and
    * drops any query, and keeps its unit only if it is of that category, so a typed number is never
@@ -148,14 +180,36 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       const ingredient =
         unit.ingredient ?? (action.ingredient === undefined ? state.ingredient : action.ingredient);
       const cooks = ingredient !== null && COOKING_OVER.has(unit.category);
+      // A shoe scale keeps the box's brand, or takes the one its match or row came with (null
+      // from ISO's row); any other unit leaves the brand behind (ADR 0028).
+      const brand = action.brand === undefined ? state.brand : action.brand;
       return {
         ...state,
         text: action.text,
         unit: unit.id,
         ingredient: cooks ? ingredient : null,
+        brand: unit.category === SHOE && brand && getShoeBrand(brand) ? brand : null,
         category: cooks ? 'cooking' : unit.category,
       };
     }
+
+    case 'useBrand': {
+      if (!getShoeBrand(action.brand)) return state;
+      const unit = state.unit ? getUnit(state.unit) : undefined;
+      // The box keeps a shoe scale; a unit of another category goes.
+      const keeps = unit !== undefined && unit.category === SHOE;
+      return {
+        ...state,
+        text: action.text,
+        brand: action.brand,
+        unit: keeps ? state.unit : null,
+        ingredient: null,
+        category: SHOE,
+      };
+    }
+
+    case 'removeBrand':
+      return { ...state, brand: null };
 
     case 'useIngredient': {
       if (!getIngredient(action.ingredient)) return state;
@@ -196,8 +250,9 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
         text: parse(state.text).valueText ?? '',
         unit: fits ? state.unit : null,
         category: action.category,
-        // Cooking keeps its ingredient; any other category leaves it.
+        // Cooking keeps its ingredient, Shoe size its brand; any other category leaves them.
         ingredient: action.category === 'cooking' ? state.ingredient : null,
+        brand: action.category === SHOE ? state.brand : null,
       };
     }
 
@@ -213,16 +268,22 @@ export function reduce(state: ConverterState, action: Action): ConverterState {
       return { ...initialState, calc: state.calc };
 
     case 'hydrate': {
-      // A URL holds a unit and an ingredient, not a category: they name it.
+      // A URL holds a unit, an ingredient, or a brand, not a category: they name it.
       const next = { ...state, ...action.state };
       const unit = next.unit ? getUnit(next.unit) : undefined;
       const named = next.ingredient && getIngredient(next.ingredient) ? next.ingredient : null;
       const ingredient = unit?.ingredient ?? named;
       const cooks = ingredient !== null && (!unit || COOKING_OVER.has(unit.category));
+      // A brand needs a shoe scale, or no unit yet (ADR 0028).
+      const brand =
+        next.brand && getShoeBrand(next.brand) && (!unit || unit.category === SHOE)
+          ? next.brand
+          : null;
       return {
         ...next,
         ingredient: cooks ? ingredient : null,
-        category: cooks ? 'cooking' : (unit?.category ?? null),
+        brand,
+        category: cooks ? 'cooking' : (unit?.category ?? (brand ? SHOE : null)),
       };
     }
   }
@@ -244,6 +305,8 @@ export interface BoxView {
   unit: Unit | null;
   /** The ingredient beside the unit, Cooking's second pill (ADR 0021). */
   ingredient: Ingredient | null;
+  /** The brand beside the unit, Shoe size's second pill (ADR 0028). */
+  brand: ShoeBrand | null;
   parsed: ParsedInput;
 }
 
@@ -252,6 +315,7 @@ export function selectBox(state: ConverterState, options: NumberEnv): BoxView {
     text: state.text,
     unit: state.unit ? (getUnit(state.unit) ?? null) : null,
     ingredient: state.ingredient ? (getIngredient(state.ingredient) ?? null) : null,
+    brand: state.brand ? (getShoeBrand(state.brand) ?? null) : null,
     parsed: parse(state.text, options.separators),
   };
 }
@@ -366,6 +430,19 @@ export interface TableRow {
    * then split (core's formatPair), whatever Display's places or fractions, and copies as it shows.
    */
   pair?: Unit | undefined;
+  /**
+   * A brand's row under the table (ADR 0028): the brand, by id, with the line of the chart read,
+   * taking the row bringing the brand with its size. The row's unit is the scale the size is
+   * written on.
+   */
+  brand?: { id: string; line: BrandChart['line'] } | undefined;
+  /** Words after the name, in the muted ink: a brand row's line and the foot its chart gives, or why it has no size. */
+  detail?: string | undefined;
+  /**
+   * The brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
+   * stands whatever Display's places or fractions, written across the value's columns.
+   */
+  printed?: true | undefined;
 }
 
 /** A match while a unit is typed: a unit, or a category whose name matched, to open. */
@@ -384,6 +461,22 @@ type MatchRow =
       unit: Unit | null;
       category: Category;
       inBox: boolean;
+      group?: string;
+    }
+  /**
+   * A brand, under Shoe size (ADR 0028), with the scale typed beside it when there was one ("nike
+   * women 8": US women; a bare size, US men's), which taking it brings too, and the number the
+   * query carried after the brand ("nike 10": "10"), or none, the box's own; the target a split
+   * read after it ("nike 10 to eu"); in the brands' list, under their one heading (`group`).
+   */
+  | {
+      kind: 'brand';
+      brand: ShoeBrand;
+      unit: Unit | null;
+      category: Category;
+      inBox: boolean;
+      text?: string | undefined;
+      target?: string | undefined;
       group?: string;
     };
 
@@ -481,6 +574,7 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   const parsed = parse(state.text, options.separators);
   const unit = state.unit ? (getUnit(state.unit) ?? null) : null;
   const ingredient = state.ingredient ? (getIngredient(state.ingredient) ?? null) : null;
+  const brand = state.brand ? (getShoeBrand(state.brand) ?? null) : null;
   // Cooking looks over the unit's own category.
   const category = state.category === 'cooking' ? 'cooking' : (unit?.category ?? state.category);
   const base = {
@@ -494,7 +588,7 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
   if (pair && pair.id !== unit?.id) {
     const typed = parsed.query ?? '';
     const rest: MatchesView = typed
-      ? selectMatches(base, typed, unit, category, options)
+      ? selectMatches(base, typed, unit, category, options, parsed.valueText)
       : {
           ...base,
           kind: 'matches',
@@ -521,7 +615,7 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       : [];
   if (opened.length > 0) {
     return withPairsAfter(
-      selectMatches(base, parsed.query ?? '', unit, category, options),
+      selectMatches(base, parsed.query ?? '', unit, category, options, parsed.valueText),
       opened,
       options,
     );
@@ -533,15 +627,21 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       ? leadingTarget(parsed.query)
       : null;
   if (typed !== null && category && category !== 'cooking') {
-    return selectUnits(base, category, unit, parsed, options, typed);
+    return category === SHOE
+      ? selectShoe(base, unit, parsed, options, brand, typed)
+      : selectUnits(base, category, unit, parsed, options, typed);
   }
-  if (typingUnit(parsed)) return selectMatches(base, parsed.query ?? '', unit, category, options);
+  if (typingUnit(parsed)) {
+    return selectMatches(base, parsed.query ?? '', unit, category, options, parsed.valueText);
+  }
   if (!category) return { ...base, kind: 'start', announcement: null };
   if (category === 'cooking') {
     return ingredient
       ? selectCooking(base, ingredient, unit, parsed, options)
       : ingredientList(base);
   }
+  // Shoe size with or without a brand (ADR 0028): the brands' rows under the scales either way.
+  if (category === SHOE) return selectShoe(base, unit, parsed, options, brand);
   return selectUnits(base, category, unit, parsed, options);
 }
 
@@ -922,6 +1022,417 @@ function selectUnits(
   };
 }
 
+// ---------------------------------------------------------------------------
+// Shoe size with a brand (ADR 0028; docs/research/shoe-sizes-2.md): the brand's own chart answers
+// the scale rows, and every brand's row reads its chart at the same foot.
+
+/** The brands' one heading, in the list their pill opens. */
+const BRANDS_HEADING = 'Brands';
+
+/** Why a brand's row has no size, after its name. */
+const WHY: Record<NonNullable<BrandRowReading['why']>, string> = {
+  'no-length': 'no foot length',
+  'no-scale': 'prints no such scale',
+  'off-chart': 'off its chart',
+};
+
+/**
+ * Every brand, to choose from, under one heading: the list the brand's pill opens (ADR 0028), the
+ * one in the box marked as a unit in the box is, as Cooking's ingredients are listed.
+ */
+export function brandList(base: ViewBase, current: ShoeBrand | null = null): MatchesView {
+  const shoe = getCategory(SHOE);
+  const rows: MatchRow[] = shoe
+    ? shoeBrands.map((brand) => ({
+        kind: 'brand',
+        brand,
+        unit: null,
+        category: shoe,
+        inBox: brand.id === current?.id,
+        group: BRANDS_HEADING,
+      }))
+    : [];
+  return {
+    ...base,
+    kind: 'matches',
+    category: SHOE,
+    query: '',
+    rows,
+    counts: { [SHOE]: rows.length },
+    hidden: [],
+    announcement: `${rows.length} brands to choose from`,
+  };
+}
+
+/**
+ * The shoe scale some words name ("women", "eu", "cm", "m"): exactly, else the best match from
+ * the start of a key; null where they name none.
+ */
+function shoeUnit(text: string, options: TableOptions): Unit | null {
+  const exact = resolveExact(text, { system: options.system, category: SHOE });
+  if (exact) return exact;
+  const best = search(text, { system: options.system, category: SHOE, limit: 1 }).results[0];
+  return best?.kind === 'unit' && best.matchClass <= 3 ? best.unit : null;
+}
+
+/**
+ * The brands a typed query offers, under Shoe size (ADR 0028): first the one it names at either
+ * end, with the scale typed beside it ("nike women 8": US women; "eu 43 new balance": European;
+ * "nike 10", a bare size, US men's, as a bare "us" is men's, unless the box already holds a shoe
+ * scale, which stays) and the number the rest carried, then those whose names match. `first` when
+ * the group leads: the query names a brand, the converter is in Shoe size, or a brand matches
+ * better than any unit. A shorthand key ("on", "nb") counts only where the category is named: in
+ * Shoe size, or beside a scale ("nb eu 43").
+ */
+function brandMatches(
+  query: string,
+  typed: string | undefined,
+  inBox: Unit | null,
+  current: CategoryId | null,
+  bestUnit: number | undefined,
+  options: TableOptions,
+): { rows: MatchRow[]; first: boolean } {
+  const shoe = getCategory(SHOE);
+  if (!shoe) return { rows: [], first: false };
+  const named = current === SHOE;
+  const rows: MatchRow[] = [];
+  /** The split, and what its rest says: the number it carried, the scale, a target. */
+  const read = (split: ReturnType<typeof splitShoeBrand>) => {
+    if (!split) return null;
+    let text = typed;
+    let rest = split.rest;
+    let target: string | undefined;
+    if (rest) {
+      const parsed = parse(rest, options.separators);
+      if (parsed.value !== undefined) {
+        text = parsed.valueText ?? text;
+        rest = parsed.query ?? '';
+      }
+    }
+    const lead = rest ? leadingTarget(rest) : null;
+    if (lead !== null) {
+      target = lead;
+      rest = '';
+    }
+    const kept = inBox !== null && inBox.category === SHOE;
+    const unit =
+      rest === ''
+        ? kept || text === undefined
+          ? null
+          : (getUnit(BRAND_DEFAULT_SCALE) ?? null)
+        : shoeUnit(rest, options);
+    if (rest !== '' && !unit) return null;
+    // Whether the words named a scale themselves, rather than the bare size's default.
+    return { brand: split.brand, unit, text, target, scaled: rest !== '' };
+  };
+  let split = read(splitShoeBrand(query, named));
+  // A shorthand key beside a scale names the category ("nb eu 43"), as a query's target does.
+  if (!split && !named) {
+    const byScale = read(splitShoeBrand(query, true));
+    if (byScale?.scaled && byScale.brand.shorthand?.length) split = byScale;
+  }
+  if (split) {
+    rows.push({
+      kind: 'brand',
+      brand: split.brand,
+      unit: split.unit,
+      category: shoe,
+      inBox: false,
+      text: split.text,
+      target: split.target,
+    });
+  }
+  const matched = matchShoeBrands(query, named);
+  for (const match of matched) {
+    if (rows.some((row) => row.kind === 'brand' && row.brand.id === match.brand.id)) continue;
+    rows.push({ kind: 'brand', brand: match.brand, unit: null, category: shoe, inBox: false });
+  }
+  const best = split ? 0 : (matched[0]?.matchClass ?? Infinity);
+  return { rows, first: named || best < (bestUnit ?? Infinity) };
+}
+
+/** A size written as the table writes one, for the locale. */
+function sizeOf(size: number, locale: string | undefined): string {
+  return formatNumber(size, { precision: TABLE_PRECISION, locale });
+}
+
+/**
+ * A size as a brand prints it (ADR 0028, as printed): a range's two ends ("9–9.5"), a third
+ * ("44 2/3"), each standing whatever the display, else the size, which the display writes.
+ */
+function asPrinted(
+  value: number,
+  range: readonly [number, number] | undefined,
+  locale: string | undefined,
+): { text: string; printed: boolean } {
+  if (range) {
+    return { text: `${sizeOf(range[0], locale)}–${sizeOf(range[1], locale)}`, printed: true };
+  }
+  const halves = value * 2;
+  if (Math.abs(halves - Math.round(halves)) < 1e-9)
+    return { text: sizeOf(value, locale), printed: false };
+  const whole = Math.floor(value);
+  const part = value - whole;
+  const third =
+    Math.abs(part - 1 / 3) < 0.02 ? '1/3' : Math.abs(part - 2 / 3) < 0.02 ? '2/3' : null;
+  return {
+    text: third ? `${sizeOf(whole, locale)}${NBSP}${third}` : sizeOf(value, locale),
+    printed: true,
+  };
+}
+
+/** A row holding a brand's cell as printed: a size on a scale, as the brand prints it. */
+function brandCellRow(
+  target: Unit,
+  from: Unit | null,
+  value: number,
+  range: readonly [number, number] | undefined,
+  approx: boolean,
+  locale: string | undefined,
+): TableRow {
+  const { text, printed } = asPrinted(value, range, locale);
+  return {
+    ...emptyRow(target, from),
+    name: unitName(target, value),
+    value,
+    text,
+    tone: 'value',
+    approx,
+    stepped: !printed,
+    inBox: false,
+    ...(printed ? { printed: true as const } : {}),
+  };
+}
+
+/**
+ * A scale row with a brand's size in the box (ADR 0028): ISO's rule from the foot the brand's
+ * chart gives for that size, none the box's own, since the brand's row is the one value in focus
+ * (Sean, 2026-10-20); a dash where there is no foot to read from.
+ */
+function fromFoot(row: TableRow, foot: number | null, locale: string | undefined): TableRow {
+  const mondopoint = getUnit('mondopoint');
+  if (foot === null || !mondopoint) return emptyRow(row.unit, null);
+  return { ...valueRow(row.unit, mondopoint, foot, locale), inBox: false };
+}
+
+/** Every row of a view through one function, its sections and hidden rows too. */
+function remapRows(view: UnitsView, map: (row: TableRow) => TableRow): UnitsView {
+  const sections = view.sections.map((section) => ({
+    ...section,
+    rows: section.rows.map(map),
+  }));
+  return {
+    ...view,
+    all: view.all.map(map),
+    rows: sections.flatMap((section) => section.rows),
+    sections,
+    hidden: view.hidden.map((section) => ({ ...section, rows: section.rows.map(map) })),
+  };
+}
+
+const LINE_WORD: Record<BrandChart['line'], string> = {
+  men: 'men’s',
+  women: 'women’s',
+  unisex: '',
+};
+
+/** A brand row's words after its name: the chart's line and the foot it gives ("men’s · 27 cm"). */
+function detailOf(
+  line: BrandChart['line'],
+  foot: number | null,
+  locale: string | undefined,
+): string {
+  const words = [LINE_WORD[line]];
+  if (foot !== null) words.push(`${sizeOf(Math.round(foot) / 10, locale)} cm`);
+  return words.filter(Boolean).join(' · ');
+}
+
+/**
+ * The brands' section (ADR 0028): one row per brand, its size on the scale for the foot in the
+ * box, read from its own chart at the nearest row, ≈ where that row's foot is not the foot, as
+ * printed; the brand in the box, with a size typed, as the box's own row, the one row filled, its
+ * size as the chart prints it; a dash with why where a brand has no size. Repeats the scales in
+ * another form, so Edit leaves it.
+ */
+function brandsSection(
+  foot: number | null,
+  scaleUnit: Unit,
+  women: boolean,
+  from: Unit | null,
+  value: number | undefined,
+  baseline: BrandReading | null,
+  locale: string | undefined,
+): Section<TableRow> {
+  const rows: TableRow[] = [];
+  const readings =
+    foot !== null && isBrandScale(scaleUnit.id) ? brandsAtFoot(foot, scaleUnit.id, women) : null;
+  shoeBrands.forEach((brand, index) => {
+    const read = readings?.[index] ?? null;
+    const own =
+      baseline?.brand.id === brand.id && !baseline.length && value !== undefined ? baseline : null;
+    const chart = own?.chart ?? read?.chart ?? brandChart(brand, women);
+    const tag = {
+      id: `brand:${brand.id}`,
+      name: brand.name,
+      brand: { id: brand.id, line: chart.line },
+    };
+    if (own && value !== undefined) {
+      const cell =
+        own.row && isBrandScale(scaleUnit.id) ? brandCell(own.row, scaleUnit.id, own.women) : null;
+      rows.push({
+        ...brandCellRow(scaleUnit, from, value, cell?.range, false, locale),
+        ...tag,
+        detail: detailOf(chart.line, own.row?.foot ?? null, locale),
+        inBox: true,
+      });
+      return;
+    }
+    if (!read || read.value === null) {
+      const why = read?.why ? WHY[read.why] : null;
+      rows.push({
+        ...emptyRow(scaleUnit, from),
+        ...tag,
+        inBox: false,
+        detail: [LINE_WORD[chart.line], why].filter(Boolean).join(' · '),
+      });
+      return;
+    }
+    rows.push({
+      ...brandCellRow(scaleUnit, from, read.value, read.range, read.approx, locale),
+      ...tag,
+      detail: detailOf(chart.line, read.foot, locale),
+    });
+  });
+  return {
+    key: 'brands',
+    label: `${SECTION_LABEL.brands}, the same foot in ${scaleUnit.symbol}`,
+    rows,
+    repeats: true,
+  };
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** "Oct 2026" from an ISO date. */
+function monthYear(iso: string): string {
+  const [year, month] = iso.split('-');
+  return `${MONTHS[Number(month) - 1] ?? month} ${year}`;
+}
+
+/** A name's possessive: "Nike’s", "Crocs’". */
+function poss(name: string): string {
+  return name + (/s$/.test(name) ? '’' : '’s');
+}
+
+/**
+ * The line under the table with a brand in the box (ADR 0028): whose chart, where, and when; the
+ * fact its numbers cannot show; where the size is off its chart, its span; where the brand gives
+ * no foot length, how its size is read and what it prints for it. Never fit advice, which the
+ * brands' rows show (Sean, 2026-10-20).
+ */
+function brandNote(
+  brand: ShoeBrand,
+  reading: BrandReading | null,
+  unit: Unit | null,
+  value: number | undefined,
+  labelled: boolean,
+  locale: string | undefined,
+): string {
+  const chart = reading?.chart ?? brandChart(brand, false);
+  const line = chart.line === 'unisex' ? '' : `, the ${LINE_WORD[chart.line]}`;
+  const lines = [
+    `${poss(brand.name)} size chart${line}, ${brand.site}, read ${monthYear(chart.read)}.`,
+  ];
+  if (brand.fact) lines.push(brand.fact);
+  const { name } = brand;
+  if (reading && unit && value !== undefined) {
+    const size = sizeOf(value, locale);
+    if (reading.beyond) {
+      const [low, high] = reading.beyond;
+      const adj = LINE_WORD[chart.line] ? `${LINE_WORD[chart.line]} ` : '';
+      lines.push(
+        `${poss(name)} ${adj}chart runs ${unit.symbol} ${sizeOf(low, locale)} to ${sizeOf(high, locale)}.`,
+      );
+    } else if (!reading.length && !reading.row) {
+      lines.push(`${poss(name)} chart prints no ${unit.plural}.`);
+    } else if (labelled && reading.row) {
+      const row = reading.row;
+      const cells = BRAND_SCALES.filter((scale) => scale !== unit.id).flatMap((scale) => {
+        const cell = brandCell(row, scale, reading.women);
+        const scaleUnit = getUnit(scale);
+        return cell && scaleUnit
+          ? [`${scaleUnit.symbol} ${asPrinted(cell.value, cell.range, locale).text}`]
+          : [];
+      });
+      lines.push(
+        `${name} gives no foot length, so its ${size} is read as ISO’s ${unit.name} ${size}${cells.length ? `; it prints ${cells.join(', ')} for it` : ''}.`,
+      );
+    } else if (reading.length && chart.basis !== 'foot') {
+      lines.push(`${name} gives no foot length, so it has no size for a measured foot.`);
+    }
+  }
+  return lines.join(' ');
+}
+
+/**
+ * Shoe size (ADR 0027, ADR 0028): ISO's scales as every category's rows, and under them one row
+ * per brand at the same foot. One value is in focus (Sean, 2026-10-20): a size on ISO's scales,
+ * or a brand's size, whose row is then the box's own and whose chart gives the foot the scale rows
+ * and the other brands convert from; a brand with no foot length has its size read as ISO's label,
+ * said in the line under the table.
+ */
+function selectShoe(
+  shared: ViewBase,
+  unit: Unit | null,
+  parsed: ParsedInput,
+  options: TableOptions,
+  brand: ShoeBrand | null,
+  target?: string,
+): UnitsView {
+  const view = selectUnits(shared, SHOE, unit, parsed, options, target);
+  if (view.message !== null) return view;
+  const value = unit ? parsed.value : undefined;
+  const women = unit?.id === 'us-women';
+  // The scale the brands' rows are written on: the box's, or US men's for a length (women's with
+  // a women's size).
+  const scaleUnit = getUnit(
+    unit && isBrandScale(unit.id) ? unit.id : women ? 'us-women' : BRAND_DEFAULT_SCALE,
+  );
+  if (!scaleUnit) return view;
+  const reading = brand && unit && value !== undefined ? readBrand(brand, unit, value) : null;
+  // A brand with no foot length: its size read as ISO's label on the same scale.
+  const labelled =
+    reading !== null && !reading.length && reading.row !== null && reading.foot === null;
+  // The foot everything converts from: the brand's chart's for the size in the box, ISO's rule's
+  // for a size on its scales or a labelled brand's, the length typed; none while the rows wait or
+  // a size is off its chart.
+  let foot: number | null = null;
+  if (reading) {
+    foot = reading.foot ?? (labelled && unit && value !== undefined ? baseOf(unit, value) : null);
+  } else if (unit && value !== undefined && !beyondOwnScale(unit, value)) {
+    foot = baseOf(unit, value);
+  }
+  // With a brand's size in the box, the scale rows are ISO's from its foot and none the box's own.
+  const read =
+    reading && !reading.length
+      ? remapRows(view, (row) => fromFoot(row, foot, options.locale))
+      : view;
+  const section = brandsSection(foot, scaleUnit, women, unit, value, reading, options.locale);
+  const note = brand ? brandNote(brand, reading, unit, value, labelled, options.locale) : view.note;
+  const announcement =
+    brand && unit && value !== undefined
+      ? `${spokenAmount(parsed, unit, options.locale)} at ${brand.name} in ${read.rows.length} units of shoe size`
+      : view.announcement;
+  return {
+    ...read,
+    rows: [...read.rows, ...section.rows],
+    sections: [...read.sections, section],
+    all: [...read.all, ...section.rows],
+    note,
+    announcement,
+  };
+}
+
 /**
  * A scale's row in the change section: the box's number as a change in it, its id the scale's
  * with "-change", so it is a row of its own (copied, pointed at) while taking it brings the scale.
@@ -1119,6 +1630,7 @@ function selectMatches(
   unit: Unit | null,
   current: CategoryId | null,
   options: TableOptions,
+  typed?: string,
 ): MatchesView {
   // Every result, not the shown list's limit, so a hidden unit ranked past it is still offered
   // apart: the shown and the hidden each keep to the limit.
@@ -1143,6 +1655,11 @@ function selectMatches(
   const cooked = ingredientMatches(query, current, results[0]?.matchClass, options);
   if (cooked.first) ranked.unshift(...cooked.rows);
   else ranked.push(...cooked.rows);
+  // Brands under Shoe size (ADR 0028): one the query names at either end first, with the scale
+  // typed beside it ("nike women 8", "eu 43 new balance"), then those whose names match.
+  const branded = brandMatches(query, typed, unit, current, results[0]?.matchClass, options);
+  if (branded.first) ranked.unshift(...branded.rows);
+  else ranked.push(...branded.rows);
   const order: CategoryId[] = [];
   for (const row of ranked) if (!order.includes(row.category.id)) order.push(row.category.id);
   const rows = order.flatMap((id) => [
@@ -1355,6 +1872,7 @@ function sameState(a: ConverterState, b: ConverterState): boolean {
     a.unit === b.unit &&
     a.category === b.category &&
     a.ingredient === b.ingredient &&
+    a.brand === b.brand &&
     a.calc.text === b.calc.text &&
     a.calc.fresh === b.calc.fresh
   );
@@ -1458,6 +1976,8 @@ export function reduceWithHistory(history: History, action: HistoryAction): Hist
     case 'use':
     case 'useIngredient':
     case 'removeIngredient':
+    case 'useBrand':
+    case 'removeBrand':
     case 'chooseCategory':
     case 'unlock':
     case 'clear':

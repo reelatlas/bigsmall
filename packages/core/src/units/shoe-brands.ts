@@ -1,0 +1,84 @@
+import { BRAND_CHARTS, type BrandChart } from './shoe-brands-data';
+
+/**
+ * A shoe brand whose own size chart the converter carries beside ISO's rule (ADR 0028;
+ * docs/research/shoe-sizes-2.md): the words are typed here, once; the charts are written from the
+ * research record by `docs/research/shoe-sizes-2/write_brands.py`, every cell as the brand prints
+ * it, and `packages/core/test/shoe-brands.test.ts` holds them to it.
+ */
+export interface ShoeBrand {
+  /** Stable identifier used in URLs. Lowercase, ASCII, kebab-case. */
+  id: string;
+  /** As the brand writes it ("adidas", "Dr. Martens", "HOKA"). */
+  name: string;
+  /** Other names people type ("birks", "chucks", "timbs"). */
+  aliases: readonly string[];
+  /**
+   * Short keys that count only where the category is named, as a unit's `shorthand` does: "on",
+   * "nb", "ua", and "docs" would otherwise read a brand into any query.
+   */
+  shorthand?: readonly string[];
+  /** The site its chart is cited to, in the line under the table ("nike.com"). */
+  site: string;
+  /**
+   * What its chart alone would hide, a fact the numbers cannot show, for the line under the table
+   * (Birkenstock's whole EU sizes, Nike's JP label); never fit advice, which the brands' rows show
+   * (Sean, 2026-10-20).
+   */
+  fact?: string;
+  /**
+   * Its charts as published: a men's and a women's where the brand prints two, since the same
+   * foot maps to a different size on each, or one chart for everyone (docs/research/shoe-sizes-2.md
+   * §5, decision 1).
+   */
+  charts: readonly BrandChart[];
+}
+
+function brand(
+  id: string,
+  name: string,
+  site: string,
+  aliases: readonly string[],
+  extra: { shorthand?: readonly string[]; fact?: string } = {},
+): ShoeBrand {
+  return { id, name, aliases, site, charts: BRAND_CHARTS[id] ?? [], ...extra };
+}
+
+/**
+ * The twenty brands of the first batch, in the order their rows are listed, by name. The name is
+ * a key itself, so an alias never repeats it (the registry's rule for a unit's keys); a shorthand
+ * key may be the name ("On"), which then counts only where the category is named.
+ */
+export const shoeBrands: readonly ShoeBrand[] = [
+  brand('adidas', 'adidas', 'adidas.com', []),
+  brand('asics', 'Asics', 'asics.com', []),
+  brand('birkenstock', 'Birkenstock', 'birkenstock.com', ['birkenstocks', 'birks'], {
+    fact: 'Whole EU sizes: two US half sizes share one.',
+  }),
+  brand('brooks', 'Brooks', 'brooksrunning.com', []),
+  brand('clarks', 'Clarks', 'clarks.com', ['clark'], {
+    fact: 'Its GB and US pages joined on the UK size they share.',
+  }),
+  brand('converse', 'Converse', 'converse.com', ['chucks', 'chuck taylor', 'chuck taylors'], {
+    fact: 'The Chuck Taylor All Star table.',
+  }),
+  brand('crocs', 'Crocs', 'crocs.com', [], { fact: 'Whole sizes; its EU is a pair, 43–44.' }),
+  brand('dr-martens', 'Dr. Martens', 'drmartens.com', ['doc martens', 'doctor martens'], {
+    shorthand: ['docs'],
+    fact: 'Whole sizes, the half sizes US women’s only; the brand says sizes differ between silhouettes.',
+  }),
+  brand('hoka', 'HOKA', 'hoka.com', ['hokas', 'hoka one one']),
+  brand('new-balance', 'New Balance', 'newbalance.com', [], { shorthand: ['nb'] }),
+  brand('nike', 'Nike', 'nike.com', ['nikes']),
+  brand('on', 'On', 'on.com', [], { shorthand: ['on'] }),
+  brand('puma', 'Puma', 'us.puma.com', ['pumas']),
+  brand('reebok', 'Reebok', 'reebok.com', ['reeboks'], {
+    fact: 'Prints US sizes and inches alone, no UK or EU.',
+  }),
+  brand('salomon', 'Salomon', 'salomon.com', []),
+  brand('skechers', 'Skechers', 'skechers.com', ['sketchers']),
+  brand('timberland', 'Timberland', 'timberland.com', ['timberlands', 'timbs']),
+  brand('ugg', 'UGG', 'ugg.com', ['uggs']),
+  brand('under-armour', 'Under Armour', 'underarmour.com', ['under armor'], { shorthand: ['ua'] }),
+  brand('vans', 'Vans', 'vans.com', []),
+];

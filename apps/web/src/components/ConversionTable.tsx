@@ -86,6 +86,19 @@ interface ConversionRow {
    * across the value's columns as a fraction is, and copies as it shows.
    */
   pair?: Unit | undefined;
+  /**
+   * A brand's row (ADR 0028), by the brand's id with the chart's line: its name is the brand's, in the names' column as a pair's is, sized as
+   * if empty and cut short rather than widening the column.
+   */
+  brand?: { id: string; line: string } | undefined;
+  /** Words after the name in the muted ink: a brand row's line and foot, or why it has no size. */
+  detail?: string | undefined;
+  /**
+   * A brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
+   * stands whatever the display's places or fractions, written across the value's columns, and
+   * copies as it shows.
+   */
+  printed?: true | undefined;
 }
 
 /** A section of rows under its name ("US (customary)"). */
@@ -333,6 +346,8 @@ function firstWritten(
 ) {
   const value = row.value;
   if (value === null) return null;
+  // A brand's cell as printed stands as its text (ADR 0028).
+  if (row.printed) return null;
   // A size (ADR 0027) takes no places: its decimal is the row's own text (10.5), and in Fraction
   // its half is written as one (10 1/2), its scale's own step whatever sizes are chosen.
   if (row.stepped) {
@@ -362,7 +377,7 @@ function firstWritten(
 
 /** Both's fraction, after the decimal; a pair's whole, its last part the fraction. */
 function secondWritten(row: ConversionRow, display: TableDisplay, locale: string | undefined) {
-  if (display.format !== 'both' || row.value === null) return null;
+  if (display.format !== 'both' || row.value === null || row.printed) return null;
   if (row.pair) return formatPair(row.value, row.pair, pairOptions(display, locale, 0, true));
   if (row.stepped) return formatFraction(row.value, { sizes: HALVES, rounding: 'nearest', locale });
   return formatFraction(row.value, {
@@ -436,6 +451,18 @@ function valueParts(
         : null;
     const text = end ? `${row.text.slice(0, 1)} ${end.text}` : row.text;
     return fraction ? splitAtFraction(text, false) : splitAtMark(text, mark, false);
+  }
+  // A brand's cell as printed (ADR 0028), a range or a third: its text stands, written across.
+  if (row.printed) {
+    return {
+      across: (
+        <>
+          {row.approx && <span className="text-ink-muted">≈ </span>}
+          <FormattedNumber text={row.text} />
+        </>
+      ),
+      spoken: `${row.approx ? 'about ' : ''}${row.text}`,
+    };
   }
   const written =
     row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
@@ -607,6 +634,8 @@ export function ConversionTable<T extends ConversionRow>({
     const stacked = written ? splitFraction(written) : null;
     const value = parts(row);
     const tone = TONE[row.tone];
+    // A brand's row reacts to the columns the units size, as a pair's does (ADR 0026, ADR 0028).
+    const reacts = row.pair !== undefined || row.brand !== undefined;
     // With Both's fraction under the value, the unit's columns span both lines, centred.
     const tall = stacked !== null && secondHidden && 'row-span-2';
     return (
@@ -691,17 +720,19 @@ export function ConversionTable<T extends ConversionRow>({
           <span
             aria-hidden="true"
             hidden={namesHidden}
-            className={cx(row.pair ? PAIR_NAME_CELL : NAME_CELL, 'col-start-7 text-ink', tall)}
+            className={cx(reacts ? PAIR_NAME_CELL : NAME_CELL, 'col-start-7 text-ink', tall)}
             data-name
-            data-column={row.pair ? undefined : 'name'}
+            data-column={reacts ? undefined : 'name'}
           >
             {row.name}
+            {row.detail && <span className="text-sm text-ink-muted"> · {row.detail}</span>}
           </span>
         ) : (
           <span aria-hidden="true" className={tall || undefined} />
         )}
         <span className="sr-only">
           {row.name}
+          {row.detail && `, ${row.detail}`}
           {row.inBox && ', in the box'}
         </span>
       </>
@@ -792,14 +823,14 @@ export function ConversionTable<T extends ConversionRow>({
       <span className={cx('col-start-6 row-start-1', unitSymbol())}>
         {stack((row) => splitExponent(row.symbol)[1])}
       </span>
-      {/* The single units' names alone: a pair's never sizes the column (PAIR_NAME_CELL). */}
+      {/* The single units' names alone: a pair's or a brand's never sizes the column (PAIR_NAME_CELL). */}
       {withNames && (
         <span
           hidden={namesHidden}
           className={cx(NAME_CELL, 'col-start-7 row-start-1')}
           data-column="name"
         >
-          {stack((row) => (row.pair ? '' : row.name))}
+          {stack((row) => (row.pair || row.brand !== undefined ? '' : row.name))}
         </span>
       )}
     </div>

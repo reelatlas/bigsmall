@@ -1,4 +1,4 @@
-import type { Category, CategoryId, Ingredient, Unit } from '@bigsmall/core';
+import type { Category, CategoryId, Ingredient, ShoeBrand, Unit } from '@bigsmall/core';
 import { useId, useLayoutEffect, useRef } from 'react';
 import { panelKeys } from '../lib/panel-keys';
 import {
@@ -33,17 +33,29 @@ export type UnitMatch =
       category: Category;
       inBox: boolean;
       group?: string | undefined;
+    }
+  /** A brand, under Shoe size, with the scale typed beside it when there was one (ADR 0028). */
+  | {
+      kind: 'brand';
+      brand: ShoeBrand;
+      unit: Unit | null;
+      category: Category;
+      inBox: boolean;
+      group?: string | undefined;
     };
 
 /** The heading a match is listed under: its kind's, where it has one, else its category's. */
 function headingOf(match: UnitMatch): string {
-  return (match.kind === 'ingredient' && match.group) || match.category.name;
+  return (
+    ((match.kind === 'ingredient' || match.kind === 'brand') && match.group) || match.category.name
+  );
 }
 
 /** A match's key among its siblings. */
 function matchKey(match: UnitMatch): string {
   if (match.kind === 'unit') return match.unit.id;
   if (match.kind === 'category') return `#${match.category.id}`;
+  if (match.kind === 'brand') return `brand:${match.brand.id}:${match.unit?.id ?? ''}`;
   return `${match.ingredient.id}:${match.unit?.id ?? ''}`;
 }
 
@@ -243,6 +255,28 @@ export function UnitMatches({
                                   className="font-semibold"
                                 />
                                 <span className="sr-only">, {match.category.name}</span>
+                              </span>
+                            </>
+                          ) : match.kind === 'brand' ? (
+                            // A brand (ADR 0028): its name, matched letters heavier, after the scale
+                            // typed beside it, "US men · Nike"; alone, its name.
+                            <>
+                              <span className={unitSymbol()}>{match.unit?.symbol}</span>
+                              <span className="min-w-0 text-ink">
+                                {match.unit && (
+                                  <span className={unitName(!symbolOnly)}>
+                                    {match.unit.plural} ·{' '}
+                                  </span>
+                                )}
+                                <MatchedText
+                                  text={match.brand.name}
+                                  query={query}
+                                  className="font-semibold"
+                                />
+                                <span className="sr-only">
+                                  , {match.category.name}
+                                  {match.inBox && ', in the box'}
+                                </span>
                               </span>
                             </>
                           ) : (

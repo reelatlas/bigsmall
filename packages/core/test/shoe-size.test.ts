@@ -139,11 +139,12 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
     ).toBeCloseTo(100, 9);
   });
 
-  it('marks every scale in half sizes and Mondopoint in 5 mm, written before its number', () => {
+  it('marks every scale in half sizes, Mondopoint in 5 mm, and the foot in cm to the millimetre, written before its number', () => {
     for (const each of unitsIn('shoe-size')) {
-      expect(each.step, each.id).toBe(each.id === 'mondopoint' ? 5 : 0.5);
+      const step = each.id === 'mondopoint' ? 5 : each.id === 'foot-cm' ? 0.1 : 0.5;
+      expect(each.step, each.id).toBe(step);
       expect(each.prefix, each.id).toBe(true);
-      expect(each.exact, each.id).toBe(each.id === 'mondopoint' || each.id === 'japan');
+      expect(each.exact, each.id).toBe(['mondopoint', 'japan', 'foot-cm'].includes(each.id));
       expect(each.conventional, each.id).toBe(each.exact ? undefined : true);
     }
     expect(roundToStep(9.89, 0.5)).toEqual({ value: 10, approx: true });
@@ -168,6 +169,7 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
       'eu',
       'eu-children',
       'mondopoint',
+      'foot-cm',
       'japan',
     ]);
     expect(ids(search('', { category: 'shoe-size', system: 'imperial' }))[0]).toBe('uk');
@@ -206,7 +208,9 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
       'uk-children',
     ]);
     expect(ids(search('cm'))[0]).toBe('centimeter');
-    expect(ids(search('cm', { prefer: 'shoe-size' }))[0]).toBe('japan');
+    // A typed "cm" in Shoe size is the foot's length, measured (ADR 0028); Japan's label is "JP".
+    expect(ids(search('cm', { prefer: 'shoe-size' }))[0]).toBe('foot-cm');
+    expect(ids(search('jp', { prefer: 'shoe-size' }))[0]).toBe('japan');
     expect(ids(search('mm', { category: 'shoe-size' }))).toEqual(['mondopoint']);
     expect(ids(search('gb'))[0]).toBe('gigabyte');
     // A possessive is typed with or without its apostrophe, and the letters are marked either way;

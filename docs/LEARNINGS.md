@@ -1318,3 +1318,23 @@ Entries are cited by their titles, which stay as written; this index finds them.
 
 **What happened.** The mock of the brand as the second value drew nine fixed scenes, one decision each, and the reply explaining the rethought shape ran long; Sean found the mock confusing and the text unparseable ("I just need to see it in action and then test it around"), and asked whether to prototype or build in production. An interactive prototype on the checked record (`docs/research/shoe-sizes-2/mocks/brand-proto.py`), a box to type into with example inputs and every row a tap, was built and published the same evening, and checked headless first: Playwright from `apps/web/node_modules/@playwright/test` by its absolute path (a script in the scratchpad does not resolve it through `NODE_PATH` under pnpm), typing each case, reading the rows, the note, and the page's errors, and measuring for horizontal overflow at a phone's width.
 **Rule.** For a question of logic (what the box reads, what a row shows, how a tap reacts), the artifact is a prototype on the real data with the product's grammar, not a set of scenes, and the reply is a few lines and the link; the decisions are recorded as proposed and settled after he has played. A static mock still serves a question of look.
+
+## 2026-10-20 — A row that borrows another row's shape borrows its flags: every brand's row read as the box's own
+
+**What happened.** The brands' rows (ADR 0028) were built from `emptyRow(scaleUnit, from)`, which marks a row `inBox` when its unit is the box's; every brand's row on the box's scale was then "in the box", and a tap on New Balance's row only rested the cursor, as a tap on the box's own row does. The unit tests passed, since they asserted `inBox` on the box's own row alone; the browser test found it before the push.
+**Rule.** A row built by spreading another row's builder sets every flag the builder decides from its arguments (`inBox`, `approx`, `stepped`), and a test of a new row kind asserts which rows are the box's own, by listing them, not only that one is.
+
+## 2026-10-20 — A unit's name is a key, so a common word in it is typed into every category
+
+**What happened.** The foot's cm unit was named Foot length (ADR 0028), and `len`, typed for Length, found it inside the name, a second match after the category; the catalog's rule had kept `foot length` out of the aliases for that reason, and the name goes through the same index.
+**Rule.** A new unit's name is checked against the catalog's typed queries (`search.test.ts`'s sweeps, the web's match tests) before it ships; a match it adds after the category is acceptable and pinned, one it adds first is a rename.
+
+## 2026-10-20 — Core's tests read a record as a JSON module, not through node's fs
+
+**What happened.** The test holding core's brand charts to the research record reached for `node:fs`; core's tsconfig keeps `types: []` so nothing of node or the DOM reaches core (ADR 0003), and the test would not typecheck. `resolveJsonModule` is on in the base config, so `import record from '../../../docs/research/shoe-sizes-2/brands.json'` reads it under Vitest and TypeScript alike, cast to the shape the test needs.
+**Rule.** A core test that reads a file in the repo imports it as a module; a path relative to the test file, no `fs`, no `process`.
+
+## 2026-10-20 — The bundle budget counts code loaded on demand, so data belongs outside the bundle
+
+**What happened.** The brands' charts (ADR 0028), 7.1 KB gzipped of data in core, took the converter page from 87.8 to 98.7 KB against a 90 KB budget, and lazy loading would not have helped: `scripts/bundle-size.mjs` follows dynamic imports on purpose, so code loaded on demand counts. The budget was raised to 100 KB with Sean's yes, since the code alone had reached 91.6 KB.
+**Rule.** A dataset that grows (brand charts, apparel's) ships as a fetched JSON file, not as code in core's bundle, so the budget measures code and stays flat as the data doubles; the move is queued before the second batch of brands. A budget is a guard against unnoticed growth: when it trips, bring the numbers and the choice to Sean, never raise it quietly.

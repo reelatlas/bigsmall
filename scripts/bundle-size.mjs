@@ -6,7 +6,9 @@ import { gzipSync } from 'node:zlib';
 
 const DIST = join('apps', 'web', 'dist');
 const PAGE = 'index.html';
-const BUDGET_JS = 90 * 1024;
+// 90 KB until 2026-10-20: the brands' charts (ADR 0028), 7.1 KB of data, took the page over it; raised with
+// Sean's yes, the charts to move out of the bundle into a fetched JSON file before the second batch of brands.
+const BUDGET_JS = 100 * 1024;
 const BUDGET_CSS = 20 * 1024;
 
 const html = readFileSync(join(DIST, PAGE), 'utf8');

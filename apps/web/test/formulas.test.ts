@@ -1,4 +1,4 @@
-import { ingredients, units } from '@bigsmall/core';
+import { ingredients, shoeBrands, units } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import { formulaGroups, writtenFactor } from '../src/features/formulas/formulas';
 
@@ -7,7 +7,9 @@ describe('formulas', () => {
   const formula = (id: string) => lines.find((line) => line.id === id)?.formula;
 
   it('lists every unit the engine has, once, and under Cooking every ingredient', () => {
-    const unitLines = lines.filter((line) => !line.id.startsWith('ingredient:'));
+    const unitLines = lines.filter(
+      (line) => !line.id.startsWith('ingredient:') && !line.id.startsWith('brand:'),
+    );
     expect(unitLines.map((line) => line.id).sort()).toEqual(units.map((unit) => unit.id).sort());
     const cooking = formulaGroups().find((group) => group.category.id === 'cooking');
     expect(cooking?.lines.map((line) => line.id)).toEqual(
@@ -15,6 +17,33 @@ describe('formulas', () => {
     );
     expect(cooking?.summary).toBe(`${ingredients.length} ingredients by the cup`);
     expect(formula('ingredient:brown-sugar')).toBe('1 cup = 211 g');
+  });
+
+  it('lists every brand’s chart under Shoe size, by convention, with its page and date (ADR 0028)', () => {
+    const shoe = formulaGroups().find((group) => group.category.id === 'shoe-size');
+    const charts = shoe?.lines.filter((line) => line.id.startsWith('brand:')) ?? [];
+    expect(charts).toHaveLength(
+      shoeBrands.reduce((count, brand) => count + brand.charts.length, 0),
+    );
+    expect(charts.map((line) => line.id)).toEqual(
+      shoeBrands.flatMap((brand) => brand.charts.map((chart) => `brand:${brand.id}:${chart.line}`)),
+    );
+    expect(shoe?.summary).toBe(`10 units in Mondopoint, ${charts.length} brands’ charts`);
+    const nike = charts.find((line) => line.id === 'brand:nike:men');
+    expect(nike).toMatchObject({
+      name: 'Nike, the men’s chart',
+      basis: 'by convention',
+      exact: false,
+    });
+    expect(nike?.formula).toBe('38 sizes: US men, US women, UK, EU, JP, the foot in mm');
+    expect(nike?.source).toContain(
+      'nike.com/size-fit/mens-footwear, read 2026-10-20; its length the foot’s.',
+    );
+    expect(formula('brand:birkenstock:unisex')).toContain('EU, the foot in mm');
+    expect(shoe?.lines.find((line) => line.id === 'brand:birkenstock:unisex')?.source).toContain(
+      'Whole EU sizes',
+    );
+    expect(formula('brand:puma:women')).toBe('12 sizes: US women, UK, EU');
   });
 
   it('writes each kind of unit as its formula in the base unit', () => {

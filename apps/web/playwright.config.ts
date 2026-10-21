@@ -40,7 +40,7 @@ export default defineConfig({
       name: 'mobile-webkit',
       use: { ...devices['iPhone 13'] },
       testMatch: /(about|formulas|feedback|smoke|table|settings|touch)\.spec\.ts/,
-      grep: /about\.spec|formulas\.spec|feedback\.spec|renders with no WCAG violations|no text field on any page is under 16 px|Cooking|stay at the window’s top|section headings stick under the block|a side panel opened under a stuck head|opening the category menu leaves the page|open category menu scrolls inside|Edit sends one to Hidden|glides to its place|glide moves only|a second tap on a row/,
+      grep: /about\.spec|formulas\.spec|feedback\.spec|renders with no WCAG violations|no text field on any page is under 16 px|Cooking|a brand typed with the size|stay at the window’s top|section headings stick under the block|a side panel opened under a stuck head|opening the category menu leaves the page|open category menu scrolls inside|Edit sends one to Hidden|glides to its place|glide moves only|a second tap on a row/,
     },
     // WebKit on a desktop, for what only a wide window has: a side panel stuck beside the head
     // from md, the head staying at the window's top, and the foot following the column (checked

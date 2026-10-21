@@ -1,7 +1,10 @@
-import { categories, ingredients, units } from '@bigsmall/core';
+import { categories, ingredients, shoeBrands, units } from '@bigsmall/core';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { aboutPanel, aboutTab, aboutTabs, applyTheme } from './support';
+
+/** The brands' charts under Shoe size (ADR 0028), lines of their own. */
+const CHARTS = shoeBrands.reduce((count, brand) => count + brand.charts.length, 0);
 
 // Every formula on the About page (docs/UX-SPEC.md §1, "About"): folded by category, Show all and
 // Hide all, and Copy all as plain text. Under its tab since 2026-10-18.
@@ -42,8 +45,10 @@ test('the About page lists every formula, folded; Show all opens them, Hide all 
   const section = await openFormulas(page);
   const groups = section.locator('details');
   await expect(groups).toHaveCount(categories.length);
-  // Every unit, and under Cooking every ingredient by the cup.
-  await expect(section.locator('li[data-plain]')).toHaveCount(units.length + ingredients.length);
+  // Every unit, under Cooking every ingredient by the cup, and under Shoe size every brand's chart.
+  await expect(section.locator('li[data-plain]')).toHaveCount(
+    units.length + ingredients.length + CHARTS,
+  );
   await expect(section.locator('details[open]')).toHaveCount(0);
   const toggle = section.getByRole('button', { name: 'Show all' });
   await toggle.click();
@@ -179,7 +184,7 @@ test('Copy all puts every formula on the clipboard as plain text', async ({
   expect(copied).toContain('## Length (base unit: meter, m)');
   expect(copied).toContain('- mile (mi): 1 mi = 1609.344 m, exact. Source:');
   expect(copied.split('\n').filter((line) => line.startsWith('- '))).toHaveLength(
-    units.length + ingredients.length,
+    units.length + ingredients.length + CHARTS,
   );
 });
 

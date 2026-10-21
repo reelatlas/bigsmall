@@ -1,4 +1,4 @@
-import { DEFAULT_SEPARATORS, getIngredient, getUnit, parse } from '@bigsmall/core';
+import { DEFAULT_SEPARATORS, getIngredient, getShoeBrand, getUnit, parse } from '@bigsmall/core';
 import { useId, useRef } from 'react';
 import { Calculator, SendButton } from '../../../components/Calculator';
 import { CategoryMenu } from '../../../components/CategoryMenu';
@@ -41,17 +41,19 @@ const FOLDED: readonly MoreMenuItem[] = [
   { id: 'clear', label: 'Clear all', icon: <EraserIcon />, onPress: noop },
 ];
 
-/** The field in a frozen state: what is typed, the unit in its chip, and an ingredient beside it. */
+/** The field in a frozen state: what is typed, the unit in its chip, and an ingredient or a brand beside it. */
 function FieldSample({
   label,
   text,
   unitId,
   ingredientId,
+  brandId,
 }: {
   label: string;
   text: string;
   unitId: string;
   ingredientId?: string;
+  brandId?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const hint = useId();
@@ -65,6 +67,7 @@ function FieldSample({
       locale={ENV.locale}
       unit={getUnit(unitId) ?? null}
       ingredient={ingredientId ? (getIngredient(ingredientId) ?? null) : null}
+      brand={brandId ? (getShoeBrand(brandId) ?? null) : null}
       placeholder="Number"
       describedBy={hint}
       popup={{ expanded: false, controls: list, activeId: undefined, kind: 'grid' }}
@@ -324,6 +327,8 @@ export function FieldSamples({ theme }: { theme: string }) {
           ingredientId="brown-sugar"
         />
       </div>
+      {/* Shoe size's two pills, the scale and the brand (ADR 0028), the same shape. */}
+      <FieldSample label={`${theme} shoe brand sample`} text="10" unitId="us-men" brandId="nike" />
       <CalculatorSample />
       <TableSamples />
     </div>

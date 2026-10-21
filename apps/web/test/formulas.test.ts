@@ -44,6 +44,11 @@ describe('formulas', () => {
       'Whole EU sizes',
     );
     expect(formula('brand:puma:women')).toBe('12 sizes: US women, UK, EU');
+    // On's rule, which fills its feet (docs/RESEARCH.md §9), said on its line in the page's words,
+    // no repo path among them (the tidy of 2026-10-21).
+    const on = charts.find((line) => line.id.startsWith('brand:on:'));
+    expect(on?.source).toContain('its Japan label less 1 cm, the brand’s own rule.');
+    expect(on?.source).not.toContain('docs/');
   });
 
   it('writes each kind of unit as its formula in the base unit', () => {

@@ -2397,7 +2397,7 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   // A brand's dash row taken brings the brand and the scale with the number cleared, as a row
   // beyond its scale does, the brand having no size for the foot (Sean, 2026-10-20): a child's
   // foot is off every adult chart.
-  await page.goto('/?a=us-children&v=1');
+  await page.goto('/?a=us-children&v=10');
   await ready(page);
   await expect(row(page, 'brand:puma')).toContainText('off its chart');
   await unitCell(page, 'brand:puma').click();

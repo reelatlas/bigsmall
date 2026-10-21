@@ -1,0 +1,15 @@
+# Transcribed by the orchestrator from Sean's screenshot of on.com/en-us/faq/product-advice-sizing-stock (the Shoe advice answers), 2026-10-20, after wave 3; the screenshot is not saved as a file, so this is a transcription, flagged as such (docs/RESEARCH.md §3). The brand's own words, not a chart; recorded as claims beside the product panels captured in pasted-text.txt.
+
+How do I know which size I need?
+If you're unsure which size you wear in our footwear or apparel, each product page has a size chart and fit recommendation. The Japanese (JP) sizing is in centimeters, so you can also measure your foot by standing barefoot with your heel against a wall, adding about 1 cm to your measured size for an indication of what size will work for you.
+
+What is the difference in sizing between men's and women's footwear?
+The primary difference is that men's shoes are designed wider than women's. Customers are free to purchase shoes of any gender, though! Women's shoes are a 1.5 size larger than men's (so a men's size 7 is a women's 8.5 in US sizes). We just recommend testing it out first at a retail location if possible.
+
+Do you offer wide sizing?
+We have certain models that are available in wide sizes. To find these select styles and colors for men and women, simply filter using the "Wide Fit" filter on the left-hand side of any product listing page. Not available in all countries.
+
+I live in Australia or New Zealand - are your shoe sizes on the website shown in US or UK sizes?
+Our Australian and New Zealand sites show shoes in US sizes.
+
+What it says for the record: On's JP label is the measured foot plus about a centimetre, by the brand's own rule, so a typed foot length can reach an On size through its words (docs/research/shoe-sizes-2.md §9); the FAQ's "women's are 1.5 sizes larger than men's" contradicts the product panels' charts, where US women's = US men's + 1 at the same JP label (manual/brand-charts.json, the on quirks); both are kept as published.

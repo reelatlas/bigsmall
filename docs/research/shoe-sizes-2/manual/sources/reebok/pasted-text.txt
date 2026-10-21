@@ -1,0 +1,104 @@
+# Pasted by Sean from reebok.com/pages/size-guides (Men's Shoes, Women's Shoes, Unisex Shoes; the page text highlighted and copied), 2026-10-20, after wave 3: a re-read of the pages worker A fetched and checker A confirmed (docs/research/shoe-sizes-2.md §8), kept as the home site read in a browser. Tab-separated, verbatim, the inch marks and spacing as printed; the page's How to Measure steps below each table. Screenshots were shown in the session and are not saved as files.
+
+## Men's Shoes Size Guide
+
+Men's Shoes Size Guide
+
+U.S. Size	Heel-Toe Measurement (in)
+6.5	9.5"
+7	9.7"
+7.5	9.8"
+8	10"
+8.5	10.2"
+9	10.3"
+9.5	10.5"
+10	10.7"
+10.5	10.8"
+11	11"
+11.5	11.2"
+12	11.3"
+12.5	11.5"
+13	11.7"
+13.5	11.8"
+14	12"
+14.5	12.2"
+15	12.3"
+15.5	12.5"
+16	12.6"
+16.5	12.8"
+
+How to Measure
+Step 1. Place a piece of paper on a hard floor with one end to the wall. Stand on the piece of paper with the heel slightly touching the wall.
+Step 2. Mark the end of your longest toe with a pencil for both feet. Tip: it's easier if you let someone help you with this.
+Step 3. Measure your markings in inches. Take the larger of the two foot length values and compare it with our sizing chart.
+
+## Women's Shoes Size Guide
+
+Women's Shoes Size Guide
+
+U.S. Size	Heel-Toe Measurement (in)
+3.5	8"
+4	8.2"
+4.5	8.3"
+5	8.5 "
+5.5	8.7"
+6	8.8"
+6.5	9"
+7	9.2"
+7.5	9.3"
+8	9.5"
+8.5	9.7"
+9	9.8"
+9.5	10"
+10	10.2"
+10.5	10.3"
+11	10.5"
+12	10.8"
+
+How to Measure
+Step 1. Place a piece of paper on a hard floor with one end to the wall. Stand on the piece of paper with the heel slightly touching the wall.
+Step 2. Mark the end of your longest toe with a pencil for both feet. Tip: it's easier if you let someone help you with this.
+Step 3. Measure your markings in inches. Take the larger of the two foot length values and compare it with our sizing chart.
+
+## Unisex Shoes Size Guide
+
+U.S. Men Size	U.S. Women Size	Heel-Toe Measurement (in)
+2	3.5	8"
+2.5	4	8.2"
+3	4.5	8.3"
+3.5	5	8.5"
+4	5.5	8.7"
+4.5	6	8.8"
+5	6.5	9"
+5.5	7	9.2"
+6	7.5	9.3"
+6.5	8	9.5"
+7	8.5	9.7"
+7.5	9	9.8"
+8	9.5	10"
+8.5	10	10.2"
+9	10.5	10.3"
+9.5	11	10.5"
+10	11.5	10.7"
+10.5	12	10.8"
+11	12.5	11"
+11.5	13	11.2"
+12	13.5	11.3"
+12.5	14	11.5"
+13	14.5	11.7"
+13.5	15	11.8"
+14	—	12"
+14.5	—	12.2"
+15	—	12.3 "
+15.5	—	12.5 "
+16	—	12.6 "
+16.5	—	12.8 "
+17	—	13"
+17.5	—	13.1"
+18	—	13.3"
+18.5	—	13.5"
+
+How to Measure
+Step 1. Place a piece of paper on a hard floor with one end to the wall. Stand on the piece of paper with the heel slightly touching the wall.
+Step 2. Mark the end of your longest toe with a pencil for both feet. Tip: it's easier if you let someone help you with this.
+Step 3. Measure your markings in inches. Take the larger of the two foot length values and compare it with our sizing chart.

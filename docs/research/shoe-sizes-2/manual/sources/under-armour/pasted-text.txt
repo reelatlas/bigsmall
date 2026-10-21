@@ -1,0 +1,143 @@
+# Pasted by Sean from underarmour.com/en-us/t/size-guide/ (mens-footwear, womens-footwear, boys-footwear, girls-footwear; the page text highlighted and copied under both toggles, the table printing its Inches and CM columns under either), 2026-10-20, after wave 3: a re-read of the pages worker A fetched and checker A confirmed (docs/research/shoe-sizes-2.md §8), kept as the home site read in a browser. Tab-separated, verbatim, the inch fractions as the page prints them; the page's How to Measure words above each table. The sentence "That measurement (in centimeters) is then translated into our standard sizes" makes the CM column the measured foot; the inch column is the page's conversion of it, which disagrees. Screenshots were shown in the session and are not saved as files.
+
+## Men's Shoes
+
+Men's Shoes
+HOW TO MEASURE
+FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes.
+To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe. If your measurement is between chart numbers, we recommend sizing up. Be sure you're putting your full weight on your foot while tracing. Please note: for the best results, measuring later in the day is recommended.
+We created this easy-to-use sizing chart so that finding the right size shoes for your kids won't be a workout in itself. *Due to the metric/imperial conversions, there will be some instances where two US sizes will equal one UK size or one CM size.
+InchesCentimeters
+Size Chart
+
+US Men	Inches	CM	Euro	UK
+7	9¹¹/₁₆	25	40	6
+7.5	9¾	25.5	40.5	6.5
+8	9¹⁵/₁₆	26	41	7
+8.5	10¹/₁₆	26.5	42	7.5
+9	10¼	27	42.5	8
+9.5	10⁷⁄₁₆	27.5	43	8.5
+10	10⁹⁄₁₆	28	44	9
+10.5	10¾	28.5	44.5	9.5
+11	10¹⁵⁄₁₆	29	45	10
+11.5	11¹⁄₁₆	29.5	45.5	10.5
+12	11¼	30	46	11
+12.5	11½	30.5	47	11.5
+13	11¹¹⁄₁₆	31	47.5	12
+13.5	11¾	31.5	48	12.5
+14	12	32	48.5	13
+14.5	12³⁄₁₆	32.5	49	13.5
+15	12¼	33	49.5	14
+15.5	13⅛	33.5	50	14.5
+16	13¼	34	50.5	15
+
+## Women's Shoes
+
+Women's Shoes
+HOW TO MEASURE
+FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes.
+To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe. If your measurement is between chart numbers, we recommend sizing up. Be sure you're putting your full weight on your foot while tracing. Please note: for the best results, measuring later in the day is recommended.
+We created this easy-to-use sizing chart so that finding the right size shoes for your kids won't be a workout in itself. *Due to the metric/imperial conversions, there will be some instances where two US sizes will equal one UK size or one CM size.
+InchesCentimeters
+Size Chart
+
+US Women	Inches	CM	Euro	UK
+5	8½	22.5	35.5	3
+5.5	8¹³/₁₆	23	36	3.5
+6	8¹⁵/₁₆	23.5	36.5	4
+6.5	9¹/₁₆	23.5	37.5	4.5
+7	9¼	24	38	5
+7.5	9⁷⁄₁₆	24	38.5	5.5
+8	9½	24.5	39	6
+8.5	9¹¹/₁₆	25	40	6
+9	9¾	25.5	40.5	6.5
+9.5	9¹⁵/₁₆	26	41	7
+10	10¹/₁₆	26.5	42	7.5
+10.5	10¼	27	42.5	8
+11	10⁷⁄₁₆	27.5	43	8.5
+11.5	10⁹⁄₁₆	28	44	9
+12	10¹⁵/₁₆	28.5	44.5	9.5
+
+## Boys' Shoes
+
+Kid's Shoes
+HOW TO MEASURE
+FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes.
+To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe. If your measurement is between chart numbers, we recommend sizing up. Be sure you're putting your full weight on your foot while tracing. Please note: for the best results, measuring later in the day is recommended.
+We created this easy-to-use sizing chart so that finding the right size shoes for your kids won't be a workout in itself. *Due to the metric/imperial conversions, there will be some instances where two US sizes will equal one UK size or one CM size.
+InchesCentimeters
+Size Chart
+
+US Youth	US Women	Inches	CM	Euro	UK
+1K	-	2¾	7	16	0.5
+2K	-	3⁵⁄₃₂	8	17	1.5
+3K	-	3³⁵⁄₆₄	9	18.5	2.5
+4K	-	3¹⁵⁄₁₆	10	19.5	3.5
+5K	-	4¹⁵⁄₁₆	11	21	4.5
+6K	-	5¼	12	22	5.5
+7K	-	5¾	13	23.5	6.5
+8K	-	5¹⁵⁄₁₆	14	25	7.5
+9K	-	6¼	15	26	8.5
+10K	-	6⁹⁄₁₆	16	27	9.5
+10.5K	-	6¾	16.5	27.5	10
+11K	-	6¹⁵⁄₁₆	17	28	10.5
+11.5K	-	7¹⁄₁₆	17.5	29	11
+12K	-	7¼	18	29.5	11.5
+12.5K	-	7⁷⁄₁₆	18.5	30	12
+13K	-	7⁹⁄₁₆	19	31	12.5
+13.5K	-	7¾	19.5	31.5	13
+1	-	7¹⁵⁄₁₆	20	32	13.5
+1.5	-	8¹⁄₁₆	20.5	33	1
+2	-	8¼	21	33.5	1.5
+2.5	-	8⁷⁄₁₆	21.5	34	2
+3	-	8⁹⁄₁₆	22	35	2.5
+3.5	5	8½	22.5	35.5	3
+4	5.5	8¹³/₁₆	23	36	3.5
+4.5	6	8¹⁵⁄₁₆	23.5	36.5	4
+5	6.5	9¹/₁₆	23.5	37.5	4.5
+5.5	7	9¼	24	38	5
+6	7.5	9⁷⁄₁₆	24	38.5	5.5
+6.5	8	9½	24.5	39	6
+7	8.5	9¹¹/₁₆	25	40	6
+
+## Girls' Shoes
+
+Kid's Shoes
+HOW TO MEASURE
+FOOT: We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes.
+To find your foot measurement closely trace your entire foot onto a piece of paper and measure from heel to toe. If your measurement is between chart numbers, we recommend sizing up. Be sure you're putting your full weight on your foot while tracing. Please note: for the best results, measuring later in the day is recommended.
+We created this easy-to-use sizing chart so that finding the right size shoes for your kids won't be a workout in itself. *Due to the metric/imperial conversions, there will be some instances where two US sizes will equal one UK size or one CM size.
+InchesCentimeters
+Size Chart
+
+US Youth	US Women	Inches	CM	Euro	UK
+1K	-	2¾	7	16	0.5
+2K	-	3⁵⁄₃₂	8	17	1.5
+3K	-	3³⁵⁄₆₄	9	18.5	2.5
+4K	-	3¹⁵⁄₁₆	10	19.5	3.5
+5K	-	4¹⁵⁄₁₆	11	21	4.5
+6K	-	5¼	12	22	5.5
+7K	-	5¾	13	23.5	6.5
+8K	-	5¹⁵⁄₁₆	14	25	7.5
+9K	-	6¼	15	26	8.5
+10K	-	6⁹⁄₁₆	16	27	9.5
+10.5K	-	6¾	16.5	27.5	10
+11K	-	6¹⁵⁄₁₆	17	28	10.5
+11.5K	-	7¹⁄₁₆	17.5	29	11
+12K	-	7¼	18	29.5	11.5
+12.5K	-	7⁷⁄₁₆	18.5	30	12
+13K	-	7⁹⁄₁₆	19	31	12.5
+13.5K	-	7¾	19.5	31.5	13
+1	-	7¹⁵⁄₁₆	20	32	13.5
+1.5	-	8¹⁄₁₆	20.5	33	1
+2	-	8¼	21	33.5	1.5
+2.5	-	8⁷⁄₁₆	21.5	34	2
+3	-	8⁹⁄₁₆	22	35	2.5
+3.5	5	8½	22.5	35.5	3
+4	5.5	8¹³/₁₆	23	36	3.5
+4.5	6	8¹⁵⁄₁₆	23.5	36.5	4
+5	6.5	9¹/₁₆	23.5	37.5	4.5
+5.5	7	9¼	24	38	5
+6	7.5	9⁷⁄₁₆	24	38.5	5.5
+6.5	8	9½	24.5	39	6
+7	8.5	9¹¹/₁₆	25	40	6

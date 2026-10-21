@@ -1,0 +1,987 @@
+<title>Brand as Second Value</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+
+<style>
+  :root {
+    --canvas: #fafaf9;
+    --surface: #ffffff;
+    --raised: #f5f5f4;
+    --ink: #1c1917;
+    --muted: #57534e;
+    --accent: #0f766e;
+    --on-accent: #ffffff;
+    --soft: #ccfbf1;
+    --line: #d6d3d1;
+    --edge: #928f8d;
+    --mock: #9a3412;
+    --mock-bg: #fff4e8;
+    --mock-line: #f2c9a8;
+    --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --canvas: #1c1917;
+      --surface: #292524;
+      --raised: #332f2c;
+      --ink: #fafaf9;
+      --muted: #a8a29e;
+      --accent: #2dd4bf;
+      --on-accent: #042f2e;
+      --soft: #134e4a;
+      --line: #44403c;
+      --edge: #78716c;
+      --mock: #fdba74;
+      --mock-bg: #3a2112;
+      --mock-line: #7c3f1a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --canvas: #1c1917;
+    --surface: #292524;
+    --raised: #332f2c;
+    --ink: #fafaf9;
+    --muted: #a8a29e;
+    --accent: #2dd4bf;
+    --on-accent: #042f2e;
+    --soft: #134e4a;
+    --line: #44403c;
+    --edge: #78716c;
+    --mock: #fdba74;
+    --mock-bg: #3a2112;
+    --mock-line: #7c3f1a;
+    color-scheme: dark;
+  }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px 48px;
+  }
+  main {
+    max-width: 576px;
+    margin: 0 auto;
+    display: grid;
+    gap: 28px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  h2 {
+    font-size: 1.05rem;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  p {
+    margin: 0;
+    max-width: 65ch;
+  }
+  .lede {
+    color: var(--muted);
+  }
+  .muted {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .scene {
+    display: grid;
+    gap: 8px;
+  }
+  .mock {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+  }
+  .box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--edge);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-variant-numeric: tabular-nums;
+    flex-wrap: wrap;
+  }
+  .box .n {
+    font-size: 1.25rem;
+    flex: 1;
+  }
+  .chip {
+    border-radius: 999px;
+    background: var(--raised);
+    border: 1px solid var(--line);
+    padding: 2px 10px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .chip b {
+    color: var(--muted);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .heads,
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1.2fr);
+    gap: 10px;
+    align-items: center;
+  }
+  .heads {
+    padding: 2px 10px 0;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .heads span {
+    text-align: right;
+  }
+  .brandhead {
+    color: var(--accent);
+  }
+  .rows {
+    display: grid;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .sec {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 10px 10px 2px;
+  }
+  .row {
+    padding: 8px 10px;
+    border-radius: 8px;
+    min-height: 40px;
+  }
+  .row.inbox {
+    background: var(--soft);
+  }
+  .row .val {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .row .brand {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .row .brand.muted {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .row .sym {
+    color: var(--muted);
+    font-weight: 600;
+    text-align: right;
+    min-width: 3.2em;
+  }
+  .row .name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .note {
+    font-size: 0.85rem;
+    color: var(--muted);
+    padding: 4px 10px 0;
+  }
+  .brandnote {
+    color: var(--ink);
+  }
+  .shows {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .shows strong {
+    color: var(--ink);
+  }
+  .flag {
+    color: var(--mock);
+    background: var(--mock-bg);
+    border: 1px solid var(--mock-line);
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+  .panel {
+    max-width: 360px;
+  }
+  .panelhead {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    padding: 2px 4px 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .list {
+    display: grid;
+    gap: 2px;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 6px;
+    border-radius: 8px;
+    min-height: 40px;
+  }
+  .item.on {
+    background: var(--soft);
+  }
+  .radio {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--edge);
+    display: inline-block;
+  }
+  .item.on .radio {
+    border-color: var(--accent);
+    background: radial-gradient(circle, var(--accent) 45%, transparent 50%);
+  }
+  ul {
+    margin: 0;
+    padding-left: 18px;
+    max-width: 65ch;
+  }
+  li {
+    margin: 2px 0;
+  }
+</style>
+
+<main>
+  <header class="scene">
+    <span class="flag">Mock · 2026-10-20 · drawn from the checked record (brands.json)</span>
+    <h1>The brand’s chart as the second value</h1>
+    <p class="lede">
+      What the converter’s Shoe size table could show once a brand is chosen
+      (docs/research/shoe-sizes-2.md §5, decisions 1 to 7). ISO 19407’s value stays first in every
+      row, as today; the brand’s own cell sits beside it in a second column headed with the brand
+      and its line; a dash means the brand prints nothing for that row, so ISO’s value stands alone.
+      The brand’s values are the brand’s cells as published on its own site, never computed; every
+      input below is read from the record that wave 2 checked. The children’s rows show the beyond
+      values the product shows today for an adult size.
+    </p>
+  </header>
+  <section class="scene">
+    <h2>1. A US men’s 10 at Nike: the shape</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">10</span><span class="chip"><b>US M</b>US men</span
+        ><span class="chip"><b>Nike</b>men’s</span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">Nike · men’s</span><span></span><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row inbox">
+          <span class="val">10</span><span class="val brand">10</span><span class="sym">US M</span
+          ><span class="name">US men</span>
+        </div>
+        <div class="row">
+          <span class="val">11</span><span class="val brand">11.5</span><span class="sym">US W</span
+          ><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>42.5</span><span class="val brand">44</span
+          ><span class="sym">EU</span><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>270</span><span class="val brand">271</span
+          ><span class="sym">mm</span><span class="name">Mondopoint</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>27</span><span class="val brand">28</span
+          ><span class="sym">cm</span><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val">9</span><span class="val brand">9</span><span class="sym">UK</span
+          ><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        Nike’s own chart, the men’s (nike.com, 2026-10-20). Nike’s CM is the box’s label, not the
+        foot’s length: its 28 sits beside a 27.1 cm foot.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decisions 1, 2, and 3. ISO’s value stays first in every row, as today;
+      the brand’s own cell sits beside it in the brand’s column, named at the top; a row the brand
+      prints nothing for keeps ISO’s value alone (—). Nike says its length is the foot’s, so the
+      Mondopoint row carries Nike’s 271 mm; its Japanese row carries Nike’s CM label, and the note’s
+      second line says why the two disagree.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>2. A US women’s 8 at Nike: the women’s line</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">nike</span><span class="chip"><b>US W</b>US women</span
+        ><span class="chip"><b>Nike</b>women’s</span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">Nike · women’s</span><span></span
+        ><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row">
+          <span class="val">7</span><span class="val brand">6.5</span><span class="sym">US M</span
+          ><span class="name">US men</span>
+        </div>
+        <div class="row inbox">
+          <span class="val">8</span><span class="val brand">8</span><span class="sym">US W</span
+          ><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>39</span><span class="val brand">39</span
+          ><span class="sym">EU</span><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>245</span><span class="val brand">245</span
+          ><span class="sym">mm</span><span class="name">Mondopoint</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>24.5</span><span class="val brand">25</span
+          ><span class="sym">cm</span><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val">6</span><span class="val brand">5.5</span><span class="sym">UK</span
+          ><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        Nike’s own chart, the women’s (nike.com, 2026-10-20): a different last from the men’s, so
+        the same label gives another UK size and foot length.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decisions 1 and 4. “women” with the brand picks the women’s chart:
+      Nike’s women’s page gives a US W 8 a 24.5 cm foot and UK 5.5, where its men’s page gives the
+      same label 24.1 cm and UK 6; ISO gives UK 6 and 245.6 mm. The two lines are kept apart, never
+      merged by length.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>3. A European 43 at New Balance: a genderless scale</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">eu</span><span class="chip"><b>EU</b>European</span
+        ><span class="chip"><b>New Balance</b>men’s</span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">New Balance · men’s</span><span></span
+        ><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>10.5</span
+          ><span class="val brand">9.5</span><span class="sym">US M</span
+          ><span class="name">US men</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>11.5</span><span class="val brand">11</span
+          ><span class="sym">US W</span><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row inbox">
+          <span class="val">43</span><span class="val brand">43</span><span class="sym">EU</span
+          ><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>275</span><span class="val brand">275</span
+          ><span class="sym">mm</span><span class="name">Mondopoint</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>27.5</span
+          ><span class="val brand">27.5</span><span class="sym">cm</span
+          ><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>9.5</span><span class="val brand">9</span
+          ><span class="sym">UK</span><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        New Balance’s own chart, the men’s (newbalance.com, 2026-10-20); type “women” for the
+        women’s chart, a different last.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decision 4. A European or British size, or a length, has no gender, so
+      the men’s chart answers unless “women” is typed or picked; New Balance’s EU 43 is its US men’s
+      9.5 and a 27.5 cm foot, where ISO’s EU 43 is a US 10.5 and 273.5 mm.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>4. A 27 cm foot at Asics: a length answered</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">27</span><span class="chip"><b>cm</b>Japanese</span
+        ><span class="chip"><b>Asics</b>men’s</span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">Asics · men’s</span><span></span><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>10</span><span class="val brand">9</span
+          ><span class="sym">US M</span><span class="name">US men</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>11</span
+          ><span class="val brand muted">—</span><span class="sym">US W</span
+          ><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>42.5</span
+          ><span class="val brand">42.5</span><span class="sym">EU</span
+          ><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val">270</span><span class="val brand">270</span><span class="sym">mm</span
+          ><span class="name">Mondopoint</span>
+        </div>
+        <div class="row inbox">
+          <span class="val">27</span><span class="val brand">27</span><span class="sym">cm</span
+          ><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>9</span><span class="val brand">8</span
+          ><span class="sym">UK</span><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        Asics’ own chart, the men’s (asics.com, 2026-10-20): its CM column is the foot’s by the
+        page’s own measuring steps.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decision 2. A typed foot length gets the brand’s size only where the
+      brand says its length is the foot’s: a 27 cm foot is Asics’ US 9 and ISO’s US 10 (the
+      centimetre-grid family of §9). Asics’ men’s chart carries no women’s column, so that row is
+      ISO’s alone.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>5. A 27 cm foot at Puma: a length not answered</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">27</span><span class="chip"><b>cm</b>Japanese</span
+        ><span class="chip"><b>Puma</b>men’s</span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">Puma · men’s</span><span></span><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>10</span
+          ><span class="val brand muted">—</span><span class="sym">US M</span
+          ><span class="name">US men</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>11</span
+          ><span class="val brand muted">—</span><span class="sym">US W</span
+          ><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>42.5</span
+          ><span class="val brand muted">—</span><span class="sym">EU</span
+          ><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val">270</span><span class="val brand muted">—</span
+          ><span class="sym">mm</span><span class="name">Mondopoint</span>
+        </div>
+        <div class="row inbox">
+          <span class="val">27</span><span class="val brand muted">—</span
+          ><span class="sym">cm</span><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>9</span
+          ><span class="val brand muted">—</span><span class="sym">UK</span
+          ><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        Puma’s chart answers a size, not a foot length: its lengths are its products’ measurements
+        (us.puma.com, 2026-10-20). Type a size for Puma’s chart.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decision 2, the other way. Puma’s US site heads its lengths Product
+      Measurements, beside heel height and weight, so no row takes them as the foot’s; the brand’s
+      column stays empty until a size is typed, and the note says why.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>6. A European 42 at Birkenstock: ranges as printed</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">eu</span><span class="chip"><b>EU</b>European</span
+        ><span class="chip"><b>Birkenstock</b></span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">Birkenstock</span><span></span><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>9.5</span
+          ><span class="val brand">9-9.5</span><span class="sym">US M</span
+          ><span class="name">US men</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>10.5</span
+          ><span class="val brand">11-11.5</span><span class="sym">US W</span
+          ><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row inbox">
+          <span class="val">42</span><span class="val brand">42</span><span class="sym">EU</span
+          ><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>265</span><span class="val brand">270</span
+          ><span class="sym">mm</span><span class="name">Mondopoint</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>26.5</span><span class="val brand">27</span
+          ><span class="sym">cm</span><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>8.5</span><span class="val brand">8</span
+          ><span class="sym">UK</span><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        Birkenstock’s own chart (its printable template, 2026-10-20). Birkenstock makes whole EU
+        sizes: two US half sizes share one.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decisions 5 and 3. Birkenstock prints a US range per EU size, and the
+      range is shown as the brand prints it, never its middle; the note’s second line is the brand’s
+      own fact.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>7. A US men’s 10 at Reebok: scales the chart lacks</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">10</span><span class="chip"><b>US M</b>US men</span
+        ><span class="chip"><b>Reebok</b>unisex</span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">Reebok</span><span></span><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row inbox">
+          <span class="val">10</span><span class="val brand">10</span><span class="sym">US M</span
+          ><span class="name">US men</span>
+        </div>
+        <div class="row">
+          <span class="val">11</span><span class="val brand">11.5</span><span class="sym">US W</span
+          ><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>42.5</span
+          ><span class="val brand muted">—</span><span class="sym">EU</span
+          ><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>270</span
+          ><span class="val brand"><span class="muted">≈ </span>270</span><span class="sym">mm</span
+          ><span class="name">Mondopoint</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>27</span
+          ><span class="val brand"><span class="muted">≈ </span>27</span><span class="sym">cm</span
+          ><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val">9</span><span class="val brand muted">—</span><span class="sym">UK</span
+          ><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        Reebok’s own chart, its unisex guide (reebok.com, 2026-10-20): US sizes and heel-to-toe
+        inches; it prints no UK or EU, so those rows are ISO’s alone.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decision 2. Reebok’s chart has US sizes and a heel-to-toe length only:
+      its 10.7 in is the foot’s, shown in mm and cm as the brand’s (≈ where the half size rounds
+      it); the UK and EU rows keep ISO’s value with no second value.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>8. A US men’s 10 at On: labels only</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">10</span><span class="chip"><b>US M</b>US men</span
+        ><span class="chip"><b>On</b>men’s</span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">On · men’s</span><span></span><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row inbox">
+          <span class="val">10</span><span class="val brand">10</span><span class="sym">US M</span
+          ><span class="name">US men</span>
+        </div>
+        <div class="row">
+          <span class="val">11</span><span class="val brand muted">—</span
+          ><span class="sym">US W</span><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>42.5</span><span class="val brand">44</span
+          ><span class="sym">EU</span><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>270</span
+          ><span class="val brand muted">—</span><span class="sym">mm</span
+          ><span class="name">Mondopoint</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>27</span><span class="val brand">28</span
+          ><span class="sym">cm</span><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val">9</span><span class="val brand">9.5</span><span class="sym">UK</span
+          ><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        On’s own chart, the men’s (on.com, 2026-10-20): sizes only, no foot length; its Japan column
+        is a size label, so a typed length gets no On value.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decision 2. On prints no length at all: its sizes answer a typed size,
+      its Japan label fills the Japanese row as the brand’s own size, and the Mondopoint row stays
+      ISO’s.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>9. A US men’s 10 at Converse: the brand’s warning</h2>
+    <div class="mock">
+      <div class="box">
+        <span class="n">10</span><span class="chip"><b>US M</b>US men</span
+        ><span class="chip"><b>Converse</b>Chuck Taylor</span>
+      </div>
+      <div class="heads">
+        <span>ISO 19407</span><span class="brandhead">Converse · Chuck Taylor All Star</span
+        ><span></span><span></span>
+      </div>
+      <div class="rows">
+        <div class="sec">US</div>
+        <div class="row inbox">
+          <span class="val">10</span><span class="val brand">10</span><span class="sym">US M</span
+          ><span class="name">US men</span>
+        </div>
+        <div class="row">
+          <span class="val">11</span><span class="val brand">12</span><span class="sym">US W</span
+          ><span class="name">US women</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">US C</span><span class="name">US children</span>
+        </div>
+        <div class="sec">Metric</div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>42.5</span><span class="val brand">44</span
+          ><span class="sym">EU</span><span class="name">European</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 38</span><span class="val brand muted">—</span
+          ><span class="sym">EU C</span><span class="name">European children</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>270</span><span class="val brand">285</span
+          ><span class="sym">mm</span><span class="name">Mondopoint</span>
+        </div>
+        <div class="row">
+          <span class="val"><span class="muted">≈ </span>27</span><span class="val brand">28.5</span
+          ><span class="sym">cm</span><span class="name">Japanese</span>
+        </div>
+        <div class="sec">British</div>
+        <div class="row">
+          <span class="val">9</span><span class="val brand">10</span><span class="sym">UK</span
+          ><span class="name">British</span>
+        </div>
+        <div class="row">
+          <span class="val muted">&gt; 13.5</span><span class="val brand muted">—</span
+          ><span class="sym">UK C</span><span class="name">British children</span>
+        </div>
+      </div>
+      <p class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. A brand’s own chart can differ
+        by up to a size; US women’s run 1 (ISO) to 1.5 (Nike, Clarks) above men’s.
+      </p>
+      <p class="note brandnote">
+        Converse’s own chart, Chuck Taylor All Star, the men’s (converse.com, 2026-10-20). Converse
+        says these sneakers run large: go down a half size.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decisions 1 and 3. Converse’s chart is its Chuck Taylor table, the shoe
+      the brand names; its US men’s 10 is UK 10 and a 28.5 cm foot, where ISO’s is UK 9 and 271 mm.
+      The note’s second line is the brand’s own warning, in its words.
+    </p>
+  </section>
+  <section class="scene">
+    <h2>10. Choosing a brand in Settings</h2>
+    <div class="mock panel">
+      <div class="panelhead"><span>Units</span><span class="muted">Shoe size</span></div>
+      <div class="list">
+        <div class="item on">
+          <span class="radio"></span><span>ISO 19407 only</span
+          ><span class="muted">the default</span>
+        </div>
+        <div class="item"><span class="radio"></span><span>adidas</span></div>
+        <div class="item">
+          <span class="radio"></span><span>Asics</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item"><span class="radio"></span><span>Birkenstock</span></div>
+        <div class="item">
+          <span class="radio"></span><span>Brooks</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>Clarks</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>Converse</span><span class="muted">Chuck Taylor</span>
+        </div>
+        <div class="item"><span class="radio"></span><span>Crocs</span></div>
+        <div class="item"><span class="radio"></span><span>Dr. Martens</span></div>
+        <div class="item">
+          <span class="radio"></span><span>HOKA</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>New Balance</span
+          ><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>Nike</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>On</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>Puma</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item"><span class="radio"></span><span>Reebok</span></div>
+        <div class="item"><span class="radio"></span><span>Salomon</span></div>
+        <div class="item">
+          <span class="radio"></span><span>Skechers</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>Timberland</span
+          ><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>UGG</span><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item">
+          <span class="radio"></span><span>Under Armour</span
+          ><span class="muted">men’s · women’s</span>
+        </div>
+        <div class="item"><span class="radio"></span><span>Vans</span></div>
+      </div>
+      <p class="note">
+        Remembered in this browser, as the other settings are. A brand typed with the size (“10
+        nike”) wins over the picked one for that conversion.
+      </p>
+    </div>
+    <p class="shows">
+      <strong>Shows</strong> decision 4. Typing is first (the box is the product’s one control); the
+      picker is for discovery and for keeping a brand across conversions. A brand with two lasts
+      lists its lines; the line follows the scale typed (US women’s → the women’s chart), the men’s
+      chart for a genderless scale unless “women” is typed.
+    </p>
+  </section>
+
+  <section class="scene">
+    <h2>Not in this mock</h2>
+    <ul>
+      <li>
+        The words are drafts: the brand line and the six warning lines (decision 3) are yours to
+        edit.
+      </li>
+      <li>
+        The brand column’s width follows the single units’ sizing rule, as a pair does; the fit at
+        phone width is the build’s to measure, not drawn here.
+      </li>
+      <li>
+        The kids’ tables, the wide lines, the widths, and a brand’s other regions stay in the record
+        (docs/PLAN.md §2).
+      </li>
+    </ul>
+  </section>
+</main>

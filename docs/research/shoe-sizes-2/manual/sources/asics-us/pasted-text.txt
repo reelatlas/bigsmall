@@ -1,0 +1,130 @@
+# Pasted by Sean from asics.com/us, Customer Service, ASICS Size & Fit Guide, ASICS Size Guide (the Gender menu: Men, Women, Kids; the Shoes product type; the page text highlighted and copied), 2026-10-20, after wave 3. Tab-separated, verbatim; the page's words above each table as printed. The measuring steps make the CM column the foot's: the foot's length heel to toe, compared with the chart below them. Screenshots: 01 to 04 the men's chart (its scrolling box in four positions, with the steps, the fit line, and the width chart), 05 to 07 the women's, 08 to 12 the kids'.
+
+## Men's shoes size chart
+
+ASICS Size Guide
+Gender: Men
+Product Types: Shoes, Clothing, Accessories
+How to Measure Your Shoe Size
+Follow these steps to determine your shoe size. Do this during or at the end of the day for accuracy, as feet swell throughout the day.
+1. Place a piece of paper under your foot. Stand up straight and have your heel lightly touching against a wall.
+2. Mark the tip of your longest toe and heel on the paper. Measure the length of your feet from heel to toe.
+3. Repeat the steps for your other foot and compare the measurements with our size chart below.
+Fit
+For running shoes, we generally recommend sizing up a half size from your casual shoe size.
+Men's Shoes Size Chart
+
+US	UK	EU	CM
+4	3	36	22.5
+4.5	3.5	37	23
+5	4	37.5	23.5
+5.5	4.5	38	24
+6	5	39	24.5
+6.5	5.5	39.5	25
+7	6	40	25.25
+7.5	6.5	40.5	25.5
+8	7	41.5	26
+8.5	7.5	42	26.5
+9	8	42.5	27
+9.5	8.5	43.5	27.5
+10	9	44	28
+10.5	9.5	44.5	28.25
+11	10	45	28.5
+11.5	10.5	46	29
+12	11	46.5	29.5
+12.5	11.5	47	30
+13	12	48	30.5
+13.5	12.5	48.5	30.75
+14	13	49	31
+14.5	13.5	49.5	31.5
+15	14	50.5	32
+
+## Men's shoes width chart
+
+Narrow	Standard	Wide	Extra wide
+B	D	2E	4E
+
+## Women's shoes size chart
+
+Gender: Women
+How to Measure Your Shoe Size
+Follow these steps to determine your shoe size. Do this during or at the end of the day for accuracy, as feet swell throughout the day.
+1. Place a piece of paper under your foot. Stand up straight and have your heel lightly touching against a wall.
+2. Mark the tip of your longest toe and heel on the paper. Measure the length of your feet from heel to toe.
+3. Repeat the steps for your other foot and compare the measurements with our size chart below.
+Fit
+For running shoes, we generally recommend sizing up a half size from your casual shoe size.
+Women's Shoes Size Chart
+
+US	UK	EU	CM
+4	2	34.5	21.5
+4.5	2.5	35	22.0
+5	3	35.5	22.5
+5.5	3.5	36	22.75
+6	4	37	23.0
+6.5	4.5	37.5	23.5
+7	5	38	24.0
+7.5	5.5	39	24.5
+8	6	39.5	25.0
+8.5	6.5	40	25.5
+9	7	40.5	25.75
+9.5	7.5	41.5	26.0
+10	8	42	26.5
+10.5	8.5	42.5	27.0
+11	9	43.5	27.5
+11.5	9.5	44	28.0
+12	10	44.5	28.5
+12.5	10.5	45	28.75
+13	11	46	29.0
+
+## Women's shoes width chart
+
+Narrow	Standard	Wide	Extra Wide
+2A	B	D	2E
+
+## Kids shoes chart
+
+Gender: Kids
+Product Types: Shoes, Socks
+How to Measure Your Shoe Size
+Follow these steps to determine your shoe size. Do this during or at the end of the day for accuracy, as feet swell throughout the day.
+1. Place a piece of paper under your foot. Stand up straight and have your heel lightly touching against a wall.
+2. Mark the tip of your longest toe and heel on the paper. Measure the length of your feet from heel to toe.
+3. Repeat the steps for your other foot and compare the measurements with our size chart below.
+Kids Shoes Chart
+
+US	EU	CM
+K4	19.5	12.5
+K4.5	20.5	12.75
+K5	21	13.0
+K5.5	21.5	13.5
+K6	22.5	14.0
+K6.5	23	14.5
+K7	23.5	15.0
+K7.5	24	15.25
+K8	25	15.5
+K8.5	25.5	15.75
+K9	26	16.0
+K9.5	26.5	16.5
+K10	27	17
+K11	28.5	17.5
+K12	30	18.5
+K13	31.5	19.5
+1	32.5	20
+1.5	33	20.5
+2	33.5	21
+2.5	34.5	21.5
+3	35	22
+3.5	35.5	22.25
+4	36	22.5
+4.5	37	23
+5	37.5	23.5
+5.5	38	24
+6	39	24.5
+6.5	39.5	25
+7	40	25.5
+
+## Kids shoes width chart
+
+Narrow	Standard	Wide	Extra wide
+B	D	2E	4E

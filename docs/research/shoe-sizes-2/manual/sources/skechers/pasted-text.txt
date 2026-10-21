@@ -1,0 +1,105 @@
+# Pasted by Sean from skechers.com/size-chart/ (the Women's, Men's, Kids', and Infant & Toddler tabs; the page text highlighted and copied), 2026-10-20, after wave 3: a re-read of the page worker A fetched and checker A confirmed (docs/research/shoe-sizes-2.md §8), kept as the home site read in a browser. Tab-separated, verbatim; the page's words above and below each table as printed. No foot length on the page. Screenshots were shown in the session (each tab, and the Find Your Perfect Fit width panel) and are not saved as files.
+
+## Women's
+
+Skechers Shoe Sizes
+Designed for women, men and kids, Skechers' size charts are an easy way to find the perfect shoe fit including size and width.
+Women's Men's Kids' Infant & Toddler
+
+USA	UK	EU
+5	2	35
+5.5	2.5	35.5
+6	3	36
+6.5	3.5	36.5
+7	4	37
+7.5	4.5	37.5
+8	5	38
+8.5	5.5	38.5
+9	6	39
+9.5	6.5	39.5
+10	7	40
+10.5	7.5	40.5
+11	8	41
+12	9	42
+13	10	43
+
+Styles marked with EWW are part of our Extra Wide Fit Collection.
+Skechers Women's Wide Fit is equivalent to Women's W or D width.
+Skechers Performance running and walking footwear sizes may vary
+
+## Men's
+
+USA	UK	EU
+6.5	5.5	39
+7	6	39.5
+7.5	6.5	40
+8	7	41
+8.5	7.5	41.5
+9	8	42.5
+9.5	8.5	42.5
+10	9	42.5
+10.5	9.5	44
+11	10	45
+11.5	10.5	45.5
+12	11	46
+12.5	11.5	47
+13	12	47.5
+13.5	12.5	48
+14	13	48.5
+15	14	49.5
+16	15	50.5
+
+Styles marked with EWW are part of our Extra Wide Fit Collection.
+Skechers Men's Wide Fit is equivalent to Men's 2E / 3E sizes.
+Skechers Performance running and walking footwear sizes may vary
+
+## Kids'
+
+USA	UK	EU
+10.5-L	9.5	27
+11-L	10	27.5
+11.5-L	10.5	28
+12-L	11	28.5
+12.5-L	11.5	29
+13-L	12	30
+13.5-L	12.5	31
+1-L	13	32
+1.5-L	13.5	33
+2-L	1	33.5
+2.5-L	1.5	34
+3-L	2	35
+3.5	2.5	35.5
+4-L	3	36
+4.5-L	3.5	36.5
+5	4	37
+5.5-L	4.5	37.5
+6	5	38
+6.5	5.5	39
+7	6	40
+
+## Infant & Toddler
+
+USA	UK	EU
+1	0	16
+2	1	17
+3	2	18.5
+4	3	19.5
+5	4	20.5
+5.5	4.5	21
+6	5	21.5
+6.5	5.5	22
+7	6	22.5
+7.5	6.5	23
+8	7	24
+8.5	7.5	25
+9	8	25.5
+9.5	8.5	26
+10	9	26.5
+
+## Find Your Perfect Fit (the width panel, from the screenshot)
+
+Every foot is unique so we've developed a signature fit system to help you find your favorite style in the best size to ensure the greatest comfort possible.
+Skechers Classic Fit: Men's D Width, Women's B Width. Medium width shoes with a snug and even fit from heel to toe.
+Relaxed Fit from Skechers: Men's D/E Width, Women's B/C Width. Maintains medium width in the heel with a roomier toe box.
+Skechers Wide Fit: Men's 2E/3E Width, Women's D Width. A bit more open interior offers a looser fit around the entire foot.
+Skechers Extra Wide Fit: Men's 4E/5E Width. Maximum space means wider feet stay comfortable all day.

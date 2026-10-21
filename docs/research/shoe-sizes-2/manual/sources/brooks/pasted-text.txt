@@ -1,0 +1,116 @@
+# Pasted by Sean from brooksrunning.com's size guide (the Women's, Men's, and All gender guides, their Shoes tab; the page text highlighted and copied), 2026-10-20, after wave 3. Tab-separated, verbatim; the page's words above each table as printed. Screenshots: 01 the women's guide, 02 the men's, 03 and 04 the all-gender guide (04 its width table with the All gender column). The page prints no foot length.
+
+## Women's shoes
+
+Women's running shoes size guides
+We recommend a thumb's width of space between your longest toe and the tip of your shoe. Consider buying a shoe that is a half size up from your measured size.
+Size chart
+Shoe size comparison
+
+US	UK	Europe
+5	3	35.5
+5.5	3.5	36
+6	4	36.5
+6.5	4.5	37.5
+7	5	38
+7.5	5.5	38.5
+8	6	39
+8.5	6.5	40
+9	7	40.5
+9.5	7.5	41
+10	8	42
+10.5	8.5	42.5
+11	9	43
+11.5	9.5	44
+12	10	44.5
+12.5	10.5	45
+13	11	45.5
+
+## Women's shoe width comparison
+
+Shoe width comparison
+
+	Men's	Women's
+Narrow	B	2A
+Medium	D	B
+Wide	2E	D
+Extra Wide	4E	2E
+
+## Men's shoes
+
+Men's shoes
+We recommend a thumb's width of space between your longest toe and the tip of your shoe. Consider buying a shoe that is a half size up from your measured size.
+Size chart
+Shoe size comparison
+
+US	UK	Europe
+5	4	37.5
+5.5	4.5	38
+6	5	38.5
+6.5	5.5	39
+7	6	40
+7.5	6.5	40.5
+8	7	41
+8.5	7.5	42
+9	8	42.5
+9.5	8.5	43
+10	9	44
+10.5	9.5	44.5
+11	10	45
+11.5	10.5	45.5
+12	11	46
+12.5	11.5	46.5
+13	12	47.5
+14	13	48.5
+15	14	49.5
+16	15	50.5
+
+## Men's shoe width comparison
+
+Shoe width comparison
+
+	Men's	Women's
+Narrow	B	2A
+Medium	D	B
+Wide	2E	D
+Extra Wide	4E	2E
+
+## All gender shoes
+
+All gender shoes
+We recommend a thumb's width of space between your longest toe and the tip of your shoe. Consider buying a shoe that is a half size up from your measured size.
+All gender ("unisex") sizes match men's sizes per industry standards.
+Size chart
+Shoe size comparison
+
+US	UK	Europe
+5	4	37.5
+5.5	4.5	38
+6	5	38.5
+6.5	5.5	39
+7	6	40
+7.5	6.5	40.5
+8	7	41
+8.5	7.5	42
+9	8	42.5
+9.5	8.5	43
+10	9	44
+10.5	9.5	44.5
+11	10	45
+11.5	10.5	45.5
+12	11	46
+12.5	11.5	46.5
+13	12	47.5
+14	13	48.5
+15	14	49.5
+16	15	50.5
+
+## All gender shoe width comparison
+
+Shoe width comparison
+
+	All gender	Men's	Women's
+Narrow	B	B	2A
+Medium	D	D	B
+Wide	2E	2E	D
+Extra Wide	4E	4E	2E

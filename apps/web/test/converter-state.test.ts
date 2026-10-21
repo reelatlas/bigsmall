@@ -726,7 +726,12 @@ describe('shoe sizes (ADR 0027)', () => {
     expect(row(between, 'us-children')).toMatchObject({ text: '8', approx: true });
     // A small foot is below the scales: where each begins.
     const small = units(type('100 mm'), { type: 'use', unit: 'mondopoint', text: '100' });
-    expect(row(small, 'us-children')).toMatchObject({ text: '< 4', tone: 'beyond', value: 4 });
+    expect(row(small, 'us-children')).toMatchObject({
+      text: '< 4',
+      tone: 'beyond',
+      value: 4,
+      detail: 'below its range',
+    });
     expect(row(small, 'uk-children')).toMatchObject({ text: '< 3.5', tone: 'beyond' });
     expect(row(small, 'eu-children')).toMatchObject({ text: '< 19.5', tone: 'beyond' });
     // A size outside its own scale: the box's row as typed, the others waiting with dashes, and
@@ -949,13 +954,11 @@ describe('brands (ADR 0028)', () => {
       text: '10',
       approx: false,
       brand: { id: 'adidas', line: 'unisex' },
-      detail: '27.1 cm',
     });
     expect(row(table, 'brand:new-balance')).toMatchObject({
       text: '9',
       value: 9,
       approx: true,
-      detail: 'men’s · 27 cm',
       symbol: 'US M',
       inBox: false,
     });
@@ -964,12 +967,11 @@ describe('brands (ADR 0028)', () => {
       text: '10',
       inBox: true,
       brand: { id: 'nike', line: 'men' },
-      detail: 'men’s · 27.1 cm',
     });
     expect(row(table, 'brand:puma')).toMatchObject({
       tone: 'empty',
       text: NO_VALUE,
-      detail: 'men’s · no foot length',
+      detail: 'no foot length',
     });
     expect(table.rows.filter((each) => each.inBox).map((each) => each.id)).toEqual(['brand:nike']);
     expect(table.note).toBe('Nike’s size chart, the men’s, nike.com, read Oct 2026.');
@@ -984,6 +986,22 @@ describe('brands (ADR 0028)', () => {
     expect(row(nb, 'brand:new-balance')).toMatchObject({ text: '9', inBox: true });
     expect(row(nb, 'us-men')).toMatchObject({ text: '10', approx: true, inBox: false });
     expect(row(nb, 'brand:nike')).toMatchObject({ text: '10', approx: true, inBox: false });
+  });
+
+  it('a brand row’s words: the line where the scale does not say it, the dash’s reason naming the scale, nothing else; a row beyond its scale says where the foot stands', () => {
+    const table = units(type('nike 10'), nike());
+    expect(row(table, 'brand:nike').detail).toBeUndefined();
+    expect(row(table, 'brand:new-balance').detail).toBeUndefined();
+    expect(row(table, 'brand:adidas').detail).toBeUndefined();
+    const eu = units(type('eu 43'), { type: 'use', unit: 'eu', text: '43' });
+    expect(row(eu, 'brand:nike')).toMatchObject({ detail: 'men' });
+    expect(row(eu, 'brand:adidas').detail).toBeUndefined();
+    expect(row(eu, 'brand:reebok')).toMatchObject({ tone: 'empty', detail: 'prints no EU' });
+    expect(row(eu, 'brand:brooks')).toMatchObject({
+      tone: 'empty',
+      detail: 'men · no foot length',
+    });
+    expect(row(table, 'us-children')).toMatchObject({ text: '> 13.5', detail: 'above its range' });
   });
 
   it('a range stands as printed in the brand’s own row; a scale the brand prints nothing for is ISO’s like every scale', () => {
@@ -1018,7 +1036,7 @@ describe('brands (ADR 0028)', () => {
 
   it('a brand with no foot length has its size read as ISO’s label, said with what it prints; a size off its chart says the span', () => {
     const puma = units(type('puma 10'), { type: 'use', unit: 'us-men', text: '10', brand: 'puma' });
-    expect(row(puma, 'brand:puma')).toMatchObject({ text: '10', inBox: true, detail: 'men’s' });
+    expect(row(puma, 'brand:puma')).toMatchObject({ text: '10', inBox: true });
     expect(row(puma, 'eu')).toMatchObject({ text: '42.5', approx: true });
     expect(row(puma, 'brand:nike')).toMatchObject({ text: '10', approx: false });
     expect(puma.note).toBe(
@@ -1050,7 +1068,7 @@ describe('brands (ADR 0028)', () => {
     expect(row(puma, 'us-men')).toMatchObject({ text: '10', approx: true });
     expect(row(puma, 'brand:puma')).toMatchObject({
       tone: 'empty',
-      detail: 'men’s · no foot length',
+      detail: 'no foot length',
     });
     expect(row(puma, 'brand:nike')).toMatchObject({ text: '10', approx: true });
     expect(puma.note).toContain('has no size for a measured foot');
@@ -1063,7 +1081,7 @@ describe('brands (ADR 0028)', () => {
     expect(row(men, 'brand:new-balance')).toMatchObject({ text: '8.5', approx: true });
     expect(row(men, 'brand:brooks')).toMatchObject({
       tone: 'empty',
-      detail: 'men’s · no foot length',
+      detail: 'no foot length',
     });
     expect(men.rows.filter((each) => each.inBox).map((each) => each.id)).toEqual(['us-men']);
     const women = units(type('women 8'), { type: 'use', unit: 'us-women', text: '8' });
@@ -1078,7 +1096,7 @@ describe('brands (ADR 0028)', () => {
     const kid = units(type('150 mm'), { type: 'use', unit: 'mondopoint', text: '150' });
     expect(row(kid, 'brand:nike')).toMatchObject({
       tone: 'empty',
-      detail: 'men’s · off its chart',
+      detail: 'off its chart',
     });
     // Nothing typed yet: dashes, the brands' too.
     const waiting = units({ type: 'chooseCategory', category: 'shoe-size' });

@@ -436,7 +436,7 @@ export interface TableRow {
    * written on.
    */
   brand?: { id: string; line: BrandChart['line'] } | undefined;
-  /** Words after the name, in the muted ink: a brand row's line and the foot its chart gives, or why it has no size. */
+  /** Words after the name, in the muted ink: a brand row's chart line where the scale does not say it, why it has no size, or where a row beyond its scale stands (above its range). */
   detail?: string | undefined;
   /**
    * The brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
@@ -1031,11 +1031,12 @@ function selectUnits(
 const BRANDS_HEADING = 'Brands';
 
 /** Why a brand's row has no size, after its name. */
-const WHY: Record<NonNullable<BrandRowReading['why']>, string> = {
-  'no-length': 'no foot length',
-  'no-scale': 'prints no such scale',
-  'off-chart': 'off its chart',
-};
+/** Why a brand has no size on the scale, after its name: the dash's reason (ADR 0028). */
+function whyWords(why: NonNullable<BrandRowReading['why']>, scaleUnit: Unit): string {
+  if (why === 'no-length') return 'no foot length';
+  if (why === 'no-scale') return `prints no ${scaleUnit.symbol}`;
+  return 'off its chart';
+}
 
 /**
  * Every brand, to choose from, under one heading: the list the brand's pill opens (ADR 0028), the
@@ -1231,21 +1232,37 @@ function remapRows(view: UnitsView, map: (row: TableRow) => TableRow): UnitsView
   };
 }
 
-const LINE_WORD: Record<BrandChart['line'], string> = {
+/** The chart's line in the note's prose: "the men’s", "Nike’s women’s chart". */
+const LINE_POSS: Record<BrandChart['line'], string> = {
   men: 'men’s',
   women: 'women’s',
   unisex: '',
 };
 
-/** A brand row's words after its name: the chart's line and the foot it gives ("men’s · 27 cm"). */
+/** The chart's line as a row's word, no possessive and no plural, as the units' names are (Sean, 2026-10-20). */
+const LINE_WORD: Record<BrandChart['line'], string> = {
+  men: 'men',
+  women: 'women',
+  unisex: '',
+};
+
+/**
+ * The chart's line after a brand's name, where the scale does not say it: "men" or "women" on
+ * EU, UK, JP, and the foot's units, nothing on US men's or US women's (Sean, 2026-10-20, the
+ * hundred-and-nineteenth pass; the foot each chart gives stood there too, cut short on every
+ * screen and saying what ≈ and the foot's rows already say).
+ */
+function lineWord(line: BrandChart['line'], scaleUnit: Unit): string {
+  return scaleUnit.id === 'us-men' || scaleUnit.id === 'us-women' ? '' : LINE_WORD[line];
+}
+
+/** A brand row's words after its name, or none: the line where the scale does not say it, and why it has no size. */
 function detailOf(
   line: BrandChart['line'],
-  foot: number | null,
-  locale: string | undefined,
-): string {
-  const words = [LINE_WORD[line]];
-  if (foot !== null) words.push(`${sizeOf(Math.round(foot) / 10, locale)} cm`);
-  return words.filter(Boolean).join(' · ');
+  scaleUnit: Unit,
+  why: string | null = null,
+): string | undefined {
+  return [lineWord(line, scaleUnit), why].filter(Boolean).join(' · ') || undefined;
 }
 
 /**
@@ -1283,25 +1300,24 @@ function brandsSection(
       rows.push({
         ...brandCellRow(scaleUnit, from, value, cell?.range, false, locale),
         ...tag,
-        detail: detailOf(chart.line, own.row?.foot ?? null, locale),
+        detail: detailOf(chart.line, scaleUnit),
         inBox: true,
       });
       return;
     }
     if (!read || read.value === null) {
-      const why = read?.why ? WHY[read.why] : null;
       rows.push({
         ...emptyRow(scaleUnit, from),
         ...tag,
         inBox: false,
-        detail: [LINE_WORD[chart.line], why].filter(Boolean).join(' · '),
+        detail: detailOf(chart.line, scaleUnit, read?.why ? whyWords(read.why, scaleUnit) : null),
       });
       return;
     }
     rows.push({
       ...brandCellRow(scaleUnit, from, read.value, read.range, read.approx, locale),
       ...tag,
-      detail: detailOf(chart.line, read.foot, locale),
+      detail: detailOf(chart.line, scaleUnit),
     });
   });
   return {
@@ -1340,7 +1356,7 @@ function brandNote(
   locale: string | undefined,
 ): string {
   const chart = reading?.chart ?? brandChart(brand, false);
-  const line = chart.line === 'unisex' ? '' : `, the ${LINE_WORD[chart.line]}`;
+  const line = chart.line === 'unisex' ? '' : `, the ${LINE_POSS[chart.line]}`;
   const lines = [
     `${poss(brand.name)} size chart${line}, ${brand.site}, read ${monthYear(chart.read)}.`,
   ];
@@ -1350,7 +1366,7 @@ function brandNote(
     const size = sizeOf(value, locale);
     if (reading.beyond) {
       const [low, high] = reading.beyond;
-      const adj = LINE_WORD[chart.line] ? `${LINE_WORD[chart.line]} ` : '';
+      const adj = LINE_POSS[chart.line] ? `${LINE_POSS[chart.line]} ` : '';
       lines.push(
         `${poss(name)} ${adj}chart runs ${unit.symbol} ${sizeOf(low, locale)} to ${sizeOf(high, locale)}.`,
       );
@@ -1495,7 +1511,8 @@ function valueRow(
   // A foot beyond the row's scale (a children's table, ADR 0027): the row says where the scale
   // ends, "> 13.5" or "< 4", in place of a size no shoe is marked in, the sign first in the form
   // a value under a step takes ("< 0.01"), the end its value, which the table writes as a size
-  // under the display ("> 13 1/2" with Fraction).
+  // under the display ("> 13 1/2" with Fraction), and after the name a word saying where the
+  // foot stands, above or below its range (Sean, 2026-10-20: the muted ink alone was not clear).
   const beyond = target.id === from.id ? null : beyondScale(from, target, value);
   if (beyond) {
     return {
@@ -1504,6 +1521,7 @@ function valueRow(
       text: `${beyond.past ? '>' : '<'} ${sizeText(beyond.end, locale)}`,
       tone: 'beyond',
       stepped: target.step !== undefined,
+      detail: beyond.past ? 'above its range' : 'below its range',
     };
   }
   const exact = target.id === from.id ? value : converter(value, from, target);

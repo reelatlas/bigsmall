@@ -2317,6 +2317,8 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   // cell ends on one edge, Puma's dash and Birkenstock's range with the sizes (Sean, 2026-10-20).
   await expect(row(page, 'brand:birkenstock')).toContainText(/\d(\.5)?–\d/);
   expect(new Set(await firstCellRights(page)).size).toBe(1);
+  // A row beyond its scale says where the foot stands (Sean, 2026-10-20).
+  await expect(row(page, 'us-children')).toContainText('above its range');
   await expect(
     page.getByText(/^Nike’s size chart, the men’s, nike\.com, read Oct 2026\./),
   ).toBeVisible();

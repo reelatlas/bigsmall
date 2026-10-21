@@ -91,7 +91,7 @@ interface ConversionRow {
    * if empty and cut short rather than widening the column.
    */
   brand?: { id: string; line: string } | undefined;
-  /** Words after the name in the muted ink: a brand row's line and foot, or why it has no size. */
+  /** Words after the name in the muted ink: a brand row's chart line, why it has no size, or where a row beyond its scale stands. */
   detail?: string | undefined;
   /**
    * A brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text

@@ -2319,6 +2319,12 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   expect(new Set(await firstCellRights(page)).size).toBe(1);
   // A row beyond its scale says where the foot stands (Sean, 2026-10-20).
   await expect(row(page, 'us-children')).toContainText('above its range');
+  // The words after a name give way before the names (2026-10-20): a phone keeps the brand
+  // rows' names; a desktop shows the words.
+  await expect(row(page, 'brand:new-balance').locator('[data-name]')).toBeVisible();
+  if ((page.viewportSize()?.width ?? 0) >= 576) {
+    await expect(row(page, 'us-children').locator('[data-column="detail"]')).toBeVisible();
+  }
   // The unit's chip with a brand opens the brand's scales (2026-10-20): EU taken reads Nike's
   // own 44 for the same row, the brand staying, the brands' rows in EU, and ISO's EU ≈ 42.5
   // beside it showing the difference; the chip again brings US men back.

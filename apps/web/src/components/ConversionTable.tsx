@@ -91,7 +91,7 @@ interface ConversionRow {
    * if empty and cut short rather than widening the column.
    */
   brand?: { id: string; line: string } | undefined;
-  /** Words after the name in the muted ink: a brand row's chart line, why it has no size, or where a row beyond its scale stands. */
+  /** Words after the name in the muted ink: a brand row's chart line, why it has no size, or where a row beyond its scale stands; they give way before the names where a row lacks the room. */
   detail?: string | undefined;
   /**
    * A brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
@@ -188,8 +188,9 @@ export interface ConversionTableProps<T extends ConversionRow> {
  * left-aligned in its own; the copied check flashing over its end, a grid item laid on the
  * row's own area (never a positioned child: WebKit lays a nested subgrid out wrong under one,
  * docs/LEARNINGS.md, 2026-10-20). The names keep to one line: where one would not fit beside
- * its value (a long value on a phone), every name gives way first (GIVE_WAY), then Both's
- * fraction moves under the decimal, on a second line in the value's columns, the symbol and the
+ * its value (a long value on a phone), the words after the names give way first, then every name
+ * (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
+ * columns, the symbol and the
  * name centred beside both lines; a column comes back once a later one's going makes its room.
  * The single units size the columns and a pair reacts to the room they leave (Sean, 2026-10-20):
  * its symbol takes the spare width before the symbols and must fit there, the names going for it
@@ -201,13 +202,15 @@ const ROWS =
   'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
 
 /**
- * The columns that give way when a row has no room for them, in that order (useColumnsFit): every
- * name, then Both's fraction; each comes back once a later one's going makes its room. A pair's
+ * The columns that give way when a row has no room for them, in that order (useColumnsFit): the
+ * words after a name (a brand row's line or reason, a row beyond its scale's word; 2026-10-20:
+ * inside the names' cells they cost a phone every name), then every name, then Both's fraction;
+ * each comes back once a later one's going makes its room. A pair's
  * symbol never gives way: it must fit (`data-fits`) over the spare width before the symbols, and
  * the names go for it as for a wide value, so nothing of a pair drops before the single units'
  * equivalent would (Sean, 2026-10-20).
  */
-const GIVE_WAY = ['name', 'second'] as const;
+const GIVE_WAY = ['detail', 'name', 'second'] as const;
 
 /** A symbol's trailing exponent, set in a column of its own: "km²" is "km" and "²". */
 const EXPONENT = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+$/u;
@@ -567,6 +570,7 @@ export function ConversionTable<T extends ConversionRow>({
   const checkId = useId();
   const gridRef = useRef<HTMLDivElement>(null);
   const fitted = useColumnsFit(gridRef, GIVE_WAY);
+  const detailsHidden = fitted.includes('detail');
   const namesHidden = fitted.includes('name');
   const secondHidden = fitted.includes('second');
   const withNames = display.names === 'both';
@@ -733,7 +737,11 @@ export function ConversionTable<T extends ConversionRow>({
             data-column={reacts ? undefined : 'name'}
           >
             {row.name}
-            {row.detail && <span className="text-sm text-ink-muted"> · {row.detail}</span>}
+            {row.detail && (
+              <span hidden={detailsHidden} data-column="detail" className="text-sm text-ink-muted">
+                {` · ${row.detail}`}
+              </span>
+            )}
           </span>
         ) : (
           <span aria-hidden="true" className={tall || undefined} />

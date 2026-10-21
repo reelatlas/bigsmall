@@ -39,9 +39,9 @@ type Outcome = 'none' | 'ready' | 'failed';
 /**
  * The charts' state for the table's options: idle until wanted (Shoe size open, a brand in the
  * box, or a brand's name begun in the box), loading while fetched, ready once core has them,
- * failed when the fetch did, the rows then waiting with dashes and the line under the table
- * saying so (state.ts, selectShoe). A want after a failure fetches again. The server renders
- * idle: the first render on a client and the server's agree, and the start view needs no chart.
+ * failed when the fetch did, the rows then waiting with dashes and the line above them saying
+ * so (state.ts, selectShoe). A want after a failure fetches again. The server renders idle: the
+ * first render on a client and the server's agree, and the start view needs no chart.
  */
 export function useBrandCharts(wanted: boolean): ChartsStatus {
   const [outcome, setOutcome] = useState<Outcome>(() =>

@@ -80,7 +80,9 @@ export function roundedScaled(value: number, scale: number, rounding: Rounding):
   return rounded(value * scale, rounding);
 }
 
-/** A value written to a step: the nearest multiple, and whether that moved it beyond float noise. */
+/**
+ * A value written to a step: the nearest multiple, and whether that moved it beyond float noise.
+ */
 export interface Stepped {
   value: number;
   approx: boolean;

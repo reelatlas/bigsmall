@@ -11,7 +11,7 @@ interface ChipProps {
    * lib/fit-step.ts). Compact hides it rather than leaving it out, so it can be measured.
    */
   nameRef?: Ref<HTMLSpanElement>;
-  /** An ingredient's chevron, which compact hides, for the field's fit to measure the same way. */
+  /** A second pill's chevron, which compact hides, for the field's fit to measure the same way. */
   chevronRef?: Ref<HTMLSpanElement>;
   /**
    * Called when the user activates the chip's body: the caret goes into the field, whose keys and
@@ -38,7 +38,8 @@ type UnitChipProps = ChipProps &
     | { brand: ShoeBrand; unit?: undefined; ingredient?: undefined; expanded?: boolean }
   );
 
-// The chip lives inside a field: its corners nest inside the field's (docs/DESIGN-SYSTEM.md, "Fields").
+// The chip lives inside a field: its corners nest inside the field's (docs/DESIGN-SYSTEM.md,
+// "Fields").
 const CHIP = 'inline-flex min-h-11 items-stretch rounded-nested bg-accent-soft text-ink';
 // Baseline alignment keeps the name and the symbol on one line of type.
 const BODY = 'inline-flex items-baseline gap-2 self-center px-3';

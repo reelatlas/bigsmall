@@ -74,7 +74,10 @@ import {
  * React, no DOM: everything here is unit-tested in node.
  */
 
-/** The calculator's own entry (docs/UX-SPEC.md §8). `fresh` is true right after =, when a digit starts over. */
+/**
+ * The calculator's own entry (docs/UX-SPEC.md §8). `fresh` is true right after =, when a digit
+ * starts over.
+ */
 export interface CalculatorState {
   text: string;
   fresh: boolean;
@@ -125,7 +128,9 @@ export interface ConverterState {
 /** Where typing lands: the box, or the calculator's entry. */
 type TextTarget = 'box' | 'calc';
 
-/** The part of the state a URL or a later persistence layer restores, through the `hydrate` action. */
+/**
+ * The part of the state a URL or a later persistence layer restores, through the `hydrate` action.
+ */
 export type Restorable = Partial<
   Pick<ConverterState, 'text' | 'unit' | 'ingredient' | 'brand' | 'line'>
 >;
@@ -161,15 +166,24 @@ function lineAfter(unit: Unit | undefined, line: ShoeLine | null): ShoeLine | nu
   return line;
 }
 
-/** Whether the women's charts answer: a US women's size, or the women's line kept on a scale that does not say it. */
+/**
+ * Whether the women's charts answer: a US women's size, or the women's line kept on a scale that
+ * does not say it.
+ */
 function readsWomen(unit: Unit | null, line: ShoeLine | null): boolean {
   return unit?.id === 'us-women' || (line === 'women' && unit?.id !== 'us-men');
 }
 
 export type Action =
-  /** A keystroke or paste in the box. `at` is a monotonic time in ms; only gaps between inputs matter. */
+  /**
+   * A keystroke or paste in the box. `at` is a monotonic time in ms; only gaps between inputs
+   * matter.
+   */
   | { type: 'input'; text: string; at: number }
-  /** A whole new text as one undoable step: arithmetic turned into its value, a number sent from the calculator, a step of Escape. */
+  /**
+   * A whole new text as one undoable step: arithmetic turned into its value, a number sent from the
+   * calculator, a step of Escape.
+   */
   | { type: 'replace'; text: string }
   /** A calculator key that edits its entry the way typing does: chunked for undo and Escape. */
   | { type: 'calcType'; text: string; fresh: boolean; at: number }
@@ -193,14 +207,20 @@ export type Action =
    * keeping a weight or a volume, and its new text, the number as typed.
    */
   | { type: 'useIngredient'; ingredient: string; text: string }
-  /** The ingredient taken out (its pill's ×, Backspace): a weight or a volume stays, in its own category. */
+  /**
+   * The ingredient taken out (its pill's ×, Backspace): a weight or a volume stays, in its own
+   * category.
+   */
   | { type: 'removeIngredient' }
   /**
    * A brand taken into the box (a match, a brand's row, or a choice in the brands' list; ADR
    * 0028): Shoe size, the box keeping a shoe scale, and its new text, the number as typed.
    */
   | { type: 'useBrand'; brand: string; text: string }
-  /** The brand taken out (its pill's ×, Backspace, ISO's row): the scale stays, ISO's chart answering. */
+  /**
+   * The brand taken out (its pill's ×, Backspace, ISO's row): the scale stays, ISO's chart
+   * answering.
+   */
   | { type: 'removeBrand' }
   /**
    * A category chosen (its menu, a start tile, or a category match): the box keeps its number and
@@ -208,7 +228,9 @@ export type Action =
    * converted from a unit nobody chose (docs/UX-SPEC.md §1).
    */
   | { type: 'chooseCategory'; category: CategoryId }
-  /** The unit taken out of the box (the chip's ×, Backspace on an empty box): its category stays. */
+  /**
+   * The unit taken out of the box (the chip's ×, Backspace on an empty box): its category stays.
+   */
   | { type: 'unlock' }
   | { type: 'clear' }
   | { type: 'hydrate'; state: Restorable };
@@ -429,7 +451,8 @@ export function noMatchMessage(query: string): string {
 
 /**
  * Significant digits a row shows with No limit: few enough to compare rows at a glance. The row's
- * own text is these to the nearest; Up and Down take the same cut (ConversionTable, Sean, 2026-10-18).
+ * own text is these to the nearest; Up and Down take the same cut (ConversionTable, Sean,
+ * 2026-10-18).
  */
 export const TABLE_PRECISION = 6;
 
@@ -439,7 +462,10 @@ export const NO_VALUE = '—';
 /** At most this many matches while a unit is typed. */
 const MATCH_LIMIT = 20;
 
-/** A row, with what the table component shows (components/ConversionTable.tsx) and what lies behind it. */
+/**
+ * A row, with what the table component shows (components/ConversionTable.tsx) and what lies behind
+ * it.
+ */
 export interface TableRow {
   unit: Unit;
   /** The unit's id. */
@@ -453,7 +479,10 @@ export interface TableRow {
    * a size under the display.
    */
   value: number | null;
-  /** As the row shows it: TABLE_PRECISION significant digits, "Too large" or "Too small", or NO_VALUE. */
+  /**
+   * As the row shows it: TABLE_PRECISION significant digits, "Too large" or "Too small", or
+   * NO_VALUE.
+   */
   text: string;
   /**
    * What the text is: a value; a dash, while there is no number or no unit to convert from; a
@@ -484,12 +513,15 @@ export interface TableRow {
    */
   pair?: Unit | undefined;
   /**
-   * A brand's row under the table (ADR 0028): the brand, by id, with the line of the chart read,
-   * taking the row bringing the brand with its size. The row's unit is the scale the size is
-   * written on.
+   * A brand's row in the brands' section (ADR 0028): the brand, by id, with the line of the chart
+   * read, taking the row bringing the brand with its size. The row's unit is the scale the size
+   * is written on.
    */
   brand?: { id: string; line: BrandChart['line'] } | undefined;
-  /** Words after the name, in the muted ink: a brand row's chart line where the scale does not say it, why it has no size, or where a row beyond its scale stands (above its range). */
+  /**
+   * Words after the name, in the muted ink: a brand row's chart line where the scale does not say
+   * it, why it has no size, or where a row beyond its scale stands (above its range).
+   */
   detail?: string | undefined;
   /**
    * The brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
@@ -531,7 +563,10 @@ type MatchRow =
       inBox: boolean;
       text?: string | undefined;
       target?: string | undefined;
-      /** The chart line to read the brand on, from the chip's list (ADR 0028, 2026-10-20); null the scale's own. */
+      /**
+       * The chart line to read the brand on, from the chip's list (ADR 0028, 2026-10-20); null the
+       * scale's own.
+       */
       line?: ShoeLine | null | undefined;
       group?: string;
     };
@@ -592,7 +627,10 @@ interface MatchesView extends TableViewBase {
   category: CategoryId | null;
   /** The typed unit, whose matched letters the rows set heavier. */
   query: string;
-  /** Each category's matches together, its own row first, the groups in the order of their best match. */
+  /**
+   * Each category's matches together, its own row first, the groups in the order of their best
+   * match.
+   */
   rows: MatchRow[];
   /** How many units match, per category with any match; one that matched by name alone counts 0. */
   counts: Partial<Record<CategoryId, number>>;
@@ -639,10 +677,16 @@ interface TableOptions extends NumberEnv {
 /** Every system switched on and no unit chosen on its own: every unit shows. */
 const SHOW_ALL: ViewRule = { shown: new Set(SYSTEM_KEYS), overrides: new Map() };
 
-/** Every unit and category, specialty ones too: the table has no standard and specialty modes (docs/UX-SPEC.md §3). */
+/**
+ * Every unit and category, specialty ones too: the table has no standard and specialty modes
+ * (docs/UX-SPEC.md §3).
+ */
 const EVERY_TIER = 'all';
 
-/** What the table shows under the box: the matches while a unit is typed, else the category's units, else the start. */
+/**
+ * What the table shows under the box: the matches while a unit is typed, else the category's units,
+ * else the start.
+ */
 export function selectTable(state: ConverterState, options: TableOptions): TableView {
   const parsed = parse(state.text, options.separators);
   const unit = state.unit ? (getUnit(state.unit) ?? null) : null;
@@ -713,7 +757,7 @@ export function selectTable(state: ConverterState, options: TableOptions): Table
       ? selectCooking(base, ingredient, unit, parsed, options)
       : ingredientList(base);
   }
-  // Shoe size with or without a brand (ADR 0028): the brands' rows under the scales either way.
+  // Shoe size with or without a brand (ADR 0028): the brands' rows beside the scales either way.
   if (category === SHOE) return selectShoe(base, unit, parsed, options, brand, state.line);
   return selectUnits(base, category, unit, parsed, options);
 }
@@ -844,7 +888,9 @@ function countsOf(rows: readonly MatchRow[]): Partial<Record<CategoryId, number>
   return counts;
 }
 
-/** What the live region says of the matches: how many, or that only hidden units, or none, match. */
+/**
+ * What the live region says of the matches: how many, or that only hidden units, or none, match.
+ */
 function matchesAnnouncement(rows: readonly MatchRow[], hidden: readonly HiddenMatch[]): string {
   if (rows.length > 0) return `${rows.length} ${rows.length === 1 ? 'match' : 'matches'}`;
   return hidden.length > 0 ? 'Only hidden units match' : 'No unit matches';
@@ -885,7 +931,9 @@ export function ingredientList(base: ViewBase, current: Ingredient | null = null
 /** Rank of a unit's group for a visitor: their own system first (order.ts). */
 const GROUP_RANK: Record<ListGroup, number> = { own: 0, other: 1, neither: 2, specialty: 3 };
 
-/** Cooking's units for an ingredient, Weight's then Volume's, each the visitor's own system first. */
+/**
+ * Cooking's units for an ingredient, Weight's then Volume's, each the visitor's own system first.
+ */
 function cookingListed(ingredient: Ingredient, inBox: Unit | null, system: UnitPreference): Unit[] {
   const listed = cookingUnits(ingredient);
   // A weight or a volume Cooking does not list (a pint) stays listed while it is in the box.
@@ -1102,7 +1150,6 @@ function selectUnits(
 /** The brands' one heading, in the list their pill opens. */
 const BRANDS_HEADING = 'Brands';
 
-/** Why a brand's row has no size, after its name. */
 /** Why a brand has no size on the scale, after its name: the dash's reason (ADR 0028). */
 function whyWords(why: NonNullable<BrandRowReading['why']>, scaleUnit: Unit): string {
   if (why === 'no-length') return 'no foot length';
@@ -1339,7 +1386,10 @@ const LINE_POSS: Record<BrandChart['line'], string> = {
   unisex: '',
 };
 
-/** The chart's line as a row's word, no possessive and no plural, as the units' names are (Sean, 2026-10-20). */
+/**
+ * The chart's line as a row's word, no possessive and no plural, as the units' names are (Sean,
+ * 2026-10-20).
+ */
 const LINE_WORD: Record<BrandChart['line'], string> = {
   men: 'men',
   women: 'women',
@@ -1356,7 +1406,10 @@ function lineWord(line: BrandChart['line'], scaleUnit: Unit): string {
   return scaleUnit.id === 'us-men' || scaleUnit.id === 'us-women' ? '' : LINE_WORD[line];
 }
 
-/** A brand row's words after its name, or none: the line where the scale does not say it, and why it has no size. */
+/**
+ * A brand row's words after its name, or none: the line where the scale does not say it, and why it
+ * has no size.
+ */
 function detailOf(
   line: BrandChart['line'],
   scaleUnit: Unit,
@@ -1616,7 +1669,7 @@ export function scaleList(
   };
 }
 
-/** The line under the table when the brands' charts could not be fetched (ADR 0029). */
+/** The line above the rows when the brands' charts could not be fetched (ADR 0029). */
 const CHARTS_FAILED = 'Brand charts not loaded. Reload to try again.';
 
 /**
@@ -1659,7 +1712,7 @@ function selectShoe(
   // for a size on its scales or a labelled brand's, the length typed; none while the rows wait or
   // a size is off its chart.
   // A brand in the box while its chart is not here (loading, or the fetch failed): no foot to
-  // read from, every row a dash, the line under the table saying so (ADR 0029).
+  // read from, every row a dash, the line above the rows saying so (ADR 0029).
   const waiting = brand !== null && !ready;
   let foot: number | null = null;
   if (reading) {
@@ -2122,7 +2175,10 @@ export interface History {
   future: Snapshot[];
   /** The typing chunk in progress: in the box or the calculator, and when its latest key landed. */
   run: { target: TextTarget; at: number } | null;
-  /** The calculator's chunks of typing, oldest first, each the text it started from: what its Escape takes back. */
+  /**
+   * The calculator's chunks of typing, oldest first, each the text it started from: what its Escape
+   * takes back.
+   */
   chunks: string[];
 }
 
@@ -2161,7 +2217,10 @@ function startsWord(before: string, after: string): boolean {
   return after.length > before.length && after.startsWith(before) && after[before.length] === ' ';
 }
 
-/** A chunk can be stepped back through only while its starting text is still a proper prefix of the text. */
+/**
+ * A chunk can be stepped back through only while its starting text is still a proper prefix of the
+ * text.
+ */
 function isCheckpoint(before: string, text: string): boolean {
   return before.length < text.length && text.startsWith(before);
 }

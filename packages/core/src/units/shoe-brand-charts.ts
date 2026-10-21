@@ -1,10 +1,11 @@
 /**
  * The brands' shoe-size charts as data core is given, not data it carries (ADR 0029): the file
  * `packages/core/data/shoe-brands.json`, written from the research record by
- * `docs/research/shoe-sizes-2/write_brands.py`, is fetched by the web app once Shoe size opens
- * and handed to `setBrandCharts`; the tests and the site's build hand it over directly. Core stays
- * pure and synchronous: the lookups (`../shoe-brands.ts`) read the charts from here once given,
- * and throw, as a programming error, if asked before.
+ * `docs/research/shoe-sizes-2/write_brands.py`, is fetched by the web app once it is wanted
+ * (Shoe size open, or a brand in the box or begun there) and handed to `setBrandCharts`; the
+ * tests and the site's build hand it over directly. Core stays pure and synchronous: the lookups
+ * (`../shoe-brands.ts`) read the charts from here once given, and throw, as a programming error,
+ * if asked before.
  */
 
 /** The line a chart is printed for: a men's or a women's page, or one chart for everyone. */
@@ -33,7 +34,10 @@ export interface BrandChartRow {
   foot?: number;
 }
 
-/** A brand's chart as published: its line, its length's basis, its name on the page, its page, and its rows. */
+/**
+ * A brand's chart as published: its line, its length's basis, its name on the page, its page, and
+ * its rows.
+ */
 export interface BrandChart {
   line: BrandLine;
   basis: LengthBasis;
@@ -49,8 +53,8 @@ export const BRAND_CHARTS_SCHEMA = 'bigsmall shoe-brand charts v1';
 
 /**
  * The charts' file as published (`packages/core/data/shoe-brands.json`): its schema's name, what
- * wrote it, the date the charts were read, and the charts by brand id (docs/research/shoe-sizes-2.md
- * §5, decision 1: 33 charts, 20 brands, one or two per brand).
+ * wrote it, the date the charts were read, and the charts by brand id
+ * (docs/research/shoe-sizes-2.md §5, decision 1: 33 charts, 20 brands, one or two per brand).
  */
 export interface BrandChartsFile {
   schema: string;

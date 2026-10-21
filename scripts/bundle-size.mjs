@@ -6,9 +6,10 @@ import { gzipSync } from 'node:zlib';
 
 const DIST = join('apps', 'web', 'dist');
 const PAGE = 'index.html';
-// 90 KB until 2026-10-20: the brands' charts (ADR 0028), 7.1 KB of data, took the page over it; raised with
-// Sean's yes, and the charts moved out of the bundle the same day into a JSON file fetched when Shoe size
-// opens (ADR 0029), so code alone is measured here; the data's size prints beside it, outside the budget.
+// 90 KB until 2026-10-20: the brands' charts (ADR 0028), 7.1 KB of data, took the page over it;
+// raised with Sean's yes, and the charts moved out of the bundle the same day into a JSON file
+// fetched when Shoe size opens (ADR 0029), so code alone is measured here; the data's size prints
+// beside it, outside the budget.
 const BUDGET_JS = 100 * 1024;
 const BUDGET_CSS = 20 * 1024;
 

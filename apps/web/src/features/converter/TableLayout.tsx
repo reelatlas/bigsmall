@@ -108,10 +108,15 @@ const TABLE_TOOLS_FADES =
  * below.
  */
 const TABLE_TOOLS_ROW = 'flex items-center gap-1';
-/** The row on a touch screen: a scroll container without a bar, the fades saying where more waits. */
+/**
+ * The row on a touch screen: a scroll container without a bar, the fades saying where more waits.
+ */
 const TABLE_TOOLS_SCROLLS = 'scrollbar-none overflow-x-auto overscroll-x-contain';
 const TABLE_LEADING = 'flex shrink-0 items-center gap-1';
-/** The right end's tools, at the row's end while there is room, right after the leading ones otherwise. */
+/**
+ * The right end's tools, at the row's end while there is room, right after the leading ones
+ * otherwise.
+ */
 const TABLE_TOOLS = 'ml-auto flex shrink-0 items-center gap-1';
 /** The box's row in the head. */
 const TABLE_BOX_CELL = 'md:row-start-2';
@@ -161,13 +166,16 @@ function typesIntoField(event: globalThis.KeyboardEvent): boolean {
  */
 const SIGNED: ReadonlySet<CategoryId> = new Set(['temperature', 'angle']);
 
-/** Which list the table's place shows, for a cursor to belong to: the start, the matches, or one category's units. */
 /**
  * What a pill of the box holds open in the table's place: the second pill's list, by its thing's
  * id, or the unit's chip's, the brand's scales, by the unit's id (ADR 0028).
  */
 type Choosing = { pill: 'second' | 'unit'; id: string };
 
+/**
+ * Which list the table's place shows, for a cursor to belong to: the start, the matches, or one
+ * category's units.
+ */
 function viewKeyOf(view: TableView): string {
   return view.kind === 'units' ? `units:${view.category}` : view.kind;
 }
@@ -188,7 +196,9 @@ export interface ToolbarTool {
   onPress: () => void;
   /** Can do nothing right now (`aria-disabled`, so it keeps its place in the row's order). */
   disabled?: boolean;
-  /** For a toggle (the calculator, Units, Display): whether its panel is open, and the panel's id. */
+  /**
+   * For a toggle (the calculator, Units, Display): whether its panel is open, and the panel's id.
+   */
   expanded?: boolean;
   controls?: string | undefined;
   /** Switched on: the panel it opens is open. */
@@ -212,7 +222,10 @@ interface TableLayoutProps {
   /** The box, as the field shows it. */
   box: BoxView;
   table: TableView;
-  /** The brands' charts' state (ADR 0029): the unit's chip opens the brand's scales only once ready. */
+  /**
+   * The brands' charts' state (ADR 0029): the brand's scales, from the chip or to choose from,
+   * are listed only once ready.
+   */
   charts: ChartsStatus;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
@@ -285,7 +298,8 @@ export function TableLayout({
   /**
    * The brand's scales, listed in the table's place while the unit's chip holds them open (ADR
    * 0028, 2026-10-20): with a brand in the box the scale rows are ISO's and taking one takes the
-   * brand out, so the chip is where a brand's size is read on another scale, the same row.
+   * brand out, so the chip is where a brand's size is read on another scale, the same row, or
+   * the other line's chart at the same foot (2026-10-21).
    */
   const choosingScale =
     choosingFor !== null &&
@@ -383,11 +397,10 @@ export function TableLayout({
   /**
    * The head, the toolbar and the box, stays at the window's top while the table scrolls, the
    * section names under it (Sean, 2026-10-17, kept the same day; docs/UX-SPEC.md §1). Measured,
-   * never
-   * counted: the head's height says where a name sticks under it, a pixel under the strip's edge
-   * (docs/LEARNINGS.md, "Stacked sticky headers"), and nothing sticks where the window is shorter
-   * than the head, a name, and three rows together (a phone on its side, 400% zoom), so the table
-   * stays usable.
+   * never counted: the head's height says where a name sticks under it, a pixel under the strip's
+   * edge (docs/LEARNINGS.md, "Stacked sticky headers"), and nothing sticks where the window is
+   * shorter than the head, a name, and three rows together (a phone on its side, 400% zoom), so the
+   * table stays usable.
    */
   const [stick, setStick] = useState({ height: 0, gap: 0, boxTop: 0, on: false });
   const [stuck, setStuck] = useState(false);
@@ -626,7 +639,9 @@ export function TableLayout({
    * between them and the hidden ones its line lists once shown (Sean, 2026-10-15).
    */
   const foot = table.kind === 'matches' && table.hidden.length > 0 ? table.rows.length : rowCount;
-  /** What the field controls: the table's place, or the matches and the hidden ones while they show. */
+  /**
+   * What the field controls: the table's place, or the matches and the hidden ones while they show.
+   */
   const controls =
     table.kind === 'matches'
       ? [table.rows.length > 0 && listId, revealed && table.hidden.length > 0 && hiddenListId]
@@ -775,10 +790,11 @@ export function TableLayout({
   });
 
   // With nothing on the page focused, the page has one job: a key that starts typing (a letter, a
-  // digit, `-`, `.`, or `,`) types in the field, ↑ or ↓ goes into it, the next press moving on from there (ADR 0014), and Escape
-  // takes the ladder's clearing steps, as it would in the field. Typing only types, never acts;
-  // none of it works with focus in another control or with Ctrl, ⌘, or Alt held (WCAG 2.1.4;
-  // ADR 0012). An Escape that closed a header menu has done its job already.
+  // digit, `-`, `.`, or `,`) types in the field, ↑ or ↓ goes into it, the next press moving on from
+  // there (ADR 0014), and Escape takes the ladder's clearing steps, as it would in the field.
+  // Typing only types, never acts; none of it works with focus in another control or with Ctrl, ⌘,
+  // or Alt held (WCAG 2.1.4; ADR 0012). An Escape that closed a header menu has done its job
+  // already.
   useLayoutEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.defaultPrevented || event.isComposing) return;
@@ -980,7 +996,8 @@ export function TableLayout({
    */
   const takeIngredient = (ingredient: string, unitId: string | null) => {
     setChoosingFor(null);
-    // The one in the box, taken again from the list its pill opened: nothing changes, nothing to undo.
+    // The one in the box, taken again from the list its pill opened: nothing changes, nothing to
+    // undo.
     if (choosing && !unitId && ingredient === box.ingredient?.id) {
       setPosition(null);
       return;
@@ -1275,7 +1292,8 @@ export function TableLayout({
         stickTop={stickTop}
       />
     );
-  // Under Cooking's table, the line saying what a cup of its ingredient weighs (ADR 0021).
+  // Under the table: Cooking's line on what a cup of its ingredient weighs (ADR 0021), Shoe
+  // size's on ISO's rule or the brand's chart (ADR 0027, ADR 0028).
   const note = table.kind === 'units' && table.note && (
     <p className={cx('mt-2', LIST_LINE)}>{table.note}</p>
   );
@@ -1308,7 +1326,8 @@ export function TableLayout({
             className={cx(TABLE_TOOLS_CELL, coarse && TABLE_TOOLS_FADES)}
             data-reach={coarse && reach ? reach : undefined}
           >
-            {/* The converter's toolbar, the page's second plane (ADR 0014): first reached at the menu. */}
+            {/* The converter's toolbar, the page's second plane (ADR 0014): first reached at the
+                menu. */}
             <div
               ref={toolsRef}
               role="toolbar"
@@ -1402,8 +1421,9 @@ export function TableLayout({
               }}
               // The unit's chip with a brand in the box (ADR 0028, 2026-10-20): its body opens the
               // brand's scales in the table's place, the cursor on the one in the box, and closes
-              // them again, as the pills do; one taken reads the same row on that scale, the brand
-              // staying. Without a brand it is a readout, the table being the list.
+              // them again, as the pills do; one taken reads the same row on that scale, or the
+              // other line's chart at the same foot (2026-10-21), the brand staying. Without a
+              // brand it is a readout, the table being the list.
               unitPicks={box.brand !== null && box.unit !== null && charts === 'ready'}
               unitOpen={choosingScale}
               onUnitOpen={() => {
@@ -1429,9 +1449,9 @@ export function TableLayout({
                 if (!pressedByTouch()) inputRef.current?.focus({ preventScroll: true });
               }}
               // The ingredient's pill: its body opens every ingredient in the table's place, the
-              // cursor on the one in the box, and closes them again (a trial, Sean, 2026-10-16); the
-              // caret goes into the field after a click, not a tap, as the chip's does. Its × takes
-              // the ingredient out, leaving a weight or a volume (ADR 0021).
+              // cursor on the one in the box, and closes them again (a trial, Sean, 2026-10-16);
+              // the caret goes into the field after a click, not a tap, as the chip's does. Its ×
+              // takes the ingredient out, leaving a weight or a volume (ADR 0021).
               ingredientOpen={choosing && box.ingredient !== null}
               onIngredientOpen={() => {
                 const current = box.ingredient?.id ?? null;

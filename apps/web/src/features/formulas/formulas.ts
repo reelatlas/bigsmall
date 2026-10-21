@@ -111,11 +111,6 @@ function formulaOf(unit: Unit, base: Unit): string {
   }
 }
 
-/**
- * An ingredient's line under Cooking (ADR 0021): what a cup of it weighs, filled as US recipes
- * mean, measured, never exact; under it how it is filled, the spread across the sources weighed,
- * and each source's figure (docs/research/cooking-2.md).
- */
 /** A source's figure as the About page lists it: "King Arthur Baking: 120 g". */
 function sourceText(source: CupSource): string {
   const { grams, detail } = source;
@@ -138,6 +133,11 @@ function basisText(ingredient: Ingredient): string {
   }
 }
 
+/**
+ * An ingredient's line under Cooking (ADR 0021): what a cup of it weighs, filled as US recipes
+ * mean, measured, never exact; under it how it is filled, the spread across the sources weighed,
+ * and each source's figure (docs/research/cooking-2.md).
+ */
 function ingredientLine(ingredient: Ingredient): FormulaLine {
   const formula = `1 cup = ${ingredient.gramsPerCup} g`;
   const method = ingredient.method.charAt(0).toUpperCase() + ingredient.method.slice(1);

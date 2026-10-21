@@ -61,7 +61,7 @@ interface ConverterController {
   box: BoxView;
   /** What the table shows under the box: the start, the category's units, or the matches. */
   table: TableView;
-  /** The brands' charts' state (ADR 0029), for the chip's list to wait on. */
+  /** The brands' charts' state (ADR 0029): the rows, the lines, and the chip's list wait on it. */
   charts: ChartsStatus;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;

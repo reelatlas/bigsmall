@@ -290,7 +290,10 @@ function idleResults(options: SearchOptions): SearchResponse {
  */
 const TAIL = /^(.*\S)\s+(?:to|in)(?:\s+(.*))?$/iu;
 
-/** A query that is only a connective and what follows ("to cm", "in eu"), its head still to come or in the box already. */
+/**
+ * A query that is only a connective and what follows ("to cm", "in eu"), its head still to come or
+ * in the box already.
+ */
 const LEADING = /^(?:to|in)(?:\s+(.*))?$/iu;
 
 /** Every match, where the categories a head matches in are wanted, not a list's worth. */
@@ -349,7 +352,10 @@ export function search(text: string, options: SearchOptions = {}): SearchRespons
   return whole;
 }
 
-/** A query read as a head and a target: the head's matches, and the target's category among the head's. */
+/**
+ * A query read as a head and a target: the head's matches, and the target's category among the
+ * head's.
+ */
 interface Split {
   response: SearchResponse;
   category: CategoryId | null;

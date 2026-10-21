@@ -43,7 +43,10 @@ const FOLDED: readonly MoreMenuItem[] = [
   { id: 'clear', label: 'Clear all', icon: <EraserIcon />, onPress: noop },
 ];
 
-/** The field in a frozen state: what is typed, the unit in its chip, and an ingredient or a brand beside it. */
+/**
+ * The field in a frozen state: what is typed, the unit in its chip, and an ingredient or a brand
+ * beside it.
+ */
 function FieldSample({
   label,
   text,

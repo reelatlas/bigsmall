@@ -61,7 +61,10 @@ export const RANGE_DASH = '–';
 /** The scale a bare size at a brand means ("nike 10"), as a bare "us" is men's (ADR 0027). */
 export const BRAND_DEFAULT_SCALE: BrandScale = 'us-men';
 
-/** The units that hold a foot's length, which a brand's chart answers where its length is the foot's. */
+/**
+ * The units that hold a foot's length, which a brand's chart answers where its length is the
+ * foot's.
+ */
 const LENGTH_UNITS: ReadonlySet<string> = new Set(['mondopoint', 'foot-cm']);
 
 export function isBrandScale(id: string): id is BrandScale {
@@ -272,7 +275,10 @@ export function brandRowNear(
 export interface BrandReading {
   brand: ShoeBrand;
   chart: BrandChart;
-  /** Women's: the box's size is on the US women's scale, so the women's chart answers where there is one. */
+  /**
+   * Women's: the box's size is on the US women's scale, so the women's chart answers where there is
+   * one.
+   */
   women: boolean;
   /**
    * The row the box's size names on its scale; for a length typed, the row nearest it where the
@@ -314,7 +320,10 @@ export function readBrand(
   return { ...base, row, foot: chart.basis === 'foot' && row.foot !== undefined ? row.foot : null };
 }
 
-/** A brand's row under the table: its size for the foot in the box, by its own chart (ADR 0028). */
+/**
+ * A brand's row in the brands' section: its size for the foot in the box, by its own chart
+ * (ADR 0028).
+ */
 export interface BrandRowReading {
   brand: ShoeBrand;
   chart: BrandChart;

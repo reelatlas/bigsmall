@@ -90,11 +90,15 @@ interface ConversionRow {
    */
   pair?: Unit | undefined;
   /**
-   * A brand's row (ADR 0028), by the brand's id with the chart's line: its name is the brand's, in the names' column as a pair's is, sized as
-   * if empty and cut short rather than widening the column.
+   * A brand's row (ADR 0028), by the brand's id with the chart's line: its name is the brand's, in
+   * the names' column as a pair's is, sized as if empty and cut short rather than widening the
+   * column.
    */
   brand?: { id: string; line: string } | undefined;
-  /** Words after the name in the muted ink: a brand row's chart line, why it has no size, or where a row beyond its scale stands; they give way before the names where a row lacks the room. */
+  /**
+   * Words after the name in the muted ink: a brand row's chart line, why it has no size, or where a
+   * row beyond its scale stands; they give way before the names where a row lacks the room.
+   */
   detail?: string | undefined;
   /**
    * A brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
@@ -187,21 +191,20 @@ interface ConversionTableProps<T extends ConversionRow> {
  * A row reads "250 … mL milliliters": the value on the left in equal-width digits, a decimal in two
  * columns, its whole part right-aligned and the rest left-aligned after it, so values line up on
  * the decimal point (96 beside 473.18), and a fraction split the same way at its fraction part, so
- * whole numbers line up (10 beside 10 1/2); with Both, its fraction beside it; past a column that takes
- * the spare width, on the right, the symbol right-aligned in its column, an exponent hanging after
- * it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
- * left-aligned in its own; the copied check flashing over its end, a grid item laid on the
- * row's own area (never a positioned child: WebKit lays a nested subgrid out wrong under one,
- * docs/LEARNINGS.md, 2026-10-20). The names keep to one line: where one would not fit beside
- * its value (a long value on a phone), the words after the names give way first, then every name
+ * whole numbers line up (10 beside 10 1/2); with Both, its fraction beside it; past a column that
+ * takes the spare width, on the right, the symbol right-aligned in its column, an exponent hanging
+ * after it in a narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name
+ * left-aligned in its own; the copied check flashing over its end, a grid item laid on the row's
+ * own area (never a positioned child: WebKit lays a nested subgrid out wrong under one,
+ * docs/LEARNINGS.md, 2026-10-20). The names keep to one line: where one would not fit beside its
+ * value (a long value on a phone), the words after the names give way first, then every name
  * (GIVE_WAY), then Both's fraction moves under the decimal, on a second line in the value's
- * columns, the symbol and the
- * name centred beside both lines; a column comes back once a later one's going makes its room.
- * The single units size the columns and a pair reacts to the room they leave (Sean, 2026-10-20):
- * its symbol takes the spare width before the symbols and must fit there, the names going for it
- * as for a wide value, and its name is cut short in the names' column. The unit's cell has no
- * column gap, since the symbol and its exponent touch: its parts space themselves (pr-2, pl-2).
- * Seven columns, so a row spans col-span-7.
+ * columns, the symbol and the name centred beside both lines; a column comes back once a later
+ * one's going makes its room. The single units size the columns and a pair reacts to the room they
+ * leave (Sean, 2026-10-20): its symbol takes the spare width before the symbols and must fit there,
+ * the names going for it as for a wide value, and its name is cut short in the names' column. The
+ * unit's cell has no column gap, since the symbol and its exponent touch: its parts space
+ * themselves (pr-2, pl-2). Seven columns, so a row spans col-span-7.
  */
 const ROWS =
   'grid grid-cols-[auto_auto_minmax(0,max-content)_minmax(0,1fr)_auto_auto_minmax(0,max-content)] gap-y-0.5';
@@ -210,10 +213,9 @@ const ROWS =
  * The columns that give way when a row has no room for them, in that order (useColumnsFit): the
  * words after a name (a brand row's line or reason, a row beyond its scale's word; 2026-10-20:
  * inside the names' cells they cost a phone every name), then every name, then Both's fraction;
- * each comes back once a later one's going makes its room. A pair's
- * symbol never gives way: it must fit (`data-fits`) over the spare width before the symbols, and
- * the names go for it as for a wide value, so nothing of a pair drops before the single units'
- * equivalent would (Sean, 2026-10-20).
+ * each comes back once a later one's going makes its room. A pair's symbol never gives way: it must
+ * fit (`data-fits`) over the spare width before the symbols, and the names go for it as for a wide
+ * value, so nothing of a pair drops before the single units' equivalent would (Sean, 2026-10-20).
  */
 const GIVE_WAY = ['detail', 'name', 'second'] as const;
 
@@ -409,7 +411,10 @@ function splitFraction(written: Rounded): { whole: string; part: string } {
   return { whole: (split.approx ? APPROX : '') + split.whole, part: split.decimals };
 }
 
-/** A value as written, "≈" ahead of one that rounds or is measured; the row's own text where nothing is. */
+/**
+ * A value as written, "≈" ahead of one that rounds or is measured; the row's own text where nothing
+ * is.
+ */
 function writtenText(row: ConversionRow, written: Rounded | null): ReactNode {
   if (written) {
     return (
@@ -647,7 +652,9 @@ export function ConversionTable<T extends ConversionRow>({
     return fraction ? splitFraction(fraction)[pick] : null;
   };
 
-  /** A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and name. */
+  /**
+   * A row's drawn cells: the value in its two columns, Both's fraction, symbol, exponent, and name.
+   */
   const cells = (row: T) => {
     // A pair's row is every row's: its symbol (ft in) beside its value in the marks, then its
     // name (ADR 0026; Sean, 2026-10-20: the units in the table, as everywhere else).
@@ -849,7 +856,8 @@ export function ConversionTable<T extends ConversionRow>({
       <span className={cx('col-start-6 row-start-1', unitSymbol())}>
         {stack((row) => splitExponent(row.symbol)[1])}
       </span>
-      {/* The single units' names alone: a pair's or a brand's never sizes the column (PAIR_NAME_CELL). */}
+      {/* The single units' names alone: a pair's or a brand's never sizes the column
+          (PAIR_NAME_CELL). */}
       {withNames && (
         <span
           hidden={namesHidden}
@@ -921,7 +929,9 @@ export function ConversionTable<T extends ConversionRow>({
    */
   const holdCard = useKept(cardRef);
 
-  /** Ends Edit, as Done does, folding Hidden, with focus back on the button that reads Edit again. */
+  /**
+   * Ends Edit, as Done does, folding Hidden, with focus back on the button that reads Edit again.
+   */
   const endEdit = () => {
     holdCard();
     onEditing(false);
@@ -1175,7 +1185,8 @@ export function ConversionTable<T extends ConversionRow>({
                   height="16"
                   className={cx('transition-transform', !hiddenOpen && '-rotate-90')}
                 />
-                {/* The word and its count on one baseline, as the matches' headers; the icon centred. */}
+                {/* The word and its count on one baseline, as the matches' headers; the icon
+                    centred. */}
                 <span className={LABEL_WITH_COUNT}>
                   Hidden
                   <span className={COUNT}>{hiddenCount}</span>

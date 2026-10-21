@@ -4,7 +4,7 @@
  * given (ADR 0029): `docs/research/shoe-sizes-2/write_brands.py` writes
  * `packages/core/data/shoe-brands.json` from the research record, every cell as the brand prints
  * it, `packages/core/test/shoe-brands.test.ts` holds the file to it, and the web app fetches it
- * once Shoe size opens (`shoe-brand-charts.ts`).
+ * once wanted (`shoe-brand-charts.ts`).
  */
 export interface ShoeBrand {
   /** Stable identifier used in URLs. Lowercase, ASCII, kebab-case. */

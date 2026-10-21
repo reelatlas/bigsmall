@@ -72,7 +72,10 @@ interface HiddenUnitMatch {
 interface UnitMatchesProps {
   /** The listbox's id, which the field's combobox controls. */
   id: string;
-  /** The hidden matches' listbox's id, under the line that offers them; the field controls it too while they show. */
+  /**
+   * The hidden matches' listbox's id, under the line that offers them; the field controls it too
+   * while they show.
+   */
   hiddenId: string;
   /** The matches, each category's together, in the order they are listed. */
   matches: readonly UnitMatch[];
@@ -86,7 +89,9 @@ interface UnitMatchesProps {
   cursor: number;
   /** The id of a match, which the field points at while the cursor is on it. */
   itemId: (index: number) => string;
-  /** A match was clicked or tapped, by index; the hidden ones, once shown, count on after the rest. */
+  /**
+   * A match was clicked or tapped, by index; the hidden ones, once shown, count on after the rest.
+   */
   onPick: (index: number) => void;
   /** The hidden units that match (docs/UX-SPEC.md §3). */
   hidden: readonly HiddenUnitMatch[];
@@ -107,9 +112,14 @@ interface UnitMatchesProps {
   stickTop?: number | undefined;
 }
 
-/** The columns of a match: the symbol, then the name, both left-aligned so they read down easily. */
+/**
+ * The columns of a match: the symbol, then the name, both left-aligned so they read down easily.
+ */
 const ROWS = 'grid grid-cols-[auto_minmax(0,1fr)] gap-x-3';
-/** A list in the columns' grid, so the matches and the hidden ones line up across the line between them. */
+/**
+ * A list in the columns' grid, so the matches and the hidden ones line up across the line between
+ * them.
+ */
 const LIST = 'col-span-2 grid grid-cols-subgrid';
 /** An option as a row of the columns' grid, which the cursor moves through. */
 const OPTION_ROW = cx(CURSOR_ROW, 'col-span-2 grid grid-cols-subgrid items-center');

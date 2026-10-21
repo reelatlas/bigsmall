@@ -38,7 +38,10 @@ export const PANEL_TITLE = 'text-sm font-medium text-ink-muted';
 /** A group's title, a step smaller: Units' and Display's legends, the matches' groups. */
 export const GROUP_TITLE = 'text-xs font-medium text-ink-muted';
 
-/** A count beside a label (Hidden's, Units' reset, the matches' groups): its digits at the regular weight. */
+/**
+ * A count beside a label (Hidden's, Units' reset, the matches' groups): its digits at the regular
+ * weight.
+ */
 export const COUNT = 'font-numeric font-normal';
 
 /**
@@ -61,7 +64,10 @@ export const ROW_RULE = 'border-t border-line pt-1';
 const PANEL_ACTIVE =
   'transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-1 focus-within:ring-accent';
 
-/** A side panel's card, the calculator's and Settings' (SidePanel): its accent edge while it has the keys. */
+/**
+ * A side panel's card, the calculator's and Settings' (SidePanel): its accent edge while it has the
+ * keys.
+ */
 export const PANEL_CARD = cx(CARD, 'p-3 shadow-sm', PANEL_ACTIVE);
 
 /** The row over a side panel's content: its title, then its close button at the right. */
@@ -246,7 +252,10 @@ export const MENU_CHEVRON =
  */
 export const CHOICE_FILL = 'hover:bg-surface-raised has-focus-visible:bg-surface-raised';
 
-/** A row in a list of choices: 44 px tall, in the nested corner (a setting's row, a menu's choice, More's items). */
+/**
+ * A row in a list of choices: 44 px tall, in the nested corner (a setting's row, a menu's choice,
+ * More's items).
+ */
 export const CHOICE_ROW = 'flex min-h-11 items-center rounded-nested-md px-2 text-sm text-ink';
 
 /** A choice someone picks, with a pointer's cursor. */
@@ -328,7 +337,10 @@ export const LIST_FOOT = 'flex min-h-11 items-center justify-between gap-2';
 // Lists a field's cursor moves through (docs/DESIGN-SYSTEM.md, "Lists"): the table, the matches,
 // and the start's categories, whose rows the arrows reach while the caret stays in the field.
 
-/** A row the cursor moves through: 44 px, inset in the card's gutter, its corners nesting in the card's. */
+/**
+ * A row the cursor moves through: 44 px, inset in the card's gutter, its corners nesting in the
+ * card's.
+ */
 export const CURSOR_ROW = 'min-h-11 cursor-pointer rounded-nested px-2';
 
 /**
@@ -379,5 +391,8 @@ export const WORDMARK_FACE = 'font-display font-semibold tracking-tight';
 export const PLAYING_LINE =
   'absolute inset-y-0 left-0 flex origin-left items-center text-left whitespace-pre';
 
-/** The line over the theme art that shows the symbol the art flips to; the motion shows and hides it. */
+/**
+ * The line over the theme art that shows the symbol the art flips to; the motion shows and hides
+ * it.
+ */
 export const ART_LINE = 'absolute inset-0 items-center justify-center whitespace-pre text-accent';

@@ -42,7 +42,9 @@ interface ValueFieldProps {
     activeId: string | undefined;
     kind: 'listbox' | 'grid';
   };
-  /** Symbol only (docs/UX-SPEC.md §7): the chip shows its symbol alone, as when it lacks the room. */
+  /**
+   * Symbol only (docs/UX-SPEC.md §7): the chip shows its symbol alone, as when it lacks the room.
+   */
   symbolOnly?: boolean;
   /**
    * The field takes a number alone (a unit in the chip, no sign likely): a touch screen brings up
@@ -99,9 +101,10 @@ const TEXT_LAYER =
   'pointer-events-none absolute inset-0 flex items-center overflow-hidden font-numeric whitespace-pre text-ink';
 
 /**
- * The row, FIELD_ROW, which with Cooking's two pills (ADR 0021) wraps where the fit says so
- * (`data-wrap`, useFieldFit), never by the browser's own wrapping: the number and its clear on
- * the first line, the pills together on a line of their own at its right end.
+ * The row, FIELD_ROW, which with two pills (Cooking's, ADR 0021; Shoe size's, ADR 0028) wraps
+ * where the fit says so (`data-wrap`, useFieldFit), never by the browser's own wrapping: the
+ * number and its clear on the first line, the pills together on a line of their own at its
+ * right end.
  */
 const ROW = cx(
   FIELD_ROW,

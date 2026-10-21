@@ -103,3 +103,15 @@ A figure has a kind (§1) and a rule computes it; a formula or a calculation is 
 - **Reversible first.** A practice we are unsure of ships as a trial, one revertable commit, measured after; the five-person test waits for traction, and friends' rounds and the counts stand in.
 
 Run with agents, workers gather by layer and checkers read the sources; the orchestrator decides (§4, "How the work is split"; the `orchestrate` skill).
+
+## 9. Filling a conventional fact's gaps: the tiers
+
+A body's or a brand's table answers only what it prints (§1). Where the product needs an answer the table does not give, the shoe brands' charts being the first case (a brand that prints no foot length, or no column for the scale in focus), the gap is filled by the first tier that applies, and every filled figure says which, in its row (Sean's tiers, 2026-10-20, the hundred-and-eighteenth pass; built 2026-10-21, ADR 0028):
+
+1. **The brand's own figure, as printed**: its foot length for the size, read at the nearest row; the row says nothing but ≈ where the nearest row's foot is not the foot.
+2. **The brand's own stated rule, applied**: On says its Japan label is the foot plus about a centimetre, so its feet are its labels less one; the row says `by its own rule`, the brand's entry carries the rule (`labelMinusCm` in `packages/core/src/units/shoe-brands.ts`), and the note carries the words it rests on.
+3. **A pattern in the record, corroborated**: a brand's grid family read from its steps, or a product length less a last allowance (Puma's product measurements run about a centimetre over ISO's feet, size for size), used only once the allowance is decided with Sean and said in the row. Not read yet.
+4. **Label-equal to ISO**: the brand's size for a foot taken as ISO's size for that foot on the brand's own US scale, then read through the brand's own row for the other scales (Brooks and Skechers, which print no length; Puma until tier 3 is decided); the row says `by ISO’s label` and carries ≈, since nothing of the brand's fixes it. A size typed at such a brand is read the same way, the note saying so.
+5. **Third-party measurements and reports**: measured internal lengths (RunRepeat) by the measured-fact rule (§2), a median across sources; forums and resale sites as leads only; each source paused with Sean for its reputability before it counts. Not read yet.
+
+A brand that prints no column for the scale in focus shows its size on its own scale with that scale's symbol, the row saying `prints no EU`; a foot off a chart's ends stays a dash, `off its chart`; a child's foot is off every adult chart until the kids' charts are read. The tier is disclosed in the row, never only in the note, so a filled figure is never mistaken for a printed one.

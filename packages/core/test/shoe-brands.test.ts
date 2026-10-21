@@ -7,14 +7,17 @@ import {
   BRAND_CHARTS_SCHEMA,
   brandCell,
   brandChart,
+  brandRowAt,
   brandChartsOf,
   brandsAtFoot,
   chartAtFoot,
+  footOfRow,
   convert,
   getShoeBrand,
   getUnit,
   matchShoeBrands,
   otherBrandChart,
+  ownScale,
   readBrand,
   setBrandCharts,
   shoeBrands,
@@ -186,10 +189,13 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
       value: null,
       why: 'off-chart',
     });
+    // Puma prints no length: ISO's label for the foot read through its own row (tier 4), with ≈.
     const puma = brand('puma');
     expect(chartAtFoot(puma, brandChart(puma, false), 250, 'us-men', false)).toMatchObject({
-      value: null,
-      why: 'no-length',
+      tier: 4,
+      foot: null,
+      approx: true,
+      why: null,
     });
   });
 });
@@ -291,14 +297,49 @@ describe('every brand at one foot (ADR 0028)', () => {
     expect(at(285, 'us-men').get('dr-martens')).toMatchObject({ value: 11, foot: 290 });
   });
 
-  it('says why a brand has no size: no foot length, no such scale, or a foot off its chart', () => {
+  it('fills a gap by the tiers (docs/RESEARCH.md §9): On by its own rule, Brooks, Skechers, and Puma by ISO’s label through their own rows, Reebok on its own scale where it prints no EU, and a foot off a chart a dash', () => {
     const rows = at(271, 'us-men');
-    for (const id of ['puma', 'on', 'skechers', 'brooks']) {
-      expect(rows.get(id), id).toMatchObject({ value: null, why: 'no-length' });
+    expect(rows.get('on')).toMatchObject({
+      value: 10,
+      tier: 2,
+      foot: 270,
+      approx: true,
+      scale: 'us-men',
+    });
+    for (const id of ['brooks', 'skechers', 'puma']) {
+      expect(rows.get(id), id).toMatchObject({
+        value: 10,
+        tier: 4,
+        foot: null,
+        approx: true,
+        scale: 'us-men',
+      });
     }
-    expect(at(271, 'eu').get('reebok')).toMatchObject({ value: null, why: 'no-scale' });
+    expect(at(271, 'eu').get('reebok')).toMatchObject({
+      value: 10,
+      scale: 'us-men',
+      tier: 1,
+      why: null,
+    });
+    expect(at(271, 'eu').get('brooks')).toMatchObject({ tier: 4, scale: 'eu', approx: true });
     expect(at(150, 'us-men').get('nike')).toMatchObject({ value: null, why: 'off-chart' });
     expect(at(150, 'us-men').get('adidas')).toMatchObject({ value: null, why: 'off-chart' });
+    expect(at(150, 'us-men').get('brooks')).toMatchObject({ value: null, why: 'off-chart' });
+    const reebok = brand('reebok');
+    expect(ownScale(brandChart(reebok, false), false)).toBe('us-men');
+    expect(ownScale(brandChart(reebok, true), true)).toBe('us-women');
+    const on = brand('on');
+    const row = brandRowAt(brandChart(on, false), 'us-men', 10, false)!;
+    expect(footOfRow(on, brandChart(on, false), row)).toBe(270);
+  });
+
+  it('reads a size at a brand with no foot length by the tiers: On’s 10 is a 27 cm foot by its own rule, Brooks’ 10 ISO’s label, and a length at Puma finds no row', () => {
+    const on = readBrand(brand('on'), unit('us-men'), 10);
+    expect(on).toMatchObject({ foot: 270, tier: 2 });
+    expect(readBrand(brand('on'), unit('foot-cm'), 27).row).toBe(on.row);
+    expect(readBrand(brand('brooks'), unit('us-men'), 10)).toMatchObject({ foot: null, tier: 4 });
+    expect(readBrand(brand('puma'), unit('foot-cm'), 27)).toMatchObject({ row: null, tier: null });
+    expect(readBrand(brand('nike'), unit('us-men'), 10).tier).toBe(1);
   });
 
   it('a women’s size reads the women’s charts and the unisex charts’ women’s column', () => {

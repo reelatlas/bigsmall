@@ -186,7 +186,11 @@ function brandLine(brand: ShoeBrand, chart: BrandChart): FormulaLine {
   const line = chart.line === 'unisex' ? 'one chart' : `the ${chart.line}’s chart`;
   const name = `${brand.name}, ${line}`;
   const formula = `${chart.rows.length} sizes: ${scales.join(', ')}`;
-  const source = `${chart.title}, ${chart.source}, read ${chart.read}; ${LENGTH_BASIS[chart.basis]}.${brand.fact ? ` ${brand.fact}` : ''}`;
+  const rule =
+    brand.labelMinusCm !== undefined
+      ? ` The foot is read as its Japan label less ${brand.labelMinusCm} cm, the brand's own rule (docs/RESEARCH.md §9).`
+      : '';
+  const source = `${chart.title}, ${chart.source}, read ${chart.read}; ${LENGTH_BASIS[chart.basis]}.${brand.fact ? ` ${brand.fact}` : ''}${rule}`;
   return {
     id: `brand:${brand.id}:${chart.line}`,
     kind: 'brand',

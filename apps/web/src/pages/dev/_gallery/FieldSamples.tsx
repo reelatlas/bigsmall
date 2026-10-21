@@ -205,7 +205,7 @@ function TableSample({
  * hanging after it; a million square kilometers in a phone's width, the names given way in every
  * row and the exponent markers bold; 6.3 feet as decimals with their fractions (Both); a fresh
  * visit's volume with its Hidden list open, and in Edit; a value with no answer; Shoe size with
- * Nike's 10, the brands' section first, the same while the charts load, a half size with
+ * Nike's 10, the brands' section first, Puma's row by ISO's label, the same while the charts load, a half size with
  * Fraction, and Asics's scales to choose from, the men's under its own heading; and the matches
  * for "250 p" from every category, the hidden ones shown. The tables' titles are for screen
  * readers; on the page the category menu over the box names them.
@@ -335,7 +335,7 @@ function TableSamples() {
         itemId={itemIds('cooking')}
       />
       {/* Shoe size with a brand (ADR 0028): the brands' section first, Nike's row the one filled,
-          Puma's dash with why, Birkenstock's range split at its first number, and ISO's scales
+          Puma's row by ISO's label, Birkenstock's range split at its first number, and ISO's scales
           from Nike's foot with ≈; then the same while the charts load (ADR 0029), every row a dash
           and the line above them. */}
       <TableSample

@@ -991,10 +991,17 @@ describe('brands (ADR 0028)', () => {
       inBox: true,
       brand: { id: 'nike', line: 'men' },
     });
+    // The dashes filled by the tiers (docs/RESEARCH.md §9): Puma by ISO's label through its own
+    // row, On by its own rule, each row saying how.
     expect(row(table, 'brand:puma')).toMatchObject({
-      tone: 'empty',
-      text: NO_VALUE,
-      detail: 'no foot length',
+      text: '10',
+      approx: true,
+      detail: 'by ISO’s label',
+    });
+    expect(row(table, 'brand:on')).toMatchObject({
+      text: '10',
+      approx: true,
+      detail: 'by its own rule',
     });
     expect(table.rows.filter((each) => each.inBox).map((each) => each.id)).toEqual(['brand:nike']);
     expect(table.note).toBe('Nike’s size chart, the men’s, nike.com, read Oct 2026.');
@@ -1011,7 +1018,7 @@ describe('brands (ADR 0028)', () => {
     expect(row(nb, 'brand:nike')).toMatchObject({ text: '10', approx: true, inBox: false });
   });
 
-  it('a brand row’s words: the line where the scale does not say it, the dash’s reason naming the scale, nothing else; a row beyond its scale says where the foot stands', () => {
+  it('a brand row’s words: the line where the scale does not say it, the scale it lacks named with its own scale shown, how a filled row was filled, nothing else; a row beyond its scale says where the foot stands', () => {
     const table = units(type('nike 10'), nike());
     expect(row(table, 'brand:nike').detail).toBeUndefined();
     expect(row(table, 'brand:new-balance').detail).toBeUndefined();
@@ -1019,10 +1026,16 @@ describe('brands (ADR 0028)', () => {
     const eu = units(type('eu 43'), { type: 'use', unit: 'eu', text: '43' });
     expect(row(eu, 'brand:nike')).toMatchObject({ detail: 'men' });
     expect(row(eu, 'brand:adidas').detail).toBeUndefined();
-    expect(row(eu, 'brand:reebok')).toMatchObject({ tone: 'empty', detail: 'prints no EU' });
+    // Reebok prints no EU: its size on its own scale, that symbol on the row; Brooks by ISO's label.
+    expect(row(eu, 'brand:reebok')).toMatchObject({
+      tone: 'value',
+      symbol: 'US M',
+      detail: 'prints no EU',
+    });
     expect(row(eu, 'brand:brooks')).toMatchObject({
-      tone: 'empty',
-      detail: 'men · no foot length',
+      tone: 'value',
+      approx: true,
+      detail: 'men · by ISO’s label',
     });
     expect(row(table, 'us-children')).toMatchObject({ text: '> 13.5', detail: 'above its range' });
   });
@@ -1090,11 +1103,20 @@ describe('brands (ADR 0028)', () => {
     });
     expect(row(puma, 'us-men')).toMatchObject({ text: '10', approx: true });
     expect(row(puma, 'brand:puma')).toMatchObject({
-      tone: 'empty',
-      detail: 'no foot length',
+      text: '10',
+      approx: true,
+      detail: 'by ISO’s label',
     });
     expect(row(puma, 'brand:nike')).toMatchObject({ text: '10', approx: true });
-    expect(puma.note).toContain('has no size for a measured foot');
+    expect(puma.note).toContain('its row is ISO’s label for the foot');
+    // On gives feet by its own rule: a 27 cm foot is its 10 (JP 28), the note saying the rule.
+    const on = units(type('27 cm on'), { type: 'use', unit: 'foot-cm', text: '27', brand: 'on' });
+    expect(row(on, 'brand:on')).toMatchObject({
+      text: '10',
+      approx: false,
+      detail: 'by its own rule',
+    });
+    expect(on.note).toContain('its foot here is its JP label less 1 cm, by its own rule');
   });
 
   it('with no brand, the brands’ rows read every chart at ISO’s foot, the women’s charts for a women’s size, a length typed, a child’s foot off every chart, and nothing typed yet', () => {
@@ -1102,8 +1124,9 @@ describe('brands (ADR 0028)', () => {
     expect(row(men, 'brand:nike')).toMatchObject({ text: '9', brand: { id: 'nike', line: 'men' } });
     expect(row(men, 'brand:new-balance')).toMatchObject({ text: '8.5', approx: true });
     expect(row(men, 'brand:brooks')).toMatchObject({
-      tone: 'empty',
-      detail: 'no foot length',
+      text: '9',
+      approx: true,
+      detail: 'by ISO’s label',
     });
     expect(men.rows.filter((each) => each.inBox).map((each) => each.id)).toEqual(['us-men']);
     const women = units(type('women 8'), { type: 'use', unit: 'us-women', text: '8' });

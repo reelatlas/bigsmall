@@ -2310,9 +2310,11 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await expect(row(page, 'brand:nike')).toContainText('in the box');
   await expect(row(page, 'brand:new-balance')).toContainText('≈ 9');
   await expect(row(page, 'brand:new-balance')).toContainText('New Balance');
-  await expect(row(page, 'brand:puma')).toContainText('no foot length');
-  // A dash sits in the whole column and a range splits at its first number, so every row's first
-  // cell ends on one edge, Puma's dash and Birkenstock's range with the sizes (Sean, 2026-10-20).
+  // The dashes filled by the tiers (docs/RESEARCH.md §9): Puma by ISO's label, the row saying so.
+  await expect(row(page, 'brand:puma')).toContainText('≈ 10');
+  await expect(row(page, 'brand:puma')).toContainText('by ISO’s label');
+  // A range splits at its first number, so every row's first cell ends on one edge, Birkenstock's
+  // range with the sizes (Sean, 2026-10-20); a dash sits in the whole column likewise.
   await expect(row(page, 'brand:birkenstock')).toContainText(/\d(\.5)?–\d/);
   expect(new Set(await firstCellRights(page)).size).toBe(1);
   // A row beyond its scale says where the foot stands (Sean, 2026-10-20).
@@ -2450,7 +2452,7 @@ test('the brand’s pill (ADR 0028): its body lists every brand with the one in 
   await expect(page).not.toHaveURL(/brand=/);
 });
 
-test('the sizes’ first cells end on one edge in every theme: a brand’s range and a dash with the sizes, and, with Fraction, a row beyond its scale with the whole numbers', async ({
+test('the sizes’ first cells end on one edge in every theme: a brand’s range with the sizes, and, with Fraction, a row beyond its scale with the whole numbers', async ({
   page,
 }) => {
   await page.goto('/?a=us-men&v=10&brand=nike');

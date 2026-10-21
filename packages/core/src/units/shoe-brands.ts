@@ -26,6 +26,12 @@ export interface ShoeBrand {
    * (Sean, 2026-10-20).
    */
   fact?: string;
+  /**
+   * The brand's own rule for a foot where its chart prints none (docs/RESEARCH.md §9, tier 2):
+   * its Japan label is the foot plus this many centimetres, so a row's foot is the label less it
+   * (On's FAQ: about a centimetre).
+   */
+  labelMinusCm?: number;
 }
 
 function brand(
@@ -33,7 +39,7 @@ function brand(
   name: string,
   site: string,
   aliases: readonly string[],
-  extra: { shorthand?: readonly string[]; fact?: string } = {},
+  extra: { shorthand?: readonly string[]; fact?: string; labelMinusCm?: number } = {},
 ): ShoeBrand {
   return { id, name, aliases, site, ...extra };
 }
@@ -64,7 +70,11 @@ export const shoeBrands: readonly ShoeBrand[] = [
   brand('hoka', 'HOKA', 'hoka.com', ['hokas', 'hoka one one']),
   brand('new-balance', 'New Balance', 'newbalance.com', [], { shorthand: ['nb'] }),
   brand('nike', 'Nike', 'nike.com', ['nikes']),
-  brand('on', 'On', 'on.com', [], { shorthand: ['on'] }),
+  brand('on', 'On', 'on.com', [], {
+    shorthand: ['on'],
+    fact: 'Its FAQ says its JP label is the foot plus about a centimetre.',
+    labelMinusCm: 1,
+  }),
   brand('puma', 'Puma', 'us.puma.com', ['pumas']),
   brand('reebok', 'Reebok', 'reebok.com', ['reeboks'], {
     fact: 'Prints US sizes and inches alone, no UK or EU.',

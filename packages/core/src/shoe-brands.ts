@@ -1,7 +1,9 @@
-import { toBase } from './convert';
+import { fromBase, toBase } from './convert';
+import { roundToStep } from './rounded';
 import { compactKey } from './normalize';
 import type { MatchClass } from './search';
 import type { Unit } from './types';
+import { getUnit } from './units';
 import { shoeBrands, type ShoeBrand } from './units/shoe-brands';
 import {
   brandChartsOf,
@@ -235,25 +237,73 @@ export function brandSpan(
   return low <= high ? [low, high] : null;
 }
 
-/** The feet a chart gives, in its rows' order, with each row. */
-function feetOf(chart: BrandChart): { foot: number; row: BrandChartRow }[] {
-  if (chart.basis !== 'foot') return [];
-  return chart.rows.flatMap((row) => (row.foot === undefined ? [] : [{ foot: row.foot, row }]));
+/**
+ * How a brand's figure was found where its chart alone could not give it (docs/RESEARCH.md §9):
+ * 1 its own foot length as printed, 2 its own stated rule applied (On's Japan label less a
+ * centimetre), 4 ISO's label on its own scale read through its own row (a brand printing no
+ * length). Tier 3, a pattern in the record, and tier 5, third-party measurements, are not read
+ * yet.
+ */
+export type BrandTier = 1 | 2 | 4;
+
+/**
+ * The foot a row stands for: the brand's own, as printed (tier 1), or by the brand's own rule
+ * from its Japan label (tier 2); none where the brand gives neither.
+ */
+export function footOfRow(
+  brand: ShoeBrand,
+  chart: BrandChart,
+  row: BrandChartRow,
+): number | undefined {
+  if (chart.basis === 'foot') return row.foot;
+  if (chart.basis === 'label' && brand.labelMinusCm !== undefined && row.jp !== undefined) {
+    return (row.jp - brand.labelMinusCm) * 10;
+  }
+  return undefined;
+}
+
+/** The feet a chart gives, as printed or by the brand's rule, in its rows' order, with each row. */
+function feetOf(brand: ShoeBrand, chart: BrandChart): { foot: number; row: BrandChartRow }[] {
+  return chart.rows.flatMap((row) => {
+    const foot = footOfRow(brand, chart, row);
+    return foot === undefined ? [] : [{ foot, row }];
+  });
+}
+
+/**
+ * The scale a chart's own sizes are read on first: its US column for the line, else the first
+ * scale it prints; what a brand's row shows where the chart lacks the scale in focus, and the
+ * scale ISO's label is taken on for a brand that gives no foot length (tier 4).
+ */
+export function ownScale(chart: BrandChart, women: boolean): BrandScale | null {
+  const order: readonly BrandScale[] = women
+    ? ['us-women', 'uk', 'eu', 'us-men', 'japan']
+    : ['us-men', 'uk', 'eu', 'us-women', 'japan'];
+  return order.find((scale) => brandSpan(chart, scale, women) !== null) ?? null;
+}
+
+/** ISO's size on a scale for a foot, to the scale's step (ADR 0027); null where the scale has none. */
+function isoLabel(foot: number, scale: BrandScale): number | null {
+  const unit = getUnit(scale);
+  if (!unit || unit.step === undefined || !(unit.step > 0)) return null;
+  return roundToStep(fromBase(unit, foot), unit.step, 'nearest')?.value ?? null;
 }
 
 /**
  * The row nearest a foot, among the rows printing the scale (every row with a foot for a null
- * scale), where the chart's length is the foot's: a tie goes to the longer foot, as brands
- * advise sizing up between sizes. Null where the chart gives no feet, or the foot lies past its
- * ends by more than half a row's step, as a shoe fits a foot half a step either way (ADR 0027).
+ * scale), where the chart gives feet, as printed or by the brand's own rule (docs/RESEARCH.md
+ * §9): a tie goes to the longer foot, as brands advise sizing up between sizes. Null where the
+ * chart gives no feet, or the foot lies past its ends by more than half a row's step, as a shoe
+ * fits a foot half a step either way (ADR 0027).
  */
 export function brandRowNear(
+  brand: ShoeBrand,
   chart: BrandChart,
   foot: number,
   scale: BrandScale | null,
   women: boolean,
 ): BrandChartRow | null {
-  const feet = feetOf(chart).filter(
+  const feet = feetOf(brand, chart).filter(
     ({ row }) => scale === null || brandCell(row, scale, women) !== null,
   );
   if (feet.length === 0) return null;
@@ -295,6 +345,8 @@ export interface BrandReading {
   length: boolean;
   /** The size is off the chart on its scale: the chart's span there; null otherwise. */
   beyond: readonly [number, number] | null;
+  /** How the foot was found (docs/RESEARCH.md §9), or null with no row to read. */
+  tier: BrandTier | null;
 }
 
 /**
@@ -309,15 +361,27 @@ export function readBrand(
   women = unit.id === 'us-women',
 ): BrandReading {
   const chart = brandChart(brand, women);
-  const base = { brand, chart, women, row: null, foot: null, length: false, beyond: null };
+  const base = {
+    brand,
+    chart,
+    women,
+    row: null,
+    foot: null,
+    length: false,
+    beyond: null,
+    tier: null,
+  };
+  const tierOf = (row: BrandChartRow): BrandTier =>
+    footOfRow(brand, chart, row) === undefined ? 4 : chart.basis === 'foot' ? 1 : 2;
   if (LENGTH_UNITS.has(unit.id)) {
     const foot = toBase(unit, value);
-    return { ...base, length: true, foot, row: brandRowNear(chart, foot, null, women) };
+    const row = brandRowNear(brand, chart, foot, null, women);
+    return { ...base, length: true, foot, row, tier: row ? tierOf(row) : null };
   }
   if (!isBrandScale(unit.id)) return base;
   const row = brandRowAt(chart, unit.id, value, women);
   if (!row) return { ...base, beyond: brandSpan(chart, unit.id, women) };
-  return { ...base, row, foot: chart.basis === 'foot' && row.foot !== undefined ? row.foot : null };
+  return { ...base, row, foot: footOfRow(brand, chart, row) ?? null, tier: tierOf(row) };
 }
 
 /**
@@ -332,19 +396,22 @@ export interface BrandRowReading {
   range?: readonly [number, number] | undefined;
   /** The foot the chart gives for that size. */
   foot: number | null;
-  /** The chart's nearest foot is not the foot read from. */
+  /** The chart's nearest foot is not the foot read from, or the figure is ISO's label (tier 4). */
   approx: boolean;
-  /**
-   * Why there is no size: the chart gives no foot length to read from; it prints no such scale;
-   * the foot is off its chart.
-   */
-  why: 'no-length' | 'no-scale' | 'off-chart' | null;
+  /** The scale the size is on: the one asked for, or the chart's own where it lacks that one. */
+  scale: BrandScale | null;
+  /** How the figure was found (docs/RESEARCH.md §9); null with none. */
+  tier: BrandTier | null;
+  /** Why there is no size: the chart prints no scale at all, or the foot is off its chart. */
+  why: 'no-scale' | 'off-chart' | null;
 }
 
 /**
- * A chart's size on a scale for a foot, at the row nearest it, ≈ where that row's foot is not the
- * foot, as printed; or why it has none: the chart gives no foot length, prints no such scale, or
- * the foot is off it.
+ * A chart's size for a foot on a scale, by the tiers (docs/RESEARCH.md §9): at the row nearest
+ * the foot where the brand gives feet, as printed or by its own rule, ≈ where that row's foot is
+ * not the foot; else ISO's label for the foot on the chart's own scale, read through the brand's
+ * own row, ≈ always. On the chart's own scale where it lacks the one asked for. Or why it has
+ * none: the chart prints no scale at all, or the foot is off it.
  */
 export function chartAtFoot(
   brand: ShoeBrand,
@@ -353,20 +420,42 @@ export function chartAtFoot(
   scale: BrandScale,
   women: boolean,
 ): BrandRowReading {
-  const base = { brand, chart, value: null, foot: null, approx: false };
-  if (chart.basis !== 'foot') return { ...base, why: 'no-length' };
-  if (brandSpan(chart, scale, women) === null) return { ...base, why: 'no-scale' };
-  const row = brandRowNear(chart, foot, scale, women);
-  if (!row || row.foot === undefined) return { ...base, why: 'off-chart' };
-  const cell = brandCell(row, scale, women);
+  const base = { brand, chart, value: null, foot: null, approx: false, scale: null, tier: null };
+  const own = ownScale(chart, women);
+  if (own === null) return { ...base, why: 'no-scale' };
+  const read: BrandScale = brandSpan(chart, scale, women) === null ? own : scale;
+  if (feetOf(brand, chart).length > 0) {
+    const row = brandRowNear(brand, chart, foot, read, women);
+    const rowFoot = row ? footOfRow(brand, chart, row) : undefined;
+    if (!row || rowFoot === undefined) return { ...base, why: 'off-chart' };
+    const cell = brandCell(row, read, women);
+    if (!cell) return { ...base, why: 'no-scale' };
+    return {
+      brand,
+      chart,
+      value: cell.value,
+      range: cell.range,
+      foot: rowFoot,
+      approx: Math.abs(rowFoot - foot) > 0.5,
+      scale: read,
+      tier: chart.basis === 'foot' ? 1 : 2,
+      why: null,
+    };
+  }
+  const label = isoLabel(foot, own);
+  const row = label === null ? null : brandRowAt(chart, own, label, women);
+  if (!row) return { ...base, why: 'off-chart' };
+  const cell = brandCell(row, read, women);
   if (!cell) return { ...base, why: 'no-scale' };
   return {
     brand,
     chart,
     value: cell.value,
     range: cell.range,
-    foot: row.foot,
-    approx: Math.abs(row.foot - foot) > 0.5,
+    foot: null,
+    approx: true,
+    scale: read,
+    tier: 4,
     why: null,
   };
 }

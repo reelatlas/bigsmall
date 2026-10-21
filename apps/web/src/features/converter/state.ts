@@ -46,6 +46,7 @@ import {
   type BrandChart,
   type BrandReading,
   type BrandRowReading,
+  type BrandTier,
   type Category,
   type CategoryId,
   type Ingredient,
@@ -1152,9 +1153,19 @@ const BRANDS_HEADING = 'Brands';
 
 /** Why a brand has no size on the scale, after its name: the dash's reason (ADR 0028). */
 function whyWords(why: NonNullable<BrandRowReading['why']>, scaleUnit: Unit): string {
-  if (why === 'no-length') return 'no foot length';
   if (why === 'no-scale') return `prints no ${scaleUnit.symbol}`;
   return 'off its chart';
+}
+
+/**
+ * How a filled row was filled, after its name (docs/RESEARCH.md §9): nothing for the brand's own
+ * foot as printed; its own rule applied (On); ISO's label read through its own row (a brand
+ * printing no length).
+ */
+function tierWords(tier: BrandTier): string | null {
+  if (tier === 2) return 'by its own rule';
+  if (tier === 4) return 'by ISO’s label';
+  return null;
 }
 
 /**
@@ -1421,9 +1432,10 @@ function detailOf(
 /**
  * The brands' section (ADR 0028): one row per brand, its size on the scale for the foot in the
  * box, read from its own chart at the nearest row, ≈ where that row's foot is not the foot, as
- * printed; the brand in the box, with a size typed, as the box's own row, the one row filled, its
- * size as the chart prints it; a dash with why where a brand has no size. Repeats the scales in
- * another form, so Edit leaves it.
+ * printed, or filled by the tiers where the chart alone cannot (docs/RESEARCH.md §9), the row
+ * saying how; the brand in the box, with a size typed, as the box's own row, the one row filled,
+ * its size as the chart prints it; a dash with why where a brand has no size. Repeats the scales
+ * in another form, so Edit leaves it.
  */
 function brandsSection(
   foot: number | null,
@@ -1475,10 +1487,19 @@ function brandsSection(
       });
       return;
     }
+    // A brand lacking the scale in focus shows its size on its own scale, that scale's symbol
+    // on the row and the words saying which it lacks; a filled row says how (RESEARCH.md §9).
+    const onUnit = read.scale !== null && read.scale !== scaleUnit.id ? getUnit(read.scale) : null;
+    const how = [
+      onUnit ? `prints no ${scaleUnit.symbol}` : null,
+      read.tier !== null ? tierWords(read.tier) : null,
+    ]
+      .filter(Boolean)
+      .join(' · ');
     rows.push({
-      ...brandCellRow(scaleUnit, read.value, read.range, read.approx, locale),
+      ...brandCellRow(onUnit ?? scaleUnit, read.value, read.range, read.approx, locale),
       ...tag,
-      detail: detailOf(read.chart.line, scaleUnit),
+      detail: detailOf(read.chart.line, scaleUnit, how || null),
     });
   });
   return {
@@ -1554,8 +1575,14 @@ function brandNote(
       lines.push(
         `${name} gives no foot length, so its ${size} is read as ISO’s ${unit.name} ${size}${cells.length ? `; it prints ${cells.join(', ')} for it` : ''}.`,
       );
-    } else if (reading.length && chart.basis !== 'foot') {
-      lines.push(`${name} gives no foot length, so it has no size for a measured foot.`);
+    } else if (reading.tier === 2 && brand.labelMinusCm !== undefined) {
+      lines.push(
+        `${name} gives no foot length; its foot here is its JP label less ${brand.labelMinusCm} cm, by its own rule.`,
+      );
+    } else if (reading.length && reading.row === null) {
+      lines.push(
+        `${name} gives no foot length; its row is ISO’s label for the foot, read through its own chart.`,
+      );
     }
   }
   return lines.join(' ');

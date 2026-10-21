@@ -14,3 +14,6 @@ docs/research/shoe-sizes-2/manual/brand-charts-check.html
 docs/research/shoe-sizes-2/brands.json
 docs/research/shoe-sizes-2/deltas.csv
 docs/research/shoe-sizes-2/deltas.md
+
+# Written by docs/research/shoe-sizes-2/mocks/brand-proto.py (the interactive prototype of the brand rows)
+docs/research/shoe-sizes-2/mocks/brand-proto.html

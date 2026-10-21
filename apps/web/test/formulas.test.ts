@@ -1,4 +1,4 @@
-import { ingredients, shoeBrands, units } from '@bigsmall/core';
+import { brandChartsOf, ingredients, shoeBrands, units } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import { formulaGroups, writtenFactor } from '../src/features/formulas/formulas';
 
@@ -23,10 +23,12 @@ describe('formulas', () => {
     const shoe = formulaGroups().find((group) => group.category.id === 'shoe-size');
     const charts = shoe?.lines.filter((line) => line.id.startsWith('brand:')) ?? [];
     expect(charts).toHaveLength(
-      shoeBrands.reduce((count, brand) => count + brand.charts.length, 0),
+      shoeBrands.reduce((count, brand) => count + brandChartsOf(brand.id).length, 0),
     );
     expect(charts.map((line) => line.id)).toEqual(
-      shoeBrands.flatMap((brand) => brand.charts.map((chart) => `brand:${brand.id}:${chart.line}`)),
+      shoeBrands.flatMap((brand) =>
+        brandChartsOf(brand.id).map((chart) => `brand:${brand.id}:${chart.line}`),
+      ),
     );
     expect(shoe?.summary).toBe(`10 units in Mondopoint, ${charts.length} brands’ charts`);
     const nike = charts.find((line) => line.id === 'brand:nike:men');

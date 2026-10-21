@@ -20,6 +20,7 @@ import {
   getIngredient,
   getShoeBrand,
   getUnit,
+  hasBrandCharts,
   INGREDIENT_KINDS,
   ingredients,
   isBrandScale,
@@ -606,9 +607,20 @@ interface HiddenMatch {
 
 export type TableView = StartView | UnitsView | MatchesView;
 
+/**
+ * The brands' charts' state (ADR 0029): idle until wanted, loading while the web app fetches the
+ * file, ready once core has it, failed when the fetch did.
+ */
+export type ChartsStatus = 'idle' | 'loading' | 'ready' | 'failed';
+
 interface TableOptions extends NumberEnv {
   /** The visitor's unit family, listed first. */
   system: UnitPreference;
+  /**
+   * The brands' charts' state, from the island's hook (ADR 0029); without it, ready once core
+   * holds them (the tests and the build hand the file over first), else loading.
+   */
+  charts?: ChartsStatus;
   /** Which units show (settings.ts); without one, every unit does. */
   rule?: ViewRule;
   /** The sections' order (settings.ts); without one, a fresh visit's. */
@@ -1357,19 +1369,24 @@ function brandsSection(
   value: number | undefined,
   baseline: BrandReading | null,
   locale: string | undefined,
+  ready: boolean,
 ): Section<TableRow> {
   const rows: TableRow[] = [];
   const readings =
-    foot !== null && isBrandScale(scaleUnit.id) ? brandsAtFoot(foot, scaleUnit.id, women) : null;
+    ready && foot !== null && isBrandScale(scaleUnit.id)
+      ? brandsAtFoot(foot, scaleUnit.id, women)
+      : null;
   shoeBrands.forEach((brand, index) => {
     const read = readings?.[index] ?? null;
     const own =
       baseline?.brand.id === brand.id && !baseline.length && value !== undefined ? baseline : null;
-    const chart = own?.chart ?? read?.chart ?? brandChart(brand, women);
+    // While the charts load, or failed to load, the rows wait as dashes with no line to say
+    // (ADR 0029).
+    const chart = own?.chart ?? read?.chart ?? (ready ? brandChart(brand, women) : null);
     const tag = {
       id: `brand:${brand.id}`,
       name: brand.name,
-      brand: { id: brand.id, line: chart.line },
+      brand: { id: brand.id, line: chart?.line ?? (women ? 'women' : 'men') },
     };
     if (own && value !== undefined) {
       const cell =
@@ -1377,7 +1394,7 @@ function brandsSection(
       rows.push({
         ...brandCellRow(scaleUnit, from, value, cell?.range, false, locale),
         ...tag,
-        detail: detailOf(chart.line, scaleUnit),
+        detail: detailOf(own.chart.line, scaleUnit),
         inBox: true,
       });
       return;
@@ -1387,14 +1404,16 @@ function brandsSection(
         ...emptyRow(scaleUnit, from),
         ...tag,
         inBox: false,
-        detail: detailOf(chart.line, scaleUnit, read?.why ? whyWords(read.why, scaleUnit) : null),
+        detail: chart
+          ? detailOf(chart.line, scaleUnit, read?.why ? whyWords(read.why, scaleUnit) : null)
+          : undefined,
       });
       return;
     }
     rows.push({
       ...brandCellRow(scaleUnit, from, read.value, read.range, read.approx, locale),
       ...tag,
-      detail: detailOf(chart.line, scaleUnit),
+      detail: detailOf(read.chart.line, scaleUnit),
     });
   });
   return {
@@ -1486,6 +1505,19 @@ export function scaleList(
   locale: string | undefined,
 ): MatchesView {
   const shoe = getCategory(SHOE);
+  // Nothing to list until core has the charts (ADR 0029); the chip opens the list only then.
+  if (!hasBrandCharts()) {
+    return {
+      categories: view.categories,
+      kind: 'matches',
+      category: SHOE,
+      query: '',
+      rows: [],
+      counts: {},
+      hidden: [],
+      announcement: null,
+    };
+  }
   const women = readsWomen(unit, line);
   const reading = unit && value !== undefined ? readBrand(brand, unit, value, women) : null;
   const chart = reading?.chart ?? brandChart(brand, women);
@@ -1531,6 +1563,9 @@ export function scaleList(
   };
 }
 
+/** The line under the table when the brands' charts could not be fetched (ADR 0029). */
+const CHARTS_FAILED = 'The brands’ charts could not be loaded. Reload the page to try again.';
+
 /**
  * Shoe size (ADR 0027, ADR 0028): ISO's scales as every category's rows, and under them one row
  * per brand at the same foot. One value is in focus (Sean, 2026-10-20): a size on ISO's scales,
@@ -1558,29 +1593,52 @@ function selectShoe(
     unit && isBrandScale(unit.id) ? unit.id : women ? 'us-women' : BRAND_DEFAULT_SCALE,
   );
   if (!scaleUnit) return view;
+  // The charts' state (ADR 0029): the island's hook says; the tests and the build hand the
+  // file over first, so ready without a word.
+  const charts: ChartsStatus = options.charts ?? (hasBrandCharts() ? 'ready' : 'loading');
+  const ready = charts === 'ready';
   const reading =
-    brand && unit && value !== undefined ? readBrand(brand, unit, value, women) : null;
+    ready && brand && unit && value !== undefined ? readBrand(brand, unit, value, women) : null;
   // A brand with no foot length: its size read as ISO's label on the same scale.
   const labelled =
     reading !== null && !reading.length && reading.row !== null && reading.foot === null;
   // The foot everything converts from: the brand's chart's for the size in the box, ISO's rule's
   // for a size on its scales or a labelled brand's, the length typed; none while the rows wait or
   // a size is off its chart.
+  // A brand in the box while its chart is not here (loading, or the fetch failed): no foot to
+  // read from, every row a dash, the line under the table saying so (ADR 0029).
+  const waiting = brand !== null && !ready;
   let foot: number | null = null;
   if (reading) {
     foot = reading.foot ?? (labelled && unit && value !== undefined ? baseOf(unit, value) : null);
-  } else if (unit && value !== undefined && !beyondOwnScale(unit, value)) {
+  } else if (!waiting && unit && value !== undefined && !beyondOwnScale(unit, value)) {
     foot = baseOf(unit, value);
   }
   // With a brand's size in the box, the scale rows are ISO's from its foot and none the box's own.
   const read =
-    reading && !reading.length
+    (reading && !reading.length) || waiting
       ? remapRows(view, (row) => fromFoot(row, foot, options.locale))
       : view;
-  const section = brandsSection(foot, scaleUnit, women, unit, value, reading, options.locale);
-  const note = brand ? brandNote(brand, reading, unit, value, labelled, options.locale) : view.note;
+  const section = brandsSection(
+    foot,
+    scaleUnit,
+    women,
+    unit,
+    value,
+    reading,
+    options.locale,
+    ready,
+  );
+  const note =
+    charts === 'failed'
+      ? CHARTS_FAILED
+      : waiting
+        ? `Loading ${poss(brand.name)} chart…`
+        : brand
+          ? brandNote(brand, reading, unit, value, labelled, options.locale)
+          : view.note;
   const announcement =
-    brand && unit && value !== undefined
+    brand && unit && value !== undefined && ready
       ? `${spokenAmount(parsed, unit, options.locale)} at ${brand.name} in ${read.rows.length} units of shoe size`
       : view.announcement;
   return {

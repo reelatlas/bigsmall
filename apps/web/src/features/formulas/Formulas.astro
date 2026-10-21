@@ -3,6 +3,11 @@ import { ChevronDownIcon } from '../../components/icons';
 import { cx, DISCLOSURE, TAG } from '../../lib/recipes';
 import { FORMULAS_HEADING, formulaGroups, SIGNIFICANT } from './formulas';
 import { FormulasTools } from './FormulasTools';
+import { setBrandCharts, type BrandChartsFile } from '@bigsmall/core';
+import chartsFile from '@bigsmall/core/data/shoe-brands.json';
+
+// The brands' charts are data core is given (ADR 0029): at build, from the file itself.
+setBrandCharts(chartsFile as unknown as BrandChartsFile);
 
 /*
  * Every formula, under its tab on the About page (docs/UX-SPEC.md §1, "About"; Sean, 2026-10-15,

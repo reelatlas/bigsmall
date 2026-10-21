@@ -1,0 +1,30 @@
+# 0029 — The brands' charts as data core is given: a JSON file fetched when Shoe size opens
+
+Date: 2026-10-20
+Status: accepted
+
+## Context
+
+ADR 0028 put the brands' 33 charts in core as a TypeScript file written from the research record, 7.1 KB gzipped, which took the converter page from 87.8 to 98.7 KB against a 90 KB JS budget; the budget was raised to 100 KB with Sean's yes (the hundred-and-eighteenth pass) on the understanding that the charts would leave the bundle before any more data landed: the kids' charts (60 in the record), the dash filling's estimates, the second batch of brands, and later apparel's charts, each the same shape and each a few KB more. Lazy loading would not have helped: the budget counts code loaded on demand on purpose (docs/LEARNINGS.md, 2026-10-20). Sean, on the move (the hundred-and-twentieth pass): "the JSON fix is becoming more pressing … if this ultimately makes our system the most flexible, reliable, scalable, usable, and in general most logical and best-practice way to manage our structure, data, codebase, systems, and architecture, I want to work toward that even if it's a heavy lift; don't overcomplicate."
+
+## Decision
+
+1. **Core is given the charts; it does not carry them.** `packages/core/src/units/shoe-brand-charts.ts` holds the charts' types and a registry: `setBrandCharts(file)` gives core the file, `hasBrandCharts()` says whether it has it, `brandChartsOf(id)` answers a brand's charts and throws if asked before, a programming error. The lookups (`src/shoe-brands.ts`) read the registry; the brands' names, aliases, shorthand keys, sites, and facts stay in `src/units/shoe-brands.ts`, in the bundle, so the grammar, the matches, and the pill's list work before the charts arrive. Core stays pure, synchronous, and free of I/O and the DOM (ADR 0003).
+2. **The file is `packages/core/data/shoe-brands.json`**, written from the research record by `docs/research/shoe-sizes-2/write_brands.py` (`brands.json`, the product's 33 charts, every cell as printed, the foot only where the brand's words make the length the foot's), named by its schema (`bigsmall shoe-brand charts v1`), what wrote it, and the date read; the core package exports it (`@bigsmall/core/data/shoe-brands.json`); `packages/core/test/shoe-brands.test.ts` hands it to core and holds it to the record cell for cell, as before.
+3. **The web app fetches it once it is wanted.** `useBrandCharts` (`apps/web/src/features/converter/useBrandCharts.ts`) starts one fetch for the island's life once Shoe size is open, a brand is in the box, or the words typed begin a brand's name, checks the file by its schema name, and hands it to core; the URL comes from Vite's `?url` import, so the file is emitted beside the page's assets with a hash in its name, cached for good, and outside the JS bundle, which the budget script does not follow (it prints the data's size beside the budget, for the record). Its state (idle, loading, ready, failed) travels in the table's options (`charts`): until ready the brands' rows are dashes, and a brand in the box leaves every row a dash with the line under the table saying "Loading Nike’s chart…"; failed, the line says the charts could not be loaded and to reload the page, and a later want retries; the scales convert as ever meanwhile, and the chip opens the brand's scales only once ready. The About page's build and every web test hand the file over directly (`Formulas.astro`'s frontmatter; `apps/web/test/setup.ts`, Vitest's `setupFiles`), so nothing fetches there.
+4. **The budget measures code.** 100 KB stays (docs/PLAN.md §9), the page at about 92 KB; data grows in the file, which the next charts join: the kids' charts, the dash filling's estimates and their tiers, the second batch; apparel's charts take a file of their own in the same shape.
+
+## Alternatives considered
+
+- **Raise the budget as data grows.** Every batch would be a budget conversation, and the page would carry charts most visits never open.
+- **A dynamic import of the data module.** The budget counts code loaded on demand (docs/LEARNINGS.md, 2026-10-20), and a module of data is still code to parse; a JSON file is fetched and parsed by the browser's own parser, cached by its hash.
+- **A file in `public/` with a version in its query.** Served as is and easy, but the hash in the name is the platform's own cache busting, and a version by hand is one more thing to remember.
+- **Core reading the file itself.** Core has no I/O (ADR 0003); the app that has the file hands it over, by fetch, by build, or by test.
+- **Keeping the charts in core until the second batch.** The move was promised before any more data, and the dash filling's estimates and the kids' charts come first.
+
+## Consequences
+
+- Core: `src/units/shoe-brands-data.ts` is gone; `src/units/shoe-brand-charts.ts` holds the types and the registry; `ShoeBrand` loses its `charts`; `brandChart` reads the registry; `package.json` exports the data file; the test hands it over at its top.
+- Web: `useBrandCharts`, the charts' state in `TableOptions` (`charts`, ready by default once core holds them, so the tests and the build pass nothing), `selectShoe` waiting with dashes and the two lines, the chip's list only once ready, the About page's build and the tests' setup handing the file over; a browser test blocks the file and reads the line.
+- The research script writes JSON (`write_brands.py`), one row a line, Prettier keeping it so; the About page still lists every chart; the budget script prints the data beside the budget.
+- Easier: the next charts are rows in the file, and apparel's charts a file of the same shape. To watch: the first open of Shoe size on a slow connection shows dashes for the fetch's length; a `<link rel="prefetch">` is one line if that ever shows.

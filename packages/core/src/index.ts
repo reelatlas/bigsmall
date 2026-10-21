@@ -70,11 +70,16 @@ export {
   isBrandScale,
   BRAND_SCALES,
   BRAND_DEFAULT_SCALE,
+  setBrandCharts,
+  hasBrandCharts,
+  brandChartsOf,
+  BRAND_CHARTS_SCHEMA,
 } from './shoe-brands';
 export type {
   ShoeBrand,
   BrandChart,
   BrandChartRow,
+  BrandChartsFile,
   BrandLine,
   LengthBasis,
   BrandScale,

@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
-// The record the charts are written from (docs/research/shoe-sizes-2/brands.py), read whole.
+// The file core is given (ADR 0029), and the record it is written from
+// (docs/research/shoe-sizes-2/brands.py), both read whole.
+import chartsFile from '../data/shoe-brands.json';
 import recordFile from '../../../docs/research/shoe-sizes-2/brands.json';
 import {
+  BRAND_CHARTS_SCHEMA,
   brandChart,
+  brandChartsOf,
   brandScale,
   brandsAtFoot,
   convert,
@@ -11,11 +15,14 @@ import {
   matchShoeBrands,
   readBrand,
   search,
+  setBrandCharts,
   shoeBrands,
   splitShoeBrand,
   unitsIn,
 } from '../src/index';
-import type { BrandChartRow, ShoeBrand, Unit } from '../src/index';
+import type { BrandChartRow, BrandChartsFile, ShoeBrand, Unit } from '../src/index';
+
+setBrandCharts(chartsFile as unknown as BrandChartsFile);
 
 interface RecordRow {
   [key: string]: number | string | boolean | Record<string, string> | undefined;
@@ -71,18 +78,26 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
   const record = recordFile as unknown as { charts: RecordChart[] };
   const charts = record.charts.filter((chart) => chart.product);
 
+  it('is given the file, named by its schema and the date read', () => {
+    expect(chartsFile.schema).toBe(BRAND_CHARTS_SCHEMA);
+    expect(chartsFile.read).toBe('2026-10-20');
+    expect(Object.keys(chartsFile.charts)).toHaveLength(20);
+  });
+
   it('carries every product chart of the record, and no other', () => {
     expect(charts).toHaveLength(33);
     const expected = new Set(charts.map((chart) => `${idOf(chart.brand)}:${chart.line}`));
     const held = new Set(
-      shoeBrands.flatMap((each) => each.charts.map((chart) => `${each.id}:${chart.line}`)),
+      shoeBrands.flatMap((each) =>
+        brandChartsOf(each.id).map((chart) => `${each.id}:${chart.line}`),
+      ),
     );
     expect(held).toEqual(expected);
   });
 
   it('every cell is the brand’s own, as printed, and the foot only where the length is the foot’s', () => {
     for (const chart of charts) {
-      const held = brand(idOf(chart.brand)).charts.find((each) => each.line === chart.line);
+      const held = brandChartsOf(idOf(chart.brand)).find((each) => each.line === chart.line);
       expect(held, `${chart.brand} ${chart.line}`).toBeDefined();
       if (!held) continue;
       const rows = chart.rows.filter(
@@ -114,8 +129,8 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
     const seen = new Map<string, string>();
     for (const each of shoeBrands) {
       expect(each.id).toMatch(/^[a-z0-9-]+$/);
-      expect(each.charts.length).toBeGreaterThan(0);
-      const lines = each.charts.map((chart) => chart.line);
+      expect(brandChartsOf(each.id).length).toBeGreaterThan(0);
+      const lines = brandChartsOf(each.id).map((chart) => chart.line);
       expect(new Set(lines).size).toBe(lines.length);
       if (lines.includes('unisex')) expect(lines).toEqual(['unisex']);
       // The name is a key itself, so no alias repeats it; a shorthand key may be the name (On).
@@ -129,7 +144,7 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
         expect(seen.get(compact), `"${key}" of ${each.id}`).toBeUndefined();
         seen.set(compact, each.id);
       }
-      for (const chart of each.charts) {
+      for (const chart of brandChartsOf(each.id)) {
         expect(chart.source.length).toBeGreaterThan(0);
         expect(chart.read).toBe('2026-10-20');
       }

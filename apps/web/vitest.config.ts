@@ -7,5 +7,7 @@ export default defineConfig({
     name: 'web',
     environment: 'node',
     include: ['test/**/*.test.ts'],
+    // The brands' charts given to core before any test (ADR 0029).
+    setupFiles: ['test/setup.ts'],
   },
 });

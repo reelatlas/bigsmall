@@ -1,10 +1,21 @@
-import { categories, ingredients, shoeBrands, units } from '@bigsmall/core';
+import { categories, ingredients, units } from '@bigsmall/core';
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { THEMES } from '../src/lib/themes';
 import { aboutPanel, aboutTab, aboutTabs, applyTheme } from './support';
 
-/** The brands' charts under Shoe size (ADR 0028), lines of their own. */
-const CHARTS = shoeBrands.reduce((count, brand) => count + brand.charts.length, 0);
+/**
+ * The brands' charts under Shoe size (ADR 0028), lines of their own: counted from the file core is
+ * given (ADR 0029), read as the package exports it.
+ */
+const chartsFile = JSON.parse(
+  readFileSync(
+    createRequire(import.meta.url).resolve('@bigsmall/core/data/shoe-brands.json'),
+    'utf8',
+  ),
+) as { charts: Record<string, unknown[]> };
+const CHARTS = Object.values(chartsFile.charts).reduce((count, charts) => count + charts.length, 0);
 
 // Every formula on the About page (docs/UX-SPEC.md §1, "About"): folded by category, Show all and
 // Hide all, and Copy all as plain text. Under its tab since 2026-10-18.

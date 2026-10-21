@@ -1,10 +1,12 @@
-"""Write core's copy of the brands' charts from `brands.json`, the record `brands.py` writes from the
-keepers (docs/research/shoe-sizes-2.md §9; ADR 0028): the 33 charts flagged `product: true`, one or
-two per brand, every cell as the brand prints it, keyed by brand id. The brands' names, aliases,
+"""Write the product's brand charts file, `packages/core/data/shoe-brands.json`, from `brands.json`,
+the record `brands.py` writes from the keepers (docs/research/shoe-sizes-2.md §9; ADR 0028, ADR
+0029): the 33 charts flagged `product: true`, one or two per brand, every cell as the brand prints
+it, keyed by brand id. Core is given the file (`setBrandCharts`): the web app fetches it once Shoe
+size opens, the tests and the About page's build hand it over directly. The brands' names, aliases,
 sites, and the facts the note carries are typed once in `packages/core/src/units/shoe-brands.ts`,
 never here. Run from the repository root: `python -I docs/research/shoe-sizes-2/write_brands.py`,
-then `pnpm format`; `packages/core/test/shoe-brands.test.ts` holds the written charts to the record
-cell for cell."""
+then `pnpm format`; `packages/core/test/shoe-brands.test.ts` holds the file to the record cell for
+cell."""
 
 from __future__ import annotations
 
@@ -14,11 +16,13 @@ import re
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 RECORD = pathlib.Path(__file__).resolve().parent / "brands.json"
-OUT = ROOT / "packages/core/src/units/shoe-brands-data.ts"
+OUT = ROOT / "packages/core/data/shoe-brands.json"
 
-HEADER = (
-    "// Written by docs/research/shoe-sizes-2/write_brands.py from brands.json, the record of the brands'\n"
-    "// charts (docs/research/shoe-sizes-2.md §9): edit the keepers and re-run brands.py, never this.\n"
+# The file's shape, which the web app checks a fetch by (packages/core/src/units/shoe-brand-charts.ts).
+SCHEMA = "bigsmall shoe-brand charts v1"
+WRITTEN = (
+    "docs/research/shoe-sizes-2/write_brands.py from brands.json, the record of the brands' charts "
+    "(docs/research/shoe-sizes-2.md §9): edit the keepers and re-run brands.py, never this"
 )
 
 # The record's row keys and the chart's fields they fill; a range's ends are `<key>_low/_high`.
@@ -37,38 +41,36 @@ def brand_id(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
-def number(value: float) -> str:
-    text = f"{value:.4f}".rstrip("0").rstrip(".")
-    return text if text else "0"
+def number(value: float) -> int | float:
+    rounded = round(float(value), 4)
+    return int(rounded) if rounded == int(rounded) else rounded
 
 
-def cell(row: dict, key: str) -> str | None:
+def cell(row: dict, key: str) -> int | float | list[int | float] | None:
     value = row.get(key)
     if value is None:
         return None
     low, high = row.get(key + "_low"), row.get(key + "_high")
     if low is not None and high is not None:
-        return f"[{number(low)}, {number(high)}]"
+        return [number(low), number(high)]
     if key == "jp" and value > 100:  # adidas prints its JP column in millimetres
         value = value / 10
     return number(value)
 
 
-def write_row(row: dict, basis: str) -> str | None:
-    parts = []
+def write_row(row: dict, basis: str) -> dict | None:
+    written: dict = {}
     for key, field in CELLS:
-        written = cell(row, key)
-        if written is not None:
-            parts.append(f"{field}: {written}")
+        value = cell(row, key)
+        if value is not None:
+            written[field] = value
     foot = row.get("foot_mm")
     if basis == "foot" and foot is not None:
-        parts.append(f"foot: {number(float(foot))}")
-    if not parts:
-        return None
-    return "      { " + ", ".join(parts) + " }"
+        written["foot"] = number(float(foot))
+    return written or None
 
 
-def ts(value: str) -> str:
+def dumps(value) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
@@ -78,72 +80,42 @@ def main() -> None:
     by_brand: dict[str, list[dict]] = {}
     for chart in charts:
         by_brand.setdefault(chart["brand"], []).append(chart)
-    order = sorted(by_brand, key=str.lower)
-    blocks = []
-    for name in order:
-        entries = []
-        for chart in sorted(by_brand[name], key=lambda c: ("men", "women", "unisex").index(c["line"])):
+    lines = [
+        "{",
+        f'  "schema": {dumps(SCHEMA)},',
+        f'  "written": {dumps(WRITTEN)},',
+        f'  "read": {dumps(record["date"])},',
+        '  "charts": {',
+    ]
+    brands = sorted(by_brand, key=str.lower)
+    rows_total = 0
+    for at, name in enumerate(brands):
+        lines.append(f"    {dumps(brand_id(name))}: [")
+        entries = sorted(by_brand[name], key=lambda c: ("men", "women", "unisex").index(c["line"]))
+        for e, chart in enumerate(entries):
             rows = [r for r in (write_row(row, chart["length"]["basis"]) for row in chart["rows"]) if r]
+            rows_total += len(rows)
             source = chart["source"]
             if isinstance(source, list):
                 source = "; ".join(source)
-            entries.append(
-                "  {\n"
-                f"    line: '{chart['line']}',\n"
-                f"    basis: '{BASIS[chart['length']['basis']]}',\n"
-                f"    title: {ts(chart['chart'])},\n"
-                f"    source: {ts(source)},\n"
-                f"    read: '{record['date']}',\n"
-                "    rows: [\n" + ",\n".join(rows) + ",\n    ],\n"
-                "  }"
-            )
-        blocks.append(f"  '{brand_id(name)}': [\n" + ",\n".join(entries) + ",\n  ]")
-    text = f"""{HEADER}
-/** The line a chart is printed for: a men's or a women's page, or one chart for everyone. */
-export type BrandLine = 'men' | 'women' | 'unisex';
-
-/**
- * What the chart's length column is, by the brand's own words (docs/research/shoe-sizes-2.md §7
- * to §9): the foot's, measured heel to toe; the product's (Puma's measurements); a size label
- * (On's Japan column); or none printed.
- */
-export type LengthBasis = 'foot' | 'product' | 'label' | 'none';
-
-/**
- * One row of a brand's chart, every cell as the brand prints it: a size on each scale the chart
- * has (a range where the brand prints one, its two ends), the British women's where the brand
- * prints men's and women's UK apart (Crocs), the Japan or CM column as a label in centimetres,
- * and the foot's length in mm where the brand says its length is the foot's.
- */
-export interface BrandChartRow {{
-  usMen?: number | readonly [number, number];
-  usWomen?: number | readonly [number, number];
-  uk?: number;
-  ukWomen?: number;
-  eu?: number | readonly [number, number];
-  jp?: number;
-  foot?: number;
-}}
-
-/** A brand's chart as published: its line, its length's basis, its name on the page, its page, and its rows. */
-export interface BrandChart {{
-  line: BrandLine;
-  basis: LengthBasis;
-  title: string;
-  source: string;
-  /** The date the page was read, ISO 8601. */
-  read: string;
-  rows: readonly BrandChartRow[];
-}}
-
-/** The product's charts by brand id (docs/research/shoe-sizes-2.md §5, decision 1): {len(charts)} charts, {len(order)} brands. */
-export const BRAND_CHARTS: Readonly<Record<string, readonly BrandChart[]>> = {{
-{",\n".join(blocks)},
-}};
-"""
-    OUT.write_text(text, encoding="utf-8", newline="\n")
-    rows = sum(len(c["rows"]) for c in charts)
-    print(f"written: {OUT.relative_to(ROOT)} ({len(order)} brands, {len(charts)} charts, {rows} rows)")
+            lines.append("      {")
+            lines.append(f'        "line": {dumps(chart["line"])},')
+            lines.append(f'        "basis": {dumps(BASIS[chart["length"]["basis"]])},')
+            lines.append(f'        "title": {dumps(chart["chart"])},')
+            lines.append(f'        "source": {dumps(source)},')
+            lines.append(f'        "read": {dumps(record["date"])},')
+            lines.append('        "rows": [')
+            for r, row in enumerate(rows):
+                # One row a line, as Prettier keeps an object that fits: `{ "usMen": 4, "uk": 3.5 }`.
+                body = ", ".join(f"{dumps(k)}: {dumps(v)}" for k, v in row.items())
+                lines.append(f"          {{ {body} }}{',' if r < len(rows) - 1 else ''}")
+            lines.append("        ]")
+            lines.append("      }" + ("," if e < len(entries) - 1 else ""))
+        lines.append("    ]" + ("," if at < len(brands) - 1 else ""))
+    lines.extend(["  }", "}", ""])
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    print(f"wrote {OUT.relative_to(ROOT)}: {len(charts)} charts, {len(brands)} brands, {rows_total} rows")
 
 
 if __name__ == "__main__":

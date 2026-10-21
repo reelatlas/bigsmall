@@ -3,7 +3,17 @@ import { compactKey } from './normalize';
 import type { MatchClass } from './search';
 import type { Unit } from './types';
 import { shoeBrands, type ShoeBrand } from './units/shoe-brands';
-import type { BrandChart, BrandChartRow, BrandLine, LengthBasis } from './units/shoe-brands-data';
+import {
+  brandChartsOf,
+  hasBrandCharts,
+  setBrandCharts,
+  BRAND_CHARTS_SCHEMA,
+  type BrandChart,
+  type BrandChartRow,
+  type BrandChartsFile,
+  type BrandLine,
+  type LengthBasis,
+} from './units/shoe-brand-charts';
 
 /**
  * The brands' shoe-size charts (ADR 0028; docs/research/shoe-sizes-2.md): a brand joins the box
@@ -12,8 +22,8 @@ import type { BrandChart, BrandChartRow, BrandLine, LengthBasis } from './units/
  * the words and the rows in the web app.
  */
 
-export { shoeBrands };
-export type { ShoeBrand, BrandChart, BrandChartRow, BrandLine, LengthBasis };
+export { shoeBrands, setBrandCharts, hasBrandCharts, brandChartsOf, BRAND_CHARTS_SCHEMA };
+export type { ShoeBrand, BrandChart, BrandChartRow, BrandChartsFile, BrandLine, LengthBasis };
 
 const byId: ReadonlyMap<string, ShoeBrand> = new Map(shoeBrands.map((each) => [each.id, each]));
 
@@ -143,14 +153,16 @@ export function splitShoeBrand(
 
 /**
  * The chart a brand answers with: the women's where it prints one and the size is women's, else
- * the men's, else its one chart for everyone.
+ * the men's, else its one chart for everyone; from the charts core was given (ADR 0029), so asked
+ * before, it throws.
  */
 export function brandChart(brand: ShoeBrand, women: boolean): BrandChart {
   const line: BrandLine = women ? 'women' : 'men';
+  const charts = brandChartsOf(brand.id);
   const chart =
-    brand.charts.find((each) => each.line === line) ??
-    brand.charts.find((each) => each.line === 'unisex') ??
-    brand.charts[0];
+    charts.find((each) => each.line === line) ??
+    charts.find((each) => each.line === 'unisex') ??
+    charts[0];
   if (!chart) throw new Error(`${brand.name} has no chart`);
   return chart;
 }

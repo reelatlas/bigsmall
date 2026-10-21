@@ -53,6 +53,7 @@ import {
   TABLE_PRECISION,
   targetRow,
   type BoxView,
+  type ChartsStatus,
   type HistoryAction,
   type ShoeLine,
   type TableRow,
@@ -211,6 +212,8 @@ interface TableLayoutProps {
   /** The box, as the field shows it. */
   box: BoxView;
   table: TableView;
+  /** The brands' charts' state (ADR 0029): the unit's chip opens the brand's scales only once ready. */
+  charts: ChartsStatus;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
   /** Id of the converter's intro, which describes the field. */
@@ -250,6 +253,7 @@ export function TableLayout({
   inputRef,
   box,
   table: selected,
+  charts,
   env,
   dispatch: send,
   describedBy,
@@ -1388,7 +1392,7 @@ export function TableLayout({
               // brand's scales in the table's place, the cursor on the one in the box, and closes
               // them again, as the pills do; one taken reads the same row on that scale, the brand
               // staying. Without a brand it is a readout, the table being the list.
-              unitPicks={box.brand !== null && box.unit !== null}
+              unitPicks={box.brand !== null && box.unit !== null && charts === 'ready'}
               unitOpen={choosingScale}
               onUnitOpen={() => {
                 const current = box.unit?.id ?? null;

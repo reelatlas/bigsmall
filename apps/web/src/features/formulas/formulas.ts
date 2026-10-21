@@ -4,6 +4,7 @@ import {
   getUnit,
   ingredients,
   pairFormula,
+  brandChartsOf,
   shoeBrands,
   unitsIn,
   type BrandChart,
@@ -232,7 +233,9 @@ export function formulaGroups(): FormulaGroup[] {
     });
     const charts =
       category.id === 'shoe-size'
-        ? shoeBrands.flatMap((brand) => brand.charts.map((chart) => brandLine(brand, chart)))
+        ? shoeBrands.flatMap((brand) =>
+            brandChartsOf(brand.id).map((chart) => brandLine(brand, chart)),
+          )
         : [];
     return [
       {

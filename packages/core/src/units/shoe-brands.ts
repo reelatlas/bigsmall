@@ -1,10 +1,10 @@
-import { BRAND_CHARTS, type BrandChart } from './shoe-brands-data';
-
 /**
  * A shoe brand whose own size chart the converter carries beside ISO's rule (ADR 0028;
- * docs/research/shoe-sizes-2.md): the words are typed here, once; the charts are written from the
- * research record by `docs/research/shoe-sizes-2/write_brands.py`, every cell as the brand prints
- * it, and `packages/core/test/shoe-brands.test.ts` holds them to it.
+ * docs/research/shoe-sizes-2.md): the words are typed here, once; the charts are data core is
+ * given (ADR 0029): `docs/research/shoe-sizes-2/write_brands.py` writes
+ * `packages/core/data/shoe-brands.json` from the research record, every cell as the brand prints
+ * it, `packages/core/test/shoe-brands.test.ts` holds the file to it, and the web app fetches it
+ * once Shoe size opens (`shoe-brand-charts.ts`).
  */
 export interface ShoeBrand {
   /** Stable identifier used in URLs. Lowercase, ASCII, kebab-case. */
@@ -26,12 +26,6 @@ export interface ShoeBrand {
    * (Sean, 2026-10-20).
    */
   fact?: string;
-  /**
-   * Its charts as published: a men's and a women's where the brand prints two, since the same
-   * foot maps to a different size on each, or one chart for everyone (docs/research/shoe-sizes-2.md
-   * §5, decision 1).
-   */
-  charts: readonly BrandChart[];
 }
 
 function brand(
@@ -41,7 +35,7 @@ function brand(
   aliases: readonly string[],
   extra: { shorthand?: readonly string[]; fact?: string } = {},
 ): ShoeBrand {
-  return { id, name, aliases, site, charts: BRAND_CHARTS[id] ?? [], ...extra };
+  return { id, name, aliases, site, ...extra };
 }
 
 /**

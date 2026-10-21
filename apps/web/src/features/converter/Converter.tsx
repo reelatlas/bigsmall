@@ -76,6 +76,7 @@ export function Converter() {
     state,
     box,
     table,
+    charts,
     env,
     dispatch,
     canUndo,
@@ -463,6 +464,7 @@ export function Converter() {
         inputRef={inputRef}
         box={box}
         table={table}
+        charts={charts}
         env={env}
         dispatch={dispatch}
         describedBy={introId}

@@ -1,6 +1,7 @@
 import {
   DEFAULT_SEPARATORS,
   localeSeparators,
+  matchShoeBrands,
   regionDefaults,
   type UnitPreference,
 } from '@bigsmall/core';
@@ -21,6 +22,7 @@ import {
   selectBox,
   selectTable,
   type BoxView,
+  type ChartsStatus,
   type ConverterState,
   type HistoryAction,
   type NumberEnv,
@@ -29,6 +31,7 @@ import {
 import { defaultOrder, FRESH_SETTINGS, type Settings } from './settings';
 import { loadSettings, saveSettings } from './settings-store';
 import { paramsToState, stateToParams } from './url';
+import { useBrandCharts } from './useBrandCharts';
 
 /** How this visitor writes numbers (NumberEnv), and which unit family their region expects. */
 export interface ConverterEnv extends NumberEnv {
@@ -58,6 +61,8 @@ interface ConverterController {
   box: BoxView;
   /** What the table shows under the box: the start, the category's units, or the matches. */
   table: TableView;
+  /** The brands' charts' state (ADR 0029), for the chip's list to wait on. */
+  charts: ChartsStatus;
   env: ConverterEnv;
   dispatch: (action: HistoryAction) => void;
   canUndo: boolean;
@@ -95,6 +100,14 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
     [],
   );
   const box = useMemo(() => selectBox(state, env), [state, env]);
+  // The brands' charts (ADR 0029), fetched once wanted: Shoe size open, a brand in the box, or a
+  // brand's name begun in the box, so they are here by the time Enter takes the brand.
+  const typed = box.parsed.query;
+  const charts = useBrandCharts(
+    state.category === 'shoe-size' ||
+      state.brand !== null ||
+      (typed !== undefined && matchShoeBrands(typed, false, 1).length > 0),
+  );
   const order = settings.order;
   const table = useMemo(
     () =>
@@ -102,8 +115,9 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
         ...env,
         rule: settings.rule,
         order: order ?? defaultOrder(env.system),
+        charts,
       }),
-    [state, env, settings.rule, order],
+    [state, env, settings.rule, order, charts],
   );
 
   // Restore the conversion from the URL once, at hydration (the server renders the empty state).
@@ -152,6 +166,7 @@ export function useConverter(input: RefObject<HTMLInputElement>): ConverterContr
     state,
     box,
     table,
+    charts,
     env,
     dispatch,
     canUndo: history.past.length > 0,

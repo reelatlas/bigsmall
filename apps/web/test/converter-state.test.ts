@@ -1230,6 +1230,29 @@ describe('brands (ADR 0028)', () => {
     ).toMatchObject({ text: '39' });
   });
 
+  it('waits for the charts (ADR 0029): loading or failed, the brands’ rows are dashes, a brand in the box leaves every row a dash, and the line says so', () => {
+    const loading = selectTable(run(type('nike 10'), nike()), { ...options, charts: 'loading' });
+    if (loading.kind !== 'units') throw new Error('units');
+    expect(row(loading, 'eu')).toMatchObject({ tone: 'empty' });
+    expect(row(loading, 'brand:nike')).toMatchObject({ tone: 'empty', inBox: false });
+    expect(loading.note).toBe('Loading Nike’s chart…');
+    const failed = selectTable(run(type('nike 10'), nike()), { ...options, charts: 'failed' });
+    if (failed.kind !== 'units') throw new Error('units');
+    expect(row(failed, 'eu')).toMatchObject({ tone: 'empty' });
+    expect(failed.note).toMatch(/^The brands’ charts could not be loaded/);
+    // Without a brand the scales convert as ever; the brands' rows wait.
+    const iso = selectTable(run(type('us 10'), { type: 'use', unit: 'us-men', text: '10' }), {
+      ...options,
+      charts: 'loading',
+    });
+    if (iso.kind !== 'units') throw new Error('units');
+    expect(row(iso, 'eu')).toMatchObject({ tone: 'value' });
+    expect(row(iso, 'brand:nike')).toMatchObject({ tone: 'empty' });
+    expect(iso.note).toMatch(/^ISO 19407/);
+    // Given to core, as the tests' setup does, ready needs no word.
+    expect(row(units(type('nike 10'), nike()), 'brand:nike')).toMatchObject({ text: '10' });
+  });
+
   it('lists every brand to choose from, the one in the box marked (the pill’s list)', () => {
     const table = units(type('nike 10'), nike());
     const list = brandList(table, selectBox(run(type('nike 10'), nike()), EN).brand);

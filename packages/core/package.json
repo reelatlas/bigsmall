@@ -5,7 +5,8 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./data/shoe-brands.json": "./data/shoe-brands.json"
   },
   "types": "./src/index.ts",
   "scripts": {

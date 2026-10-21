@@ -1,13 +1,14 @@
 // Measures what the converter page ships, gzipped, against the budgets in docs/PLAN.md §9.
 // Usage: node scripts/bundle-size.mjs [--check]   (run after `pnpm build`)
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, posix } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 const DIST = join('apps', 'web', 'dist');
 const PAGE = 'index.html';
 // 90 KB until 2026-10-20: the brands' charts (ADR 0028), 7.1 KB of data, took the page over it; raised with
-// Sean's yes, the charts to move out of the bundle into a fetched JSON file before the second batch of brands.
+// Sean's yes, and the charts moved out of the bundle the same day into a JSON file fetched when Shoe size
+// opens (ADR 0029), so code alone is measured here; the data's size prints beside it, outside the budget.
 const BUDGET_JS = 100 * 1024;
 const BUDGET_CSS = 20 * 1024;
 
@@ -47,6 +48,16 @@ for (const [url, size] of rows) {
   if (url.endsWith('.css')) css += size;
   else js += size;
   console.log(`${kb(size).padStart(9)}  ${url}`);
+}
+// Data fetched on demand (ADR 0029): outside the budget, listed for the record.
+const assets = join(DIST, '_astro');
+for (const name of readdirSync(assets)
+  .filter((each) => each.endsWith('.json'))
+  .sort()) {
+  const size = gzipSync(readFileSync(join(assets, name))).length;
+  console.log(
+    `${kb(size).padStart(9)}  /_astro/${name}  (data, fetched on demand, outside the budget)`,
+  );
 }
 console.log('');
 console.log(`JS  ${kb(js).padStart(9)} of ${kb(BUDGET_JS)} budget`);

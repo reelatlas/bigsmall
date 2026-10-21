@@ -33,7 +33,8 @@ One file per decision, numbered. An accepted ADR is not rewritten: a reversed or
 | [0025](0025-scroll-anchoring-opt-out.md)        | The page opts out of scroll anchoring: what must stay put is kept by hand, in every engine        | accepted                                                                          |
 | [0026](0026-compound-quantities.md)             | Compound quantities: one grammar reads them, and a pair is a unit of its own                      | accepted; amends 0011 and 0019; amended 2026-10-19                                |
 | [0027](0027-shoe-sizes.md)                      | Shoe sizes: ISO's foot-length model, gender and age as units, the chart as the second value later | accepted; amended 2026-10-20, decision 6 built by 0028                            |
-| [0028](0028-brand-charts.md)                    | The brands' shoe-size charts as the second value: one foot, every brand                           | accepted                                                                          |
+| [0028](0028-brand-charts.md)                    | The brands' shoe-size charts as the second value: one foot, every brand                           | accepted; amended 2026-10-20 (decisions 1 to 3); decision 6's file moved by 0029  |
+| [0029](0029-brand-charts-as-data.md)            | The brands' charts as data core is given: a JSON file fetched when Shoe size opens                | accepted                                                                          |
 
 ## Template
 

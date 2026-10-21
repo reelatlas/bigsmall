@@ -1243,6 +1243,7 @@ describe('brands (ADR 0028)', () => {
     if (failed.kind !== 'units') throw new Error('units');
     expect(row(failed, 'eu')).toMatchObject({ tone: 'empty' });
     expect(failed.notice).toBe('Brand charts not loaded. Reload to try again.');
+    expect(failed.sections[0]?.label).toBe('Brands, the same foot in US M');
     // Without a brand the scales convert as ever; the brands' rows wait.
     const iso = selectTable(run(type('us 10'), { type: 'use', unit: 'us-men', text: '10' }), {
       ...options,

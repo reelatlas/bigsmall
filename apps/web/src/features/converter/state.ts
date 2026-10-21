@@ -1376,6 +1376,7 @@ function brandsSection(
   baseline: BrandReading | null,
   locale: string | undefined,
   charts: ChartsStatus,
+  heads: boolean,
 ): Section<TableRow> {
   const ready = charts === 'ready';
   const rows: TableRow[] = [];
@@ -1427,13 +1428,14 @@ function brandsSection(
     key: 'brands',
     // With no brand in the box only this section waits for the charts: its heading says so
     // (ADR 0029; Sean, 2026-10-21).
-    // No commas in a status line: a pause the reader does not need (Sean, 2026-10-21).
+    // No commas in a status line: a pause the reader does not need (Sean, 2026-10-21). With a
+    // brand in the box the line above the rows says it instead (`heads` false).
     label:
-      charts === 'failed'
+      heads && charts === 'failed'
         ? 'Brand charts not loaded'
-        : ready
-          ? `${SECTION_LABEL.brands}, the same foot in ${scaleUnit.symbol}`
-          : 'Brand charts loading…',
+        : heads && !ready
+          ? 'Brand charts loading…'
+          : `${SECTION_LABEL.brands}, the same foot in ${scaleUnit.symbol}`,
     rows,
     repeats: true,
   };
@@ -1647,6 +1649,7 @@ function selectShoe(
     reading,
     options.locale,
     charts,
+    brand === null,
   );
   // What the whole table waits on, above the rows (Sean, 2026-10-21: under the table it was too
   // far down to see); with no brand only the brands' section waits, and its heading says so.

@@ -1,4 +1,13 @@
-import { DEFAULT_SEPARATORS, getIngredient, getShoeBrand, getUnit, parse } from '@bigsmall/core';
+import {
+  DEFAULT_SEPARATORS,
+  getIngredient,
+  getShoeBrand,
+  getUnit,
+  parse,
+  setBrandCharts,
+  type BrandChartsFile,
+} from '@bigsmall/core';
+import chartsFile from '@bigsmall/core/data/shoe-brands.json';
 import { useId, useRef } from 'react';
 import { Calculator, SendButton } from '../../../components/Calculator';
 import { CategoryMenu } from '../../../components/CategoryMenu';
@@ -12,8 +21,10 @@ import { UnitMatches } from '../../../components/UnitMatches';
 import { ValueField } from '../../../components/ValueField';
 import {
   initialState,
+  scaleList,
   selectTable,
   TABLE_PRECISION,
+  type ChartsStatus,
   type ConverterState,
   type TableRow,
   type TableView,
@@ -32,6 +43,8 @@ import type { ConverterEnv } from '../../../features/converter/useConverter';
 // ships. Nothing here dispatches; typing into a sample changes nothing.
 
 const ENV: ConverterEnv = { locale: 'en-US', separators: DEFAULT_SEPARATORS, system: 'us' };
+// The brands' charts, given to core as the build gives them (ADR 0029), so the brand samples read.
+setBrandCharts(chartsFile as unknown as BrandChartsFile);
 const noop = () => undefined;
 /** A phone's width for the samples that show a row giving way: 320 px, the narrowest supported. */
 const PHONE = 'max-w-80';
@@ -53,12 +66,15 @@ function FieldSample({
   unitId,
   ingredientId,
   brandId,
+  open,
 }: {
   label: string;
   text: string;
   unitId: string;
   ingredientId?: string;
   brandId?: string;
+  /** The pill held open: the unit's chip with the brand's scales, or the brand's pill. */
+  open?: 'unit' | 'brand';
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const hint = useId();
@@ -82,7 +98,9 @@ function FieldSample({
       onChipOpen={noop}
       onChipRemove={noop}
       unitPicks={brandId !== undefined}
+      unitOpen={open === 'unit'}
       onUnitOpen={noop}
+      brandOpen={open === 'brand'}
     />
   );
 }
@@ -110,8 +128,15 @@ function CalculatorSample() {
 }
 
 /** The table's view of a state, from the real selector; every unit shows without a rule. */
-function tableOf(state: Partial<ConverterState>, rule?: ViewRule): TableView {
-  return selectTable({ ...initialState, ...state }, rule ? { ...ENV, rule } : ENV);
+function tableOf(
+  state: Partial<ConverterState>,
+  rule?: ViewRule,
+  charts?: ChartsStatus,
+): TableView {
+  return selectTable(
+    { ...initialState, ...state },
+    { ...ENV, ...(rule ? { rule } : {}), ...(charts ? { charts } : {}) },
+  );
 }
 
 /** Names on and six significant digits, the way the table showed before Settings. */
@@ -152,6 +177,7 @@ function TableSample({
       hidden={view.hidden}
       every={sectionsOf(view.all, ENV.system)}
       message={view.message}
+      notice={view.notice}
       display={display}
       significant={TABLE_PRECISION}
       locale={ENV.locale}
@@ -174,13 +200,15 @@ function TableSample({
  * The table's pieces in frozen states, from the real table view: the category menu before and
  * after a category is chosen; the start's categories, the cursor on one; 250 mL in every unit of
  * volume in its sections, names on, milliliters marked as the unit in the box, the cursor on
- * cups, its copy button laid over its end and confirmed; Area chosen with no unit, symbols alone,
- * each value a dash, the symbols lined up on their last letter with their exponents hanging after
- * it; a million square kilometers in a phone's width, the names given way in every row and the
- * exponent markers bold; 6.3 feet as decimals with their fractions (Both); a fresh visit's volume
- * with its Hidden list open, and in Edit; a value with no answer; and the matches for "250 p" from
- * every category, the hidden ones shown. The tables' titles are for screen readers; on the page the
- * category menu over the box names them.
+ * cups, one row just copied, the check flashing over its end; Area chosen with no unit, symbols
+ * alone, each value a dash, the symbols lined up on their last letter with their exponents
+ * hanging after it; a million square kilometers in a phone's width, the names given way in every
+ * row and the exponent markers bold; 6.3 feet as decimals with their fractions (Both); a fresh
+ * visit's volume with its Hidden list open, and in Edit; a value with no answer; Shoe size with
+ * Nike's 10, the brands' section first, the same while the charts load, a half size with
+ * Fraction, and Asics's scales to choose from, the men's under its own heading; and the matches
+ * for "250 p" from every category, the hidden ones shown. The tables' titles are for screen
+ * readers; on the page the category menu over the box names them.
  */
 function TableSamples() {
   const id = useId();
@@ -194,6 +222,24 @@ function TableSamples() {
   const feet = tableOf({ text: '6.3', unit: 'foot', category: 'length' });
   const fresh = tableOf({ text: '2', unit: 'us-cup', category: 'volume' }, FRESH_RULE);
   const tooLarge = tableOf({ text: '1e400', unit: 'meter', category: 'length' });
+  const nike = tableOf({ text: '10', unit: 'us-men', brand: 'nike', category: 'shoe-size' });
+  const loading = tableOf(
+    { text: '10', unit: 'us-men', brand: 'nike', category: 'shoe-size' },
+    undefined,
+    'loading',
+  );
+  const half = tableOf({ text: '10.5', unit: 'us-men', category: 'shoe-size' });
+  const asics = tableOf({
+    text: '8',
+    unit: 'us-women',
+    brand: 'asics',
+    line: 'women',
+    category: 'shoe-size',
+  });
+  const scales =
+    asics.kind === 'units'
+      ? scaleList(asics, getShoeBrand('asics')!, getUnit('us-women')!, 8, 'women', ENV.locale)
+      : null;
   const cups = values.kind === 'units' ? values.rows.findIndex((row) => row.id === 'us-cup') : -1;
   return (
     <>
@@ -288,6 +334,48 @@ function TableSamples() {
         title="Cooking, all-purpose flour"
         itemId={itemIds('cooking')}
       />
+      {/* Shoe size with a brand (ADR 0028): the brands' section first, Nike's row the one filled,
+          Puma's dash with why, Birkenstock's range split at its first number, and ISO's scales
+          from Nike's foot with ≈; then the same while the charts load (ADR 0029), every row a dash
+          and the line above them. */}
+      <TableSample
+        view={nike}
+        title="Shoe size, Nike 10"
+        display={NAMED}
+        itemId={itemIds('nike')}
+      />
+      <TableSample
+        view={loading}
+        title="Shoe size, Nike 10, the charts loading"
+        display={NAMED}
+        itemId={itemIds('loading')}
+      />
+      {/* A half size with Fraction: the children's row beyond its scale written as a size is. */}
+      <TableSample
+        view={half}
+        title="Shoe size, 10 1/2 with Fraction"
+        display={{ ...FRESH_DISPLAY, format: 'fraction' }}
+        itemId={itemIds('half')}
+      />
+      {/* The brand's scales to choose from, the chip's list: Asics's women's chart, and the men's
+          under its own heading (2026-10-21). */}
+      {scales && (
+        <UnitMatches
+          id={`${id}-scales`}
+          hiddenId={`${id}-scales-hidden`}
+          matches={scales.rows}
+          counts={scales.counts}
+          query=""
+          notFound=""
+          cursor={0}
+          itemId={itemIds('scales')}
+          onPick={noop}
+          hidden={[]}
+          revealed={false}
+          onReveal={noop}
+          symbolOnly={false}
+        />
+      )}
       {matches.kind === 'matches' && (
         <UnitMatches
           id={`${id}-matches`}
@@ -334,8 +422,16 @@ export function FieldSamples({ theme }: { theme: string }) {
           ingredientId="brown-sugar"
         />
       </div>
-      {/* Shoe size's two pills, the scale and the brand (ADR 0028), the same shape. */}
+      {/* Shoe size's two pills, the scale and the brand (ADR 0028), the same shape; then the unit's
+          chip holding the brand's scales open, its chevron turned (2026-10-20). */}
       <FieldSample label={`${theme} shoe brand sample`} text="10" unitId="us-men" brandId="nike" />
+      <FieldSample
+        label={`${theme} shoe scales sample`}
+        text="10"
+        unitId="us-men"
+        brandId="nike"
+        open="unit"
+      />
       <CalculatorSample />
       <TableSamples />
     </div>

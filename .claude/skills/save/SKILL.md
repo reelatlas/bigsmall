@@ -1,12 +1,12 @@
 ---
 name: save
-description: Save a checkpoint of bigsmall before a compaction or a fresh session: write Sean's pending notes and the plan for each into the findings log, bring CLAUDE.md's "Pick up here" up to date, ship, and stop. Use when Sean says "do a save", "save", "checkpoint", "compact first", or that he is starting a new session.
+description: Save a checkpoint of bigsmall before a compaction or a fresh session: write Sean's pending notes and the plan for each into the findings log, bring CLAUDE.md's "Pick up here" up to date, ship, and stop. Use when Sean says "do a save", "save", "checkpoint", "compact first", or that he is starting a new session, or when the context gauge says the room is short (CLAUDE.md, Working habits, "Gauge the context at every close").
 argument-hint: '[empty]'
 ---
 
 # Save
 
-A save leaves nothing only in the conversation: the next session, or the one after a compaction, starts from the repo alone.
+A save leaves nothing only in the conversation: the next session, or the one after a compaction, starts from the repo alone. The context gauge is its usual trigger (CLAUDE.md, Working habits): a save, then Sean compacts and says when it is done, and the work resumes from the repo; a fresh session only on an account switch or at his ask.
 
 ## 1. Write down what is pending
 

@@ -1230,6 +1230,91 @@ describe('brands (ADR 0028)', () => {
     expect(
       womenList.rows.find((each) => each.kind === 'brand' && each.unit?.id === 'eu'),
     ).toMatchObject({ text: '39' });
+    // Nike prints both US columns on both pages: one chart's scales, under one heading.
+    expect(
+      womenList.rows.every(
+        (each) => each.kind === 'brand' && each.group === 'Nike’s chart, the women’s',
+      ),
+    ).toBe(true);
+    // Asics prints its lines apart, each page its own US column (Sean, 2026-10-21): the other
+    // line's scale comes from the other chart, under its heading after the chart's, read at the
+    // same foot, the nearest row: a women's 8 is a 25 cm foot, the men's 6.5 on the men's page.
+    const asics = units(type('asics women 8'), {
+      type: 'use',
+      unit: 'us-women',
+      text: '8',
+      brand: 'asics',
+    });
+    const asicsList = scaleList(
+      asics,
+      getShoeBrand('asics')!,
+      getUnit('us-women')!,
+      8,
+      'women',
+      'en-US',
+    );
+    expect(asicsList.rows[0]).toMatchObject({ group: 'Asics’ chart, the women’s' });
+    expect(asicsList.rows.at(-1)).toMatchObject({
+      kind: 'brand',
+      unit: { id: 'us-men' },
+      text: '6.5',
+      line: null,
+      inBox: false,
+      group: 'Asics’ chart, the men’s',
+    });
+    expect(
+      asicsList.rows.filter(
+        (each) => each.kind === 'brand' && each.group === 'Asics’ chart, the men’s',
+      ),
+    ).toHaveLength(1);
+    expect(asicsList.announcement).toBe('6 scales of Asics’ charts to choose from');
+    // And back: a men's 10, a 28 cm foot, reaches the women's 11.5.
+    const asicsMen = units(type('asics 10'), {
+      type: 'use',
+      unit: 'us-men',
+      text: '10',
+      brand: 'asics',
+    });
+    expect(
+      scaleList(asicsMen, getShoeBrand('asics')!, getUnit('us-men')!, 10, null, 'en-US').rows.at(
+        -1,
+      ),
+    ).toMatchObject({
+      unit: { id: 'us-women' },
+      text: '11.5',
+      line: 'women',
+      group: 'Asics’ chart, the women’s',
+    });
+    // Puma gives no foot: the men's scale is offered with the number cleared, a women's 8 being
+    // no men's 8.
+    const pumaWomen = units(type('puma women 8'), {
+      type: 'use',
+      unit: 'us-women',
+      text: '8',
+      brand: 'puma',
+    });
+    expect(
+      scaleList(
+        pumaWomen,
+        getShoeBrand('puma')!,
+        getUnit('us-women')!,
+        8,
+        'women',
+        'en-US',
+      ).rows.at(-1),
+    ).toMatchObject({ unit: { id: 'us-men' }, text: '', line: null });
+    // adidas has one chart for everyone: nothing from another.
+    const adidas = units(type('adidas 10'), {
+      type: 'use',
+      unit: 'us-men',
+      text: '10',
+      brand: 'adidas',
+    });
+    expect(
+      scaleList(adidas, getShoeBrand('adidas')!, getUnit('us-men')!, 10, null, 'en-US').rows.every(
+        (each) => each.kind === 'brand' && each.group === 'adidas’ chart',
+      ),
+    ).toBe(true);
   });
 
   it('waits for the charts (ADR 0029): loading or failed, the brands’ rows are dashes, a brand in the box leaves every row a dash, and the line says so', () => {
@@ -1275,6 +1360,25 @@ describe('brands (ADR 0028)', () => {
     });
     expect(list.rows.every((each) => each.kind === 'brand' && each.text === undefined)).toBe(true);
     expect(list.rows.some((each) => each.kind === 'brand' && each.unit?.id === 'eu')).toBe(true);
+    // A brand that prints its lines apart lists the other line's scale too, under the other
+    // chart's heading, the number as typed going with it as with every scale here.
+    const asics = units(type('asics women 8'), {
+      type: 'use',
+      unit: 'us-women',
+      text: '8',
+      brand: 'asics',
+    });
+    const asicsList = scaleList(asics, getShoeBrand('asics')!, null, 8, 'women', 'en-US', true);
+    expect(asicsList.rows[0]).toMatchObject({
+      group: 'Asics’ chart, the women’s: choose the scale to read it on',
+    });
+    const last = asicsList.rows.at(-1);
+    expect(last).toMatchObject({
+      unit: { id: 'us-men' },
+      line: null,
+      group: 'Asics’ chart, the men’s',
+    });
+    expect(last?.kind === 'brand' ? last.text : 'set').toBeUndefined();
   });
 
   it('lists every brand to choose from, the one in the box marked (the pill’s list)', () => {

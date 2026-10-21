@@ -2398,6 +2398,27 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Remove Puma' })).toBeVisible();
   await expect(box(page)).toHaveValue('10');
+  // A brand that prints its lines apart (Sean, 2026-10-21): Asics's women's page has no US men's
+  // column, so the chip's list offers US men from the men's page, under that chart's heading, at
+  // the same foot: a women's 8 is a 25 cm foot, the men's 6.5; and from there US women back.
+  await box(page).fill('asics women 8');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove US women' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove Asics' })).toBeVisible();
+  await page.getByRole('button', { name: 'Unit: US women' }).click();
+  const men = matches(page).getByRole('group', { name: 'Asics’ chart, the men’s' });
+  await expect(men.getByRole('option')).toHaveCount(1);
+  await men.getByRole('option', { name: /US men · Asics/ }).click();
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove Asics' })).toBeVisible();
+  await expect(box(page)).toHaveValue('6.5');
+  await page.getByRole('button', { name: 'Unit: US men' }).click();
+  await matches(page)
+    .getByRole('group', { name: 'Asics’ chart, the women’s' })
+    .getByRole('option', { name: /US women · Asics/ })
+    .click();
+  await expect(page.getByRole('button', { name: 'Remove US women' })).toBeVisible();
+  await expect(box(page)).toHaveValue('8');
 });
 
 test('the brands’ charts are data fetched once Shoe size opens (ADR 0029): the file blocked, a brand opened from the URL waits with dashes and the line says the charts could not be loaded', async ({

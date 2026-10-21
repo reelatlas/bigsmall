@@ -9,10 +9,12 @@ import {
   brandChartsOf,
   brandScale,
   brandsAtFoot,
+  chartAtFoot,
   convert,
   getShoeBrand,
   getUnit,
   matchShoeBrands,
+  otherBrandChart,
   readBrand,
   search,
   setBrandCharts,
@@ -156,6 +158,40 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
     expect(brandChart(brand('nike'), false).line).toBe('men');
     expect(brandChart(brand('adidas'), true).line).toBe('unisex');
     expect(brandChart(brand('crocs'), false).line).toBe('unisex');
+  });
+
+  it('names the chart for the other line where a brand prints its lines apart, none for one chart for everyone', () => {
+    const asics = brand('asics');
+    expect(otherBrandChart(asics, brandChart(asics, false))?.line).toBe('women');
+    expect(otherBrandChart(asics, brandChart(asics, true))?.line).toBe('men');
+    expect(otherBrandChart(brand('adidas'), brandChart(brand('adidas'), false))).toBeNull();
+  });
+
+  it('reads one chart at a foot on a scale, the nearest row, ≈ where its foot is not the foot: Asics’ men’s 6.5 at a women’s 8’s 25 cm, Under Armour’s 7 at 25 cm for a 25.2 cm foot, and nothing half a step below its first row', () => {
+    const asics = brand('asics');
+    expect(chartAtFoot(asics, brandChart(asics, false), 250, 'us-men', false)).toMatchObject({
+      value: 6.5,
+      foot: 250,
+      approx: false,
+      why: null,
+    });
+    const ua = brand('under-armour');
+    expect(chartAtFoot(ua, brandChart(ua, false), 252, 'us-men', false)).toMatchObject({
+      value: 7,
+      foot: 250,
+      approx: true,
+    });
+    // Its women's 8 is a 24.5 cm foot, half a step below the men's first row, 25 cm: off the
+    // chart, as a shoe fits a foot half a step either way (ADR 0027).
+    expect(chartAtFoot(ua, brandChart(ua, false), 245, 'us-men', false)).toMatchObject({
+      value: null,
+      why: 'off-chart',
+    });
+    const puma = brand('puma');
+    expect(chartAtFoot(puma, brandChart(puma, false), 250, 'us-men', false)).toMatchObject({
+      value: null,
+      why: 'no-length',
+    });
   });
 });
 

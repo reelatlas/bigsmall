@@ -167,6 +167,18 @@ export function brandChart(brand: ShoeBrand, women: boolean): BrandChart {
   return chart;
 }
 
+/**
+ * The brand's chart for the other line, where it prints its lines apart: the women's beside the
+ * men's and the men's beside the women's; null for a brand with one chart for everyone, or with
+ * no chart for the other line.
+ */
+export function otherBrandChart(brand: ShoeBrand, chart: BrandChart): BrandChart | null {
+  const line: BrandLine | null =
+    chart.line === 'men' ? 'women' : chart.line === 'women' ? 'men' : null;
+  if (line === null) return null;
+  return brandChartsOf(brand.id).find((each) => each.line === line) ?? null;
+}
+
 /** A row's size on a scale: the size, with the two ends where the brand prints a range. */
 export interface BrandCell {
   /** The size; a range's lower end. */
@@ -359,25 +371,39 @@ export interface BrandRowReading {
   why: 'no-length' | 'no-scale' | 'off-chart' | null;
 }
 
+/**
+ * A chart's size on a scale for a foot, at the row nearest it, ≈ where that row's foot is not the
+ * foot, as printed; or why it has none: the chart gives no foot length, prints no such scale, or
+ * the foot is off it.
+ */
+export function chartAtFoot(
+  brand: ShoeBrand,
+  chart: BrandChart,
+  foot: number,
+  scale: BrandScale,
+  women: boolean,
+): BrandRowReading {
+  const base = { brand, chart, value: null, foot: null, approx: false };
+  if (chart.basis !== 'foot') return { ...base, why: 'no-length' };
+  if (brandSpan(chart, scale, women) === null) return { ...base, why: 'no-scale' };
+  const row = brandRowNear(chart, foot, scale, women);
+  if (!row || row.foot === undefined) return { ...base, why: 'off-chart' };
+  const cell = brandCell(row, scale, women);
+  if (!cell) return { ...base, why: 'no-scale' };
+  return {
+    brand,
+    chart,
+    value: cell.value,
+    range: cell.range,
+    foot: row.foot,
+    approx: Math.abs(row.foot - foot) > 0.5,
+    why: null,
+  };
+}
+
 /** Every brand's size on a scale for a foot, each by its own chart at the nearest row. */
 export function brandsAtFoot(foot: number, scale: BrandScale, women: boolean): BrandRowReading[] {
-  return shoeBrands.map((brand) => {
-    const chart = brandChart(brand, women);
-    const base = { brand, chart, value: null, foot: null, approx: false };
-    if (chart.basis !== 'foot') return { ...base, why: 'no-length' };
-    if (brandSpan(chart, scale, women) === null) return { ...base, why: 'no-scale' };
-    const row = brandRowNear(chart, foot, scale, women);
-    if (!row || row.foot === undefined) return { ...base, why: 'off-chart' };
-    const cell = brandCell(row, scale, women);
-    if (!cell) return { ...base, why: 'no-scale' };
-    return {
-      brand,
-      chart,
-      value: cell.value,
-      range: cell.range,
-      foot: row.foot,
-      approx: Math.abs(row.foot - foot) > 0.5,
-      why: null,
-    };
-  });
+  return shoeBrands.map((brand) =>
+    chartAtFoot(brand, brandChart(brand, women), foot, scale, women),
+  );
 }

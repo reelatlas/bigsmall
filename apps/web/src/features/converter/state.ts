@@ -5,6 +5,7 @@ import {
   brandChart,
   brandsAtFoot,
   brandSpan,
+  chartAtFoot,
   clockUnits,
   convert,
   convertChange,
@@ -27,6 +28,7 @@ import {
   leadingTarget,
   matchIngredients,
   matchShoeBrands,
+  otherBrandChart,
   NBSP,
   pairParts,
   pairsOpenedBy,
@@ -1511,10 +1513,14 @@ function brandNote(
  * the foot, the one in the box marked, each carrying the same row's size on that scale (a range's
  * lower end; none where the brand has no row for the box, so the number as typed goes with the
  * scale) with the line the row was read on; so a size is read on another scale without leaving
- * the brand, which the scale rows, ISO's, cannot do, since taking one takes the brand out. With
+ * the brand, which the scale rows, ISO's, cannot do, since taking one takes the brand out. Where
+ * the brand prints its lines apart, the scales its other chart alone prints follow under that
+ * chart's own heading, each read at the foot in play, the nearest row, or with the number cleared
+ * where the brand gives no foot (Sean, 2026-10-21, the hundred-and-twenty-third pass: Asics's
+ * women's page prints no US men's column, so a women's reading offered no men's scale). With
  * `choose`, the table's place while a brand has no scale (its chip emptied, or a brand alone),
  * the heading asking for one, as Cooking lists its ingredients until one is chosen (Sean,
- * 2026-10-21).
+ * 2026-10-21), the number as typed going with any scale there, the other chart's too.
  */
 export function scaleList(
   view: UnitsView,
@@ -1545,13 +1551,36 @@ export function scaleList(
   const row = reading?.row ?? null;
   const mondopoint = getUnit('mondopoint');
   const group = `${poss(brand.name)} chart${chart.line === 'unisex' ? '' : `, the ${LINE_POSS[chart.line]}`}${choose ? ': choose the scale to read it on' : ''}`;
+  // The other line's chart, where the brand prints its lines apart: its own scales after the
+  // chart's, under its heading, read at the foot the box stands for, where there is one.
+  const other = otherBrandChart(brand, chart);
+  const otherWomen = other?.line === 'women';
+  const foot = reading?.foot ?? null;
   const rows: MatchRow[] = [];
+  const others: MatchRow[] = [];
   for (const each of view.rows) {
     if (!shoe || each.brand !== undefined || each.tone === 'message') continue;
     const scale = each.unit;
     let text: string | undefined;
     if (isBrandScale(scale.id)) {
-      if (brandSpan(chart, scale.id, women) === null) continue;
+      if (brandSpan(chart, scale.id, women) === null) {
+        if (!other || brandSpan(other, scale.id, otherWomen) === null) continue;
+        // The nearest row of the other chart at the same foot; with no foot to read from (the
+        // brand gives none, or the size is off its chart) the number is cleared, a women's 8
+        // being no men's 8; choosing a scale, the number as typed, as with every scale listed.
+        const read = foot !== null ? chartAtFoot(brand, other, foot, scale.id, otherWomen) : null;
+        others.push({
+          kind: 'brand',
+          brand,
+          unit: scale,
+          category: shoe,
+          inBox: false,
+          text: choose ? undefined : read && read.value !== null ? sizeOf(read.value, locale) : '',
+          line: otherWomen ? 'women' : null,
+          group: `${poss(brand.name)} chart, the ${LINE_POSS[other.line]}`,
+        });
+        continue;
+      }
       const cell = row ? brandCell(row, scale.id, women) : null;
       text = cell ? sizeOf(cell.value, locale) : undefined;
     } else if (scale.id === 'mondopoint' || scale.id === 'foot-cm') {
@@ -1572,15 +1601,16 @@ export function scaleList(
       group,
     });
   }
+  const all = [...rows, ...others];
   return {
     categories: view.categories,
     kind: 'matches',
     category: SHOE,
     query: '',
-    rows,
-    counts: { [SHOE]: rows.length },
+    rows: all,
+    counts: { [SHOE]: all.length },
     hidden: [],
-    announcement: `${rows.length} scales of ${poss(brand.name)} chart to choose from`,
+    announcement: `${all.length} scales of ${poss(brand.name)} chart${others.length ? 's' : ''} to choose from`,
   };
 }
 

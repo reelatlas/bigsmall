@@ -708,7 +708,7 @@ test('fractions, both, and rounding write the values and never move the columns'
   await expectNoA11yViolations(page);
 });
 
-test("Both's second form splits as the first does, its whole numbers on one edge in every theme, and a row's ≈ is drawn once, before the first form, its own < with the second", async ({
+test("Both's second form splits as the first does, its whole numbers on one edge in every theme, and a row's ≈ is drawn once, before the first form, a form's < with its digits", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -738,14 +738,16 @@ test("Both's second form splits as the first does, its whole numbers on one edge
   }
   await applyTheme(page, THEMES[0]!);
   // The ≈ the fraction's rounding earns is drawn once a row, before the decimal, both forms being
-  // one value; a "<" of a form under its step stays with that form. Half an inch: its 1/2 exact,
-  // no mark; 1.27 cm and 1 1/4, ≈ once; 0.04 ft and < 1/8, the "<" with the fraction alone.
+  // one value; a "<" of a form under its step stays with that form's digits, as a sign does (Sean,
+  // 2026-10-21). Half an inch: its 1/2 exact, no mark; 1.27 cm and 1 1/4, ≈ once; 0.04 ft and
+  // < 1/8, no ≈, the "<" with the fraction.
   await page.goto('/?a=inch&v=0.5');
   await ready(page);
   const marksOf = (unitId: string) => row(page, unitId).locator('[data-mark]');
-  await expect(marksOf('inch')).toHaveText(['', '']);
-  await expect(marksOf('centimeter')).toHaveText([/^≈/, '']);
-  await expect(marksOf('foot')).toHaveText(['', /^</]);
+  await expect(marksOf('inch')).toHaveText(['']);
+  await expect(marksOf('centimeter')).toHaveText([/^≈/]);
+  await expect(marksOf('foot')).toHaveText(['']);
+  await expect(row(page, 'foot').locator('[data-second-whole]:not([hidden])')).toHaveText('<');
   await expect(row(page, 'foot')).toContainText('< 1/8');
   await expect(unitCell(page, 'foot')).toHaveAccessibleName(/^0\.04 < 1\/8 ft feet/);
   await expectNoA11yViolations(page);
@@ -787,9 +789,8 @@ test("where Both's fraction has no room beside the decimal, it sits under it, li
     await expect(beside).toBeHidden();
   }
   await expect(ounce.getByRole('gridcell').first()).toHaveAccessibleName(/about 36 3\/4/);
-  // The row's ≈ once, at the whole numbers' start on the first line; nothing on the second's.
-  await expect(ounce.locator('[data-mark]:not([data-column])')).toHaveText(/^≈/);
-  await expect(ounce.locator('[data-instead="second"]').first()).toHaveText('');
+  // The row's ≈ once, at the whole numbers' start on the first line.
+  await expect(ounce.locator('[data-mark]')).toHaveText(/^≈/);
   const value = (await ounce.locator('[data-whole]').boundingBox())!;
   const fraction = (await under.boundingBox())!;
   // Its "36" ends where the decimal's "36" does, at the decimal point, on the line under it.

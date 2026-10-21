@@ -58,10 +58,10 @@ interface ConversionRow {
   /**
    * What the text is: a value; a dash, while there is no number or no unit to convert from; a
    * message, in the danger color; or beyond, a value past the row's scale (ADR 0027), its text
-   * the sign and where the scale ends ("> 13.5") in the muted ink, the sign at the whole numbers'
-   * start as every mark and the end written in the value's columns as a size is, in the display's
-   * form ("> 13 1/2" with Fraction), so it lines up with the sizes. Only a value can be copied; a
-   * row beyond its scale is taken, as the layout decides.
+   * the sign and where the scale ends ("> 13.5") in the muted ink, written in the value's columns
+   * as a size is, the sign with the whole number as a minus is, the end in the display's form
+   * ("> 13 1/2" with Fraction), so it lines up with the sizes. Only a value can be copied; a row
+   * beyond its scale is taken, as the layout decides.
    */
   tone: 'value' | 'empty' | 'message' | 'beyond';
   /** The unit in the box: marked in the accent's soft fill. */
@@ -192,15 +192,17 @@ interface ConversionTableProps<T extends ConversionRow> {
  * A row reads "250 … mL milliliters": the value on the left in equal-width digits, a decimal in two
  * columns, its whole part right-aligned and the rest left-aligned after it, so values line up on
  * the decimal point (96 beside 473.18), and a fraction split the same way at its fraction part, so
- * whole numbers line up (10 beside 10 1/2); a mark that qualifies a value (≈, <, >) at the start
- * of the whole numbers' column, a second item in the same cell, so every mark lines up down the
+ * whole numbers line up (10 beside 10 1/2); the ≈ of a value that rounds or is measured at the
+ * start of the whole numbers' column, a second item in the same cell, so every ≈ lines up down the
  * table and never meets its own number, the column being as wide as the widest row's mark and
  * number together (Sean, 2026-10-21: written with the number, ≈ floated left by a digit for 10
  * against 9; a column of its own cost every table the mark's width, which took a pair's symbol
- * its room on a phone), while a sign stays with its digits, part of the numeral
- * (docs/DESIGN-SYSTEM.md, "Values line up on the decimal point"); with Both, the fraction beside
- * the decimal in two columns of the same shape, its own mark at their start, the ≈ drawn once a
- * row before the first value, since both forms are one value; past a column that takes the spare
+ * its room on a phone), while a sign stays with its digits, part of the numeral, and so do the <
+ * and > of a value under its step or past its scale, which bound that number as a sign does
+ * (Sean, 2026-10-21: apart from its number a < was harder to read, where ≈ reads from afar;
+ * docs/DESIGN-SYSTEM.md, "Values line up on the decimal point"); with Both, the fraction beside
+ * the decimal in two columns of the same shape, the ≈ drawn once a row before the first value,
+ * since both forms are one value, a form's own < with its digits; past a column that takes the spare
  * width, on the right, the symbol right-aligned in its column, an exponent hanging after it in a
  * narrow column of its own (so "ha" ends where the "m" of "m²" does), and the name left-aligned in
  * its own; the copied check flashing over its end, a grid item laid on the row's own area (never a
@@ -250,14 +252,15 @@ const TONE: Record<ConversionRow['tone'], string> = {
 
 /**
  * A decimal's whole part, right-aligned, and the rest from its decimal mark; a value written whole
- * spans the whole and the rest, right-aligned. The mark that qualifies a value shares the whole
- * numbers' cell, a second item set at its start (`justify-self-start`), in the muted ink whatever
- * the row's tone, a no-break space after it for the space a mark takes before its number (a
+ * spans the whole and the rest, right-aligned. The ≈ of a value that rounds or is measured shares
+ * the whole numbers' cell, a second item set at its start (`justify-self-start`), in the muted ink
+ * whatever the row's tone, a no-break space after it for the space it takes before its number (a
  * cell's end space would be stripped, as its first is; docs/LEARNINGS.md, 2026-10-20): the sizer
  * writes each row's mark and whole number as one line, so the column is as wide as the widest of
- * them and a mark never meets its own number, while a mark costs no width where a wider number already
- * gives the room (the hundred-and-twenty-fifth pass; a column of its own took 19 px from every
- * table whose hidden rows held a "< 0.01").
+ * them and a mark never meets its own number, while a mark costs no width where a wider number
+ * already gives the room (the hundred-and-twenty-fifth pass; a column of its own took 19 px from
+ * every table whose hidden rows held a "< 0.01"). The < and > of a value under its step or past its
+ * scale are in the text, with the digits, as a sign is (the hundred-and-twenty-sixth pass).
  */
 const MARK_CELL =
   'col-start-1 row-start-1 justify-self-start font-numeric whitespace-nowrap text-ink-muted';
@@ -267,15 +270,12 @@ const ACROSS_CELL =
   'col-start-1 col-end-3 row-start-1 pr-2 text-right font-numeric whitespace-nowrap';
 /**
  * Both's second form beside the first, in two columns of the same shape: its whole right-aligned,
- * its own mark at the cell's start (a "<" of one under its step; the ≈ of one that rounds is the
- * row's, drawn once before the first value), and its part after it, so its whole numbers line up
- * as the first's do (Sean, 2026-10-21: one right-aligned cell drifted, 8 1/2 against 10); a pair's,
- * in its notation, written across both. The cells give way together (`second`) and are clipped
- * where they lack the room, so the fit can tell; the sizer's line of mark and whole is among them,
- * so a mark overrunning a number is told too.
+ * a "<" of one under its step with it, and its part after it, so its whole numbers line up as the
+ * first's do (Sean, 2026-10-21: one right-aligned cell drifted, 8 1/2 against 10); the ≈ of one
+ * that rounds is the row's, drawn once before the first value; a pair's, in its notation, written
+ * across both. The cells give way together (`second`) and are clipped where they lack the room, so
+ * the fit can tell.
  */
-const SECOND_MARK_CELL =
-  'col-start-3 row-start-1 justify-self-start pl-3 font-numeric whitespace-nowrap text-ink-muted';
 const SECOND_WHOLE_CELL =
   'col-start-3 row-start-1 min-w-0 overflow-hidden pl-3 text-right font-numeric whitespace-nowrap';
 const SECOND_PART_CELL =
@@ -284,14 +284,11 @@ const SECOND_ACROSS_CELL =
   'col-start-3 col-end-5 row-start-1 min-w-0 overflow-hidden pr-2 pl-3 text-right font-numeric whitespace-nowrap';
 /**
  * Both's second form where its columns have no room (a phone): on a second line under the value, a
- * step smaller so the row keeps its 44 px, lined up as the values are, its mark at the whole
- * numbers' start, its whole number under the value's whole part, and its part after the point
- * (Sean, 2026-10-15), split as every value is, the space between them in the text; a pair's
- * across the whole and the rest. The row is the cell's to say: the second where it shows, the
- * sizer's first.
+ * step smaller so the row keeps its 44 px, lined up as the values are, its whole number under the
+ * value's whole part and its part after the point (Sean, 2026-10-15), split as every value is,
+ * the space between them in the text; a pair's across the whole and the rest. The row is the
+ * cell's to say: the second where it shows, the sizer's first.
  */
-const STACKED_MARK_CELL =
-  'col-start-1 justify-self-start text-sm font-numeric whitespace-nowrap text-ink-muted';
 const STACKED_WHOLE_CELL = 'col-start-1 text-right text-sm font-numeric whitespace-nowrap';
 const STACKED_PART_CELL = 'col-start-2 pr-2 text-sm font-numeric whitespace-nowrap';
 const STACKED_ACROSS_CELL =
@@ -377,14 +374,6 @@ export function copiedText(
 const HALVES: ReadonlySet<FractionSize> = new Set([2]);
 /** The mark ahead of a value that rounds, is measured, or is a chart's nearest row. */
 const APPROX = '≈';
-/** The marks that may lead a value's text, "< 0.01" for one under its step, "> 13.5" for one past its scale. */
-const LEADING_MARK = /^([<>])\s+/u;
-
-/** A value's leading mark apart from its digits: "< 0.01" is "<" and "0.01"; none, the text whole. */
-function takeMark(text: string): [mark: string, rest: string] {
-  const found = LEADING_MARK.exec(text);
-  return found ? [found[1]!, text.slice(found[0].length)] : ['', text];
-}
 
 /** A mark as its cell draws it: the mark and the space before its number; nothing for none. */
 function markText(mark: string): string {
@@ -463,15 +452,16 @@ function secondWritten(row: ConversionRow, display: TableDisplay, locale: string
 }
 
 /**
- * A row's value as the value's columns draw it: the mark that qualifies it apart, at the start
- * of the whole numbers' column, and the rest in two. A decimal splits at its decimal mark, or at the exponent marker
+ * A row's value as the value's columns draw it: the ≈ that qualifies it apart, at the start of
+ * the whole numbers' column, and the rest in two. A decimal splits at its decimal mark, or at the exponent marker
  * without one ("1E23"), so its whole part and the rest sit in two columns and every decimal point
  * lines up; a fraction splits at its fraction part the same way, so every whole number lines up
  * and the fractions hang in a column after them (10 beside 10 1/2; Sean, 2026-10-20:
  * right-aligned across, a whole number sat under the fraction of the row above and the signs
- * scattered). The mark is the text's own ("<" of one under its step, ">" of one past its scale),
- * else "≈" where the value rounds or is measured, never both (one qualifier a value; "<" already
- * says it is not exact); a sign (−) stays with its digits, part of the numeral. Screen readers
+ * scattered). The mark is "≈" where the value rounds or is measured; a sign (−) stays with its
+ * digits, part of the numeral, and so do the "<" of one under its step and the ">" of one past
+ * its scale, which bound that number as a sign does (Sean, 2026-10-21: apart from its number a
+ * "<" was harder to read, where "≈" reads from afar). Screen readers
  * hear it whole, from `text`, "about" ahead of one that rounds, in its words where its marks read
  * badly (a pair's). A pair, in its own notation, and a message are written whole across the whole
  * and the rest, right-aligned, their mark at the whole numbers' start as every row's; a dash sits in the
@@ -480,7 +470,7 @@ function secondWritten(row: ConversionRow, display: TableDisplay, locale: string
 interface ValueParts {
   /** The value whole, as written. */
   text: string;
-  /** The mark that qualifies it, drawn at the whole numbers' start: "≈", "<", or ">"; empty for none. */
+  /** The mark that qualifies it, drawn at the whole numbers' start: "≈"; empty for none. */
   mark: string;
   /** Its whole part and the rest from its mark; null where it is written across (a pair, a message). */
   split: { whole: string; decimals: string } | null;
@@ -505,7 +495,7 @@ function valueParts(
     return { text: row.text, mark: '', split: { whole: row.text, decimals: '' }, approx: false };
   }
   const fraction = display.format === 'fraction';
-  // A row beyond its scale (ADR 0027) is written as a size is: its sign apart as a mark, then the
+  // A row beyond its scale (ADR 0027) is written as a size is: its sign with the digits, then the
   // scale's end in the display's form, "13" in the whole column and ".5" after the mark, or
   // "13" and "1/2" with Fraction, so it lines up with the sizes (Sean, 2026-10-20: written across,
   // it sat past them, and in Fraction its decimal sat among their halves).
@@ -547,10 +537,10 @@ function valueParts(
 }
 
 /**
- * Both's second form as its columns draw it: its own mark ("<" of one under its step), its whole
- * and its part at its fraction, a pair's across in its notation; "about" for screen readers where
- * it rounds, in its words for a pair. Its ≈ is drawn once for the row, before the first form
- * (the row's mark, `markOf`), both forms being one value (Sean, 2026-10-21).
+ * Both's second form as its columns draw it: its whole, a "<" of one under its step with it, and
+ * its part at its fraction, a pair's across in its notation; "about" for screen readers where it
+ * rounds, in its words for a pair. Its ≈ is drawn once for the row, before the first form (the
+ * row's mark, `markOf`), both forms being one value (Sean, 2026-10-21).
  */
 function secondParts(
   row: ConversionRow,
@@ -590,40 +580,38 @@ function spokenText(value: ValueParts): string {
 }
 
 /**
- * A value in two, at its decimal mark, or at the exponent marker without one ("1E23"), its leading
- * mark apart.
+ * A value in two, at its decimal mark, or at the exponent marker without one ("1E23"); a "<" or ">"
+ * ahead of it stays with the whole number, as a sign does.
  */
 function splitAtPoint(text: string, point: string, approx: boolean): ValueParts {
-  const [lead, rest] = takeMark(text);
-  let at = rest.indexOf(point);
-  if (at < 0) at = rest.indexOf('E');
+  let at = text.indexOf(point);
+  if (at < 0) at = text.indexOf('E');
   // A pace's colon lines up as a decimal point does: 5:30 over 10.91.
-  if (at < 0) at = rest.indexOf(':');
-  if (at < 0) at = rest.length;
+  if (at < 0) at = text.indexOf(':');
+  if (at < 0) at = text.length;
   return {
     text,
-    mark: lead || (approx ? APPROX : ''),
-    split: { whole: rest.slice(0, at), decimals: rest.slice(at) },
+    mark: approx ? APPROX : '',
+    split: { whole: text.slice(0, at), decimals: text.slice(at) },
     approx,
   };
 }
 
 /**
- * A fraction in two, at its fraction part, its leading mark apart: the whole number with its sign
- * ("−") in the whole column, and the fraction after it a space off, as "10 1/2" is written, the
- * space a no-break one, since a cell's first space is stripped (docs/LEARNINGS.md, 2026-10-20). A
- * fraction with no whole number ("3/4", "< 1/8") has nothing in the whole column, its mark alone
- * before it, if any, and a whole number alone ("≈ 1,043,262") nothing after.
+ * A fraction in two, at its fraction part: the whole number with its sign ("−", "<", "> 13") in
+ * the whole column, and the fraction after it a space off, as "10 1/2" is written, the space a
+ * no-break one, since a cell's first space is stripped (docs/LEARNINGS.md, 2026-10-20). A
+ * fraction with no whole number ("3/4", "< 1/8") has its sign alone before it, if any, and a whole
+ * number alone ("≈ 1,043,262") nothing after.
  */
 function splitAtFraction(text: string, approx: boolean): ValueParts {
-  const [lead, rest] = takeMark(text);
-  const mark = lead || (approx ? APPROX : '');
-  const at = rest.search(/\d+\/\d+$/);
-  if (at < 0) return { text, mark, split: { whole: rest, decimals: '' }, approx };
+  const mark = approx ? APPROX : '';
+  const at = text.search(/\d+\/\d+$/);
+  if (at < 0) return { text, mark, split: { whole: text, decimals: '' }, approx };
   return {
     text,
     mark,
-    split: { whole: rest.slice(0, at).trimEnd(), decimals: NBSP + rest.slice(at) },
+    split: { whole: text.slice(0, at).trimEnd(), decimals: NBSP + text.slice(at) },
     approx,
   };
 }
@@ -810,15 +798,6 @@ export function ConversionTable<T extends ConversionRow>({
                 <span
                   hidden={secondHidden}
                   aria-hidden="true"
-                  className={SECOND_MARK_CELL}
-                  data-column="second"
-                  data-mark
-                >
-                  {markText(second.mark)}
-                </span>
-                <span
-                  hidden={secondHidden}
-                  aria-hidden="true"
                   className={cx(SECOND_WHOLE_CELL, muted)}
                   data-column="second"
                   data-second-whole
@@ -846,14 +825,6 @@ export function ConversionTable<T extends ConversionRow>({
               </span>
             ) : (
               <>
-                <span
-                  hidden={!secondHidden}
-                  aria-hidden="true"
-                  className={cx(STACKED_MARK_CELL, 'row-start-2')}
-                  data-instead="second"
-                >
-                  {markText(second.mark)}
-                </span>
                 <span
                   hidden={!secondHidden}
                   aria-hidden="true"

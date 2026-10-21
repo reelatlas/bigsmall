@@ -246,7 +246,8 @@ export function UnitMatches({
                       style={stickTop !== undefined ? { top: stickTop } : undefined}
                     >
                       <span className="text-ink">{group.heading}</span>
-                      {/* The group's name is its heading alone; each option says its category too. */}
+                      {/* The group's name is its heading alone; each option says its category
+                          too. */}
                       {count > 0 && (
                         <span aria-hidden="true" className={COUNT}>
                           {count}

@@ -1,4 +1,4 @@
-import { categories, INGREDIENT_KINDS, unitsIn } from '@bigsmall/core';
+import { categories, INGREDIENT_KINDS, shoeBrands, unitsIn } from '@bigsmall/core';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { THEMES } from '../src/lib/themes';
 import { ANNOUNCE_MS, COPIED_MS, TYPING_CHUNK_MS } from '../src/lib/timing';
@@ -13,10 +13,12 @@ import {
   expectNoA11yViolations,
   hiddenToggle,
   MARGIN_MS,
+  matches,
   menu,
   pressControl,
   pressTool,
   ready,
+  rightEdges,
   row,
   sectionIds,
   setSettings,
@@ -36,7 +38,6 @@ import {
 // US: their own units come first (ADR 0011).
 
 const tiles = (page: Page) => page.getByRole('listbox', { name: 'Categories' });
-const matches = (page: Page) => page.getByRole('listbox', { name: 'Matches' });
 /** The headings over a list's groups, in order: the ingredients' kinds under the Cooking pill. */
 const kindHeadings = (list: Locator) =>
   list
@@ -1413,12 +1414,9 @@ test('a pace: "5:30 /km" lists the speeds, then the paces in minutes and seconds
   // number faces differ (monospace, serif).
   for (const theme of THEMES) {
     await applyTheme(page, theme);
-    const lineUp = await page.evaluate(() =>
-      ['kilometer-per-hour', 'minute-per-mile'].map((id) =>
-        Math.round(
-          document.querySelector(`[data-row="${id}"] [data-whole]`)!.getBoundingClientRect().right,
-        ),
-      ),
+    const lineUp = await rightEdges(
+      page,
+      '[data-row="kilometer-per-hour"] [data-whole], [data-row="minute-per-mile"] [data-whole]',
     );
     expect(Math.abs(lineUp[0]! - lineUp[1]!), theme.id).toBeLessThanOrEqual(1);
   }
@@ -1485,7 +1483,7 @@ test('shoe sizes: "us 11" reads the scale before its number; the rows to the hal
   await expect(row(page, 'uk')).toContainText('9 1/2');
   await expect(row(page, 'eu')).toContainText('≈ 43 1/2');
   await expect(row(page, 'us-children')).toContainText('> 13 1/2');
-  await expect(unitCell(page, 'us-men').locator('> span').nth(1)).toHaveText(/^\s*1\/2$/);
+  await expect(unitCell(page, 'us-men').locator('[data-decimals]')).toHaveText(/^\s*1\/2$/);
   expect(new Set(await firstCellRights(page)).size).toBe(1);
   // A row beyond its scale, taken, brings the scale into the box with the number cleared, for a
   // size of its own, the rows waiting with dashes (Sean, 2026-10-20).
@@ -1511,7 +1509,8 @@ test('a query’s target: "us 11 to eu" rests the cursor on the EU row, which En
   // A shorthand reading is listed after the as-typed one: "11 w e" is Weight and the week first,
   // US women after them, taken with the cursor on the EU row (Sean, 2026-10-20).
   await box(page).fill('11 w e');
-  await expect(matches(page).getByRole('option').first()).not.toContainText('US women');
+  await expect(matches(page).getByRole('option').first()).toContainText('Weight');
+  await expect(matches(page).getByRole('option').nth(1)).toContainText('week');
   const women = matches(page).getByRole('option').filter({ hasText: 'US women' });
   await expect(women).toHaveCount(1);
   await women.click();
@@ -1597,7 +1596,7 @@ test('Cooking: "2 cups flour" takes the cup and the flour, two pills, Weight the
   await expect(page.getByRole('button', { name: 'Remove all-purpose flour' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
   await expect(menu(page)).toHaveText(/Cooking/);
-  await expect(page.getByRole('listbox', { name: 'Matches' })).toBeVisible();
+  await expect(matches(page)).toBeVisible();
   await box(page).press('Backspace');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
   await expect(menu(page)).toHaveText(/Cooking/);
@@ -1618,7 +1617,7 @@ test('in Cooking, Escape and the pills’ × take one pill a step and keep Cooki
   await expect(page.getByRole('button', { name: 'Remove all-purpose flour' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
   await expect(menu(page)).toHaveText(/Cooking/);
-  await expect(page.getByRole('listbox', { name: 'Matches' })).toBeVisible();
+  await expect(matches(page)).toBeVisible();
   await box(page).press('Escape');
   await expect(page.getByRole('button', { name: /^Remove/ })).toHaveCount(0);
   await expect(menu(page)).toHaveText(/^Category$/);
@@ -1630,7 +1629,7 @@ test('in Cooking, Escape and the pills’ × take one pill a step and keep Cooki
   await expect(menu(page)).toHaveText(/Cooking/);
   await expect(page.getByRole('button', { name: 'Remove cups' })).toBeVisible();
   await expect(box(page)).toHaveValue('2');
-  await expect(page.getByRole('listbox', { name: 'Matches' })).toBeVisible();
+  await expect(matches(page)).toBeVisible();
 });
 
 test('Cooking’s box keeps one line where it can, fitted as with one pill: the unit’s symbol, then the sizes, then a line of their own', async ({
@@ -1706,7 +1705,7 @@ test('Cooking: the ingredient’s pill opens every ingredient under its kind, th
   await page.waitForTimeout(MARGIN_MS);
   expect(await page.evaluate(() => Math.round(scrollY))).toBe(60);
   await page.evaluate(() => scrollTo(0, 0));
-  const list = page.getByRole('listbox', { name: 'Matches' });
+  const list = matches(page);
   expect(await kindHeadings(list)).toEqual(INGREDIENT_KINDS.map((kind) => kind.name));
   // The cursor starts on the one in the box.
   await expect(list.getByRole('option', { selected: true })).toHaveText(/all-purpose flour/);
@@ -1737,7 +1736,7 @@ test('Cooking: from the keys, the pill’s list moves with the arrows, Enter tak
   test.skip(isMobile, 'a keyboard walk needs a keyboard');
   await page.goto('/?a=us-cup&v=2&i=all-purpose-flour');
   await ready(page);
-  const list = page.getByRole('listbox', { name: 'Matches' });
+  const list = matches(page);
   await page.getByRole('button', { name: 'Ingredient: all-purpose flour' }).click();
   // The caret in the box, the cursor on the flour: ↓ to bread flour, Enter takes it.
   await box(page).press('ArrowDown');
@@ -1766,7 +1765,7 @@ test('Cooking chosen with no ingredient lists every ingredient; Enter goes in, E
     .getByRole('group', { name: 'Category' })
     .locator('label', { hasText: 'Cooking' })
     .click();
-  const list = page.getByRole('listbox', { name: 'Matches' });
+  const list = matches(page);
   await expect(list.getByRole('option').first()).toHaveText(/all-purpose flour/);
   // Under their kinds' headings, in the kinds' order: Flour first.
   expect(await kindHeadings(list)).toEqual(INGREDIENT_KINDS.map((kind) => kind.name));
@@ -2288,7 +2287,7 @@ test('a clock names its units: "5:55" offers the paces first, "1:30:00" the time
   await expect(options.nth(1)).toContainText('feet, inches');
 });
 
-test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, the one value in focus, the scales ISO’s from Nike’s foot, every brand at that foot under them, a brand’s row taken into the box, a scale’s row taking the brand out, and the brand in the URL', async ({
+test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, the one value in focus, the scales ISO’s from Nike’s foot, every brand at that foot under them, a brand’s row taken into the box, a scale’s row taking the brand out, the brand in the URL, the chip’s list of the brand’s scales, a dash row taken with the number cleared, the scales to choose from with the chip emptied, and the other line’s scale from Asics’s other chart', async ({
   page,
 }) => {
   await page.goto('/');
@@ -2306,9 +2305,8 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await expect(row(page, 'eu')).toContainText('≈ 42.5');
   await expect(row(page, 'foot-cm')).toContainText('27.1');
   await expect(row(page, 'us-men')).not.toContainText('in the box');
-  // The brands' rows under the scales, by their own charts; Nike's the box's, the one filled.
-  expect(await sectionIds(page)).toContain('brands');
-  await expect(row(page, 'brand:iso')).toHaveCount(0);
+  // The brands' rows first, by their own charts; Nike's the box's, the one filled.
+  expect((await sectionIds(page))[0]).toBe('brands');
   await expect(row(page, 'brand:nike')).toContainText('in the box');
   await expect(row(page, 'brand:new-balance')).toContainText('≈ 9');
   await expect(row(page, 'brand:new-balance')).toContainText('New Balance');
@@ -2320,11 +2318,20 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   // A row beyond its scale says where the foot stands (Sean, 2026-10-20).
   await expect(row(page, 'us-children')).toContainText('above its range');
   // The words after a name give way before the names (2026-10-20): a phone keeps the brand
-  // rows' names; a desktop shows the words.
+  // rows' names, and the words show only where every one fits whole, never clipped: the rule,
+  // not a width (useColumnsFit).
   await expect(row(page, 'brand:new-balance').locator('[data-name]')).toBeVisible();
-  if ((page.viewportSize()?.width ?? 0) >= 576) {
-    await expect(row(page, 'us-children').locator('[data-column="detail"]')).toBeVisible();
-  }
+  const details = await page.locator('[data-row] [data-column="detail"]').evaluateAll((cells) => {
+    const shown = cells.filter((cell) => !(cell as HTMLElement).hidden);
+    return {
+      rows: cells.length,
+      shown: shown.length,
+      clipped: shown.filter((cell) => cell.scrollWidth > cell.clientWidth).length,
+    };
+  });
+  expect(details.rows).toBeGreaterThan(0);
+  expect(details.clipped).toBe(0);
+  expect([0, details.rows]).toContain(details.shown);
   // The unit's chip with a brand opens the brand's scales (2026-10-20): EU taken reads Nike's
   // own 44 for the same row, the brand staying, the brands' rows in EU, and ISO's EU ≈ 42.5
   // beside it showing the difference; the chip again brings US men back.
@@ -2419,6 +2426,49 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
     .click();
   await expect(page.getByRole('button', { name: 'Remove US women' })).toBeVisible();
   await expect(box(page)).toHaveValue('8');
+});
+
+test('the brand’s pill (ADR 0028): its body lists every brand with the one in the box marked, another taken keeps the size and the scale, and its × takes the brand out and keeps the scale', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-men&v=10&brand=nike');
+  await ready(page);
+  await expect(row(page, 'brand:nike')).toContainText('in the box');
+  await page.getByRole('button', { name: 'Brand: Nike' }).click();
+  const list = matches(page);
+  await expect(list.getByRole('option')).toHaveCount(shoeBrands.length);
+  await expect(list.getByRole('option', { selected: true })).toContainText('Nike');
+  await list.getByRole('option', { name: 'adidas' }).click();
+  await expect(page.getByRole('button', { name: 'Remove adidas' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await expect(box(page)).toHaveValue('10');
+  await expect(row(page, 'brand:adidas')).toContainText('in the box');
+  await page.getByRole('button', { name: 'Remove adidas' }).click();
+  await expect(page.getByRole('button', { name: /^Remove (adidas|Nike)$/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await expect(box(page)).toHaveValue('10');
+  await expect(page).not.toHaveURL(/brand=/);
+});
+
+test('the sizes’ first cells end on one edge in every theme: a brand’s range and a dash with the sizes, and, with Fraction, a row beyond its scale with the whole numbers', async ({
+  page,
+}) => {
+  await page.goto('/?a=us-men&v=10&brand=nike');
+  await ready(page);
+  await expect(row(page, 'brand:nike')).toContainText('in the box');
+  await expect(row(page, 'brand:birkenstock')).toContainText(/\d(\.5)?–\d/);
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    expect(new Set(await firstCellRights(page)).size, theme.id).toBe(1);
+  }
+  await page.goto('/?a=us-men&v=10.5');
+  await ready(page);
+  await setSettings(page, 'Fraction');
+  await expect(row(page, 'us-children')).toContainText('> 13 1/2');
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    expect(new Set(await firstCellRights(page)).size, theme.id).toBe(1);
+  }
 });
 
 test('the brands’ charts are data fetched once Shoe size opens (ADR 0029): the file blocked, a brand opened from the URL waits with dashes and the line says the charts could not be loaded', async ({

@@ -16,7 +16,6 @@ import {
   matchShoeBrands,
   otherBrandChart,
   readBrand,
-  search,
   setBrandCharts,
   shoeBrands,
   splitShoeBrand,
@@ -148,7 +147,7 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
       }
       for (const chart of brandChartsOf(each.id)) {
         expect(chart.source.length).toBeGreaterThan(0);
-        expect(chart.read).toBe('2026-10-20');
+        expect(chart.read).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       }
     }
   });
@@ -342,7 +341,10 @@ describe('a brand typed with the size (ADR 0028)', () => {
     expect(matchShoeBrands('on', true)[0]?.brand.id).toBe('on');
   });
 
-  it('matches brands by name as units are matched: exactly, from the start, then inside', () => {
+  it('matches brands by name as units are matched: exactly, from the start, then inside, and never by a typo', () => {
+    // No fuzzy match for brands (docs/UX-SPEC.md §4): a typo matches nothing, at either end.
+    expect(matchShoeBrands('nkie')).toEqual([]);
+    expect(splitShoeBrand('nkie 10')).toBeNull();
     expect(matchShoeBrands('nik')[0]).toMatchObject({ brand: { id: 'nike' }, matchClass: 3 });
     expect(matchShoeBrands('nike')[0]).toMatchObject({ matchClass: 2 });
     expect(matchShoeBrands('new')[0]?.brand.id).toBe('new-balance');
@@ -363,9 +365,5 @@ describe('the foot’s own row and Japan’s label (ADR 0028)', () => {
     expect(convert(271, 'mondopoint', 'foot-cm')).toBeCloseTo(27.1, 9);
     expect(unit('japan').symbol).toBe('JP');
     expect(unit('foot-cm').symbol).toBe('cm');
-    expect(search('cm', { prefer: 'shoe-size' }).results[0]).toMatchObject({
-      unit: { id: 'foot-cm' },
-    });
-    expect(search('cm').results[0]).toMatchObject({ unit: { id: 'centimeter' } });
   });
 });

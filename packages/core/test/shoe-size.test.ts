@@ -139,7 +139,7 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
     ).toBeCloseTo(100, 9);
   });
 
-  it('marks every scale in half sizes, Mondopoint in 5 mm, and the foot in cm to the millimetre, written before its number', () => {
+  it('marks every scale in half sizes, Mondopoint in 5 mm, and the foot in cm to the millimetre, written before its number; roundToStep rounds to a step, its ties, noise, and directions', () => {
     for (const each of unitsIn('shoe-size')) {
       const step = each.id === 'mondopoint' ? 5 : each.id === 'foot-cm' ? 0.1 : 0.5;
       expect(each.step, each.id).toBe(step);
@@ -176,7 +176,7 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
     expect(ids(search('', { category: 'shoe-size', system: 'metric' }))[0]).toBe('eu');
   });
 
-  it('reads a scale before its number, a bare "us" as men’s, and "size" as the category', () => {
+  it('reads a scale before its number, a bare "us" as men’s, "size" and "kids" as the category, a possessive with or without its mark, the lone foot mark, and cm, jp, mm, and gb in and out of Shoe size', () => {
     expect(parse('us 11')).toMatchObject({
       value: 11,
       valueText: '11',
@@ -245,7 +245,7 @@ describe('shoe sizes (ADR 0027): ISO/TS 19407:2015 as the engine holds it', () =
     expect(search('xyz to abc').target).toBeUndefined();
   });
 
-  it('ranks the target’s category first, reads a target with no connective, and a connective alone', () => {
+  it('ranks the target’s category first, reads a target with no connective, a connective alone, the shorthand keys where the category is named, the two readings, and leadingTarget', () => {
     // "m" and "w" are shorthand keys: nothing at the start, where the meter and the watt lead
     // alone, the US scales in Shoe size or where a target names it ("11m to eu", "8 w to m").
     const exactly = (query: string, id: string) =>

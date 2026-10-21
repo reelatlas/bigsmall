@@ -179,6 +179,18 @@ export async function applyTheme(page: Page, theme: Pick<ThemeMeta, 'id' | 'name
  */
 export const box = (page: Page) => page.getByRole('combobox', { name: 'Value', exact: true });
 
+/** The matches' listbox in the table's place. */
+export const matches = (page: Page) => page.getByRole('listbox', { name: 'Matches' });
+
+/**
+ * The rounded right edges of what a selector finds, in document order, for the columns that must
+ * line up.
+ */
+export const rightEdges = (page: Page, selector: string) =>
+  page
+    .locator(selector)
+    .evaluateAll((cells) => cells.map((cell) => Math.round(cell.getBoundingClientRect().right)));
+
 /** The converter's category menu trigger, before a category is chosen or after. */
 export const menu = (page: Page) => page.getByRole('button', { name: /^Category/ });
 

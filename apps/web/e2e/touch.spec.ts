@@ -6,6 +6,7 @@ import {
   copyCell,
   menu,
   ready,
+  rightEdges,
   row,
   unitCell,
 } from './support';
@@ -160,12 +161,9 @@ test('a second tap on a row copies what it shows, the check flashing and the row
   // The flash leaves the row's cells where they were: a grid item laid over the row, never a
   // positioned child, under which WebKit laid the nested subgrid out wrong, the value and the
   // symbol drifting apart until a later layout (Sean's iPhone, 2026-10-20).
-  const right = (id: string, part: string) =>
-    row(page, id)
-      .locator(part)
-      .evaluate((cell) => Math.round(cell.getBoundingClientRect().right));
-  expect(await right('liter', '[data-symbol]')).toBe(await right('milliliter', '[data-symbol]'));
-  expect(await right('liter', '[data-whole]')).toBe(await right('milliliter', '[data-whole]'));
+  const right = (id: string, part: string) => rightEdges(page, `[data-row="${id}"] ${part}`);
+  expect(await right('liter', '[data-symbol]')).toEqual(await right('milliliter', '[data-symbol]'));
+  expect(await right('liter', '[data-whole]')).toEqual(await right('milliliter', '[data-whole]'));
   // No button sits in a row: a tap at a row's end takes that row.
   const pint = row(page, 'us-pint');
   const size = (await pint.boundingBox())!;

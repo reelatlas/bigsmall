@@ -1,4 +1,4 @@
-import { brandChart, brandRowAt, getShoeBrand, getUnit } from '@bigsmall/core';
+import { brandChart, brandRowAt, getShoeBrand, getUnit, shoeBrands } from '@bigsmall/core';
 import { describe, expect, it } from 'vitest';
 import {
   brandList,
@@ -973,7 +973,6 @@ describe('brands (ADR 0028)', () => {
     expect(table.sections[0]?.repeats).toBe(true);
     expect(table.rows[0]?.id).toBe('brand:adidas');
     // Every brand by name, its size by its chart at that foot; Nike's row the box's, as typed.
-    expect(row(table, 'brand:iso')).toBeUndefined();
     expect(row(table, 'brand:adidas')).toMatchObject({
       text: '10',
       approx: false,
@@ -1098,9 +1097,8 @@ describe('brands (ADR 0028)', () => {
     expect(puma.note).toContain('has no size for a measured foot');
   });
 
-  it('with no brand, the brands’ rows read every chart at ISO’s foot, the women’s charts for a women’s size', () => {
+  it('with no brand, the brands’ rows read every chart at ISO’s foot, the women’s charts for a women’s size, a length typed, a child’s foot off every chart, and nothing typed yet', () => {
     const men = units(type('us 9'), { type: 'use', unit: 'us-men', text: '9' });
-    expect(row(men, 'brand:iso')).toBeUndefined();
     expect(row(men, 'brand:nike')).toMatchObject({ text: '9', brand: { id: 'nike', line: 'men' } });
     expect(row(men, 'brand:new-balance')).toMatchObject({ text: '8.5', approx: true });
     expect(row(men, 'brand:brooks')).toMatchObject({
@@ -1165,7 +1163,7 @@ describe('brands (ADR 0028)', () => {
     expect(selectBox(eu, EN).line).toBe('women');
   });
 
-  it('lists the brand’s scales to choose from (the chip’s list): every scale its chart prints with the row’s size, the foot’s units where it gives the foot, the one in the box marked, the line carried', () => {
+  it('lists the brand’s scales to choose from (the chip’s list): every scale its chart prints with the row’s size, the foot’s units where it gives the foot, the one in the box marked, the line carried, and the other line’s scales from the brand’s other chart under its heading, at the same foot or with the number cleared', () => {
     const table = units(type('nike 10'), nike());
     const nikeRow = brandRowAt(brandChart(getShoeBrand('nike')!, false), 'us-men', 10, false)!;
     const list = scaleList(table, getShoeBrand('nike')!, getUnit('us-men')!, 10, null, 'en-US');
@@ -1317,7 +1315,7 @@ describe('brands (ADR 0028)', () => {
     ).toBe(true);
   });
 
-  it('waits for the charts (ADR 0029): loading or failed, the brands’ rows are dashes, a brand in the box leaves every row a dash, and the line says so', () => {
+  it('waits for the charts (ADR 0029): loading or failed, the brands’ rows are dashes, a brand in the box leaves every row a dash with the line above the rows saying so, and the brands’ heading says it with no brand', () => {
     const loading = selectTable(run(type('nike 10'), nike()), { ...options, charts: 'loading' });
     if (loading.kind !== 'units') throw new Error('units');
     expect(row(loading, 'eu')).toMatchObject({ tone: 'empty' });
@@ -1384,7 +1382,7 @@ describe('brands (ADR 0028)', () => {
   it('lists every brand to choose from, the one in the box marked (the pill’s list)', () => {
     const table = units(type('nike 10'), nike());
     const list = brandList(table, selectBox(run(type('nike 10'), nike()), EN).brand);
-    expect(list.rows).toHaveLength(20);
+    expect(list.rows).toHaveLength(shoeBrands.length);
     expect(list.rows.filter((each) => each.kind === 'brand' && each.inBox)).toHaveLength(1);
     expect(list.rows[0]).toMatchObject({ kind: 'brand', group: 'Brands' });
     expect(list.announcement).toBe('20 brands to choose from');

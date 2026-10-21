@@ -1013,6 +1013,29 @@ export function TableLayout({
   };
 
   /**
+   * Scrolls as little as needed to show a row of the table where it now lies: under the stuck
+   * head and its section's name stuck beneath it, or above the window's foot. By the layout's own
+   * positions (offsets), which the glide's transforms leave alone, so a row still travelling
+   * lands in view (Sean, 2026-10-21: the page stayed where it was while the row went to the top;
+   * scrolling to the section's top instead would leave a late brand below a phone's foot).
+   */
+  const followRow = (id: string) => {
+    const element = rootRef.current?.querySelector<HTMLElement>(`[data-row="${id}"]`);
+    if (!element) return;
+    const heading = element.parentElement?.querySelector<HTMLElement>('[data-section]');
+    const covered = sticking ? stick.height + stick.gap + (heading?.offsetHeight ?? 0) : 0;
+    let top = 0;
+    for (let part: HTMLElement | null = element; part; part = part.offsetParent as HTMLElement) {
+      top += part.offsetTop;
+    }
+    const bottom = top + element.offsetHeight;
+    const viewTop = window.scrollY + covered;
+    const viewBottom = window.scrollY + window.innerHeight;
+    if (top < viewTop) window.scrollBy(0, top - viewTop);
+    else if (bottom > viewBottom) window.scrollBy(0, bottom - viewBottom);
+  };
+
+  /**
    * Enter or a click on what the cursor is on. A row of the units moves into the box with its
    * value, to the 10 digits a box shows, as if it had been typed, or with the number as typed
    * while the rows are dashes, or, beyond its scale, with the number cleared; a match moves in
@@ -1083,29 +1106,6 @@ export function TableLayout({
       glide(rootRef.current, () => take(row.unit.id, text, undefined, brand));
       followRow(row.id);
     }
-  };
-
-  /**
-   * Scrolls as little as needed to show a row of the table where it now lies: under the stuck
-   * head and its section's name stuck beneath it, or above the window's foot. By the layout's own
-   * positions (offsets), which the glide's transforms leave alone, so a row still travelling
-   * lands in view (Sean, 2026-10-21: the page stayed where it was while the row went to the top;
-   * scrolling to the section's top instead would leave a late brand below a phone's foot).
-   */
-  const followRow = (id: string) => {
-    const element = rootRef.current?.querySelector<HTMLElement>(`[data-row="${id}"]`);
-    if (!element) return;
-    const heading = element.parentElement?.querySelector<HTMLElement>('[data-section]');
-    const covered = sticking ? stick.height + stick.gap + (heading?.offsetHeight ?? 0) : 0;
-    let top = 0;
-    for (let part: HTMLElement | null = element; part; part = part.offsetParent as HTMLElement) {
-      top += part.offsetTop;
-    }
-    const bottom = top + element.offsetHeight;
-    const viewTop = window.scrollY + covered;
-    const viewBottom = window.scrollY + window.innerHeight;
-    if (top < viewTop) window.scrollBy(0, top - viewTop);
-    else if (bottom > viewBottom) window.scrollBy(0, bottom - viewBottom);
   };
 
   /**

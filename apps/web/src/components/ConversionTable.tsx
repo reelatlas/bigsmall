@@ -942,11 +942,12 @@ export function ConversionTable<T extends ConversionRow>({
     const value = parts(row, under);
     return partOf(value, pick, markOf(value, secondOf(row, under)));
   };
-  /** One part of Both's second form as drawn under a rounding, with its own mark. */
-  const secondPart = (pick: Part) => (row: T, under: TableDisplay) => {
-    const second = secondOf(row, under);
-    return partOf(second, pick, second?.mark ?? '');
-  };
+  /**
+   * One part of Both's second form as drawn under a rounding, with no mark of its own: the row's
+   * ≈ is drawn once, before the first form (markOf).
+   */
+  const secondPart = (pick: Part) => (row: T, under: TableDisplay) =>
+    partOf(secondOf(row, under), pick, '');
   const sizer = (
     <div
       aria-hidden="true"

@@ -1312,4 +1312,4 @@ Entries are cited by their titles, which stay as written; this index finds them.
 ## 2026-10-20 — Screenshots sent while a turn runs do not land as files
 
 **What happened.** Sean's first message's screenshots were saved in the session's images folder and copied into the sources; the screenshots in his later messages the same turn were shown in the conversation and never written to disk, so Converse's, Crocs', Skechers', Reebok's, Under Armour's, and On's could not be filed.
-**Rule.** When screenshots arrive mid-turn, say so at once, keep the pasted text as the source of record, name the screenshots as shown and not saved, and ask for a re-send at a turn's start if the files matter.
+**Rule.** When screenshots arrive mid-turn, say so at once, keep the pasted text as the source of record, name the screenshots as shown and not saved, and ask for a re-send at a turn's start if the files matter: re-sent that way, all 36 landed and were filed the same evening.

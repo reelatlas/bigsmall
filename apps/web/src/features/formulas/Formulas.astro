@@ -23,8 +23,7 @@ const groups = formulaGroups();
 // Units alone: Cooking lists ingredients, and Shoe size the brands' charts, which are not units.
 const units = groups.reduce(
   (count, group) =>
-    count +
-    (group.category.over ? 0 : group.lines.filter((line) => !line.id.startsWith('brand:')).length),
+    count + (group.category.over ? 0 : group.lines.filter((line) => line.kind === 'unit').length),
   0,
 );
 const listId = 'formula-list';

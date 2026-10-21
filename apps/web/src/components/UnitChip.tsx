@@ -74,6 +74,14 @@ export function UnitChip({
   // never scrolls the page to center it, as WebKit does (docs/LEARNINGS.md, 2026-10-17). Cancelled
   // on mousedown, as the field's × does: cancelling pointerdown swallows the tap itself in WebKit.
   const keepFocus = (event: MouseEvent<HTMLButtonElement>) => event.preventDefault();
+  /** The pill's chevron, turned over while its list is open: the cue that the pill opens one. */
+  const chevron = (
+    <ChevronDownIcon
+      width="16"
+      height="16"
+      className={cx('block text-ink-muted transition-transform', expanded && 'rotate-180')}
+    />
+  );
   return (
     // A unit's chip keeps its size; an ingredient's or a brand's gives way, its name cut short.
     <span className={cx(CHIP, second ? 'min-w-0' : 'shrink-0')}>
@@ -100,16 +108,7 @@ export function UnitChip({
             </span>
             {expanded !== undefined && (
               // The pill's chevron: the chip opens the brand's scales (ADR 0028, 2026-10-20).
-              <span className="shrink-0 self-center">
-                <ChevronDownIcon
-                  width="16"
-                  height="16"
-                  className={cx(
-                    'block text-ink-muted transition-transform',
-                    expanded && 'rotate-180',
-                  )}
-                />
-              </span>
+              <span className="shrink-0 self-center">{chevron}</span>
             )}
           </span>
         ) : (
@@ -119,14 +118,7 @@ export function UnitChip({
             </span>
             {/* Gives way after the unit chip's name where the box lacks the room (useFieldFit). */}
             <span ref={chevronRef ?? null} hidden={compact} className="shrink-0 self-center">
-              <ChevronDownIcon
-                width="16"
-                height="16"
-                className={cx(
-                  'block text-ink-muted transition-transform',
-                  expanded && 'rotate-180',
-                )}
-              />
+              {chevron}
             </span>
           </span>
         )}

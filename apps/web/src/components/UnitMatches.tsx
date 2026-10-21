@@ -8,6 +8,8 @@ import {
   cx,
   GROUP_TITLE,
   LIST_CARD,
+  LIST_FOOT,
+  LIST_LINE,
   LIST_MESSAGE,
   ROW_RULE,
   rowFill,
@@ -109,6 +111,8 @@ interface UnitMatchesProps {
 const ROWS = 'grid grid-cols-[auto_minmax(0,1fr)] gap-x-3';
 /** A list in the columns' grid, so the matches and the hidden ones line up across the line between them. */
 const LIST = 'col-span-2 grid grid-cols-subgrid';
+/** An option as a row of the columns' grid, which the cursor moves through. */
+const OPTION_ROW = cx(CURSOR_ROW, 'col-span-2 grid grid-cols-subgrid items-center');
 
 /**
  * The matches for a typed unit, in the table's place (docs/UX-SPEC.md §1): units from every
@@ -171,6 +175,33 @@ export function UnitMatches({
       </span>
     </>
   );
+  /**
+   * An ingredient's or a brand's match: its name, matched letters heavier, after the unit typed
+   * beside it when there was one, joined by the kind's word ("cups of all-purpose flour", "US men
+   * · Nike"); alone, its name. Screen readers hear its category, and whether it is in the box.
+   */
+  const secondText = (
+    match: { unit: Unit | null; category: Category; inBox: boolean },
+    joiner: string,
+    name: string,
+  ) => (
+    <>
+      <span className={unitSymbol()}>{match.unit?.symbol}</span>
+      <span className="min-w-0 text-ink">
+        {match.unit && (
+          <span className={unitName(!symbolOnly)}>
+            {match.unit.plural}
+            {joiner}
+          </span>
+        )}
+        <MatchedText text={name} query={query} className="font-semibold" />
+        <span className="sr-only">
+          , {match.category.name}
+          {match.inBox && ', in the box'}
+        </span>
+      </span>
+    </>
+  );
 
   return (
     <div ref={ref} className={cx(LIST_CARD, 'p-2')}>
@@ -225,8 +256,7 @@ export function UnitMatches({
                           onMouseDown={(event) => event.preventDefault()}
                           onClick={() => onPick(index)}
                           className={cx(
-                            CURSOR_ROW,
-                            'col-span-2 grid grid-cols-subgrid items-center',
+                            OPTION_ROW,
                             rowFill(match.kind !== 'category' && match.inBox, index === cursor),
                           )}
                         >
@@ -239,46 +269,11 @@ export function UnitMatches({
                               </span>
                             </>
                           ) : match.kind === 'ingredient' ? (
-                            // An ingredient: its name, matched letters heavier, after the unit typed
-                            // before it, "cups of all-purpose flour"; alone, its name.
-                            <>
-                              <span className={unitSymbol()}>{match.unit?.symbol}</span>
-                              <span className="min-w-0 text-ink">
-                                {match.unit && (
-                                  <span className={unitName(!symbolOnly)}>
-                                    {match.unit.plural} of{' '}
-                                  </span>
-                                )}
-                                <MatchedText
-                                  text={match.ingredient.name}
-                                  query={query}
-                                  className="font-semibold"
-                                />
-                                <span className="sr-only">, {match.category.name}</span>
-                              </span>
-                            </>
+                            // "cups of all-purpose flour" (ADR 0021).
+                            secondText(match, ' of ', match.ingredient.name)
                           ) : match.kind === 'brand' ? (
-                            // A brand (ADR 0028): its name, matched letters heavier, after the scale
-                            // typed beside it, "US men · Nike"; alone, its name.
-                            <>
-                              <span className={unitSymbol()}>{match.unit?.symbol}</span>
-                              <span className="min-w-0 text-ink">
-                                {match.unit && (
-                                  <span className={unitName(!symbolOnly)}>
-                                    {match.unit.plural} ·{' '}
-                                  </span>
-                                )}
-                                <MatchedText
-                                  text={match.brand.name}
-                                  query={query}
-                                  className="font-semibold"
-                                />
-                                <span className="sr-only">
-                                  , {match.category.name}
-                                  {match.inBox && ', in the box'}
-                                </span>
-                              </span>
-                            </>
+                            // "US men · Nike" (ADR 0028).
+                            secondText(match, ' · ', match.brand.name)
                           ) : (
                             <span className="col-span-2 text-ink">
                               <MatchedText
@@ -304,12 +299,9 @@ export function UnitMatches({
            */}
           {hidden.length > 0 && (
             <div
-              className={cx(
-                'col-span-2 flex min-h-11 items-center justify-between gap-2',
-                matches.length > 0 && cx('mt-1.5', ROW_RULE),
-              )}
+              className={cx('col-span-2', LIST_FOOT, matches.length > 0 && cx('mt-1.5', ROW_RULE))}
             >
-              <span id={lineId} className="px-2 text-sm text-ink-muted">
+              <span id={lineId} className={LIST_LINE}>
                 {matches.length === 0 ? (
                   'Only hidden units match'
                 ) : (
@@ -351,11 +343,7 @@ export function UnitMatches({
                     aria-selected={index === cursor}
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => onPick(index)}
-                    className={cx(
-                      CURSOR_ROW,
-                      'col-span-2 grid grid-cols-subgrid items-center',
-                      rowFill(false, index === cursor),
-                    )}
+                    className={cx(OPTION_ROW, rowFill(false, index === cursor))}
                   >
                     <span className={unitSymbol()} data-symbol>
                       <MatchedText text={match.unit.symbol} query={query} className="text-ink" />

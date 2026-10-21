@@ -153,12 +153,15 @@ export function ValueField({
   const rowRef = useRef<HTMLDivElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
   const chipNameRef = useRef<HTMLSpanElement>(null);
-  /** The second pill's name (an ingredient's or a brand's), which the unit chip's name gives way to where it would be cut short. */
-  const ingredientNameRef = useRef<HTMLSpanElement>(null);
+  /**
+   * The second pill's name, an ingredient's or a brand's, which the unit chip's name gives way to
+   * where it would be cut short.
+   */
+  const secondNameRef = useRef<HTMLSpanElement>(null);
   /** No name to measure: with Symbol only the chip never shows one, so the number has its room. */
   const noName = useRef<HTMLSpanElement>(null);
-  /** The ingredient pill's chevron, which gives way after the unit chip's name (a trial). */
-  const chevronRef = useRef<HTMLSpanElement>(null);
+  /** The second pill's chevron, which gives way after the unit chip's name. */
+  const secondChevronRef = useRef<HTMLSpanElement>(null);
   const inputId = `${useId()}-input`;
 
   // The row is measured, not counted: in any box, wide or narrow, the chip keeps its name while
@@ -167,9 +170,9 @@ export function ValueField({
     () => ({ ref: textLayerRef, base: TEXT_LAYER, steps: NUMBER_SIZES }),
     [],
   );
-  // What gives way, in order: the unit chip's name, then the ingredient pill's chevron.
-  const parts = useMemo(() => [symbolOnly ? noName : chipNameRef, chevronRef], [symbolOnly]);
-  const fit = useFieldFit(rowRef, parts, fitText, ingredientNameRef);
+  // What gives way, in order: the unit chip's name, then the second pill's chevron.
+  const parts = useMemo(() => [symbolOnly ? noName : chipNameRef, secondChevronRef], [symbolOnly]);
+  const fit = useFieldFit(rowRef, parts, fitText, secondNameRef);
   const sizeClass = NUMBER_SIZES[fit.step];
 
   // A number too long even at the smallest size scrolls inside the field; the layer follows it.
@@ -264,8 +267,8 @@ export function ValueField({
                   ingredient={ingredient}
                   expanded={ingredientOpen}
                   compact={fit.gaveWay > 1}
-                  nameRef={ingredientNameRef}
-                  chevronRef={chevronRef}
+                  nameRef={secondNameRef}
+                  chevronRef={secondChevronRef}
                   onOpen={onIngredientOpen ?? onChipOpen}
                   onRemove={onIngredientRemove ?? onChipRemove}
                 />
@@ -274,8 +277,8 @@ export function ValueField({
                   brand={brand}
                   expanded={brandOpen}
                   compact={fit.gaveWay > 1}
-                  nameRef={ingredientNameRef}
-                  chevronRef={chevronRef}
+                  nameRef={secondNameRef}
+                  chevronRef={secondChevronRef}
                   onOpen={onBrandOpen ?? onChipOpen}
                   onRemove={onBrandRemove ?? onChipRemove}
                 />

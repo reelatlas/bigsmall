@@ -315,6 +315,16 @@ export const NO_ANSWER = 'text-sm font-medium text-danger';
 /** A message in place of a list's rows (no answer, no match), set in the rows' gutter. */
 export const LIST_MESSAGE = 'px-2 py-2.5';
 
+/**
+ * A muted line in a list's gutter: the table's notice over its rows, "Every unit shown" in its
+ * foot, the hidden matches' line, the note under Cooking's and Shoe size's tables; a margin is
+ * the caller's.
+ */
+export const LIST_LINE = 'px-2 text-sm text-ink-muted';
+
+/** A list's foot row: its words at the left and a button at its right end, a cursor row high. */
+export const LIST_FOOT = 'flex min-h-11 items-center justify-between gap-2';
+
 // Lists a field's cursor moves through (docs/DESIGN-SYSTEM.md, "Lists"): the table, the matches,
 // and the start's categories, whose rows the arrows reach while the caret stays in the field.
 

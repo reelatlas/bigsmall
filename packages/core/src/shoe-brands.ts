@@ -55,6 +55,9 @@ export type BrandScale = 'us-men' | 'us-women' | 'uk' | 'eu' | 'japan';
 
 export const BRAND_SCALES: readonly BrandScale[] = ['us-men', 'us-women', 'uk', 'eu', 'japan'];
 
+/** The dash between a range's two ends as a row writes it ("9–9.5"), which a split finds. */
+export const RANGE_DASH = '–';
+
 /** The scale a bare size at a brand means ("nike 10"), as a bare "us" is men's (ADR 0027). */
 export const BRAND_DEFAULT_SCALE: BrandScale = 'us-men';
 

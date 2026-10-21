@@ -7,9 +7,7 @@ describe('formulas', () => {
   const formula = (id: string) => lines.find((line) => line.id === id)?.formula;
 
   it('lists every unit the engine has, once, and under Cooking every ingredient', () => {
-    const unitLines = lines.filter(
-      (line) => !line.id.startsWith('ingredient:') && !line.id.startsWith('brand:'),
-    );
+    const unitLines = lines.filter((line) => line.kind === 'unit');
     expect(unitLines.map((line) => line.id).sort()).toEqual(units.map((unit) => unit.id).sort());
     const cooking = formulaGroups().find((group) => group.category.id === 'cooking');
     expect(cooking?.lines.map((line) => line.id)).toEqual(
@@ -21,7 +19,7 @@ describe('formulas', () => {
 
   it('lists every brand’s chart under Shoe size, by convention, with its page and date (ADR 0028)', () => {
     const shoe = formulaGroups().find((group) => group.category.id === 'shoe-size');
-    const charts = shoe?.lines.filter((line) => line.id.startsWith('brand:')) ?? [];
+    const charts = shoe?.lines.filter((line) => line.kind === 'brand') ?? [];
     expect(charts).toHaveLength(
       shoeBrands.reduce((count, brand) => count + brandChartsOf(brand.id).length, 0),
     );

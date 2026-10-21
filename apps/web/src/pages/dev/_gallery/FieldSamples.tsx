@@ -33,6 +33,8 @@ import type { ConverterEnv } from '../../../features/converter/useConverter';
 
 const ENV: ConverterEnv = { locale: 'en-US', separators: DEFAULT_SEPARATORS, system: 'us' };
 const noop = () => undefined;
+/** A phone's width for the samples that show a row giving way: 320 px, the narrowest supported. */
+const PHONE = 'max-w-80';
 
 /** The tools More lists in the gallery: the toolbar's right end, redo with nothing to redo. */
 const FOLDED: readonly MoreMenuItem[] = [
@@ -235,7 +237,7 @@ function TableSamples() {
         display={SYMBOLS}
         itemId={itemIds('dashes')}
       />
-      <div className="max-w-80">
+      <div className={PHONE}>
         <TableSample
           view={narrow}
           title="Area, on a phone"
@@ -249,7 +251,7 @@ function TableSamples() {
         display={{ ...FRESH_DISPLAY, format: 'both' }}
         itemId={itemIds('both')}
       />
-      <div className="max-w-80">
+      <div className={PHONE}>
         <TableSample
           view={feet}
           title="Length, decimals and fractions, on a phone"
@@ -321,7 +323,7 @@ export function FieldSamples({ theme }: { theme: string }) {
         unitId="us-cup"
         ingredientId="all-purpose-flour"
       />
-      <div className="max-w-80">
+      <div className={PHONE}>
         <FieldSample
           label={`${theme} cooking phone sample`}
           text="250"

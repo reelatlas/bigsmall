@@ -69,6 +69,7 @@ export {
   brandsAtFoot,
   chartAtFoot,
   isBrandScale,
+  RANGE_DASH,
   BRAND_SCALES,
   BRAND_DEFAULT_SCALE,
   setBrandCharts,

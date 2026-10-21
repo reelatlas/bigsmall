@@ -6,6 +6,7 @@ import {
   localeSeparators,
   MINUS,
   NBSP,
+  RANGE_DASH,
   type FractionSize,
   type Rounded,
   type Rounding,
@@ -24,6 +25,8 @@ import {
   CURSOR_ROW,
   cx,
   LIST_CARD,
+  LIST_FOOT,
+  LIST_LINE,
   LIST_MESSAGE,
   NO_ANSWER,
   PANEL_TITLE,
@@ -263,6 +266,8 @@ const NAME_CELL = 'min-w-0 overflow-hidden pl-2 text-left whitespace-nowrap';
  */
 const PAIR_NAME_CELL = cx(NAME_CELL, 'truncate [contain:inline-size]');
 const HEADING = cx(PANEL_TITLE, 'px-2 pb-1');
+/** A heading that is a row of its own: Edit's section headings and the foot's Hidden toggle. */
+const TITLE_ROW = cx(PANEL_TITLE, CURSOR_ROW, 'flex items-center gap-2');
 const ROUNDINGS: readonly Rounding[] = ['nearest', 'up', 'down'];
 
 /**
@@ -320,6 +325,8 @@ export function copiedText(
 
 /** A size's own step as a fraction: a half (ADR 0027). */
 const HALVES: ReadonlySet<FractionSize> = new Set([2]);
+/** The mark ahead of a value that rounds, is measured, or is a chart's nearest row. */
+const APPROX = '≈ ';
 
 /**
  * How a pair is written under the display: the last part to its places or sizes, else the
@@ -399,7 +406,7 @@ function secondWritten(row: ConversionRow, display: TableDisplay, locale: string
  */
 function splitFraction(written: Rounded): { whole: string; part: string } {
   const split = splitAtFraction(written.text, written.approx);
-  return { whole: (split.approx ? '≈ ' : '') + split.whole, part: split.decimals };
+  return { whole: (split.approx ? APPROX : '') + split.whole, part: split.decimals };
 }
 
 /** A value as written, "≈" ahead of one that rounds or is measured; the row's own text where nothing is. */
@@ -513,7 +520,7 @@ function splitAtFraction(text: string, approx: boolean): SplitValue {
  */
 function splitPrinted(text: string, mark: string, approx: boolean): SplitValue {
   if (/\d+\/\d+$/.test(text)) return splitAtFraction(text, approx);
-  const ends = [text.indexOf(mark), text.indexOf('–')].filter((at) => at >= 0);
+  const ends = [text.indexOf(mark), text.indexOf(RANGE_DASH)].filter((at) => at >= 0);
   const at = ends.length > 0 ? Math.min(...ends) : text.length;
   return { text, whole: text.slice(0, at), decimals: text.slice(at), approx };
 }
@@ -671,11 +678,11 @@ export function ConversionTable<T extends ConversionRow>({
           <>
             <span className={cx(WHOLE_CELL, tone)}>
               <span aria-hidden="true" data-whole>
-                {value.approx && <span className="text-ink-muted">≈ </span>}
+                {value.approx && <span className="text-ink-muted">{APPROX}</span>}
                 <FormattedNumber text={value.whole} />
               </span>
             </span>
-            <span aria-hidden="true" className={cx(DECIMALS_CELL, tone)}>
+            <span aria-hidden="true" className={cx(DECIMALS_CELL, tone)} data-decimals>
               <FormattedNumber text={value.decimals} />
             </span>
             <span className="sr-only">
@@ -785,7 +792,7 @@ export function ConversionTable<T extends ConversionRow>({
     if (pick === 'across') return null;
     return (
       <>
-        {pick === 'whole' && value.approx && '≈ '}
+        {pick === 'whole' && value.approx && APPROX}
         <FormattedNumber text={value[pick]} />
       </>
     );
@@ -983,7 +990,7 @@ export function ConversionTable<T extends ConversionRow>({
     // pushes it up.
     return (
       <h3 className={cx(edge, stuck)} style={stickStyle} {...marker}>
-        <label className={cx(PANEL_TITLE, CURSOR_ROW, 'flex items-center gap-2', CHOICE_FILL)}>
+        <label className={cx(TITLE_ROW, CHOICE_FILL)}>
           <TriCheckbox
             state={state}
             data-spot={spot}
@@ -1143,7 +1150,7 @@ export function ConversionTable<T extends ConversionRow>({
         )}
         data-table-card
       >
-        {notice && <p className="px-2 pt-2 text-sm text-ink-muted">{notice}</p>}
+        {notice && <p className={cx(LIST_LINE, 'pt-2')}>{notice}</p>}
         {body}
         {/* The foot keeps its place in Edit, nothing over the list moving: Edit reads Done where it
             was, and Hidden stays. Over a long list the foot stays at the screen's bottom edge, Done
@@ -1151,11 +1158,7 @@ export function ConversionTable<T extends ConversionRow>({
             Edit (a strip). */}
         {!message && (
           <div
-            className={cx(
-              ROW_RULE,
-              'mt-1 flex min-h-11 items-center justify-between gap-2',
-              editing && 'sticky bottom-0 bg-surface',
-            )}
+            className={cx(ROW_RULE, LIST_FOOT, 'mt-1', editing && 'sticky bottom-0 bg-surface')}
             data-table-foot
             data-strip
           >
@@ -1165,11 +1168,7 @@ export function ConversionTable<T extends ConversionRow>({
                 type="button"
                 aria-expanded={hiddenOpen}
                 onClick={() => onHiddenOpen(!hiddenOpen)}
-                className={cx(
-                  PANEL_TITLE,
-                  CURSOR_ROW,
-                  'flex items-center gap-2 hover:bg-surface-raised',
-                )}
+                className={cx(TITLE_ROW, 'hover:bg-surface-raised')}
               >
                 <ChevronDownIcon
                   width="16"
@@ -1183,7 +1182,7 @@ export function ConversionTable<T extends ConversionRow>({
                 </span>
               </button>
             ) : (
-              <span className="px-2 text-sm text-ink-muted">Every unit shown</span>
+              <span className={LIST_LINE}>Every unit shown</span>
             )}
             {/* Done, switched on to show Edit is, folds Hidden too: whoever just chose what to hide
                 should not have to fold it. */}

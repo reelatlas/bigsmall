@@ -38,7 +38,7 @@ import { rowsIn, stopOf } from '../../lib/panel-keys';
 import { stepPlane } from '../../lib/planes';
 import { useKept } from '../../lib/keeping';
 import { useRefit } from '../../lib/fit-step';
-import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID } from '../../lib/recipes';
+import { CONTENT_COLUMN, cx, IN_CONVERTER_GRID, LIST_LINE } from '../../lib/recipes';
 import { DOUBLE_TAP_MS } from '../../lib/timing';
 import { STARTS_TYPING } from '../../lib/typing';
 import { evaluatedText } from './calculator';
@@ -1277,7 +1277,7 @@ export function TableLayout({
     );
   // Under Cooking's table, the line saying what a cup of its ingredient weighs (ADR 0021).
   const note = table.kind === 'units' && table.note && (
-    <p className="mt-2 px-2 text-sm text-ink-muted">{table.note}</p>
+    <p className={cx('mt-2', LIST_LINE)}>{table.note}</p>
   );
 
   // The cursor shows only while focus is in the box or its table: moving to the toolbar, the

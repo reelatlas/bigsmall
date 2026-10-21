@@ -34,6 +34,7 @@ import {
   pairsOpenedBy,
   parse,
   readBrand,
+  RANGE_DASH,
   resolveExact,
   roundToStep,
   search,
@@ -1265,7 +1266,10 @@ function asPrinted(
   locale: string | undefined,
 ): { text: string; printed: boolean } {
   if (range) {
-    return { text: `${sizeOf(range[0], locale)}–${sizeOf(range[1], locale)}`, printed: true };
+    return {
+      text: `${sizeOf(range[0], locale)}${RANGE_DASH}${sizeOf(range[1], locale)}`,
+      printed: true,
+    };
   }
   const halves = value * 2;
   if (Math.abs(halves - Math.round(halves)) < 1e-9)
@@ -2146,6 +2150,7 @@ function sameState(a: ConverterState, b: ConverterState): boolean {
     a.category === b.category &&
     a.ingredient === b.ingredient &&
     a.brand === b.brand &&
+    a.line === b.line &&
     a.calc.text === b.calc.text &&
     a.calc.fresh === b.calc.fresh
   );

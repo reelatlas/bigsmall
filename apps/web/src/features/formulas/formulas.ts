@@ -24,6 +24,8 @@ import {
 /** One unit's line: what one of it is in its category's base unit, or its formula. */
 interface FormulaLine {
   id: string;
+  /** What the line is: a unit's formula, an ingredient's cup, or a brand's chart. */
+  kind: 'unit' | 'ingredient' | 'brand';
   name: string;
   symbol: string;
   /** "1 mi = 1609.344 m"; "K = (°F + 459.67) × 5/9"; "km/L = 100 ÷ (L/100 km)". */
@@ -143,6 +145,7 @@ function ingredientLine(ingredient: Ingredient): FormulaLine {
   const source = `${method}; ${basisText(ingredient)}: ${sources}.${ingredient.note ? ` ${ingredient.note}` : ''}`;
   return {
     id: `ingredient:${ingredient.id}`,
+    kind: 'ingredient',
     name: ingredient.name,
     symbol: '',
     formula,
@@ -186,6 +189,7 @@ function brandLine(brand: ShoeBrand, chart: BrandChart): FormulaLine {
   const source = `${chart.title}, ${chart.source}, read ${chart.read}; ${LENGTH_BASIS[chart.basis]}.${brand.fact ? ` ${brand.fact}` : ''}`;
   return {
     id: `brand:${brand.id}:${chart.line}`,
+    kind: 'brand',
     name,
     symbol: '',
     formula,
@@ -222,6 +226,7 @@ export function formulaGroups(): FormulaGroup[] {
       const basis = unit.exact ? 'exact' : unit.conventional ? 'by convention' : 'measured';
       return {
         id: unit.id,
+        kind: 'unit',
         name: unit.name,
         symbol: unit.symbol,
         formula,

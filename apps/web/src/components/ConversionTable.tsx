@@ -137,6 +137,8 @@ export interface ConversionTableProps<T extends ConversionRow> {
   every: readonly RowSection<T>[];
   /** In place of the rows when the value has no answer: "Too large to convert". */
   message: string | null;
+  /** A line above the rows, for what the whole table waits on (the brands' charts; ADR 0029). */
+  notice?: string | undefined;
   display: TableDisplay;
   /** Significant digits a value is written to with no decimal limit: the table's six. */
   significant: number;
@@ -545,6 +547,7 @@ export function ConversionTable<T extends ConversionRow>({
   hidden,
   every,
   message,
+  notice,
   display,
   significant,
   locale,
@@ -1140,6 +1143,7 @@ export function ConversionTable<T extends ConversionRow>({
         )}
         data-table-card
       >
+        {notice && <p className="px-2 pt-2 text-sm text-ink-muted">{notice}</p>}
         {body}
         {/* The foot keeps its place in Edit, nothing over the list moving: Edit reads Done where it
             was, and Hidden stays. Over a long list the foot stays at the screen's bottom edge, Done

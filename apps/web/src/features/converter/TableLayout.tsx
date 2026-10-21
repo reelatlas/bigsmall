@@ -297,12 +297,23 @@ export function TableLayout({
     selected.category === 'shoe-size';
   /** A list held open in the table's place, by either pill. */
   const listing = choosing || choosingScale;
+  /**
+   * A brand with no scale (its chip emptied, or a brand alone from the matches): the brand's
+   * scales in the table's place, to choose the one to read it on, as Cooking lists its
+   * ingredients until one is chosen (Sean, 2026-10-21); once the charts are here.
+   */
+  const needsScale =
+    box.brand !== null &&
+    box.unit === null &&
+    selected.kind === 'units' &&
+    selected.category === 'shoe-size' &&
+    charts === 'ready';
   const table: TableView = choosing
     ? box.ingredient
       ? ingredientList(selected, box.ingredient)
       : brandList(selected, box.brand)
-    : choosingScale && box.brand && selected.kind === 'units'
-      ? scaleList(selected, box.brand, box.unit, box.parsed.value, box.line, env.locale)
+    : (choosingScale || needsScale) && box.brand && selected.kind === 'units'
+      ? scaleList(selected, box.brand, box.unit, box.parsed.value, box.line, env.locale, needsScale)
       : selected;
   const rootRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
@@ -960,7 +971,7 @@ export function TableLayout({
       caretToEnd.current = true;
     }
     // A scale taken from the chip's list is the same brand: a unit chosen, which `take` counts.
-    if (!choosingScale) track('Brand chosen', { brand });
+    if (!choosingScale && !needsScale) track('Brand chosen', { brand });
   };
 
   /**
@@ -1242,6 +1253,7 @@ export function TableLayout({
         hidden={table.hidden}
         every={sectionsOf(table.all, env.system, orderOf(settings, env.system))}
         message={table.message}
+        notice={table.notice}
         display={display}
         significant={TABLE_PRECISION}
         locale={env.locale}

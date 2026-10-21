@@ -1,0 +1,474 @@
+<title>Charts loading states</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<style>
+  :root {
+    --bg: #f6f6f2;
+    --surface: #ffffff;
+    --ink: #1c1c1c;
+    --muted: #6f6f6f;
+    --line: #e2e2dd;
+    --head: #f3f3ef;
+    --accent-soft: #c9f5ec;
+    --accent: #0f766e;
+    --danger: #b4452a;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #121212;
+      --surface: #1c1c1c;
+      --ink: #ececec;
+      --muted: #9c9c9c;
+      --line: #2e2e2e;
+      --head: #232323;
+      --accent-soft: #1f4f45;
+      --accent: #6fd9c8;
+      --danger: #f0917a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #121212;
+    --surface: #1c1c1c;
+    --ink: #ececec;
+    --muted: #9c9c9c;
+    --line: #2e2e2e;
+    --head: #232323;
+    --accent-soft: #1f4f45;
+    --accent: #6fd9c8;
+    --danger: #f0917a;
+    color-scheme: dark;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font:
+      16px/1.45 system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+    padding-block: 24px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+    display: grid;
+    gap: 28px;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  h2 {
+    font-size: 1rem;
+    margin: 0 0 8px;
+  }
+  p {
+    margin: 0 0 8px;
+    max-width: 65ch;
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .when {
+    display: grid;
+    gap: 6px;
+    padding: 0;
+    margin: 8px 0 0;
+    list-style: none;
+    max-width: 65ch;
+  }
+  .when li {
+    padding-left: 1.1em;
+    position: relative;
+  }
+  .when li::before {
+    content: '·';
+    position: absolute;
+    left: 0;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  button {
+    font: inherit;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    min-height: 44px;
+  }
+  button:hover {
+    border-color: var(--accent);
+  }
+  .state {
+    display: grid;
+    gap: 8px;
+  }
+  .box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    padding: 10px 12px;
+    min-height: 52px;
+    font-size: 1.5rem;
+  }
+  .box .num {
+    flex: 1;
+    min-width: 0;
+  }
+  .box .placeholder {
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 1rem;
+    background: var(--accent-soft);
+    border-radius: 10px;
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
+  .chip b {
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .card {
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .section {
+    background: var(--head);
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 6ch 1fr auto minmax(0, 1fr);
+    gap: 0 8px;
+    align-items: center;
+    padding: 6px 12px;
+    min-height: 40px;
+    font-variant-numeric: tabular-nums;
+  }
+  .row.own {
+    background: var(--accent-soft);
+    border-radius: 10px;
+    margin: 0 4px;
+  }
+  .row .v {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .row .v .about {
+    color: var(--muted);
+  }
+  .row .beyond {
+    color: var(--muted);
+  }
+  .row .sym {
+    font-weight: 600;
+    color: var(--muted);
+    text-align: right;
+    grid-column: 3;
+  }
+  .row .name {
+    grid-column: 4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row .name small {
+    color: var(--muted);
+  }
+  .dash {
+    color: var(--muted);
+  }
+  .note {
+    padding: 10px 12px 12px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    border-top: 1px solid var(--line);
+  }
+  .note.failed {
+    color: var(--danger);
+  }
+  .more {
+    padding: 4px 12px 10px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .pill.on {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  @media (max-width: 420px) {
+    .row {
+      grid-template-columns: 6ch 1fr auto;
+    }
+    .row .name {
+      display: none;
+    }
+  }
+</style>
+
+<main>
+  <header>
+    <h1>The brands’ charts, loading and failed</h1>
+    <p>
+      Since ADR 0029 the brands’ 33 charts are a 7 KB file the page fetches once it is wanted,
+      cached by a hash in its name. These are the only moments a visitor could see it being fetched;
+      the numbers below are illustrative.
+    </p>
+    <ul class="when">
+      <li>
+        <b>When it fetches:</b> Shoe size is opened, a brand is in the box (a link with
+        <code>brand=nike</code>), or a brand’s name is begun in the box (<code>nik</code>), so by
+        Enter it is usually here.
+      </li>
+      <li>
+        <b>How long:</b> one small request, typically tens of milliseconds on broadband, a second or
+        two on a weak phone connection; then never again in that browser until the file changes.
+      </li>
+      <li>
+        <b>What you see meanwhile:</b> state 1 or 2 below. If the request fails, state 3, and the
+        next time Shoe size is wanted it tries again.
+      </li>
+    </ul>
+    <div class="controls">
+      <button id="replay" type="button">Replay the fetch (1.5 s)</button>
+      <span id="status" class="muted">Loaded</span>
+    </div>
+  </header>
+
+  <section class="state" id="state-a">
+    <h2>
+      1. Shoe size opened with a size, no brand <span class="pill on">ISO answers at once</span>
+    </h2>
+    <p class="muted">
+      The scales convert as ever; only the brands’ rows wait, dashes without a word, then fill.
+    </p>
+    <div class="box">
+      <span class="num">11</span><span class="chip"><b>US M</b> US men</span>
+    </div>
+    <div class="card">
+      <div class="section">US (customary)</div>
+      <div class="row own">
+        <span class="v">11</span><span></span><span class="sym">US M</span
+        ><span class="name">US men</span>
+      </div>
+      <div class="row">
+        <span class="v"><span class="about">≈ </span>12</span><span></span
+        ><span class="sym">US W</span><span class="name">US women</span>
+      </div>
+      <div class="row">
+        <span class="v beyond">&gt; 13.5</span><span></span><span class="sym">US C</span
+        ><span class="name">US children <small>· above its range</small></span>
+      </div>
+      <div class="section">Metric</div>
+      <div class="row">
+        <span class="v"><span class="about">≈ </span>44</span><span></span
+        ><span class="sym">EU</span><span class="name">European</span>
+      </div>
+      <div class="row">
+        <span class="v">280</span><span></span><span class="sym">mm</span
+        ><span class="name">Mondopoint</span>
+      </div>
+      <div class="row">
+        <span class="v"><span class="about">≈ </span>28</span><span></span
+        ><span class="sym">JP</span><span class="name">Japanese</span>
+      </div>
+      <div class="section">Brands, the same foot in US M</div>
+      <div class="row" data-brand>
+        <span class="v" data-v="≈ 11"></span><span></span><span class="sym">US M</span
+        ><span class="name">adidas</span>
+      </div>
+      <div class="row" data-brand>
+        <span class="v" data-v="≈ 10"></span><span></span><span class="sym">US M</span
+        ><span class="name">Asics</span>
+      </div>
+      <div class="row" data-brand>
+        <span class="v" data-v="≈ 10–10.5"></span><span></span><span class="sym">US M</span
+        ><span class="name">Birkenstock</span>
+      </div>
+      <div class="row" data-brand>
+        <span class="v" data-v="—" data-why="no foot length"></span><span></span
+        ><span class="sym">US M</span><span class="name">Brooks <small data-why-slot></small></span>
+      </div>
+      <div class="row" data-brand>
+        <span class="v" data-v="11"></span><span></span><span class="sym">US M</span
+        ><span class="name">Nike</span>
+      </div>
+      <div class="row" data-brand>
+        <span class="v" data-v="≈ 10"></span><span></span><span class="sym">US M</span
+        ><span class="name">New Balance</span>
+      </div>
+      <div class="more">… and 14 more brands</div>
+      <div class="note">
+        ISO 19407’s sizes from the foot’s length, to the half size. Each brand’s row is its own
+        chart read at that foot.
+      </div>
+    </div>
+  </section>
+
+  <section class="state" id="state-b">
+    <h2>
+      2. A brand in the box before its chart is here
+      <span class="pill">a link with brand=nike, or Enter before the fetch lands</span>
+    </h2>
+    <p class="muted">
+      Nike’s 11 converts through Nike’s chart, so until it arrives nothing can be said: every row a
+      dash, the line saying why. Then everything fills at once.
+    </p>
+    <div class="box">
+      <span class="num">11</span><span class="chip"><b>US M</b> US men ⌄</span
+      ><span class="chip">Nike ⌄</span>
+    </div>
+    <div class="card">
+      <div class="section">US (customary)</div>
+      <div class="row" data-wait>
+        <span class="v" data-v="≈ 11"></span><span></span><span class="sym">US M</span
+        ><span class="name">US men</span>
+      </div>
+      <div class="row" data-wait>
+        <span class="v" data-v="≈ 12"></span><span></span><span class="sym">US W</span
+        ><span class="name">US women</span>
+      </div>
+      <div class="section">Metric</div>
+      <div class="row" data-wait>
+        <span class="v" data-v="≈ 44"></span><span></span><span class="sym">EU</span
+        ><span class="name">European</span>
+      </div>
+      <div class="row" data-wait>
+        <span class="v" data-v="27.9"></span><span></span><span class="sym">cm</span
+        ><span class="name">Foot length</span>
+      </div>
+      <div class="section">Brands, the same foot in US M</div>
+      <div class="row" data-wait>
+        <span class="v" data-v="≈ 11"></span><span></span><span class="sym">US M</span
+        ><span class="name">adidas</span>
+      </div>
+      <div class="row" data-wait data-own>
+        <span class="v" data-v="11"></span><span></span><span class="sym">US M</span
+        ><span class="name">Nike</span>
+      </div>
+      <div class="row" data-wait>
+        <span class="v" data-v="≈ 10"></span><span></span><span class="sym">US M</span
+        ><span class="name">New Balance</span>
+      </div>
+      <div class="more">… and 17 more brands</div>
+      <div
+        class="note"
+        data-note
+        data-loading="Loading Nike’s chart…"
+        data-ready="Nike’s size chart, the men’s, nike.com, read Oct 2026."
+      ></div>
+    </div>
+  </section>
+
+  <section class="state" id="state-c">
+    <h2>
+      3. The fetch failed <span class="pill">offline, a blocked request, a bad response</span>
+    </h2>
+    <p class="muted">
+      The same rows stay dashes and the line says so. Leaving Shoe size and coming back tries again;
+      so does a reload.
+    </p>
+    <div class="box">
+      <span class="num">11</span><span class="chip"><b>US M</b> US men ⌄</span
+      ><span class="chip">Nike ⌄</span>
+    </div>
+    <div class="card">
+      <div class="section">US (customary)</div>
+      <div class="row">
+        <span class="v dash">—</span><span></span><span class="sym">US M</span
+        ><span class="name">US men</span>
+      </div>
+      <div class="row">
+        <span class="v dash">—</span><span></span><span class="sym">US W</span
+        ><span class="name">US women</span>
+      </div>
+      <div class="section">Brands, the same foot in US M</div>
+      <div class="row">
+        <span class="v dash">—</span><span></span><span class="sym">US M</span
+        ><span class="name">adidas</span>
+      </div>
+      <div class="row">
+        <span class="v dash">—</span><span></span><span class="sym">US M</span
+        ><span class="name">Nike</span>
+      </div>
+      <div class="more">… and 18 more brands</div>
+      <div class="note failed">
+        The brands’ charts could not be loaded. Reload the page to try again.
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const status = document.getElementById('status');
+  const brandRows = [...document.querySelectorAll('#state-a [data-brand]')];
+  const waitRows = [...document.querySelectorAll('#state-b [data-wait]')];
+  const note = document.querySelector('#state-b [data-note]');
+  const show = (span, text) => {
+    const about = text.startsWith('≈ ');
+    span.innerHTML = about ? '<span class="about">≈ </span>' + text.slice(2) : text;
+    span.classList.toggle('dash', text === '—');
+  };
+  function loading() {
+    for (const row of [...brandRows, ...waitRows]) {
+      show(row.querySelector('.v'), '—');
+      row.classList.remove('own');
+      const slot = row.querySelector('[data-why-slot]');
+      if (slot) slot.textContent = '';
+    }
+    note.textContent = note.dataset.loading;
+    status.textContent = 'Fetching…';
+  }
+  function ready() {
+    for (const row of [...brandRows, ...waitRows]) {
+      const v = row.querySelector('.v');
+      show(v, v.dataset.v);
+      if (row.hasAttribute('data-own')) row.classList.add('own');
+      const slot = row.querySelector('[data-why-slot]');
+      if (slot && v.dataset.why) slot.textContent = '· ' + v.dataset.why;
+    }
+    note.textContent = note.dataset.ready;
+    status.textContent = 'Loaded';
+  }
+  let timer = null;
+  document.getElementById('replay').addEventListener('click', () => {
+    clearTimeout(timer);
+    loading();
+    timer = setTimeout(ready, 1500);
+  });
+  ready();
+</script>

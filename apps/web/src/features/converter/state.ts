@@ -566,6 +566,12 @@ export interface UnitsView extends TableViewBase {
    */
   note: string | null;
   /**
+   * A line above the rows, for what the whole table waits on: the brands' charts loading, or
+   * failed to load, with a brand in the box (ADR 0029; Sean, 2026-10-21: under the table it was
+   * too far down to see).
+   */
+  notice?: string | undefined;
+  /**
    * A target typed after the number with the unit in the box ("11 to eu"; ADR 0027;
    * docs/UX-SPEC.md §5), as typed: the row the cursor rests on (`targetRow`), empty while it is
    * still to come ("11 to").
@@ -1369,8 +1375,9 @@ function brandsSection(
   value: number | undefined,
   baseline: BrandReading | null,
   locale: string | undefined,
-  ready: boolean,
+  charts: ChartsStatus,
 ): Section<TableRow> {
+  const ready = charts === 'ready';
   const rows: TableRow[] = [];
   const readings =
     ready && foot !== null && isBrandScale(scaleUnit.id)
@@ -1418,7 +1425,14 @@ function brandsSection(
   });
   return {
     key: 'brands',
-    label: `${SECTION_LABEL.brands}, the same foot in ${scaleUnit.symbol}`,
+    // With no brand in the box only this section waits for the charts: its heading says so
+    // (ADR 0029; Sean, 2026-10-21).
+    label:
+      charts === 'failed'
+        ? `${SECTION_LABEL.brands}, charts not loaded`
+        : ready
+          ? `${SECTION_LABEL.brands}, the same foot in ${scaleUnit.symbol}`
+          : `${SECTION_LABEL.brands}, loading their charts…`,
     rows,
     repeats: true,
   };
@@ -1492,9 +1506,12 @@ function brandNote(
  * brand in the box (ADR 0028, 2026-10-20; Sean: "a more immediate way to flip the reading").
  * Every scale its chart prints, in the table's order, and the foot's units where the chart gives
  * the foot, the one in the box marked, each carrying the same row's size on that scale (a range's
- * lower end; nothing while the size is off the chart) with the line the row was read on; so a
- * size is read on another scale without leaving the brand, which the scale rows, ISO's, cannot
- * do, since taking one takes the brand out.
+ * lower end; none where the brand has no row for the box, so the number as typed goes with the
+ * scale) with the line the row was read on; so a size is read on another scale without leaving
+ * the brand, which the scale rows, ISO's, cannot do, since taking one takes the brand out. With
+ * `choose`, the table's place while a brand has no scale (its chip emptied, or a brand alone),
+ * the heading asking for one, as Cooking lists its ingredients until one is chosen (Sean,
+ * 2026-10-21).
  */
 export function scaleList(
   view: UnitsView,
@@ -1503,6 +1520,7 @@ export function scaleList(
   value: number | undefined,
   line: ShoeLine | null,
   locale: string | undefined,
+  choose = false,
 ): MatchesView {
   const shoe = getCategory(SHOE);
   // Nothing to list until core has the charts (ADR 0029); the chip opens the list only then.
@@ -1523,21 +1541,21 @@ export function scaleList(
   const chart = reading?.chart ?? brandChart(brand, women);
   const row = reading?.row ?? null;
   const mondopoint = getUnit('mondopoint');
-  const group = `${poss(brand.name)} chart${chart.line === 'unisex' ? '' : `, the ${LINE_POSS[chart.line]}`}`;
+  const group = `${poss(brand.name)} chart${chart.line === 'unisex' ? '' : `, the ${LINE_POSS[chart.line]}`}${choose ? ': choose the scale to read it on' : ''}`;
   const rows: MatchRow[] = [];
   for (const each of view.rows) {
     if (!shoe || each.brand !== undefined || each.tone === 'message') continue;
     const scale = each.unit;
-    let text: string;
+    let text: string | undefined;
     if (isBrandScale(scale.id)) {
       if (brandSpan(chart, scale.id, women) === null) continue;
       const cell = row ? brandCell(row, scale.id, women) : null;
-      text = cell ? sizeOf(cell.value, locale) : '';
+      text = cell ? sizeOf(cell.value, locale) : undefined;
     } else if (scale.id === 'mondopoint' || scale.id === 'foot-cm') {
       if (chart.basis !== 'foot' || !mondopoint) continue;
       text =
         row?.foot === undefined
-          ? ''
+          ? undefined
           : formatNumber(convert(row.foot, mondopoint, scale), { locale });
     } else continue;
     rows.push({
@@ -1627,26 +1645,35 @@ function selectShoe(
     value,
     reading,
     options.locale,
-    ready,
+    charts,
   );
-  const note =
-    charts === 'failed'
+  // What the whole table waits on, above the rows (Sean, 2026-10-21: under the table it was too
+  // far down to see); with no brand only the brands' section waits, and its heading says so.
+  const notice = waiting
+    ? charts === 'failed'
       ? CHARTS_FAILED
-      : waiting
-        ? `Loading ${poss(brand.name)} chart…`
-        : brand
-          ? brandNote(brand, reading, unit, value, labelled, options.locale)
-          : view.note;
+      : `Loading ${poss(brand.name)} chart…`
+    : undefined;
+  const note = waiting
+    ? null
+    : brand
+      ? brandNote(brand, reading, unit, value, labelled, options.locale)
+      : view.note;
   const announcement =
     brand && unit && value !== undefined && ready
       ? `${spokenAmount(parsed, unit, options.locale)} at ${brand.name} in ${read.rows.length} units of shoe size`
       : view.announcement;
+  // With a brand in the box its row is the one in focus: the brands' section comes first, right
+  // under the box with the other brands beside it, the scales after (Sean, 2026-10-21: the row
+  // chosen sat below ten scale rows).
+  const first = brand !== null;
   return {
     ...read,
-    rows: [...read.rows, ...section.rows],
-    sections: [...read.sections, section],
-    all: [...read.all, ...section.rows],
+    rows: first ? [...section.rows, ...read.rows] : [...read.rows, ...section.rows],
+    sections: first ? [section, ...read.sections] : [...read.sections, section],
+    all: first ? [...section.rows, ...read.all] : [...read.all, ...section.rows],
     note,
+    notice,
     announcement,
   };
 }

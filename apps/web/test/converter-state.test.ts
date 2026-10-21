@@ -968,8 +968,10 @@ describe('brands (ADR 0028)', () => {
     expect(row(table, 'mondopoint')).toMatchObject({ text: '271', value: 271, inBox: false });
     expect(row(table, 'foot-cm')).toMatchObject({ text: '27.1', approx: false });
     expect(row(table, 'us-children')).toMatchObject({ text: '> 13.5', tone: 'beyond' });
-    expect(table.sections.at(-1)?.label).toBe('Brands, the same foot in US M');
-    expect(table.sections.at(-1)?.repeats).toBe(true);
+    // The brand's row is the one in focus: its section first, the scales after (Sean, 2026-10-21).
+    expect(table.sections[0]?.label).toBe('Brands, the same foot in US M');
+    expect(table.sections[0]?.repeats).toBe(true);
+    expect(table.rows[0]?.id).toBe('brand:adidas');
     // Every brand by name, its size by its chart at that foot; Nike's row the box's, as typed.
     expect(row(table, 'brand:iso')).toBeUndefined();
     expect(row(table, 'brand:adidas')).toMatchObject({
@@ -1140,7 +1142,7 @@ describe('brands (ADR 0028)', () => {
       detail: 'women',
     });
     expect(row(table, 'foot-cm')).toMatchObject({ text: '24.5' });
-    expect(table.sections.at(-1)?.label).toBe('Brands, the same foot in EU');
+    expect(table.sections[0]?.label).toBe('Brands, the same foot in EU');
     expect(table.note).toContain('the women’s');
     expect(reduce(eu, { type: 'use', unit: 'us-men', text: '7', brand: 'nike' }).line).toBeNull();
     expect(reduce(eu, { type: 'use', unit: 'meter', text: '1' })).toMatchObject({
@@ -1235,11 +1237,12 @@ describe('brands (ADR 0028)', () => {
     if (loading.kind !== 'units') throw new Error('units');
     expect(row(loading, 'eu')).toMatchObject({ tone: 'empty' });
     expect(row(loading, 'brand:nike')).toMatchObject({ tone: 'empty', inBox: false });
-    expect(loading.note).toBe('Loading Nike’s chart…');
+    expect(loading.notice).toBe('Loading Nike’s chart…');
+    expect(loading.note).toBeNull();
     const failed = selectTable(run(type('nike 10'), nike()), { ...options, charts: 'failed' });
     if (failed.kind !== 'units') throw new Error('units');
     expect(row(failed, 'eu')).toMatchObject({ tone: 'empty' });
-    expect(failed.note).toMatch(/^The brands’ charts could not be loaded/);
+    expect(failed.notice).toMatch(/^The brands’ charts could not be loaded/);
     // Without a brand the scales convert as ever; the brands' rows wait.
     const iso = selectTable(run(type('us 10'), { type: 'use', unit: 'us-men', text: '10' }), {
       ...options,
@@ -1249,8 +1252,28 @@ describe('brands (ADR 0028)', () => {
     expect(row(iso, 'eu')).toMatchObject({ tone: 'value' });
     expect(row(iso, 'brand:nike')).toMatchObject({ tone: 'empty' });
     expect(iso.note).toMatch(/^ISO 19407/);
+    expect(iso.notice).toBeUndefined();
+    expect(iso.sections.at(-1)?.label).toBe('Brands, loading their charts…');
+    const isoFailed = selectTable(run(type('us 10'), { type: 'use', unit: 'us-men', text: '10' }), {
+      ...options,
+      charts: 'failed',
+    });
+    if (isoFailed.kind !== 'units') throw new Error('units');
+    expect(isoFailed.sections.at(-1)?.label).toBe('Brands, charts not loaded');
+    expect(isoFailed.notice).toBeUndefined();
     // Given to core, as the tests' setup does, ready needs no word.
     expect(row(units(type('nike 10'), nike()), 'brand:nike')).toMatchObject({ text: '10' });
+  });
+
+  it('lists the brand’s scales to choose from while it has no scale (the chip emptied, a brand alone): the heading asks, and the number as typed goes with the scale', () => {
+    const table = units(type('nike 10'), nike());
+    const list = scaleList(table, getShoeBrand('nike')!, null, 11, null, 'en-US', true);
+    expect(list.rows[0]).toMatchObject({
+      kind: 'brand',
+      group: 'Nike’s chart, the men’s: choose the scale to read it on',
+    });
+    expect(list.rows.every((each) => each.kind === 'brand' && each.text === undefined)).toBe(true);
+    expect(list.rows.some((each) => each.kind === 'brand' && each.unit?.id === 'eu')).toBe(true);
   });
 
   it('lists every brand to choose from, the one in the box marked (the pill’s list)', () => {

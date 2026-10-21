@@ -1019,14 +1019,21 @@ export function TableLayout({
     } else {
       const row = table.rows[index];
       if (!row || row.tone === 'message') return;
-      // A brand's row (ADR 0028) brings its brand with its size (a dash, the number as typed);
-      // a scale's row taken with a brand in the box takes the brand out, since the scales are
-      // ISO's: one value in focus (Sean, 2026-10-20).
-      const brand = row.brand !== undefined ? row.brand.id : box.brand ? null : undefined;
+      // Whether the box holds a size: with one the rows are values, and a scale's row taken with
+      // a brand in the box takes the brand out, since the scales are ISO's: one value in focus
+      // (Sean, 2026-10-20); without one the rows are dashes, and a scale's row is the scale to
+      // read the brand on, the brand staying (the scale's chip emptied, or a brand alone; Sean,
+      // 2026-10-20). A brand's row (ADR 0028) brings its brand with its size.
+      const sized = box.unit !== null && box.parsed.value !== undefined;
+      const brand = row.brand !== undefined ? row.brand.id : box.brand && sized ? null : undefined;
       if (row.inBox) setPosition(null);
       // A row beyond its scale (ADR 0027): its scale comes into the box with the number cleared,
-      // for a size of its own to be typed.
+      // for a size of its own to be typed; so does a brand's dash, the brand having no size for
+      // the foot in play (Sean, 2026-10-20: the number carried over read as the brand's size).
       else if (row.tone === 'beyond') take(row.unit.id, '', undefined, brand);
+      else if (row.value === null && row.brand !== undefined && sized) {
+        take(row.unit.id, '', undefined, brand);
+      }
       // Its unit: a change row's is its scale's (Temperature's As a change).
       else if (row.value === null) take(row.unit.id, number, undefined, brand);
       // A pace comes into the box as the row writes it, minutes and seconds (5:30).

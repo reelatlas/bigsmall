@@ -935,6 +935,26 @@ describe('brands (ADR 0028)', () => {
     });
     // Words that name no scale after a brand offer nothing for it.
     expect(matched('nike xyz').rows.some((each) => each.kind === 'brand' && each.unit)).toBe(false);
+    // A brand's name begun at either end beside the scale words (Sean, 2026-10-20): every brand
+    // the letters begin, each with that scale and the number; nothing where the other words name
+    // no scale; the brands lead where no unit matches better.
+    const begun = (text: string) =>
+      matched(text)
+        .rows.flatMap((each) =>
+          each.kind === 'brand' && each.unit
+            ? [`${each.brand.id}:${each.unit.id}:${each.text ?? ''}`]
+            : [],
+        )
+        .sort();
+    expect(begun('11 us n')).toEqual(['new-balance:us-men:11', 'nike:us-men:11']);
+    expect(begun('11 m us ni')).toEqual(['nike:us-men:11']);
+    expect(begun('nik us 11')).toEqual(['nike:us-men:11']);
+    expect(begun('eu 43 new')).toEqual(['new-balance:eu:43']);
+    expect(begun('27 cm ni')).toEqual(['nike:foot-cm:27']);
+    expect(begun('11 nik')).toEqual(['nike:us-men:11']);
+    expect(begun('11 w ni')).toEqual(['nike:us-women:11']);
+    expect(begun('11 xyz ni')).toEqual([]);
+    expect(matched('nik us 11').rows[0]).toMatchObject({ kind: 'brand', brand: { id: 'nike' } });
   });
 
   it('with Nike’s 10 in the box, that is the one value in focus: the scales are ISO’s from Nike’s foot, the brands at the same foot', () => {

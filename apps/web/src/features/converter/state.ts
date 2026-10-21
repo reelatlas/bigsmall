@@ -1184,23 +1184,49 @@ function brandMatches(
     const byScale = read(splitShoeBrand(query, true));
     if (byScale?.scaled && byScale.brand.shorthand?.length) split = byScale;
   }
-  if (split) {
-    rows.push({
-      kind: 'brand',
-      brand: split.brand,
-      unit: split.unit,
-      category: shoe,
-      inBox: false,
-      text: split.text,
-      target: split.target,
-    });
+  /** A brand's row from a reading of the query, with the scale and the number it carried. */
+  const rowOf = (found: NonNullable<ReturnType<typeof read>>): MatchRow => ({
+    kind: 'brand',
+    brand: found.brand,
+    unit: found.unit,
+    category: shoe,
+    inBox: false,
+    text: found.text,
+    target: found.target,
+  });
+  if (split) rows.push(rowOf(split));
+  // A brand's name begun at either end, the other words naming the scale and carrying the number
+  // ("11 us n": Nike and New Balance on US men's; "11 m us ni"; "nik us 11"; "eu 43 new"; "11
+  // nik"): every brand the letters begin, each with that scale, from one letter, since the scale
+  // words say the category (Sean, 2026-10-20: "11 m us ni" showed nothing until the name was
+  // whole). The shortest beginning that reads wins, the tail tried first.
+  const begun: NonNullable<ReturnType<typeof read>>[] = [];
+  if (!split) {
+    const words = query.trim().split(/\s+/).filter(Boolean);
+    const tryBegun = (part: string[], other: string[]) => {
+      for (const match of matchShoeBrands(part.join(' '), named)) {
+        if (match.matchClass > 3) continue;
+        const found = read({ rest: other.join(' '), brand: match.brand });
+        if (found) begun.push(found);
+      }
+    };
+    for (let k = 1; k <= words.length && begun.length === 0; k += 1) {
+      tryBegun(words.slice(-k), words.slice(0, words.length - k));
+    }
+    for (let k = 1; k < words.length && begun.length === 0; k += 1) {
+      tryBegun(words.slice(0, k), words.slice(k));
+    }
+  }
+  for (const found of begun) {
+    if (rows.some((row) => row.kind === 'brand' && row.brand.id === found.brand.id)) continue;
+    rows.push(rowOf(found));
   }
   const matched = matchShoeBrands(query, named);
   for (const match of matched) {
     if (rows.some((row) => row.kind === 'brand' && row.brand.id === match.brand.id)) continue;
     rows.push({ kind: 'brand', brand: match.brand, unit: null, category: shoe, inBox: false });
   }
-  const best = split ? 0 : (matched[0]?.matchClass ?? Infinity);
+  const best = split ? 0 : begun.length > 0 ? 3 : (matched[0]?.matchClass ?? Infinity);
   return { rows, first: named || best < (bestUnit ?? Infinity) };
 }
 

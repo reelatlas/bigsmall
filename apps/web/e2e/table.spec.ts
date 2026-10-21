@@ -2375,4 +2375,22 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await box(page).press('Backspace');
   await expect(page.getByRole('button', { name: 'Remove Nike' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  // A brand's dash row taken brings the brand and the scale with the number cleared, as a row
+  // beyond its scale does, the brand having no size for the foot (Sean, 2026-10-20); the scale's
+  // chip emptied, a scale's row taken keeps the brand, the rows being dashes.
+  await box(page).fill('nike 10');
+  await box(page).press('Enter');
+  await expect(page.getByRole('button', { name: 'Remove Nike' })).toBeVisible();
+  await unitCell(page, 'brand:puma').click();
+  await expect(page.getByRole('button', { name: 'Remove Puma' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await expect(box(page)).toHaveValue('');
+  await box(page).fill('10');
+  await expect(page.getByText(/Puma gives no foot length/)).toBeVisible();
+  await page.getByRole('button', { name: 'Remove US men' }).click();
+  await expect(page.getByRole('button', { name: 'Remove Puma' })).toBeVisible();
+  await unitCell(page, 'eu').click();
+  await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove Puma' })).toBeVisible();
+  await expect(box(page)).toHaveValue('10');
 });

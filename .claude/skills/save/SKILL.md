@@ -20,6 +20,7 @@ Bring `CLAUDE.md`'s "Current status" (its date, and what the stretch changed) an
 - Trials awaiting Sean's verdict, each with the commit that reverts it.
 - Questions open with Sean, the recommendation first.
 - The next build, pointing at the saved pass.
+- The tidy, named first under Next where the stretch since the last one closed with Sean's sign-off (CLAUDE.md, "Tidy up"), so the next session offers it rather than waits to be asked (the save of 2026-10-21 before a compaction went straight to the sources pass, and Sean had to ask).
 - Anything left mid-way, said plainly (a failing test, a half-done change), never hidden.
 
 ## 3. Ship and stop

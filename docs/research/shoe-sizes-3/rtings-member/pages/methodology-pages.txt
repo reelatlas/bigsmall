@@ -1,0 +1,52 @@
+# RTINGS method pages as the browser gave them (get_page_text, or read off the rendered page where noted), 2026-10-21
+# Kept: the passages bearing on size tested and on internal shape; site chrome, newsletters, and comments left out.
+
+=== https://www.rtings.com/running-shoes/learn/how-we-test ===
+Title: How We Test Running Shoes: Transforming Data Into Objective Reviews - RTINGS.com
+By Robin Bonneau Patry, Updated Oct 02, 2026 at 11:27 am
+
+"This article isn't fully up to date. While most of the basics still apply, it doesn't cover recent changes to our testing process or newly added tests. See our test bench changelog directory for the latest updates to our methodology."
+
+DESIGN: "We don't really judge style or aesthetics; we focus on measurable aspects of a shoe's build so you can decide if it'll fit well on your feet and meet your running needs. These measurements are specific to our test size (a men's US size 9). Shoe weight, shape, fit, and stack heights can vary between sizes or even between men's and women's versions, so keep that in mind when comparing our results to your own shoe size."
+
+Shape: "We examine each shoe's construction, both internally and externally, to understand its overall fit and shape. Using the Artec Space Spider 3D scanner technology, we visualize the upper and outsole to assess how the design accommodates various foot types. Additionally, by measuring internal dimensions such as heel, arch, and forefoot width, we provide insights into whether the footbed will feel large, small, or in between."
+
+Fit: "To quantify overall space through the midfoot and forefoot, we create a mold of the shoe's interior and scan it in 3D using the Artec Space Spider. From that 3D model, we extract width and height measurements directly within the software for maximal accuracy. ... For length, we use a standardized toe-clearance check while wearing the shoe, marking where the longest toe ends to determine whether most runners should stick to their normal size or consider sizing up or down."
+
+Product selection: "We don't accept review samples from manufacturers; instead, we purchase directly from Amazon, online shoe retailers, and local physical stores." "To keep things consistent, our tester always uses one dedicated pair of each shoe for lab testing and a separate pair for logging miles in."
+Weight (the only pair count stated): "We weigh each shoe (with laces and insole) multiple times using a scientific scale, ... for both the left and right shoe in the same size. We then use the average weight ..."
+(No sentence on how many pairs or which shoe of the pair the internal length is taken on, nor on its variance.)
+
+=== https://www.rtings.com/running-shoes/tests/changelogs/0-10 ===
+Title: Test Bench 0.10: Changelog - RTINGS.com; By Robin Bonneau Patry, Updated Apr 24, 2026 at 09:45 am
+"To capture this more directly, this update adds a 3D view of the shoe's interior. A 3D scan of the inside is performed using the Artec Space Spider, and width and height measurements are extracted from the model in the software for high precision. Those measurements are then compared to true-to-size reference values ... For all new shoes that we test, these measurements will be taken on a men's US size 9. For some shoes we had already reviewed before adding this test bench, measurements were taken on men's US sizes 8 and 13."
+"Because the results are expressed as a deviation from a standard, the data remains comparable across different shoe sizes ... Finally, length is handled with a standardized toe-clearance check ... For all new shoes that we test, this measurement is taken using a mold of a true-to-size 9 foot. For shoes we had already reviewed and had to measure using men's US size 8 or 13 models, we measured with our testers' actual feet in the shoes."
+"... which is exactly why our existing footbed measurements alone do not always predict how roomy or snug the shoe actually feels."
+"136 Running Shoes Updated So Far" (the list is copied into rtings-member-scripts/build_csv.py as TB010); "1 Running Shoes Planned To Be Updated: Brooks Ghost Max 2".
+
+=== https://www.rtings.com/running-shoes/tests/changelogs/0-8 ===
+Title: Test Bench 0.8: Changelog - RTINGS.com; By Adriana Wiszniewska, Updated Mar 21, 2025 at 10:47 am
+Lists 37 running shoes converted; says nothing on internal shape or size.
+
+=== https://www.rtings.com/running-shoes/tests/changelogs (index) ===
+Test Bench 0.16 Breathability, Time-to-Dry, Water Absorption; 0.15 Bounciness, Snappiness, Roll; 0.14 Laces; 0.13 Foam Type; 0.12 Firmness and Stability fix, Long Run and Daily Training usages; 0.11 Responsiveness; 0.10 True To Size Fit; 0.9 Forefoot Long Run Cushioning; 0.8.2 Haversine load profile; 0.8.1 Marathon and Stability Usage Fixes; 0.8 Compression, Energy Return, and Stability. (No changelog titled for internal shape.)
+
+=== https://www.rtings.com/running-shoes/reviews/nike/pegasus-41 (tooltips read off the rendered page by hover, and the size sentence) ===
+Internal Shape heading tooltip: "What it is: The internal dimensions relating to the overall fit of the shoe. When it matters: When you're looking for a shoe that'll best fit your foot shape."
+Internal Length tooltip: "What it is: The footbed's length measured from the heel's back to the toe box's end. Good value: A typical men's size 9 shoe has an internal length of about 270 mm."
+Internal Heel Width tooltip: "What it is: The width of the footbed at 12% of the internal length. When it matters: Ensuring the shoe can accommodate your foot is essential for comfort when you have a wider or narrower heel."
+Internal Forefoot Width tooltip: "What it is: Width of the footbed at 75% of the internal length. When it matters: Ensuring the shoe can accommodate one's foot is essential for comfort when one has a wider or narrower forefoot."
+Values shown: Internal Length 274 mm (10.8"), Internal Heel Width 62 mm (2.4"), Internal Forefoot Width 89 mm (3.5"), Wide Sizing Available Yes.
+Differences Between Sizes And Variants: "We tested the Nike Pegasus 41 in men's US size 9, as noted on the label."
+
+=== https://www.rtings.com/running-shoes/reviews/nike/streakfly (redirected to .../nike/streakfly-running-shoe) ===
+A database-only page ("We've tested these running shoes to expand our database and allow users to compare results ..."); no size sentence found.
+
+=== https://www.rtings.com/running-shoes/reviews/crocs/classic-clog (redirected to .../crocs/classic-clog-red) ===
+No "Differences Between Sizes And Variants" section; no size sentence found.
+
+=== https://www.rtings.com/running-shoes/reviews/brooks/ghost-max-2 (redirected to .../brooks/ghost-max-2-running-shoe) ===
+No size sentence found in the page's accessibility tree.
+
+=== https://www.rtings.com/running-shoes/tests (redirected to https://www.rtings.com/research) and https://www.rtings.com/running-shoes/tests/design/internal-shape (Error 404) ===
+No internal-shape test article reached.

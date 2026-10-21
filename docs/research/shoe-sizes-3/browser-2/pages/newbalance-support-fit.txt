@@ -1,0 +1,6 @@
+Could not reach. https://support.newbalance.com/hc/en-us/articles/211241357-How-do-New-Balance-shoes-fit-
+Attempt 1 (in a batch): 'Navigation to this domain is not allowed'.
+Attempt 2 (after a 10 s wait): same.
+Attempt 3 (standalone navigate): navigation reported done, but get_page_text and screenshot both failed: 'Frame with ID 0 is showing error page'.
+Attempt 4 (end of session): navigate done, get_page_text: 'Frame with ID 0 is showing error page'.
+No text obtained.

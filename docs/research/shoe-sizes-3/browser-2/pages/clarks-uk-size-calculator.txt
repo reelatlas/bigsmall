@@ -1,0 +1,38 @@
+Title: Clarks Shoe Size Calculator - Toddlers & Kids | Clarks
+URL: https://www.clarks.com/en-gb/size-calculator
+Source element: <main>
+---
+SIZE CALCULATOR
+
+Use the size calculator below in conjunction with your Clarks foot gauge to determine your child's Clarks shoe size.
+
+SIZE CALCULATOR
+Measurements
+Enter Length
+
+Enter Width
+
+Calculate size
+
+Use the size calculator above in conjunction with your Clarks Foot Gauge to determine your child's Clarks shoe size. If you found a slight difference between feet, enter the largest length and width measurements.
+
+*Please note, foot gauge measurements are exclusive to this method of measuring and are not in standard millimetres (mm).
+
+How to use a foot gauge
+
+Toddler guide   (href https://clarks.a.bigcontent.io/v1/static/Toddler-gauge-step-by-step-guide-2025, not opened)
+Junior guide    (href https://clarks.a.bigcontent.io/v1/static/Junior-gauge-step-by-step-guide-2025, not opened)
+NEED MORE HELP?
+
+Comfort starts with the perfect fit. Our in-store experts ensure every step feels right.
+
+First Shoes, School Fittings, Quiet Times & Adults Fittings.
+
+Book a fitting appointment
+
+Updated on: 06 July 2026
+
+[Validation hints shown under the fields after an out-of-range entry, read from a zoomed screenshot:]
+Length: Enter a number between 97-281
+Width: Enter a number between 67-227
+[Out-of-table result text:] No size was found

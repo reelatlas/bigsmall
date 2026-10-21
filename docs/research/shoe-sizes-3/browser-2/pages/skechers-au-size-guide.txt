@@ -1,0 +1,187 @@
+===== tab MEN (clicked) =====
+Title: Size guide
+URL: https://www.skechers.com.au/size-guide
+Source element: <main>
+---
+SIZE & FIT GUIDE
+MENWOMENKIDSINFANTS
+
+Sizes can vary by style and by brand and getting the right size for you is important to us. Not 100% sure? Use our True Fit size tool below. True Fit gives you personal fit and size recommendations for all Skechers styles, eliminating the guesswork from online shopping.
+
+FIND YOUR TRUE FIT
+
+Simply answer a few questions to get started - No measuring required.
+
+FIND YOUR TRUE FIT
+FOOTWEAR
+US MEN’S EU UK CM
+6 38.5 5 24.3
+6.5 39 5.5 24.5
+7 39.5 6 25
+7.5 40 6.5 25.5
+8 41 7 26
+8.5 41.5 7.5 26.5
+9 42 8 27
+9.5 42.5 8.5 27.5
+10 43 9 28
+10.5 44 9.5 28.5
+11 45 10 29
+11.5 45.5 10.5 29.5
+12 46 11 30
+12.5 47 11.5 30.5
+13 47.5 12 31
+13.5 48 12.5 31.2
+14 48.5 13 31.5
+15 50.5 14 32
+16 51 15 32.5
+HOW TO MEASURE FOOTWEAR
+When you find a sneaker that you like, simply select your preferred size metric (US/EU/UK) and choose your size. If you are unsure of which size is right for you, here are some helpful tips:
+Already own a pair of kicks in the brand?
+Generally sizing tends to be standard across brands, although sizes can vary slightly depending on the style, shape and material of the shoe.
+The size of the pair that you already own is a good guide!
+Use the product information and reviews
+Certain brands or styles can run a size larger or smaller. We'll include this information on the product page when we have this information
+available, and often, fellow shoppers will leave reviews with size information that you can use.
+Use our fitting tool "Truefit"
+Answer a few simple questions about sizing of some of your current kicks and Truefit will provide you a recomendation on which size you should choose. Trufit leverages data from global brands and returns information based on sizing to give you the most accurate recomendation possible.
+Measure your feet in CM
+Stand with your heel against a wall. With a ruler or measuring tape, measure from the wall to the tip of your biggest toe in centimetres. Use our CM size matrix on the product page of the brand you're interested in and add that item to cart.
+HOW TO MEASURE APPAREL
+[apparel measuring text: chest, bust, sleeve, waist, hip, inseam; omitted, not footwear]
+NEED ANSWERS TO A QUESTION?
+Delivery / Sizing / Track Order / Returns / Contact
+
+===== tab WOMEN (clicked) =====
+Title: Size guide
+URL: https://www.skechers.com.au/size-guide
+Source element: <main>
+---
+SIZE & FIT GUIDE
+MENWOMENKIDSINFANTS
+
+Sizes can vary by style and by brand and getting the right size for you is important to us. Not 100% sure? Use our True Fit size tool below. True Fit gives you personal fit and size recommendations for all Skechers styles, eliminating the guesswork from online shopping.
+
+FIND YOUR TRUE FIT
+
+Simply answer a few questions to get started - No measuring required.
+
+FIND YOUR TRUE FIT
+FOOTWEAR
+US WOMEN’S EU UK CM
+5 35 2 22
+5.5 35.5 2.5 22.5
+6 36 3 23
+6.5 36.5 3.5 23.5
+7 37 4 24
+7.5 37.5 4.5 24.5
+8 38 5 25
+8.5 38.5 5.5 25.5
+9 39 6 26
+9.5 39.5 6.5 26.5
+10 40 7 27
+10.5 40.5 7.5 27.5
+11 41 8 28
+11.5 41.5 8.5 28.5
+12 42 9 29
+13 43 10 31.5
+HOW TO MEASURE FOOTWEAR
+When you find a sneaker that you like, simply select your preferred size metric (US/EU/UK) and choose your size. If you are unsure of which size is right for you, here are some helpful tips:
+Already own a pair of kicks in the brand?
+Generally sizing tends to be standard across brands, although sizes can vary slightly depending on the style, shape and material of the shoe.
+The size of the pair that you already own is a good guide!
+Use the product information and reviews
+Certain brands or styles can run a size larger or smaller. We'll include this information on the product page when we have this information
+available, and often, fellow shoppers will leave reviews with size information that you can use.
+Use our fitting tool "Truefit"
+Answer a few simple questions about sizing of some of your current kicks and Truefit will provide you a recomendation on which size you should choose. Trufit leverages data from global brands and returns information based on sizing to give you the most accurate recomendation possible.
+Measure your feet in CM
+Stand with your heel against a wall. With a ruler or measuring tape, measure from the wall to the tip of your biggest toe in centimetres. Use our CM size matrix on the product page of the brand you're interested in and add that item to cart.
+HOW TO MEASURE APPAREL
+[apparel measuring text: chest, bust, sleeve, waist, hip, inseam; omitted, not footwear]
+NEED ANSWERS TO A QUESTION?
+Delivery / Sizing / Track Order / Returns / Contact
+
+===== tab KIDS (clicked) =====
+Title: Size guide
+URL: https://www.skechers.com.au/size-guide
+Source element: <main>
+---
+SIZE & FIT GUIDE
+MENWOMENKIDSINFANTS
+
+Sizes can vary by style and by brand and getting the right size for you is important to us. Not 100% sure? Use our True Fit size tool below. True Fit gives you personal fit and size recommendations for all Skechers styles, eliminating the guesswork from online shopping.
+
+FIND YOUR TRUE FIT
+
+Simply answer a few questions to get started - No measuring required.
+
+FIND YOUR TRUE FIT
+FOOTWEAR
+US KIDS PRE-SCHOOL US KIDS GRADE-SCHOOL EU UK CM
+1 1 32 13 20
+2 2 33.5 1 21
+3 3 35 2 22
+4 4 36 3 23
+5 5 37 4 23.5
+6 6 38 5 24
+7 7 39 6 25
+11 11 27.5 10 17
+12 12 28.5 11 18
+13 13 30 12 19
+HOW TO MEASURE FOOTWEAR
+When you find a sneaker that you like, simply select your preferred size metric (US/EU/UK) and choose your size. If you are unsure of which size is right for you, here are some helpful tips:
+Already own a pair of kicks in the brand?
+Generally sizing tends to be standard across brands, although sizes can vary slightly depending on the style, shape and material of the shoe.
+The size of the pair that you already own is a good guide!
+Use the product information and reviews
+Certain brands or styles can run a size larger or smaller. We'll include this information on the product page when we have this information
+available, and often, fellow shoppers will leave reviews with size information that you can use.
+Use our fitting tool "Truefit"
+Answer a few simple questions about sizing of some of your current kicks and Truefit will provide you a recomendation on which size you should choose. Trufit leverages data from global brands and returns information based on sizing to give you the most accurate recomendation possible.
+Measure your feet in CM
+Stand with your heel against a wall. With a ruler or measuring tape, measure from the wall to the tip of your biggest toe in centimetres. Use our CM size matrix on the product page of the brand you're interested in and add that item to cart.
+HOW TO MEASURE APPAREL
+[apparel measuring text: chest, bust, sleeve, waist, hip, inseam; omitted, not footwear]
+NEED ANSWERS TO A QUESTION?
+Delivery / Sizing / Track Order / Returns / Contact
+
+===== tab INFANTS (clicked) =====
+Title: Size guide
+URL: https://www.skechers.com.au/size-guide
+Source element: <main>
+---
+SIZE & FIT GUIDE
+MENWOMENKIDSINFANTS
+
+Sizes can vary by style and by brand and getting the right size for you is important to us. Not 100% sure? Use our True Fit size tool below. True Fit gives you personal fit and size recommendations for all Skechers styles, eliminating the guesswork from online shopping.
+
+FIND YOUR TRUE FIT
+
+Simply answer a few questions to get started - No measuring required.
+
+FIND YOUR TRUE FIT
+FOOTWEAR
+US KIDS INFANT EU UK CM
+5 20.5 4 11
+6 21.5 5 12
+7 22.5 6 13
+8 24 7 14
+9 25.5 8 15
+10 26.5 9 16
+HOW TO MEASURE FOOTWEAR
+When you find a sneaker that you like, simply select your preferred size metric (US/EU/UK) and choose your size. If you are unsure of which size is right for you, here are some helpful tips:
+Already own a pair of kicks in the brand?
+Generally sizing tends to be standard across brands, although sizes can vary slightly depending on the style, shape and material of the shoe.
+The size of the pair that you already own is a good guide!
+Use the product information and reviews
+Certain brands or styles can run a size larger or smaller. We'll include this information on the product page when we have this information
+available, and often, fellow shoppers will leave reviews with size information that you can use.
+Use our fitting tool "Truefit"
+Answer a few simple questions about sizing of some of your current kicks and Truefit will provide you a recomendation on which size you should choose. Trufit leverages data from global brands and returns information based on sizing to give you the most accurate recomendation possible.
+Measure your feet in CM
+Stand with your heel against a wall. With a ruler or measuring tape, measure from the wall to the tip of your biggest toe in centimetres. Use our CM size matrix on the product page of the brand you're interested in and add that item to cart.
+HOW TO MEASURE APPAREL
+[apparel measuring text: chest, bust, sleeve, waist, hip, inseam; omitted, not footwear]
+NEED ANSWERS TO A QUESTION?
+Delivery / Sizing / Track Order / Returns / Contact
+

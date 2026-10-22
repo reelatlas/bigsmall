@@ -2332,7 +2332,8 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   // The brands' rows first, by their own charts; Nike's the box's, the one filled.
   expect((await sectionIds(page))[0]).toBe('brands');
   await expect(row(page, 'brand:nike')).toContainText('in the box');
-  await expect(row(page, 'brand:new-balance')).toContainText('≈ 9');
+  // New Balance by ISO's label (ADR 0030): Nike's 10 is a 27.1 cm foot, ISO's 10.
+  await expect(row(page, 'brand:new-balance')).toContainText('≈ 10');
   await expect(row(page, 'brand:new-balance')).toContainText('New Balance');
   // The dashes filled by the tiers (docs/RESEARCH.md §9): Puma by ISO's label, the row saying so.
   await expect(row(page, 'brand:puma')).toContainText('≈ 10');
@@ -2390,14 +2391,15 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await expect(
     page.getByText(/^Nike’s size chart, the men’s, nike\.com, read Oct 2026\./),
   ).toBeVisible();
-  // A brand's row taken: its size and the brand come into the box, the one value in focus, and
-  // ISO's US men says where that differs (New Balance's 9 is a 27 cm foot, ISO's ≈ 10).
+  // A brand's row taken: its size and the brand come into the box, the one value in focus; New
+  // Balance's 10 is ISO's 10 by its label (ADR 0030), so ISO's US men and Nike's 10 read exact.
   await unitCell(page, 'brand:new-balance').click();
   await expect(page.getByRole('button', { name: 'Remove New Balance' })).toBeVisible();
-  await expect(box(page)).toHaveValue('9');
+  await expect(box(page)).toHaveValue('10');
   await expect(row(page, 'brand:new-balance')).toContainText('in the box');
-  await expect(row(page, 'us-men')).toContainText('≈ 10');
-  await expect(row(page, 'brand:nike')).toContainText('≈ 10');
+  await expect(row(page, 'us-men')).toContainText('10');
+  await expect(row(page, 'us-men')).not.toContainText('≈');
+  await expect(row(page, 'brand:nike')).toContainText('10');
   await expect(page).toHaveURL(/[?&]brand=new-balance/);
   // A scale's row taken takes the brand out: the scales are ISO's; the URL drops it.
   await unitCell(page, 'us-men').click();
@@ -2449,7 +2451,8 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await expect(box(page)).toHaveValue('10');
   // A brand that prints its lines apart (Sean, 2026-10-21): Asics's women's page has no US men's
   // column, so the chip's list offers US men from the men's page, under that chart's heading, at
-  // the same foot: a women's 8 is a 25 cm foot, the men's 6.5; and from there US women back.
+  // the same foot: a women's 8 is a 24 cm foot by its rule (ADR 0030), the men's 6.5; and from
+  // there US women back.
   await box(page).fill('asics women 8');
   await box(page).press('Enter');
   await expect(page.getByRole('button', { name: 'Remove US women' })).toBeVisible();

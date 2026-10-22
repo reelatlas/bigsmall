@@ -1,0 +1,496 @@
+<title>Shoe size words</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* One reading column, bigsmall's own greys and teal (the Daylight theme's tokens, as the mocks), the
+     product's system face; every item: the words as shown, where, and a field for Sean's. */
+  :root {
+    --bg: #f6f6f2;
+    --surface: #ffffff;
+    --ink: #1c1c1c;
+    --muted: #6f6f6f;
+    --line: #e2e2dd;
+    --head: #f3f3ef;
+    --accent-soft: #c9f5ec;
+    --accent: #0f766e;
+    --danger: #b4452a;
+    --ok: #2a7a3b;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #121212;
+      --surface: #1c1c1c;
+      --ink: #ececec;
+      --muted: #9c9c9c;
+      --line: #2e2e2e;
+      --head: #232323;
+      --accent-soft: #1f4f45;
+      --accent: #6fd9c8;
+      --danger: #f0917a;
+      --ok: #7fcf8f;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #121212;
+    --surface: #1c1c1c;
+    --ink: #ececec;
+    --muted: #9c9c9c;
+    --line: #2e2e2e;
+    --head: #232323;
+    --accent-soft: #1f4f45;
+    --accent: #6fd9c8;
+    --danger: #f0917a;
+    --ok: #7fcf8f;
+    color-scheme: dark;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.45 var(--sans);
+    padding-block: 0 64px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: var(--bg);
+  }
+  .top {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding-block: 10px;
+    margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .top .in {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+  }
+  h1 {
+    font-size: 1.25rem;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .bar {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.875rem;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  button {
+    font: inherit;
+    font-size: 0.875rem;
+    min-height: 40px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  button:hover {
+    border-color: var(--accent);
+  }
+  button:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  #flash {
+    min-width: 6ch;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    display: grid;
+    gap: 44px;
+    padding-top: 20px;
+  }
+  .lede {
+    display: grid;
+    gap: 10px;
+  }
+  .lede p {
+    margin: 0;
+    max-width: 65ch;
+    color: var(--muted);
+  }
+  .lede nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    font-size: 0.875rem;
+  }
+  a {
+    color: var(--accent);
+  }
+  section {
+    display: grid;
+    gap: 14px;
+  }
+  h2 {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  .where-s {
+    margin: 0;
+    max-width: 65ch;
+    color: var(--muted);
+  }
+  .item {
+    display: grid;
+    gap: 8px;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+  .eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    align-items: baseline;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .eyebrow .key {
+    font-family: var(--mono);
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    font-size: 0.8125rem;
+  }
+  .eyebrow .state {
+    margin-left: auto;
+    background: var(--head);
+    border-radius: 999px;
+    padding: 1px 8px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .shown {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+    overflow-x: auto;
+  }
+  .shown.spoken {
+    background: transparent;
+    border-style: dashed;
+    font-style: italic;
+  }
+  .line {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .k-placeholder,
+  .k-status,
+  .k-note,
+  .k-heading {
+    color: var(--muted);
+  }
+  .k-heading {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .k-note {
+    font-size: 0.9375rem;
+    max-width: 65ch;
+  }
+  .k-chip {
+    display: inline-block;
+    justify-self: start;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 2px 10px;
+    background: var(--head);
+  }
+  .k-console,
+  .k-about {
+    font-size: 0.875rem;
+  }
+  .k-console {
+    font-family: var(--mono);
+  }
+  .k-message {
+    font-weight: 500;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 7ch 4.5ch minmax(0, 1fr);
+    gap: 0 12px;
+    align-items: baseline;
+    font-variant-numeric: tabular-nums;
+  }
+  .row .val {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .row .sym {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  .row .name {
+    min-width: 0;
+  }
+  .row .detail {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin-left: 0.4em;
+  }
+  .meta {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    max-width: 70ch;
+  }
+  .meta .src {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+  }
+  .flag {
+    margin: 0;
+    font-size: 0.875rem;
+    padding: 8px 10px;
+    border-left: 3px solid var(--danger);
+    background: var(--head);
+    border-radius: 0 6px 6px 0;
+    max-width: 65ch;
+  }
+  label {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  textarea {
+    font: inherit;
+    font-size: 0.9375rem;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    resize: vertical;
+  }
+  .saved {
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-height: 1em;
+  }
+  .saved.ok {
+    color: var(--ok);
+  }
+  .saved.err {
+    color: var(--danger);
+  }
+  .general {
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    display: grid;
+    gap: 8px;
+  }
+  #clip {
+    min-height: 120px;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+  }
+</style>
+<header class="top">
+  <div class="in">
+    <h1>Shoe size words</h1>
+    <div class="bar">
+      <span id="count" aria-live="polite"></span>
+      <span id="mode"></span>
+      <button type="button" id="copy">Copy my rewrites</button>
+      <span id="flash" aria-live="polite"></span>
+    </div>
+  </div>
+</header>
+<main id="main">
+  <div class="lede">
+    <p>Every piece of text Shoe size shows today, by where it shows: the words as the product writes them, then a field for yours. An empty field keeps the words. What you type saves to this page as you go, and Copy my rewrites puts it on the clipboard for chat. The sizes in the examples are illustrative; the words are exact.</p>
+    <nav aria-label="Surfaces"><a href="#s1">The box</a> <a href="#s2">The matches, while typing</a> <a href="#s3">The scales&#x27; rows</a> <a href="#s4">The brands&#x27; rows</a> <a href="#s5">The line above the rows</a> <a href="#s6">The line under the table, with a brand</a> <a href="#s7">The lists in the table&#x27;s place</a> <a href="#s8">The About page, Formulas</a> <a href="#s9">Elsewhere</a></nav>
+    <div class="general">
+      <label for="w-general">Anything general: rules to keep across the words, or what to change everywhere</label>
+      <textarea id="w-general" data-key="general" rows="3" placeholder="For example: no possessives in the rows; every status line without a period"></textarea>
+      <span class="saved" id="s-general" aria-live="polite"></span>
+    </div>
+  </div>
+  <section id="s1"><h2>The box</h2><p class="where-s">The box at the top of the converter, Shoe size in it; the chips and the pills in it.</p><article class="item" id="i-box.placeholder"><div class="eyebrow"><span class="key">box.placeholder</span><span class="kind">placeholder</span><span class="state">empty</span></div><div class="shown"><div class="line k-placeholder">Number or unit</div><div class="line k-placeholder">Number</div></div><p class="meta">The empty box before a unit, then with one; every category&#x27;s. <span class="src">apps/web/src/features/converter/TableLayout.tsx</span></p><label for="w-box.placeholder">Your words</label><textarea id="w-box.placeholder" data-key="box.placeholder" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-box.placeholder" aria-live="polite"></span></article><article class="item" id="i-box.chip"><div class="eyebrow"><span class="key">box.chip</span><span class="kind">chip</span><span class="state">a scale in the box</span></div><div class="shown"><div class="line k-chip">US M US men</div><div class="line k-chip">EU European</div><div class="line k-chip">cm Foot length</div></div><p class="meta">The unit&#x27;s chip: its symbol, then its name; the symbol alone with Symbol only or where the box needs the room. The ten scales&#x27; names and symbols are in the scales&#x27; rows below. <span class="src">packages/core/src/units/shoe-size.ts</span></p><label for="w-box.chip">Your words</label><textarea id="w-box.chip" data-key="box.chip" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-box.chip" aria-live="polite"></span></article><article class="item" id="i-box.pill"><div class="eyebrow"><span class="key">box.pill</span><span class="kind">chip</span><span class="state">a brand in the box</span></div><div class="shown"><div class="line k-chip">Nike</div><div class="line k-chip">New Balance</div><div class="line k-chip">Dr. Martens</div></div><p class="meta">The brand&#x27;s pill beside the scale: its name, a chevron, its ×. <span class="src">apps/web/src/components/UnitChip.tsx</span></p><label for="w-box.pill">Your words</label><textarea id="w-box.pill" data-key="box.pill" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-box.pill" aria-live="polite"></span></article><article class="item" id="i-box.spoken"><div class="eyebrow"><span class="key">box.spoken</span><span class="kind">spoken, not shown</span></div><div class="shown spoken"><div class="line k-spoken">Unit: US men</div><div class="line k-spoken">Brand: Nike</div><div class="line k-spoken">Remove US men</div><div class="line k-spoken">Remove Nike</div><div class="line k-spoken">Clear number</div><div class="line k-spoken">Clear text</div></div><p class="meta">The chip&#x27;s and the pill&#x27;s spoken labels, their × buttons&#x27;, and the box&#x27;s own ×; every category&#x27;s shape. <span class="src">apps/web/src/components/UnitChip.tsx, apps/web/src/components/ValueField.tsx</span></p><label for="w-box.spoken">Your words</label><textarea id="w-box.spoken" data-key="box.spoken" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-box.spoken" aria-live="polite"></span></article></section><section id="s2"><h2>The matches, while typing</h2><p class="where-s">Under the box while a unit or a brand is being typed, in the table&#x27;s place.</p><article class="item" id="i-match.scale"><div class="eyebrow"><span class="key">match.scale</span><span class="kind">a list</span><span class="state">typing a scale</span></div><div class="shown"><div class="row"><span class="val"></span><span class="sym">US M</span><span class="name">US men <span class="detail">(spoken: , Shoe size, in the box)</span></span></div></div><p class="meta">A scale matched: its symbol and name as every unit&#x27;s, the category spoken after it, and “in the box” where it is. <span class="src">apps/web/src/components/UnitMatches.tsx</span></p><label for="w-match.scale">Your words</label><textarea id="w-match.scale" data-key="match.scale" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-match.scale" aria-live="polite"></span></article><article class="item" id="i-match.brand"><div class="eyebrow"><span class="key">match.brand</span><span class="kind">a list</span><span class="state">typing a brand</span></div><div class="shown"><div class="row"><span class="val">10</span><span class="sym">US M</span><span class="name">US men · Nike</span></div><div class="row"><span class="val">8</span><span class="sym">US W</span><span class="name">US women · Nike</span></div><div class="row"><span class="val">43</span><span class="sym">EU</span><span class="name">European · New Balance</span></div><div class="row"><span class="val"></span><span class="sym"></span><span class="name">Nike</span></div></div><p class="meta">A brand typed with the size, at either end: one match, the scale&#x27;s name, a middle dot, the brand&#x27;s name, the size in the number&#x27;s place; a bare size at a brand is US men&#x27;s; a brand alone brings no scale. <span class="src">apps/web/src/components/UnitMatches.tsx</span></p><label for="w-match.brand">Your words</label><textarea id="w-match.brand" data-key="match.brand" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-match.brand" aria-live="polite"></span></article><article class="item" id="i-match.group"><div class="eyebrow"><span class="key">match.group</span><span class="kind">heading</span></div><div class="shown"><div class="line k-heading">Shoe size</div></div><p class="meta">The heading over the matches of a category, with its count; a brand&#x27;s match sits under Shoe size&#x27;s. <span class="src">apps/web/src/components/UnitMatches.tsx</span></p><label for="w-match.group">Your words</label><textarea id="w-match.group" data-key="match.group" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-match.group" aria-live="polite"></span></article><article class="item" id="i-match.category"><div class="eyebrow"><span class="key">match.category</span><span class="kind">a list</span></div><div class="shown"><div class="line k-list">Shoe size  all its units</div></div><p class="meta">The category&#x27;s own row among the matches, taking the whole category. <span class="src">apps/web/src/components/UnitMatches.tsx</span></p><label for="w-match.category">Your words</label><textarea id="w-match.category" data-key="match.category" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-match.category" aria-live="polite"></span></article><article class="item" id="i-match.spoken"><div class="eyebrow"><span class="key">match.spoken</span><span class="kind">spoken, not shown</span></div><div class="shown spoken"><div class="line k-spoken">3 matches</div><div class="line k-spoken">1 match</div><div class="line k-spoken">Only hidden units match</div><div class="line k-spoken">No unit matches</div></div><p class="meta">What the live region says of the matches; every category&#x27;s. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-match.spoken">Your words</label><textarea id="w-match.spoken" data-key="match.spoken" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-match.spoken" aria-live="polite"></span></article><article class="item" id="i-match.none"><div class="eyebrow"><span class="key">match.none</span><span class="kind">message</span><span class="state">no match</span></div><div class="shown"><div class="line k-message">No unit matches “nikee 10”. Try ml, feet, or °F.</div></div><p class="meta">In the table&#x27;s place when a typed unit matches nothing; every category&#x27;s. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-match.none">Your words</label><textarea id="w-match.none" data-key="match.none" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-match.none" aria-live="polite"></span></article></section><section id="s3"><h2>The scales&#x27; rows</h2><p class="where-s">The table under the box: ISO&#x27;s ten scales, each in its system&#x27;s section.</p><article class="item" id="i-rows.sections"><div class="eyebrow"><span class="key">rows.sections</span><span class="kind">heading</span></div><div class="shown"><div class="line k-heading">US (customary)</div><div class="line k-heading">UK (imperial)</div><div class="line k-heading">Metric</div></div><p class="meta">The sections&#x27; headings, by system; every category&#x27;s. Shoe size&#x27;s rows fall in these three. <span class="src">apps/web/src/features/converter/settings.ts</span></p><label for="w-rows.sections">Your words</label><textarea id="w-rows.sections" data-key="rows.sections" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-rows.sections" aria-live="polite"></span></article><article class="item" id="i-rows.units"><div class="eyebrow"><span class="key">rows.units</span><span class="kind">rows</span><span class="state">a scale size</span></div><div class="shown"><div class="row"><span class="val"></span><span class="sym">US M</span><span class="name">US men</span></div><div class="row"><span class="val"></span><span class="sym">US W</span><span class="name">US women</span></div><div class="row"><span class="val"></span><span class="sym">US C</span><span class="name">US children</span></div><div class="row"><span class="val"></span><span class="sym">UK</span><span class="name">British</span></div><div class="row"><span class="val"></span><span class="sym">UK C</span><span class="name">British children</span></div><div class="row"><span class="val"></span><span class="sym">EU</span><span class="name">European</span></div><div class="row"><span class="val"></span><span class="sym">EU C</span><span class="name">European children</span></div><div class="row"><span class="val"></span><span class="sym">mm</span><span class="name">Mondopoint</span></div><div class="row"><span class="val"></span><span class="sym">cm</span><span class="name">Foot length</span></div><div class="row"><span class="val"></span><span class="sym">JP</span><span class="name">Japanese</span></div></div><p class="meta">The ten scales, each row&#x27;s symbol and name, in the table&#x27;s order; named without a possessive (Sean, 2026-10-20). <span class="src">packages/core/src/units/shoe-size.ts</span></p><label for="w-rows.units">Your words</label><textarea id="w-rows.units" data-key="rows.units" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-rows.units" aria-live="polite"></span></article><article class="item" id="i-rows.approx"><div class="eyebrow"><span class="key">rows.approx</span><span class="kind">rows</span></div><div class="shown"><div class="row"><span class="val">≈ 44</span><span class="sym">EU</span><span class="name">European</span></div><div class="row"><span class="val">27.5</span><span class="sym">JP</span><span class="name">Japanese</span></div></div><p class="meta">The mark before a size that moved to the half size, and before a brand&#x27;s nearest row; the box&#x27;s own row echoes what was typed. <span class="src">apps/web/src/components/ConversionTable.tsx</span></p><label for="w-rows.approx">Your words</label><textarea id="w-rows.approx" data-key="rows.approx" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-rows.approx" aria-live="polite"></span></article><article class="item" id="i-rows.beyond"><div class="eyebrow"><span class="key">rows.beyond</span><span class="kind">rows</span><span class="state">beyond</span></div><div class="shown"><div class="row"><span class="val">&gt; 13.5</span><span class="sym">US C</span><span class="name">US children <span class="detail">above its range</span></span></div><div class="row"><span class="val">&lt; 4</span><span class="sym">US C</span><span class="name">US children <span class="detail">below its range</span></span></div><div class="row"><span class="val">&gt; 13 1/2</span><span class="sym">US C</span><span class="name">US children <span class="detail">above its range</span></span></div></div><p class="meta">A foot past a children&#x27;s scale: where the scale ends in place of a size, in the muted ink, written as Display writes a size, and after the name where the foot stands; a click takes the scale with the number cleared. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-rows.beyond">Your words</label><textarea id="w-rows.beyond" data-key="rows.beyond" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-rows.beyond" aria-live="polite"></span></article><article class="item" id="i-rows.own-beyond"><div class="eyebrow"><span class="key">rows.own-beyond</span><span class="kind">rows</span><span class="state">outside its own scale</span></div><div class="shown"><div class="row"><span class="val">—</span><span class="sym">EU</span><span class="name">European</span></div><div class="row"><span class="val"></span><span class="sym"></span><span class="name">(spoken: US children runs 4 to 13.5)</span></div></div><p class="meta">A size outside its own scale in the box (US C 20): every other row a dash, a click taking its unit with the number as typed, and the live region saying the scale&#x27;s span. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-rows.own-beyond">Your words</label><textarea id="w-rows.own-beyond" data-key="rows.own-beyond" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-rows.own-beyond" aria-live="polite"></span></article><article class="item" id="i-rows.spoken"><div class="eyebrow"><span class="key">rows.spoken</span><span class="kind">spoken, not shown</span></div><div class="shown spoken"><div class="line k-spoken">11 US men in 10 units of shoe size</div><div class="line k-spoken">27 Foot length in 10 units of shoe size</div></div><p class="meta">What the live region says once a size converts: the amount as typed with the unit&#x27;s name, the row count, and the category; every category&#x27;s shape. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-rows.spoken">Your words</label><textarea id="w-rows.spoken" data-key="rows.spoken" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-rows.spoken" aria-live="polite"></span></article><article class="item" id="i-rows.note"><div class="eyebrow"><span class="key">rows.note</span><span class="kind">note</span></div><div class="shown"><div class="line k-note">ISO 19407’s sizes from the foot’s length, to the half size. Each brand’s row is its own chart read at that foot. Type a brand you fit (nike 10), or measure your foot heel to toe and type its length (27 cm). Measured inside, a US 9 is about the same length at every brand; the charts differ by the room each brand leaves.</div></div><p class="meta">The line under the table with no brand in the box: what the sizes rest on and how to anchor. <span class="src">packages/core/src/units/shoe-size.ts</span></p><p class="flag">The last sentence reads as a measurement where the room is derived (the shoe&#x27;s inside less the foot the chart assigns); the precise wording is “the charts differ in the foot they give that size” (docs/TESTING.md, 2026-10-21).</p><label for="w-rows.note">Your words</label><textarea id="w-rows.note" data-key="rows.note" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-rows.note" aria-live="polite"></span></article><article class="item" id="i-rows.unit-notes"><div class="eyebrow"><span class="key">rows.unit-notes</span><span class="kind">note</span></div><div class="shown"><div class="line k-note">US men: ISO puts US men’s one size above UK; the Brannock device half a size. Youth sizes (1Y to 7Y) are men’s sizes.</div><div class="line k-note">US women: ISO’s scale, men’s + 1; Nike, Clarks, and KEEN count men’s + 1.5, and Zappos’s FAQ + 2.</div><div class="line k-note">US children: ISO’s children’s table, 4C to 13.5C; from 1Y on, youth sizes are men’s sizes.</div><div class="line k-note">British: A third of an inch a size, counted from a four-inch last; ISO’s shoe is two sizes longer than the foot.</div><div class="line k-note">British children: ISO’s children’s table, 3.5 to 13.5; the scale then restarts at 1, which is the adult UK 1.</div><div class="line k-note">European: Two thirds of a centimetre a size; shoes are often marked half a size above ISO (UK 4 as 37, not 36.5).</div><div class="line k-note">European children: ISO’s children’s table, 19.5 to 38, which gives a growing foot more room than the adult rule.</div><div class="line k-note">Mondopoint: The foot’s length in millimetres, marked in steps of 5 mm; China’s sizes too.</div><div class="line k-note">Foot length: The foot’s length in centimetres, measured heel to toe: Mondopoint in centimetres. A brand’s chart gives it where its length is the foot’s.</div><div class="line k-note">Japanese: A size label in centimetres, the foot’s length by ISO; brands print it about a centimetre above the foot, so its symbol is JP.</div></div><p class="meta">A note written in core for each scale. <span class="src">packages/core/src/units/shoe-size.ts</span></p><p class="flag">Shown nowhere in the product today: the About page lists each scale&#x27;s formula and source, not its note. Show them there, or drop them.</p><label for="w-rows.unit-notes">Your words</label><textarea id="w-rows.unit-notes" data-key="rows.unit-notes" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-rows.unit-notes" aria-live="polite"></span></article></section><section id="s4"><h2>The brands&#x27; rows</h2><p class="where-s">One row per brand at the same foot, under the scales, or first while the box holds a brand&#x27;s size.</p><article class="item" id="i-brands.heading"><div class="eyebrow"><span class="key">brands.heading</span><span class="kind">heading</span></div><div class="shown"><div class="line k-heading">Brands, the same foot in US M</div><div class="line k-heading">Brands, the same foot in EU</div></div><p class="meta">The section&#x27;s heading, the scale after it following the box&#x27;s (US W, EU, JP, …). <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.heading">Your words</label><textarea id="w-brands.heading" data-key="brands.heading" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.heading" aria-live="polite"></span></article><article class="item" id="i-brands.heading-waiting"><div class="eyebrow"><span class="key">brands.heading-waiting</span><span class="kind">status line</span><span class="state">loading, failed</span></div><div class="shown"><div class="line k-status">Brand charts loading…</div><div class="line k-status">Brand charts not loaded</div></div><p class="meta">The heading with no brand in the box while the charts are on their way, and after the fetch failed; no commas in a status line (Sean, 2026-10-21). <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.heading-waiting">Your words</label><textarea id="w-brands.heading-waiting" data-key="brands.heading-waiting" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.heading-waiting" aria-live="polite"></span></article><article class="item" id="i-brands.line"><div class="eyebrow"><span class="key">brands.line</span><span class="kind">rows</span><span class="state">women&#x27;s</span></div><div class="shown"><div class="row"><span class="val">≈ 44</span><span class="sym">EU</span><span class="name">Nike <span class="detail">men</span></span></div><div class="row"><span class="val">≈ 42</span><span class="sym">EU</span><span class="name">Nike <span class="detail">women</span></span></div><div class="row"><span class="val">≈ 44</span><span class="sym">EU</span><span class="name">adidas</span></div></div><p class="meta">After a brand&#x27;s name on EU, UK, JP, mm, and cm, the chart&#x27;s line where the scale does not say it; nothing on US M and US W; nothing at a brand with one chart for everyone. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.line">Your words</label><textarea id="w-brands.line" data-key="brands.line" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.line" aria-live="polite"></span></article><article class="item" id="i-brands.kids"><div class="eyebrow"><span class="key">brands.kids</span><span class="kind">rows</span><span class="state">kids&#x27;</span></div><div class="shown"><div class="row"><span class="val">10</span><span class="sym">US C</span><span class="name">Nike <span class="detail">kids</span></span></div><div class="row"><span class="val">3</span><span class="sym">US M</span><span class="name">Nike <span class="detail">kids</span></span></div></div><p class="meta">After the name on every scale where the brand&#x27;s kids&#x27; chart answered: a children&#x27;s size, or a youth size the adults&#x27; chart lacks. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.kids">Your words</label><textarea id="w-brands.kids" data-key="brands.kids" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.kids" aria-live="polite"></span></article><article class="item" id="i-brands.rule"><div class="eyebrow"><span class="key">brands.rule</span><span class="kind">rows</span><span class="state">by its own rule</span></div><div class="shown"><div class="row"><span class="val">≈ 9.5</span><span class="sym">US M</span><span class="name">On <span class="detail">by its own rule</span></span></div><div class="row"><span class="val">≈ 44</span><span class="sym">EU</span><span class="name">Asics <span class="detail">men · by its own rule</span></span></div></div><p class="meta">A row filled by the brand&#x27;s own rule for the foot (On, Asics: the centimetre label less a centimetre). <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.rule">Your words</label><textarea id="w-brands.rule" data-key="brands.rule" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.rule" aria-live="polite"></span></article><article class="item" id="i-brands.label"><div class="eyebrow"><span class="key">brands.label</span><span class="kind">rows</span><span class="state">by ISO&#x27;s label</span></div><div class="shown"><div class="row"><span class="val">≈ 9</span><span class="sym">US M</span><span class="name">Puma <span class="detail">by ISO’s label</span></span></div><div class="row"><span class="val">≈ 10</span><span class="sym">US C</span><span class="name">Puma <span class="detail">kids · by ISO’s label</span></span></div></div><p class="meta">A row filled as ISO&#x27;s label on the brand&#x27;s own scale, read through its row (Skechers, Puma, New Balance, Under Armour, Vans). <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.label">Your words</label><textarea id="w-brands.label" data-key="brands.label" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.label" aria-live="polite"></span></article><article class="item" id="i-brands.no-scale"><div class="eyebrow"><span class="key">brands.no-scale</span><span class="kind">rows</span><span class="state">no scale</span></div><div class="shown"><div class="row"><span class="val">≈ 9.5</span><span class="sym">US M</span><span class="name">Birkenstock <span class="detail">prints no JP</span></span></div></div><p class="meta">The brand lacks the scale in focus: its size on its own scale, that scale&#x27;s symbol on the row, the words saying which it lacks (Birkenstock prints no JP). <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.no-scale">Your words</label><textarea id="w-brands.no-scale" data-key="brands.no-scale" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.no-scale" aria-live="polite"></span></article><article class="item" id="i-brands.off"><div class="eyebrow"><span class="key">brands.off</span><span class="kind">rows</span><span class="state">off its chart</span></div><div class="shown"><div class="row"><span class="val">—</span><span class="sym">US M</span><span class="name">Brooks <span class="detail">off its chart</span></span></div><div class="row"><span class="val">—</span><span class="sym">US C</span><span class="name">Brooks <span class="detail">men · off its chart</span></span></div></div><p class="meta">The foot is past the chart&#x27;s ends: a dash, and the words; a child&#x27;s foot asked on a children&#x27;s scale at a brand with no kids&#x27; chart (Brooks) says the line too. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.off">Your words</label><textarea id="w-brands.off" data-key="brands.off" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.off" aria-live="polite"></span></article><article class="item" id="i-brands.dash"><div class="eyebrow"><span class="key">brands.dash</span><span class="kind">rows</span><span class="state">loading, failed</span></div><div class="shown"><div class="row"><span class="val">—</span><span class="sym">US M</span><span class="name">adidas</span></div><div class="row"><span class="val">—</span><span class="sym">US M</span><span class="name">Asics</span></div></div><p class="meta">Every brand row while the charts load or after the fetch failed, with no words; a brand in the box leaves the scale rows dashes too. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.dash">Your words</label><textarea id="w-brands.dash" data-key="brands.dash" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.dash" aria-live="polite"></span></article><article class="item" id="i-brands.range"><div class="eyebrow"><span class="key">brands.range</span><span class="kind">rows</span><span class="state">a brand size</span></div><div class="shown"><div class="row"><span class="val">10–10.5</span><span class="sym">US M</span><span class="name">Birkenstock</span></div><div class="row"><span class="val">10–10 1/2</span><span class="sym">US M</span><span class="name">Birkenstock <span class="detail">(with Fraction)</span></span></div><div class="row"><span class="val">44 2/3</span><span class="sym">EU</span><span class="name">adidas <span class="detail">(as printed)</span></span></div></div><p class="meta">A brand&#x27;s size printed as a range, its two ends each written as Display writes a size; a printed third stands as printed whatever Display says. <span class="src">apps/web/src/components/ConversionTable.tsx</span></p><label for="w-brands.range">Your words</label><textarea id="w-brands.range" data-key="brands.range" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.range" aria-live="polite"></span></article><article class="item" id="i-brands.spoken"><div class="eyebrow"><span class="key">brands.spoken</span><span class="kind">spoken, not shown</span></div><div class="shown spoken"><div class="line k-spoken">10 US men at Nike in 10 units of shoe size</div></div><p class="meta">What the live region says once a brand&#x27;s size converts. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-brands.spoken">Your words</label><textarea id="w-brands.spoken" data-key="brands.spoken" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-brands.spoken" aria-live="polite"></span></article></section><section id="s5"><h2>The line above the rows</h2><p class="where-s">Between the box and the table, with a brand in the box, while the whole table waits.</p><article class="item" id="i-above.loading"><div class="eyebrow"><span class="key">above.loading</span><span class="kind">status line</span><span class="state">loading</span></div><div class="shown"><div class="line k-status">Nike’s chart loading…</div><div class="line k-status">Crocs’ chart loading…</div></div><p class="meta">A brand in the box while its chart is on its way: every row a dash and this line above them. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-above.loading">Your words</label><textarea id="w-above.loading" data-key="above.loading" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-above.loading" aria-live="polite"></span></article><article class="item" id="i-above.failed"><div class="eyebrow"><span class="key">above.failed</span><span class="kind">status line</span><span class="state">failed</span></div><div class="shown"><div class="line k-status">Brand charts not loaded. Reload to try again.</div></div><p class="meta">A brand in the box after the fetch failed: the rows stay dashes. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-above.failed">Your words</label><textarea id="w-above.failed" data-key="above.failed" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-above.failed" aria-live="polite"></span></article><article class="item" id="i-console.fetch"><div class="eyebrow"><span class="key">console.fetch</span><span class="kind">console only</span><span class="state">failed</span></div><div class="shown"><div class="line k-console">404 fetching the brands’ charts</div><div class="line k-console">The brands’ charts file has another shape.</div></div><p class="meta">Why the fetch failed, in the browser&#x27;s console alone. <span class="src">apps/web/src/features/converter/useBrandCharts.ts</span></p><label for="w-console.fetch">Your words</label><textarea id="w-console.fetch" data-key="console.fetch" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-console.fetch" aria-live="polite"></span></article></section><section id="s6"><h2>The line under the table, with a brand</h2><p class="where-s">The note&#x27;s place under the table once a brand is in the box: facts only, never fit advice.</p><article class="item" id="i-note.chart"><div class="eyebrow"><span class="key">note.chart</span><span class="kind">note</span><span class="state">a brand size</span></div><div class="shown"><div class="line k-note">Nike’s size chart, the men’s, nike.com, read Oct 2026.</div><div class="line k-note">Nike’s size chart, the women’s, nike.com, read Oct 2026.</div><div class="line k-note">Nike’s size chart, the kids’, nike.com, read Oct 2026.</div><div class="line k-note">adidas’s size chart, adidas.com, read Oct 2026.</div></div><p class="meta">The first sentence: whose chart, which line where the brand prints its lines apart, where, and when. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-note.chart">Your words</label><textarea id="w-note.chart" data-key="note.chart" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-note.chart" aria-live="polite"></span></article><article class="item" id="i-note.fact"><div class="eyebrow"><span class="key">note.fact</span><span class="kind">note</span></div><div class="shown"><div class="line k-note">Asics: Its NZ and AU pages say to add 1 to 1.5 cm to the foot to read its CM column, so the foot is the label less a centimetre; its US page adds a half size for running shoes.</div><div class="line k-note">Birkenstock: Whole EU sizes: two US half sizes share one.</div><div class="line k-note">Brooks: Its foot lengths are its UK site’s, brooksrunning.com/en_gb; its US page prints the same sizes without them.</div><div class="line k-note">Clarks: Its GB and US pages joined on the UK size they share.</div><div class="line k-note">Converse: The Chuck Taylor All Star table.</div><div class="line k-note">Crocs: Whole sizes; its EU is a pair, 43–44.</div><div class="line k-note">Dr. Martens: Whole sizes, the half sizes US women’s only; the brand says sizes differ between silhouettes.</div><div class="line k-note">New Balance: Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label.</div><div class="line k-note">On: Its FAQ says its JP label is the foot plus about a centimetre.</div><div class="line k-note">Puma: Its printed lengths are the shoe’s inside: at a US 9, 27.0 cm against RunRepeat’s 26.96 cm median over 18 models.</div><div class="line k-note">Reebok: UK and EU from its Australian guide, reebok.com.au; its US page prints US sizes and inches alone.</div><div class="line k-note">Skechers: Its Australian guide prints a CM column it never explains; its sizes read by ISO’s label.</div><div class="line k-note">Under Armour: Its CM column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label.</div><div class="line k-note">Vans: Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label.</div></div><p class="meta">The second sentence, at the brands that have one: the fact its chart alone would hide, written in core. <span class="src">packages/core/src/units/shoe-brands.ts</span></p><label for="w-note.fact">Your words</label><textarea id="w-note.fact" data-key="note.fact" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-note.fact" aria-live="polite"></span></article><article class="item" id="i-note.span"><div class="eyebrow"><span class="key">note.span</span><span class="kind">note</span><span class="state">off its chart</span></div><div class="shown"><div class="line k-note">Nike’s men’s chart runs US M 3.5 to 22.</div><div class="line k-note">Nike’s kids’ chart runs US C 1 to 13.5.</div></div><p class="meta">A size past the chart in the box: its span on that scale. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-note.span">Your words</label><textarea id="w-note.span" data-key="note.span" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-note.span" aria-live="polite"></span></article><article class="item" id="i-note.no-scale"><div class="eyebrow"><span class="key">note.no-scale</span><span class="kind">note</span><span class="state">no scale</span></div><div class="shown"><div class="line k-note">Birkenstock’s chart prints no Japanese.</div><div class="line k-note">Brooks’ chart prints no US children.</div></div><p class="meta">A scale the chart does not print, in the box. <span class="src">apps/web/src/features/converter/state.ts</span></p><p class="flag">The scale&#x27;s plural stands in for its name: “no Japanese”, “no US children”.</p><label for="w-note.no-scale">Your words</label><textarea id="w-note.no-scale" data-key="note.no-scale" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-note.no-scale" aria-live="polite"></span></article><article class="item" id="i-note.labelled"><div class="eyebrow"><span class="key">note.labelled</span><span class="kind">note</span><span class="state">by ISO&#x27;s label</span></div><div class="shown"><div class="line k-note">Puma gives no foot length, so its 9 is read as ISO’s US men 9; it prints UK 8, EU 42 for it.</div></div><p class="meta">A brand with no foot length, its size read as ISO&#x27;s label on the same scale, with what it prints for it. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-note.labelled">Your words</label><textarea id="w-note.labelled" data-key="note.labelled" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-note.labelled" aria-live="polite"></span></article><article class="item" id="i-note.rule"><div class="eyebrow"><span class="key">note.rule</span><span class="kind">note</span><span class="state">by its own rule</span></div><div class="shown"><div class="line k-note">On gives no foot length; its foot here is its centimetre label less 1 cm, by its own rule.</div></div><p class="meta">A brand read by its own rule. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-note.rule">Your words</label><textarea id="w-note.rule" data-key="note.rule" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-note.rule" aria-live="polite"></span></article><article class="item" id="i-note.length"><div class="eyebrow"><span class="key">note.length</span><span class="kind">note</span><span class="state">a length</span></div><div class="shown"><div class="line k-note">Puma gives no foot length; its row is ISO’s label for the foot, read through its own chart.</div></div><p class="meta">A length typed with a brand that prints no foot length: the row is ISO&#x27;s label read through the chart. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-note.length">Your words</label><textarea id="w-note.length" data-key="note.length" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-note.length" aria-live="polite"></span></article></section><section id="s7"><h2>The lists in the table&#x27;s place</h2><p class="where-s">The brand&#x27;s pill opens every brand; the unit&#x27;s chip with a brand opens the brand&#x27;s scales; a brand with no scale shows its scales to choose from.</p><article class="item" id="i-list.brands"><div class="eyebrow"><span class="key">list.brands</span><span class="kind">a list</span><span class="state">the chooser</span></div><div class="shown"><div class="line k-list">Brands</div><div class="line k-list">(spoken: 20 brands to choose from)</div></div><p class="meta">The brand&#x27;s pill opened: one heading, every brand by name, the one in the box marked; the live region counts them. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-list.brands">Your words</label><textarea id="w-list.brands" data-key="list.brands" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-list.brands" aria-live="polite"></span></article><article class="item" id="i-list.scales-heading"><div class="eyebrow"><span class="key">list.scales-heading</span><span class="kind">heading</span><span class="state">the chip&#x27;s headings</span></div><div class="shown"><div class="line k-heading">Nike’s chart, the men’s</div><div class="line k-heading">Nike’s chart, the women’s</div><div class="line k-heading">Nike’s chart, the kids’</div><div class="line k-heading">adidas’s chart</div></div><p class="meta">The unit&#x27;s chip opened with a brand: the brand&#x27;s scales by chart, the chart in play first, then its other charts, each under its own heading. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-list.scales-heading">Your words</label><textarea id="w-list.scales-heading" data-key="list.scales-heading" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-list.scales-heading" aria-live="polite"></span></article><article class="item" id="i-list.scales-ask"><div class="eyebrow"><span class="key">list.scales-ask</span><span class="kind">heading</span><span class="state">no scale</span></div><div class="shown"><div class="line k-heading">Nike’s chart, the men’s: choose the scale to read it on</div></div><p class="meta">The same list in the table&#x27;s place while the brand has no scale (its chip emptied, or a brand alone): the heading asks. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-list.scales-ask">Your words</label><textarea id="w-list.scales-ask" data-key="list.scales-ask" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-list.scales-ask" aria-live="polite"></span></article><article class="item" id="i-list.scales-entry"><div class="eyebrow"><span class="key">list.scales-entry</span><span class="kind">a list</span></div><div class="shown"><div class="row"><span class="val">44</span><span class="sym">EU</span><span class="name">European</span></div><div class="row"><span class="val">9</span><span class="sym">UK</span><span class="name">British</span></div><div class="row"><span class="val"></span><span class="sym">US W</span><span class="name">US women</span></div></div><p class="meta">Each scale as a row, its symbol and name, with the row&#x27;s size on it; the one in the box marked; the number as typed where the brand has no row for the box. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-list.scales-entry">Your words</label><textarea id="w-list.scales-entry" data-key="list.scales-entry" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-list.scales-entry" aria-live="polite"></span></article><article class="item" id="i-list.scales-spoken"><div class="eyebrow"><span class="key">list.scales-spoken</span><span class="kind">spoken, not shown</span></div><div class="shown spoken"><div class="line k-spoken">6 scales of Nike’s chart to choose from</div><div class="line k-spoken">9 scales of Nike’s charts to choose from</div></div><p class="meta">The live region&#x27;s count for the chip&#x27;s list. <span class="src">apps/web/src/features/converter/state.ts</span></p><label for="w-list.scales-spoken">Your words</label><textarea id="w-list.scales-spoken" data-key="list.scales-spoken" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-list.scales-spoken" aria-live="polite"></span></article></section><section id="s8"><h2>The About page, Formulas</h2><p class="where-s">bigsmall.work/about, the Formulas tab, the Shoe size group: a line per scale and per chart, as rendered.</p><article class="item" id="i-about.intro"><div class="eyebrow"><span class="key">about.intro</span><span class="kind">About page</span></div><div class="shown"><div class="line k-about">Each conversion in its category’s base unit and the source it was checked against.</div></div><p class="meta">The tab&#x27;s one line, over every category. <span class="src">apps/web/src/features/formulas/Formulas.astro</span></p><label for="w-about.intro">Your words</label><textarea id="w-about.intro" data-key="about.intro" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-about.intro" aria-live="polite"></span></article><article class="item" id="i-about.summary"><div class="eyebrow"><span class="key">about.summary</span><span class="kind">About page</span></div><div class="shown"><div class="line k-about">10 units in Mondopoint, 53 brands’ charts</div></div><p class="meta">After the group&#x27;s name, closed. <span class="src">apps/web/src/features/formulas/formulas.ts</span></p><p class="flag">Reads as 53 brands; it is 53 charts of 20 brands.</p><label for="w-about.summary">Your words</label><textarea id="w-about.summary" data-key="about.summary" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-about.summary" aria-live="polite"></span></article><article class="item" id="i-about.scales"><div class="eyebrow"><span class="key">about.scales</span><span class="kind">About page</span></div><div class="shown"><div class="line k-about">US men · mm = (US M + 22) × 8.47 · by convention · ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 d): the US system is the UK one shifted one size for men’s shoes and two for women’s</div><div class="line k-about">US women · mm = (US W + 21) × 8.47 · by convention · ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 d): the US system is the UK one shifted one size for men’s shoes and two for women’s</div><div class="line k-about">US children · mm from US C by a table, 118.5 to 194 mm · by convention · ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, Table 3 (children), straight lines between its rows</div><div class="line k-about">British · mm = (UK + 23) × 8.47 · by convention · ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 c): UK adult = (lf + 2 × 8.47)/8.47 − 25, lf the foot length in mm</div><div class="line k-about">British children · mm from UK C by a table, 118.5 to 196.5 mm · by convention · ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, Table 3 (children), straight lines between its rows</div><div class="line k-about">European · mm = (EU + -2) × 6.67 · by convention · ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 b): EUR = (lf + 2 × 6.67)/6.67, lf the foot length in mm</div><div class="line k-about">European children · mm from EU C by a table, 118.5 to 238 mm · by convention · ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, Table 3 (children), straight lines between its rows</div><div class="line k-about">Mondopoint · mm, the base unit · exact · ISO 9407:2019: Mondopoint is the foot length in mm; ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 a) and Table 1 (Mondopoint, China and Japan)</div><div class="line k-about">Foot length · 1 cm = 10 mm · exact · ISO 9407:2019: Mondopoint is the foot length in mm; ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 a) and Table 1 (Mondopoint, China and Japan)</div><div class="line k-about">Japanese · 1 JP = 10 mm · exact · ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 a): Japan sometimes expresses the size in centimetres; Table 1 (Mondopoint, China and Japan)</div></div><p class="meta">A line per scale: its name, its formula in Mondopoint, the basis tag, and the source it was checked against. <span class="src">apps/web/src/features/formulas/formulas.ts</span></p><p class="flag">“mm = (EU + -2) × 6.67” writes a negative offset as “+ -2”; the sign belongs in the formula (“EU − 2”). “mm, the base unit” is Mondopoint&#x27;s whole formula.</p><label for="w-about.scales">Your words</label><textarea id="w-about.scales" data-key="about.scales" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-about.scales" aria-live="polite"></span></article><article class="item" id="i-about.charts"><div class="eyebrow"><span class="key">about.charts</span><span class="kind">About page</span></div><div class="shown"><div class="line k-about">adidas, one chart · 28 sizes: US men, US women, UK, EU, JP, the foot in mm · by convention · adult, adidas.com size charts (manual capture from reading mode, 2026-10-20), read 2026-10-21; its length the foot’s.</div><div class="line k-about">Nike, the men’s chart · 38 sizes: US men, US women, UK, EU, JP, the foot in mm · by convention · Men&#x27;s Footwear, https://www.nike.com/size-fit/mens-footwear, read 2026-10-21; its length the foot’s.</div><div class="line k-about">Nike, the kids’ chart · 30 sizes: US men, US women, UK, EU, JP, US children, UK children, EU children, the foot in mm · by convention · Kids, composed, nike.com/us: Kids&#x27; Footwear - Babies &amp; Toddlers (1C - 10C) (https://www.nike.com/size-fit/kids-footwear); nike.com/us: Kids&#x27; Footwear - Little Kids (8C - 3Y) (https://www.nike.com/size-fit/kids-footwear); nike.com/us: Kids&#x27; Footwear - Big Kids (1Y - 7Y) (https://www.nike.com/size-fit/kids-footwear), read 2026-10-21; its length the foot’s.</div><div class="line k-about">On, the men’s chart · 16 sizes: US men, UK, EU, JP · by convention · men, on.com product Size &amp; Fit panel (Mens Shoes, Womens Shoes, Kids Shoes; kids panel has cm/inches toggle), 2026-10-20, read 2026-10-21; its length a size label, not the foot. Its FAQ says its JP label is the foot plus about a centimetre. The foot is read as its centimetre label less 1 cm, the brand’s own rule.</div><div class="line k-about">On, the kids’ chart · 12 sizes: US men, UK, EU, JP, US children, UK children, EU children, the foot in mm · by convention · Kids, composed, manual: kids (on.com product Size &amp; Fit panel (Mens Shoes, Womens Shoes, Kids Shoes; kids panel has cm/inches toggle), 2026-10-20), read 2026-10-21; its length the foot’s. Its FAQ says its JP label is the foot plus about a centimetre. The foot is read as its centimetre label less 1 cm, the brand’s own rule.</div></div><p class="meta">A line per chart, 53 in all: the brand and its line, how many sizes and which scales, the basis tag, then the chart&#x27;s title and source as the record holds them, the date read, what its length is, the brand&#x27;s fact, and its rule. Five shown. <span class="src">apps/web/src/features/formulas/formulas.ts</span></p><p class="flag">The title and the source print the record&#x27;s own words: “adult”, “manual: kids_0_3 (…)”, “Kids, composed”, a URL, a page&#x27;s menu path. On&#x27;s rule sentence follows its kids&#x27; chart too, whose length is the foot&#x27;s.</p><label for="w-about.charts">Your words</label><textarea id="w-about.charts" data-key="about.charts" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-about.charts" aria-live="polite"></span></article><article class="item" id="i-about.length-basis"><div class="eyebrow"><span class="key">about.length-basis</span><span class="kind">About page</span></div><div class="shown"><div class="line k-about">its length the foot’s</div><div class="line k-about">its length the product’s</div><div class="line k-about">its length a size label, not the foot</div><div class="line k-about">no length printed</div></div><p class="meta">What a chart&#x27;s length column is, after the date read. <span class="src">apps/web/src/features/formulas/formulas.ts</span></p><label for="w-about.length-basis">Your words</label><textarea id="w-about.length-basis" data-key="about.length-basis" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-about.length-basis" aria-live="polite"></span></article><article class="item" id="i-about.scale-names"><div class="eyebrow"><span class="key">about.scale-names</span><span class="kind">About page</span></div><div class="shown"><div class="line k-about">US men, US women, UK, UK women, EU, JP, US children, UK children, EU children, the CM label, the foot in mm</div></div><p class="meta">The scales a chart can print, as the About page names them in a chart&#x27;s line. <span class="src">apps/web/src/features/formulas/formulas.ts</span></p><label for="w-about.scale-names">Your words</label><textarea id="w-about.scale-names" data-key="about.scale-names" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-about.scale-names" aria-live="polite"></span></article><article class="item" id="i-about.copy-all"><div class="eyebrow"><span class="key">about.copy-all</span><span class="kind">console only</span></div><div class="shown"><div class="line k-console">bigsmall: every conversion factor and formula, each with the standard it was checked against (https://bigsmall.work/about/).</div><div class="line k-console">## Shoe size (base unit: Mondopoint, mm)</div><div class="line k-console">US men (US M): mm = (US M + 22) × 8.47, by convention. Source: …</div><div class="line k-console">Nike, the men’s chart: 38 sizes: …, by convention. Source: …</div></div><p class="meta">Copy all&#x27;s plain text: its opening line, a group&#x27;s heading, a scale&#x27;s line, a chart&#x27;s line. <span class="src">apps/web/src/features/formulas/formulas.ts</span></p><label for="w-about.copy-all">Your words</label><textarea id="w-about.copy-all" data-key="about.copy-all" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-about.copy-all" aria-live="polite"></span></article></section><section id="s9"><h2>Elsewhere</h2><p class="where-s">Text that names shoes outside the converter&#x27;s Shoe size views.</p><article class="item" id="i-feedback.example"><div class="eyebrow"><span class="key">feedback.example</span><span class="kind">text</span></div><div class="shown"><div class="line k-text">Add shoe sizes, US to EU</div></div><p class="meta">The Feedback form&#x27;s example for an idea, one of five drawn at random into the empty message. <span class="src">apps/web/src/features/feedback/report.ts</span></p><p class="flag">Shoe sizes exist now; the example is stale.</p><label for="w-feedback.example">Your words</label><textarea id="w-feedback.example" data-key="feedback.example" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-feedback.example" aria-live="polite"></span></article><article class="item" id="i-category.name"><div class="eyebrow"><span class="key">category.name</span><span class="kind">text</span></div><div class="shown"><div class="line k-text">Shoe size</div><div class="line k-text">typed: shoe, shoes, shoe sizes, size, sizes, footwear, sneakers, boots, foot size, kids, kid, child, children, children&#x27;s, toddler, toddlers, infant, baby, kids shoe size, kids shoes, kids size, brand, brands, shoe brand</div></div><p class="meta">The category&#x27;s name on the start&#x27;s tile, in the menu, over the matches, and spoken in the live region; the words that reach it when typed. <span class="src">packages/core/src/units/shoe-size.ts</span></p><label for="w-category.name">Your words</label><textarea id="w-category.name" data-key="category.name" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-category.name" aria-live="polite"></span></article><article class="item" id="i-url.params"><div class="eyebrow"><span class="key">url.params</span><span class="kind">console only</span></div><div class="shown"><div class="line k-console">?a=us-men&amp;v=10&amp;brand=nike</div><div class="line k-console">?a=eu&amp;v=39&amp;brand=nike&amp;line=women</div></div><p class="meta">The address bar: the scale, the number, the brand, and the women&#x27;s line; not words, listed so nothing is missed. <span class="src">apps/web/src/features/converter/url.ts</span></p><label for="w-url.params">Your words</label><textarea id="w-url.params" data-key="url.params" rows="2" placeholder="Empty keeps the words"></textarea><span class="saved" id="s-url.params" aria-live="polite"></span></article></section>
+  <textarea id="clip" hidden aria-label="Your rewrites, as text"></textarea>
+</main>
+<script>
+  (function () {
+    var fields = Array.prototype.slice.call(document.querySelectorAll('textarea[data-key]'));
+    var count = document.getElementById('count');
+    var mode = document.getElementById('mode');
+    var flashEl = document.getElementById('flash');
+    var local = {
+      get: function () {
+        try {
+          return JSON.parse(localStorage.getItem('shoe-words') || '{}');
+        } catch (e) {
+          return {};
+        }
+      },
+      set: function (obj) {
+        try {
+          localStorage.setItem('shoe-words', JSON.stringify(obj));
+        } catch (e) {}
+      },
+    };
+    var words = local.get();
+    var col = null;
+    var writable = true;
+    var chains = {};
+    var timers = {};
+
+    function tally() {
+      var n = fields.filter(function (f) {
+        return f.dataset.key !== 'general' && f.value.trim();
+      }).length;
+      count.textContent = n + ' of ' + (fields.length - 1) + ' rewritten';
+    }
+    function apply(obj) {
+      fields.forEach(function (f) {
+        var v = obj[f.dataset.key] || '';
+        if (document.activeElement !== f && f.value !== v) f.value = v;
+      });
+      tally();
+    }
+    function setMode(text) {
+      mode.textContent = text;
+    }
+    function status(key, text, cls) {
+      var el = document.getElementById('s-' + key);
+      if (!el) return;
+      el.textContent = text;
+      el.className = 'saved' + (cls ? ' ' + cls : '');
+    }
+    function write(key, value) {
+      var prev = chains[key] || Promise.resolve();
+      var next = prev.then(function () {
+        var ref = col.doc(key);
+        var op = value.trim() ? ref.set({ words: value, at: new Date().toISOString() }) : ref.delete();
+        return op.then(
+          function () {
+            status(key, value.trim() ? 'Saved' : '', 'ok');
+          },
+          function (e) {
+            if (e && e.code === 'invalid_argument') {
+              writable = false;
+              setMode('Read-only for you here; use Copy my rewrites');
+            }
+            status(key, 'Not saved here; it stays in this browser', 'err');
+          }
+        );
+      });
+      chains[key] = next.catch(function () {});
+    }
+    function save(key, value) {
+      if (value.trim()) words[key] = value;
+      else delete words[key];
+      local.set(words);
+      tally();
+      if (!col || !writable) return;
+      status(key, 'Saving…');
+      clearTimeout(timers[key]);
+      timers[key] = setTimeout(function () {
+        write(key, value);
+      }, 700);
+    }
+    fields.forEach(function (f) {
+      f.addEventListener('input', function () {
+        save(f.dataset.key, f.value);
+      });
+    });
+    apply(words);
+    setMode('Kept in this browser');
+
+    function flash(text) {
+      flashEl.textContent = text;
+      setTimeout(function () {
+        flashEl.textContent = '';
+      }, 2500);
+    }
+    function fallback(text) {
+      var ta = document.getElementById('clip');
+      ta.value = text;
+      ta.hidden = false;
+      ta.focus();
+      ta.select();
+      flash('Select and copy the text at the foot');
+    }
+    document.getElementById('copy').addEventListener('click', function () {
+      var lines = fields
+        .filter(function (f) {
+          return f.value.trim();
+        })
+        .map(function (f) {
+          return f.dataset.key + ': ' + f.value.trim().replace(/\s*\n\s*/g, ' ⏎ ');
+        });
+      var text = lines.length ? lines.join('\n') : '(no rewrites yet)';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () {
+            flash('Copied');
+          },
+          function () {
+            fallback(text);
+          }
+        );
+      } else fallback(text);
+    });
+
+    (function () {
+      if (!window.claude || typeof window.claude.use !== 'function') return;
+      window.claude.use('db').then(function (db) {
+        if (!db) return;
+        col = db.collection('rewrites');
+        setMode('Saving to this page');
+        col.onSnapshot(
+          function (snap) {
+            var obj = {};
+            snap.docs.forEach(function (d) {
+              var data = d.data();
+              if (data && typeof data.words === 'string') obj[d.id] = data.words;
+            });
+            words = obj;
+            local.set(words);
+            apply(words);
+          },
+          function () {
+            col = null;
+            setMode('Saving is off here; use Copy my rewrites');
+          }
+        );
+      });
+    })();
+  })();
+</script>

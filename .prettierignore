@@ -17,3 +17,7 @@ docs/research/shoe-sizes-2/deltas.md
 
 # Written by docs/research/shoe-sizes-2/mocks/brand-proto.py (the interactive prototype of the brand rows)
 docs/research/shoe-sizes-2/mocks/brand-proto.html
+
+# Written by docs/research/strings-1/inventory.py (the Shoe size strings inventory: the page for Sean's eye, and the About page's lines as rendered)
+docs/research/strings-1/inventory.html
+docs/research/strings-1/about-lines.json

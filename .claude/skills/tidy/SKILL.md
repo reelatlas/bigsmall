@@ -1,6 +1,6 @@
 ---
 name: tidy
-description: Tidy pass for bigsmall after a lab, a feature, or a stretch without one. Audits what changed (or the whole system) against the design system, the architecture, and the docs; fixes what is mechanical (dead code, duplicated class lists, one-off components, stale docs, missing gallery samples and inventory rows); brings anything that would change a look, a behavior, or a token to Sean with a recommendation; records learnings in the right docs; then ships. Use when Sean asks to tidy, clean up, systemize, check hygiene, or get ready to launch, or types /tidy. After a lab or a feature lands, and when a stretch of feedback rounds closes with his sign-off, offer it in that reply, scoped to the stretch, rather than running it unasked, so the next piece starts from a tidied base (Sean, 2026-10-20); the full tidy comes before launch, with the second accuracy audit (docs/PLAN.md §11).
+description: Tidy pass for bigsmall after a lab, a feature, or a stretch without one. Audits what changed (or the whole system) against the design system, the architecture, and the docs; fixes what is mechanical (dead code, duplicated class lists, one-off components, stale docs, missing gallery samples and inventory rows); brings anything that would change a look, a behavior, or a token to Sean with a recommendation; records learnings in the right docs; then ships. Use when Sean asks to tidy, clean up, systemize, check hygiene, or get ready to launch, or types /tidy. After a lab or a feature lands, and when a stretch of feedback rounds closes with his sign-off, offer it in that reply, scoped to the stretch, rather than running it unasked, so the next piece starts from a tidied base (Sean, 2026-10-20), the offer carrying a verdict and a scope so his answer is yes or no, never before a decision or ahead of a wording pass over the same surfaces (Sean, 2026-10-21; §0); the full tidy comes before launch, with the second accuracy audit (docs/PLAN.md §11).
 argument-hint: '[empty: since the last tidy | an area or path | full]'
 ---
 
@@ -9,6 +9,14 @@ argument-hint: '[empty: since the last tidy | an area or path | full]'
 A tidy pass leaves the system easier to build on than it found it: every shared shape in one place, every value from a token, every component in the gallery, every behavior in the spec, every surprise in the learnings, and nothing dead. A tidy changes no look and no behavior by itself. Those go to Sean.
 
 Requested scope: `$ARGUMENTS`
+
+## 0. When, and the offer
+
+The session offers a tidy and Sean decides (2026-10-20), and the offer always carries a verdict and a scope, so his answer is yes or no: "tidy now, scoped to X", or "not yet, after Y, because Z" (Sean, 2026-10-21, the hundred-and-thirty-sixth pass).
+
+- **Offer one** when a feature lands and the next piece is another area, so it starts from a tidied base; when a stretch of feedback rounds closes with his sign-off ("it works", "behaves like a user would expect"); before agents run over the code or the scripts (a build wave, a research pass); and the full tidy before launch, with the second accuracy audit (docs/PLAN.md §11).
+- **Not after** mid-stretch tweaks; not while a decision is open (a mock or a prototype settles it, and a tidy before it polishes what a revert may remove); not ahead of a wording pass over the surfaces a tidy would polish (comments quoting the words, the tests' titles, the gallery's states, the spec's sentences): the tidy follows the pass.
+- **What a tidy is not for.** It does not help a decision; what it can do is list what is open in one place (step 8, "Your call"), a by-product. Learnings never wait for one: each goes in the same commit as its surprise (CLAUDE.md, rule 10), and the tidy catches the ones missed. Cleanup interrupts a pass only when it blocks: a gate red, a budget at its line, a file two features left in two shapes.
 
 ## 1. Find the scope
 

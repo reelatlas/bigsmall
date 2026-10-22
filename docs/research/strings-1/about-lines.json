@@ -1,0 +1,384 @@
+{
+ "summary": "10 units in Mondopoint, 53 brands’ charts",
+ "lines": [
+  [
+   "US men",
+   "mm = (US M + 22) × 8.47",
+   "by convention",
+   "ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 d): the US system is the UK one shifted one size for men’s shoes and two for women’s"
+  ],
+  [
+   "US women",
+   "mm = (US W + 21) × 8.47",
+   "by convention",
+   "ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 d): the US system is the UK one shifted one size for men’s shoes and two for women’s"
+  ],
+  [
+   "US children",
+   "mm from US C by a table, 118.5 to 194 mm",
+   "by convention",
+   "ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, Table 3 (children), straight lines between its rows"
+  ],
+  [
+   "British",
+   "mm = (UK + 23) × 8.47",
+   "by convention",
+   "ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 c): UK adult = (lf + 2 × 8.47)/8.47 − 25, lf the foot length in mm"
+  ],
+  [
+   "British children",
+   "mm from UK C by a table, 118.5 to 196.5 mm",
+   "by convention",
+   "ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, Table 3 (children), straight lines between its rows"
+  ],
+  [
+   "European",
+   "mm = (EU + -2) × 6.67",
+   "by convention",
+   "ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 b): EUR = (lf + 2 × 6.67)/6.67, lf the foot length in mm"
+  ],
+  [
+   "European children",
+   "mm from EU C by a table, 118.5 to 238 mm",
+   "by convention",
+   "ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, Table 3 (children), straight lines between its rows"
+  ],
+  [
+   "Mondopoint",
+   "mm, the base unit",
+   "exact",
+   "ISO 9407:2019: Mondopoint is the foot length in mm; ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 a) and Table 1 (Mondopoint, China and Japan)"
+  ],
+  [
+   "Foot length",
+   "1 cm = 10 mm",
+   "exact",
+   "ISO 9407:2019: Mondopoint is the foot length in mm; ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 a) and Table 1 (Mondopoint, China and Japan)"
+  ],
+  [
+   "Japanese",
+   "1 JP = 10 mm",
+   "exact",
+   "ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption, §2.2 a): Japan sometimes expresses the size in centimetres; Table 1 (Mondopoint, China and Japan)"
+  ],
+  [
+   "adidas, one chart",
+   "28 sizes: US men, US women, UK, EU, JP, the foot in mm",
+   "by convention",
+   "adult, adidas.com size charts (manual capture from reading mode, 2026-10-20), read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "adidas, the kids’ chart",
+   "36 sizes: US men, UK, EU, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, manual: kids_0_3 (adidas.com size charts (manual capture from reading mode, 2026-10-20)); manual: kids_4_7 (adidas.com size charts (manual capture from reading mode, 2026-10-20)); manual: kids_8_16 (adidas.com size charts (manual capture from reading mode, 2026-10-20)), read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "Asics, the men’s chart",
+   "23 sizes: US men, UK, EU, the CM label",
+   "by convention",
+   "Men's shoes size chart, asics.com/us, Customer Service, ASICS Size & Fit Guide, ASICS Size Guide, the Gender menu (Men, Women, Kids), the Shoes product type, read 2026-10-21; its length a size label, not the foot. Its NZ and AU pages say to add 1 to 1.5 cm to the foot to read its CM column, so the foot is the label less a centimetre; its US page adds a half size for running shoes. The foot is read as its centimetre label less 1 cm, the brand’s own rule."
+  ],
+  [
+   "Asics, the women’s chart",
+   "19 sizes: US women, UK, EU, the CM label",
+   "by convention",
+   "Women's shoes size chart, asics.com/us, Customer Service, ASICS Size & Fit Guide, ASICS Size Guide, the Gender menu (Men, Women, Kids), the Shoes product type, read 2026-10-21; its length a size label, not the foot. Its NZ and AU pages say to add 1 to 1.5 cm to the foot to read its CM column, so the foot is the label less a centimetre; its US page adds a half size for running shoes. The foot is read as its centimetre label less 1 cm, the brand’s own rule."
+  ],
+  [
+   "Asics, the kids’ chart",
+   "29 sizes: US men, EU, US children, EU children, the CM label",
+   "by convention",
+   "Kids, composed, asics.com/us: Kids shoes chart (asics.com/us, Customer Service, ASICS Size & Fit Guide, ASICS Size Guide, the Gender menu (Men, Women, Kids), the Shoes product type), read 2026-10-21; its length a size label, not the foot. Its NZ and AU pages say to add 1 to 1.5 cm to the foot to read its CM column, so the foot is the label less a centimetre; its US page adds a half size for running shoes. The foot is read as its centimetre label less 1 cm, the brand’s own rule."
+  ],
+  [
+   "Birkenstock, one chart",
+   "27 sizes: US men, US women, UK, EU, the foot in mm",
+   "by convention",
+   "PRINTABLE SIZING TEMPLATE A4: size table, https://www.birkenstock.com/on/demandware.static/-/Library-Sites-birkenstock-amer/default/dwa81bfd9b/documents/Measurement_Template_US_A4.pdf, read 2026-10-21; its length the foot’s. Whole EU sizes: two US half sizes share one."
+  ],
+  [
+   "Birkenstock, the kids’ chart",
+   "11 sizes: US men, UK, EU, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, birkenstock.com (Sites-EU-Site en_NL): Kids: EU sizes and measurements (in mm) (https://www.birkenstock.com/on/demandware.store/Sites-EU-Site/en_NL/FitGuide-SizeChart); birkenstock.com/gb: Kids: UK sizes and measurements (in mm) (https://www.birkenstock.com/gb/fit-guide-size-chart.html); birkenstock.com/us: Size Conversion Chart: Kids (https://www.birkenstock.com/us/fit-guide/), read 2026-10-21; its length the foot’s. Whole EU sizes: two US half sizes share one."
+  ],
+  [
+   "Brooks, the men’s chart",
+   "20 sizes: US men, UK, EU, the foot in mm",
+   "by convention",
+   "Men's, composed, brooksrunning.com/en_gb (UK): Men's running shoes, Shoe size comparison (https://www.brooksrunning.com/en_gb/main-size-guide/?sizeChartIdNew=size-men%3Asize-men-shoes&ajaxCall=true); brooksrunning.com: Men's shoes (brooksrunning.com, the Women's, Men's, and All gender size guides, their Shoes tab), read 2026-10-21; its length the foot’s. Its foot lengths are its UK site’s, brooksrunning.com/en_gb; its US page prints the same sizes without them."
+  ],
+  [
+   "Brooks, the women’s chart",
+   "17 sizes: US women, UK, EU, the foot in mm",
+   "by convention",
+   "Women's, composed, brooksrunning.com/en_gb (UK): Women's running shoes, Shoe size comparison (https://www.brooksrunning.com/en_gb/main-size-guide/); brooksrunning.com: Women's shoes (brooksrunning.com, the Women's, Men's, and All gender size guides, their Shoes tab), read 2026-10-21; its length the foot’s. Its foot lengths are its UK site’s, brooksrunning.com/en_gb; its US page prints the same sizes without them."
+  ],
+  [
+   "Clarks, the men’s chart",
+   "16 sizes: US men, UK, EU, the foot in mm",
+   "by convention",
+   "Men's, composed, clarks.com/en-gb: Mens Clarks Shoe Sizes (https://www.clarks.com/en-gb/fitguide); clarks.com/en-us: Men's Shoe Size Chart (https://www.clarks.com/en-us/fit-guide/mens), read 2026-10-21; its length the foot’s. Its GB and US pages joined on the UK size they share."
+  ],
+  [
+   "Clarks, the women’s chart",
+   "15 sizes: US women, UK, EU, the foot in mm",
+   "by convention",
+   "Women's, composed, clarks.com/en-gb: Womens Clarks Shoe Sizes (https://www.clarks.com/en-gb/fitguide); clarks.com/en-us: Women's Shoe Size Chart (US & UK) (https://www.clarks.com/en-us/fit-guide/womens), read 2026-10-21; its length the foot’s. Its GB and US pages joined on the UK size they share."
+  ],
+  [
+   "Clarks, the kids’ chart",
+   "43 sizes: US men, UK, EU, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, clarks.com/en-gb: Kids & Babies Clarks Shoe Sizes (https://www.clarks.com/en-gb/fitguide); clarks.com.au: Kids: Baby/Toddler (https://clarks.com.au/pages/size-guide); clarks.com.au: Kids: Junior Kids (https://clarks.com.au/pages/size-guide); clarks.com.au: Kids: Senior Kids (https://clarks.com.au/pages/size-guide), read 2026-10-21; its length the foot’s. Its GB and US pages joined on the UK size they share."
+  ],
+  [
+   "Converse, the men’s chart",
+   "22 sizes: US men, US women, UK, EU, the foot in mm",
+   "by convention",
+   "Men's Chuck Taylor All Star, converse.com/size-chart-guide (Men's and Women's, Chuck Sneakers and Standard Sneakers, under the inches and cm toggles; Kids'; Babies & Toddlers), read 2026-10-21; its length the foot’s. The Chuck Taylor All Star table."
+  ],
+  [
+   "Converse, the women’s chart",
+   "22 sizes: US women, UK, EU, the foot in mm",
+   "by convention",
+   "Women's Chuck Taylor, converse.com/size-chart-guide (Men's and Women's, Chuck Sneakers and Standard Sneakers, under the inches and cm toggles; Kids'; Babies & Toddlers), read 2026-10-21; its length the foot’s. The Chuck Taylor All Star table."
+  ],
+  [
+   "Converse, the kids’ chart",
+   "36 sizes: US men, US children, the foot in mm",
+   "by convention",
+   "Kids, composed, converse.com: Babies & toddlers shoes (converse.com/size-chart-guide (Men's and Women's, Chuck Sneakers and Standard Sneakers, under the inches and cm toggles; Kids'; Babies & Toddlers)); converse.com: Kids' shoes (converse.com/size-chart-guide (Men's and Women's, Chuck Sneakers and Standard Sneakers, under the inches and cm toggles; Kids'; Babies & Toddlers)), read 2026-10-21; its length the foot’s. The Chuck Taylor All Star table."
+  ],
+  [
+   "Crocs, one chart",
+   "16 sizes: US men, US women, UK, UK women, EU, JP, the foot in mm",
+   "by convention",
+   "Adults, https://www.crocs.com/size-chart/default.json, read 2026-10-21; its length the foot’s. Whole sizes; its EU is a pair, 43–44."
+  ],
+  [
+   "Crocs, the kids’ chart",
+   "19 sizes: US men, UK, EU, JP, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, crocs.com/size-chart: Kids' (crocs.com/size-chart as rendered (Adult and Kids' under the Inches and Centimeters toggles)), read 2026-10-21; its length the foot’s. Whole sizes; its EU is a pair, 43–44."
+  ],
+  [
+   "Dr. Martens, one chart",
+   "15 sizes: US men, US women, UK, EU, the foot in mm",
+   "by convention",
+   "Women's and Men's, cm toggle, https://www.drmartens.com/us/en/about/size-guide, read 2026-10-21; its length the foot’s. Whole sizes, the half sizes US women’s only; the brand says sizes differ between silhouettes."
+  ],
+  [
+   "Dr. Martens, the kids’ chart",
+   "24 sizes: US men, UK, EU, JP, US children, UK children, EU children",
+   "by convention",
+   "Kids, composed, pasted: Kid's Sizing (https://www.drmartens.com/us/en/about/size-guide), read 2026-10-21; its length a size label, not the foot. Whole sizes, the half sizes US women’s only; the brand says sizes differ between silhouettes."
+  ],
+  [
+   "HOKA, the men’s chart",
+   "21 sizes: US men, UK, EU, JP, the foot in mm",
+   "by convention",
+   "men, hoka.com/en/us/sizing-information.html (Women / Men / All Gender / Kids; Regular / Wide; in / cm toggles), 2026-10-20, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "HOKA, the women’s chart",
+   "15 sizes: US women, UK, EU, JP, the foot in mm",
+   "by convention",
+   "women, hoka.com/en/us/sizing-information.html (Women / Men / All Gender / Kids; Regular / Wide; in / cm toggles), 2026-10-20, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "HOKA, the kids’ chart",
+   "8 sizes: US men, the foot in mm",
+   "by convention",
+   "Kids, composed, manual: kids (hoka.com/en/us/sizing-information.html (Women / Men / All Gender / Kids; Regular / Wide; in / cm toggles), 2026-10-20), read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "New Balance, the men’s chart",
+   "30 sizes: US men, US women, UK, EU",
+   "by convention",
+   "men, newbalance.com Size & Width Guide (web page text + saved PDFs + printable measuring tools), 2026-10-20, read 2026-10-21; its length a size label, not the foot. Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label."
+  ],
+  [
+   "New Balance, the women’s chart",
+   "25 sizes: US men, US women, UK, EU",
+   "by convention",
+   "women, newbalance.com Size & Width Guide (web page text + saved PDFs + printable measuring tools), 2026-10-20, read 2026-10-21; its length a size label, not the foot. Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label."
+  ],
+  [
+   "New Balance, the kids’ chart",
+   "40 sizes: US men, US women, UK, EU, US children, UK children, EU children",
+   "by convention",
+   "Kids, composed, manual: kids_0_4 (newbalance.com Size & Width Guide (web page text + saved PDFs + printable measuring tools), 2026-10-20); manual: kids_4_8 (newbalance.com Size & Width Guide (web page text + saved PDFs + printable measuring tools), 2026-10-20); manual: kids_8_12 (newbalance.com Size & Width Guide (web page text + saved PDFs + printable measuring tools), 2026-10-20), read 2026-10-21; its length a size label, not the foot. Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label."
+  ],
+  [
+   "Nike, the men’s chart",
+   "38 sizes: US men, US women, UK, EU, JP, the foot in mm",
+   "by convention",
+   "Men's Footwear, https://www.nike.com/size-fit/mens-footwear, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "Nike, the women’s chart",
+   "39 sizes: US men, US women, UK, EU, JP, the foot in mm",
+   "by convention",
+   "Women's Footwear, https://www.nike.com/size-fit/womens-footwear, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "Nike, the kids’ chart",
+   "30 sizes: US men, US women, UK, EU, JP, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, nike.com/us: Kids' Footwear - Babies & Toddlers (1C - 10C) (https://www.nike.com/size-fit/kids-footwear); nike.com/us: Kids' Footwear - Little Kids (8C - 3Y) (https://www.nike.com/size-fit/kids-footwear); nike.com/us: Kids' Footwear - Big Kids (1Y - 7Y) (https://www.nike.com/size-fit/kids-footwear), read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "On, the men’s chart",
+   "16 sizes: US men, UK, EU, JP",
+   "by convention",
+   "men, on.com product Size & Fit panel (Mens Shoes, Womens Shoes, Kids Shoes; kids panel has cm/inches toggle), 2026-10-20, read 2026-10-21; its length a size label, not the foot. Its FAQ says its JP label is the foot plus about a centimetre. The foot is read as its centimetre label less 1 cm, the brand’s own rule."
+  ],
+  [
+   "On, the women’s chart",
+   "14 sizes: US women, UK, EU, JP",
+   "by convention",
+   "women, on.com product Size & Fit panel (Mens Shoes, Womens Shoes, Kids Shoes; kids panel has cm/inches toggle), 2026-10-20, read 2026-10-21; its length a size label, not the foot. Its FAQ says its JP label is the foot plus about a centimetre. The foot is read as its centimetre label less 1 cm, the brand’s own rule."
+  ],
+  [
+   "On, the kids’ chart",
+   "12 sizes: US men, UK, EU, JP, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, manual: kids (on.com product Size & Fit panel (Mens Shoes, Womens Shoes, Kids Shoes; kids panel has cm/inches toggle), 2026-10-20), read 2026-10-21; its length the foot’s. Its FAQ says its JP label is the foot plus about a centimetre. The foot is read as its centimetre label less 1 cm, the brand’s own rule."
+  ],
+  [
+   "Puma, the men’s chart",
+   "18 sizes: US men, UK, EU",
+   "by convention",
+   "Men's shoes, us.puma.com, the Size guide panel on product pages (a men's shoe, a women's shoe, Speedcat Ballet Suede Big Kids Sneakers 406132), read 2026-10-21; no length printed. Its printed lengths are the shoe’s inside: at a US 9, 27.0 cm against RunRepeat’s 26.96 cm median over 18 models."
+  ],
+  [
+   "Puma, the women’s chart",
+   "12 sizes: US women, UK, EU",
+   "by convention",
+   "Women's shoes, us.puma.com, the Size guide panel on product pages (a men's shoe, a women's shoe, Speedcat Ballet Suede Big Kids Sneakers 406132), read 2026-10-21; no length printed. Its printed lengths are the shoe’s inside: at a US 9, 27.0 cm against RunRepeat’s 26.96 cm median over 18 models."
+  ],
+  [
+   "Puma, the kids’ chart",
+   "24 sizes: US men, UK, EU, US children, UK children, EU children",
+   "by convention",
+   "Kids, composed, us.puma.com: Kids' sizing: Toddler shoes (us.puma.com, the Size guide panel on product pages (a men's shoe, a women's shoe, Speedcat Ballet Suede Big Kids Sneakers 406132)); us.puma.com: Kids' sizing: Little kids' shoes (us.puma.com, the Size guide panel on product pages (a men's shoe, a women's shoe, Speedcat Ballet Suede Big Kids Sneakers 406132)); us.puma.com: Kids' sizing: Junior shoes (us.puma.com, the Size guide panel on product pages (a men's shoe, a women's shoe, Speedcat Ballet Suede Big Kids Sneakers 406132)), read 2026-10-21; no length printed. Its printed lengths are the shoe’s inside: at a US 9, 27.0 cm against RunRepeat’s 26.96 cm median over 18 models."
+  ],
+  [
+   "Reebok, the men’s chart",
+   "27 sizes: US men, UK, EU, the foot in mm",
+   "by convention",
+   "Men's, composed, reebok.com: Men's Shoes Size Guide (https://www.reebok.com/pages/size-guides); reebok.com.au (AU): Men's Size Guides, Men's Footwear (https://reebok.com.au/pages/size-guides), read 2026-10-21; its length the foot’s. UK and EU from its Australian guide, reebok.com.au; its US page prints US sizes and inches alone."
+  ],
+  [
+   "Reebok, the women’s chart",
+   "17 sizes: US women, UK, EU, the foot in mm",
+   "by convention",
+   "Women's, composed, reebok.com: Women's Shoes Size Guide (https://www.reebok.com/pages/size-guides); reebok.com.au (AU): Women's Size Guides, Women's Footwear (https://reebok.com.au/pages/size-guides), read 2026-10-21; its length the foot’s. UK and EU from its Australian guide, reebok.com.au; its US page prints US sizes and inches alone."
+  ],
+  [
+   "Reebok, the kids’ chart",
+   "39 sizes: US men, US children, the foot in mm",
+   "by convention",
+   "Kids, composed, reebok.com: TODDLER & BABY SHOES SIZING (https://www.reebok.com/pages/kids-shoe-size-guide); reebok.com: PRESCHOOL/LITTLE KIDS SHOES SIZING (https://www.reebok.com/pages/kids-shoe-size-guide); reebok.com: GRADE SCHOOL/BIG KIDS SHOES SIZING (https://www.reebok.com/pages/kids-shoe-size-guide), read 2026-10-21; its length the foot’s. UK and EU from its Australian guide, reebok.com.au; its US page prints US sizes and inches alone."
+  ],
+  [
+   "Salomon, one chart",
+   "23 sizes: US men, US women, UK, EU, JP, the foot in mm",
+   "by convention",
+   "Unisex Footwear, https://www.salomon.com/en-us/sizingchart, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "Salomon, the kids’ chart",
+   "15 sizes: US men, UK, EU, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, salomon.com/en-us: Kid's Footwear (https://www.salomon.com/en-us/sizingchart), read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "Skechers, the men’s chart",
+   "18 sizes: US men, UK, EU",
+   "by convention",
+   "Men's, https://www.skechers.com/size-chart/, read 2026-10-21; no length printed. Its Australian guide prints a CM column it never explains; its sizes read by ISO’s label."
+  ],
+  [
+   "Skechers, the women’s chart",
+   "15 sizes: US women, UK, EU",
+   "by convention",
+   "Women's, https://www.skechers.com/size-chart/, read 2026-10-21; no length printed. Its Australian guide prints a CM column it never explains; its sizes read by ISO’s label."
+  ],
+  [
+   "Skechers, the kids’ chart",
+   "35 sizes: US men, UK, EU, US children, UK children, EU children",
+   "by convention",
+   "Kids, composed, skechers.com (re-read): Infant & Toddler (skechers.com/size-chart/, the four tabs); skechers.com (re-read): Kids' (skechers.com/size-chart/, the four tabs), read 2026-10-21; no length printed. Its Australian guide prints a CM column it never explains; its sizes read by ISO’s label."
+  ],
+  [
+   "Timberland, the men’s chart",
+   "20 sizes: US men, UK, EU, the foot in mm",
+   "by convention",
+   "men, timberland.com size charts (Men / Women / Kids: Infant, Toddler, Youth, Junior / Timberland PRO men's & women's; inch and cm toggles), 2026-10-20, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "Timberland, the women’s chart",
+   "12 sizes: US women, UK, EU, the foot in mm",
+   "by convention",
+   "women, timberland.com size charts (Men / Women / Kids: Infant, Toddler, Youth, Junior / Timberland PRO men's & women's; inch and cm toggles), 2026-10-20, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "Timberland, the kids’ chart",
+   "39 sizes: US men, UK, EU, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, manual: infant (timberland.com size charts (Men / Women / Kids: Infant, Toddler, Youth, Junior / Timberland PRO men's & women's; inch and cm toggles), 2026-10-20); manual: toddler (timberland.com size charts (Men / Women / Kids: Infant, Toddler, Youth, Junior / Timberland PRO men's & women's; inch and cm toggles), 2026-10-20); manual: youth (timberland.com size charts (Men / Women / Kids: Infant, Toddler, Youth, Junior / Timberland PRO men's & women's; inch and cm toggles), 2026-10-20); manual: junior (timberland.com size charts (Men / Women / Kids: Infant, Toddler, Youth, Junior / Timberland PRO men's & women's; inch and cm toggles), 2026-10-20), read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "UGG, the men’s chart",
+   "24 sizes: US men, UK, EU, JP, the foot in mm",
+   "by convention",
+   "men, ugg.com size chart (Footwear: Women's, Women's Wide, Men's, Men's Wide, All-Gender, Big Kids, Toddlers, Baby) + UGG Kid's Shoe Fit Guide PDF, 2026-10-20, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "UGG, the women’s chart",
+   "18 sizes: US women, UK, EU, JP, the foot in mm",
+   "by convention",
+   "women, ugg.com size chart (Footwear: Women's, Women's Wide, Men's, Men's Wide, All-Gender, Big Kids, Toddlers, Baby) + UGG Kid's Shoe Fit Guide PDF, 2026-10-20, read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "UGG, the kids’ chart",
+   "20 sizes: US men, UK, EU, JP, US children, UK children, EU children, the foot in mm",
+   "by convention",
+   "Kids, composed, manual: baby (ugg.com size chart (Footwear: Women's, Women's Wide, Men's, Men's Wide, All-Gender, Big Kids, Toddlers, Baby) + UGG Kid's Shoe Fit Guide PDF, 2026-10-20); manual: toddlers (ugg.com size chart (Footwear: Women's, Women's Wide, Men's, Men's Wide, All-Gender, Big Kids, Toddlers, Baby) + UGG Kid's Shoe Fit Guide PDF, 2026-10-20); manual: big_kids (ugg.com size chart (Footwear: Women's, Women's Wide, Men's, Men's Wide, All-Gender, Big Kids, Toddlers, Baby) + UGG Kid's Shoe Fit Guide PDF, 2026-10-20), read 2026-10-21; its length the foot’s."
+  ],
+  [
+   "Under Armour, the men’s chart",
+   "19 sizes: US men, UK, EU",
+   "by convention",
+   "Men's Shoes Size Chart, https://www.underarmour.com/en-us/t/size-guide/mens-footwear/, read 2026-10-21; its length a size label, not the foot. Its CM column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label."
+  ],
+  [
+   "Under Armour, the women’s chart",
+   "15 sizes: US women, UK, EU",
+   "by convention",
+   "Women's Shoes Size Chart, https://www.underarmour.com/en-us/t/size-guide/womens-footwear/, read 2026-10-21; its length a size label, not the foot. Its CM column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label."
+  ],
+  [
+   "Under Armour, the kids’ chart",
+   "30 sizes: US men, US women, UK, EU, US children, UK children, EU children",
+   "by convention",
+   "Kids, composed, underarmour.com (re-read): Boys' Shoes (underarmour.com/en-us/t/size-guide/, mens-, womens-, boys-, and girls-footwear), read 2026-10-21; its length a size label, not the foot. Its CM column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label."
+  ],
+  [
+   "Vans, one chart",
+   "22 sizes: US men, US women, UK, EU, JP",
+   "by convention",
+   "adult, vans.com Clothing & Shoe Fit Guide (Men / Women / Kids tabs, inch and cm toggles), 2026-10-20, read 2026-10-21; its length a size label, not the foot. Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label."
+  ],
+  [
+   "Vans, the kids’ chart",
+   "38 sizes: US men, UK, EU, US children, UK children, EU children",
+   "by convention",
+   "Kids, composed, manual: infants (vans.com Clothing & Shoe Fit Guide (Men / Women / Kids tabs, inch and cm toggles), 2026-10-20); manual: toddlers (vans.com Clothing & Shoe Fit Guide (Men / Women / Kids tabs, inch and cm toggles), 2026-10-20); manual: kids (vans.com Clothing & Shoe Fit Guide (Men / Women / Kids tabs, inch and cm toggles), 2026-10-20); manual: youth (vans.com Clothing & Shoe Fit Guide (Men / Women / Kids tabs, inch and cm toggles), 2026-10-20), read 2026-10-21; its length a size label, not the foot. Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label."
+  ]
+ ],
+ "from": "apps/web/dist/about/index.html"
+}

@@ -102,11 +102,18 @@ interface ConversionRow {
    */
   detail?: string | undefined;
   /**
-   * A brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
-   * stands whatever the display's places or fractions, split at its first number's end as every
-   * value is at its mark (splitPrinted), and copies as it shows.
+   * A brand's cell printed as a third ("44 2/3"; ADR 0028): its text stands whatever the display's
+   * places or fractions, split at its first number's end as every value is at its mark
+   * (splitPrinted), and copies as it shows.
    */
   printed?: true | undefined;
+  /**
+   * A brand's cell printed as a range (ADR 0028), its two ends: each written as the display writes
+   * a size, its half as a fraction with Fraction ("9–9 1/2"), the decimal first and the fraction
+   * after it with Both, split at the first end's whole number (splitRange), and copies as it
+   * shows (Sean, 2026-10-21: under Fraction a range stood in decimals beside the fractions).
+   */
+  range?: readonly [number, number] | undefined;
 }
 
 /** A section of rows under its name ("US (customary)"). */
@@ -366,6 +373,8 @@ export function copiedText(
   significant: number,
 ): string | null {
   if (row.tone !== 'value') return null;
+  if (row.range)
+    return rangeText(row, display.format === 'fraction', locale).replaceAll(MINUS, '-');
   const written =
     row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
   return (written?.text ?? row.text).replaceAll(MINUS, '-');
@@ -375,6 +384,17 @@ export function copiedText(
 const HALVES: ReadonlySet<FractionSize> = new Set([2]);
 /** The mark ahead of a value that rounds, is measured, or is a chart's nearest row. */
 const APPROX = '≈';
+
+/**
+ * A range's ends as the display writes a size (ADR 0028; Sean, 2026-10-21): each half as a
+ * fraction with Fraction, else the row's own decimal text ("9–9.5").
+ */
+function rangeText(row: ConversionRow, fraction: boolean, locale: string | undefined): string {
+  if (!row.range || !fraction) return row.text;
+  const end = (size: number) =>
+    formatFraction(size, { sizes: HALVES, rounding: 'nearest', locale })?.text ?? String(size);
+  return `${end(row.range[0])}${RANGE_DASH}${end(row.range[1])}`;
+}
 
 /** A mark as its cell draws it: the mark and the space before its number; nothing for none. */
 function markText(mark: string): string {
@@ -445,6 +465,7 @@ function firstWritten(
  */
 function secondWritten(row: ConversionRow, display: TableDisplay, locale: string | undefined) {
   if (display.format !== 'both' || row.value === null || row.printed) return null;
+  if (row.range) return { text: rangeText(row, true, locale), approx: false };
   if (row.pair) return formatPair(row.value, row.pair, pairOptions(display, locale, 0, true));
   if (row.stepped) return formatFraction(row.value, { sizes: HALVES, rounding: 'nearest', locale });
   return formatFraction(row.value, {
@@ -513,10 +534,12 @@ function valueParts(
     const text = end ? `${row.text.slice(0, 1)} ${end.text}` : row.text;
     return fraction ? splitAtFraction(text, false) : splitAtPoint(text, point, false);
   }
-  // A brand's cell as printed (ADR 0028), a range or a third: its text stands, split at its first
-  // number's end as every value is at its mark, so the first number lines up with the whole
-  // numbers and the rest hangs after it (the 10 of "10–10.5" under an 11; Sean, 2026-10-20:
-  // written across, a range lined up with nothing).
+  // A brand's range (ADR 0028): its ends as the display writes a size, split at the first end's
+  // whole number, so it lines up with the whole numbers and the rest hangs after it (the 10 of
+  // "10–10.5" under an 11; Sean, 2026-10-20: written across, a range lined up with nothing).
+  if (row.range) return splitRange(rangeText(row, fraction, locale), row.approx === true);
+  // A brand's cell printed as a third: its text stands, split at its fraction as every value is
+  // at its mark.
   if (row.printed) return splitPrinted(row.text, point, row.approx === true);
   const written =
     row.value === null || row.clock ? null : firstWritten(row, display, locale, significant);
@@ -555,6 +578,7 @@ function secondParts(
 ): ValueParts | null {
   const written = secondWritten(row, display, locale);
   if (!written) return null;
+  if (row.range) return { ...splitRange(written.text, false), approx: written.approx };
   if (row.pair && row.value !== null) {
     const spoken = formatPair(row.value, row.pair, {
       ...pairOptions(display, locale, 0, true),
@@ -623,10 +647,24 @@ function splitAtFraction(text: string, approx: boolean): ValueParts {
 }
 
 /**
- * A brand's cell as printed in two (ADR 0028): a third at its fraction, as a fraction is; a range
- * at its first number's end, its decimal mark or the dash to the second end ("9" and ".5–10",
- * "10" and "–10.5"), so the first number lines up with the whole numbers and the rest hangs after
- * it as a decimal part does.
+ * A brand's range in two (ADR 0028): the first end's whole number, and the rest from its decimal
+ * mark, its fraction, or the dash to the second end ("9" and ".5–10", "10" and "–10.5", "10" and
+ * "–10 1/2"), so the first number lines up with the whole numbers and the rest hangs after it as
+ * a decimal part does.
+ */
+function splitRange(text: string, approx: boolean): ValueParts {
+  const at = text.search(/\D/);
+  return {
+    text,
+    mark: approx ? APPROX : '',
+    split: { whole: at < 0 ? text : text.slice(0, at), decimals: at < 0 ? '' : text.slice(at) },
+    approx,
+  };
+}
+
+/**
+ * A brand's cell printed as a third, in two (ADR 0028): at its fraction, as a fraction is; any
+ * other printed text at its first number's end.
  */
 function splitPrinted(text: string, point: string, approx: boolean): ValueParts {
   if (/\d+\/\d+$/.test(text)) return splitAtFraction(text, approx);

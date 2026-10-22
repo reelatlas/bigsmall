@@ -53,7 +53,7 @@ The 34 charts recommended for the product (§5, decision 1), one per brand and g
 | Crocs | 1 | 19 | 13 · 6 | the foot's | US C, US M, UK C, UK, EU C, EU, JP, foot | — |
 | Dr. Martens | 1 | 24 | 18 · 6 | a size label | US C, US M, UK C, UK, EU C, EU, JP | — |
 | HOKA | 1 | 8 | 0 · 8 | the foot's | US M, foot | — |
-| New Balance | 3 | 40 | 27 · 13 | a size label | US C, US M, US W, UK C, UK, EU C, EU | uk at US 2.5: UK 5 printed between UK 1.5 and 2.5, out of the chart's own order |
+| New Balance | 3 | 40 | 27 · 13 | a size label | US C, US M, US W, UK C, UK, EU C, EU | uk at US 2.5: UK 5 printed between UK 1.5 and 2.5, out of the chart's own order; printed so on the live page too, read in Sean's browser on 2026-10-21 |
 | Nike | 3 | 30 | 17 · 13 | the foot's | US C, US M, US W, UK C, UK, EU C, EU, JP, foot | — |
 | On | 1 | 12 | 7 · 5 | the foot's | US C, US M, UK C, UK, EU C, EU, JP, foot | — |
 | Puma | 3 | 24 | 11 · 13 | none | US C, US M, UK C, UK, EU C, EU | — |
@@ -65,7 +65,7 @@ The 34 charts recommended for the product (§5, decision 1), one per brand and g
 | Under Armour | 1 | 30 | 17 · 13 | a size label | US C, US M, US W, UK C, UK, EU C, EU | — |
 | Vans | 4 | 38 | 25 · 13 | a size label | US C, US M, UK C, UK, EU C, EU | — |
 
-The kids' charts recommended for the product (§5, decision 11; ADR 0031), one per brand, composed from its home site's age bands in age order (Pages), a size printed twice kept once where the bands agree. Children · youth: the rows before and from the chart's restart at 1 (US and UK sizes run to 13.5 and start again), the children's rows on ISO's children's scales (US C, UK C, EU C) and the youth rows on its adult scales (youth sizes are men's sizes, ISO's Table 3), the EU column written by the row's kind. Length as the brand's adults' (ADR 0030). Left out: a cell printed out of its column's order, kept out of the product chart until the refresh checks it. Brooks prints no kids' chart.
+The kids' charts recommended for the product (§5, decision 11; ADR 0031), one per brand, composed from its home site's age bands in age order (Pages), a size printed twice kept once where the bands agree. Children · youth: the rows before and from the chart's restart at 1 (US and UK sizes run to 13.5 and start again), the children's rows on ISO's children's scales (US C, UK C, EU C) and the youth rows on its adult scales (youth sizes are men's sizes, ISO's Table 3), the EU column written by the row's kind. Length as the brand's adults' (ADR 0030). Left out: a cell printed out of its column's order, kept out of the product chart (the live page prints it so, read on 2026-10-21: the brand's own slip). Brooks prints no kids' chart.
 
 ## Every other adult chart kept
 

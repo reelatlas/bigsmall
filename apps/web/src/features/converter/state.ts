@@ -534,11 +534,18 @@ export interface TableRow {
    */
   detail?: string | undefined;
   /**
-   * The brand's cell as printed (ADR 0028), a range ("9–9.5") or a third ("44 2/3"): its text
-   * stands whatever Display's places or fractions, split at its first number's end as every value
-   * is at its mark, so the first number lines up with the whole numbers (Sean, 2026-10-20).
+   * The brand's cell printed as a third ("44 2/3"; ADR 0028): its text stands whatever Display's
+   * places or fractions, split at its first number's end as every value is at its mark, so the
+   * first number lines up with the whole numbers (Sean, 2026-10-20).
    */
   printed?: true | undefined;
+  /**
+   * The brand's cell printed as a range (ADR 0028), its two ends: each written as Display writes
+   * a size ("9–9.5", "9–9 1/2" with Fraction; Sean, 2026-10-21, the hundred-and-thirty-fifth pass:
+   * it stood in decimals beside the fractions), split at the first end's whole number; the value
+   * is the lower end.
+   */
+  range?: readonly [number, number] | undefined;
 }
 
 /** A match while a unit is typed: a unit, or a category whose name matched, to open. */
@@ -1324,18 +1331,20 @@ function sizeOf(size: number, locale: string | undefined): string {
 }
 
 /**
- * A size as a brand prints it (ADR 0028, as printed): a range's two ends ("9–9.5"), a third
- * ("44 2/3"), each standing whatever the display, else the size, which the display writes.
+ * A size as a brand prints it (ADR 0028): a range's two ends ("9–9.5"), each a size the display
+ * writes (the table rewrites the halves as fractions with Fraction; Sean, 2026-10-21), a third
+ * ("44 2/3") standing whatever the display, else the size, which the display writes.
  */
 function asPrinted(
   value: number,
   range: readonly [number, number] | undefined,
   locale: string | undefined,
-): { text: string; printed: boolean } {
+): { text: string; printed: boolean; range?: readonly [number, number] } {
   if (range) {
     return {
       text: `${sizeOf(range[0], locale)}${RANGE_DASH}${sizeOf(range[1], locale)}`,
-      printed: true,
+      printed: false,
+      range,
     };
   }
   const halves = value * 2;
@@ -1359,7 +1368,7 @@ function brandCellRow(
   approx: boolean,
   locale: string | undefined,
 ): TableRow {
-  const { text, printed } = asPrinted(value, range, locale);
+  const { text, printed, range: ends } = asPrinted(value, range, locale);
   return {
     ...emptyRow(target, null),
     name: unitName(target, value),
@@ -1370,6 +1379,7 @@ function brandCellRow(
     stepped: !printed,
     inBox: false,
     ...(printed ? { printed: true as const } : {}),
+    ...(ends ? { range: ends } : {}),
   };
 }
 

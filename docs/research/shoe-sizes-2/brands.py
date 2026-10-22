@@ -773,7 +773,7 @@ KIDS = [
         ("nike.com/us", "Kids' Footwear - Babies & Toddlers (1C - 10C)", {}),
         ("nike.com/us", "Kids' Footwear - Little Kids (8C - 3Y)", {"inches": True}),
         ("nike.com/us", "Kids' Footwear - Big Kids (1Y - 7Y)", {"youth": True}),
-    ], "the three bands of nike.com's kids' page; the Little Kids band's cm column is its CM/JP label (140 at 8C against 150 on the Babies band and 15.08 in on its own inch column), so that band's inches are its foot (ADR 0030's grid test), equal to the Babies band's cm where the two overlap"),
+    ], "the three bands of nike.com's kids' page; the Little Kids band's cm column is its CM/JP label (140 at 8C against 150 on the Babies band and 15.08 in on its own inch column; the live page prints it so, read in Sean's browser on 2026-10-21, its Foot Length (cm) row equal to its CM / JP row cell for cell), so that band's inches are its foot (ADR 0030's grid test), equal to the Babies band's cm where the two overlap"),
     ("adidas", [
         ("manual", "kids_0_3", {}),
         ("manual", "kids_4_7", {}),
@@ -781,7 +781,7 @@ KIDS = [
     ], "the three bands of adidas.com's kids' charts, Sean's capture; its US column heads 1k to 13.5k then 1 to 7.5"),
     ("New Balance", [
         ("manual", "kids_0_4", {}),
-        ("manual", "kids_4_8", {"out": [(2.5, "uk", "UK 5 printed between UK 1.5 and 2.5, out of the chart's own order")]}),
+        ("manual", "kids_4_8", {"out": [(2.5, "uk", "UK 5 printed between UK 1.5 and 2.5, out of the chart's own order; printed so on the live page too, read in Sean's browser on 2026-10-21")]}),
         ("manual", "kids_8_12", {"youth": True}),
     ], "the three bands of newbalance.com's kids' guide, Sean's capture; its length column the standard centimetre label as its adults' (ADR 0030); one cell left out, UK 5 at a 2.5Y, printed out of the column's order"),
     ("Vans", [
@@ -1039,7 +1039,7 @@ def kids_table(charts):
     note = (
         "\n\nThe kids' charts recommended for the product (§5, decision 11; ADR 0031), one per brand, composed from its home site's age bands in age order (Pages), a size printed twice kept once where the bands agree. "
         "Children · youth: the rows before and from the chart's restart at 1 (US and UK sizes run to 13.5 and start again), the children's rows on ISO's children's scales (US C, UK C, EU C) and the youth rows on its adult scales (youth sizes are men's sizes, ISO's Table 3), the EU column written by the row's kind. "
-        "Length as the brand's adults' (ADR 0030). Left out: a cell printed out of its column's order, kept out of the product chart until the refresh checks it. Brooks prints no kids' chart.\n"
+        "Length as the brand's adults' (ADR 0030). Left out: a cell printed out of its column's order, kept out of the product chart (the live page prints it so, read on 2026-10-21: the brand's own slip). Brooks prints no kids' chart.\n"
     )
     return KIDS_HEAD + "\n".join(lines) + note
 

@@ -1054,20 +1054,23 @@ describe('brands (ADR 0028)', () => {
     expect(row(table, 'us-children')).toMatchObject({ text: '> 13.5', detail: 'above its range' });
   });
 
-  it('a range stands as printed in the brand’s own row; a scale the brand prints nothing for is ISO’s like every scale', () => {
+  it('a range is the brand’s own row with its two ends, each a size the display writes; a scale the brand prints nothing for is ISO’s like every scale', () => {
     const birks = units(type('birkenstock 9'), {
       type: 'use',
       unit: 'us-men',
       text: '9',
       brand: 'birkenstock',
     });
+    // The ends travel with the row for the table to write under Display (a half as a fraction
+    // with Fraction; Sean, 2026-10-21); a printed third alone stands as its text.
     expect(row(birks, 'brand:birkenstock')).toMatchObject({
       text: '9–9.5',
       value: 9,
-      printed: true,
-      stepped: false,
+      range: [9, 9.5],
+      stepped: true,
       inBox: true,
     });
+    expect(row(birks, 'brand:birkenstock')?.printed).toBeUndefined();
     expect(row(birks, 'us-men')).toMatchObject({ text: '10', approx: true, inBox: false });
     expect(row(birks, 'eu')).toMatchObject({ text: '42.5', approx: true });
     expect(birks.note).toContain('Whole EU sizes');

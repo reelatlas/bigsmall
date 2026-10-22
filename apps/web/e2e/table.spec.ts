@@ -2525,6 +2525,8 @@ test('the sizes’ first cells end on one edge in every theme, and the ≈ marks
   await ready(page);
   await setSettings(page, 'Fraction');
   await expect(row(page, 'us-children')).toContainText('> 13 1/2');
+  // A brand's range follows Display too: its halves as fractions (Sean, 2026-10-21).
+  await expect(row(page, 'brand:birkenstock')).toContainText(/\d+–\d+ 1\/2/);
   for (const theme of THEMES) {
     await applyTheme(page, theme);
     await linedUp(theme.id);

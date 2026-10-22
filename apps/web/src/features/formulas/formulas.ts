@@ -164,6 +164,9 @@ const CHART_SCALES: ReadonlyArray<readonly [keyof BrandChart['rows'][number], st
   ['ukWomen', 'UK women'],
   ['eu', 'EU'],
   ['jp', 'JP'],
+  ['usKids', 'US children'],
+  ['ukKids', 'UK children'],
+  ['euKids', 'EU children'],
   ['label', 'the CM label'],
   ['foot', 'the foot in mm'],
 ];
@@ -184,7 +187,12 @@ function brandLine(brand: ShoeBrand, chart: BrandChart): FormulaLine {
   const scales = CHART_SCALES.filter(([key]) =>
     chart.rows.some((row) => row[key] !== undefined),
   ).map(([, name]) => name);
-  const line = chart.line === 'unisex' ? 'one chart' : `the ${chart.line}’s chart`;
+  const line =
+    chart.line === 'unisex'
+      ? 'one chart'
+      : chart.line === 'kids'
+        ? 'the kids’ chart'
+        : `the ${chart.line}’s chart`;
   const name = `${brand.name}, ${line}`;
   const formula = `${chart.rows.length} sizes: ${scales.join(', ')}`;
   const rule =

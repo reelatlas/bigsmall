@@ -39,7 +39,33 @@
 | Under Armour | Women's Shoes Size Chart (underarmour.com/en-us) | 15 | a size label | 4.6 | 245 (−1) | +0.2 to +0.7 (+0.4) | −0.5 to 0 (−0.3) | −0.7 to +0.2 (−0.3) | — |
 | Vans | adult, Sean's capture | 22 | a size label | 5 | 280 (+9) | +0.2 to +0.8 (+0.5) | 0 | −1.6 to −0.4 (−1) | 1.5 |
 
-The 34 charts recommended for the product (§5, decision 1), one per brand and gender line; the other 87 adult charts kept (a brand's other regions, lines, and pages) follow in `deltas.md`, and the 70 kids' charts and 5 others (socks, sandals, boots) are in `brands.json` alone. Length: what the brand says its length column is (§7, §8). mm a half size: the chart's foot step, the median over its rows; ISO's barleycorn is 4.2, a centimetre grid 5. Foot at US M 10: the brand's foot length for its US men's 10 (a women's chart: US women's 8) and its difference from ISO's 271 mm (245.6 for W 8); a positive number means the chart gives a longer foot the same size, so a measured foot gets a smaller size from the brand than from ISO. EU − ISO and UK − ISO: the brand's European or British size beside its US size, minus the size ISO's rule gives that US size, the range over the chart's rows in the range most adults buy in (US men's 6 to 13, US women's 5 to 11, UK 4 to 12, EU 36 to 47) and the mean in brackets; a visitor who types a US size and reads our EU row meets this difference. US size − ISO at the same foot: the brand's US size for a row's foot length minus ISO's, for the charts with a length; the mirror of the foot column, in sizes. W − M: the brand's US women's minus US men's on one row; ISO's is 1. A range's middle stands in for a range (Birkenstock's US sizes, Crocs' EU pairs); Clarks' composed charts are its GB and US pages joined on the UK size they share.
+The 34 charts recommended for the product (§5, decision 1), one per brand and gender line; the other 87 adult charts kept (a brand's other regions, lines, and pages) follow in `deltas.md`, and the 70 kids' charts read (19 composed for the product, the table after this one) and 5 others (socks, sandals, boots) are in `brands.json` alone. Length: what the brand says its length column is (§7, §8). mm a half size: the chart's foot step, the median over its rows; ISO's barleycorn is 4.2, a centimetre grid 5. Foot at US M 10: the brand's foot length for its US men's 10 (a women's chart: US women's 8) and its difference from ISO's 271 mm (245.6 for W 8); a positive number means the chart gives a longer foot the same size, so a measured foot gets a smaller size from the brand than from ISO. EU − ISO and UK − ISO: the brand's European or British size beside its US size, minus the size ISO's rule gives that US size, the range over the chart's rows in the range most adults buy in (US men's 6 to 13, US women's 5 to 11, UK 4 to 12, EU 36 to 47) and the mean in brackets; a visitor who types a US size and reads our EU row meets this difference. US size − ISO at the same foot: the brand's US size for a row's foot length minus ISO's, for the charts with a length; the mirror of the foot column, in sizes. W − M: the brand's US women's minus US men's on one row; ISO's is 1. A range's middle stands in for a range (Birkenstock's US sizes, Crocs' EU pairs); Clarks' composed charts are its GB and US pages joined on the UK size they share.
+
+## The product's kids' charts
+
+| Brand | Pages | Rows | Children · youth | Length | Scales | Left out |
+|---|---|---|---|---|---|---|
+| adidas | 3 | 36 | 22 · 14 | the foot's | US C, US M, UK C, UK, EU C, EU, foot | — |
+| Asics | 1 | 29 | 16 · 13 | a size label | US C, US M, EU C, EU, CM label | — |
+| Birkenstock | 3 | 11 | 8 · 3 | the foot's | US C, US M, UK C, UK, EU C, EU, foot | — |
+| Clarks | 4 | 43 | 23 · 20 | the foot's | US C, US M, UK C, UK, EU C, EU, foot | — |
+| Converse | 2 | 36 | 25 · 11 | the foot's | US C, US M, foot | — |
+| Crocs | 1 | 19 | 13 · 6 | the foot's | US C, US M, UK C, UK, EU C, EU, JP, foot | — |
+| Dr. Martens | 1 | 24 | 18 · 6 | a size label | US C, US M, UK C, UK, EU C, EU, JP | — |
+| HOKA | 1 | 8 | 0 · 8 | the foot's | US M, foot | — |
+| New Balance | 3 | 40 | 27 · 13 | a size label | US C, US M, US W, UK C, UK, EU C, EU | uk at US 2.5: UK 5 printed between UK 1.5 and 2.5, out of the chart's own order |
+| Nike | 3 | 30 | 17 · 13 | the foot's | US C, US M, US W, UK C, UK, EU C, EU, JP, foot | — |
+| On | 1 | 12 | 7 · 5 | the foot's | US C, US M, UK C, UK, EU C, EU, JP, foot | — |
+| Puma | 3 | 24 | 11 · 13 | none | US C, US M, UK C, UK, EU C, EU | — |
+| Reebok | 3 | 39 | 26 · 13 | the foot's | US C, US M, foot | — |
+| Salomon | 1 | 15 | 6 · 9 | the foot's | US C, US M, UK C, UK, EU C, EU, foot | — |
+| Skechers | 2 | 35 | 22 · 13 | none | US C, US M, UK C, UK, EU C, EU | — |
+| Timberland | 4 | 39 | 26 · 13 | the foot's | US C, US M, UK C, UK, EU C, EU, foot | — |
+| UGG | 3 | 20 | 14 · 6 | the foot's | US C, US M, UK C, UK, EU C, EU, JP, foot | — |
+| Under Armour | 1 | 30 | 17 · 13 | a size label | US C, US M, US W, UK C, UK, EU C, EU | — |
+| Vans | 4 | 38 | 25 · 13 | a size label | US C, US M, UK C, UK, EU C, EU | — |
+
+The kids' charts recommended for the product (§5, decision 11; ADR 0031), one per brand, composed from its home site's age bands in age order (Pages), a size printed twice kept once where the bands agree. Children · youth: the rows before and from the chart's restart at 1 (US and UK sizes run to 13.5 and start again), the children's rows on ISO's children's scales (US C, UK C, EU C) and the youth rows on its adult scales (youth sizes are men's sizes, ISO's Table 3), the EU column written by the row's kind. Length as the brand's adults' (ADR 0030). Left out: a cell printed out of its column's order, kept out of the product chart until the refresh checks it. Brooks prints no kids' chart.
 
 ## Every other adult chart kept
 

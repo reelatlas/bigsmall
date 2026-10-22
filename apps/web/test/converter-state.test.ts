@@ -1097,8 +1097,14 @@ describe('brands (ADR 0028)', () => {
     expect(row(beyond, 'brand:nike')).toMatchObject({ text: '25', inBox: true });
     expect(row(beyond, 'brand:adidas')).toMatchObject({ tone: 'empty' });
     expect(beyond.note).toContain('Nike’s men’s chart runs US M 3.5 to 22.');
-    const kids = units(type('nike 8'), nike('8', 'us-children'));
-    expect(kids.note).toContain('Nike’s chart prints no US children.');
+    const brooks = units(type('brooks kids 8'), {
+      type: 'use',
+      unit: 'us-children',
+      text: '8',
+      brand: 'brooks',
+    });
+    expect(brooks.note).toContain('Brooks’ chart prints no US children.');
+    expect(row(brooks, 'brand:brooks')).toMatchObject({ text: '8', inBox: true });
   });
 
   it('a length typed is the value in focus, the brand’s row its size at that foot, ≈', () => {
@@ -1166,12 +1172,24 @@ describe('brands (ADR 0028)', () => {
       symbol: 'US M',
       detail: 'by its own rule',
     });
-    // A child's foot is off every adult chart.
+    // A child's foot is off every adults' chart: the kids' charts answer on the children's US,
+    // the twin of the scale asked, the row saying the chart (ADR 0031); Brooks prints none.
     const kid = units(type('150 mm'), { type: 'use', unit: 'mondopoint', text: '150' });
     expect(row(kid, 'brand:nike')).toMatchObject({
-      tone: 'empty',
-      detail: 'off its chart',
+      text: '8',
+      approx: false,
+      symbol: 'US C',
+      detail: 'kids',
+      brand: { id: 'nike', line: 'kids' },
     });
+    expect(row(kid, 'brand:adidas')).toMatchObject({ text: '8.5', approx: true, symbol: 'US C' });
+    expect(row(kid, 'brand:puma')).toMatchObject({
+      text: '8',
+      approx: true,
+      symbol: 'US C',
+      detail: 'kids · by ISO’s label',
+    });
+    expect(row(kid, 'brand:brooks')).toMatchObject({ tone: 'empty', detail: 'off its chart' });
     // Nothing typed yet: dashes, the brands' too.
     const waiting = units({ type: 'chooseCategory', category: 'shoe-size' });
     expect(row(waiting, 'brand:nike')).toMatchObject({ tone: 'empty' });
@@ -1449,13 +1467,93 @@ describe('brands (ADR 0028)', () => {
     expect(asicsList.rows[0]).toMatchObject({
       group: 'Asics’ chart, the women’s: choose the scale to read it on',
     });
-    const last = asicsList.rows.at(-1);
-    expect(last).toMatchObject({
-      unit: { id: 'us-men' },
-      line: null,
-      group: 'Asics’ chart, the men’s',
+    const men = asicsList.rows.find((each) => each.kind === 'brand' && each.unit?.id === 'us-men');
+    expect(men).toMatchObject({ line: null, group: 'Asics’ chart, the men’s' });
+    expect(men?.kind === 'brand' ? men.text : 'set').toBeUndefined();
+    // The kids' chart's scales last, offered while choosing (ADR 0031).
+    expect(asicsList.rows.at(-1)).toMatchObject({
+      unit: { id: 'eu-children' },
+      group: 'Asics’ chart, the kids’',
     });
-    expect(last?.kind === 'brand' ? last.text : 'set').toBeUndefined();
+    // In the table's order: the US scales, then the metric, then the UK (§5).
+    expect(
+      asicsList.rows.map((each) => (each.kind === 'brand' ? each.unit?.id : each.kind)),
+    ).toEqual(['us-women', 'eu', 'uk', 'us-men', 'us-children', 'eu-children']);
+  });
+
+  it('reads a kids’ chart (ADR 0031): a children’s size at a brand, the one value in focus, the rows kids’ sizes, the chip’s list the row’s scales by chart, and a youth size off the men’s chart', () => {
+    const kids = units(type('nike kids 10'), nike('10', 'us-children'));
+    expect(row(kids, 'brand:nike')).toMatchObject({
+      text: '10',
+      inBox: true,
+      symbol: 'US C',
+      detail: 'kids',
+    });
+    expect(kids.sections[0]!.label).toBe('Brands, the same foot in US C');
+    // ISO's rows from Nike's 10C foot, 16.7 cm: its children's table puts it between 10 and 10.5.
+    expect(row(kids, 'foot-cm')).toMatchObject({ text: '16.7', approx: false });
+    expect(row(kids, 'us-children')).toMatchObject({ text: '10', approx: true, inBox: false });
+    expect(row(kids, 'eu-children')).toMatchObject({ text: '27', approx: true });
+    // The other brands' kids' charts at the same foot, each saying the chart.
+    expect(row(kids, 'brand:adidas')).toMatchObject({ text: '10.5', approx: true, detail: 'kids' });
+    // Brooks prints no kids' chart: its men's, read on a scale that does not say the line, is off.
+    expect(row(kids, 'brand:brooks')).toMatchObject({
+      tone: 'empty',
+      detail: 'men · off its chart',
+    });
+    expect(kids.note).toBe('Nike’s size chart, the kids’, nike.com, read Oct 2026.');
+    // The chip's list: the kids' row's scales under the kids' heading, its youth scales left
+    // out, and the adults' charts off at this foot, so nothing of theirs.
+    const list = scaleList(kids, getShoeBrand('nike')!, getUnit('us-children')!, 10, null, 'en-US');
+    // In the table's order (§5): the US scales, the metric ones, then the UK.
+    expect(
+      list.rows.map((each) => (each.kind === 'brand' ? [each.unit?.id, each.text] : [each.kind])),
+    ).toEqual([
+      ['us-children', '10'],
+      ['eu-children', '27'],
+      ['japan', '16'],
+      ['uk-children', '9.5'],
+    ]);
+    expect(list.rows[0]).toMatchObject({ inBox: true, group: 'Nike’s chart, the kids’' });
+    expect(list.announcement).toBe('4 scales of Nike’s chart to choose from');
+    // A men's 3 is Nike's 3Y, off its men's chart: the kids' chart answers, its row the box's.
+    const youth = units(type('nike 3'), nike('3'));
+    expect(row(youth, 'brand:nike')).toMatchObject({
+      text: '3',
+      inBox: true,
+      symbol: 'US M',
+      detail: 'kids',
+    });
+    expect(row(youth, 'foot-cm')).toMatchObject({ text: '21.8' });
+    expect(youth.note).toBe('Nike’s size chart, the kids’, nike.com, read Oct 2026.');
+    // Its chip's list: the youth row's scales, US W among them where Nike's kids' page prints a
+    // women's column, all under the kids' heading, and the adults' charts off at this foot.
+    const youthList = scaleList(youth, getShoeBrand('nike')!, getUnit('us-men')!, 3, null, 'en-US');
+    expect(
+      youthList.rows.map((each) => (each.kind === 'brand' ? each.unit?.id : each.kind)),
+    ).toEqual(['us-men', 'us-women', 'eu', 'japan', 'uk']);
+    expect(
+      youthList.rows.every(
+        (each) => each.kind === 'brand' && each.group === 'Nike’s chart, the kids’',
+      ),
+    ).toBe(true);
+    expect(youthList.rows[1]).toMatchObject({ unit: { id: 'us-women' }, text: '4.5' });
+    // Typed: "nike kids 10" offers Nike on US children, "nike 10c" too.
+    for (const query of ['nike kids 10', 'nike 10c', 'kids 10 nike']) {
+      const typed = selectTable(run(type(query)), options);
+      expect(typed.kind, query).toBe('matches');
+      if (typed.kind !== 'matches') throw new Error('expected matches');
+      expect(typed.rows[0], query).toMatchObject({
+        kind: 'brand',
+        brand: { id: 'nike' },
+        unit: { id: 'us-children' },
+        text: '10',
+      });
+    }
+    // A children's size beyond the kids' chart says its span.
+    const beyond = units(type('nike kids 20'), nike('20', 'us-children'));
+    expect(beyond.note).toContain('Nike’s kids’ chart runs US C 1 to 13.5.');
+    expect(row(beyond, 'brand:adidas')).toMatchObject({ tone: 'empty' });
   });
 
   it('lists every brand to choose from, the one in the box marked (the pill’s list)', () => {

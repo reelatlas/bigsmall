@@ -36,6 +36,13 @@ describe('formulas', () => {
       exact: false,
     });
     expect(nike?.formula).toBe('38 sizes: US men, US women, UK, EU, JP, the foot in mm');
+    // The kids' chart (ADR 0031): its children's rows on the children's scales, its youth rows
+    // on the adults'.
+    const kids = charts.find((line) => line.id === 'brand:nike:kids');
+    expect(kids).toMatchObject({ name: 'Nike, the kids’ chart' });
+    expect(kids?.formula).toBe(
+      '30 sizes: US men, US women, UK, EU, JP, US children, UK children, EU children, the foot in mm',
+    );
     expect(nike?.source).toContain(
       'nike.com/size-fit/mens-footwear, read 2026-10-21; its length the foot’s.',
     );

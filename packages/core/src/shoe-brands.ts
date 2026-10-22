@@ -52,10 +52,55 @@ export function getShoeBrand(id: string): ShoeBrand | undefined {
   return byId.get(id);
 }
 
-/** The scales a brand's chart can print, by the unit's id. */
-export type BrandScale = 'us-men' | 'us-women' | 'uk' | 'eu' | 'japan';
+/**
+ * The scales a brand's chart can print, by the unit's id: the adult scales, and the children's
+ * scales a kids' chart prints up to its restart (ADR 0031).
+ */
+export type BrandScale =
+  'us-men' | 'us-women' | 'us-children' | 'uk' | 'uk-children' | 'eu' | 'eu-children' | 'japan';
 
-export const BRAND_SCALES: readonly BrandScale[] = ['us-men', 'us-women', 'uk', 'eu', 'japan'];
+export const BRAND_SCALES: readonly BrandScale[] = [
+  'us-men',
+  'us-women',
+  'us-children',
+  'uk',
+  'uk-children',
+  'eu',
+  'eu-children',
+  'japan',
+];
+
+/** The children's scales, printed by a kids' chart alone. */
+const CHILDREN_SCALES: ReadonlySet<BrandScale> = new Set([
+  'us-children',
+  'uk-children',
+  'eu-children',
+]);
+
+/**
+ * A scale's twin on a kids' chart (ADR 0031): the children's scale and the adult one it restarts
+ * into (US C and US M, a 1Y being a men's 1; UK C and UK; EU C and EU), so a size the adults'
+ * chart lacks is looked for on the kids' chart under either, and a kids' row answers on whichever
+ * it prints. None for the women's scale and Japan's.
+ */
+const TWIN: Partial<Record<BrandScale, BrandScale>> = {
+  'us-men': 'us-children',
+  'us-children': 'us-men',
+  uk: 'uk-children',
+  'uk-children': 'uk',
+  eu: 'eu-children',
+  'eu-children': 'eu',
+};
+
+export function twinScale(scale: BrandScale): BrandScale | null {
+  return TWIN[scale] ?? null;
+}
+
+/** The scale and its twin, where it has one: the fields a row is read on, in that order. */
+function withTwin(scale: BrandScale): readonly BrandScale[] {
+  const twin = TWIN[scale];
+  return twin ? [scale, twin] : [scale];
+}
 
 /** The dash between a range's two ends as a row writes it ("9–9.5"), which a split finds. */
 export const RANGE_DASH = '–';
@@ -73,11 +118,17 @@ export function isBrandScale(id: string): id is BrandScale {
   return (BRAND_SCALES as readonly string[]).includes(id);
 }
 
-const FIELD: Record<BrandScale, 'usMen' | 'usWomen' | 'uk' | 'eu' | 'jp'> = {
+const FIELD: Record<
+  BrandScale,
+  'usMen' | 'usWomen' | 'usKids' | 'uk' | 'ukKids' | 'eu' | 'euKids' | 'jp'
+> = {
   'us-men': 'usMen',
   'us-women': 'usWomen',
+  'us-children': 'usKids',
   uk: 'uk',
+  'uk-children': 'ukKids',
   eu: 'eu',
+  'eu-children': 'euKids',
   japan: 'jp',
 };
 
@@ -158,19 +209,24 @@ export function splitShoeBrand(
 }
 
 /**
- * The chart a brand answers with: the women's where it prints one and the size is women's, else
- * the men's, else its one chart for everyone; from the charts core was given (ADR 0029), so asked
- * before, it throws.
+ * The adults' chart a brand answers with: the women's where it prints one and the size is
+ * women's, else the men's, else its one chart for everyone; from the charts core was given
+ * (ADR 0029), so asked before, it throws.
  */
 export function brandChart(brand: ShoeBrand, women: boolean): BrandChart {
   const line: BrandLine = women ? 'women' : 'men';
-  const charts = brandChartsOf(brand.id);
+  const charts = brandChartsOf(brand.id).filter((each) => each.line !== 'kids');
   const chart =
     charts.find((each) => each.line === line) ??
     charts.find((each) => each.line === 'unisex') ??
     charts[0];
   if (!chart) throw new Error(`${brand.name} has no chart`);
   return chart;
+}
+
+/** The brand's kids' chart (ADR 0031), or null where it prints none (Brooks). */
+export function kidsChart(brand: ShoeBrand): BrandChart | null {
+  return brandChartsOf(brand.id).find((each) => each.line === 'kids') ?? null;
 }
 
 /**
@@ -183,6 +239,16 @@ export function otherBrandChart(brand: ShoeBrand, chart: BrandChart): BrandChart
     chart.line === 'men' ? 'women' : chart.line === 'women' ? 'men' : null;
   if (line === null) return null;
   return brandChartsOf(brand.id).find((each) => each.line === line) ?? null;
+}
+
+/**
+ * The brand's other charts beside one (ADR 0031): the other gender line's first where it prints
+ * its lines apart, then the kids'; beside the kids' chart, the adults' in the file's order.
+ */
+export function otherBrandCharts(brand: ShoeBrand, chart: BrandChart): readonly BrandChart[] {
+  const rest = brandChartsOf(brand.id).filter((each) => each !== chart);
+  const other = otherBrandChart(brand, chart);
+  return other ? [other, ...rest.filter((each) => each !== other)] : rest;
 }
 
 /** A row's size on a scale: the size, with the two ends where the brand prints a range. */
@@ -275,15 +341,25 @@ function feetOf(brand: ShoeBrand, chart: BrandChart): { foot: number; row: Brand
 }
 
 /**
+ * The scales a chart's own sizes are read on, first first: its US column for the line, else the
+ * first scale it prints; a kids' chart's children's US, then its youth US, and so on (ADR 0031).
+ */
+function ownOrder(chart: BrandChart, women: boolean): readonly BrandScale[] {
+  if (chart.line === 'kids') {
+    return ['us-children', 'us-men', 'uk-children', 'uk', 'eu-children', 'eu', 'us-women', 'japan'];
+  }
+  return women
+    ? ['us-women', 'uk', 'eu', 'us-men', 'japan']
+    : ['us-men', 'uk', 'eu', 'us-women', 'japan'];
+}
+
+/**
  * The scale a chart's own sizes are read on first: its US column for the line, else the first
  * scale it prints; what a brand's row shows where the chart lacks the scale in focus, and the
  * scale ISO's label is taken on for a brand that gives no foot length (tier 4).
  */
 export function ownScale(chart: BrandChart, women: boolean): BrandScale | null {
-  const order: readonly BrandScale[] = women
-    ? ['us-women', 'uk', 'eu', 'us-men', 'japan']
-    : ['us-men', 'uk', 'eu', 'us-women', 'japan'];
-  return order.find((scale) => brandSpan(chart, scale, women) !== null) ?? null;
+  return ownOrder(chart, women).find((scale) => brandSpan(chart, scale, women) !== null) ?? null;
 }
 
 /**
@@ -296,21 +372,21 @@ function isoLabel(foot: number, scale: BrandScale): number | null {
 }
 
 /**
- * The row nearest a foot, among the rows printing the scale (every row with a foot for a null
- * scale), where the chart gives feet, as printed or by the brand's own rule (docs/RESEARCH.md
- * §9): a tie goes to the longer foot, as brands advise sizing up between sizes. Null where the
- * chart gives no feet, or the foot lies past its ends by more than half a row's step, as a shoe
- * fits a foot half a step either way (ADR 0027).
+ * The row nearest a foot, among the rows printing one of the scales (every row with a foot for
+ * null), where the chart gives feet, as printed or by the brand's own rule (docs/RESEARCH.md §9):
+ * a tie goes to the longer foot, as brands advise sizing up between sizes. Null where the chart
+ * gives no feet, or the foot lies past its ends by more than half a row's step, as a shoe fits a
+ * foot half a step either way (ADR 0027).
  */
 export function brandRowNear(
   brand: ShoeBrand,
   chart: BrandChart,
   foot: number,
-  scale: BrandScale | null,
+  scales: readonly BrandScale[] | null,
   women: boolean,
 ): BrandChartRow | null {
   const feet = feetOf(brand, chart).filter(
-    ({ row }) => scale === null || brandCell(row, scale, women) !== null,
+    ({ row }) => scales === null || scales.some((scale) => brandCell(row, scale, women) !== null),
   );
   if (feet.length === 0) return null;
   const first = feet[0]!;
@@ -330,6 +406,7 @@ export function brandRowNear(
 /** What a brand's chart says of the size in the box (ADR 0028). */
 export interface BrandReading {
   brand: ShoeBrand;
+  /** The chart that answered: the adults' for the line, or the kids' (ADR 0031). */
   chart: BrandChart;
   /**
    * Women's: the box's size is on the US women's scale, so the women's chart answers where there is
@@ -358,7 +435,9 @@ export interface BrandReading {
 /**
  * The brand's chart read at the box's unit and value; `women` reads the women's chart on a scale
  * that does not say the line (EU, UK, JP, a length), where the web app keeps the line from a US
- * women's size (ADR 0028, 2026-10-20).
+ * women's size (ADR 0028, 2026-10-20). The kids' chart answers a children's scale, a size on an
+ * adult scale the adults' chart lacks and it prints (a Nike 3 is its 3Y; an EU 28 its 11C), and a
+ * length off the adults' chart (ADR 0031).
  */
 export function readBrand(
   brand: ShoeBrand,
@@ -366,10 +445,11 @@ export function readBrand(
   value: number,
   women = unit.id === 'us-women',
 ): BrandReading {
-  const chart = brandChart(brand, women);
+  const adults = brandChart(brand, women);
+  const kids = kidsChart(brand);
   const base = {
     brand,
-    chart,
+    chart: adults,
     women,
     row: null,
     foot: null,
@@ -377,17 +457,44 @@ export function readBrand(
     beyond: null,
     tier: null,
   };
-  const tierOf = (row: BrandChartRow): BrandTier =>
+  const tierOf = (chart: BrandChart, row: BrandChartRow): BrandTier =>
     footOfRow(brand, chart, row) === undefined ? 4 : chart.basis === 'foot' ? 1 : 2;
+  const found = (chart: BrandChart, row: BrandChartRow): BrandReading => ({
+    ...base,
+    chart,
+    row,
+    foot: footOfRow(brand, chart, row) ?? null,
+    tier: tierOf(chart, row),
+  });
   if (LENGTH_UNITS.has(unit.id)) {
     const foot = toBase(unit, value);
-    const row = brandRowNear(brand, chart, foot, null, women);
-    return { ...base, length: true, foot, row, tier: row ? tierOf(row) : null };
+    let chart = adults;
+    let row = brandRowNear(brand, adults, foot, null, women);
+    if (row === null && kids) {
+      const kidsRow = brandRowNear(brand, kids, foot, null, women);
+      if (kidsRow) {
+        chart = kids;
+        row = kidsRow;
+      }
+    }
+    return { ...base, chart, length: true, foot, row, tier: row ? tierOf(chart, row) : null };
   }
   if (!isBrandScale(unit.id)) return base;
-  const row = brandRowAt(chart, unit.id, value, women);
-  if (!row) return { ...base, beyond: brandSpan(chart, unit.id, women) };
-  return { ...base, row, foot: footOfRow(brand, chart, row) ?? null, tier: tierOf(row) };
+  if (CHILDREN_SCALES.has(unit.id)) {
+    if (!kids) return base;
+    const row = brandRowAt(kids, unit.id, value, women);
+    if (!row) return { ...base, chart: kids, beyond: brandSpan(kids, unit.id, women) };
+    return found(kids, row);
+  }
+  const row = brandRowAt(adults, unit.id, value, women);
+  if (row) return found(adults, row);
+  if (kids) {
+    for (const scale of withTwin(unit.id)) {
+      const kidsRow = brandRowAt(kids, scale, value, women);
+      if (kidsRow) return found(kids, kidsRow);
+    }
+  }
+  return { ...base, beyond: brandSpan(adults, unit.id, women) };
 }
 
 /**
@@ -416,8 +523,9 @@ export interface BrandRowReading {
  * A chart's size for a foot on a scale, by the tiers (docs/RESEARCH.md §9): at the row nearest
  * the foot where the brand gives feet, as printed or by its own rule, ≈ where that row's foot is
  * not the foot; else ISO's label for the foot on the chart's own scale, read through the brand's
- * own row, ≈ always. On the chart's own scale where it lacks the one asked for. Or why it has
- * none: the chart prints no scale at all, or the foot is off it.
+ * own row, ≈ always. On the scale's twin where the chart prints that for the row (a kids' chart's
+ * children's US for a foot asked in US M; ADR 0031), else on the chart's own scale where it lacks
+ * the one asked for. Or why it has none: the chart prints no scale at all, or the foot is off it.
  */
 export function chartAtFoot(
   brand: ShoeBrand,
@@ -429,46 +537,69 @@ export function chartAtFoot(
   const base = { brand, chart, value: null, foot: null, approx: false, scale: null, tier: null };
   const own = ownScale(chart, women);
   if (own === null) return { ...base, why: 'no-scale' };
-  const read: BrandScale = brandSpan(chart, scale, women) === null ? own : scale;
+  // The scales the row is read on, first first: the one asked for, its twin, the chart's own.
+  const wanted = withTwin(scale).filter((each) => brandSpan(chart, each, women) !== null);
+  const scales: readonly BrandScale[] = wanted.length > 0 ? wanted : [own];
+  const cellOn = (row: BrandChartRow): { cell: BrandCell; scale: BrandScale } | null => {
+    for (const each of scales) {
+      const cell = brandCell(row, each, women);
+      if (cell) return { cell, scale: each };
+    }
+    return null;
+  };
   if (feetOf(brand, chart).length > 0) {
-    const row = brandRowNear(brand, chart, foot, read, women);
+    const row = brandRowNear(brand, chart, foot, scales, women);
     const rowFoot = row ? footOfRow(brand, chart, row) : undefined;
     if (!row || rowFoot === undefined) return { ...base, why: 'off-chart' };
-    const cell = brandCell(row, read, women);
-    if (!cell) return { ...base, why: 'no-scale' };
+    const on = cellOn(row);
+    if (!on) return { ...base, why: 'no-scale' };
     return {
       brand,
       chart,
-      value: cell.value,
-      range: cell.range,
+      value: on.cell.value,
+      range: on.cell.range,
       foot: rowFoot,
       approx: Math.abs(rowFoot - foot) > 0.5,
-      scale: read,
+      scale: on.scale,
       tier: chart.basis === 'foot' ? 1 : 2,
       why: null,
     };
   }
-  const label = isoLabel(foot, own);
-  const row = label === null ? null : brandRowAt(chart, own, label, women);
+  // ISO's label for the foot on the chart's own scales in turn, the first the chart prints a row
+  // for: a kids' chart's children's scale for a child's foot, its youth scale for a youth's.
+  let row: BrandChartRow | null = null;
+  for (const each of ownOrder(chart, women)) {
+    if (brandSpan(chart, each, women) === null) continue;
+    const label = isoLabel(foot, each);
+    row = label === null ? null : brandRowAt(chart, each, label, women);
+    if (row) break;
+  }
   if (!row) return { ...base, why: 'off-chart' };
-  const cell = brandCell(row, read, women);
-  if (!cell) return { ...base, why: 'no-scale' };
+  const on = cellOn(row);
+  if (!on) return { ...base, why: 'no-scale' };
   return {
     brand,
     chart,
-    value: cell.value,
-    range: cell.range,
+    value: on.cell.value,
+    range: on.cell.range,
     foot: null,
     approx: true,
-    scale: read,
+    scale: on.scale,
     tier: 4,
     why: null,
   };
 }
 
-/** Every brand's size on a scale for a foot, each by its own chart at the nearest row. */
+/**
+ * Every brand's size on a scale for a foot, each by its own chart at the nearest row: the adults'
+ * chart for the line, and the kids' chart where the foot is off it (ADR 0031).
+ */
 export function brandsAtFoot(foot: number, scale: BrandScale, women: boolean): BrandRowReading[] {
-  return shoeBrands.map((brand) =>
-    chartAtFoot(brand, brandChart(brand, women), foot, scale, women),
-  );
+  return shoeBrands.map((brand) => {
+    const read = chartAtFoot(brand, brandChart(brand, women), foot, scale, women);
+    const kids = read.why === 'off-chart' ? kidsChart(brand) : null;
+    if (!kids) return read;
+    const onKids = chartAtFoot(brand, kids, foot, scale, women);
+    return onKids.why === 'off-chart' ? read : onKids;
+  });
 }

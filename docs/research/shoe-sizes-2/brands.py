@@ -320,6 +320,8 @@ RECOMMENDED = {
     ("Under Armour", "underarmour.com/en-us", "Men's Shoes Size Chart"),
     ("Under Armour", "underarmour.com/en-us", "Women's Shoes Size Chart"),
     ("Vans", "manual", "adult"),
+    # The kids' charts (§5, decision 11; ADR 0031): one per brand, composed from its home site's
+    # age bands by KIDS below; Brooks prints none.
 }
 
 MANUAL_NAMES = {"adidas": "adidas", "new_balance": "New Balance", "vans": "Vans", "ugg": "UGG", "hoka": "HOKA", "timberland": "Timberland", "on": "On"}
@@ -476,7 +478,7 @@ def scales_only(chart):
 
 
 MANUAL_KEYS = {
-    "us_men": "us_men", "us_women": "us_women", "us_kids": "us_kids", "us_youth": "us_kids", "us_numeric": "us_numeric",
+    "us_men": "us_men", "us_women": "us_women", "us_kids": "us_kids", "us_youth": "us_kids", "us_numeric": "us_numeric", "us": "us_by_line",
     "uk": "uk", "eu": "eu", "jp": "jp", "mx": "mx", "cn": "cn", "br": "br", "au": "au",
     "heel_toe_cm": "foot_cm", "heel_toe_in": "foot_in", "heel_toe_mm": "foot_mm", "ball_width_in": "width_in",
 }
@@ -757,6 +759,291 @@ def composed(charts):
     return [finish(c) for c in out]
 
 
+# --- the kids' charts (docs/research/shoe-sizes-2.md §5, decision 11; ADR 0031) -------------------------
+# One kids' chart per brand from its home site's age bands, in age order. A part is (site, chart,
+# options): `youth` where the band starts past the restart (1Y on); `inches` where the band's cm
+# column is a label grid and its inch column the foot (Nike's Little Kids: 140, 150, 160, 165 ...
+# a round centimetre a size at round numbers, equal to its CM/JP label column, while its inches
+# step the barleycorn and agree with the Babies and Big Kids bands where they overlap; ADR 0030's
+# grid test); `pairs` False where a table's paired rows (UGG's baby booties, 0/1, 2/3) are left
+# out; `only` the keys taken from a part joined onto the rows (`on`: the key the pages share, a
+# children's or youth key alike); `out` the cells left out of the product chart with why.
+KIDS = [
+    ("Nike", [
+        ("nike.com/us", "Kids' Footwear - Babies & Toddlers (1C - 10C)", {}),
+        ("nike.com/us", "Kids' Footwear - Little Kids (8C - 3Y)", {"inches": True}),
+        ("nike.com/us", "Kids' Footwear - Big Kids (1Y - 7Y)", {"youth": True}),
+    ], "the three bands of nike.com's kids' page; the Little Kids band's cm column is its CM/JP label (140 at 8C against 150 on the Babies band and 15.08 in on its own inch column), so that band's inches are its foot (ADR 0030's grid test), equal to the Babies band's cm where the two overlap"),
+    ("adidas", [
+        ("manual", "kids_0_3", {}),
+        ("manual", "kids_4_7", {}),
+        ("manual", "kids_8_16", {"youth": True}),
+    ], "the three bands of adidas.com's kids' charts, Sean's capture; its US column heads 1k to 13.5k then 1 to 7.5"),
+    ("New Balance", [
+        ("manual", "kids_0_4", {}),
+        ("manual", "kids_4_8", {"out": [(2.5, "uk", "UK 5 printed between UK 1.5 and 2.5, out of the chart's own order")]}),
+        ("manual", "kids_8_12", {"youth": True}),
+    ], "the three bands of newbalance.com's kids' guide, Sean's capture; its length column the standard centimetre label as its adults' (ADR 0030); one cell left out, UK 5 at a 2.5Y, printed out of the column's order"),
+    ("Vans", [
+        ("manual", "infants", {}),
+        ("manual", "toddlers", {}),
+        ("manual", "kids", {}),
+        ("manual", "youth", {"youth": True}),
+    ], "the four bands of vans.com's kids' tab, Sean's capture; its length column the standard centimetre label as its adults' (ADR 0030); the youth band's last two rows print UK and EU alone"),
+    ("UGG", [
+        ("manual", "baby", {"pairs": False}),
+        ("manual", "toddlers", {}),
+        ("manual", "big_kids", {}),
+    ], "the three kids' tables of ugg.com's size chart, Sean's capture, the baby table's paired rows (0/1, 2/3, 4/5, 6/7, its booties) left out; the kids' PDF, a label grid, not read"),
+    ("HOKA", [("manual", "kids", {"youth": True})], "hoka.com's kids' table, Sean's capture: youth sizes 3.5 to 7 with the foot alone"),
+    ("Timberland", [
+        ("manual", "infant", {}),
+        ("manual", "toddler", {}),
+        ("manual", "youth", {}),
+        ("manual", "junior", {"youth": True}),
+    ], "the four bands of timberland.com's kids' charts, Sean's capture"),
+    ("On", [("manual", "kids", {})], "on.com's kids' Size & Fit panel, Sean's capture, its length a measured foot that equals its Japan label"),
+    ("Dr. Martens", [("pasted", "Kid's Sizing", {})], "drmartens.com's Kid's Sizing tab, Sean's pasted text: size labels alone, its Japan column a centimetre label; the first row printed twice"),
+    ("Puma", [
+        ("us.puma.com", "Kids' sizing: Toddler shoes", {}),
+        ("us.puma.com", "Kids' sizing: Little kids' shoes", {}),
+        ("us.puma.com", "Kids' sizing: Junior shoes", {"youth": True}),
+    ], "the three bands of us.puma.com's kids' sizing panel, Sean's read; no length"),
+    ("Asics", [("asics.com/us", "Kids shoes chart", {})], "asics.com/us's kids' chart, Sean's read: K4 to K13 then 1 to 7, its CM column the centimetre label its NZ and AU rule reads (decision 5 of the sources pass)"),
+    ("Converse", [
+        ("converse.com", "Babies & toddlers shoes", {}),
+        ("converse.com", "Kids' shoes", {}),
+    ], "converse.com's two kids' tables, Sean's read: US sizes and the foot's length alone"),
+    ("Crocs", [("crocs.com/size-chart", "Kids'", {})], "crocs.com's Kids' chart as rendered, Sean's read: C1 to C13 then J1 to J6, its EU a pair"),
+    ("Skechers", [
+        ("skechers.com (re-read)", "Infant & Toddler", {}),
+        ("skechers.com (re-read)", "Kids'", {}),
+    ], "skechers.com's two kids' tabs, Sean's re-read: 10.5-L to 3-L then whole youth sizes; no length"),
+    ("Under Armour", [("underarmour.com (re-read)", "Boys' Shoes", {})], "underarmour.com's boys' chart, Sean's re-read: 1K to 13.5K then 1 to 7; its CM column the standard centimetre label as its adults' (ADR 0030); the girls' chart prints the same sizes"),
+    ("Reebok", [
+        ("reebok.com", "TODDLER & BABY SHOES SIZING", {}),
+        ("reebok.com", "PRESCHOOL/LITTLE KIDS SHOES SIZING", {}),
+        ("reebok.com", "GRADE SCHOOL/BIG KIDS SHOES SIZING", {"youth": True}),
+    ], "the three bands of reebok.com's kids' size guide: US sizes and heel-to-toe inches alone"),
+    ("Salomon", [("salomon.com/en-us", "Kid's Footwear", {})], "salomon.com's kids' chart: 9 (Kid) to 13 (Kid) then 1 to 8"),
+    ("Clarks", [
+        ("clarks.com/en-gb", "Kids & Babies Clarks Shoe Sizes", {}),
+        ("clarks.com.au", "Kids: Baby/Toddler", {"on": "uk", "only": ("us_kids",)}),
+        ("clarks.com.au", "Kids: Junior Kids", {"on": "uk", "only": ("us_kids",)}),
+        ("clarks.com.au", "Kids: Senior Kids", {"on": "uk", "only": ("us_kids",), "youth": True}),
+    ], "the GB page's kids' chart (UK, EU, mm) with the AU page's US kids' sizes joined on the UK size they share, the AU page's CM column, unexplained, left as text; the GB chart runs on past the junior sizes to UK 10"),
+    ("Birkenstock", [
+        ("birkenstock.com (Sites-EU-Site en_NL)", "Kids: EU sizes and measurements (in mm)", {}),
+        ("birkenstock.com/gb", "Kids: UK sizes and measurements (in mm)", {"on": "foot_mm", "only": ("uk",)}),
+        ("birkenstock.com/us", "Size Conversion Chart: Kids", {"on": "eu", "only": ("us_kids",)}),
+    ], "the EU page's kids' sizes and feet, the GB page's UK sizes joined on the foot the two print alike, and the US page's US pairs (6–6.5 to 3–3.5) joined on the EU size"),
+]
+
+# The keys a row keeps from a part; the derived ones are rebuilt by finish.
+DERIVED = {"foot_in_mm", "foot_from_inches", "uk_from_men", "label", "product_mm", "foot_mm_korea", "disagree", "youth"}
+# A children's key and the youth key it becomes past the restart (the US and UK scales restart at
+# 1 after 13.5; ISO's children's scales to the restart, its adult scales from it; EU is one scale
+# with no restart, written as the children's or the adult European by the row's US, else UK, kind).
+YOUTH_KEY = {"us_kids": "us_men", "uk": "uk", "eu": "eu"}
+CHILD_KEY = {"us_kids": "us_kids", "uk": "uk_kids", "eu": "eu_kids"}
+
+
+def kids_key(row, base):
+    """A row's cell on a base scale, under its children's or its youth key: (key, value) or None."""
+    for key in (CHILD_KEY.get(base, base), YOUTH_KEY.get(base, base)):
+        if row.get(key) is not None:
+            return key, row[key]
+    return None
+
+
+def rename(row, old, new):
+    for suffix in ("", "_low", "_high"):
+        if old + suffix in row:
+            row[new + suffix] = row.pop(old + suffix)
+
+
+def split_kids(part, options, site):
+    """A band's rows with each cell under its children's or youth key: youth from the first row the US
+    column drops at (the restart), or from the start where the band begins past it; the UK column by
+    its own drop, one row later than the US at most brands (a 1Y is a UK 13.5)."""
+    rows = []
+    youth = bool(options.get("youth"))
+    # A band starting at 1Y still prints that row's UK as the children's 13.5 (Nike's Big Kids),
+    # the UK restarting a row later, so the UK's own drop says, unless the band starts past it.
+    first_uk = next((row.get("uk") for row in part["rows"] if row.get("uk") is not None), None)
+    uk_youth = youth and (first_uk is None or first_uk < 10)
+    prev_us = prev_uk = None
+    only = options.get("only")
+    on = options.get("on")
+    if only and on:
+        only = (*only, on, CHILD_KEY.get(on, on))  # the key the join rests on travels with the cells taken
+    out = {(size, key): why for size, key, why in options.get("out", [])}
+    for row in part["rows"]:
+        text = row.get("text") or {}
+        if options.get("pairs") is False and any("/" in str(v) for k, v in text.items() if k.startswith("us")):
+            continue
+        r = {}
+        for key, value in row.items():
+            if key == "text" or key in DERIVED or value is None:
+                continue
+            if key == "foot_mm" and (row.get("foot_cm") is not None or row.get("foot_in") is not None):
+                continue  # derived from the cm or the inches at finish
+            if only and not any(key == k or key.startswith(k + "_") for k in only):
+                continue
+            r[key] = value
+        if options.get("inches"):
+            r.pop("foot_cm", None)
+            r.pop("foot_mm", None)
+        us = row.get("us_kids")
+        if us is not None:
+            if prev_us is not None and us < prev_us - 1e-9:
+                youth = True
+            prev_us = us
+            for key, why in [(k, w) for (s, k), w in out.items() if abs(s - us) < 1e-9]:
+                if key in r:
+                    r.pop(key, None)
+                    r.setdefault("left_out", []).append(f"{key} at US {us:g}: {why}")
+        uk = row.get("uk")
+        if uk is not None:
+            if prev_uk is not None and uk < prev_uk - 1e-9:
+                uk_youth = True
+            prev_uk = uk
+        if us is None and uk is not None and not options.get("youth"):
+            youth = uk_youth  # no US column: the UK's restart says
+        if youth:
+            rename(r, "us_kids", "us_men")
+        if not uk_youth:
+            rename(r, "uk", "uk_kids")
+        r["youth"] = youth
+        r["text"] = {f"{site}: {h}": v for h, v in text.items()}
+        rows.append(r)
+    return rows
+
+
+def kind_of(row):
+    """Youth where the row has a youth US cell, children's where a children's one, else by its UK."""
+    if row.get("us_men") is not None or row.get("us_men_low") is not None:
+        return True
+    if row.get("us_kids") is not None or row.get("us_kids_low") is not None:
+        return False
+    return row.get("uk") is not None and row.get("uk_kids") is None
+
+
+def same_cells(a, b):
+    """Whether two rows agree on every scale they share (the foot within a millimetre)."""
+    for key in set(a) & set(b):
+        if key in ("text", "youth", "left_out"):
+            continue
+        tolerance = 1.0 if key.startswith("foot") else 1e-9
+        if isinstance(a[key], (int, float)) and isinstance(b[key], (int, float)) and abs(a[key] - b[key]) > tolerance:
+            return False
+    return True
+
+
+def compose_kids(charts, brand, specs, note):
+    """One kids' chart from a brand's bands and joined pages: the bands appended in age order, a size
+    printed twice kept once where the bands agree (their cells unioned), the first kept and the
+    disagreement recorded where they differ; a joined page's cells put on the rows sharing its key."""
+    rows = []
+    parts = []
+    dropped = []
+    for site, chart, options in specs:
+        part = find(charts, brand, site, chart)
+        parts.append(part)
+        split = split_kids(part, options, part["site"])
+        on = options.get("on")
+        if on:
+            for r in split:
+                hit = kids_key(r, on)
+                if hit is None:
+                    continue
+                key, value = hit
+                # The row under the same key first (a UK 2.5 is a baby's and a junior's), the other
+                # kind's only where the page joined has no restart to say (Birkenstock's EU page).
+                target = next((x for x in rows if x.get(key) is not None and abs(x[key] - value) < 1e-9), None) or next(
+                    (x for x in rows if any(x.get(k) is not None and abs(x[k] - value) < 1e-9 for k in (CHILD_KEY.get(on, on), YOUTH_KEY.get(on, on)))), None
+                )
+                if target is None:
+                    dropped.append(f"{part['site']} {chart}: no row shares {key} {value:g}")
+                    continue
+                for k, v in r.items():
+                    if k in ("text", "youth"):
+                        continue
+                    if k == "left_out":
+                        target.setdefault("left_out", []).extend(v)
+                    elif target.get(k) is None:
+                        target[k] = v
+                    elif isinstance(v, (int, float)) and abs(target[k] - v) > 1e-9:
+                        target.setdefault("disagree", []).append(f"{k}: {target[k]} against {part['site']}'s {v}")
+                target["text"].update(r["text"])
+                if r["youth"] and not target["youth"]:
+                    target["youth"] = True
+            continue
+        for r in split:
+            key = kids_key(r, "us_kids") or kids_key(r, "uk")
+            twin = next((x for x in rows if key is not None and x.get(key[0]) is not None and abs(x[key[0]] - key[1]) < 1e-9 and x["youth"] == r["youth"]), None)
+            if twin is None:
+                rows.append(r)
+            elif same_cells(twin, r):
+                for k, v in r.items():
+                    if k not in twin or twin[k] is None:
+                        twin[k] = v
+                twin["text"].update(r["text"])
+                dropped.append(f"{chart}: {key[0]} {key[1]:g} printed again, equal")
+            else:
+                twin.setdefault("disagree", []).append(f"{chart} prints {key[0]} {key[1]:g} as " + ", ".join(f"{k} {v}" for k, v in r.items() if k not in ("text", "youth") and isinstance(v, (int, float)) and twin.get(k) != v))
+                twin["text"].update(r["text"])
+    # EU under the children's or the adult key by the row's kind, found from its US, else its UK.
+    for r in rows:
+        youth = kind_of(r)
+        r["youth"] = youth
+        if youth:
+            rename(r, "eu_kids", "eu")
+        else:
+            rename(r, "eu", "eu_kids")
+    rows.sort(key=lambda r: (r.get("foot_mm") if r.get("foot_mm") is not None else (r.get("foot_cm") * 10 if r.get("foot_cm") is not None else (r.get("foot_in") * 25.4 if r.get("foot_in") is not None else (r.get("eu_kids") if r.get("eu_kids") is not None else r.get("eu", 0)) * 10))))
+    chart = {
+        "brand": brand,
+        "site": "composed",
+        "chart": "Kids, composed",
+        "line": "kids",
+        "kind": "composed",
+        "length": parts[0]["length"],
+        "columns": sorted({c for p in parts for c in p["columns"]}),
+        "source": [f"{p['site']}: {p['chart']} ({p['source']})" for p in parts],
+        "read": note,
+        "rows": rows,
+        "dropped": dropped,
+    }
+    return finish(chart)
+
+
+def composed_kids(charts):
+    return [compose_kids(charts, brand, specs, note) for brand, specs, note in KIDS]
+
+
+KIDS_HEAD = "| Brand | Pages | Rows | Children · youth | Length | Scales | Left out |\n|---|---|---|---|---|---|---|\n"
+
+
+def kids_table(charts):
+    """The kids' composed charts' table (the doc's §9)."""
+    lines = []
+    for c in sorted((c for c in charts if c["line"] == "kids" and c.get("product")), key=lambda c: BRAND_ORDER.index(c["brand"])):
+        rows = c["rows"]
+        children = sum(1 for r in rows if not r.get("youth"))
+        scales = [s for s, keys in (("US C", ("us_kids",)), ("US M", ("us_men",)), ("US W", ("us_women",)), ("UK C", ("uk_kids",)), ("UK", ("uk",)), ("EU C", ("eu_kids",)), ("EU", ("eu",)), ("JP", ("jp",)), ("CM label", ("label",)), ("foot", ("foot_mm",))) if any(r.get(k) is not None or r.get(k + "_low") is not None for r in rows for k in keys)]
+        if c["length"]["basis"] != "foot" and "foot" in scales:
+            scales.remove("foot")
+        left = "; ".join(x for r in rows for x in r.get("left_out", [])) or ("; ".join(c.get("dropped", [])) if any("no row" in d for d in c.get("dropped", [])) else "—")
+        lines.append(f"| {c['brand']} | {len(c['source'])} | {len(rows)} | {children} · {len(rows) - children} | {summarize(c)['length']} | {', '.join(scales)} | {left} |")
+    note = (
+        "\n\nThe kids' charts recommended for the product (§5, decision 11; ADR 0031), one per brand, composed from its home site's age bands in age order (Pages), a size printed twice kept once where the bands agree. "
+        "Children · youth: the rows before and from the chart's restart at 1 (US and UK sizes run to 13.5 and start again), the children's rows on ISO's children's scales (US C, UK C, EU C) and the youth rows on its adult scales (youth sizes are men's sizes, ISO's Table 3), the EU column written by the row's kind. "
+        "Length as the brand's adults' (ADR 0030). Left out: a cell printed out of its column's order, kept out of the product chart until the refresh checks it. Brooks prints no kids' chart.\n"
+    )
+    return KIDS_HEAD + "\n".join(lines) + note
+
+
 # --- deltas --------------------------------------------------------------------------------------------
 def delta_row(chart, row):
     """The brand's cells beside ISO's for one adult row: by the foot (where the chart has one) and by the US size."""
@@ -921,7 +1208,7 @@ def table(charts):
     kids = [c for c in charts if c["line"] == "kids"]
     other = [c for c in charts if not adult(c) and c["line"] != "kids"]
     note = (
-        f"\n\nThe {len(product)} charts recommended for the product (§5, decision 1), one per brand and gender line; the other {len(rest)} adult charts kept (a brand's other regions, lines, and pages) follow in `deltas.md`, and the {len(kids)} kids' charts and {len(other)} others (socks, sandals, boots) are in `brands.json` alone. "
+        f"\n\nThe {len(product)} charts recommended for the product (§5, decision 1), one per brand and gender line; the other {len(rest)} adult charts kept (a brand's other regions, lines, and pages) follow in `deltas.md`, and the {len(kids) - sum(1 for c in kids if c.get('product'))} kids' charts read ({sum(1 for c in kids if c.get('product'))} composed for the product, the table after this one) and {len(other)} others (socks, sandals, boots) are in `brands.json` alone. "
         "Length: what the brand says its length column is (§7, §8). "
         "mm a half size: the chart's foot step, the median over its rows; ISO's barleycorn is 4.2, a centimetre grid 5. "
         "Foot at US M 10: the brand's foot length for its US men's 10 (a women's chart: US women's 8) and its difference from ISO's 271 mm (245.6 for W 8); a positive number means the chart gives a longer foot the same size, so a measured foot gets a smaller size from the brand than from ISO. "
@@ -955,7 +1242,7 @@ def write_json(charts, path):
     with path.open("w", encoding="utf-8", newline="\n") as f:
         f.write('{\n"schema": "bigsmall shoe-size brands v1 (docs/research/shoe-sizes-2/brands.py)",\n')
         f.write(f'"date": "{DATE}",\n"iso": {{"eu": "foot / 6.67 + 2", "uk": "foot / 8.47 - 23", "us_men": "uk + 1", "us_women": "uk + 2", "japan": "foot / 10", "source": "ISO/TS 19407:2015, as packages/core/src/units/shoe-size.ts holds it (ADR 0027)"}},\n')
-        f.write('"keys": {"foot_mm": "the brand\'s length in mm, from its mm or cm column, else its inches (foot_from_inches)", "foot_in_mm": "its inch column in mm, kept beside the metric one", "us_men": "US men\'s", "us_women": "US women\'s", "us_kids": "US children\'s, the label\'s number", "uk": "British (uk_men where a brand prints men\'s and women\'s UK)", "eu": "European (eu_standard: Clarks\' standard EU beside its own)", "jp": "the Japan or CM column, a label unless the brand\'s words make it the foot", "*_low, *_high": "a range\'s ends, the middle in the key", "text": "every cell as printed, by the chart\'s own heading"},\n')
+        f.write('"keys": {"foot_mm": "the brand\'s length in mm, from its mm or cm column, else its inches (foot_from_inches)", "foot_in_mm": "its inch column in mm, kept beside the metric one", "us_men": "US men\'s", "us_women": "US women\'s", "us_kids": "US children\'s, the label\'s number (a composed kids\' chart: the rows before its restart at 1; us_men from it, youth sizes being men\'s)", "uk_kids, eu_kids": "a composed kids\' chart\'s children\'s rows on the British and European children\'s scales (ISO\'s Table 3), uk and eu from the restart", "uk": "British (uk_men where a brand prints men\'s and women\'s UK)", "eu": "European (eu_standard: Clarks\' standard EU beside its own)", "jp": "the Japan or CM column, a label unless the brand\'s words make it the foot", "*_low, *_high": "a range\'s ends, the middle in the key", "text": "every cell as printed, by the chart\'s own heading"},\n')
         f.write('"charts": [\n')
         for i, c in enumerate(charts):
             head = {k: v for k, v in c.items() if k != "rows"}
@@ -1022,6 +1309,8 @@ def main():
     for spec in PASTED:
         charts += load_pasted(spec)
     charts += composed(charts)
+    charts += composed_kids(charts)
+    RECOMMENDED.update((brand, "composed", "Kids, composed") for brand, _specs, _note in KIDS)
     for c in charts:
         c["product"] = any(c["brand"] == b and s in c["site"] and c["chart"] == n for b, s, n in RECOMMENDED)
     found = {(b, s, n) for b, s, n in RECOMMENDED for c in charts if c["brand"] == b and s in c["site"] and c["chart"] == n}
@@ -1035,7 +1324,14 @@ def main():
     for c in charts:
         if c["kind"] == "composed":
             dis = [x for r in c["rows"] for x in r.get("disagree", [])]
-            print(f"{c['brand']} {c['chart']}: {len(c['rows'])} rows, {len(dis)} disagreements" + (": " + "; ".join(dis[:6]) if dis else ""))
+            kids = f", {sum(1 for r in c['rows'] if not r.get('youth'))} children's and {sum(1 for r in c['rows'] if r.get('youth'))} youth, {len(c.get('dropped', []))} repeats dropped" if c["line"] == "kids" else ""
+            print(f"{c['brand']} {c['chart']}: {len(c['rows'])} rows{kids}, {len(dis)} disagreements" + (": " + "; ".join(dis[:6]) if dis else ""))
+            for d in c.get("dropped", []):
+                if "no row" in d:
+                    print(f"  unjoined: {d}")
+            for x in (x for r in c["rows"] for x in r.get("left_out", [])):
+                print(f"  left out: {x}")
+    print(kids_table(charts))
     for a, b, on, *keys in COMPARISONS:
         print(compare(find(charts, *a), find(charts, *b), on, *keys))
     if "--write" in sys.argv:
@@ -1043,7 +1339,7 @@ def main():
         write_deltas_csv(charts, HERE / "deltas.csv")
         (HERE / "deltas.md").write_text(
             f"<!-- written by brands.py, {DATE}: the first table is pasted into docs/research/shoe-sizes-2.md §9 between its markers; edit the keepers, never this -->\n\n"
-            f"## The product's charts\n\n{product_md}\n## Every other adult chart kept\n\n{rest_md}\n",
+            f"## The product's charts\n\n{product_md}\n## The product's kids' charts\n\n{kids_table(charts)}\n## Every other adult chart kept\n\n{rest_md}\n",
             encoding="utf-8",
             newline="\n",
         )

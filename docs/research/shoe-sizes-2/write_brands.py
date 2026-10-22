@@ -1,7 +1,7 @@
 """Write the product's brand charts file, `packages/core/data/shoe-brands.json`, from `brands.json`,
 the record `brands.py` writes from the keepers (docs/research/shoe-sizes-2.md §9; ADR 0028, ADR
 0029): the charts flagged `product: true` by `brands.py`'s `RECOMMENDED`, one or two per brand, every cell as the brand prints
-it, keyed by brand id. Core is given the file (`setBrandCharts`): the web app fetches it once Shoe
+it, keyed by brand id, a brand's kids' chart after its adults' (ADR 0031). Core is given the file (`setBrandCharts`): the web app fetches it once Shoe
 size opens, the tests and the About page's build hand it over directly. The brands' names, aliases,
 shorthand keys, sites, and the facts the note carries are typed once in `packages/core/src/units/shoe-brands.ts`,
 never here. Run from the repository root: `python -I docs/research/shoe-sizes-2/write_brands.py`,
@@ -34,6 +34,11 @@ CELLS = (
     ("eu", "eu"),
     ("jp", "jp"),
     ("label", "label"),
+    # A kids' chart's children's rows, on ISO's children's scales (ADR 0031); its youth rows are
+    # on the adult keys above, youth sizes being men's sizes.
+    ("us_kids", "usKids"),
+    ("uk_kids", "ukKids"),
+    ("eu_kids", "euKids"),
 )
 BASIS = {"foot": "foot", "product": "product", "none": "none", "label": "label"}
 
@@ -59,9 +64,17 @@ def cell(row: dict, key: str) -> int | float | list[int | float] | None:
     return number(value)
 
 
-def write_row(row: dict, basis: str) -> dict | None:
+# The children's keys, written for a kids' chart alone: an adults' page's kids column (Nike's youth
+# labels beside its men's sizes, Birkenstock's template) is the record's, never a scale of the
+# adults' chart in the product.
+KIDS_KEYS = {"us_kids", "uk_kids", "eu_kids"}
+
+
+def write_row(row: dict, basis: str, line: str) -> dict | None:
     written: dict = {}
     for key, field in CELLS:
+        if key in KIDS_KEYS and line != "kids":
+            continue
         value = cell(row, key)
         if value is not None:
             written[field] = value
@@ -92,9 +105,9 @@ def main() -> None:
     rows_total = 0
     for at, name in enumerate(brands):
         lines.append(f"    {dumps(brand_id(name))}: [")
-        entries = sorted(by_brand[name], key=lambda c: ("men", "women", "unisex").index(c["line"]))
+        entries = sorted(by_brand[name], key=lambda c: ("men", "women", "unisex", "kids").index(c["line"]))
         for e, chart in enumerate(entries):
-            rows = [r for r in (write_row(row, chart["length"]["basis"]) for row in chart["rows"]) if r]
+            rows = [r for r in (write_row(row, chart["length"]["basis"], chart["line"]) for row in chart["rows"]) if r]
             rows_total += len(rows)
             source = chart["source"]
             if isinstance(source, list):

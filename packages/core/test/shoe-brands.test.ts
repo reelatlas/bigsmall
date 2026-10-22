@@ -12,6 +12,9 @@ import {
   brandsAtFoot,
   chartAtFoot,
   footOfRow,
+  kidsChart,
+  otherBrandCharts,
+  twinScale,
   convert,
   getShoeBrand,
   getUnit,
@@ -24,7 +27,7 @@ import {
   splitShoeBrand,
   unitsIn,
 } from '../src/index';
-import type { BrandChartRow, BrandChartsFile, ShoeBrand, Unit } from '../src/index';
+import type { BrandChartRow, BrandChartsFile, BrandScale, ShoeBrand, Unit } from '../src/index';
 
 setBrandCharts(chartsFile as unknown as BrandChartsFile);
 
@@ -33,7 +36,7 @@ interface RecordRow {
 }
 interface RecordChart {
   brand: string;
-  line: 'men' | 'women' | 'unisex';
+  line: 'men' | 'women' | 'unisex' | 'kids';
   product?: boolean;
   length: { basis: string };
   rows: RecordRow[];
@@ -78,7 +81,18 @@ const RECORD_KEYS: readonly [string, keyof BrandChartRow][] = [
   ['uk_women', 'ukWomen'],
   ['eu', 'eu'],
   ['jp', 'jp'],
+  // A kids' chart's children's rows (ADR 0031); an adults' page's kids column (Nike's youth labels
+  // beside its men's sizes) stays in the record and never reaches the product.
+  ['us_kids', 'usKids'],
+  ['uk_kids', 'ukKids'],
+  ['eu_kids', 'euKids'],
 ];
+const KIDS_KEYS: ReadonlySet<string> = new Set(['us_kids', 'uk_kids', 'eu_kids']);
+
+/** The record keys a chart's cells are held to: the children's ones on a kids' chart alone. */
+function keysOf(chart: RecordChart): readonly [string, keyof BrandChartRow][] {
+  return RECORD_KEYS.filter(([key]) => chart.line === 'kids' || !KIDS_KEYS.has(key));
+}
 
 describe('the brands’ charts (ADR 0028): core holds the record cell for cell', () => {
   const record = recordFile as unknown as { charts: RecordChart[] };
@@ -91,7 +105,8 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
   });
 
   it('carries every product chart of the record, and no other', () => {
-    expect(charts).toHaveLength(34);
+    // 34 adults' charts and a kids' chart at every brand but Brooks (ADR 0031).
+    expect(charts).toHaveLength(53);
     const expected = new Set(charts.map((chart) => `${idOf(chart.brand)}:${chart.line}`));
     const held = new Set(
       shoeBrands.flatMap((each) =>
@@ -106,15 +121,16 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
       const held = brandChartsOf(idOf(chart.brand)).find((each) => each.line === chart.line);
       expect(held, `${chart.brand} ${chart.line}`).toBeDefined();
       if (!held) continue;
+      const keys = keysOf(chart);
       const rows = chart.rows.filter(
         (row) =>
-          RECORD_KEYS.some(([key]) => cellOf(row, key) !== undefined) ||
+          keys.some(([key]) => cellOf(row, key) !== undefined) ||
           (chart.length.basis === 'foot' && typeof row['foot_mm'] === 'number'),
       );
       expect(held.rows, `${chart.brand} ${chart.line} rows`).toHaveLength(rows.length);
       rows.forEach((row, at) => {
         const own = held.rows[at]!;
-        for (const [key, field] of RECORD_KEYS) {
+        for (const [key, field] of keys) {
           const cell = cellOf(row, key);
           const label = `${chart.brand} ${chart.line} row ${at} ${key}`;
           if (cell === undefined) expect(own[field], label).toBeUndefined();
@@ -138,7 +154,11 @@ describe('the brands’ charts (ADR 0028): core holds the record cell for cell',
       expect(brandChartsOf(each.id).length).toBeGreaterThan(0);
       const lines = brandChartsOf(each.id).map((chart) => chart.line);
       expect(new Set(lines).size).toBe(lines.length);
-      if (lines.includes('unisex')) expect(lines).toEqual(['unisex']);
+      const adults = lines.filter((line) => line !== 'kids');
+      if (adults.includes('unisex')) expect(adults).toEqual(['unisex']);
+      // A kids' chart at every brand but Brooks, after the adults' (ADR 0031).
+      expect(lines.includes('kids'), each.id).toBe(each.id !== 'brooks');
+      if (lines.includes('kids')) expect(lines.at(-1)).toBe('kids');
       // The name is a key itself, so no alias repeats it; a shorthand key may be the name (On).
       const own = each.name.toLowerCase().replace(/[^a-z0-9]/g, '');
       for (const key of [each.name, ...each.aliases, ...(each.shorthand ?? [])]) {
@@ -259,12 +279,63 @@ describe('a brand read at the box (ADR 0028)', () => {
     expect(puma.foot).toBe(270);
   });
 
-  it('a size off the chart says the chart’s span; a children’s size answers nothing', () => {
+  it('a size off the chart says the chart’s span; a children’s size answers nothing where the brand prints no kids’ chart', () => {
     expect(readBrand(brand('nike'), unit('us-men'), 25).beyond).toEqual([3.5, 22]);
-    const kids = readBrand(brand('nike'), unit('us-children'), 8);
-    expect(kids.row).toBeNull();
-    expect(kids.beyond).toBeNull();
-    expect(kids.foot).toBeNull();
+    const brooks = readBrand(brand('brooks'), unit('us-children'), 8);
+    expect(brooks.row).toBeNull();
+    expect(brooks.beyond).toBeNull();
+    expect(brooks.foot).toBeNull();
+    expect(brooks.chart.line).toBe('men');
+  });
+
+  it('the kids’ chart answers a children’s size, a youth size the adults’ chart lacks, a size on a children’s scale’s twin, and a length off the adults’ chart (ADR 0031)', () => {
+    const nike = brand('nike');
+    // An 8C on Nike's Babies & Toddlers band: a 15 cm foot, tier 1, the kids' chart answering.
+    const eightC = readBrand(nike, unit('us-children'), 8);
+    expect(eightC.chart.line).toBe('kids');
+    expect(eightC).toMatchObject({ foot: 150, tier: 1, beyond: null });
+    expect(brandCell(eightC.row!, 'uk-children', false)).toMatchObject({ value: 7.5 });
+    expect(brandCell(eightC.row!, 'eu-children', false)).toMatchObject({ value: 25 });
+    expect(brandCell(eightC.row!, 'us-men', false)).toBeNull();
+    // Past the children's scale: the kids' chart's span on it.
+    expect(readBrand(nike, unit('us-children'), 20).beyond).toEqual([1, 13.5]);
+    // A men's 3 is off Nike's men's chart (3.5 up) and its 3Y: a 21.8 cm foot, on the youth row.
+    const threeY = readBrand(nike, unit('us-men'), 3);
+    expect(threeY.chart.line).toBe('kids');
+    expect(threeY).toMatchObject({ foot: 218, tier: 1 });
+    expect(brandCell(threeY.row!, 'us-women', false)).toMatchObject({ value: 4.5 });
+    // A men's 4 is on the men's chart, which answers first.
+    expect(readBrand(nike, unit('us-men'), 4).chart.line).toBe('men');
+    // An EU 28 is off the men's chart and on the kids' as the children's EU 28, its 11C.
+    const eu28 = readBrand(nike, unit('eu'), 28);
+    expect(eu28.chart.line).toBe('kids');
+    expect(brandCell(eu28.row!, 'us-children', false)).toMatchObject({ value: 11 });
+    // Nike's Little Kids band's inches are its foot (ADR 0030's grid test): 11C is 6.94 in.
+    expect(eu28.foot).toBeCloseTo(176.21, 2);
+    // A 15 cm foot typed: off the men's chart, the kids' row nearest it.
+    const length = readBrand(nike, unit('foot-cm'), 15);
+    expect(length.chart.line).toBe('kids');
+    expect(length).toMatchObject({ length: true, foot: 150, tier: 1 });
+    expect(brandCell(length.row!, 'us-children', false)).toMatchObject({ value: 8 });
+    expect(readBrand(brand('brooks'), unit('foot-cm'), 15).row).toBeNull();
+    // Asics's kids' CM column is its label, read less a centimetre by its rule (tier 2).
+    const asics = readBrand(brand('asics'), unit('us-children'), 10);
+    expect(asics.chart.line).toBe('kids');
+    expect(asics).toMatchObject({ foot: 160, tier: 2 });
+    // The twin scales, and the kids' chart's own order.
+    expect(twinScale('us-men')).toBe('us-children');
+    expect(twinScale('eu-children')).toBe('eu');
+    expect(twinScale('us-women')).toBeNull();
+    expect(ownScale(kidsChart(nike)!, false)).toBe('us-children');
+    expect(otherBrandCharts(nike, brandChart(nike, false)).map((chart) => chart.line)).toEqual([
+      'women',
+      'kids',
+    ]);
+    expect(otherBrandCharts(nike, kidsChart(nike)!).map((chart) => chart.line)).toEqual([
+      'men',
+      'women',
+    ]);
+    expect(kidsChart(brand('brooks'))).toBeNull();
   });
 
   it('a range is read as printed: a Birkenstock EU 42 is US men’s 9 to 9.5', () => {
@@ -275,7 +346,7 @@ describe('a brand read at the box (ADR 0028)', () => {
 });
 
 describe('every brand at one foot (ADR 0028)', () => {
-  const at = (foot: number, scale: 'us-men' | 'us-women' | 'uk' | 'eu' | 'japan', women = false) =>
+  const at = (foot: number, scale: BrandScale, women = false) =>
     new Map(brandsAtFoot(foot, scale, women).map((row) => [row.brand.id, row]));
 
   it('a Nike 10’s foot is adidas 10 and Converse ≈ 8.5 by their charts, New Balance and Vans 10 by ISO’s label, Asics 10 by its rule (ADR 0030)', () => {
@@ -329,9 +400,34 @@ describe('every brand at one foot (ADR 0028)', () => {
       why: null,
     });
     expect(at(271, 'eu').get('brooks')).toMatchObject({ value: 44.5, tier: 1, scale: 'eu' });
-    expect(at(150, 'us-men').get('nike')).toMatchObject({ value: null, why: 'off-chart' });
-    expect(at(150, 'us-men').get('adidas')).toMatchObject({ value: null, why: 'off-chart' });
+    // A child's foot is off every adults' chart; the kids' charts answer on the children's US,
+    // the twin of the scale asked (ADR 0031), Brooks printing none.
+    expect(at(150, 'us-men').get('nike')).toMatchObject({
+      value: 8,
+      scale: 'us-children',
+      tier: 1,
+      approx: false,
+    });
+    expect(at(150, 'us-men').get('nike')!.chart.line).toBe('kids');
+    expect(at(150, 'us-men').get('adidas')).toMatchObject({
+      value: 8.5,
+      scale: 'us-children',
+      approx: true,
+    });
     expect(at(150, 'us-men').get('brooks')).toMatchObject({ value: null, why: 'off-chart' });
+    // A kids' chart with no foot length: ISO's children's label through its own row (tier 4).
+    expect(at(150, 'us-children').get('puma')).toMatchObject({
+      value: 8,
+      scale: 'us-children',
+      tier: 4,
+      approx: true,
+    });
+    expect(at(150, 'us-children').get('new-balance')).toMatchObject({ value: 8, tier: 4 });
+    // A youth's foot is on the adults' charts where they reach it, which answer first (Nike's
+    // men's chart starts at 3.5); where they do not (HOKA's at 7), the kids' chart's youth row.
+    expect(at(220, 'us-men').get('nike')!.chart.line).toBe('men');
+    expect(at(220, 'us-men').get('hoka')).toMatchObject({ value: 3.5, scale: 'us-men', tier: 1 });
+    expect(at(220, 'us-men').get('hoka')!.chart.line).toBe('kids');
     const reebok = brand('reebok');
     expect(ownScale(brandChart(reebok, false), false)).toBe('us-men');
     expect(ownScale(brandChart(reebok, true), true)).toBe('us-women');

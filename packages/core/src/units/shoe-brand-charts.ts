@@ -8,8 +8,11 @@
  * if asked before.
  */
 
-/** The line a chart is printed for: a men's or a women's page, or one chart for everyone. */
-export type BrandLine = 'men' | 'women' | 'unisex';
+/**
+ * The line a chart is printed for: a men's or a women's page, one chart for everyone, or the
+ * brand's kids' chart (ADR 0031), one per brand composed from its age bands by the record.
+ */
+export type BrandLine = 'men' | 'women' | 'unisex' | 'kids';
 
 /**
  * What the chart's length column is, by the brand's own words (docs/research/shoe-sizes-2.md §7
@@ -24,7 +27,10 @@ export type LengthBasis = 'foot' | 'product' | 'label' | 'none';
  * One row of a brand's chart, every cell as the brand prints it: a size on each scale the chart
  * has (a range where the brand prints one, its two ends), the British women's where the brand
  * prints men's and women's UK apart (Crocs), the Japan or CM column as a label in centimetres,
- * and the foot's length in mm where the brand says its length is the foot's.
+ * and the foot's length in mm where the brand says its length is the foot's. A kids' chart's rows
+ * (ADR 0031) are on ISO's children's scales (`usKids`, `ukKids`, `euKids`) up to the chart's
+ * restart at 1, the US and UK scales running to 13.5 and starting again, and from it on the adult
+ * fields, youth sizes being men's sizes (ISO's Table 3), the European column by the row's kind.
  */
 export interface BrandChartRow {
   usMen?: number | readonly [number, number];
@@ -33,6 +39,9 @@ export interface BrandChartRow {
   ukWomen?: number;
   eu?: number | readonly [number, number];
   jp?: number;
+  usKids?: number | readonly [number, number];
+  ukKids?: number;
+  euKids?: number | readonly [number, number];
   /**
    * The brand's centimetre label where its page heads it CM and not Japan (Asics), the foot
    * read from it by the brand's rule (ADR 0030); never a scale to list or type.
@@ -61,7 +70,8 @@ export const BRAND_CHARTS_SCHEMA = 'bigsmall shoe-brand charts v1';
 /**
  * The charts' file as published (`packages/core/data/shoe-brands.json`): its schema's name, what
  * wrote it, the date the charts were read, and the charts by brand id
- * (docs/research/shoe-sizes-2.md §5, decision 1: 33 charts, 20 brands, one or two per brand).
+ * (docs/research/shoe-sizes-2.md §5, decisions 1 and 11: 53 charts, 20 brands, one or two adults'
+ * charts per brand and a kids' chart at every brand but Brooks).
  */
 export interface BrandChartsFile {
   schema: string;

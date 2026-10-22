@@ -28,11 +28,11 @@ import {
   leadingTarget,
   matchIngredients,
   matchShoeBrands,
-  otherBrandChart,
   NBSP,
   pairParts,
   pairsOpenedBy,
   parse,
+  otherBrandCharts,
   readBrand,
   RANGE_DASH,
   resolveExact,
@@ -42,6 +42,7 @@ import {
   splitIngredient,
   splitShoeBrand,
   toBase,
+  twinScale,
   unitListGroup,
   type BrandChart,
   type BrandReading,
@@ -154,16 +155,19 @@ const COOKING_OVER: ReadonlySet<CategoryId> = new Set(getCategory('cooking')?.ov
 /** A brand stays in the box beside a shoe scale alone (ADR 0028). */
 const SHOE: CategoryId = 'shoe-size';
 
+/** The children's scales, which a brand's kids' chart answers (ADR 0031). */
+const CHILDREN_SCALES: ReadonlySet<string> = new Set(['us-children', 'uk-children', 'eu-children']);
+
 /**
  * The chart line after a unit comes into the box (ADR 0028): a US women's size says women's, a
- * US men's size men's, the other shoe scales keep the line, any other unit leaves it; no unit
- * keeps it.
+ * US men's size men's, a children's size the kids' chart's (ADR 0031), the other shoe scales
+ * keep the line, any other unit leaves it; no unit keeps it.
  */
 function lineAfter(unit: Unit | undefined, line: ShoeLine | null): ShoeLine | null {
   if (!unit) return line;
   if (unit.category !== SHOE) return null;
   if (unit.id === 'us-women') return 'women';
-  if (unit.id === 'us-men') return null;
+  if (unit.id === 'us-men' || CHILDREN_SCALES.has(unit.id)) return null;
   return line;
 }
 
@@ -1395,11 +1399,12 @@ function remapRows(view: UnitsView, map: (row: TableRow) => TableRow): UnitsView
   };
 }
 
-/** The chart's line in the note's prose: "the men’s", "Nike’s women’s chart". */
+/** The chart's line in the note's prose: "the men’s", "Nike’s women’s chart", "the kids’". */
 const LINE_POSS: Record<BrandChart['line'], string> = {
   men: 'men’s',
   women: 'women’s',
   unisex: '',
+  kids: 'kids’',
 };
 
 /**
@@ -1410,15 +1415,19 @@ const LINE_WORD: Record<BrandChart['line'], string> = {
   men: 'men',
   women: 'women',
   unisex: '',
+  kids: 'kids',
 };
 
 /**
  * The chart's line after a brand's name, where the scale does not say it: "men" or "women" on
  * EU, UK, JP, and the foot's units, nothing on US men's or US women's (Sean, 2026-10-20, the
  * hundred-and-nineteenth pass; the foot each chart gives stood there too, cut short on every
- * screen and saying what ≈ and the foot's rows already say).
+ * screen and saying what ≈ and the foot's rows already say); "kids" on every scale where the
+ * kids' chart answered, since a youth size on US M is a men's size by ISO and the chart's by the
+ * brand (ADR 0031).
  */
 function lineWord(line: BrandChart['line'], scaleUnit: Unit): string {
+  if (line === 'kids') return LINE_WORD.kids;
   return scaleUnit.id === 'us-men' || scaleUnit.id === 'us-women' ? '' : LINE_WORD[line];
 }
 
@@ -1494,9 +1503,12 @@ function brandsSection(
     }
     // A brand lacking the scale in focus shows its size on its own scale, that scale's symbol
     // on the row and the words saying which it lacks; a filled row says how (RESEARCH.md §9).
+    // On the scale's twin (a kids' row's US C for a foot asked in US M; ADR 0031) the symbol
+    // says it all.
     const onUnit = read.scale !== null && read.scale !== scaleUnit.id ? getUnit(read.scale) : null;
+    const twin = isBrandScale(scaleUnit.id) && read.scale === twinScale(scaleUnit.id);
     const how = [
-      onUnit ? `prints no ${scaleUnit.symbol}` : null,
+      onUnit && !twin ? `prints no ${scaleUnit.symbol}` : null,
       read.tier !== null ? tierWords(read.tier) : null,
     ]
       .filter(Boolean)
@@ -1594,24 +1606,28 @@ function brandNote(
 }
 
 /**
- * The brand's scales, to choose from, under one heading: the list the unit's chip opens with a
- * brand in the box (ADR 0028, 2026-10-20; Sean: "a more immediate way to flip the reading").
- * Every scale its chart prints, in the table's order, never the foot's units, which are ISO's
- * rows, read in the table from the chart (a foot taken here put ISO's row in the box, the brand's
- * row unfilled below twenty brands; Sean, 2026-10-21), the one in the box marked, each carrying
- * the same row's size on that scale (a range's lower end; none where the brand has no row for the
- * box, so the number as typed goes with the scale) with the line the row was read on; so a size
- * is read on another scale without leaving the brand, which the scale rows, ISO's, cannot do,
- * since taking one takes the brand out. Where the brand prints its lines apart, the other line's
- * own scale, and any scale its other chart alone prints, follow under that chart's own heading,
- * since that chart is the one they read, each read at the foot in play, the nearest row, or with
- * the number cleared where the brand gives no foot (Sean, 2026-10-21, the hundred-and-twenty-third
- * pass: Asics's women's page prints no US men's column, so a women's reading offered no men's
- * scale; and later that day: Nike's men's page prints a women's column, so its US W sat under the
- * men's heading with the men's page's number, where taking it reads the women's chart). With
- * `choose`, the table's place while a brand has no scale (its chip emptied, or a brand alone),
- * the heading asking for one, as Cooking lists its ingredients until one is chosen (Sean,
- * 2026-10-21), the number as typed going with any scale there, the other chart's too.
+ * The brand's scales, to choose from, by chart: the list the unit's chip opens with a brand in the
+ * box (ADR 0028, 2026-10-20; Sean: "a more immediate way to flip the reading"). Under the chart
+ * in play's heading, every scale it prints, in the table's order, never the foot's units, which
+ * are ISO's rows, read in the table from the chart (a foot taken here put ISO's row in the box,
+ * the brand's row unfilled below twenty brands; Sean, 2026-10-21), the one in the box marked, each
+ * carrying the same row's size on that scale (a range's lower end; none where the brand has no row
+ * for the box, so the number as typed goes with the scale) with the line the row was read on; so a
+ * size is read on another scale without leaving the brand, which the scale rows, ISO's, cannot do,
+ * since taking one takes the brand out. A kids' chart in play lists the scales its row prints, its
+ * children's or its youth ones, the other kind being another size (ADR 0031). Then the brand's
+ * other charts, each under its own heading, since that chart is the one they read: the other
+ * gender line's own scale wherever the brand prints its lines apart, read at the foot in play, the
+ * nearest row, or with the number cleared where the brand gives no foot (Sean, 2026-10-21, the
+ * hundred-and-twenty-third pass: Asics's women's page prints no US men's column, so a women's
+ * reading offered no men's scale; and later that day: Nike's men's page prints a women's column,
+ * so its US W sat under the men's heading with the men's page's number, where taking it reads the
+ * women's chart); and any other scale a chart prints where that chart has a row at the foot in
+ * play, the kids' chart's children's scales for a child's foot and its youth sizes for a youth's,
+ * none for an adult's (ADR 0031); no scale listed twice. With `choose`, the table's place while a
+ * brand has no scale (its chip emptied, or a brand alone), the heading asking for one, as Cooking
+ * lists its ingredients until one is chosen (Sean, 2026-10-21), every chart's scales offered, the
+ * number as typed going with any of them.
  */
 export function scaleList(
   view: UnitsView,
@@ -1624,7 +1640,7 @@ export function scaleList(
 ): MatchesView {
   const shoe = getCategory(SHOE);
   // Nothing to list until core has the charts (ADR 0029); the chip opens the list only then.
-  if (!hasBrandCharts()) {
+  if (!shoe || !hasBrandCharts()) {
     return {
       categories: view.categories,
       kind: 'matches',
@@ -1640,57 +1656,70 @@ export function scaleList(
   const reading = unit && value !== undefined ? readBrand(brand, unit, value, women) : null;
   const chart = reading?.chart ?? brandChart(brand, women);
   const row = reading?.row ?? null;
-  const group = `${poss(brand.name)} chart${chart.line === 'unisex' ? '' : `, the ${LINE_POSS[chart.line]}`}${choose ? ': choose the scale to read it on' : ''}`;
-  // The other line's chart, where the brand prints its lines apart: its own scales after the
-  // chart's, under its heading, read at the foot the box stands for, where there is one.
-  const other = otherBrandChart(brand, chart);
-  const otherWomen = other?.line === 'women';
+  const heading = (each: BrandChart, ask = false): string =>
+    `${poss(brand.name)} chart${each.line === 'unisex' ? '' : `, the ${LINE_POSS[each.line]}`}${ask ? ': choose the scale to read it on' : ''}`;
+  const group = heading(chart, choose);
+  const others = otherBrandCharts(brand, chart);
   const foot = reading?.foot ?? null;
   const rows: MatchRow[] = [];
-  const others: MatchRow[] = [];
+  const theirs = new Map<BrandChart, MatchRow[]>(others.map((each) => [each, []]));
+  const entry = (
+    scale: Unit,
+    text: string | undefined,
+    on: BrandChart,
+    asWomen: boolean,
+  ): MatchRow => ({
+    kind: 'brand',
+    brand,
+    unit: scale,
+    category: shoe,
+    inBox: on === chart && scale.id === unit?.id,
+    text,
+    line: asWomen ? 'women' : null,
+    group: on === chart ? group : heading(on),
+  });
   for (const each of view.rows) {
-    if (!shoe || each.brand !== undefined || each.tone === 'message') continue;
+    if (each.brand !== undefined || each.tone === 'message') continue;
     const scale = each.unit;
-    let text: string | undefined;
-    if (isBrandScale(scale.id)) {
-      // The other line's own scale (US W beside the men's chart) reads the other chart, as a US
-      // women's size always does (lineAfter), whichever page prints the column: it sits under
-      // that chart's heading, read on it; a brand with one chart for everyone keeps every scale
-      // under its one heading (Sean, 2026-10-21).
-      const theirs = other !== null && lineOfScale(scale.id) === other.line;
-      if (theirs || brandSpan(chart, scale.id, women) === null) {
-        if (!other || brandSpan(other, scale.id, otherWomen) === null) continue;
-        // The nearest row of the other chart at the same foot; with no foot to read from (the
-        // brand gives none, or the size is off its chart) the number is cleared, a women's 8
-        // being no men's 8; choosing a scale, the number as typed, as with every scale listed.
-        const read = foot !== null ? chartAtFoot(brand, other, foot, scale.id, otherWomen) : null;
-        others.push({
-          kind: 'brand',
-          brand,
-          unit: scale,
-          category: shoe,
-          inBox: false,
-          text: choose ? undefined : read && read.value !== null ? sizeOf(read.value, locale) : '',
-          line: otherWomen ? 'women' : null,
-          group: `${poss(brand.name)} chart, the ${LINE_POSS[other.line]}`,
-        });
-        continue;
-      }
+    if (!isBrandScale(scale.id)) continue;
+    // The other line's own scale (US W beside the men's chart) reads the other chart, as a US
+    // women's size always does (lineAfter), whichever page prints the column: it sits under
+    // that chart's heading, read on it; a brand with one chart for everyone keeps every scale
+    // under its one heading (Sean, 2026-10-21).
+    // A kids' row's own youth scales (US M, and US W where the page prints one) stay under the
+    // kids' heading, the row's own print, so no scale is listed twice (ADR 0031).
+    const printed =
+      chart.line === 'kids' && row !== null && brandCell(row, scale.id, women) !== null;
+    const owner = printed
+      ? null
+      : (others.find((other) => other.line !== 'kids' && lineOfScale(scale.id) === other.line) ??
+        null);
+    if (owner === null && brandSpan(chart, scale.id, women) !== null) {
       const cell = row ? brandCell(row, scale.id, women) : null;
-      text = cell ? sizeOf(cell.value, locale) : undefined;
-    } else continue;
-    rows.push({
-      kind: 'brand',
-      brand,
-      unit: scale,
-      category: shoe,
-      inBox: scale.id === unit?.id,
-      text,
-      line: women ? 'women' : null,
-      group,
-    });
+      if (chart.line === 'kids' && row !== null && cell === null) continue;
+      rows.push(entry(scale, cell ? sizeOf(cell.value, locale) : undefined, chart, women));
+      continue;
+    }
+    // The nearest row of another chart at the same foot; with no foot to read from (the brand
+    // gives none, or the size is off its chart) the number is cleared, a women's 8 being no
+    // men's 8; choosing a scale, the number as typed, as with every scale listed.
+    for (const other of owner ? [owner] : others) {
+      const asWomen = other.line === 'women';
+      if (brandSpan(other, scale.id, asWomen) === null) continue;
+      const read = foot !== null ? chartAtFoot(brand, other, foot, scale.id, asWomen) : null;
+      const size =
+        read !== null && read.value !== null && read.scale === scale.id
+          ? sizeOf(read.value, locale)
+          : null;
+      // The other gender line's own scale is listed beside an adults' chart whatever the foot;
+      // beside the kids' chart, as any other chart's scale, only where it reads at the foot.
+      const always = owner !== null && chart.line !== 'kids';
+      if (!always && size === null && !choose) continue;
+      theirs.get(other)?.push(entry(scale, choose ? undefined : (size ?? ''), other, asWomen));
+      break;
+    }
   }
-  const all = [...rows, ...others];
+  const all = [...rows, ...others.flatMap((other) => theirs.get(other) ?? [])];
   return {
     categories: view.categories,
     kind: 'matches',
@@ -1699,7 +1728,7 @@ export function scaleList(
     rows: all,
     counts: { [SHOE]: all.length },
     hidden: [],
-    announcement: `${all.length} scales of ${poss(brand.name)} chart${others.length ? 's' : ''} to choose from`,
+    announcement: `${all.length} scales of ${poss(brand.name)} chart${all.length > rows.length ? 's' : ''} to choose from`,
   };
 }
 

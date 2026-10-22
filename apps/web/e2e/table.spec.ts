@@ -2426,28 +2426,31 @@ test('a brand typed with the size (ADR 0028): "nike 10" takes US men and Nike, t
   await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
   await expect(box(page)).toHaveValue('10');
   await expect(page.getByText(/Puma gives no foot length/)).toBeVisible();
-  // A brand's dash row taken brings the brand and the scale with the number cleared, as a row
-  // beyond its scale does, the brand having no size for the foot (Sean, 2026-10-20): a child's
-  // foot is off every adult chart.
+  // A children's size reads the kids' charts (ADR 0031): Puma's by ISO's children's label
+  // through its own row, the row saying so; Brooks prints none, so its row stays a dash, and a
+  // brand's dash row taken brings the brand and the scale with the number cleared, as a row
+  // beyond its scale does, the brand having no size for the foot (Sean, 2026-10-20).
   await page.goto('/?a=us-children&v=10');
   await ready(page);
-  await expect(row(page, 'brand:puma')).toContainText('off its chart');
-  await unitCell(page, 'brand:puma').click();
-  await expect(page.getByRole('button', { name: 'Remove Puma' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Remove US men' })).toBeVisible();
+  await expect(row(page, 'brand:puma')).toContainText('≈ 10');
+  await expect(row(page, 'brand:puma')).toContainText('kids · by ISO’s label');
+  await expect(row(page, 'brand:brooks')).toContainText('off its chart');
+  await unitCell(page, 'brand:brooks').click();
+  await expect(page.getByRole('button', { name: 'Remove Brooks' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove US children' })).toBeVisible();
   await expect(box(page)).toHaveValue('');
   // The scale's chip emptied, a scale's row taken keeps the brand, the rows being dashes.
   await box(page).fill('10');
-  await page.getByRole('button', { name: 'Remove US men' }).click();
-  await expect(page.getByRole('button', { name: 'Remove Puma' })).toBeVisible();
+  await page.getByRole('button', { name: 'Remove US children' }).click();
+  await expect(page.getByRole('button', { name: 'Remove Brooks' })).toBeVisible();
   // With no scale, the brand's scales take the table's place to choose from (Sean, 2026-10-21),
   // as Cooking lists its ingredients; one taken keeps the number as typed.
   await expect(matches(page).getByText(/choose the scale/)).toBeVisible();
   await matches(page)
-    .getByRole('option', { name: /European · Puma/ })
+    .getByRole('option', { name: /European · Brooks/ })
     .click();
   await expect(page.getByRole('button', { name: 'Remove European' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Remove Puma' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove Brooks' })).toBeVisible();
   await expect(box(page)).toHaveValue('10');
   // A brand that prints its lines apart (Sean, 2026-10-21): Asics's women's page has no US men's
   // column, so the chip's list offers US men from the men's page, under that chart's heading, at

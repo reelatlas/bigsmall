@@ -260,7 +260,7 @@ def row(value: str, symbol: str, name: str, detail: str = "") -> dict:
     return {"value": value, "symbol": symbol, "name": name, "detail": detail}
 
 
-def item(key, surface, where, kind, shown, src, lit=None, flag=None, state=""):
+def item(key, surface, where, kind, shown, src, lit=None, flag=None, state="", recommended=None):
     return {
         "key": key,
         "surface": surface,
@@ -271,6 +271,9 @@ def item(key, surface, where, kind, shown, src, lit=None, flag=None, state=""):
         "lit": lit,
         "flag": flag,
         "state": state,
+        # The session's recommended output beside the words as printed, where Sean asked to see both
+        # before deciding (the About page's chart lines, 2026-10-21).
+        "recommended": recommended,
     }
 
 
@@ -279,6 +282,48 @@ def chip(uid: str) -> str:
 
 
 units_rows = [row("", u["symbol"], u["name"]) for u in UNITS]
+
+
+def recommended_about(name: str, source: str) -> str:
+    """A chart's About line with the source as recommended, its formula and basis as rendered."""
+    formula, basis, _source = about_by_name[name]
+    return f"{name} · {formula} · {basis} · {source}"
+
+
+READ = {
+    "adidas": chart_of("adidas", "unisex")["read"],
+    "nike-men": nike_men["read"],
+    "nike-kids": nike_kids["read"],
+    "on-men": chart_of("on", "men")["read"],
+    "on-kids": chart_of("on", "kids")["read"],
+}
+
+# The recommended shape (docs/research/strings-1.md §5, decision 2): the site, then the page in the
+# page's own words, then the date read; a composed kids' chart names its pages as one; the rule
+# sentence only on a chart whose length is a label; the record keeps its titles and keys in fields
+# of its own. Sean keeps the lines as printed on the page beside these, to decide (2026-10-21).
+RECOMMENDED_CHARTS = [
+    recommended_about(
+        "adidas, one chart",
+        f"adidas.com, its size chart, read {READ['adidas']}; its length the foot’s.",
+    ),
+    recommended_about(
+        "Nike, the men’s chart",
+        f"nike.com, Men's Footwear, read {READ['nike-men']}; its length the foot’s.",
+    ),
+    recommended_about(
+        "Nike, the kids’ chart",
+        f"nike.com, Kids' Footwear, its three age bands as one chart (Babies & Toddlers, Little Kids, Big Kids), read {READ['nike-kids']}; its length the foot’s.",
+    ),
+    recommended_about(
+        "On, the men’s chart",
+        f"on.com, the Size & Fit panel of its men's shoes, read {READ['on-men']}; its length a size label, not the foot. Its FAQ says its JP label is the foot plus about a centimetre. The foot is read as its centimetre label less 1 cm, the brand’s own rule.",
+    ),
+    recommended_about(
+        "On, the kids’ chart",
+        f"on.com, the Size & Fit panel of its kids' shoes, read {READ['on-kids']}; its length the foot’s. Its FAQ says its JP label is the foot plus about a centimetre.",
+    ),
+]
 
 ITEMS = [
     # The box
@@ -763,7 +808,8 @@ ITEMS = [
         [about_line(n) for n in ("adidas, one chart", "Nike, the men’s chart", "Nike, the kids’ chart", "On, the men’s chart", "On, the kids’ chart")],
         FORMULAS,
         ["'one chart'", "'the kids’ chart'", "the brand’s own rule.`"],
-        flag="The title and the source print the record's own words: “adult”, “manual: kids_0_3 (…)”, “Kids, composed”, a URL, a page's menu path. On's rule sentence follows its kids' chart too, whose length is the foot's.",
+        flag="The title and the source print the record's own words: “adult”, “manual: kids_0_3 (…)”, “Kids, composed”, a URL, a page's menu path. On's rule sentence follows its kids' chart too, whose length is the foot's. Kept as it prints at Sean's ask (2026-10-21), the recommended output beside it for his decision: the site, then the page in the page's own words, then the date read; a composed kids' chart names its pages as one; the rule sentence only where the length is a label; the record keeps its titles and keys in fields of its own.",
+        recommended=RECOMMENDED_CHARTS,
     ),
     item(
         "about.length-basis",
@@ -850,8 +896,12 @@ for it in ITEMS:
 
 
 def shown_text(it: dict) -> str:
+    return variants_text(it["shown"])
+
+
+def variants_text(variants: list) -> str:
     parts = []
-    for variant in it["shown"]:
+    for variant in variants:
         if isinstance(variant, dict):
             bits = [variant["value"], variant["symbol"], variant["name"]]
             text = " ".join(b for b in bits if b)
@@ -874,6 +924,8 @@ def table_md() -> str:
         where = f"{it['surface']}: {it['where']}"
         if it["flag"]:
             where += f" Flag: {it['flag']}"
+        if it.get("recommended"):
+            where += f" Recommended: {variants_text(it['recommended'])}"
         rows.append(f"| `{it['key']}` | {md_cell(where)} | {md_cell(shown_text(it))} |  |")
     return head + "\n".join(rows) + "\n"
 
@@ -914,6 +966,14 @@ def render_item(it: dict) -> str:
     state = f'<span class="state">{esc(it["state"])}</span>' if it["state"] else ""
     spoken = " spoken" if it["kind"] == "spoken" else ""
     key = esc(it["key"])
+    recommended = ""
+    if it.get("recommended"):
+        recommended = (
+            '<div class="eyebrow"><span class="kind">Recommended, yours to keep or rework</span></div>'
+            '<div class="shown recommended">'
+            + "".join(f'<div class="line k-{it["kind"]}">{esc(v)}</div>' for v in it["recommended"])
+            + "</div>"
+        )
     return (
         f'<article class="item" id="i-{key}">'
         f'<div class="eyebrow"><span class="key">{key}</span>'
@@ -921,6 +981,7 @@ def render_item(it: dict) -> str:
         f'<div class="shown{spoken}">{render_shown(it)}</div>'
         f'<p class="meta">{esc(it["where"])} <span class="src">{esc(", ".join(srcs))}</span></p>'
         f"{flag}"
+        f"{recommended}"
         f'<label for="w-{key}">Your words</label>'
         f'<textarea id="w-{key}" data-key="{key}" rows="2" placeholder="Empty keeps the words"></textarea>'
         f'<span class="saved" id="s-{key}" aria-live="polite"></span>'
@@ -1145,6 +1206,9 @@ TEMPLATE = r"""<title>Shoe size words</title>
     background: transparent;
     border-style: dashed;
     font-style: italic;
+  }
+  .shown.recommended {
+    border-color: var(--accent);
   }
   .line {
     white-space: pre-wrap;

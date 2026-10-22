@@ -35,7 +35,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-DATE = "2026-10-20"
+DATE = "2026-10-21"
 
 # --- ISO/TS 19407 over the foot's length in mm, as the engine holds it (ADR 0027) --------------
 UK_STEP = 8.47  # a UK or US size, the barleycorn as the standard prints it
@@ -245,7 +245,7 @@ def classify(chart):
 # --- what each brand says its length is (docs/research/shoe-sizes-2.md §7 and §8) -----------------
 BASIS = {
     "Nike": ("foot", "Foot Length in cm and inches, the foot's; the CM/JP column is the box's label, which the page says differs from the foot length"),
-    "Under Armour": ("foot", "the page: 'We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes', so the CM column is the measured foot (Sean's re-read, 2026-10-20; wave 2 had read the sentence as naming no column); the inch column, the page's conversion, disagrees by 3.9 to 18.8 mm and is never read as the foot"),
+    "Under Armour": ("label", "the page: 'We start with the true foot, which means we measure from heel to toe. That measurement (in centimeters) is then translated into our standard sizes' (Sean's re-read, 2026-10-20), but the CM column is the standard centimetre label, 27 at a US 9 on a round-centimetre grid, and measured inside its 9 is every brand's 9 (shoe-sizes-3.md §5, decision 10; ADR 0030): the product reads its sizes by ISO's label; the inch column, the page's conversion, disagrees by 3.9 to 18.8 mm and is never read as the foot"),
     "Reebok": ("foot", "Heel-Toe Measurement in inches, heel to longest toe"),
     "Clarks": ("foot", "Foot Length in mm, a ruler on the foot; the page says it does not correlate with a Clarks foot gauge"),
     "Birkenstock": ("foot", "the foot on its printable template, mm; its GB and EU pages give a range per size"),
@@ -253,13 +253,13 @@ BASIS = {
     "Salomon": ("foot", "Foot length in cm and inches, the foot in socks"),
     "Dr. Martens": ("foot", "Foot length under the page's cm or in toggle, heels against a wall, the longest toe marked; the inch toggle a second grid, not a conversion"),
     "Puma": ("product", "a length the US site's size guide heads Product Measurements, beside heel height, weight, and width, under an inches/cm toggle, equal size for size to the AU chart's Length cm: the product's, not the foot's (Sean's capture, 2026-10-20)"),
-    "Asics": ("unstated", "a CM column the NZ and SG pages never explain"),
+    "Asics": ("label", "a CM column, its centimetre label: the NZ and AU pages say to add 1 to 1.5 cm to the foot to read it, so the foot is the label less a centimetre (shoe-sizes-3.md §5, decision 5; ADR 0030); the US page's steps compare the foot with the chart and add a half size for running shoes"),
     "Converse": ("foot", "the US page's How to Find Your Size: the longest part of the foot marked on paper, heel against a wall, measured as the heel-to-toe length, and the kids' column headed Foot Length (Sean's capture, 2026-10-20); the CA page prints the same cells without the words"),
     "Skechers": ("none", "no length on any chart"),
-    "Brooks": ("label", "Japan (cm) columns, size labels, no measured length"),
+    "Brooks": ("foot", "Foot Length (CM) per size on its UK site, brooksrunning.com/en_gb, its IE and DE charts cell-equal, the home page printing the same sizes without the column (shoe-sizes-3.md §5, decision 1); its AU help centre's Japan columns are labels"),
     "adidas": ("foot", "heel-to-toe foot length in inches and cm"),
-    "New Balance": ("foot", "heel to longest toe, cm and inches, with ball widths"),
-    "Vans": ("foot", "heel to longest toe, inches and cm; its JP column equals the cm"),
+    "New Balance": ("label", "heel to longest toe, cm and inches, with ball widths, the page says; but the column is the standard centimetre label, 27 at a US 9 on a round-centimetre grid, and measured inside its 9 is every brand's 9 (shoe-sizes-3.md §5, decision 10; ADR 0030): the product reads its sizes by ISO's label"),
+    "Vans": ("label", "heel to longest toe, inches and cm, the page says, its JP column equal to the cm: the standard centimetre label on a round-centimetre grid, and measured inside its 9 is every brand's 9 (shoe-sizes-3.md §5, decision 10; ADR 0030): the product reads its sizes by ISO's label"),
     "UGG": ("foot", "heel to longest toe in inches; its Japan and Mexico columns are cm labels"),
     "HOKA": ("foot", "the foot traced, middle of the heel to the longest toe, on a sixth-of-an-inch grid; its Japan column is the Mondopoint label"),
     "Timberland": ("foot", "heel against a wall to the longest toe, inches and cm"),
@@ -277,8 +277,6 @@ def basis_of(brand, site, chart, line, kind, keys):
     used = set(keys.values())
     if brand == "Clarks" and "clarks.com.au" in site:
         return ("unstated", "a CM column the AU page never explains") if "foot_cm" in used else ("none", "no length")
-    if brand == "Asics" and "asics.com/us" in site and "foot_cm" in used:
-        return "foot", "the US page's steps: the foot's length heel to toe, heel against a wall, compared with the chart below them (Sean's capture, 2026-10-20)"
     if used & {"product_cm", "product_in"}:
         return BASIS["Puma"]
     if not used & {"foot_cm", "foot_in", "foot_mm", "foot_from_mm"}:
@@ -292,8 +290,8 @@ RECOMMENDED = {
     ("Asics", "asics.com/us", "Men's shoes size chart"),
     ("Asics", "asics.com/us", "Women's shoes size chart"),
     ("Birkenstock", "template", "PRINTABLE SIZING TEMPLATE A4: size table"),
-    ("Brooks", "brooksrunning.com", "Men's shoes"),
-    ("Brooks", "brooksrunning.com", "Women's shoes"),
+    ("Brooks", "composed", "Men's, composed"),
+    ("Brooks", "composed", "Women's, composed"),
     ("Clarks", "composed", "Men's, composed"),
     ("Clarks", "composed", "Women's, composed"),
     ("Converse", "converse.com", "Men's Chuck Taylor All Star"),
@@ -310,7 +308,8 @@ RECOMMENDED = {
     ("On", "manual", "women"),
     ("Puma", "us.puma.com", "Men's shoes"),
     ("Puma", "us.puma.com", "Women's shoes"),
-    ("Reebok", "reebok.com", "Unisex Shoe Size Guide"),
+    ("Reebok", "composed", "Men's, composed"),
+    ("Reebok", "composed", "Women's, composed"),
     ("Salomon", "salomon.com/en-us", "Unisex Footwear"),
     ("Skechers", "skechers.com/us", "Men's"),
     ("Skechers", "skechers.com/us", "Women's"),
@@ -408,6 +407,8 @@ def finish(chart):
             if row.get("foot_mm") is None:
                 row["foot_mm"] = row["foot_in_mm"]
                 row["foot_from_inches"] = True
+        if chart["brand"] == "Asics" and row.get("foot_cm") is not None:
+            row["label"] = row["foot_cm"]  # its CM column is its centimetre label, read by its rule and never listed as a scale (shoe-sizes-3.md §5, decision 5; ADR 0030)
         if row.get("uk") is None and row.get("uk_men") is not None:
             row["uk"] = row["uk_men"]
             row["uk_from_men"] = True
@@ -436,6 +437,42 @@ def load_workers():
             read = f"worker {'A' if worker == 'brands-a' else 'B'}, {g['date']}, {g['tool']}" + (f"; notes: {' | '.join(sorted(g['notes']))}" if g["notes"] else "")
             charts.append(finish(make_chart(brand, site, chart, g["columns"], keys, texts, g["url"], read)))
     return charts
+
+
+SOURCES_PASS = HERE.parent / "shoe-sizes-3"
+
+
+def load_sources_pass():
+    """The charts the sources pass read on the brands' other sites and checked at its wave 2
+    (docs/research/shoe-sizes-3.md §7 and §8): Brooks' UK charts with their foot lengths, Reebok's
+    AU charts with their UK and EU. The same shape as a worker's charts.csv."""
+    groups = {}
+    with (SOURCES_PASS / "rules" / "charts.csv").open(encoding="utf-8", newline="") as f:
+        for r in csv.DictReader(f):
+            if not (r["site"].startswith("brooksrunning.com/en_gb") or r["site"].startswith("reebok.com.au")):
+                continue
+            g = groups.setdefault((r["brand"], r["site"], r["chart"]), {"rows": {}, "columns": [], "url": r["url"], "date": r["date_read"], "tool": r["tool"], "notes": set()})
+            g["rows"].setdefault(int(r["row"]), {})[r["column"]] = r["value"]
+            if r["column"] not in g["columns"]:
+                g["columns"].append(r["column"])
+            if r["notes"]:
+                g["notes"].add(r["notes"])
+    charts = []
+    for (brand, site, chart), g in groups.items():
+        line, _ = classify(chart)
+        keys = {h: key_of(h, line, chart) for h in g["columns"]}
+        texts = [g["rows"][i] for i in sorted(g["rows"])]
+        read = f"worker A of the sources pass, {g['date']}, {g['tool']}, checked at its wave 2 (shoe-sizes-3.md §8)" + (f"; notes: {' | '.join(sorted(g['notes']))}" if g["notes"] else "")
+        charts.append(finish(make_chart(brand, site, chart, g["columns"], keys, texts, g["url"], read)))
+    return charts
+
+
+def scales_only(chart):
+    """A copy of a chart with its sizes alone, its lengths left as text: for a join that takes a page's scales and never its lengths (Reebok AU, another grid than the home page's)."""
+    keep = {"us_men", "us_women", "uk", "eu", "text"}
+    copy = dict(chart)
+    copy["rows"] = [{k: v for k, v in row.items() if k in keep} for row in chart["rows"]]
+    return copy
 
 
 MANUAL_KEYS = {
@@ -699,6 +736,24 @@ def composed(charts):
     us_women = find(charts, "Clarks", "clarks.com/en-us", "Women's Shoe Size Chart (US & UK)")
     out.append(compose("Clarks", "Men's, composed", [gb_men, us_men], "uk", "the GB page's UK, Clarks EU, standard EU, and mm joined with the US page's US sizes on the UK size they share; the US page's inches kept as text"))
     out.append(compose("Clarks", "Women's, composed", [gb_women, us_women], "uk", "the GB page's UK, Clarks EU, standard EU, and mm joined with the US page's US sizes on the UK size they share; the US page's inches kept as text"))
+    # The sources pass (docs/research/shoe-sizes-3.md §5, decisions 1 and 7; ADR 0030): Brooks' UK
+    # foot column and Reebok's AU scales onto the home charts, each on the US size the pages share.
+    brooks_note = "the UK page's Foot Length (CM) joined with the home page's chart on the US size they share, their UK and EU cells equal on every row (shoe-sizes-3.md §9, Table 5); the home page prints no length"
+    uk_men = find(charts, "Brooks", "brooksrunning.com/en_gb", "Men's running shoes, Shoe size comparison")
+    uk_women = find(charts, "Brooks", "brooksrunning.com/en_gb", "Women's running shoes, Shoe size comparison")
+    home_men = find(charts, "Brooks", "brooksrunning.com", "Men's shoes")
+    home_women = find(charts, "Brooks", "brooksrunning.com", "Women's shoes")
+    out.append(compose("Brooks", "Men's, composed", [uk_men, home_men], "us_men", brooks_note))
+    out.append(compose("Brooks", "Women's, composed", [uk_women, home_women], "us_women", brooks_note))
+    # Reebok per line: its AU men's and women's charts disagree on EU at the women's 5 to 7.5 (a
+    # half to a full size), so each line's home guide takes its own AU chart's UK and EU.
+    reebok_note = "the home page's {line} guide, US sizes and inches, joined with the AU page's {line} chart's UK and EU on the US size they share; the AU page's lengths, another grid (27 cm at a US men's 9 against the home page's 10.3 in), left as text and never read (shoe-sizes-3.md §5, decision 7)"
+    reebok_men = find(charts, "Reebok", "reebok.com", "Men's Shoes Size Guide")
+    reebok_women = find(charts, "Reebok", "reebok.com", "Women's Shoes Size Guide")
+    au_men = scales_only(find(charts, "Reebok", "reebok.com.au", "Men's Size Guides, Men's Footwear"))
+    au_women = scales_only(find(charts, "Reebok", "reebok.com.au", "Women's Size Guides, Women's Footwear"))
+    out.append(compose("Reebok", "Men's, composed", [reebok_men, au_men], "us_men", reebok_note.format(line="men's")))
+    out.append(compose("Reebok", "Women's, composed", [reebok_women, au_women], "us_women", reebok_note.format(line="women's")))
     return [finish(c) for c in out]
 
 
@@ -831,12 +886,12 @@ def summarize(chart):
         "brand": chart["brand"],
         "chart": label_of(chart),
         "rows": len(rows),
-        "length": {"foot": "the foot's", "unstated": "unstated", "uncertain": "uncertain", "label": "labels only", "none": "none", "misaligned": "misaligned", "product": "the product's"}[basis],
+        "length": {"foot": "the foot's", "unstated": "unstated", "uncertain": "uncertain", "label": "a size label", "none": "none", "misaligned": "misaligned", "product": "the product's"}[basis],
         "grid": plain(g, 1) if g is not None else "—",
         "ref": ref_text,
         "o_eu": stat(o_eu) if any(v is not None for v in o_eu) else "—",
         "o_uk": stat(o_uk) if any(v is not None for v in o_uk) else "—",
-        "d_us": stat(d_us) if basis in ("foot", "unstated", "uncertain") and any(v is not None for v in d_us) else "—",
+        "d_us": stat(d_us) if basis in ("foot", "unstated", "uncertain", "label") and any(v is not None for v in d_us) else "—",
         "w_m": ", ".join(plain(v) for v in w_m) if w_m else "—",
         "product": chart.get("product", False),
     }
@@ -952,6 +1007,9 @@ COMPARISONS = [
     (("Reebok", "reebok.com (re-read)", "Women's Shoes Size Guide"), ("Reebok", "reebok.com", "Women's Shoes Size Guide"), "us_women"),
     (("Under Armour", "underarmour.com (re-read)", "Men's Shoes"), ("Under Armour", "underarmour.com/en-us", "Men's Shoes Size Chart"), "us_men"),
     (("Under Armour", "underarmour.com (re-read)", "Women's Shoes"), ("Under Armour", "underarmour.com/en-us", "Women's Shoes Size Chart"), "us_women"),
+    (("Reebok", "composed", "Women's, composed"), ("Reebok", "reebok.com", "Unisex Shoe Size Guide"), "us_women", ("foot_in",)),
+    (("Reebok", "composed", "Men's, composed"), ("Reebok", "reebok.com", "Unisex Shoe Size Guide"), "us_men", ("foot_in",)),
+    (("Reebok", "reebok.com.au", "Men's Size Guides, Men's Footwear"), ("Reebok", "reebok.com.au", "Women's Size Guides, Women's Footwear"), "uk", ("eu",)),
 ]
 
 
@@ -960,7 +1018,7 @@ def main():
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-    charts = load_workers() + load_manual() + load_dr_martens()
+    charts = load_workers() + load_manual() + load_dr_martens() + load_sources_pass()
     for spec in PASTED:
         charts += load_pasted(spec)
     charts += composed(charts)
@@ -978,8 +1036,8 @@ def main():
         if c["kind"] == "composed":
             dis = [x for r in c["rows"] for x in r.get("disagree", [])]
             print(f"{c['brand']} {c['chart']}: {len(c['rows'])} rows, {len(dis)} disagreements" + (": " + "; ".join(dis[:6]) if dis else ""))
-    for a, b, on in COMPARISONS:
-        print(compare(find(charts, *a), find(charts, *b), on))
+    for a, b, on, *keys in COMPARISONS:
+        print(compare(find(charts, *a), find(charts, *b), on, *keys))
     if "--write" in sys.argv:
         write_json(charts, HERE / "brands.json")
         write_deltas_csv(charts, HERE / "deltas.csv")

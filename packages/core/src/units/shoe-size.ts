@@ -45,7 +45,7 @@ export const shoeSize: Category = {
   tier: 'standard',
   group: 'sizes',
   prefix: true,
-  note: 'ISO 19407’s sizes from the foot’s length, to the half size. Each brand’s row is its own chart read at that foot. Type a brand you fit (nike 10), or measure your foot heel to toe and type its length (27 cm).',
+  note: 'ISO 19407’s sizes from the foot’s length, to the half size. Each brand’s row is its own chart read at that foot. Type a brand you fit (nike 10), or measure your foot heel to toe and type its length (27 cm). Measured inside, a US 9 is about the same length at every brand; the charts differ by the room each brand leaves.',
 };
 
 const ISO = 'ISO/TS 19407:2015, read through GOST R 57425-2017, its adoption';

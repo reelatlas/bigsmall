@@ -1582,7 +1582,7 @@ function brandNote(
       );
     } else if (reading.tier === 2 && brand.labelMinusCm !== undefined) {
       lines.push(
-        `${name} gives no foot length; its foot here is its JP label less ${brand.labelMinusCm} cm, by its own rule.`,
+        `${name} gives no foot length; its foot here is its centimetre label less ${brand.labelMinusCm} cm, by its own rule.`,
       );
     } else if (reading.length && reading.row === null) {
       lines.push(

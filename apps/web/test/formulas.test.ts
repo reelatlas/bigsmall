@@ -37,7 +37,7 @@ describe('formulas', () => {
     });
     expect(nike?.formula).toBe('38 sizes: US men, US women, UK, EU, JP, the foot in mm');
     expect(nike?.source).toContain(
-      'nike.com/size-fit/mens-footwear, read 2026-10-20; its length the foot’s.',
+      'nike.com/size-fit/mens-footwear, read 2026-10-21; its length the foot’s.',
     );
     expect(formula('brand:birkenstock:unisex')).toContain('EU, the foot in mm');
     expect(shoe?.lines.find((line) => line.id === 'brand:birkenstock:unisex')?.source).toContain(
@@ -47,7 +47,7 @@ describe('formulas', () => {
     // On's rule, which fills its feet (docs/RESEARCH.md §9), said on its line in the page's words,
     // no repo path among them (the tidy of 2026-10-21).
     const on = charts.find((line) => line.id.startsWith('brand:on:'));
-    expect(on?.source).toContain('its Japan label less 1 cm, the brand’s own rule.');
+    expect(on?.source).toContain('its centimetre label less 1 cm, the brand’s own rule.');
     expect(on?.source).not.toContain('docs/');
   });
 

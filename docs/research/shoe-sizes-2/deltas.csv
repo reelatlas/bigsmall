@@ -1,85 +1,85 @@
 brand,site,chart,line,kind,basis,foot_mm,foot_in_mm,us_men,us_women,uk,eu,jp,iso_eu,iso_uk,iso_usm,iso_usw,d_eu,d_uk,d_usm,d_usw,o_eu_m,o_uk_m,o_foot_m,o_eu_w,o_uk_w,o_foot_w,w_minus_m,in_minus_cm_mm,product
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,225,,4,5.5,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,-0.564,-0.064,0.984,0,4.78,0.349,-0.5,0.545,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,235,,5,6.5,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,-0.745,-0.245,1.214,0,6.31,0.579,-0.5,2.075,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,240,,5.5,7,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,-0.835,-0.335,1.079,0,7.075,0.444,-0.5,2.84,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,245,,6,7.5,5,39,,38.732,5.926,6.926,7.926,0.268,-0.926,-0.926,-0.426,1.444,0,7.84,0.809,-0.5,3.605,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,250,,6.5,8,5.5,39.5,,39.481,6.516,7.516,8.516,0.019,-1.016,-1.016,-0.516,1.309,0,8.605,0.674,-0.5,4.37,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,255,,7,8.5,6,40,,40.231,7.106,8.106,9.106,-0.231,-1.106,-1.106,-0.606,1.174,0,9.37,0.539,-0.5,5.135,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,257.5,,7.5,9,6.5,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.901,-0.901,-0.401,1.039,0,7.635,0.404,-0.5,3.4,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,260,,8,9.5,7,41.5,,40.981,7.697,8.697,9.697,0.519,-0.697,-0.697,-0.197,1.404,0,5.9,0.769,-0.5,1.665,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,265,,8.5,10,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,-0.287,1.269,0,6.665,0.634,-0.5,2.43,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,270,,9,10.5,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,-0.377,1.134,0,7.43,0.499,-0.5,3.195,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,275,,9.5,11,8.5,43.5,,43.229,9.468,10.468,11.468,0.271,-0.968,-0.968,-0.468,1.499,0,8.195,0.864,-0.5,3.96,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,280,,10,11.5,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,-0.558,1.364,0,8.96,0.729,-0.5,4.725,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,282.5,,10.5,12,9.5,44.5,,44.354,10.353,11.353,12.353,0.146,-0.853,-0.853,-0.353,1.229,0,7.225,0.594,-0.5,2.99,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,285,,11,12.5,10,45,,44.729,10.648,11.648,12.648,0.271,-0.648,-0.648,-0.148,1.094,0,5.49,0.46,-0.5,1.255,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,290,,11.5,13,10.5,46,,45.478,11.238,12.238,13.238,0.522,-0.738,-0.738,-0.238,1.46,0,6.255,0.825,-0.5,2.02,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,295,,12,13.5,11,46.5,,46.228,11.829,12.829,13.829,0.272,-0.829,-0.829,-0.329,1.325,0,7.02,0.69,-0.5,2.785,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,300,,12.5,14,11.5,47,,46.978,12.419,13.419,14.419,0.022,-0.919,-0.919,-0.419,1.19,0,7.785,0.555,-0.5,3.55,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,305,,13,14.5,12,48,,47.727,13.009,14.009,15.009,0.273,-1.009,-1.009,-0.509,1.555,0,8.55,0.92,-0.5,4.315,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,307.5,,13.5,15,12.5,48.5,,48.102,13.305,14.305,15.305,0.398,-0.805,-0.805,-0.305,1.42,0,6.815,0.785,-0.5,2.58,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,310,,14,15.5,13,49,,48.477,13.6,14.6,15.6,0.523,-0.6,-0.6,-0.1,1.285,0,5.08,0.65,-0.5,0.845,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,320,,15,16.5,14,50.5,,49.976,14.78,15.78,16.78,0.524,-0.78,-0.78,-0.28,1.515,0,6.61,0.88,-0.5,2.375,1.5,,
-Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,unstated,330,,16,17.5,15,51.5,,51.475,15.961,16.961,17.961,0.025,-0.961,-0.961,-0.461,1.245,0,8.14,0.61,-0.5,3.905,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,220,,3.5,5,3,35.5,,34.984,2.974,3.974,4.974,0.516,0.026,-0.474,0.026,1.118,0.5,4.015,0.484,0,-0.22,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,225,,4,5.5,3.5,36,,35.733,3.564,4.564,5.564,0.267,-0.064,-0.564,-0.064,0.984,0.5,4.78,0.349,0,0.545,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,230,,4.5,6,4,37,,36.483,4.155,5.155,6.155,0.517,-0.155,-0.655,-0.155,1.349,0.5,5.545,0.714,0,1.31,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,235,,5,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,-0.745,-0.245,1.214,0.5,6.31,0.579,0,2.075,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,240,,5.5,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,-0.835,-0.335,1.079,0.5,7.075,0.444,0,2.84,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,245,,6,7.5,5.5,39,,38.732,5.926,6.926,7.926,0.268,-0.426,-0.926,-0.426,1.444,0.5,7.84,0.809,0,3.605,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,250,,6.5,8,6,39.5,,39.481,6.516,7.516,8.516,0.019,-0.516,-1.016,-0.516,1.309,0.5,8.605,0.674,0,4.37,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,255,,7,8.5,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,-1.106,-0.606,1.174,0.5,9.37,0.539,0,5.135,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,257.5,,7.5,9,7,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.401,-0.901,-0.401,1.039,0.5,7.635,0.404,0,3.4,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,260,,8,9.5,7.5,41.5,,40.981,7.697,8.697,9.697,0.519,-0.197,-0.697,-0.197,1.404,0.5,5.9,0.769,0,1.665,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,265,,8.5,10,8,42,,41.73,8.287,9.287,10.287,0.27,-0.287,-0.787,-0.287,1.269,0.5,6.665,0.634,0,2.43,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,270,,9,10.5,8.5,42.5,,42.48,8.877,9.877,10.877,0.02,-0.377,-0.877,-0.377,1.134,0.5,7.43,0.499,0,3.195,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,275,,9.5,11,9,43.5,,43.229,9.468,10.468,11.468,0.271,-0.468,-0.968,-0.468,1.499,0.5,8.195,0.864,0,3.96,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,280,,10,11.5,9.5,44,,43.979,10.058,11.058,12.058,0.021,-0.558,-1.058,-0.558,1.364,0.5,8.96,0.729,0,4.725,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,285,,10.5,12,10,44.5,,44.729,10.648,11.648,12.648,-0.229,-0.648,-1.148,-0.648,1.229,0.5,9.725,0.594,0,5.49,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,287.5,,11,12.5,10.5,45,,45.103,10.943,11.943,12.943,-0.103,-0.443,-0.943,-0.443,1.094,0.5,7.99,0.46,0,3.755,1.5,,
-Asics,asics.com/nz,Women's Shoe Sizes,women,main,unstated,290,,11.5,13,11,46,,45.478,11.238,12.238,13.238,0.522,-0.238,-0.738,-0.238,1.46,0.5,6.255,0.825,0,2.02,1.5,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,225,,4,,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,-0.564,,0.984,0,4.78,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,230,,4.5,,3.5,37,,36.483,4.155,5.155,6.155,0.517,-0.655,-0.655,,1.349,0,5.545,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,235,,5,,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,-0.745,,1.214,0,6.31,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,240,,5.5,,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,-0.835,,1.079,0,7.075,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,245,,6,,5,39,,38.732,5.926,6.926,7.926,0.268,-0.926,-0.926,,1.444,0,7.84,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,250,,6.5,,5.5,39.5,,39.481,6.516,7.516,8.516,0.019,-1.016,-1.016,,1.309,0,8.605,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,255,,7,,6,40,,40.231,7.106,8.106,9.106,-0.231,-1.106,-1.106,,1.174,0,9.37,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,257.5,,7.5,,6.5,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.901,-0.901,,1.039,0,7.635,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,260,,8,,7,41.5,,40.981,7.697,8.697,9.697,0.519,-0.697,-0.697,,1.404,0,5.9,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,265,,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,270,,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,275,,9.5,,8.5,43.5,,43.229,9.468,10.468,11.468,0.271,-0.968,-0.968,,1.499,0,8.195,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,280,,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,282.5,,10.5,,9.5,44.5,,44.354,10.353,11.353,12.353,0.146,-0.853,-0.853,,1.229,0,7.225,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,285,,11,,10,45,,44.729,10.648,11.648,12.648,0.271,-0.648,-0.648,,1.094,0,5.49,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,290,,11.5,,10.5,46,,45.478,11.238,12.238,13.238,0.522,-0.738,-0.738,,1.46,0,6.255,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,295,,12,,11,46.5,,46.228,11.829,12.829,13.829,0.272,-0.829,-0.829,,1.325,0,7.02,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,300,,12.5,,11.5,47,,46.978,12.419,13.419,14.419,0.022,-0.919,-0.919,,1.19,0,7.785,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,305,,13,,12,48,,47.727,13.009,14.009,15.009,0.273,-1.009,-1.009,,1.555,0,8.55,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,307.5,,13.5,,12.5,48.5,,48.102,13.305,14.305,15.305,0.398,-0.805,-0.805,,1.42,0,6.815,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,310,,14,,13,49,,48.477,13.6,14.6,15.6,0.523,-0.6,-0.6,,1.285,0,5.08,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,315,,14.5,,13.5,49.5,,49.226,14.19,15.19,16.19,0.274,-0.69,-0.69,,1.15,0,5.845,,,,,,
-Asics,asics.com/sg,Men's/Unisex Sizes,men,main,unstated,320,,15,,14,50.5,,49.976,14.78,15.78,16.78,0.524,-0.78,-0.78,,1.515,0,6.61,,,,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,215,,,4,2,34.5,,34.234,2.384,3.384,4.384,0.266,-0.384,,-0.384,,,,0.753,0,3.25,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,220,,,4.5,2.5,35,,34.984,2.974,3.974,4.974,0.016,-0.474,,-0.474,,,,0.618,0,4.015,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,225,,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,227.5,,,5.5,3.5,36,,36.108,3.86,4.86,5.86,-0.108,-0.36,,-0.36,,,,0.349,0,3.045,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,230,,,6,4,37,,36.483,4.155,5.155,6.155,0.517,-0.155,,-0.155,,,,0.714,0,1.31,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,235,,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,240,,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,245,,,7.5,5.5,39,,38.732,5.926,6.926,7.926,0.268,-0.426,,-0.426,,,,0.809,0,3.605,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,250,,,8,6,39.5,,39.481,6.516,7.516,8.516,0.019,-0.516,,-0.516,,,,0.674,0,4.37,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,255,,,8.5,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,,-0.606,,,,0.539,0,5.135,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,257.5,,,9,7,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.401,,-0.401,,,,0.404,0,3.4,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,260,,,9.5,7.5,41.5,,40.981,7.697,8.697,9.697,0.519,-0.197,,-0.197,,,,0.769,0,1.665,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,265,,,10,8,42,,41.73,8.287,9.287,10.287,0.27,-0.287,,-0.287,,,,0.634,0,2.43,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,270,,,10.5,8.5,42.5,,42.48,8.877,9.877,10.877,0.02,-0.377,,-0.377,,,,0.499,0,3.195,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,275,,,11,9,43.5,,43.229,9.468,10.468,11.468,0.271,-0.468,,-0.468,,,,0.864,0,3.96,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,280,,,11.5,9.5,44,,43.979,10.058,11.058,12.058,0.021,-0.558,,-0.558,,,,0.729,0,4.725,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,285,,,12,10,44.5,,44.729,10.648,11.648,12.648,-0.229,-0.648,,-0.648,,,,0.594,0,5.49,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,287.5,,,12.5,10.5,45,,45.103,10.943,11.943,12.943,-0.103,-0.443,,-0.443,,,,0.46,0,3.755,,,
-Asics,asics.com/sg,Women's Sizes,women,main,unstated,290,,,13,11,46,,45.478,11.238,12.238,13.238,0.522,-0.238,,-0.238,,,,0.825,0,2.02,,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,225,,4,5.5,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,-0.564,-0.064,0.984,0,4.78,0.349,-0.5,0.545,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,235,,5,6.5,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,-0.745,-0.245,1.214,0,6.31,0.579,-0.5,2.075,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,240,,5.5,7,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,-0.835,-0.335,1.079,0,7.075,0.444,-0.5,2.84,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,245,,6,7.5,5,39,,38.732,5.926,6.926,7.926,0.268,-0.926,-0.926,-0.426,1.444,0,7.84,0.809,-0.5,3.605,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,250,,6.5,8,5.5,39.5,,39.481,6.516,7.516,8.516,0.019,-1.016,-1.016,-0.516,1.309,0,8.605,0.674,-0.5,4.37,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,255,,7,8.5,6,40,,40.231,7.106,8.106,9.106,-0.231,-1.106,-1.106,-0.606,1.174,0,9.37,0.539,-0.5,5.135,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,257.5,,7.5,9,6.5,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.901,-0.901,-0.401,1.039,0,7.635,0.404,-0.5,3.4,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,260,,8,9.5,7,41.5,,40.981,7.697,8.697,9.697,0.519,-0.697,-0.697,-0.197,1.404,0,5.9,0.769,-0.5,1.665,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,265,,8.5,10,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,-0.287,1.269,0,6.665,0.634,-0.5,2.43,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,270,,9,10.5,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,-0.377,1.134,0,7.43,0.499,-0.5,3.195,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,275,,9.5,11,8.5,43.5,,43.229,9.468,10.468,11.468,0.271,-0.968,-0.968,-0.468,1.499,0,8.195,0.864,-0.5,3.96,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,280,,10,11.5,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,-0.558,1.364,0,8.96,0.729,-0.5,4.725,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,282.5,,10.5,12,9.5,44.5,,44.354,10.353,11.353,12.353,0.146,-0.853,-0.853,-0.353,1.229,0,7.225,0.594,-0.5,2.99,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,285,,11,12.5,10,45,,44.729,10.648,11.648,12.648,0.271,-0.648,-0.648,-0.148,1.094,0,5.49,0.46,-0.5,1.255,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,290,,11.5,13,10.5,46,,45.478,11.238,12.238,13.238,0.522,-0.738,-0.738,-0.238,1.46,0,6.255,0.825,-0.5,2.02,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,295,,12,13.5,11,46.5,,46.228,11.829,12.829,13.829,0.272,-0.829,-0.829,-0.329,1.325,0,7.02,0.69,-0.5,2.785,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,300,,12.5,14,11.5,47,,46.978,12.419,13.419,14.419,0.022,-0.919,-0.919,-0.419,1.19,0,7.785,0.555,-0.5,3.55,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,305,,13,14.5,12,48,,47.727,13.009,14.009,15.009,0.273,-1.009,-1.009,-0.509,1.555,0,8.55,0.92,-0.5,4.315,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,307.5,,13.5,15,12.5,48.5,,48.102,13.305,14.305,15.305,0.398,-0.805,-0.805,-0.305,1.42,0,6.815,0.785,-0.5,2.58,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,310,,14,15.5,13,49,,48.477,13.6,14.6,15.6,0.523,-0.6,-0.6,-0.1,1.285,0,5.08,0.65,-0.5,0.845,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,320,,15,16.5,14,50.5,,49.976,14.78,15.78,16.78,0.524,-0.78,-0.78,-0.28,1.515,0,6.61,0.88,-0.5,2.375,1.5,,
+Asics,asics.com/nz,Men's/Unisex Shoe Sizes,men,main,label,330,,16,17.5,15,51.5,,51.475,15.961,16.961,17.961,0.025,-0.961,-0.961,-0.461,1.245,0,8.14,0.61,-0.5,3.905,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,220,,3.5,5,3,35.5,,34.984,2.974,3.974,4.974,0.516,0.026,-0.474,0.026,1.118,0.5,4.015,0.484,0,-0.22,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,225,,4,5.5,3.5,36,,35.733,3.564,4.564,5.564,0.267,-0.064,-0.564,-0.064,0.984,0.5,4.78,0.349,0,0.545,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,230,,4.5,6,4,37,,36.483,4.155,5.155,6.155,0.517,-0.155,-0.655,-0.155,1.349,0.5,5.545,0.714,0,1.31,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,235,,5,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,-0.745,-0.245,1.214,0.5,6.31,0.579,0,2.075,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,240,,5.5,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,-0.835,-0.335,1.079,0.5,7.075,0.444,0,2.84,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,245,,6,7.5,5.5,39,,38.732,5.926,6.926,7.926,0.268,-0.426,-0.926,-0.426,1.444,0.5,7.84,0.809,0,3.605,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,250,,6.5,8,6,39.5,,39.481,6.516,7.516,8.516,0.019,-0.516,-1.016,-0.516,1.309,0.5,8.605,0.674,0,4.37,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,255,,7,8.5,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,-1.106,-0.606,1.174,0.5,9.37,0.539,0,5.135,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,257.5,,7.5,9,7,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.401,-0.901,-0.401,1.039,0.5,7.635,0.404,0,3.4,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,260,,8,9.5,7.5,41.5,,40.981,7.697,8.697,9.697,0.519,-0.197,-0.697,-0.197,1.404,0.5,5.9,0.769,0,1.665,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,265,,8.5,10,8,42,,41.73,8.287,9.287,10.287,0.27,-0.287,-0.787,-0.287,1.269,0.5,6.665,0.634,0,2.43,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,270,,9,10.5,8.5,42.5,,42.48,8.877,9.877,10.877,0.02,-0.377,-0.877,-0.377,1.134,0.5,7.43,0.499,0,3.195,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,275,,9.5,11,9,43.5,,43.229,9.468,10.468,11.468,0.271,-0.468,-0.968,-0.468,1.499,0.5,8.195,0.864,0,3.96,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,280,,10,11.5,9.5,44,,43.979,10.058,11.058,12.058,0.021,-0.558,-1.058,-0.558,1.364,0.5,8.96,0.729,0,4.725,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,285,,10.5,12,10,44.5,,44.729,10.648,11.648,12.648,-0.229,-0.648,-1.148,-0.648,1.229,0.5,9.725,0.594,0,5.49,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,287.5,,11,12.5,10.5,45,,45.103,10.943,11.943,12.943,-0.103,-0.443,-0.943,-0.443,1.094,0.5,7.99,0.46,0,3.755,1.5,,
+Asics,asics.com/nz,Women's Shoe Sizes,women,main,label,290,,11.5,13,11,46,,45.478,11.238,12.238,13.238,0.522,-0.238,-0.738,-0.238,1.46,0.5,6.255,0.825,0,2.02,1.5,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,225,,4,,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,-0.564,,0.984,0,4.78,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,230,,4.5,,3.5,37,,36.483,4.155,5.155,6.155,0.517,-0.655,-0.655,,1.349,0,5.545,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,235,,5,,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,-0.745,,1.214,0,6.31,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,240,,5.5,,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,-0.835,,1.079,0,7.075,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,245,,6,,5,39,,38.732,5.926,6.926,7.926,0.268,-0.926,-0.926,,1.444,0,7.84,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,250,,6.5,,5.5,39.5,,39.481,6.516,7.516,8.516,0.019,-1.016,-1.016,,1.309,0,8.605,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,255,,7,,6,40,,40.231,7.106,8.106,9.106,-0.231,-1.106,-1.106,,1.174,0,9.37,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,257.5,,7.5,,6.5,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.901,-0.901,,1.039,0,7.635,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,260,,8,,7,41.5,,40.981,7.697,8.697,9.697,0.519,-0.697,-0.697,,1.404,0,5.9,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,265,,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,270,,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,275,,9.5,,8.5,43.5,,43.229,9.468,10.468,11.468,0.271,-0.968,-0.968,,1.499,0,8.195,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,280,,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,282.5,,10.5,,9.5,44.5,,44.354,10.353,11.353,12.353,0.146,-0.853,-0.853,,1.229,0,7.225,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,285,,11,,10,45,,44.729,10.648,11.648,12.648,0.271,-0.648,-0.648,,1.094,0,5.49,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,290,,11.5,,10.5,46,,45.478,11.238,12.238,13.238,0.522,-0.738,-0.738,,1.46,0,6.255,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,295,,12,,11,46.5,,46.228,11.829,12.829,13.829,0.272,-0.829,-0.829,,1.325,0,7.02,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,300,,12.5,,11.5,47,,46.978,12.419,13.419,14.419,0.022,-0.919,-0.919,,1.19,0,7.785,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,305,,13,,12,48,,47.727,13.009,14.009,15.009,0.273,-1.009,-1.009,,1.555,0,8.55,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,307.5,,13.5,,12.5,48.5,,48.102,13.305,14.305,15.305,0.398,-0.805,-0.805,,1.42,0,6.815,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,310,,14,,13,49,,48.477,13.6,14.6,15.6,0.523,-0.6,-0.6,,1.285,0,5.08,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,315,,14.5,,13.5,49.5,,49.226,14.19,15.19,16.19,0.274,-0.69,-0.69,,1.15,0,5.845,,,,,,
+Asics,asics.com/sg,Men's/Unisex Sizes,men,main,label,320,,15,,14,50.5,,49.976,14.78,15.78,16.78,0.524,-0.78,-0.78,,1.515,0,6.61,,,,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,215,,,4,2,34.5,,34.234,2.384,3.384,4.384,0.266,-0.384,,-0.384,,,,0.753,0,3.25,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,220,,,4.5,2.5,35,,34.984,2.974,3.974,4.974,0.016,-0.474,,-0.474,,,,0.618,0,4.015,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,225,,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,227.5,,,5.5,3.5,36,,36.108,3.86,4.86,5.86,-0.108,-0.36,,-0.36,,,,0.349,0,3.045,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,230,,,6,4,37,,36.483,4.155,5.155,6.155,0.517,-0.155,,-0.155,,,,0.714,0,1.31,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,235,,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,240,,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,245,,,7.5,5.5,39,,38.732,5.926,6.926,7.926,0.268,-0.426,,-0.426,,,,0.809,0,3.605,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,250,,,8,6,39.5,,39.481,6.516,7.516,8.516,0.019,-0.516,,-0.516,,,,0.674,0,4.37,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,255,,,8.5,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,,-0.606,,,,0.539,0,5.135,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,257.5,,,9,7,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.401,,-0.401,,,,0.404,0,3.4,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,260,,,9.5,7.5,41.5,,40.981,7.697,8.697,9.697,0.519,-0.197,,-0.197,,,,0.769,0,1.665,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,265,,,10,8,42,,41.73,8.287,9.287,10.287,0.27,-0.287,,-0.287,,,,0.634,0,2.43,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,270,,,10.5,8.5,42.5,,42.48,8.877,9.877,10.877,0.02,-0.377,,-0.377,,,,0.499,0,3.195,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,275,,,11,9,43.5,,43.229,9.468,10.468,11.468,0.271,-0.468,,-0.468,,,,0.864,0,3.96,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,280,,,11.5,9.5,44,,43.979,10.058,11.058,12.058,0.021,-0.558,,-0.558,,,,0.729,0,4.725,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,285,,,12,10,44.5,,44.729,10.648,11.648,12.648,-0.229,-0.648,,-0.648,,,,0.594,0,5.49,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,287.5,,,12.5,10.5,45,,45.103,10.943,11.943,12.943,-0.103,-0.443,,-0.443,,,,0.46,0,3.755,,,
+Asics,asics.com/sg,Women's Sizes,women,main,label,290,,,13,11,46,,45.478,11.238,12.238,13.238,0.522,-0.238,,-0.238,,,,0.825,0,2.02,,,
 Converse,converse.ca,Women - Chuck Taylor All Star,women,chuck,foot,220,220.98,,5,3,35,,34.984,2.974,3.974,4.974,0.016,0.026,,0.026,,,,-0.016,0,-0.22,,0.98,
 Converse,converse.ca,Women - Chuck Taylor All Star,women,chuck,foot,225,226.06,,5.5,3.5,36,,35.733,3.564,4.564,5.564,0.267,-0.064,,-0.064,,,,0.349,0,0.545,,1.06,
 Converse,converse.ca,Women - Chuck Taylor All Star,women,chuck,foot,230,231.14,,6,4,36.5,,36.483,4.155,5.155,6.155,0.017,-0.155,,-0.155,,,,0.214,0,1.31,,1.14,
@@ -671,40 +671,40 @@ Reebok,reebok.com,Special Unisex Shoe Size Guide (table headed Unisex Shoes Size
 Reebok,reebok.com,Special Unisex Shoe Size Guide (table headed Unisex Shoes Size Guide),unisex,special,foot,332.74,332.74,17.5,,,,,51.886,16.285,17.285,18.285,,,0.215,,,,-1.825,,,,,,
 Reebok,reebok.com,Special Unisex Shoe Size Guide (table headed Unisex Shoes Size Guide),unisex,special,foot,337.82,337.82,18,,,,,52.648,16.884,17.884,18.884,,,0.116,,,,-0.98,,,,,,
 Reebok,reebok.com,Special Unisex Shoe Size Guide (table headed Unisex Shoes Size Guide),unisex,special,foot,342.9,342.9,18.5,,,,,53.409,17.484,18.484,19.484,,,0.016,,,,-0.135,,,,,,
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,203.2,203.2,2,3.5,,,,32.465,0.991,1.991,2.991,,,0.009,0.509,,,-0.08,,,-4.315,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,208.28,208.28,2.5,4,,,,33.226,1.59,2.59,3.59,,,-0.09,0.41,,,0.765,,,-3.47,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,210.82,210.82,3,4.5,,,,33.607,1.89,2.89,3.89,,,0.11,0.61,,,-0.93,,,-5.165,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,215.9,215.9,3.5,5,,,,34.369,2.49,3.49,4.49,,,0.01,0.51,,,-0.085,,,-4.32,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,220.98,220.98,4,5.5,,,,35.13,3.09,4.09,5.09,,,-0.09,0.41,,,0.76,,,-3.475,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,223.52,223.52,4.5,6,,,,35.511,3.39,4.39,5.39,,,0.11,0.61,,,-0.935,,,-5.17,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,228.6,228.6,5,6.5,,,,36.273,3.989,4.989,5.989,,,0.011,0.511,,,-0.09,,,-4.325,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,233.68,233.68,5.5,7,,,,37.034,4.589,5.589,6.589,,,-0.089,0.411,,,0.755,,,-3.48,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,236.22,236.22,6,7.5,,,,37.415,4.889,5.889,6.889,,,0.111,0.611,,,-0.94,,,-5.175,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,241.3,241.3,6.5,8,,,,38.177,5.489,6.489,7.489,,,0.011,0.511,,,-0.095,,,-4.33,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,246.38,246.38,7,8.5,,,,38.939,6.089,7.089,8.089,,,-0.089,0.411,,,0.75,,,-3.485,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,248.92,248.92,7.5,9,,,,39.319,6.388,7.388,8.388,,,0.112,0.612,,,-0.945,,,-5.18,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,254,254,8,9.5,,,,40.081,6.988,7.988,8.988,,,0.012,0.512,,,-0.1,,,-4.335,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,259.08,259.08,8.5,10,,,,40.843,7.588,8.588,9.588,,,-0.088,0.412,,,0.745,,,-3.49,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,261.62,261.62,9,10.5,,,,41.223,7.888,8.888,9.888,,,0.112,0.612,,,-0.95,,,-5.185,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,266.7,266.7,9.5,11,,,,41.985,8.488,9.488,10.488,,,0.012,0.512,,,-0.105,,,-4.34,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,271.78,271.78,10,11.5,,,,42.747,9.087,10.087,11.087,,,-0.087,0.413,,,0.74,,,-3.495,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,274.32,274.32,10.5,12,,,,43.127,9.387,10.387,11.387,,,0.113,0.613,,,-0.955,,,-5.19,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,279.4,279.4,11,12.5,,,,43.889,9.987,10.987,11.987,,,0.013,0.513,,,-0.11,,,-4.345,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,284.48,284.48,11.5,13,,,,44.651,10.587,11.587,12.587,,,-0.087,0.413,,,0.735,,,-3.5,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,287.02,287.02,12,13.5,,,,45.031,10.887,11.887,12.887,,,0.113,0.613,,,-0.96,,,-5.195,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,292.1,292.1,12.5,14,,,,45.793,11.486,12.486,13.486,,,0.014,0.514,,,-0.115,,,-4.35,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,297.18,297.18,13,14.5,,,,46.555,12.086,13.086,14.086,,,-0.086,0.414,,,0.73,,,-3.505,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,299.72,299.72,13.5,15,,,,46.936,12.386,13.386,14.386,,,0.114,0.614,,,-0.965,,,-5.2,1.5,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,304.8,304.8,14,,,,,47.697,12.986,13.986,14.986,,,0.014,,,,-0.12,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,309.88,309.88,14.5,,,,,48.459,13.586,14.586,15.586,,,-0.086,,,,0.725,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,312.42,312.42,15,,,,,48.84,13.885,14.885,15.885,,,0.115,,,,-0.97,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,317.5,317.5,15.5,,,,,49.601,14.485,15.485,16.485,,,0.015,,,,-0.125,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,320.04,320.04,16,,,,,49.982,14.785,15.785,16.785,,,0.215,,,,-1.82,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,325.12,325.12,16.5,,,,,50.744,15.385,16.385,17.385,,,0.115,,,,-0.975,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,330.2,330.2,17,,,,,51.505,15.985,16.985,17.985,,,0.015,,,,-0.13,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,332.74,332.74,17.5,,,,,51.886,16.285,17.285,18.285,,,0.215,,,,-1.825,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,337.82,337.82,18,,,,,52.648,16.884,17.884,18.884,,,0.116,,,,-0.98,,,,,,yes
-Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,342.9,342.9,18.5,,,,,53.409,17.484,18.484,19.484,,,0.016,,,,-0.135,,,,,,yes
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,203.2,203.2,2,3.5,,,,32.465,0.991,1.991,2.991,,,0.009,0.509,,,-0.08,,,-4.315,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,208.28,208.28,2.5,4,,,,33.226,1.59,2.59,3.59,,,-0.09,0.41,,,0.765,,,-3.47,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,210.82,210.82,3,4.5,,,,33.607,1.89,2.89,3.89,,,0.11,0.61,,,-0.93,,,-5.165,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,215.9,215.9,3.5,5,,,,34.369,2.49,3.49,4.49,,,0.01,0.51,,,-0.085,,,-4.32,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,220.98,220.98,4,5.5,,,,35.13,3.09,4.09,5.09,,,-0.09,0.41,,,0.76,,,-3.475,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,223.52,223.52,4.5,6,,,,35.511,3.39,4.39,5.39,,,0.11,0.61,,,-0.935,,,-5.17,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,228.6,228.6,5,6.5,,,,36.273,3.989,4.989,5.989,,,0.011,0.511,,,-0.09,,,-4.325,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,233.68,233.68,5.5,7,,,,37.034,4.589,5.589,6.589,,,-0.089,0.411,,,0.755,,,-3.48,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,236.22,236.22,6,7.5,,,,37.415,4.889,5.889,6.889,,,0.111,0.611,,,-0.94,,,-5.175,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,241.3,241.3,6.5,8,,,,38.177,5.489,6.489,7.489,,,0.011,0.511,,,-0.095,,,-4.33,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,246.38,246.38,7,8.5,,,,38.939,6.089,7.089,8.089,,,-0.089,0.411,,,0.75,,,-3.485,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,248.92,248.92,7.5,9,,,,39.319,6.388,7.388,8.388,,,0.112,0.612,,,-0.945,,,-5.18,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,254,254,8,9.5,,,,40.081,6.988,7.988,8.988,,,0.012,0.512,,,-0.1,,,-4.335,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,259.08,259.08,8.5,10,,,,40.843,7.588,8.588,9.588,,,-0.088,0.412,,,0.745,,,-3.49,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,261.62,261.62,9,10.5,,,,41.223,7.888,8.888,9.888,,,0.112,0.612,,,-0.95,,,-5.185,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,266.7,266.7,9.5,11,,,,41.985,8.488,9.488,10.488,,,0.012,0.512,,,-0.105,,,-4.34,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,271.78,271.78,10,11.5,,,,42.747,9.087,10.087,11.087,,,-0.087,0.413,,,0.74,,,-3.495,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,274.32,274.32,10.5,12,,,,43.127,9.387,10.387,11.387,,,0.113,0.613,,,-0.955,,,-5.19,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,279.4,279.4,11,12.5,,,,43.889,9.987,10.987,11.987,,,0.013,0.513,,,-0.11,,,-4.345,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,284.48,284.48,11.5,13,,,,44.651,10.587,11.587,12.587,,,-0.087,0.413,,,0.735,,,-3.5,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,287.02,287.02,12,13.5,,,,45.031,10.887,11.887,12.887,,,0.113,0.613,,,-0.96,,,-5.195,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,292.1,292.1,12.5,14,,,,45.793,11.486,12.486,13.486,,,0.014,0.514,,,-0.115,,,-4.35,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,297.18,297.18,13,14.5,,,,46.555,12.086,13.086,14.086,,,-0.086,0.414,,,0.73,,,-3.505,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,299.72,299.72,13.5,15,,,,46.936,12.386,13.386,14.386,,,0.114,0.614,,,-0.965,,,-5.2,1.5,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,304.8,304.8,14,,,,,47.697,12.986,13.986,14.986,,,0.014,,,,-0.12,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,309.88,309.88,14.5,,,,,48.459,13.586,14.586,15.586,,,-0.086,,,,0.725,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,312.42,312.42,15,,,,,48.84,13.885,14.885,15.885,,,0.115,,,,-0.97,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,317.5,317.5,15.5,,,,,49.601,14.485,15.485,16.485,,,0.015,,,,-0.125,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,320.04,320.04,16,,,,,49.982,14.785,15.785,16.785,,,0.215,,,,-1.82,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,325.12,325.12,16.5,,,,,50.744,15.385,16.385,17.385,,,0.115,,,,-0.975,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,330.2,330.2,17,,,,,51.505,15.985,16.985,17.985,,,0.015,,,,-0.13,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,332.74,332.74,17.5,,,,,51.886,16.285,17.285,18.285,,,0.215,,,,-1.825,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,337.82,337.82,18,,,,,52.648,16.884,17.884,18.884,,,0.116,,,,-0.98,,,,,,
+Reebok,reebok.com,Unisex Shoe Size Guide,unisex,main,foot,342.9,342.9,18.5,,,,,53.409,17.484,18.484,19.484,,,0.016,,,,-0.135,,,,,,
 Skechers,skechers.co.uk,Women's,women,main,none,,,,5,2,35,,,,,,,,,,,,,-0.016,-1,,,,
 Skechers,skechers.co.uk,Women's,women,main,none,,,,5.5,2.5,35.5,,,,,,,,,,,,,-0.151,-1,,,,
 Skechers,skechers.co.uk,Women's,women,main,none,,,,6,3,36,,,,,,,,,,,,,-0.286,-1,,,,
@@ -771,108 +771,108 @@ Skechers,skechers.com/us,Men's,men,main,none,,,13.5,,12.5,48,,,,,,,,,,0.92,0,,,,
 Skechers,skechers.com/us,Men's,men,main,none,,,14,,13,48.5,,,,,,,,,,0.785,0,,,,,,,yes
 Skechers,skechers.com/us,Men's,men,main,none,,,15,,14,49.5,,,,,,,,,,0.515,0,,,,,,,yes
 Skechers,skechers.com/us,Men's,men,main,none,,,16,,15,50.5,,,,,,,,,,0.245,0,,,,,,,yes
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,250,246.06,7,,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,-0.516,,1.174,0,4.37,,,,,-3.94,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,255,247.65,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,-7.35,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,260,252.41,8,,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,-0.697,,0.904,0,5.9,,,,,-7.59,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,265,255.59,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,-9.41,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,270,260.35,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,-9.65,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,275,265.11,9.5,,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,-0.968,,0.999,0,8.195,,,,,-9.89,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,280,268.29,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,-11.71,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,285,273.05,10.5,,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,-1.148,,1.229,0,9.725,,,,,-11.95,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,290,277.81,11,,10,45,,45.478,11.238,12.238,13.238,-0.478,-1.238,-1.238,,1.094,0,10.49,,,,,-12.19,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,295,280.99,11.5,,10.5,45.5,,46.228,11.829,12.829,13.829,-0.728,-1.329,-1.329,,0.96,0,11.255,,,,,-14.01,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,300,285.75,12,,11,46,,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,-14.25,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,305,292.1,12.5,,11.5,47,,47.727,13.009,14.009,15.009,-0.727,-1.509,-1.509,,1.19,0,12.785,,,,,-12.9,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,310,296.86,13,,12,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.6,-1.6,,1.055,0,13.55,,,,,-13.14,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,315,298.45,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,-16.55,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,320,304.8,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,-15.2,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,325,309.56,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,-15.44,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,330,311.15,15,,14,49.5,,51.475,15.961,16.961,17.961,-1.975,-1.961,-1.961,,0.515,0,16.61,,,,,-18.85,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,335,333.38,15.5,,14.5,50,,52.225,16.551,17.551,18.551,-2.225,-2.051,-2.051,,0.38,0,17.375,,,,,-1.62,
-Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,foot,340,336.55,16,,15,50.5,,52.975,17.142,18.142,19.142,-2.475,-2.142,-2.142,,0.245,0,18.14,,,,,-3.45,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,220,220.13,,5,2.5,35.5,,34.984,2.974,3.974,4.974,0.516,-0.474,,0.026,,,,0.484,-0.5,-0.22,,0.13,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,225,224.97,,5.5,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,,-0.064,,,,0.349,-0.5,0.545,,-0.03,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,230,228.6,,6,3.5,36.5,,36.483,4.155,5.155,6.155,0.017,-0.655,,-0.155,,,,0.214,-0.5,1.31,,-1.4,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,235,234.95,,6.5,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,,-0.245,,,,0.579,-0.5,2.075,,-0.05,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,240,239.89,,7,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,,-0.335,,,,0.444,-0.5,2.84,,-0.11,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,245,245.53,,7.5,5,38.5,,38.732,5.926,6.926,7.926,-0.232,-0.926,,-0.426,,,,0.309,-0.5,3.605,,0.53,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,250,228.6,,8,5.5,39,,39.481,6.516,7.516,8.516,-0.481,-1.016,,-0.516,,,,0.174,-0.5,4.37,,-21.4,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,255,254,,8.5,6,40,,40.231,7.106,8.106,9.106,-0.231,-1.106,,-0.606,,,,0.539,-0.5,5.135,,-1,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,260,260.35,,9,6.5,40.5,,40.981,7.697,8.697,9.697,-0.481,-1.197,,-0.697,,,,0.404,-0.5,5.9,,0.35,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,265,264.89,,9.5,7,41,,41.73,8.287,9.287,10.287,-0.73,-1.287,,-0.787,,,,0.269,-0.5,6.665,,-0.11,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,270,269.88,,10,7.5,42,,42.48,8.877,9.877,10.877,-0.48,-1.377,,-0.877,,,,0.634,-0.5,7.43,,-0.12,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,275,254,,10.5,8,42.5,,43.229,9.468,10.468,11.468,-0.729,-1.468,,-0.968,,,,0.499,-0.5,8.195,,-21,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,280,279.4,,11,8.5,43,,43.979,10.058,11.058,12.058,-0.979,-1.558,,-1.058,,,,0.364,-0.5,8.96,,-0.6,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,285,285.04,,11.5,9,44,,44.729,10.648,11.648,12.648,-0.729,-1.648,,-1.148,,,,0.729,-0.5,9.725,,0.04,
-Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,foot,290,290.29,,12,9.5,44.5,,45.478,11.238,12.238,13.238,-0.978,-1.738,,-1.238,,,,0.594,-0.5,10.49,,0.29,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,250,,7,,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,-0.516,,1.174,0,4.37,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,255,,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,260,,8,,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,-0.697,,0.904,0,5.9,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,265,,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,270,,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,275,,9.5,,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,-0.968,,0.999,0,8.195,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,280,,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,285,,10.5,,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,-1.148,,1.229,0,9.725,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,290,,11,,10,45,,45.478,11.238,12.238,13.238,-0.478,-1.238,-1.238,,1.094,0,10.49,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,295,,11.5,,10.5,45.5,,46.228,11.829,12.829,13.829,-0.728,-1.329,-1.329,,0.96,0,11.255,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,300,,12,,11,46,,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,305,,12.5,,11.5,47,,47.727,13.009,14.009,15.009,-0.727,-1.509,-1.509,,1.19,0,12.785,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,310,,13,,12,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.6,-1.6,,1.055,0,13.55,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,315,,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,320,,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,325,,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,330,,15,,14,49.5,,51.475,15.961,16.961,17.961,-1.975,-1.961,-1.961,,0.515,0,16.61,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,335,,15.5,,14.5,50,,52.225,16.551,17.551,18.551,-2.225,-2.051,-2.051,,0.38,0,17.375,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,foot,340,,16,,15,50.5,,52.975,17.142,18.142,19.142,-2.475,-2.142,-2.142,,0.245,0,18.14,,,,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,220,,,5,2.5,35.5,,34.984,2.974,3.974,4.974,0.516,-0.474,,0.026,,,,0.484,-0.5,-0.22,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,225,,,5.5,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,,-0.064,,,,0.349,-0.5,0.545,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,230,,,6,3.5,36.5,,36.483,4.155,5.155,6.155,0.017,-0.655,,-0.155,,,,0.214,-0.5,1.31,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,235,,,6.5,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,,-0.245,,,,0.579,-0.5,2.075,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,240,,,7,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,,-0.335,,,,0.444,-0.5,2.84,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,245,,,7.5,5,38.5,,38.732,5.926,6.926,7.926,-0.232,-0.926,,-0.426,,,,0.309,-0.5,3.605,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,250,,,8,5.5,39,,39.481,6.516,7.516,8.516,-0.481,-1.016,,-0.516,,,,0.174,-0.5,4.37,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,255,,,8.5,6,40,,40.231,7.106,8.106,9.106,-0.231,-1.106,,-0.606,,,,0.539,-0.5,5.135,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,260,,,9,6.5,40.5,,40.981,7.697,8.697,9.697,-0.481,-1.197,,-0.697,,,,0.404,-0.5,5.9,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,265,,,9.5,7,41,,41.73,8.287,9.287,10.287,-0.73,-1.287,,-0.787,,,,0.269,-0.5,6.665,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,270,,,10,7.5,42,,42.48,8.877,9.877,10.877,-0.48,-1.377,,-0.877,,,,0.634,-0.5,7.43,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,275,,,10.5,8,42.5,,43.229,9.468,10.468,11.468,-0.729,-1.468,,-0.968,,,,0.499,-0.5,8.195,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,280,,,11,8.5,43,,43.979,10.058,11.058,12.058,-0.979,-1.558,,-1.058,,,,0.364,-0.5,8.96,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,285,,,11.5,9,44,,44.729,10.648,11.648,12.648,-0.729,-1.648,,-1.148,,,,0.729,-0.5,9.725,,,
-Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,foot,290,,,12,9.5,44.5,,45.478,11.238,12.238,13.238,-0.978,-1.738,,-1.238,,,,0.594,-0.5,10.49,,,
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,250,246.06,7,,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,-0.516,,1.174,0,4.37,,,,,-3.94,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,255,247.65,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,-7.35,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,260,252.41,8,,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,-0.697,,0.904,0,5.9,,,,,-7.59,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,265,255.59,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,-9.41,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,270,260.35,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,-9.65,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,275,265.11,9.5,,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,-0.968,,0.999,0,8.195,,,,,-9.89,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,280,268.29,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,-11.71,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,285,273.05,10.5,,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,-1.148,,1.229,0,9.725,,,,,-11.95,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,290,277.81,11,,10,45,,45.478,11.238,12.238,13.238,-0.478,-1.238,-1.238,,1.094,0,10.49,,,,,-12.19,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,295,280.99,11.5,,10.5,45.5,,46.228,11.829,12.829,13.829,-0.728,-1.329,-1.329,,0.96,0,11.255,,,,,-14.01,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,300,285.75,12,,11,46,,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,-14.25,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,305,292.1,12.5,,11.5,47,,47.727,13.009,14.009,15.009,-0.727,-1.509,-1.509,,1.19,0,12.785,,,,,-12.9,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,310,296.86,13,,12,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.6,-1.6,,1.055,0,13.55,,,,,-13.14,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,315,298.45,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,-16.55,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,320,304.8,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,-15.2,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,325,309.56,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,-15.44,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,330,311.15,15,,14,49.5,,51.475,15.961,16.961,17.961,-1.975,-1.961,-1.961,,0.515,0,16.61,,,,,-18.85,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,335,333.38,15.5,,14.5,50,,52.225,16.551,17.551,18.551,-2.225,-2.051,-2.051,,0.38,0,17.375,,,,,-1.62,yes
-Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,foot,340,336.55,16,,15,50.5,,52.975,17.142,18.142,19.142,-2.475,-2.142,-2.142,,0.245,0,18.14,,,,,-3.45,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,225,215.9,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,-9.1,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,230,223.84,,5.5,3.5,36,,36.483,4.155,5.155,6.155,-0.483,-0.655,,-0.655,,,,0.349,0,5.545,,-6.16,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,235,227.01,,6,4,36.5,,37.232,4.745,5.745,6.745,-0.732,-0.745,,-0.745,,,,0.214,0,6.31,,-7.99,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,235,230.19,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,-4.81,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,240,234.95,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,-5.05,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,240,239.71,,7.5,5.5,38.5,,37.982,5.335,6.335,7.335,0.518,0.165,,0.165,,,,0.309,0,-1.395,,-0.29,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,245,241.3,,8,6,39,,38.732,5.926,6.926,7.926,0.268,0.074,,0.074,,,,0.174,0,-0.63,,-3.7,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,250,246.06,,8.5,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,,-0.016,,,,0.539,-0.5,0.135,,-3.94,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,255,247.65,,9,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,,-0.106,,,,0.404,-0.5,0.9,,-7.35,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,260,252.41,,9.5,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,,-0.197,,,,0.269,-0.5,1.665,,-7.59,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,265,255.59,,10,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,,-0.287,,,,0.634,-0.5,2.43,,-9.41,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,270,260.35,,10.5,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,,-0.377,,,,0.499,-0.5,3.195,,-9.65,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,275,265.11,,11,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,,-0.468,,,,0.364,-0.5,3.96,,-9.89,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,280,268.29,,11.5,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,,-0.558,,,,0.729,-0.5,4.725,,-11.71,yes
-Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,foot,285,277.81,,12,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,,-0.648,,,,0.594,-0.5,5.49,,-7.19,yes
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,250,246.06,7,,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,-0.516,,1.174,0,4.37,,,,,-3.94,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,255,247.65,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,-7.35,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,260,252.41,8,,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,-0.697,,0.904,0,5.9,,,,,-7.59,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,265,255.59,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,-9.41,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,270,260.35,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,-9.65,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,275,265.11,9.5,,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,-0.968,,0.999,0,8.195,,,,,-9.89,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,280,268.29,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,-11.71,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,285,273.05,10.5,,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,-1.148,,1.229,0,9.725,,,,,-11.95,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,290,277.81,11,,10,45,,45.478,11.238,12.238,13.238,-0.478,-1.238,-1.238,,1.094,0,10.49,,,,,-12.19,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,295,280.99,11.5,,10.5,45.5,,46.228,11.829,12.829,13.829,-0.728,-1.329,-1.329,,0.96,0,11.255,,,,,-14.01,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,300,285.75,12,,11,46,,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,-14.25,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,305,292.1,12.5,,11.5,47,,47.727,13.009,14.009,15.009,-0.727,-1.509,-1.509,,1.19,0,12.785,,,,,-12.9,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,310,296.86,13,,12,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.6,-1.6,,1.055,0,13.55,,,,,-13.14,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,315,298.45,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,-16.55,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,320,304.8,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,-15.2,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,325,309.56,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,-15.44,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,330,311.15,15,,14,49.5,,51.475,15.961,16.961,17.961,-1.975,-1.961,-1.961,,0.515,0,16.61,,,,,-18.85,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,335,333.38,15.5,,14.5,50,,52.225,16.551,17.551,18.551,-2.225,-2.051,-2.051,,0.38,0,17.375,,,,,-1.62,
+Under Armour,underarmour.com.au/en-au,Men's Shoe Size Chart,men,main,label,340,336.55,16,,15,50.5,,52.975,17.142,18.142,19.142,-2.475,-2.142,-2.142,,0.245,0,18.14,,,,,-3.45,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,220,220.13,,5,2.5,35.5,,34.984,2.974,3.974,4.974,0.516,-0.474,,0.026,,,,0.484,-0.5,-0.22,,0.13,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,225,224.97,,5.5,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,,-0.064,,,,0.349,-0.5,0.545,,-0.03,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,230,228.6,,6,3.5,36.5,,36.483,4.155,5.155,6.155,0.017,-0.655,,-0.155,,,,0.214,-0.5,1.31,,-1.4,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,235,234.95,,6.5,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,,-0.245,,,,0.579,-0.5,2.075,,-0.05,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,240,239.89,,7,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,,-0.335,,,,0.444,-0.5,2.84,,-0.11,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,245,245.53,,7.5,5,38.5,,38.732,5.926,6.926,7.926,-0.232,-0.926,,-0.426,,,,0.309,-0.5,3.605,,0.53,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,250,228.6,,8,5.5,39,,39.481,6.516,7.516,8.516,-0.481,-1.016,,-0.516,,,,0.174,-0.5,4.37,,-21.4,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,255,254,,8.5,6,40,,40.231,7.106,8.106,9.106,-0.231,-1.106,,-0.606,,,,0.539,-0.5,5.135,,-1,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,260,260.35,,9,6.5,40.5,,40.981,7.697,8.697,9.697,-0.481,-1.197,,-0.697,,,,0.404,-0.5,5.9,,0.35,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,265,264.89,,9.5,7,41,,41.73,8.287,9.287,10.287,-0.73,-1.287,,-0.787,,,,0.269,-0.5,6.665,,-0.11,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,270,269.88,,10,7.5,42,,42.48,8.877,9.877,10.877,-0.48,-1.377,,-0.877,,,,0.634,-0.5,7.43,,-0.12,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,275,254,,10.5,8,42.5,,43.229,9.468,10.468,11.468,-0.729,-1.468,,-0.968,,,,0.499,-0.5,8.195,,-21,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,280,279.4,,11,8.5,43,,43.979,10.058,11.058,12.058,-0.979,-1.558,,-1.058,,,,0.364,-0.5,8.96,,-0.6,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,285,285.04,,11.5,9,44,,44.729,10.648,11.648,12.648,-0.729,-1.648,,-1.148,,,,0.729,-0.5,9.725,,0.04,
+Under Armour,underarmour.com.au/en-au,Women's Shoe Size Chart,women,main,label,290,290.29,,12,9.5,44.5,,45.478,11.238,12.238,13.238,-0.978,-1.738,,-1.238,,,,0.594,-0.5,10.49,,0.29,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,250,,7,,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,-0.516,,1.174,0,4.37,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,255,,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,260,,8,,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,-0.697,,0.904,0,5.9,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,265,,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,270,,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,275,,9.5,,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,-0.968,,0.999,0,8.195,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,280,,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,285,,10.5,,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,-1.148,,1.229,0,9.725,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,290,,11,,10,45,,45.478,11.238,12.238,13.238,-0.478,-1.238,-1.238,,1.094,0,10.49,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,295,,11.5,,10.5,45.5,,46.228,11.829,12.829,13.829,-0.728,-1.329,-1.329,,0.96,0,11.255,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,300,,12,,11,46,,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,305,,12.5,,11.5,47,,47.727,13.009,14.009,15.009,-0.727,-1.509,-1.509,,1.19,0,12.785,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,310,,13,,12,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.6,-1.6,,1.055,0,13.55,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,315,,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,320,,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,325,,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,330,,15,,14,49.5,,51.475,15.961,16.961,17.961,-1.975,-1.961,-1.961,,0.515,0,16.61,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,335,,15.5,,14.5,50,,52.225,16.551,17.551,18.551,-2.225,-2.051,-2.051,,0.38,0,17.375,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Men's Shoes Size Chart,men,main,label,340,,16,,15,50.5,,52.975,17.142,18.142,19.142,-2.475,-2.142,-2.142,,0.245,0,18.14,,,,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,220,,,5,2.5,35.5,,34.984,2.974,3.974,4.974,0.516,-0.474,,0.026,,,,0.484,-0.5,-0.22,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,225,,,5.5,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,,-0.064,,,,0.349,-0.5,0.545,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,230,,,6,3.5,36.5,,36.483,4.155,5.155,6.155,0.017,-0.655,,-0.155,,,,0.214,-0.5,1.31,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,235,,,6.5,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,,-0.245,,,,0.579,-0.5,2.075,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,240,,,7,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,,-0.335,,,,0.444,-0.5,2.84,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,245,,,7.5,5,38.5,,38.732,5.926,6.926,7.926,-0.232,-0.926,,-0.426,,,,0.309,-0.5,3.605,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,250,,,8,5.5,39,,39.481,6.516,7.516,8.516,-0.481,-1.016,,-0.516,,,,0.174,-0.5,4.37,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,255,,,8.5,6,40,,40.231,7.106,8.106,9.106,-0.231,-1.106,,-0.606,,,,0.539,-0.5,5.135,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,260,,,9,6.5,40.5,,40.981,7.697,8.697,9.697,-0.481,-1.197,,-0.697,,,,0.404,-0.5,5.9,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,265,,,9.5,7,41,,41.73,8.287,9.287,10.287,-0.73,-1.287,,-0.787,,,,0.269,-0.5,6.665,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,270,,,10,7.5,42,,42.48,8.877,9.877,10.877,-0.48,-1.377,,-0.877,,,,0.634,-0.5,7.43,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,275,,,10.5,8,42.5,,43.229,9.468,10.468,11.468,-0.729,-1.468,,-0.968,,,,0.499,-0.5,8.195,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,280,,,11,8.5,43,,43.979,10.058,11.058,12.058,-0.979,-1.558,,-1.058,,,,0.364,-0.5,8.96,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,285,,,11.5,9,44,,44.729,10.648,11.648,12.648,-0.729,-1.648,,-1.148,,,,0.729,-0.5,9.725,,,
+Under Armour,underarmour.co.uk/en-gb,Women's Shoes Size Chart,women,main,label,290,,,12,9.5,44.5,,45.478,11.238,12.238,13.238,-0.978,-1.738,,-1.238,,,,0.594,-0.5,10.49,,,
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,250,246.06,7,,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,-0.516,,1.174,0,4.37,,,,,-3.94,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,255,247.65,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,-7.35,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,260,252.41,8,,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,-0.697,,0.904,0,5.9,,,,,-7.59,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,265,255.59,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,-9.41,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,270,260.35,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,-9.65,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,275,265.11,9.5,,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,-0.968,,0.999,0,8.195,,,,,-9.89,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,280,268.29,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,-11.71,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,285,273.05,10.5,,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,-1.148,,1.229,0,9.725,,,,,-11.95,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,290,277.81,11,,10,45,,45.478,11.238,12.238,13.238,-0.478,-1.238,-1.238,,1.094,0,10.49,,,,,-12.19,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,295,280.99,11.5,,10.5,45.5,,46.228,11.829,12.829,13.829,-0.728,-1.329,-1.329,,0.96,0,11.255,,,,,-14.01,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,300,285.75,12,,11,46,,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,-14.25,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,305,292.1,12.5,,11.5,47,,47.727,13.009,14.009,15.009,-0.727,-1.509,-1.509,,1.19,0,12.785,,,,,-12.9,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,310,296.86,13,,12,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.6,-1.6,,1.055,0,13.55,,,,,-13.14,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,315,298.45,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,-16.55,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,320,304.8,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,-15.2,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,325,309.56,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,-15.44,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,330,311.15,15,,14,49.5,,51.475,15.961,16.961,17.961,-1.975,-1.961,-1.961,,0.515,0,16.61,,,,,-18.85,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,335,333.38,15.5,,14.5,50,,52.225,16.551,17.551,18.551,-2.225,-2.051,-2.051,,0.38,0,17.375,,,,,-1.62,yes
+Under Armour,underarmour.com/en-us,Men's Shoes Size Chart,men,main,label,340,336.55,16,,15,50.5,,52.975,17.142,18.142,19.142,-2.475,-2.142,-2.142,,0.245,0,18.14,,,,,-3.45,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,225,215.9,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,-9.1,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,230,223.84,,5.5,3.5,36,,36.483,4.155,5.155,6.155,-0.483,-0.655,,-0.655,,,,0.349,0,5.545,,-6.16,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,235,227.01,,6,4,36.5,,37.232,4.745,5.745,6.745,-0.732,-0.745,,-0.745,,,,0.214,0,6.31,,-7.99,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,235,230.19,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,-4.81,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,240,234.95,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,-5.05,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,240,239.71,,7.5,5.5,38.5,,37.982,5.335,6.335,7.335,0.518,0.165,,0.165,,,,0.309,0,-1.395,,-0.29,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,245,241.3,,8,6,39,,38.732,5.926,6.926,7.926,0.268,0.074,,0.074,,,,0.174,0,-0.63,,-3.7,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,250,246.06,,8.5,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,,-0.016,,,,0.539,-0.5,0.135,,-3.94,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,255,247.65,,9,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,,-0.106,,,,0.404,-0.5,0.9,,-7.35,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,260,252.41,,9.5,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,,-0.197,,,,0.269,-0.5,1.665,,-7.59,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,265,255.59,,10,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,,-0.287,,,,0.634,-0.5,2.43,,-9.41,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,270,260.35,,10.5,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,,-0.377,,,,0.499,-0.5,3.195,,-9.65,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,275,265.11,,11,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,,-0.468,,,,0.364,-0.5,3.96,,-9.89,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,280,268.29,,11.5,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,,-0.558,,,,0.729,-0.5,4.725,,-11.71,yes
+Under Armour,underarmour.com/en-us,Women's Shoes Size Chart,women,main,label,285,277.81,,12,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,,-0.648,,,,0.594,-0.5,5.49,,-7.19,yes
 Birkenstock,birkenstock.com/us,Size Conversion Chart: Women,women,main,none,,,,4.25,,35,,,,,,,,,,,,,0.936,,,,,
 Birkenstock,birkenstock.com/us,Size Conversion Chart: Women,women,main,none,,,,5.25,,36,,,,,,,,,,,,,0.666,,,,,
 Birkenstock,birkenstock.com/us,Size Conversion Chart: Women,women,main,none,,,,6.25,,37,,,,,,,,,,,,,0.396,,,,,
@@ -1369,83 +1369,83 @@ adidas,manual,adult,unisex,main,foot,326,330.2,17,,16,52.67,,50.876,15.489,16.48
 adidas,manual,adult,unisex,main,foot,335,337.82,18,,17,53.33,,52.225,16.551,17.551,18.551,1.105,0.449,0.449,,0.535,0,-3.8,,,,,2.82,yes
 adidas,manual,adult,unisex,main,foot,343,347.98,19,,18,54.67,,53.424,17.496,18.496,19.496,1.246,0.504,0.504,,0.606,0,-4.27,,,,,4.98,yes
 adidas,manual,adult,unisex,main,foot,352,355.6,20,,19,55.67,,54.774,18.558,19.558,20.558,0.896,0.442,0.442,,0.336,0,-3.74,,,,,3.6,yes
-New Balance,manual,men,men,main,foot,205,206.38,2.5,4,2,34,,32.735,1.203,2.203,3.203,1.265,0.797,0.297,0.797,0.888,0.5,-2.515,0.253,0,-6.75,1.5,1.38,yes
-New Balance,manual,men,men,main,foot,210,209.55,3,4.5,2.5,35,,33.484,1.793,2.793,3.793,1.516,0.707,0.207,0.707,1.253,0.5,-1.75,0.618,0,-5.985,1.5,-0.45,yes
-New Balance,manual,men,men,main,foot,215,215.9,3.5,5,3,35.5,,34.234,2.384,3.384,4.384,1.266,0.616,0.116,0.616,1.118,0.5,-0.985,0.484,0,-5.22,1.5,0.9,yes
-New Balance,manual,men,men,main,foot,220,219.07,4,5.5,3.5,36,,34.984,2.974,3.974,4.974,1.016,0.526,0.026,0.526,0.984,0.5,-0.22,0.349,0,-4.455,1.5,-0.93,yes
-New Balance,manual,men,men,main,foot,225,225.42,4.5,6,4,37,,35.733,3.564,4.564,5.564,1.267,0.436,-0.064,0.436,1.349,0.5,0.545,0.714,0,-3.69,1.5,0.42,yes
-New Balance,manual,men,men,main,foot,230,228.6,5,6.5,4.5,37.5,,36.483,4.155,5.155,6.155,1.017,0.345,-0.155,0.345,1.214,0.5,1.31,0.579,0,-2.925,1.5,-1.4,yes
-New Balance,manual,men,men,main,foot,235,234.95,5.5,7,5,38,,37.232,4.745,5.745,6.745,0.768,0.255,-0.245,0.255,1.079,0.5,2.075,0.444,0,-2.16,1.5,-0.05,yes
-New Balance,manual,men,men,main,foot,240,241.3,6,7.5,5.5,38.5,,37.982,5.335,6.335,7.335,0.518,0.165,-0.335,0.165,0.944,0.5,2.84,0.309,0,-1.395,1.5,1.3,yes
-New Balance,manual,men,men,main,foot,245,244.47,6.5,8,6,39.5,,38.732,5.926,6.926,7.926,0.768,0.074,-0.426,0.074,1.309,0.5,3.605,0.674,0,-0.63,1.5,-0.53,yes
-New Balance,manual,men,men,main,foot,250,250.82,7,8.5,6.5,40,,39.481,6.516,7.516,8.516,0.519,-0.016,-0.516,-0.016,1.174,0.5,4.37,0.539,0,0.135,1.5,0.82,yes
-New Balance,manual,men,men,main,foot,255,254,7.5,9,7,40.5,,40.231,7.106,8.106,9.106,0.269,-0.106,-0.606,-0.106,1.039,0.5,5.135,0.404,0,0.9,1.5,-1,yes
-New Balance,manual,men,men,main,foot,260,260.35,8,9.5,7.5,41.5,,40.981,7.697,8.697,9.697,0.519,-0.197,-0.697,-0.197,1.404,0.5,5.9,0.769,0,1.665,1.5,0.35,yes
-New Balance,manual,men,men,main,foot,265,263.52,8.5,10,8,42,,41.73,8.287,9.287,10.287,0.27,-0.287,-0.787,-0.287,1.269,0.5,6.665,0.634,0,2.43,1.5,-1.48,yes
-New Balance,manual,men,men,main,foot,270,269.88,9,10.5,8.5,42.5,,42.48,8.877,9.877,10.877,0.02,-0.377,-0.877,-0.377,1.134,0.5,7.43,0.499,0,3.195,1.5,-0.12,yes
-New Balance,manual,men,men,main,foot,275,276.22,9.5,11,9,43,,43.229,9.468,10.468,11.468,-0.229,-0.468,-0.968,-0.468,0.999,0.5,8.195,0.364,0,3.96,1.5,1.22,yes
-New Balance,manual,men,men,main,foot,280,279.4,10,11.5,9.5,44,,43.979,10.058,11.058,12.058,0.021,-0.558,-1.058,-0.558,1.364,0.5,8.96,0.729,0,4.725,1.5,-0.6,yes
-New Balance,manual,men,men,main,foot,285,285.75,10.5,12,10,44.5,,44.729,10.648,11.648,12.648,-0.229,-0.648,-1.148,-0.648,1.229,0.5,9.725,0.594,0,5.49,1.5,0.75,yes
-New Balance,manual,men,men,main,foot,290,288.93,11,12.5,10.5,45,,45.478,11.238,12.238,13.238,-0.478,-0.738,-1.238,-0.738,1.094,0.5,10.49,0.46,0,6.255,1.5,-1.07,yes
-New Balance,manual,men,men,main,foot,295,295.27,11.5,13,11,45.5,,46.228,11.829,12.829,13.829,-0.728,-0.829,-1.329,-0.829,0.96,0.5,11.255,0.325,0,7.02,1.5,0.27,yes
-New Balance,manual,men,men,main,foot,300,298.45,12,13.5,11.5,46.5,,46.978,12.419,13.419,14.419,-0.478,-0.919,-1.419,-0.919,1.325,0.5,12.02,0.69,0,7.785,1.5,-1.55,yes
-New Balance,manual,men,men,main,foot,305,304.8,12.5,14,12,47,,47.727,13.009,14.009,15.009,-0.727,-1.009,-1.509,-1.009,1.19,0.5,12.785,0.555,0,8.55,1.5,-0.2,yes
-New Balance,manual,men,men,main,foot,310,311.15,13,14.5,12.5,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.1,-1.6,-1.1,1.055,0.5,13.55,0.42,0,9.315,1.5,1.15,yes
-New Balance,manual,men,men,main,foot,315,314.32,13.5,15,13,48.5,,49.226,14.19,15.19,16.19,-0.726,-1.19,-1.69,-1.19,1.42,0.5,14.315,0.785,0,10.08,1.5,-0.68,yes
-New Balance,manual,men,men,main,foot,320,320.67,14,15.5,13.5,49,,49.976,14.78,15.78,16.78,-0.976,-1.28,-1.78,-1.28,1.285,0.5,15.08,0.65,0,10.845,1.5,0.67,yes
-New Balance,manual,men,men,main,foot,330,330.2,15,16.5,14.5,50,,51.475,15.961,16.961,17.961,-1.475,-1.461,-1.961,-1.461,1.015,0.5,16.61,0.38,0,12.375,1.5,0.2,yes
-New Balance,manual,men,men,main,foot,340,339.72,16,17.5,15.5,51,,52.975,17.142,18.142,19.142,-1.975,-1.642,-2.142,-1.642,0.745,0.5,18.14,0.11,0,13.905,1.5,-0.28,yes
-New Balance,manual,men,men,main,foot,350,349.25,17,18.5,16.5,52,,54.474,18.322,19.322,20.322,-2.474,-1.822,-2.322,-1.822,0.475,0.5,19.67,-0.16,0,15.435,1.5,-0.75,yes
-New Balance,manual,men,men,main,foot,360,358.77,18,19.5,17.5,53,,55.973,19.503,20.503,21.503,-2.973,-2.003,-2.503,-2.003,0.205,0.5,21.2,-0.43,0,16.965,1.5,-1.23,yes
-New Balance,manual,men,men,main,foot,370,371.47,19,,18.5,54,,57.472,20.684,21.684,22.684,-3.472,-2.184,-2.684,,-0.064,0.5,22.73,,,,,1.47,yes
-New Balance,manual,men,men,main,foot,380,381,20,,19.5,55,,58.972,21.864,22.864,23.864,-3.972,-2.364,-2.864,,-0.334,0.5,24.26,,,,,1,yes
-New Balance,manual,women,women,main,foot,200,200.02,1.5,3,1,33,,31.985,0.613,1.613,2.613,1.015,0.387,-0.113,0.387,1.158,0.5,0.955,0.523,0,-3.28,1.5,0.02,yes
-New Balance,manual,women,women,main,foot,205,206.38,2,3.5,1.5,33.5,,32.735,1.203,2.203,3.203,0.765,0.297,-0.203,0.297,1.023,0.5,1.72,0.388,0,-2.515,1.5,1.38,yes
-New Balance,manual,women,women,main,foot,210,209.55,2.5,4,2,34,,33.484,1.793,2.793,3.793,0.516,0.207,-0.293,0.207,0.888,0.5,2.485,0.253,0,-1.75,1.5,-0.45,yes
-New Balance,manual,women,women,main,foot,215,215.9,3,4.5,2.5,34.5,,34.234,2.384,3.384,4.384,0.266,0.116,-0.384,0.116,0.753,0.5,3.25,0.118,0,-0.985,1.5,0.9,yes
-New Balance,manual,women,women,main,foot,220,219.07,3.5,5,3,35,,34.984,2.974,3.974,4.974,0.016,0.026,-0.474,0.026,0.618,0.5,4.015,-0.016,0,-0.22,1.5,-0.93,yes
-New Balance,manual,women,women,main,foot,225,225.42,4,5.5,3.5,36,,35.733,3.564,4.564,5.564,0.267,-0.064,-0.564,-0.064,0.984,0.5,4.78,0.349,0,0.545,1.5,0.42,yes
-New Balance,manual,women,women,main,foot,230,228.6,4.5,6,4,36.5,,36.483,4.155,5.155,6.155,0.017,-0.155,-0.655,-0.155,0.849,0.5,5.545,0.214,0,1.31,1.5,-1.4,yes
-New Balance,manual,women,women,main,foot,235,234.95,5,6.5,4.5,37,,37.232,4.745,5.745,6.745,-0.232,-0.245,-0.745,-0.245,0.714,0.5,6.31,0.079,0,2.075,1.5,-0.05,yes
-New Balance,manual,women,women,main,foot,240,241.3,5.5,7,5,37.5,,37.982,5.335,6.335,7.335,-0.482,-0.335,-0.835,-0.335,0.579,0.5,7.075,-0.056,0,2.84,1.5,1.3,yes
-New Balance,manual,women,women,main,foot,245,244.47,6,7.5,5.5,38,,38.732,5.926,6.926,7.926,-0.732,-0.426,-0.926,-0.426,0.444,0.5,7.84,-0.191,0,3.605,1.5,-0.53,yes
-New Balance,manual,women,women,main,foot,250,250.82,6.5,8,6,39,,39.481,6.516,7.516,8.516,-0.481,-0.516,-1.016,-0.516,0.809,0.5,8.605,0.174,0,4.37,1.5,0.82,yes
-New Balance,manual,women,women,main,foot,255,254,7,8.5,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,-1.106,-0.606,1.174,0.5,9.37,0.539,0,5.135,1.5,-1,yes
-New Balance,manual,women,women,main,foot,260,260.35,7.5,9,7,40.5,,40.981,7.697,8.697,9.697,-0.481,-0.697,-1.197,-0.697,1.039,0.5,10.135,0.404,0,5.9,1.5,0.35,yes
-New Balance,manual,women,women,main,foot,265,263.52,8,9.5,7.5,41,,41.73,8.287,9.287,10.287,-0.73,-0.787,-1.287,-0.787,0.904,0.5,10.9,0.269,0,6.665,1.5,-1.48,yes
-New Balance,manual,women,women,main,foot,270,269.88,8.5,10,8,41.5,,42.48,8.877,9.877,10.877,-0.98,-0.877,-1.377,-0.877,0.769,0.5,11.665,0.134,0,7.43,1.5,-0.12,yes
-New Balance,manual,women,women,main,foot,275,276.22,9,10.5,8.5,42.5,,43.229,9.468,10.468,11.468,-0.729,-0.968,-1.468,-0.968,1.134,0.5,12.43,0.499,0,8.195,1.5,1.22,yes
-New Balance,manual,women,women,main,foot,280,279.4,9.5,11,9,43,,43.979,10.058,11.058,12.058,-0.979,-1.058,-1.558,-1.058,0.999,0.5,13.195,0.364,0,8.96,1.5,-0.6,yes
-New Balance,manual,women,women,main,foot,285,285.75,10,11.5,9.5,43.5,,44.729,10.648,11.648,12.648,-1.229,-1.148,-1.648,-1.148,0.864,0.5,13.96,0.229,0,9.725,1.5,0.75,yes
-New Balance,manual,women,women,main,foot,290,288.93,10.5,12,10,44,,45.478,11.238,12.238,13.238,-1.478,-1.238,-1.738,-1.238,0.729,0.5,14.725,0.094,0,10.49,1.5,-1.07,yes
-New Balance,manual,women,women,main,foot,295,295.27,11,12.5,10.5,45,,46.228,11.829,12.829,13.829,-1.228,-1.329,-1.829,-1.329,1.094,0.5,15.49,0.46,0,11.255,1.5,0.27,yes
-New Balance,manual,women,women,main,foot,300,298.45,11.5,13,11,45.5,,46.978,12.419,13.419,14.419,-1.478,-1.419,-1.919,-1.419,0.96,0.5,16.255,0.325,0,12.02,1.5,-1.55,yes
-New Balance,manual,women,women,main,foot,305,304.8,12,13.5,11.5,46,,47.727,13.009,14.009,15.009,-1.727,-1.509,-2.009,-1.509,0.825,0.5,17.02,0.19,0,12.785,1.5,-0.2,yes
-New Balance,manual,women,women,main,foot,310,311.15,12.5,14,12,46.5,,48.477,13.6,14.6,15.6,-1.977,-1.6,-2.1,-1.6,0.69,0.5,17.785,0.055,0,13.55,1.5,1.15,yes
-New Balance,manual,women,women,main,foot,320,320.67,13.5,15,13,48,,49.976,14.78,15.78,16.78,-1.976,-1.78,-2.28,-1.78,0.92,0.5,19.315,0.285,0,15.08,1.5,0.67,yes
-New Balance,manual,women,women,main,foot,325,323.85,14.5,16,14,49,,50.726,15.371,16.371,17.371,-1.726,-1.371,-1.871,-1.371,0.65,0.5,15.845,0.015,0,11.61,1.5,-1.15,yes
-Vans,manual,adult,unisex,main,foot,215,215.9,,5,2.5,34.5,21.5,34.234,2.384,3.384,4.384,0.266,0.116,,0.616,,,,-0.516,-0.5,-5.22,,0.9,yes
-Vans,manual,adult,unisex,main,foot,220,220.98,,5.5,3,35,22,34.984,2.974,3.974,4.974,0.016,0.026,,0.526,,,,-0.651,-0.5,-4.455,,0.98,yes
-Vans,manual,adult,unisex,main,foot,225,226.06,,6,3.5,36,22.5,35.733,3.564,4.564,5.564,0.267,-0.064,,0.436,,,,-0.286,-0.5,-3.69,,1.06,yes
-Vans,manual,adult,unisex,main,foot,230,231.14,,6.5,4,36.5,23,36.483,4.155,5.155,6.155,0.017,-0.155,,0.345,,,,-0.421,-0.5,-2.925,,1.14,yes
-Vans,manual,adult,unisex,main,foot,235,236.22,,7,4.5,37,23.5,37.232,4.745,5.745,6.745,-0.232,-0.245,,0.255,,,,-0.556,-0.5,-2.16,,1.22,yes
-Vans,manual,adult,unisex,main,foot,240,238.76,,7.5,5,38,24,37.982,5.335,6.335,7.335,0.018,-0.335,,0.165,,,,-0.191,-0.5,-1.395,,-1.24,yes
-Vans,manual,adult,unisex,main,foot,245,243.84,6.5,8,5.5,38.5,24.5,38.732,5.926,6.926,7.926,-0.232,-0.426,-0.426,0.074,0.309,0,3.605,-0.326,-0.5,-0.63,1.5,-1.16,yes
-Vans,manual,adult,unisex,main,foot,250,248.92,7,8.5,6,39,25,39.481,6.516,7.516,8.516,-0.481,-0.516,-0.516,-0.016,0.174,0,4.37,-0.461,-0.5,0.135,1.5,-1.08,yes
-Vans,manual,adult,unisex,main,foot,255,254,7.5,9,6.5,40,25.5,40.231,7.106,8.106,9.106,-0.231,-0.606,-0.606,-0.106,0.539,0,5.135,-0.096,-0.5,0.9,1.5,-1,yes
-Vans,manual,adult,unisex,main,foot,260,259.08,8,9.5,7,40.5,26,40.981,7.697,8.697,9.697,-0.481,-0.697,-0.697,-0.197,0.404,0,5.9,-0.231,-0.5,1.665,1.5,-0.92,yes
-Vans,manual,adult,unisex,main,foot,265,264.16,8.5,10,7.5,41,26.5,41.73,8.287,9.287,10.287,-0.73,-0.787,-0.787,-0.287,0.269,0,6.665,-0.366,-0.5,2.43,1.5,-0.84,yes
-Vans,manual,adult,unisex,main,foot,270,269.24,9,10.5,8,42,27,42.48,8.877,9.877,10.877,-0.48,-0.877,-0.877,-0.377,0.634,0,7.43,-0.001,-0.5,3.195,1.5,-0.76,yes
-Vans,manual,adult,unisex,main,foot,275,274.32,9.5,11,8.5,42.5,27.5,43.229,9.468,10.468,11.468,-0.729,-0.968,-0.968,-0.468,0.499,0,8.195,-0.136,-0.5,3.96,1.5,-0.68,yes
-Vans,manual,adult,unisex,main,foot,280,279.4,10,11.5,9,43,28,43.979,10.058,11.058,12.058,-0.979,-1.058,-1.058,-0.558,0.364,0,8.96,-0.271,-0.5,4.725,1.5,-0.6,yes
-Vans,manual,adult,unisex,main,foot,285,284.48,10.5,,9.5,44,28.5,44.729,10.648,11.648,12.648,-0.729,-1.148,-1.148,,0.729,0,9.725,,,,,-0.52,yes
-Vans,manual,adult,unisex,main,foot,290,289.56,11,,10,44.5,29,45.478,11.238,12.238,13.238,-0.978,-1.238,-1.238,,0.594,0,10.49,,,,,-0.44,yes
-Vans,manual,adult,unisex,main,foot,295,294.64,11.5,,10.5,45,29.5,46.228,11.829,12.829,13.829,-1.228,-1.329,-1.329,,0.46,0,11.255,,,,,-0.36,yes
-Vans,manual,adult,unisex,main,foot,300,299.72,12,,11,46,30,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,-0.28,yes
-Vans,manual,adult,unisex,main,foot,310,309.88,13,,12,47,31,48.477,13.6,14.6,15.6,-1.477,-1.6,-1.6,,0.555,0,13.55,,,,,-0.12,yes
-Vans,manual,adult,unisex,main,foot,320,320.04,14,,13,48,32,49.976,14.78,15.78,16.78,-1.976,-1.78,-1.78,,0.285,0,15.08,,,,,0.04,yes
-Vans,manual,adult,unisex,main,foot,330,330.2,15,,14,49,33,51.475,15.961,16.961,17.961,-2.475,-1.961,-1.961,,0.015,0,16.61,,,,,0.2,yes
-Vans,manual,adult,unisex,main,foot,340,340.36,16,,15,50,34,52.975,17.142,18.142,19.142,-2.975,-2.142,-2.142,,-0.255,0,18.14,,,,,0.36,yes
+New Balance,manual,men,men,main,label,205,206.38,2.5,4,2,34,,32.735,1.203,2.203,3.203,1.265,0.797,0.297,0.797,0.888,0.5,-2.515,0.253,0,-6.75,1.5,1.38,yes
+New Balance,manual,men,men,main,label,210,209.55,3,4.5,2.5,35,,33.484,1.793,2.793,3.793,1.516,0.707,0.207,0.707,1.253,0.5,-1.75,0.618,0,-5.985,1.5,-0.45,yes
+New Balance,manual,men,men,main,label,215,215.9,3.5,5,3,35.5,,34.234,2.384,3.384,4.384,1.266,0.616,0.116,0.616,1.118,0.5,-0.985,0.484,0,-5.22,1.5,0.9,yes
+New Balance,manual,men,men,main,label,220,219.07,4,5.5,3.5,36,,34.984,2.974,3.974,4.974,1.016,0.526,0.026,0.526,0.984,0.5,-0.22,0.349,0,-4.455,1.5,-0.93,yes
+New Balance,manual,men,men,main,label,225,225.42,4.5,6,4,37,,35.733,3.564,4.564,5.564,1.267,0.436,-0.064,0.436,1.349,0.5,0.545,0.714,0,-3.69,1.5,0.42,yes
+New Balance,manual,men,men,main,label,230,228.6,5,6.5,4.5,37.5,,36.483,4.155,5.155,6.155,1.017,0.345,-0.155,0.345,1.214,0.5,1.31,0.579,0,-2.925,1.5,-1.4,yes
+New Balance,manual,men,men,main,label,235,234.95,5.5,7,5,38,,37.232,4.745,5.745,6.745,0.768,0.255,-0.245,0.255,1.079,0.5,2.075,0.444,0,-2.16,1.5,-0.05,yes
+New Balance,manual,men,men,main,label,240,241.3,6,7.5,5.5,38.5,,37.982,5.335,6.335,7.335,0.518,0.165,-0.335,0.165,0.944,0.5,2.84,0.309,0,-1.395,1.5,1.3,yes
+New Balance,manual,men,men,main,label,245,244.47,6.5,8,6,39.5,,38.732,5.926,6.926,7.926,0.768,0.074,-0.426,0.074,1.309,0.5,3.605,0.674,0,-0.63,1.5,-0.53,yes
+New Balance,manual,men,men,main,label,250,250.82,7,8.5,6.5,40,,39.481,6.516,7.516,8.516,0.519,-0.016,-0.516,-0.016,1.174,0.5,4.37,0.539,0,0.135,1.5,0.82,yes
+New Balance,manual,men,men,main,label,255,254,7.5,9,7,40.5,,40.231,7.106,8.106,9.106,0.269,-0.106,-0.606,-0.106,1.039,0.5,5.135,0.404,0,0.9,1.5,-1,yes
+New Balance,manual,men,men,main,label,260,260.35,8,9.5,7.5,41.5,,40.981,7.697,8.697,9.697,0.519,-0.197,-0.697,-0.197,1.404,0.5,5.9,0.769,0,1.665,1.5,0.35,yes
+New Balance,manual,men,men,main,label,265,263.52,8.5,10,8,42,,41.73,8.287,9.287,10.287,0.27,-0.287,-0.787,-0.287,1.269,0.5,6.665,0.634,0,2.43,1.5,-1.48,yes
+New Balance,manual,men,men,main,label,270,269.88,9,10.5,8.5,42.5,,42.48,8.877,9.877,10.877,0.02,-0.377,-0.877,-0.377,1.134,0.5,7.43,0.499,0,3.195,1.5,-0.12,yes
+New Balance,manual,men,men,main,label,275,276.22,9.5,11,9,43,,43.229,9.468,10.468,11.468,-0.229,-0.468,-0.968,-0.468,0.999,0.5,8.195,0.364,0,3.96,1.5,1.22,yes
+New Balance,manual,men,men,main,label,280,279.4,10,11.5,9.5,44,,43.979,10.058,11.058,12.058,0.021,-0.558,-1.058,-0.558,1.364,0.5,8.96,0.729,0,4.725,1.5,-0.6,yes
+New Balance,manual,men,men,main,label,285,285.75,10.5,12,10,44.5,,44.729,10.648,11.648,12.648,-0.229,-0.648,-1.148,-0.648,1.229,0.5,9.725,0.594,0,5.49,1.5,0.75,yes
+New Balance,manual,men,men,main,label,290,288.93,11,12.5,10.5,45,,45.478,11.238,12.238,13.238,-0.478,-0.738,-1.238,-0.738,1.094,0.5,10.49,0.46,0,6.255,1.5,-1.07,yes
+New Balance,manual,men,men,main,label,295,295.27,11.5,13,11,45.5,,46.228,11.829,12.829,13.829,-0.728,-0.829,-1.329,-0.829,0.96,0.5,11.255,0.325,0,7.02,1.5,0.27,yes
+New Balance,manual,men,men,main,label,300,298.45,12,13.5,11.5,46.5,,46.978,12.419,13.419,14.419,-0.478,-0.919,-1.419,-0.919,1.325,0.5,12.02,0.69,0,7.785,1.5,-1.55,yes
+New Balance,manual,men,men,main,label,305,304.8,12.5,14,12,47,,47.727,13.009,14.009,15.009,-0.727,-1.009,-1.509,-1.009,1.19,0.5,12.785,0.555,0,8.55,1.5,-0.2,yes
+New Balance,manual,men,men,main,label,310,311.15,13,14.5,12.5,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.1,-1.6,-1.1,1.055,0.5,13.55,0.42,0,9.315,1.5,1.15,yes
+New Balance,manual,men,men,main,label,315,314.32,13.5,15,13,48.5,,49.226,14.19,15.19,16.19,-0.726,-1.19,-1.69,-1.19,1.42,0.5,14.315,0.785,0,10.08,1.5,-0.68,yes
+New Balance,manual,men,men,main,label,320,320.67,14,15.5,13.5,49,,49.976,14.78,15.78,16.78,-0.976,-1.28,-1.78,-1.28,1.285,0.5,15.08,0.65,0,10.845,1.5,0.67,yes
+New Balance,manual,men,men,main,label,330,330.2,15,16.5,14.5,50,,51.475,15.961,16.961,17.961,-1.475,-1.461,-1.961,-1.461,1.015,0.5,16.61,0.38,0,12.375,1.5,0.2,yes
+New Balance,manual,men,men,main,label,340,339.72,16,17.5,15.5,51,,52.975,17.142,18.142,19.142,-1.975,-1.642,-2.142,-1.642,0.745,0.5,18.14,0.11,0,13.905,1.5,-0.28,yes
+New Balance,manual,men,men,main,label,350,349.25,17,18.5,16.5,52,,54.474,18.322,19.322,20.322,-2.474,-1.822,-2.322,-1.822,0.475,0.5,19.67,-0.16,0,15.435,1.5,-0.75,yes
+New Balance,manual,men,men,main,label,360,358.77,18,19.5,17.5,53,,55.973,19.503,20.503,21.503,-2.973,-2.003,-2.503,-2.003,0.205,0.5,21.2,-0.43,0,16.965,1.5,-1.23,yes
+New Balance,manual,men,men,main,label,370,371.47,19,,18.5,54,,57.472,20.684,21.684,22.684,-3.472,-2.184,-2.684,,-0.064,0.5,22.73,,,,,1.47,yes
+New Balance,manual,men,men,main,label,380,381,20,,19.5,55,,58.972,21.864,22.864,23.864,-3.972,-2.364,-2.864,,-0.334,0.5,24.26,,,,,1,yes
+New Balance,manual,women,women,main,label,200,200.02,1.5,3,1,33,,31.985,0.613,1.613,2.613,1.015,0.387,-0.113,0.387,1.158,0.5,0.955,0.523,0,-3.28,1.5,0.02,yes
+New Balance,manual,women,women,main,label,205,206.38,2,3.5,1.5,33.5,,32.735,1.203,2.203,3.203,0.765,0.297,-0.203,0.297,1.023,0.5,1.72,0.388,0,-2.515,1.5,1.38,yes
+New Balance,manual,women,women,main,label,210,209.55,2.5,4,2,34,,33.484,1.793,2.793,3.793,0.516,0.207,-0.293,0.207,0.888,0.5,2.485,0.253,0,-1.75,1.5,-0.45,yes
+New Balance,manual,women,women,main,label,215,215.9,3,4.5,2.5,34.5,,34.234,2.384,3.384,4.384,0.266,0.116,-0.384,0.116,0.753,0.5,3.25,0.118,0,-0.985,1.5,0.9,yes
+New Balance,manual,women,women,main,label,220,219.07,3.5,5,3,35,,34.984,2.974,3.974,4.974,0.016,0.026,-0.474,0.026,0.618,0.5,4.015,-0.016,0,-0.22,1.5,-0.93,yes
+New Balance,manual,women,women,main,label,225,225.42,4,5.5,3.5,36,,35.733,3.564,4.564,5.564,0.267,-0.064,-0.564,-0.064,0.984,0.5,4.78,0.349,0,0.545,1.5,0.42,yes
+New Balance,manual,women,women,main,label,230,228.6,4.5,6,4,36.5,,36.483,4.155,5.155,6.155,0.017,-0.155,-0.655,-0.155,0.849,0.5,5.545,0.214,0,1.31,1.5,-1.4,yes
+New Balance,manual,women,women,main,label,235,234.95,5,6.5,4.5,37,,37.232,4.745,5.745,6.745,-0.232,-0.245,-0.745,-0.245,0.714,0.5,6.31,0.079,0,2.075,1.5,-0.05,yes
+New Balance,manual,women,women,main,label,240,241.3,5.5,7,5,37.5,,37.982,5.335,6.335,7.335,-0.482,-0.335,-0.835,-0.335,0.579,0.5,7.075,-0.056,0,2.84,1.5,1.3,yes
+New Balance,manual,women,women,main,label,245,244.47,6,7.5,5.5,38,,38.732,5.926,6.926,7.926,-0.732,-0.426,-0.926,-0.426,0.444,0.5,7.84,-0.191,0,3.605,1.5,-0.53,yes
+New Balance,manual,women,women,main,label,250,250.82,6.5,8,6,39,,39.481,6.516,7.516,8.516,-0.481,-0.516,-1.016,-0.516,0.809,0.5,8.605,0.174,0,4.37,1.5,0.82,yes
+New Balance,manual,women,women,main,label,255,254,7,8.5,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,-1.106,-0.606,1.174,0.5,9.37,0.539,0,5.135,1.5,-1,yes
+New Balance,manual,women,women,main,label,260,260.35,7.5,9,7,40.5,,40.981,7.697,8.697,9.697,-0.481,-0.697,-1.197,-0.697,1.039,0.5,10.135,0.404,0,5.9,1.5,0.35,yes
+New Balance,manual,women,women,main,label,265,263.52,8,9.5,7.5,41,,41.73,8.287,9.287,10.287,-0.73,-0.787,-1.287,-0.787,0.904,0.5,10.9,0.269,0,6.665,1.5,-1.48,yes
+New Balance,manual,women,women,main,label,270,269.88,8.5,10,8,41.5,,42.48,8.877,9.877,10.877,-0.98,-0.877,-1.377,-0.877,0.769,0.5,11.665,0.134,0,7.43,1.5,-0.12,yes
+New Balance,manual,women,women,main,label,275,276.22,9,10.5,8.5,42.5,,43.229,9.468,10.468,11.468,-0.729,-0.968,-1.468,-0.968,1.134,0.5,12.43,0.499,0,8.195,1.5,1.22,yes
+New Balance,manual,women,women,main,label,280,279.4,9.5,11,9,43,,43.979,10.058,11.058,12.058,-0.979,-1.058,-1.558,-1.058,0.999,0.5,13.195,0.364,0,8.96,1.5,-0.6,yes
+New Balance,manual,women,women,main,label,285,285.75,10,11.5,9.5,43.5,,44.729,10.648,11.648,12.648,-1.229,-1.148,-1.648,-1.148,0.864,0.5,13.96,0.229,0,9.725,1.5,0.75,yes
+New Balance,manual,women,women,main,label,290,288.93,10.5,12,10,44,,45.478,11.238,12.238,13.238,-1.478,-1.238,-1.738,-1.238,0.729,0.5,14.725,0.094,0,10.49,1.5,-1.07,yes
+New Balance,manual,women,women,main,label,295,295.27,11,12.5,10.5,45,,46.228,11.829,12.829,13.829,-1.228,-1.329,-1.829,-1.329,1.094,0.5,15.49,0.46,0,11.255,1.5,0.27,yes
+New Balance,manual,women,women,main,label,300,298.45,11.5,13,11,45.5,,46.978,12.419,13.419,14.419,-1.478,-1.419,-1.919,-1.419,0.96,0.5,16.255,0.325,0,12.02,1.5,-1.55,yes
+New Balance,manual,women,women,main,label,305,304.8,12,13.5,11.5,46,,47.727,13.009,14.009,15.009,-1.727,-1.509,-2.009,-1.509,0.825,0.5,17.02,0.19,0,12.785,1.5,-0.2,yes
+New Balance,manual,women,women,main,label,310,311.15,12.5,14,12,46.5,,48.477,13.6,14.6,15.6,-1.977,-1.6,-2.1,-1.6,0.69,0.5,17.785,0.055,0,13.55,1.5,1.15,yes
+New Balance,manual,women,women,main,label,320,320.67,13.5,15,13,48,,49.976,14.78,15.78,16.78,-1.976,-1.78,-2.28,-1.78,0.92,0.5,19.315,0.285,0,15.08,1.5,0.67,yes
+New Balance,manual,women,women,main,label,325,323.85,14.5,16,14,49,,50.726,15.371,16.371,17.371,-1.726,-1.371,-1.871,-1.371,0.65,0.5,15.845,0.015,0,11.61,1.5,-1.15,yes
+Vans,manual,adult,unisex,main,label,215,215.9,,5,2.5,34.5,21.5,34.234,2.384,3.384,4.384,0.266,0.116,,0.616,,,,-0.516,-0.5,-5.22,,0.9,yes
+Vans,manual,adult,unisex,main,label,220,220.98,,5.5,3,35,22,34.984,2.974,3.974,4.974,0.016,0.026,,0.526,,,,-0.651,-0.5,-4.455,,0.98,yes
+Vans,manual,adult,unisex,main,label,225,226.06,,6,3.5,36,22.5,35.733,3.564,4.564,5.564,0.267,-0.064,,0.436,,,,-0.286,-0.5,-3.69,,1.06,yes
+Vans,manual,adult,unisex,main,label,230,231.14,,6.5,4,36.5,23,36.483,4.155,5.155,6.155,0.017,-0.155,,0.345,,,,-0.421,-0.5,-2.925,,1.14,yes
+Vans,manual,adult,unisex,main,label,235,236.22,,7,4.5,37,23.5,37.232,4.745,5.745,6.745,-0.232,-0.245,,0.255,,,,-0.556,-0.5,-2.16,,1.22,yes
+Vans,manual,adult,unisex,main,label,240,238.76,,7.5,5,38,24,37.982,5.335,6.335,7.335,0.018,-0.335,,0.165,,,,-0.191,-0.5,-1.395,,-1.24,yes
+Vans,manual,adult,unisex,main,label,245,243.84,6.5,8,5.5,38.5,24.5,38.732,5.926,6.926,7.926,-0.232,-0.426,-0.426,0.074,0.309,0,3.605,-0.326,-0.5,-0.63,1.5,-1.16,yes
+Vans,manual,adult,unisex,main,label,250,248.92,7,8.5,6,39,25,39.481,6.516,7.516,8.516,-0.481,-0.516,-0.516,-0.016,0.174,0,4.37,-0.461,-0.5,0.135,1.5,-1.08,yes
+Vans,manual,adult,unisex,main,label,255,254,7.5,9,6.5,40,25.5,40.231,7.106,8.106,9.106,-0.231,-0.606,-0.606,-0.106,0.539,0,5.135,-0.096,-0.5,0.9,1.5,-1,yes
+Vans,manual,adult,unisex,main,label,260,259.08,8,9.5,7,40.5,26,40.981,7.697,8.697,9.697,-0.481,-0.697,-0.697,-0.197,0.404,0,5.9,-0.231,-0.5,1.665,1.5,-0.92,yes
+Vans,manual,adult,unisex,main,label,265,264.16,8.5,10,7.5,41,26.5,41.73,8.287,9.287,10.287,-0.73,-0.787,-0.787,-0.287,0.269,0,6.665,-0.366,-0.5,2.43,1.5,-0.84,yes
+Vans,manual,adult,unisex,main,label,270,269.24,9,10.5,8,42,27,42.48,8.877,9.877,10.877,-0.48,-0.877,-0.877,-0.377,0.634,0,7.43,-0.001,-0.5,3.195,1.5,-0.76,yes
+Vans,manual,adult,unisex,main,label,275,274.32,9.5,11,8.5,42.5,27.5,43.229,9.468,10.468,11.468,-0.729,-0.968,-0.968,-0.468,0.499,0,8.195,-0.136,-0.5,3.96,1.5,-0.68,yes
+Vans,manual,adult,unisex,main,label,280,279.4,10,11.5,9,43,28,43.979,10.058,11.058,12.058,-0.979,-1.058,-1.058,-0.558,0.364,0,8.96,-0.271,-0.5,4.725,1.5,-0.6,yes
+Vans,manual,adult,unisex,main,label,285,284.48,10.5,,9.5,44,28.5,44.729,10.648,11.648,12.648,-0.729,-1.148,-1.148,,0.729,0,9.725,,,,,-0.52,yes
+Vans,manual,adult,unisex,main,label,290,289.56,11,,10,44.5,29,45.478,11.238,12.238,13.238,-0.978,-1.238,-1.238,,0.594,0,10.49,,,,,-0.44,yes
+Vans,manual,adult,unisex,main,label,295,294.64,11.5,,10.5,45,29.5,46.228,11.829,12.829,13.829,-1.228,-1.329,-1.329,,0.46,0,11.255,,,,,-0.36,yes
+Vans,manual,adult,unisex,main,label,300,299.72,12,,11,46,30,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,-0.28,yes
+Vans,manual,adult,unisex,main,label,310,309.88,13,,12,47,31,48.477,13.6,14.6,15.6,-1.477,-1.6,-1.6,,0.555,0,13.55,,,,,-0.12,yes
+Vans,manual,adult,unisex,main,label,320,320.04,14,,13,48,32,49.976,14.78,15.78,16.78,-1.976,-1.78,-1.78,,0.285,0,15.08,,,,,0.04,yes
+Vans,manual,adult,unisex,main,label,330,330.2,15,,14,49,33,51.475,15.961,16.961,17.961,-2.475,-1.961,-1.961,,0.015,0,16.61,,,,,0.2,yes
+Vans,manual,adult,unisex,main,label,340,340.36,16,,15,50,34,52.975,17.142,18.142,19.142,-2.975,-2.142,-2.142,,-0.255,0,18.14,,,,,0.36,yes
 UGG,manual,women,women,main,foot,220.98,220.98,,5,3,36,22,35.13,3.09,4.09,5.09,0.87,-0.09,,-0.09,,,,0.984,0,0.76,,,yes
 UGG,manual,women,women,main,foot,226.06,226.06,,5.5,3.5,36.5,22.5,35.892,3.689,4.689,5.689,0.608,-0.189,,-0.189,,,,0.849,0,1.605,,,yes
 UGG,manual,women,women,main,foot,231.14,231.14,,6,4,37,23,36.654,4.289,5.289,6.289,0.346,-0.289,,-0.289,,,,0.714,0,2.45,,,yes
@@ -1705,43 +1705,158 @@ Dr. Martens,pasted,"Women's and Men's, cm toggle",unisex,main,foot,310,313.69,13
 Dr. Martens,pasted,"Women's and Men's, cm toggle",unisex,main,foot,320,322.07,14,15,13,48,,49.976,14.78,15.78,16.78,-1.976,-1.78,-1.78,-1.78,0.285,0,15.08,0.285,0,15.08,1,2.07,yes
 Dr. Martens,pasted,"Women's and Men's, cm toggle",unisex,main,foot,330,330.71,15,16,14,49,,51.475,15.961,16.961,17.961,-2.475,-1.961,-1.961,-1.961,0.015,0,16.61,0.015,0,16.61,1,0.71,yes
 Dr. Martens,pasted,"Women's and Men's, cm toggle",unisex,main,foot,340,339.09,16,17,15,50,,52.975,17.142,18.142,19.142,-2.975,-2.142,-2.142,-2.142,-0.255,0,18.14,-0.255,0,18.14,1,-0.91,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,5,3,35.5,,,,,,,,,,,,,0.484,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,5.5,3.5,36,,,,,,,,,,,,,0.349,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,6,4,36.5,,,,,,,,,,,,,0.214,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,6.5,4.5,37.5,,,,,,,,,,,,,0.579,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,7,5,38,,,,,,,,,,,,,0.444,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,7.5,5.5,38.5,,,,,,,,,,,,,0.309,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,8,6,39,,,,,,,,,,,,,0.174,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,8.5,6.5,40,,,,,,,,,,,,,0.539,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,9,7,40.5,,,,,,,,,,,,,0.404,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,9.5,7.5,41,,,,,,,,,,,,,0.269,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,10,8,42,,,,,,,,,,,,,0.634,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,10.5,8.5,42.5,,,,,,,,,,,,,0.499,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,11,9,43,,,,,,,,,,,,,0.364,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,11.5,9.5,44,,,,,,,,,,,,,0.729,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,12,10,44.5,,,,,,,,,,,,,0.594,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,12.5,10.5,45,,,,,,,,,,,,,0.46,0,,,,yes
-Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,13,11,45.5,,,,,,,,,,,,,0.325,0,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,5,,4,37.5,,,,,,,,,,1.214,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,5.5,,4.5,38,,,,,,,,,,1.079,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,6,,5,38.5,,,,,,,,,,0.944,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,6.5,,5.5,39,,,,,,,,,,0.809,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,7,,6,40,,,,,,,,,,1.174,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,7.5,,6.5,40.5,,,,,,,,,,1.039,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,8,,7,41,,,,,,,,,,0.904,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,8.5,,7.5,42,,,,,,,,,,1.269,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,9,,8,42.5,,,,,,,,,,1.134,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,9.5,,8.5,43,,,,,,,,,,0.999,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,10,,9,44,,,,,,,,,,1.364,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,10.5,,9.5,44.5,,,,,,,,,,1.229,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,11,,10,45,,,,,,,,,,1.094,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,11.5,,10.5,45.5,,,,,,,,,,0.96,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,12,,11,46,,,,,,,,,,0.825,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,12.5,,11.5,46.5,,,,,,,,,,0.69,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,13,,12,47.5,,,,,,,,,,1.055,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,14,,13,48.5,,,,,,,,,,0.785,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,15,,14,49.5,,,,,,,,,,0.515,0,,,,,,,yes
-Brooks,brooksrunning.com,Men's shoes,men,main,none,,,16,,15,50.5,,,,,,,,,,0.245,0,,,,,,,yes
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,211.7,,,5,3,35.5,,33.739,1.994,2.994,3.994,1.761,1.006,,1.006,,,,0.484,0,-8.52,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,215.9,,,5.5,3.5,36,,34.369,2.49,3.49,4.49,1.631,1.01,,1.01,,,,0.349,0,-8.555,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,220.1,,,6,4,36.5,,34.999,2.986,3.986,4.986,1.501,1.014,,1.014,,,,0.214,0,-8.59,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,224.4,,,6.5,4.5,37.5,,35.643,3.494,4.494,5.494,1.857,1.006,,1.006,,,,0.579,0,-8.525,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,228.6,,,7,5,38,,36.273,3.989,4.989,5.989,1.727,1.011,,1.011,,,,0.444,0,-8.56,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,232.8,,,7.5,5.5,38.5,,36.903,4.485,5.485,6.485,1.597,1.015,,1.015,,,,0.309,0,-8.595,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,237.1,,,8,6,39,,37.547,4.993,5.993,6.993,1.453,1.007,,1.007,,,,0.174,0,-8.53,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,241.3,,,8.5,6.5,40,,38.177,5.489,6.489,7.489,1.823,1.011,,1.011,,,,0.539,0,-8.565,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,245.5,,,9,7,40.5,,38.807,5.985,6.985,7.985,1.693,1.015,,1.015,,,,0.404,0,-8.6,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,249.8,,,9.5,7.5,41,,39.451,6.492,7.492,8.492,1.549,1.008,,1.008,,,,0.269,0,-8.535,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,254,,,10,8,42,,40.081,6.988,7.988,8.988,1.919,1.012,,1.012,,,,0.634,0,-8.57,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,258.2,,,10.5,8.5,42.5,,40.711,7.484,8.484,9.484,1.789,1.016,,1.016,,,,0.499,0,-8.605,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,262.5,,,11,9,43,,41.355,7.992,8.992,9.992,1.645,1.008,,1.008,,,,0.364,0,-8.54,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,266.7,,,11.5,9.5,44,,41.985,8.488,9.488,10.488,2.015,1.012,,1.012,,,,0.729,0,-8.575,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,270.9,,,12,10,44.5,,42.615,8.983,9.983,10.983,1.885,1.017,,1.017,,,,0.594,0,-8.61,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,275.2,,,12.5,10.5,45,,43.259,9.491,10.491,11.491,1.741,1.009,,1.009,,,,0.46,0,-8.545,,,
+Brooks,brooksrunning.com/en_gb (UK),"Women's running shoes, Shoe size comparison",women,main,foot,279.4,,,13,11,45.5,,43.889,9.987,10.987,11.987,1.611,1.013,,1.013,,,,0.325,0,-8.58,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,224.4,,5,,4,37.5,,35.643,3.494,4.494,5.494,1.857,0.506,0.506,,1.214,0,-4.29,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,228.6,,5.5,,4.5,38,,36.273,3.989,4.989,5.989,1.727,0.511,0.511,,1.079,0,-4.325,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,232.8,,6,,5,38.5,,36.903,4.485,5.485,6.485,1.597,0.515,0.515,,0.944,0,-4.36,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,237.1,,6.5,,5.5,39,,37.547,4.993,5.993,6.993,1.453,0.507,0.507,,0.809,0,-4.295,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,241.3,,7,,6,40,,38.177,5.489,6.489,7.489,1.823,0.511,0.511,,1.174,0,-4.33,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,245.5,,7.5,,6.5,40.5,,38.807,5.985,6.985,7.985,1.693,0.515,0.515,,1.039,0,-4.365,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,249.8,,8,,7,41,,39.451,6.492,7.492,8.492,1.549,0.508,0.508,,0.904,0,-4.3,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,254,,8.5,,7.5,42,,40.081,6.988,7.988,8.988,1.919,0.512,0.512,,1.269,0,-4.335,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,258.2,,9,,8,42.5,,40.711,7.484,8.484,9.484,1.789,0.516,0.516,,1.134,0,-4.37,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,262.5,,9.5,,8.5,43,,41.355,7.992,8.992,9.992,1.645,0.508,0.508,,0.999,0,-4.305,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,266.7,,10,,9,44,,41.985,8.488,9.488,10.488,2.015,0.512,0.512,,1.364,0,-4.34,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,270.9,,10.5,,9.5,44.5,,42.615,8.983,9.983,10.983,1.885,0.517,0.517,,1.229,0,-4.375,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,275.2,,11,,10,45,,43.259,9.491,10.491,11.491,1.741,0.509,0.509,,1.094,0,-4.31,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,279.4,,11.5,,10.5,45.5,,43.889,9.987,10.987,11.987,1.611,0.513,0.513,,0.96,0,-4.345,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,283.6,,12,,11,46,,44.519,10.483,11.483,12.483,1.481,0.517,0.517,,0.825,0,-4.38,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,287.9,,12.5,,11.5,46.5,,45.163,10.991,11.991,12.991,1.337,0.509,0.509,,0.69,0,-4.315,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,292.1,,13,,12,47.5,,45.793,11.486,12.486,13.486,1.707,0.514,0.514,,1.055,0,-4.35,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,300.6,,14,,13,48.5,,47.067,12.49,13.49,14.49,1.433,0.51,0.51,,0.785,0,-4.32,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,309,,15,,14,49.5,,48.327,13.482,14.482,15.482,1.173,0.518,0.518,,0.515,0,-4.39,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"Men's running shoes, Shoe size comparison",men,main,foot,317.5,,16,,15,50.5,,49.601,14.485,15.485,16.485,0.899,0.515,0.515,,0.245,0,-4.36,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,224.4,,,,,37.5,,35.643,3.494,4.494,5.494,1.857,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,228.6,,,,,38,,36.273,3.989,4.989,5.989,1.727,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,232.8,,,,,38.5,,36.903,4.485,5.485,6.485,1.597,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,237.1,,,,,39,,37.547,4.993,5.993,6.993,1.453,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,241.3,,,,,40,,38.177,5.489,6.489,7.489,1.823,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,245.5,,,,,40.5,,38.807,5.985,6.985,7.985,1.693,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,249.8,,,,,41,,39.451,6.492,7.492,8.492,1.549,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,254,,,,,42,,40.081,6.988,7.988,8.988,1.919,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,258.2,,,,,42.5,,40.711,7.484,8.484,9.484,1.789,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,262.5,,,,,43,,41.355,7.992,8.992,9.992,1.645,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,266.7,,,,,44,,41.985,8.488,9.488,10.488,2.015,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,270.9,,,,,44.5,,42.615,8.983,9.983,10.983,1.885,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,275.2,,,,,45,,43.259,9.491,10.491,11.491,1.741,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,279.4,,,,,45.5,,43.889,9.987,10.987,11.987,1.611,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,283.6,,,,,46,,44.519,10.483,11.483,12.483,1.481,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,287.9,,,,,46.5,,45.163,10.991,11.991,12.991,1.337,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,292.1,,,,,47.5,,45.793,11.486,12.486,13.486,1.707,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,300.6,,,,,48.5,,47.067,12.49,13.49,14.49,1.433,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,309,,,,,49.5,,48.327,13.482,14.482,15.482,1.173,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, EU Shoe size comparison",unisex,all-gender,foot,317.5,,,,,50.5,,49.601,14.485,15.485,16.485,0.899,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,224.4,,,,,,,35.643,3.494,4.494,5.494,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,228.6,,,,,,,36.273,3.989,4.989,5.989,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,232.8,,,,,,,36.903,4.485,5.485,6.485,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,237.1,,,,,,,37.547,4.993,5.993,6.993,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,241.3,,,,,,,38.177,5.489,6.489,7.489,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,245.5,,,,,,,38.807,5.985,6.985,7.985,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,249.8,,,,,,,39.451,6.492,7.492,8.492,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,254,,,,,,,40.081,6.988,7.988,8.988,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,258.2,,,,,,,40.711,7.484,8.484,9.484,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,262.5,,,,,,,41.355,7.992,8.992,9.992,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,266.7,,,,,,,41.985,8.488,9.488,10.488,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,270.9,,,,,,,42.615,8.983,9.983,10.983,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,275.2,,,,,,,43.259,9.491,10.491,11.491,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,279.4,,,,,,,43.889,9.987,10.987,11.987,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,283.6,,,,,,,44.519,10.483,11.483,12.483,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,287.9,,,,,,,45.163,10.991,11.991,12.991,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,292.1,,,,,,,45.793,11.486,12.486,13.486,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,300.6,,,,,,,47.067,12.49,13.49,14.49,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,309,,,,,,,48.327,13.482,14.482,15.482,,,,,,,,,,,,,
+Brooks,brooksrunning.com/en_gb (UK),"All gender shoes, US Shoe size comparison",unisex,all-gender,foot,317.5,,,,,,,49.601,14.485,15.485,16.485,,,,,,,,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,215,,3.5,,2.5,34,,34.234,2.384,3.384,4.384,-0.234,0.116,0.116,,-0.382,0,-0.985,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,220,,4,,3,34.5,,34.984,2.974,3.974,4.974,-0.484,0.026,0.026,,-0.516,0,-0.22,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,225,,4.5,,3.5,35,,35.733,3.564,4.564,5.564,-0.733,-0.064,-0.064,,-0.651,0,0.545,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,230,,5,,4,36,,36.483,4.155,5.155,6.155,-0.483,-0.155,-0.155,,-0.286,0,1.31,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,235,,5.5,,4.5,36.5,,37.232,4.745,5.745,6.745,-0.732,-0.245,-0.245,,-0.421,0,2.075,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,240,,6,,5,37.5,,37.982,5.335,6.335,7.335,-0.482,-0.335,-0.335,,-0.056,0,2.84,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,245,,6.5,,5.5,38.5,,38.732,5.926,6.926,7.926,-0.232,-0.426,-0.426,,0.309,0,3.605,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,250,,7,,6,39,,39.481,6.516,7.516,8.516,-0.481,-0.516,-0.516,,0.174,0,4.37,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,255,,7.5,,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,-0.606,,0.539,0,5.135,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,260,,8,,7,40.5,,40.981,7.697,8.697,9.697,-0.481,-0.697,-0.697,,0.404,0,5.9,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,265,,8.5,,7.5,41,,41.73,8.287,9.287,10.287,-0.73,-0.787,-0.787,,0.269,0,6.665,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,270,,9,,8,42,,42.48,8.877,9.877,10.877,-0.48,-0.877,-0.877,,0.634,0,7.43,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,275,,9.5,,8.5,42.5,,43.229,9.468,10.468,11.468,-0.729,-0.968,-0.968,,0.499,0,8.195,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,280,,10,,9,43,,43.979,10.058,11.058,12.058,-0.979,-1.058,-1.058,,0.364,0,8.96,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,285,,10.5,,9.5,44,,44.729,10.648,11.648,12.648,-0.729,-1.148,-1.148,,0.729,0,9.725,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,290,,11,,10,44.5,,45.478,11.238,12.238,13.238,-0.978,-1.238,-1.238,,0.594,0,10.49,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,295,,11.5,,10.5,45,,46.228,11.829,12.829,13.829,-1.228,-1.329,-1.329,,0.46,0,11.255,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,300,,12,,11,45.5,,46.978,12.419,13.419,14.419,-1.478,-1.419,-1.419,,0.325,0,12.02,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,305,,12.5,,11.5,46,,47.727,13.009,14.009,15.009,-1.727,-1.509,-1.509,,0.19,0,12.785,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,310,,13,,12,47,,48.477,13.6,14.6,15.6,-1.477,-1.6,-1.6,,0.555,0,13.55,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,315,,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,320,,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,325,,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,,
+Reebok,reebok.com.au (AU),"Men's Size Guides, Men's Footwear",men,main,foot,330,,15,,14,50,,51.475,15.961,16.961,17.961,-1.475,-1.961,-1.961,,1.015,0,16.61,,,,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,215,,,5,2.5,35,,34.234,2.384,3.384,4.384,0.766,0.116,,0.616,,,,-0.016,-0.5,-5.22,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,220,,,5.5,3,35.5,,34.984,2.974,3.974,4.974,0.516,0.026,,0.526,,,,-0.151,-0.5,-4.455,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,225,,,6,3.5,36,,35.733,3.564,4.564,5.564,0.267,-0.064,,0.436,,,,-0.286,-0.5,-3.69,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,230,,,6.5,4,37,,36.483,4.155,5.155,6.155,0.517,-0.155,,0.345,,,,0.079,-0.5,-2.925,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,235,,,7,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,0.255,,,,-0.056,-0.5,-2.16,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,240,,,7.5,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,0.165,,,,-0.191,-0.5,-1.395,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,245,,,8,5.5,38.5,,38.732,5.926,6.926,7.926,-0.232,-0.426,,0.074,,,,-0.326,-0.5,-0.63,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,250,,,8.5,6,39,,39.481,6.516,7.516,8.516,-0.481,-0.516,,-0.016,,,,-0.461,-0.5,0.135,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,255,,,9,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,,-0.106,,,,-0.096,-0.5,0.9,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,260,,,9.5,7,40.5,,40.981,7.697,8.697,9.697,-0.481,-0.697,,-0.197,,,,-0.231,-0.5,1.665,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,265,,,10,7.5,41,,41.73,8.287,9.287,10.287,-0.73,-0.787,,-0.287,,,,-0.366,-0.5,2.43,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,270,,,10.5,8,42,,42.48,8.877,9.877,10.877,-0.48,-0.877,,-0.377,,,,-0.001,-0.5,3.195,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,275,,,11,8.5,42.5,,43.229,9.468,10.468,11.468,-0.729,-0.968,,-0.468,,,,-0.136,-0.5,3.96,,,
+Reebok,reebok.com.au (AU),"Women's Size Guides, Women's Footwear",women,main,foot,285,,,12,9.5,44,,44.729,10.648,11.648,12.648,-0.729,-1.148,,-0.648,,,,0.094,-0.5,5.49,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,5,3,35.5,,,,,,,,,,,,,0.484,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,5.5,3.5,36,,,,,,,,,,,,,0.349,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,6,4,36.5,,,,,,,,,,,,,0.214,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,6.5,4.5,37.5,,,,,,,,,,,,,0.579,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,7,5,38,,,,,,,,,,,,,0.444,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,7.5,5.5,38.5,,,,,,,,,,,,,0.309,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,8,6,39,,,,,,,,,,,,,0.174,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,8.5,6.5,40,,,,,,,,,,,,,0.539,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,9,7,40.5,,,,,,,,,,,,,0.404,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,9.5,7.5,41,,,,,,,,,,,,,0.269,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,10,8,42,,,,,,,,,,,,,0.634,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,10.5,8.5,42.5,,,,,,,,,,,,,0.499,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,11,9,43,,,,,,,,,,,,,0.364,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,11.5,9.5,44,,,,,,,,,,,,,0.729,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,12,10,44.5,,,,,,,,,,,,,0.594,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,12.5,10.5,45,,,,,,,,,,,,,0.46,0,,,,
+Brooks,brooksrunning.com,Women's shoes,women,main,none,,,,13,11,45.5,,,,,,,,,,,,,0.325,0,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,5,,4,37.5,,,,,,,,,,1.214,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,5.5,,4.5,38,,,,,,,,,,1.079,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,6,,5,38.5,,,,,,,,,,0.944,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,6.5,,5.5,39,,,,,,,,,,0.809,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,7,,6,40,,,,,,,,,,1.174,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,7.5,,6.5,40.5,,,,,,,,,,1.039,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,8,,7,41,,,,,,,,,,0.904,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,8.5,,7.5,42,,,,,,,,,,1.269,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,9,,8,42.5,,,,,,,,,,1.134,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,9.5,,8.5,43,,,,,,,,,,0.999,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,10,,9,44,,,,,,,,,,1.364,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,10.5,,9.5,44.5,,,,,,,,,,1.229,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,11,,10,45,,,,,,,,,,1.094,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,11.5,,10.5,45.5,,,,,,,,,,0.96,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,12,,11,46,,,,,,,,,,0.825,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,12.5,,11.5,46.5,,,,,,,,,,0.69,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,13,,12,47.5,,,,,,,,,,1.055,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,14,,13,48.5,,,,,,,,,,0.785,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,15,,14,49.5,,,,,,,,,,0.515,0,,,,,,,
+Brooks,brooksrunning.com,Men's shoes,men,main,none,,,16,,15,50.5,,,,,,,,,,0.245,0,,,,,,,
 Brooks,brooksrunning.com,All gender shoes,unisex,all-gender,none,,,5,,4,37.5,,,,,,,,,,1.214,0,,,,,,,
 Brooks,brooksrunning.com,All gender shoes,unisex,all-gender,none,,,5.5,,4.5,38,,,,,,,,,,1.079,0,,,,,,,
 Brooks,brooksrunning.com,All gender shoes,unisex,all-gender,none,,,6,,5,38.5,,,,,,,,,,0.944,0,,,,,,,
@@ -1833,48 +1948,48 @@ Puma,us.puma.com,Women's product measurements,women,main,product,,,,9.5,,,,,,,,,
 Puma,us.puma.com,Women's product measurements,women,main,product,,,,10,,,,,,,,,,,,,,,,,,,,
 Puma,us.puma.com,Women's product measurements,women,main,product,,,,10.5,,,,,,,,,,,,,,,,,,,,
 Puma,us.puma.com,Women's product measurements,women,main,product,,,,11,,,,,,,,,,,,,,,,,,,,
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,225,,4,,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,-0.564,,0.984,0,4.78,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,230,,4.5,,3.5,37,,36.483,4.155,5.155,6.155,0.517,-0.655,-0.655,,1.349,0,5.545,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,235,,5,,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,-0.745,,1.214,0,6.31,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,240,,5.5,,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,-0.835,,1.079,0,7.075,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,245,,6,,5,39,,38.732,5.926,6.926,7.926,0.268,-0.926,-0.926,,1.444,0,7.84,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,250,,6.5,,5.5,39.5,,39.481,6.516,7.516,8.516,0.019,-1.016,-1.016,,1.309,0,8.605,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,252.5,,7,,6,40,,39.856,6.811,7.811,8.811,0.144,-0.811,-0.811,,1.174,0,6.87,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,255,,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,260,,8,,7,41.5,,40.981,7.697,8.697,9.697,0.519,-0.697,-0.697,,1.404,0,5.9,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,265,,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,270,,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,275,,9.5,,8.5,43.5,,43.229,9.468,10.468,11.468,0.271,-0.968,-0.968,,1.499,0,8.195,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,280,,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,282.5,,10.5,,9.5,44.5,,44.354,10.353,11.353,12.353,0.146,-0.853,-0.853,,1.229,0,7.225,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,285,,11,,10,45,,44.729,10.648,11.648,12.648,0.271,-0.648,-0.648,,1.094,0,5.49,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,290,,11.5,,10.5,46,,45.478,11.238,12.238,13.238,0.522,-0.738,-0.738,,1.46,0,6.255,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,295,,12,,11,46.5,,46.228,11.829,12.829,13.829,0.272,-0.829,-0.829,,1.325,0,7.02,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,300,,12.5,,11.5,47,,46.978,12.419,13.419,14.419,0.022,-0.919,-0.919,,1.19,0,7.785,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,305,,13,,12,48,,47.727,13.009,14.009,15.009,0.273,-1.009,-1.009,,1.555,0,8.55,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,307.5,,13.5,,12.5,48.5,,48.102,13.305,14.305,15.305,0.398,-0.805,-0.805,,1.42,0,6.815,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,310,,14,,13,49,,48.477,13.6,14.6,15.6,0.523,-0.6,-0.6,,1.285,0,5.08,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,315,,14.5,,13.5,49.5,,49.226,14.19,15.19,16.19,0.274,-0.69,-0.69,,1.15,0,5.845,,,,,,yes
-Asics,asics.com/us,Men's shoes size chart,men,main,foot,320,,15,,14,50.5,,49.976,14.78,15.78,16.78,0.524,-0.78,-0.78,,1.515,0,6.61,,,,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,215,,,4,2,34.5,,34.234,2.384,3.384,4.384,0.266,-0.384,,-0.384,,,,0.753,0,3.25,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,220,,,4.5,2.5,35,,34.984,2.974,3.974,4.974,0.016,-0.474,,-0.474,,,,0.618,0,4.015,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,225,,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,227.5,,,5.5,3.5,36,,36.108,3.86,4.86,5.86,-0.108,-0.36,,-0.36,,,,0.349,0,3.045,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,230,,,6,4,37,,36.483,4.155,5.155,6.155,0.517,-0.155,,-0.155,,,,0.714,0,1.31,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,235,,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,240,,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,245,,,7.5,5.5,39,,38.732,5.926,6.926,7.926,0.268,-0.426,,-0.426,,,,0.809,0,3.605,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,250,,,8,6,39.5,,39.481,6.516,7.516,8.516,0.019,-0.516,,-0.516,,,,0.674,0,4.37,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,255,,,8.5,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,,-0.606,,,,0.539,0,5.135,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,257.5,,,9,7,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.401,,-0.401,,,,0.404,0,3.4,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,260,,,9.5,7.5,41.5,,40.981,7.697,8.697,9.697,0.519,-0.197,,-0.197,,,,0.769,0,1.665,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,265,,,10,8,42,,41.73,8.287,9.287,10.287,0.27,-0.287,,-0.287,,,,0.634,0,2.43,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,270,,,10.5,8.5,42.5,,42.48,8.877,9.877,10.877,0.02,-0.377,,-0.377,,,,0.499,0,3.195,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,275,,,11,9,43.5,,43.229,9.468,10.468,11.468,0.271,-0.468,,-0.468,,,,0.864,0,3.96,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,280,,,11.5,9.5,44,,43.979,10.058,11.058,12.058,0.021,-0.558,,-0.558,,,,0.729,0,4.725,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,285,,,12,10,44.5,,44.729,10.648,11.648,12.648,-0.229,-0.648,,-0.648,,,,0.594,0,5.49,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,287.5,,,12.5,10.5,45,,45.103,10.943,11.943,12.943,-0.103,-0.443,,-0.443,,,,0.46,0,3.755,,,yes
-Asics,asics.com/us,Women's shoes size chart,women,main,foot,290,,,13,11,46,,45.478,11.238,12.238,13.238,0.522,-0.238,,-0.238,,,,0.825,0,2.02,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,225,,4,,3,36,,35.733,3.564,4.564,5.564,0.267,-0.564,-0.564,,0.984,0,4.78,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,230,,4.5,,3.5,37,,36.483,4.155,5.155,6.155,0.517,-0.655,-0.655,,1.349,0,5.545,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,235,,5,,4,37.5,,37.232,4.745,5.745,6.745,0.268,-0.745,-0.745,,1.214,0,6.31,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,240,,5.5,,4.5,38,,37.982,5.335,6.335,7.335,0.018,-0.835,-0.835,,1.079,0,7.075,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,245,,6,,5,39,,38.732,5.926,6.926,7.926,0.268,-0.926,-0.926,,1.444,0,7.84,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,250,,6.5,,5.5,39.5,,39.481,6.516,7.516,8.516,0.019,-1.016,-1.016,,1.309,0,8.605,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,252.5,,7,,6,40,,39.856,6.811,7.811,8.811,0.144,-0.811,-0.811,,1.174,0,6.87,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,255,,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,260,,8,,7,41.5,,40.981,7.697,8.697,9.697,0.519,-0.697,-0.697,,1.404,0,5.9,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,265,,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,270,,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,275,,9.5,,8.5,43.5,,43.229,9.468,10.468,11.468,0.271,-0.968,-0.968,,1.499,0,8.195,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,280,,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,282.5,,10.5,,9.5,44.5,,44.354,10.353,11.353,12.353,0.146,-0.853,-0.853,,1.229,0,7.225,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,285,,11,,10,45,,44.729,10.648,11.648,12.648,0.271,-0.648,-0.648,,1.094,0,5.49,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,290,,11.5,,10.5,46,,45.478,11.238,12.238,13.238,0.522,-0.738,-0.738,,1.46,0,6.255,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,295,,12,,11,46.5,,46.228,11.829,12.829,13.829,0.272,-0.829,-0.829,,1.325,0,7.02,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,300,,12.5,,11.5,47,,46.978,12.419,13.419,14.419,0.022,-0.919,-0.919,,1.19,0,7.785,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,305,,13,,12,48,,47.727,13.009,14.009,15.009,0.273,-1.009,-1.009,,1.555,0,8.55,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,307.5,,13.5,,12.5,48.5,,48.102,13.305,14.305,15.305,0.398,-0.805,-0.805,,1.42,0,6.815,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,310,,14,,13,49,,48.477,13.6,14.6,15.6,0.523,-0.6,-0.6,,1.285,0,5.08,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,315,,14.5,,13.5,49.5,,49.226,14.19,15.19,16.19,0.274,-0.69,-0.69,,1.15,0,5.845,,,,,,yes
+Asics,asics.com/us,Men's shoes size chart,men,main,label,320,,15,,14,50.5,,49.976,14.78,15.78,16.78,0.524,-0.78,-0.78,,1.515,0,6.61,,,,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,215,,,4,2,34.5,,34.234,2.384,3.384,4.384,0.266,-0.384,,-0.384,,,,0.753,0,3.25,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,220,,,4.5,2.5,35,,34.984,2.974,3.974,4.974,0.016,-0.474,,-0.474,,,,0.618,0,4.015,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,225,,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,227.5,,,5.5,3.5,36,,36.108,3.86,4.86,5.86,-0.108,-0.36,,-0.36,,,,0.349,0,3.045,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,230,,,6,4,37,,36.483,4.155,5.155,6.155,0.517,-0.155,,-0.155,,,,0.714,0,1.31,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,235,,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,240,,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,245,,,7.5,5.5,39,,38.732,5.926,6.926,7.926,0.268,-0.426,,-0.426,,,,0.809,0,3.605,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,250,,,8,6,39.5,,39.481,6.516,7.516,8.516,0.019,-0.516,,-0.516,,,,0.674,0,4.37,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,255,,,8.5,6.5,40,,40.231,7.106,8.106,9.106,-0.231,-0.606,,-0.606,,,,0.539,0,5.135,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,257.5,,,9,7,40.5,,40.606,7.401,8.401,9.401,-0.106,-0.401,,-0.401,,,,0.404,0,3.4,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,260,,,9.5,7.5,41.5,,40.981,7.697,8.697,9.697,0.519,-0.197,,-0.197,,,,0.769,0,1.665,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,265,,,10,8,42,,41.73,8.287,9.287,10.287,0.27,-0.287,,-0.287,,,,0.634,0,2.43,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,270,,,10.5,8.5,42.5,,42.48,8.877,9.877,10.877,0.02,-0.377,,-0.377,,,,0.499,0,3.195,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,275,,,11,9,43.5,,43.229,9.468,10.468,11.468,0.271,-0.468,,-0.468,,,,0.864,0,3.96,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,280,,,11.5,9.5,44,,43.979,10.058,11.058,12.058,0.021,-0.558,,-0.558,,,,0.729,0,4.725,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,285,,,12,10,44.5,,44.729,10.648,11.648,12.648,-0.229,-0.648,,-0.648,,,,0.594,0,5.49,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,287.5,,,12.5,10.5,45,,45.103,10.943,11.943,12.943,-0.103,-0.443,,-0.443,,,,0.46,0,3.755,,,yes
+Asics,asics.com/us,Women's shoes size chart,women,main,label,290,,,13,11,46,,45.478,11.238,12.238,13.238,0.522,-0.238,,-0.238,,,,0.825,0,2.02,,,yes
 Converse,converse.com,Men's Chuck Taylor All Star,men,chuck,foot,220,220.13,3,5,3,35,,34.984,2.974,3.974,4.974,0.016,0.026,-0.974,0.026,1.253,1,8.25,-0.016,0,-0.22,2,0.13,yes
 Converse,converse.com,Men's Chuck Taylor All Star,men,chuck,foot,225,224.97,3.5,5.5,3.5,36,,35.733,3.564,4.564,5.564,0.267,-0.064,-1.064,-0.064,1.618,1,9.015,0.349,0,0.545,2,-0.03,yes
 Converse,converse.com,Men's Chuck Taylor All Star,men,chuck,foot,230,228.6,4,6,4,36.5,,36.483,4.155,5.155,6.155,0.017,-0.155,-1.155,-0.155,1.484,1,9.78,0.214,0,1.31,2,-1.4,yes
@@ -2093,70 +2208,70 @@ Reebok,reebok.com (re-read),Unisex Shoes Size Guide,unisex,main,foot,330.2,330.2
 Reebok,reebok.com (re-read),Unisex Shoes Size Guide,unisex,main,foot,332.74,332.74,17.5,,,,,51.886,16.285,17.285,18.285,,,0.215,,,,-1.825,,,,,,
 Reebok,reebok.com (re-read),Unisex Shoes Size Guide,unisex,main,foot,337.82,337.82,18,,,,,52.648,16.884,17.884,18.884,,,0.116,,,,-0.98,,,,,,
 Reebok,reebok.com (re-read),Unisex Shoes Size Guide,unisex,main,foot,342.9,342.9,18.5,,,,,53.409,17.484,18.484,19.484,,,0.016,,,,-0.135,,,,,,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,250,246.06,7,,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,-0.516,,1.174,0,4.37,,,,,-3.94,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,255,247.65,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,-7.35,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,260,252.41,8,,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,-0.697,,0.904,0,5.9,,,,,-7.59,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,265,255.59,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,-9.41,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,270,260.35,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,-9.65,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,275,265.11,9.5,,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,-0.968,,0.999,0,8.195,,,,,-9.89,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,280,268.29,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,-11.71,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,285,273.05,10.5,,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,-1.148,,1.229,0,9.725,,,,,-11.95,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,290,277.81,11,,10,45,,45.478,11.238,12.238,13.238,-0.478,-1.238,-1.238,,1.094,0,10.49,,,,,-12.19,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,295,280.99,11.5,,10.5,45.5,,46.228,11.829,12.829,13.829,-0.728,-1.329,-1.329,,0.96,0,11.255,,,,,-14.01,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,300,285.75,12,,11,46,,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,-14.25,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,305,292.1,12.5,,11.5,47,,47.727,13.009,14.009,15.009,-0.727,-1.509,-1.509,,1.19,0,12.785,,,,,-12.9,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,310,296.86,13,,12,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.6,-1.6,,1.055,0,13.55,,,,,-13.14,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,315,298.45,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,-16.55,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,320,304.8,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,-15.2,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,325,309.56,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,-15.44,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,330,311.15,15,,14,49.5,,51.475,15.961,16.961,17.961,-1.975,-1.961,-1.961,,0.515,0,16.61,,,,,-18.85,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,335,333.38,15.5,,14.5,50,,52.225,16.551,17.551,18.551,-2.225,-2.051,-2.051,,0.38,0,17.375,,,,,-1.62,
-Under Armour,underarmour.com (re-read),Men's Shoes,men,main,foot,340,336.55,16,,15,50.5,,52.975,17.142,18.142,19.142,-2.475,-2.142,-2.142,,0.245,0,18.14,,,,,-3.45,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,225,215.9,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,-9.1,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,230,223.84,,5.5,3.5,36,,36.483,4.155,5.155,6.155,-0.483,-0.655,,-0.655,,,,0.349,0,5.545,,-6.16,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,235,227.01,,6,4,36.5,,37.232,4.745,5.745,6.745,-0.732,-0.745,,-0.745,,,,0.214,0,6.31,,-7.99,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,235,230.19,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,-4.81,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,240,234.95,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,-5.05,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,240,239.71,,7.5,5.5,38.5,,37.982,5.335,6.335,7.335,0.518,0.165,,0.165,,,,0.309,0,-1.395,,-0.29,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,245,241.3,,8,6,39,,38.732,5.926,6.926,7.926,0.268,0.074,,0.074,,,,0.174,0,-0.63,,-3.7,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,250,246.06,,8.5,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,,-0.016,,,,0.539,-0.5,0.135,,-3.94,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,255,247.65,,9,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,,-0.106,,,,0.404,-0.5,0.9,,-7.35,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,260,252.41,,9.5,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,,-0.197,,,,0.269,-0.5,1.665,,-7.59,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,265,255.59,,10,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,,-0.287,,,,0.634,-0.5,2.43,,-9.41,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,270,260.35,,10.5,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,,-0.377,,,,0.499,-0.5,3.195,,-9.65,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,275,265.11,,11,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,,-0.468,,,,0.364,-0.5,3.96,,-9.89,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,280,268.29,,11.5,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,,-0.558,,,,0.729,-0.5,4.725,,-11.71,
-Under Armour,underarmour.com (re-read),Women's Shoes,women,main,foot,285,277.81,,12,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,,-0.648,,,,0.594,-0.5,5.49,,-7.19,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,70,69.85,,,0.5,16,,12.495,-14.736,-13.736,-12.736,3.505,15.236,,,,,,,,,,-0.15,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,80,80.17,,,1.5,17,,13.994,-13.555,-12.555,-11.555,3.006,15.055,,,,,,,,,,0.17,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,90,90.09,,,2.5,18.5,,15.493,-12.374,-11.374,-10.374,3.007,14.874,,,,,,,,,,0.09,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,100,100.01,,,3.5,19.5,,16.993,-11.194,-10.194,-9.194,2.507,14.694,,,,,,,,,,0.01,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,110,125.41,,,4.5,21,,18.492,-10.013,-9.013,-8.013,2.508,14.513,,,,,,,,,,15.41,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,120,133.35,,,5.5,22,,19.991,-8.832,-7.832,-6.832,2.009,14.332,,,,,,,,,,13.35,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,130,146.05,,,6.5,23.5,,21.49,-7.652,-6.652,-5.652,2.01,14.152,,,,,,,,,,16.05,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,140,150.81,,,7.5,25,,22.99,-6.471,-5.471,-4.471,2.01,13.971,,,,,,,,,,10.81,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,150,158.75,,,8.5,26,,24.489,-5.29,-4.29,-3.29,1.511,13.79,,,,,,,,,,8.75,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,160,166.69,,,9.5,27,,25.988,-4.11,-3.11,-2.11,1.012,13.61,,,,,,,,,,6.69,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,165,171.45,,,10,27.5,,26.738,-3.519,-2.519,-1.519,0.762,13.519,,,,,,,,,,6.45,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,170,176.21,,,10.5,28,,27.487,-2.929,-1.929,-0.929,0.513,13.429,,,,,,,,,,6.21,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,175,179.39,,,11,29,,28.237,-2.339,-1.339,-0.339,0.763,13.339,,,,,,,,,,4.39,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,180,184.15,,,11.5,29.5,,28.987,-1.749,-0.749,0.251,0.513,13.249,,,,,,,,,,4.15,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,185,188.91,,,12,30,,29.736,-1.158,-0.158,0.842,0.264,13.158,,,,,,,,,,3.91,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,190,192.09,,,12.5,31,,30.486,-0.568,0.432,1.432,0.514,13.068,,,,,,,,,,2.09,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,195,196.85,,,13,31.5,,31.235,0.022,1.022,2.022,0.265,12.978,,,,,,,,,,1.85,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,200,201.61,,,13.5,32,,31.985,0.613,1.613,2.613,0.015,12.887,,,,,,,,,,1.61,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,205,204.79,,,1,33,,32.735,1.203,2.203,3.203,0.265,-0.203,,,,,,,,,,-0.21,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,210,209.55,,,1.5,33.5,,33.484,1.793,2.793,3.793,0.016,-0.293,,,,,,,,,,-0.45,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,215,214.31,,,2,34,,34.234,2.384,3.384,4.384,-0.234,-0.384,,,,,,,,,,-0.69,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,220,217.49,,,2.5,35,,34.984,2.974,3.974,4.974,0.016,-0.474,,,,,,,,,,-2.51,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,225,215.9,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,-9.1,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,230,223.84,,5.5,3.5,36,,36.483,4.155,5.155,6.155,-0.483,-0.655,,-0.655,,,,0.349,0,5.545,,-6.16,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,235,227.01,,6,4,36.5,,37.232,4.745,5.745,6.745,-0.732,-0.745,,-0.745,,,,0.214,0,6.31,,-7.99,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,235,230.19,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,-4.81,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,240,234.95,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,-5.05,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,240,239.71,,7.5,5.5,38.5,,37.982,5.335,6.335,7.335,0.518,0.165,,0.165,,,,0.309,0,-1.395,,-0.29,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,245,241.3,,8,6,39,,38.732,5.926,6.926,7.926,0.268,0.074,,0.074,,,,0.174,0,-0.63,,-3.7,
-Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,foot,250,246.06,,8.5,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,,-0.016,,,,0.539,-0.5,0.135,,-3.94,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,250,246.06,7,,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,-0.516,,1.174,0,4.37,,,,,-3.94,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,255,247.65,7.5,,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,-0.606,,1.039,0,5.135,,,,,-7.35,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,260,252.41,8,,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,-0.697,,0.904,0,5.9,,,,,-7.59,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,265,255.59,8.5,,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,-0.787,,1.269,0,6.665,,,,,-9.41,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,270,260.35,9,,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,-0.877,,1.134,0,7.43,,,,,-9.65,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,275,265.11,9.5,,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,-0.968,,0.999,0,8.195,,,,,-9.89,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,280,268.29,10,,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,-1.058,,1.364,0,8.96,,,,,-11.71,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,285,273.05,10.5,,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,-1.148,,1.229,0,9.725,,,,,-11.95,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,290,277.81,11,,10,45,,45.478,11.238,12.238,13.238,-0.478,-1.238,-1.238,,1.094,0,10.49,,,,,-12.19,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,295,280.99,11.5,,10.5,45.5,,46.228,11.829,12.829,13.829,-0.728,-1.329,-1.329,,0.96,0,11.255,,,,,-14.01,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,300,285.75,12,,11,46,,46.978,12.419,13.419,14.419,-0.978,-1.419,-1.419,,0.825,0,12.02,,,,,-14.25,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,305,292.1,12.5,,11.5,47,,47.727,13.009,14.009,15.009,-0.727,-1.509,-1.509,,1.19,0,12.785,,,,,-12.9,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,310,296.86,13,,12,47.5,,48.477,13.6,14.6,15.6,-0.977,-1.6,-1.6,,1.055,0,13.55,,,,,-13.14,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,315,298.45,13.5,,12.5,48,,49.226,14.19,15.19,16.19,-1.226,-1.69,-1.69,,0.92,0,14.315,,,,,-16.55,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,320,304.8,14,,13,48.5,,49.976,14.78,15.78,16.78,-1.476,-1.78,-1.78,,0.785,0,15.08,,,,,-15.2,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,325,309.56,14.5,,13.5,49,,50.726,15.371,16.371,17.371,-1.726,-1.871,-1.871,,0.65,0,15.845,,,,,-15.44,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,330,311.15,15,,14,49.5,,51.475,15.961,16.961,17.961,-1.975,-1.961,-1.961,,0.515,0,16.61,,,,,-18.85,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,335,333.38,15.5,,14.5,50,,52.225,16.551,17.551,18.551,-2.225,-2.051,-2.051,,0.38,0,17.375,,,,,-1.62,
+Under Armour,underarmour.com (re-read),Men's Shoes,men,main,label,340,336.55,16,,15,50.5,,52.975,17.142,18.142,19.142,-2.475,-2.142,-2.142,,0.245,0,18.14,,,,,-3.45,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,225,215.9,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,-9.1,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,230,223.84,,5.5,3.5,36,,36.483,4.155,5.155,6.155,-0.483,-0.655,,-0.655,,,,0.349,0,5.545,,-6.16,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,235,227.01,,6,4,36.5,,37.232,4.745,5.745,6.745,-0.732,-0.745,,-0.745,,,,0.214,0,6.31,,-7.99,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,235,230.19,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,-4.81,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,240,234.95,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,-5.05,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,240,239.71,,7.5,5.5,38.5,,37.982,5.335,6.335,7.335,0.518,0.165,,0.165,,,,0.309,0,-1.395,,-0.29,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,245,241.3,,8,6,39,,38.732,5.926,6.926,7.926,0.268,0.074,,0.074,,,,0.174,0,-0.63,,-3.7,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,250,246.06,,8.5,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,,-0.016,,,,0.539,-0.5,0.135,,-3.94,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,255,247.65,,9,6.5,40.5,,40.231,7.106,8.106,9.106,0.269,-0.606,,-0.106,,,,0.404,-0.5,0.9,,-7.35,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,260,252.41,,9.5,7,41,,40.981,7.697,8.697,9.697,0.019,-0.697,,-0.197,,,,0.269,-0.5,1.665,,-7.59,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,265,255.59,,10,7.5,42,,41.73,8.287,9.287,10.287,0.27,-0.787,,-0.287,,,,0.634,-0.5,2.43,,-9.41,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,270,260.35,,10.5,8,42.5,,42.48,8.877,9.877,10.877,0.02,-0.877,,-0.377,,,,0.499,-0.5,3.195,,-9.65,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,275,265.11,,11,8.5,43,,43.229,9.468,10.468,11.468,-0.229,-0.968,,-0.468,,,,0.364,-0.5,3.96,,-9.89,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,280,268.29,,11.5,9,44,,43.979,10.058,11.058,12.058,0.021,-1.058,,-0.558,,,,0.729,-0.5,4.725,,-11.71,
+Under Armour,underarmour.com (re-read),Women's Shoes,women,main,label,285,277.81,,12,9.5,44.5,,44.729,10.648,11.648,12.648,-0.229,-1.148,,-0.648,,,,0.594,-0.5,5.49,,-7.19,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,70,69.85,,,0.5,16,,12.495,-14.736,-13.736,-12.736,3.505,15.236,,,,,,,,,,-0.15,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,80,80.17,,,1.5,17,,13.994,-13.555,-12.555,-11.555,3.006,15.055,,,,,,,,,,0.17,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,90,90.09,,,2.5,18.5,,15.493,-12.374,-11.374,-10.374,3.007,14.874,,,,,,,,,,0.09,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,100,100.01,,,3.5,19.5,,16.993,-11.194,-10.194,-9.194,2.507,14.694,,,,,,,,,,0.01,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,110,125.41,,,4.5,21,,18.492,-10.013,-9.013,-8.013,2.508,14.513,,,,,,,,,,15.41,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,120,133.35,,,5.5,22,,19.991,-8.832,-7.832,-6.832,2.009,14.332,,,,,,,,,,13.35,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,130,146.05,,,6.5,23.5,,21.49,-7.652,-6.652,-5.652,2.01,14.152,,,,,,,,,,16.05,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,140,150.81,,,7.5,25,,22.99,-6.471,-5.471,-4.471,2.01,13.971,,,,,,,,,,10.81,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,150,158.75,,,8.5,26,,24.489,-5.29,-4.29,-3.29,1.511,13.79,,,,,,,,,,8.75,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,160,166.69,,,9.5,27,,25.988,-4.11,-3.11,-2.11,1.012,13.61,,,,,,,,,,6.69,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,165,171.45,,,10,27.5,,26.738,-3.519,-2.519,-1.519,0.762,13.519,,,,,,,,,,6.45,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,170,176.21,,,10.5,28,,27.487,-2.929,-1.929,-0.929,0.513,13.429,,,,,,,,,,6.21,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,175,179.39,,,11,29,,28.237,-2.339,-1.339,-0.339,0.763,13.339,,,,,,,,,,4.39,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,180,184.15,,,11.5,29.5,,28.987,-1.749,-0.749,0.251,0.513,13.249,,,,,,,,,,4.15,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,185,188.91,,,12,30,,29.736,-1.158,-0.158,0.842,0.264,13.158,,,,,,,,,,3.91,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,190,192.09,,,12.5,31,,30.486,-0.568,0.432,1.432,0.514,13.068,,,,,,,,,,2.09,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,195,196.85,,,13,31.5,,31.235,0.022,1.022,2.022,0.265,12.978,,,,,,,,,,1.85,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,200,201.61,,,13.5,32,,31.985,0.613,1.613,2.613,0.015,12.887,,,,,,,,,,1.61,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,205,204.79,,,1,33,,32.735,1.203,2.203,3.203,0.265,-0.203,,,,,,,,,,-0.21,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,210,209.55,,,1.5,33.5,,33.484,1.793,2.793,3.793,0.016,-0.293,,,,,,,,,,-0.45,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,215,214.31,,,2,34,,34.234,2.384,3.384,4.384,-0.234,-0.384,,,,,,,,,,-0.69,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,220,217.49,,,2.5,35,,34.984,2.974,3.974,4.974,0.016,-0.474,,,,,,,,,,-2.51,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,225,215.9,,5,3,35.5,,35.733,3.564,4.564,5.564,-0.233,-0.564,,-0.564,,,,0.484,0,4.78,,-9.1,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,230,223.84,,5.5,3.5,36,,36.483,4.155,5.155,6.155,-0.483,-0.655,,-0.655,,,,0.349,0,5.545,,-6.16,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,235,227.01,,6,4,36.5,,37.232,4.745,5.745,6.745,-0.732,-0.745,,-0.745,,,,0.214,0,6.31,,-7.99,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,235,230.19,,6.5,4.5,37.5,,37.232,4.745,5.745,6.745,0.268,-0.245,,-0.245,,,,0.579,0,2.075,,-4.81,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,240,234.95,,7,5,38,,37.982,5.335,6.335,7.335,0.018,-0.335,,-0.335,,,,0.444,0,2.84,,-5.05,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,240,239.71,,7.5,5.5,38.5,,37.982,5.335,6.335,7.335,0.518,0.165,,0.165,,,,0.309,0,-1.395,,-0.29,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,245,241.3,,8,6,39,,38.732,5.926,6.926,7.926,0.268,0.074,,0.074,,,,0.174,0,-0.63,,-3.7,
+Under Armour,underarmour.com (re-read),Girls' Shoes,unisex,main,label,250,246.06,,8.5,6,40,,39.481,6.516,7.516,8.516,0.519,-0.516,,-0.016,,,,0.539,-0.5,0.135,,-3.94,
 Clarks,composed,"Men's, composed",men,composed,foot,237,,,,5,38,,37.532,4.981,5.981,6.981,0.468,0.019,,,,,,,,,,,yes
 Clarks,composed,"Men's, composed",men,composed,foot,241,,,,5.5,39,,38.132,5.453,6.453,7.453,0.868,0.047,,,,,,,,,,,yes
 Clarks,composed,"Men's, composed",men,composed,foot,246,246.38,7,,6,39.5,,38.882,6.044,7.044,8.044,0.618,-0.044,-0.044,,0.674,0,0.37,,,,,0.38,yes
@@ -2188,3 +2303,84 @@ Clarks,composed,"Women's, composed",women,composed,foot,263,261.62,,10.5,8,42,,4
 Clarks,composed,"Women's, composed",women,composed,foot,267,266.7,,11,8.5,42.5,,42.03,8.523,9.523,10.523,0.47,-0.023,,0.477,,,,-0.136,-0.5,-4.04,,-0.3,yes
 Clarks,composed,"Women's, composed",women,composed,foot,272,,,,9,43,,42.78,9.113,10.113,11.113,0.22,-0.113,,,,,,,,,,,yes
 Clarks,composed,"Women's, composed",women,composed,foot,276.86,276.86,,12,9.5,,,43.508,9.687,10.687,11.687,,-0.187,,0.313,,,,,-0.5,-2.65,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,224.4,,5,,4,37.5,,35.643,3.494,4.494,5.494,1.857,0.506,0.506,,1.214,0,-4.29,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,228.6,,5.5,,4.5,38,,36.273,3.989,4.989,5.989,1.727,0.511,0.511,,1.079,0,-4.325,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,232.8,,6,,5,38.5,,36.903,4.485,5.485,6.485,1.597,0.515,0.515,,0.944,0,-4.36,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,237.1,,6.5,,5.5,39,,37.547,4.993,5.993,6.993,1.453,0.507,0.507,,0.809,0,-4.295,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,241.3,,7,,6,40,,38.177,5.489,6.489,7.489,1.823,0.511,0.511,,1.174,0,-4.33,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,245.5,,7.5,,6.5,40.5,,38.807,5.985,6.985,7.985,1.693,0.515,0.515,,1.039,0,-4.365,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,249.8,,8,,7,41,,39.451,6.492,7.492,8.492,1.549,0.508,0.508,,0.904,0,-4.3,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,254,,8.5,,7.5,42,,40.081,6.988,7.988,8.988,1.919,0.512,0.512,,1.269,0,-4.335,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,258.2,,9,,8,42.5,,40.711,7.484,8.484,9.484,1.789,0.516,0.516,,1.134,0,-4.37,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,262.5,,9.5,,8.5,43,,41.355,7.992,8.992,9.992,1.645,0.508,0.508,,0.999,0,-4.305,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,266.7,,10,,9,44,,41.985,8.488,9.488,10.488,2.015,0.512,0.512,,1.364,0,-4.34,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,270.9,,10.5,,9.5,44.5,,42.615,8.983,9.983,10.983,1.885,0.517,0.517,,1.229,0,-4.375,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,275.2,,11,,10,45,,43.259,9.491,10.491,11.491,1.741,0.509,0.509,,1.094,0,-4.31,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,279.4,,11.5,,10.5,45.5,,43.889,9.987,10.987,11.987,1.611,0.513,0.513,,0.96,0,-4.345,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,283.6,,12,,11,46,,44.519,10.483,11.483,12.483,1.481,0.517,0.517,,0.825,0,-4.38,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,287.9,,12.5,,11.5,46.5,,45.163,10.991,11.991,12.991,1.337,0.509,0.509,,0.69,0,-4.315,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,292.1,,13,,12,47.5,,45.793,11.486,12.486,13.486,1.707,0.514,0.514,,1.055,0,-4.35,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,300.6,,14,,13,48.5,,47.067,12.49,13.49,14.49,1.433,0.51,0.51,,0.785,0,-4.32,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,309,,15,,14,49.5,,48.327,13.482,14.482,15.482,1.173,0.518,0.518,,0.515,0,-4.39,,,,,,yes
+Brooks,composed,"Men's, composed",men,composed,foot,317.5,,16,,15,50.5,,49.601,14.485,15.485,16.485,0.899,0.515,0.515,,0.245,0,-4.36,,,,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,211.7,,,5,3,35.5,,33.739,1.994,2.994,3.994,1.761,1.006,,1.006,,,,0.484,0,-8.52,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,215.9,,,5.5,3.5,36,,34.369,2.49,3.49,4.49,1.631,1.01,,1.01,,,,0.349,0,-8.555,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,220.1,,,6,4,36.5,,34.999,2.986,3.986,4.986,1.501,1.014,,1.014,,,,0.214,0,-8.59,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,224.4,,,6.5,4.5,37.5,,35.643,3.494,4.494,5.494,1.857,1.006,,1.006,,,,0.579,0,-8.525,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,228.6,,,7,5,38,,36.273,3.989,4.989,5.989,1.727,1.011,,1.011,,,,0.444,0,-8.56,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,232.8,,,7.5,5.5,38.5,,36.903,4.485,5.485,6.485,1.597,1.015,,1.015,,,,0.309,0,-8.595,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,237.1,,,8,6,39,,37.547,4.993,5.993,6.993,1.453,1.007,,1.007,,,,0.174,0,-8.53,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,241.3,,,8.5,6.5,40,,38.177,5.489,6.489,7.489,1.823,1.011,,1.011,,,,0.539,0,-8.565,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,245.5,,,9,7,40.5,,38.807,5.985,6.985,7.985,1.693,1.015,,1.015,,,,0.404,0,-8.6,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,249.8,,,9.5,7.5,41,,39.451,6.492,7.492,8.492,1.549,1.008,,1.008,,,,0.269,0,-8.535,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,254,,,10,8,42,,40.081,6.988,7.988,8.988,1.919,1.012,,1.012,,,,0.634,0,-8.57,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,258.2,,,10.5,8.5,42.5,,40.711,7.484,8.484,9.484,1.789,1.016,,1.016,,,,0.499,0,-8.605,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,262.5,,,11,9,43,,41.355,7.992,8.992,9.992,1.645,1.008,,1.008,,,,0.364,0,-8.54,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,266.7,,,11.5,9.5,44,,41.985,8.488,9.488,10.488,2.015,1.012,,1.012,,,,0.729,0,-8.575,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,270.9,,,12,10,44.5,,42.615,8.983,9.983,10.983,1.885,1.017,,1.017,,,,0.594,0,-8.61,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,275.2,,,12.5,10.5,45,,43.259,9.491,10.491,11.491,1.741,1.009,,1.009,,,,0.46,0,-8.545,,,yes
+Brooks,composed,"Women's, composed",women,composed,foot,279.4,,,13,11,45.5,,43.889,9.987,10.987,11.987,1.611,1.013,,1.013,,,,0.325,0,-8.58,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,,,3.5,,2.5,34,,,,,,,,,,-0.382,0,,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,,,4,,3,34.5,,,,,,,,,,-0.516,0,,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,,,4.5,,3.5,35,,,,,,,,,,-0.651,0,,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,,,5,,4,36,,,,,,,,,,-0.286,0,,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,,,5.5,,4.5,36.5,,,,,,,,,,-0.421,0,,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,,,6,,5,37.5,,,,,,,,,,-0.056,0,,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,241.3,241.3,6.5,,5.5,38.5,,38.177,5.489,6.489,7.489,0.323,0.011,0.011,,0.309,0,-0.095,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,246.38,246.38,7,,6,39,,38.939,6.089,7.089,8.089,0.061,-0.089,-0.089,,0.174,0,0.75,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,248.92,248.92,7.5,,6.5,40,,39.319,6.388,7.388,8.388,0.681,0.112,0.112,,0.539,0,-0.945,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,254,254,8,,7,40.5,,40.081,6.988,7.988,8.988,0.419,0.012,0.012,,0.404,0,-0.1,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,259.08,259.08,8.5,,7.5,41,,40.843,7.588,8.588,9.588,0.157,-0.088,-0.088,,0.269,0,0.745,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,261.62,261.62,9,,8,42,,41.223,7.888,8.888,9.888,0.777,0.112,0.112,,0.634,0,-0.95,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,266.7,266.7,9.5,,8.5,42.5,,41.985,8.488,9.488,10.488,0.515,0.012,0.012,,0.499,0,-0.105,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,271.78,271.78,10,,9,43,,42.747,9.087,10.087,11.087,0.253,-0.087,-0.087,,0.364,0,0.74,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,274.32,274.32,10.5,,9.5,44,,43.127,9.387,10.387,11.387,0.873,0.113,0.113,,0.729,0,-0.955,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,279.4,279.4,11,,10,44.5,,43.889,9.987,10.987,11.987,0.611,0.013,0.013,,0.594,0,-0.11,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,284.48,284.48,11.5,,10.5,45,,44.651,10.587,11.587,12.587,0.349,-0.087,-0.087,,0.46,0,0.735,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,287.02,287.02,12,,11,45.5,,45.031,10.887,11.887,12.887,0.469,0.113,0.113,,0.325,0,-0.96,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,292.1,292.1,12.5,,11.5,46,,45.793,11.486,12.486,13.486,0.207,0.014,0.014,,0.19,0,-0.115,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,297.18,297.18,13,,12,47,,46.555,12.086,13.086,14.086,0.445,-0.086,-0.086,,0.555,0,0.73,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,299.72,299.72,13.5,,12.5,48,,46.936,12.386,13.386,14.386,1.064,0.114,0.114,,0.92,0,-0.965,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,304.8,304.8,14,,13,48.5,,47.697,12.986,13.986,14.986,0.803,0.014,0.014,,0.785,0,-0.12,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,309.88,309.88,14.5,,13.5,49,,48.459,13.586,14.586,15.586,0.541,-0.086,-0.086,,0.65,0,0.725,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,312.42,312.42,15,,14,50,,48.84,13.885,14.885,15.885,1.16,0.115,0.115,,1.015,0,-0.97,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,317.5,317.5,15.5,,,,,49.601,14.485,15.485,16.485,,,0.015,,,,-0.125,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,320.04,320.04,16,,,,,49.982,14.785,15.785,16.785,,,0.215,,,,-1.82,,,,,,yes
+Reebok,composed,"Men's, composed",men,composed,foot,325.12,325.12,16.5,,,,,50.744,15.385,16.385,17.385,,,0.115,,,,-0.975,,,,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,203.2,203.2,,3.5,,,,32.465,0.991,1.991,2.991,,,,0.509,,,,,,-4.315,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,208.28,208.28,,4,,,,33.226,1.59,2.59,3.59,,,,0.41,,,,,,-3.47,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,210.82,210.82,,4.5,,,,33.607,1.89,2.89,3.89,,,,0.61,,,,,,-5.165,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,215.9,215.9,,5,2.5,35,,34.369,2.49,3.49,4.49,0.631,0.01,,0.51,,,,-0.016,-0.5,-4.32,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,220.98,220.98,,5.5,3,35.5,,35.13,3.09,4.09,5.09,0.37,-0.09,,0.41,,,,-0.151,-0.5,-3.475,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,223.52,223.52,,6,3.5,36,,35.511,3.39,4.39,5.39,0.489,0.11,,0.61,,,,-0.286,-0.5,-5.17,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,228.6,228.6,,6.5,4,37,,36.273,3.989,4.989,5.989,0.727,0.011,,0.511,,,,0.079,-0.5,-4.325,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,233.68,233.68,,7,4.5,37.5,,37.034,4.589,5.589,6.589,0.466,-0.089,,0.411,,,,-0.056,-0.5,-3.48,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,236.22,236.22,,7.5,5,38,,37.415,4.889,5.889,6.889,0.585,0.111,,0.611,,,,-0.191,-0.5,-5.175,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,241.3,241.3,,8,5.5,38.5,,38.177,5.489,6.489,7.489,0.323,0.011,,0.511,,,,-0.326,-0.5,-4.33,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,246.38,246.38,,8.5,6,39,,38.939,6.089,7.089,8.089,0.061,-0.089,,0.411,,,,-0.461,-0.5,-3.485,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,248.92,248.92,,9,6.5,40,,39.319,6.388,7.388,8.388,0.681,0.112,,0.612,,,,-0.096,-0.5,-5.18,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,254,254,,9.5,7,40.5,,40.081,6.988,7.988,8.988,0.419,0.012,,0.512,,,,-0.231,-0.5,-4.335,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,259.08,259.08,,10,7.5,41,,40.843,7.588,8.588,9.588,0.157,-0.088,,0.412,,,,-0.366,-0.5,-3.49,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,261.62,261.62,,10.5,8,42,,41.223,7.888,8.888,9.888,0.777,0.112,,0.612,,,,-0.001,-0.5,-5.185,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,266.7,266.7,,11,8.5,42.5,,41.985,8.488,9.488,10.488,0.515,0.012,,0.512,,,,-0.136,-0.5,-4.34,,,yes
+Reebok,composed,"Women's, composed",women,composed,foot,274.32,274.32,,12,9.5,44,,43.127,9.387,10.387,11.387,0.873,0.113,,0.613,,,,0.094,-0.5,-5.19,,,yes

@@ -14,7 +14,9 @@ export type BrandLine = 'men' | 'women' | 'unisex';
 /**
  * What the chart's length column is, by the brand's own words (docs/research/shoe-sizes-2.md §7
  * to §9): the foot's, measured heel to toe; the product's (Puma's measurements); a size label
- * (On's Japan column); or none printed.
+ * (On's Japan column; Asics's CM column, read by its rule; and the standard centimetre label New
+ * Balance, Under Armour, and Vans head as the foot, read by ISO's label, ADR 0030); or none
+ * printed.
  */
 export type LengthBasis = 'foot' | 'product' | 'label' | 'none';
 
@@ -31,6 +33,11 @@ export interface BrandChartRow {
   ukWomen?: number;
   eu?: number | readonly [number, number];
   jp?: number;
+  /**
+   * The brand's centimetre label where its page heads it CM and not Japan (Asics), the foot
+   * read from it by the brand's rule (ADR 0030); never a scale to list or type.
+   */
+  label?: number;
   foot?: number;
 }
 

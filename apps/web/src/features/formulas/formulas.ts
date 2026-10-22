@@ -164,13 +164,14 @@ const CHART_SCALES: ReadonlyArray<readonly [keyof BrandChart['rows'][number], st
   ['ukWomen', 'UK women'],
   ['eu', 'EU'],
   ['jp', 'JP'],
+  ['label', 'the CM label'],
   ['foot', 'the foot in mm'],
 ];
 
 const LENGTH_BASIS: Record<BrandChart['basis'], string> = {
   foot: 'its length the foot’s',
   product: 'its length the product’s',
-  label: 'size labels only',
+  label: 'its length a size label, not the foot',
   none: 'no length printed',
 };
 
@@ -188,7 +189,7 @@ function brandLine(brand: ShoeBrand, chart: BrandChart): FormulaLine {
   const formula = `${chart.rows.length} sizes: ${scales.join(', ')}`;
   const rule =
     brand.labelMinusCm !== undefined
-      ? ` The foot is read as its Japan label less ${brand.labelMinusCm} cm, the brand’s own rule.`
+      ? ` The foot is read as its centimetre label less ${brand.labelMinusCm} cm, the brand’s own rule.`
       : '';
   const source = `${chart.title}, ${chart.source}, read ${chart.read}; ${LENGTH_BASIS[chart.basis]}.${brand.fact ? ` ${brand.fact}` : ''}${rule}`;
   return {

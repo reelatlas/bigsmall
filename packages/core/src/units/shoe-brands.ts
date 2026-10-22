@@ -51,11 +51,16 @@ function brand(
  */
 export const shoeBrands: readonly ShoeBrand[] = [
   brand('adidas', 'adidas', 'adidas.com', []),
-  brand('asics', 'Asics', 'asics.com', []),
+  brand('asics', 'Asics', 'asics.com', [], {
+    fact: 'Its NZ and AU pages say to add 1 to 1.5 cm to the foot to read its CM column, so the foot is the label less a centimetre; its US page adds a half size for running shoes.',
+    labelMinusCm: 1,
+  }),
   brand('birkenstock', 'Birkenstock', 'birkenstock.com', ['birkenstocks', 'birks'], {
     fact: 'Whole EU sizes: two US half sizes share one.',
   }),
-  brand('brooks', 'Brooks', 'brooksrunning.com', []),
+  brand('brooks', 'Brooks', 'brooksrunning.com', [], {
+    fact: 'Its foot lengths are its UK site’s, brooksrunning.com/en_gb; its US page prints the same sizes without them.',
+  }),
   brand('clarks', 'Clarks', 'clarks.com', ['clark'], {
     fact: 'Its GB and US pages joined on the UK size they share.',
   }),
@@ -68,21 +73,33 @@ export const shoeBrands: readonly ShoeBrand[] = [
     fact: 'Whole sizes, the half sizes US women’s only; the brand says sizes differ between silhouettes.',
   }),
   brand('hoka', 'HOKA', 'hoka.com', ['hokas', 'hoka one one']),
-  brand('new-balance', 'New Balance', 'newbalance.com', [], { shorthand: ['nb'] }),
+  brand('new-balance', 'New Balance', 'newbalance.com', [], {
+    shorthand: ['nb'],
+    fact: 'Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label.',
+  }),
   brand('nike', 'Nike', 'nike.com', ['nikes']),
   brand('on', 'On', 'on.com', [], {
     shorthand: ['on'],
     fact: 'Its FAQ says its JP label is the foot plus about a centimetre.',
     labelMinusCm: 1,
   }),
-  brand('puma', 'Puma', 'us.puma.com', ['pumas']),
+  brand('puma', 'Puma', 'us.puma.com', ['pumas'], {
+    fact: 'Its printed lengths are the shoe’s inside: at a US 9, 27.0 cm against RunRepeat’s 26.96 cm median over 18 models.',
+  }),
   brand('reebok', 'Reebok', 'reebok.com', ['reeboks'], {
-    fact: 'Prints US sizes and inches alone, no UK or EU.',
+    fact: 'UK and EU from its Australian guide, reebok.com.au; its US page prints US sizes and inches alone.',
   }),
   brand('salomon', 'Salomon', 'salomon.com', []),
-  brand('skechers', 'Skechers', 'skechers.com', ['sketchers']),
+  brand('skechers', 'Skechers', 'skechers.com', ['sketchers'], {
+    fact: 'Its Australian guide prints a CM column it never explains; its sizes read by ISO’s label.',
+  }),
   brand('timberland', 'Timberland', 'timberland.com', ['timberlands', 'timbs']),
   brand('ugg', 'UGG', 'ugg.com', ['uggs']),
-  brand('under-armour', 'Under Armour', 'underarmour.com', ['under armor'], { shorthand: ['ua'] }),
-  brand('vans', 'Vans', 'vans.com', []),
+  brand('under-armour', 'Under Armour', 'underarmour.com', ['under armor'], {
+    shorthand: ['ua'],
+    fact: 'Its CM column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label.',
+  }),
+  brand('vans', 'Vans', 'vans.com', [], {
+    fact: 'Its length column is the standard centimetre label: measured inside, its 9 is every brand’s 9, so its sizes read by ISO’s label.',
+  }),
 ];

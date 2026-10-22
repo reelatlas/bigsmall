@@ -239,16 +239,19 @@ export function brandSpan(
 
 /**
  * How a brand's figure was found where its chart alone could not give it (docs/RESEARCH.md §9):
- * 1 its own foot length as printed, 2 its own stated rule applied (On's Japan label less a
- * centimetre), 4 ISO's label on its own scale read through its own row (a brand printing no
- * length). Tier 3, a pattern in the record, and tier 5, third-party measurements, are not read
- * yet.
+ * 1 its own foot length as printed, 2 its own stated rule applied (On's Japan label and Asics's
+ * CM column, each less a centimetre), 4 ISO's label on its own scale read through its own row (a
+ * brand printing no length, or printing the standard centimetre label as the foot, overridden
+ * where the labs' measured shoes corroborate it: ADR 0030). Tier 3, a pattern in the record,
+ * fills no row yet; tier 5, the labs' measurements, corroborates the others
+ * (docs/research/shoe-sizes-3.md §5).
  */
 export type BrandTier = 1 | 2 | 4;
 
 /**
  * The foot a row stands for: the brand's own, as printed (tier 1), or by the brand's own rule
- * from its Japan label (tier 2); none where the brand gives neither.
+ * from its centimetre label, On's Japan column or Asics's CM (tier 2); none where the brand
+ * gives neither.
  */
 export function footOfRow(
   brand: ShoeBrand,
@@ -256,8 +259,9 @@ export function footOfRow(
   row: BrandChartRow,
 ): number | undefined {
   if (chart.basis === 'foot') return row.foot;
-  if (chart.basis === 'label' && brand.labelMinusCm !== undefined && row.jp !== undefined) {
-    return (row.jp - brand.labelMinusCm) * 10;
+  const label = row.label ?? row.jp;
+  if (chart.basis === 'label' && brand.labelMinusCm !== undefined && label !== undefined) {
+    return (label - brand.labelMinusCm) * 10;
   }
   return undefined;
 }

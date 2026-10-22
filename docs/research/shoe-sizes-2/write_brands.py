@@ -33,6 +33,7 @@ CELLS = (
     ("uk_women", "ukWomen"),
     ("eu", "eu"),
     ("jp", "jp"),
+    ("label", "label"),
 )
 BASIS = {"foot": "foot", "product": "product", "none": "none", "label": "label"}
 

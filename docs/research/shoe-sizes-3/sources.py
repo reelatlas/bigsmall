@@ -236,13 +236,15 @@ def pack(brands: dict[str, dict]) -> float:
 
 # --- the calibration ---------------------------------------------------------------------------
 def calibration_brands() -> list[dict]:
-    """Every brand whose product chart says its length is the foot's and prints a foot at a US men's
-    9 on its men's or unisex chart; Asics's basis is this pass's question, so it is shown and never
-    counted in a family's allowance."""
+    """Every brand whose product chart prints a length as the foot's at a US men's 9 on its men's or
+    unisex chart, by the print and not by the record's later reading of it (ADR 0030 reads New
+    Balance's, Under Armour's, Vans', and Asics's columns as labels; the calibration is of what the
+    pages print); Asics's basis is this pass's question, so it is shown and never counted in a
+    family's allowance."""
     out = []
     for brand in sorted({c["brand"] for c in CHARTS if c["product"]}, key=str.lower):
         chart = record_chart(brand, "men")
-        if chart is None or chart["length"]["basis"] != "foot":
+        if chart is None or chart["length"]["basis"] not in ("foot", "label"):
             continue
         foot = foot_at_usm9(chart)
         if foot is None:
@@ -351,9 +353,9 @@ LIVE_CHECKS = [
      {"UK": ("uk", "size", 1), "Europe": ("eu", "size", 1)}),
     ("Brooks UK women against its US chart", "rules", "Brooks", "Women's running shoes, Shoe size comparison", "US", "us_women", "women",
      {"UK": ("uk", "size", 1), "EU": ("eu", "size", 1)}),
-    ("Reebok AU men against its US chart", "rules", "Reebok", "Men's Size Guides, Men's Footwear", "US", "us_men", "unisex",
+    ("Reebok AU men against its US chart", "rules", "Reebok", "Men's Size Guides, Men's Footwear", "US", "us_men", "men",
      {"INCH": ("foot_in", "in", 1)}),
-    ("Reebok AU women against its US chart", "rules", "Reebok", "Women's Size Guides, Women's Footwear", "US", "us_women", "unisex",
+    ("Reebok AU women against its US chart", "rules", "Reebok", "Women's Size Guides, Women's Footwear", "US", "us_women", "women",
      {"INCH": ("foot_in", "in", 1)}),
 ]
 
@@ -663,7 +665,7 @@ def build() -> tuple[str, list[dict], list[dict]]:
             cells += [", ".join(names_in), "", signed(a)]
         rows.append(cells)
     blocks.append(
-        f"**Table 2, the calibration.** The brands whose charts say their length is the foot’s, each with the foot its men’s or unisex chart gives a US men’s 9 (the charts’ record, shoe-sizes-2/brands.json), its family by that foot against ISO’s {ISO9:.1f} mm (within half a size, {HALF:.1f} mm, or a size above), and per lab the allowance, the median internal length less the chart’s foot. A family’s allowance is the median over its brands with three shoes or more, Asics set aside as the brand under test.\n\n"
+        f"**Table 2, the calibration.** The brands whose charts print a length as the foot’s (by the print; the record has since read New Balance’s, Under Armour’s, Vans’, and Asics’s columns as labels, ADR 0030), each with the foot its men’s or unisex chart gives a US men’s 9 (the charts’ record, shoe-sizes-2/brands.json), its family by that foot against ISO’s {ISO9:.1f} mm (within half a size, {HALF:.1f} mm, or a size above), and per lab the allowance, the median internal length less the chart’s foot. A family’s allowance is the median over its brands with three shoes or more, Asics set aside as the brand under test.\n\n"
         + md_table(["Brand", "chart’s foot at US 9", "family", "RunRepeat n", "median", "allowance", "RTINGS n", "median", "allowance"], rows)
     )
 

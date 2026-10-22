@@ -35,3 +35,6 @@ Thumbs.db
 # Claude desktop app: machine-specific launch config and local overrides
 .claude/launch.json
 .claude/settings.local.json
+
+# Python bytecode from the research scripts
+__pycache__/

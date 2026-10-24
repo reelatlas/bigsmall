@@ -10,7 +10,7 @@ Every state Shoe size can be in and the words each shows, where, in one place fo
 
 - **Gathered from three places, each checked against the others:** the state tests (`apps/web/test/converter-state.test.ts`, "shoe sizes" and "brands"), the spec (docs/UX-SPEC.md §5, Shoe size), and the strings in the code (core's scales and brands, the converter's state, the components' labels, the About page's builder, the feedback form). The About page's lines are read from the built site (`apps/web/dist/about/index.html`) and kept in `strings-1/about-lines.json`, so the inventory shows them as rendered, not as the builder's template.
 - **The inventory is data.** `strings-1/inventory.py` holds every item with its key, where it shows, the words today, the file that holds them, and a literal the generator asserts is still in that file, so a string changed in code fails the generator until the inventory follows; the scales' names, symbols, notes, and sources, the brands' names, sites, and facts, and the charts' spans and cells are read from core's own files and the charts' data, never typed here. It writes `strings-1/inventory.html`, the page for his eye, and §3's table between the markers below. The examples' sizes are illustrative; the words are exact.
-- **The page saves his words to its own store** as he types (the artifact's database, one document per key under `rewrites`), and a Copy button puts them on the clipboard for chat; an empty field keeps the words. The session reads the store back (the `ArtifactData` tool) and applies them, each with its test.
+- **The page saves his words to its own store** as he types (the artifact's database, one document per key under `rewrites`), and a Copy button puts them on the clipboard for chat; an empty field keeps the words. The session reads the store back (the `ArtifactData` tool) and applies them, each with its test. Republished on 2026-10-24 under Sean's second account (https://claude.ai/artifact/FpGMWpZ7iZHj1uwXUD3Lss) after a usage switch; the first page's store belongs to the first account, so words typed there come over by its Copy button into chat.
 - **Keys.** Each item's key names its surface and its state (`brands.off`, `note.span`); his rewrite is applied by key, so the page, the doc, the commit, and the tests say the same thing.
 
 ## 3. The inventory
@@ -76,7 +76,7 @@ Every state Shoe size can be in and the words each shows, where, in one place fo
 
 <!-- /inventory.py -->
 
-The page for his eye: https://claude.ai/artifact/UnSF8Qd9eccPgGhEXeED6H (its HTML is `strings-1/inventory.html`, written by the generator; private to him).
+The page for his eye: https://claude.ai/artifact/FpGMWpZ7iZHj1uwXUD3Lss (its HTML is `strings-1/inventory.html`, written by the generator; private to him).
 
 ## 4. What gathering found
 

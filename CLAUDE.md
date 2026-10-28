@@ -92,3 +92,37 @@ The skills in `.claude/skills/` are the routines a session runs, one job each (`
 ## Commits
 
 Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `perf:`, `a11y:`, and `style:` for a visual trial, "(trial)" in its subject. Optional scope: `feat(core): add dry volume units`. Keep commits small and focused, each committed on the gate's exit status (Working habits).
+
+## Profile (read by the global skills)
+
+The kit (`~/Projects/claude-kit`, github.com/reelatlas/claude-kit) installs
+global `orchestrate`, `tidy`, `ship`, `save`, `research-practice`, and the
+sandbox skills. This repo keeps its own specialized copies of `orchestrate`,
+`research`, `save`, `ship`, `tidy` in `.claude/skills/`, and a project copy
+wins; the block below is what the kit's skills read when one is used here.
+
+```
+gate: pnpm check
+format: pnpm format
+e2e: pnpm build && pnpm e2e:preview
+e2e-when: a change to behavior or look
+deploy: push main deploys bigsmall.work (Vercel); GitHub Actions by hand only
+branch: main, no PRs
+commits: Conventional Commits; a visual trial is style: with "(trial)" in its subject
+tidy-base: git log --grep='(tidy)' -1 --format=%H
+tidy-checklist: .claude/skills/tidy/checklist.md
+homes:
+  spec: docs/UX-SPEC.md
+  design: docs/DESIGN-SYSTEM.md
+  architecture: docs/ARCHITECTURE.md
+  testing: docs/TESTING.md
+  decisions: docs/decisions/
+  learnings: docs/LEARNINGS.md
+  findings: docs/research/findings-0-first-pass.md
+  plan: docs/PLAN.md
+  state: CLAUDE.md "Pick up here"
+  research: docs/research/
+tokens: apps/web/src/styles/global.css, apps/web/src/lib/themes.ts
+env: export PATH="/c/Users/seanr/AppData/Roaming/npm:/c/Program Files/nodejs:/c/Program Files/GitHub CLI:$PATH"
+shell: Git Bash on the Windows PC, zsh on the Mac
+```
